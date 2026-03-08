@@ -482,6 +482,12 @@ export default function Gazette() {
       {/* All-Time Meta Chart */}
       {hasContent && <AllTimeMetaChart allFights={allFights} />}
 
+      {/* Warrior Leaderboard */}
+      {hasContent && <WarriorLeaderboard allFights={allFights} />}
+
+      {/* Style Matchup Heatmap */}
+      {hasContent && <StyleMatchupHeatmap allFights={allFights} />}
+
       {!hasContent && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
