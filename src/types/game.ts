@@ -427,6 +427,16 @@ export interface MatchRecord {
 
 export const BASE_ROSTER_CAP = 10;
 
+/** Owner-to-owner grudge (personality-driven rivalry) */
+export interface OwnerGrudge {
+  ownerIdA: string;
+  ownerIdB: string;
+  intensity: number;
+  reason: string;
+  startWeek: number;
+  lastEscalation: number;
+}
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -462,6 +472,7 @@ export interface GameState {
   matchHistory: MatchRecord[];
   recruitPool: any[]; // PoolWarrior[] from recruitment engine
   rosterBonus: number; // extra roster slots from championships
+  ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
   settings: {
     featureFlags: {
       tournaments: boolean;
