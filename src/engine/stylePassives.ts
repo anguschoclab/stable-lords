@@ -41,7 +41,35 @@ export function getEnduranceMult(style: FightingStyle): number {
   return STYLE_TEMPO[style]?.enduranceMult ?? 1.0;
 }
 
-// ─── 2) Style Passives — unique per-exchange modifiers ────────────────────
+// ─── 2) Style Mastery — fight-count tiers that enhance passives ───────────
+
+export type MasteryTier = "Novice" | "Practiced" | "Veteran" | "Master" | "Grandmaster";
+
+export interface MasteryInfo {
+  tier: MasteryTier;
+  fights: number;
+  /** Flat bonus added to key passive values at this tier */
+  bonus: number;
+  /** Multiplier applied to all passive bonuses (stacks with bonus) */
+  mult: number;
+}
+
+const MASTERY_THRESHOLDS: { tier: MasteryTier; minFights: number; bonus: number; mult: number }[] = [
+  { tier: "Grandmaster", minFights: 50, bonus: 3, mult: 1.40 },
+  { tier: "Master",      minFights: 30, bonus: 2, mult: 1.25 },
+  { tier: "Veteran",     minFights: 20, bonus: 1, mult: 1.15 },
+  { tier: "Practiced",   minFights: 10, bonus: 1, mult: 1.08 },
+  { tier: "Novice",      minFights: 0,  bonus: 0, mult: 1.00 },
+];
+
+export function getMastery(totalFights: number): MasteryInfo {
+  for (const t of MASTERY_THRESHOLDS) {
+    if (totalFights >= t.minFights) return { tier: t.tier, fights: totalFights, bonus: t.bonus, mult: t.mult };
+  }
+  return { tier: "Novice", fights: totalFights, bonus: 0, mult: 1.0 };
+}
+
+// ─── 3) Style Passives — unique per-exchange modifiers ────────────────────
 
 export interface StylePassiveResult {
   attBonus: number;
@@ -51,17 +79,18 @@ export interface StylePassiveResult {
   dmgBonus: number;
   critChance: number;   // extra crit multiplier (0 = none)
   iniBonus: number;
+  mastery: MasteryTier;
   narrative?: string;   // optional flavor text when passive triggers
 }
 
 const EMPTY_PASSIVE: StylePassiveResult = {
   attBonus: 0, parBonus: 0, defBonus: 0, ripBonus: 0,
-  dmgBonus: 0, critChance: 0, iniBonus: 0,
+  dmgBonus: 0, critChance: 0, iniBonus: 0, mastery: "Novice",
 };
 
 /**
  * Compute style-specific passive bonuses for the current exchange.
- * These layer on top of the base resolution chain.
+ * Mastery from fight experience scales all bonuses.
  */
 export function getStylePassive(
   style: FightingStyle,
@@ -72,12 +101,19 @@ export function getStylePassive(
     hitsTaken: number;
     ripostes: number;
     consecutiveHits: number;
-    hpRatio: number;      // current hp / max hp
-    endRatio: number;     // current endurance / max endurance
+    hpRatio: number;
+    endRatio: number;
     opponentStyle: FightingStyle;
     targetedLocation?: string;
+    totalFights?: number;  // career wins+losses for mastery scaling
   }
 ): StylePassiveResult {
+  const m = getMastery(context.totalFights ?? 0);
+
+  /** Apply mastery scaling: multiply base value by mult, then add tier bonus to the style's signature stat */
+  function scale(val: number): number {
+    return Math.round(val * m.mult);
+  }
   switch (style) {
     // ── Aimed Blow: Precision Master ──
     // Bonus ATT when targeting specific locations; crit chance scales with patience
