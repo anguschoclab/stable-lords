@@ -79,6 +79,7 @@ export function createFreshState(): GameState {
     trainers: [],
     hiringPool: [],
     trainingAssignments: [],
+    seasonalGrowth: [],
     rivals: [],
     scoutReports: [],
     restStates: [],

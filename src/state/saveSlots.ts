@@ -96,6 +96,14 @@ export function loadFromSlot(slotId: string): GameState | null {
         if (parsed.settings && !parsed.settings.featureFlags?.scouting) {
           parsed.settings.featureFlags = { ...parsed.settings.featureFlags, scouting: true };
         }
+        if (!parsed.seasonalGrowth) parsed.seasonalGrowth = [];
+        // Migrate old training assignments (add type field)
+        if (parsed.trainingAssignments) {
+          parsed.trainingAssignments = parsed.trainingAssignments.map((a: any) => ({
+            ...a,
+            type: a.type ?? "attribute",
+          }));
+        }
         parsed.roster = (parsed.roster || []).map((w: any) => ({ ...w, status: w.status || "Active" }));
         return parsed as GameState;
       }

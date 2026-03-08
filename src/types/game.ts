@@ -298,7 +298,15 @@ export interface TournamentBout {
 /** Training assignment — which attribute a warrior is training this week */
 export interface TrainingAssignment {
   warriorId: string;
-  attribute: keyof Attributes;
+  type: "attribute" | "recovery";
+  attribute?: keyof Attributes; // required if type === "attribute"
+}
+
+/** Seasonal growth tracking — caps attribute gains per season */
+export interface SeasonalGrowth {
+  warriorId: string;
+  season: Season;
+  gains: Partial<Record<keyof Attributes, number>>;
 }
 
 /** A single ledger entry for the economy log */
@@ -378,6 +386,7 @@ export interface GameState {
   trainers: TrainerData[];
   hiringPool: TrainerData[];
   trainingAssignments: TrainingAssignment[];
+  seasonalGrowth: SeasonalGrowth[];
   rivals: RivalStableData[];
   scoutReports: ScoutReportData[];
   restStates: RestState[];
