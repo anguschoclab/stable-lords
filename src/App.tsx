@@ -26,6 +26,7 @@ import HallOfFame from "@/pages/HallOfFame";
 import KillAnalytics from "@/pages/KillAnalytics";
 import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
 import TrainingPlanner from "@/pages/TrainingPlanner";
+import SeasonalAwards from "@/pages/SeasonalAwards";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ function GameRoutes() {
         <Route path="/kill-analytics" element={<KillAnalytics />} />
         <Route path="/equipment-optimizer" element={<EquipmentOptimizerPage />} />
         <Route path="/training-planner" element={<TrainingPlanner />} />
+        <Route path="/seasonal-awards" element={<SeasonalAwards />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
