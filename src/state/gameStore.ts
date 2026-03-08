@@ -173,6 +173,18 @@ export function advanceWeek(state: GameState): GameState {
   if (injuryNews.length > 0) {
     updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Medical Report", items: injuryNews }];
   }
+
+  // Clear expired rest states
+  updatedState.restStates = clearExpiredRest(updatedState.restStates || [], updatedState.week);
+
+  // Run AI vs AI background bouts
+  if ((updatedState.rivals || []).length > 0) {
+    const { updatedRivals, gazetteItems } = runAIvsAIBouts(updatedState);
+    updatedState.rivals = updatedRivals;
+    if (gazetteItems.length > 0) {
+      updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Rival Arena Report", items: gazetteItems }];
+    }
+  }
   
   const newWeek = updatedState.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
