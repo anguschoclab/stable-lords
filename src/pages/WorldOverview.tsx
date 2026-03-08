@@ -26,6 +26,7 @@ interface StableRow {
   roster: number;
   tier: string;
   philosophy: string;
+  motto: string;
   isPlayer: boolean;
 }
 
