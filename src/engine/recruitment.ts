@@ -16,6 +16,7 @@ export interface PoolWarrior {
   name: string;
   style: FightingStyle;
   attributes: Attributes;
+  potential: AttributePotential;
   baseSkills: BaseSkills;
   derivedStats: DerivedStats;
   tier: RecruitTier;
