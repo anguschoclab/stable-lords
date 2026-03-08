@@ -35,7 +35,17 @@ export default function Graveyard() {
 
         <TabsContent value="graveyard" className="space-y-3 mt-4">
           {state.graveyard.length === 0 ? (
-            <p className="text-muted-foreground italic text-sm">No warriors have fallen… yet.</p>
+            <Card>
+              <CardContent className="p-8 text-center space-y-3">
+                <Skull className="h-10 w-10 mx-auto text-muted-foreground/50" />
+                <p className="text-muted-foreground text-sm">No warriors have fallen… yet. Send them into the arena to tempt fate.</p>
+                <Link to="/run-round">
+                  <Button variant="outline" size="sm" className="gap-2 mt-2">
+                    <Zap className="h-4 w-4" /> Run a Round
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           ) : (
             state.graveyard.map((w) => (
               <Card key={w.id}>
