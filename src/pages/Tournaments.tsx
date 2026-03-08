@@ -227,9 +227,9 @@ export default function Tournaments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-display font-bold">Seasonal Tournaments</h1>
+          <h1 className="text-xl sm:text-2xl font-display font-bold">Seasonal Tournaments</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Compete for glory across the four seasons. Current: {state.season}
           </p>
