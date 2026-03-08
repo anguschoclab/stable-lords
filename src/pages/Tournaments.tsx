@@ -97,7 +97,7 @@ export default function Tournaments() {
 
       const planA = wA.plan ?? defaultPlanForWarrior(wA);
       const planD = wD.plan ?? defaultPlanForWarrior(wD);
-      const outcome = simulateFight(planA, planD);
+      const outcome = simulateFight(planA, planD, wA, wD);
 
       bout.winner = outcome.winner;
       bout.by = outcome.by;
