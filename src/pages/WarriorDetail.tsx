@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair } from "lucide-react";
 import PlanBuilder from "@/components/PlanBuilder";
+import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
 import { defaultPlanForWarrior } from "@/engine/simulate";
 import { DAMAGE_LABELS } from "@/engine/skillCalc";
 import { retireWarrior } from "@/state/gameStore";
+import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";
 import { toast } from "sonner";
 
 function AttrBar({ label, value, max = 25 }: { label: string; value: number; max?: number }) {

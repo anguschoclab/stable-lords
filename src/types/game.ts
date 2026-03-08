@@ -151,6 +151,12 @@ export interface Warrior {
   champion: boolean;
   plan?: FightPlan;
   gear?: Gear;
+  equipment?: {
+    weapon: string;
+    armor: string;
+    shield: string;
+    helm: string;
+  };
   status: WarriorStatus;
   age?: number;
   deathWeek?: number;
