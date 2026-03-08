@@ -24,6 +24,7 @@ import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight, 
 import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/modules/trainers";
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "./tacticSuitability";
 import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "./stylePassives";
+import { getFavoriteWeaponBonus, getFavoriteRhythmBonus } from "./favorites";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 function mulberry32(seed: number) {
@@ -405,8 +406,12 @@ export function simulateFight(
   const classicBonusA = getClassicWeaponBonus(planA.style, (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon);
   const classicBonusD = getClassicWeaponBonus(planD.style, (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon);
 
+  // Favorite weapon/rhythm bonuses (only if warrior has discovered them)
+  const favWeaponA = warriorA ? getFavoriteWeaponBonus(warriorA) : 0;
+  const favWeaponD = warriorD ? getFavoriteWeaponBonus(warriorD) : 0;
+
   const effSkillsA: BaseSkills = {
-    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA,
+    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA + favWeaponA,
     PAR: skillsA.PAR + equipA.parMod + (trainerModsA?.parMod ?? 0),
     DEF: skillsA.DEF + equipA.defMod + (trainerModsA?.defMod ?? 0),
     INI: skillsA.INI + equipA.iniMod + (trainerModsA?.iniMod ?? 0),
@@ -414,7 +419,7 @@ export function simulateFight(
     DEC: skillsA.DEC + (trainerModsA?.decMod ?? 0),
   };
   const effSkillsD: BaseSkills = {
-    ATT: skillsD.ATT + equipD.attMod + (trainerModsD?.attMod ?? 0) + classicBonusD,
+    ATT: skillsD.ATT + equipD.attMod + (trainerModsD?.attMod ?? 0) + classicBonusD + favWeaponD,
     PAR: skillsD.PAR + equipD.parMod + (trainerModsD?.parMod ?? 0),
     DEF: skillsD.DEF + equipD.defMod + (trainerModsD?.defMod ?? 0),
     INI: skillsD.INI + equipD.iniMod + (trainerModsD?.iniMod ?? 0),
