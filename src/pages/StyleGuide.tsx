@@ -14,6 +14,7 @@ import {
   SUITABILITY_LABELS,
   type SuitabilityRating,
 } from "@/engine/tacticSuitability";
+import { getMastery, type MasteryTier, type MasteryInfo } from "@/engine/stylePassives";
 import { Swords, Shield, Zap, Target, Crown, ChevronRight } from "lucide-react";
 
 // ─── Style Data ───────────────────────────────────────────────────────
