@@ -220,6 +220,9 @@ export function parseImportedSave(json: string): GameState {
   if (!state.hiringPool) state.hiringPool = [];
   if (state.ftueComplete === undefined) state.ftueComplete = true;
   if (!state.coachDismissed) state.coachDismissed = [];
+  if (!state.rivals) state.rivals = [];
+  if (!state.scoutReports) state.scoutReports = [];
+  if (!state.trainingAssignments) state.trainingAssignments = [];
   state.roster = (state.roster || []).map((w: any) => ({ ...w, status: w.status || "Active" }));
 
   return state as GameState;
