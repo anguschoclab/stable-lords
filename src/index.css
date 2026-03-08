@@ -57,6 +57,51 @@
     --background: 220 20% 7%;
     --foreground: 215 30% 92%;
   }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 210 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 20% 10%;
+
+    --muted: 220 12% 90%;
+    --muted-foreground: 215 15% 40%;
+
+    --accent: 38 90% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 210 80% 50%;
+
+    --arena-gold: 38 90% 45%;
+    --arena-blood: 0 70% 40%;
+    --arena-fame: 265 70% 50%;
+    --arena-pop: 160 60% 35%;
+    --arena-steel: 215 20% 50%;
+
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 220 20% 15%;
+    --sidebar-primary: 210 80% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 93%;
+    --sidebar-accent-foreground: 220 20% 10%;
+    --sidebar-border: 220 15% 88%;
+    --sidebar-ring: 210 80% 50%;
+  }
 }
 
 @layer base {
