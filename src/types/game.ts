@@ -96,6 +96,21 @@ export interface DerivedStats {
 
 export type ShieldSize = "None" | "Small" | "Medium" | "Large";
 
+/** Weight class for armor encumbrance calculations (per Design Bible §Equipment) */
+export type ArmorWeight = "None" | "Light" | "Medium" | "Heavy" | "Ultra-Heavy";
+
+/** Maps armor weight classes to encumbrance penalty ranges */
+export const ARMOR_WEIGHT_MAP: Record<ArmorWeight, { minWeight: number; maxWeight: number; speedPenalty: number }> = {
+  "None":        { minWeight: 0, maxWeight: 0, speedPenalty: 0 },
+  "Light":       { minWeight: 1, maxWeight: 2, speedPenalty: 1 },
+  "Medium":      { minWeight: 3, maxWeight: 4, speedPenalty: 2 },
+  "Heavy":       { minWeight: 5, maxWeight: 6, speedPenalty: 4 },
+  "Ultra-Heavy": { minWeight: 7, maxWeight: 10, speedPenalty: 6 },
+};
+
+/** Equipment slot identifiers */
+export type EquipmentSlot = "weapon" | "armor" | "shield" | "helm";
+
 export interface Weapon {
   name: string;
   twoHanded?: boolean;
@@ -106,6 +121,21 @@ export interface Gear {
   shield: ShieldSize;
   armor: string;
   helm: string;
+}
+
+/**
+ * Resolved encumbrance breakdown for a warrior's full loadout.
+ * Used by the engine to apply speed/fatigue penalties.
+ */
+export interface ArmorEncumbrance {
+  /** Total encumbrance points from all gear */
+  totalWeight: number;
+  /** Effective speed penalty applied to SP-based calculations */
+  speedPenalty: number;
+  /** Fatigue multiplier — heavier loadouts drain endurance faster */
+  fatigueMult: number;
+  /** Armor weight class for display/categorization */
+  weightClass: ArmorWeight;
 }
 
 // ─── Fight Plan ─────────────────────────────────────────────────────────────
@@ -148,13 +178,30 @@ export interface CareerRecord {
 
 export type WarriorStatus = "Active" | "Dead" | "Retired";
 
+/** Injury severity tiers (per Design Bible §Injuries) */
+export type InjurySeverity = "Minor" | "Moderate" | "Severe" | "Critical" | "Permanent";
+
+/** Recovery time ranges by severity (in weeks) */
+export const INJURY_SEVERITY_WEEKS: Record<InjurySeverity, { min: number; max: number }> = {
+  Minor: { min: 1, max: 2 },
+  Moderate: { min: 2, max: 4 },
+  Severe: { min: 4, max: 8 },
+  Critical: { min: 8, max: 16 },
+  Permanent: { min: Infinity, max: Infinity },
+};
+
+/** Body locations that can sustain injuries */
+export type InjuryLocation = "Head" | "Chest" | "Abdomen" | "Arms" | "Legs" | "General";
+
 export interface InjuryData {
   id: string;
   name: string;
   description: string;
-  severity: "Minor" | "Moderate" | "Severe";
+  severity: InjurySeverity;
+  location?: InjuryLocation;
   weeksRemaining: number;
-  penalties: Record<string, number>;
+  penalties: Partial<Record<keyof Attributes | keyof BaseSkills, number>>;
+  permanent?: boolean;
 }
 
 /**

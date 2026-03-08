@@ -837,17 +837,29 @@ type WidgetDef = {
   component: React.FC;
 };
 
+// Memoize all widgets to prevent unnecessary re-renders from context changes
+const MemoSeasonWidget = React.memo(SeasonWidget);
+const MemoStableWidget = React.memo(StableWidget);
+const MemoFinancesWidget = React.memo(FinancesWidget);
+const MemoTrainingWidget = React.memo(TrainingWidget);
+const MemoRivalsWidget = React.memo(RivalsWidget);
+const MemoRivalryWidget = React.memo(RivalryWidget);
+const MemoRankingsWidget = React.memo(RankingsWidget);
+const MemoMetaPulseWidget = React.memo(MetaPulseWidget);
+const MemoRecentBoutsWidget = React.memo(RecentBoutsWidget);
+const MemoGazetteWidget = React.memo(GazetteWidget);
+
 const WIDGET_REGISTRY: WidgetDef[] = [
-  { id: "season",   label: "Season & Schedule", component: SeasonWidget },
-  { id: "stable",   label: "Stable Overview",   component: StableWidget },
-  { id: "finances", label: "Finances",           component: FinancesWidget },
-  { id: "training", label: "Training Status",    component: TrainingWidget },
-  { id: "rivals",    label: "Rival Stables",      component: RivalsWidget },
-  { id: "rivalries", label: "Rivalries",          component: RivalryWidget, wide: true },
-  { id: "rankings", label: "Warrior Rankings",   component: RankingsWidget, wide: true },
-  { id: "meta",     label: "Meta Pulse",         component: MetaPulseWidget },
-  { id: "bouts",    label: "Recent Bouts",       component: RecentBoutsWidget, wide: true },
-  { id: "gazette",  label: "Arena Gazette",       component: GazetteWidget, wide: true },
+  { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
+  { id: "stable",   label: "Stable Overview",   component: MemoStableWidget },
+  { id: "finances", label: "Finances",           component: MemoFinancesWidget },
+  { id: "training", label: "Training Status",    component: MemoTrainingWidget },
+  { id: "rivals",    label: "Rival Stables",      component: MemoRivalsWidget },
+  { id: "rivalries", label: "Rivalries",          component: MemoRivalryWidget, wide: true },
+  { id: "rankings", label: "Warrior Rankings",   component: MemoRankingsWidget, wide: true },
+  { id: "meta",     label: "Meta Pulse",         component: MemoMetaPulseWidget },
+  { id: "bouts",    label: "Recent Bouts",       component: MemoRecentBoutsWidget, wide: true },
+  { id: "gazette",  label: "Arena Gazette",       component: MemoGazetteWidget, wide: true },
 ];
 
 const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);

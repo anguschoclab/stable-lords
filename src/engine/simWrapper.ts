@@ -1,5 +1,13 @@
 /**
- * Wraps simulateFight with signal emission for UI toasts and fame tracking.
+ * Fight Simulation Wrapper
+ *
+ * Wraps the core `simulateFight` engine with side-effects:
+ * - Emits UI signals (for toasts, sound cues, etc.)
+ * - Computes fame/popularity deltas from fight tags
+ *
+ * NOTE: This is NOT the weekly advance pipeline. The weekly pipeline
+ * lives in `gameStore.ts → advanceWeek()`. This wrapper handles
+ * individual fight resolution only.
  */
 import { simulateFight } from "./simulate";
 import { sendSignal } from "./signals";
