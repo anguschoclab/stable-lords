@@ -38,6 +38,7 @@ const navItems = [
   { to: "/kill-analytics", label: "Kill Stats", icon: Target },
   { to: "/equipment-optimizer", label: "Gear", icon: Shield },
   { to: "/training-planner", label: "Planner", icon: BarChart3 },
+  { to: "/seasonal-awards", label: "Awards", icon: Award },
   { to: "/hall-of-fame", label: "Hall of Fame", icon: Crown },
   { to: "/graveyard", label: "Hall of Warriors", icon: Skull },
   { to: "/help", label: "Help", icon: HelpCircle },
