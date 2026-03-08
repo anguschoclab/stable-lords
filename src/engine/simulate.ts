@@ -859,17 +859,18 @@ export function simulateFight(
       break;
     }
 
-    // Fatigue narration
+    // Fatigue narration (canonical PBP style)
     if (ex > 0 && ex % 4 === 0) {
-      const fatigued = [fA, fD].filter(f => f.endurance < f.maxEndurance * 0.3);
-      for (const f of fatigued) {
-        if (rng() < 0.5) {
-          log.push({
-            minute: min,
-            text: `${name(f)} is visibly tiring, movements growing sluggish.`,
-          });
-        }
+      for (const f of [fA, fD]) {
+        const endRatio = f.endurance / f.maxEndurance;
+        const fLine = fatigueLine(rng, name(f), endRatio);
+        if (fLine) log.push({ minute: min, text: fLine });
       }
+    }
+
+    // Trading blows filler (canonical: "The two warriors fiercely trade attacks and parrys.")
+    if (ex > 2 && rng() < 0.15) {
+      log.push({ minute: min, text: tradingBlowsLine(rng) });
     }
   }
 
