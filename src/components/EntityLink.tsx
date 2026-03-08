@@ -70,9 +70,15 @@ interface StableLinkProps {
 }
 
 export function StableLink({ name, className, children }: StableLinkProps) {
+  const { state } = useGame();
+
+  // Resolve stable name to owner ID
+  const stableId = (state.rivals ?? []).find(r => r.owner.stableName === name)?.owner.id;
+  const to = stableId ? `/stable/${stableId}` : "/scouting";
+
   return (
     <Link
-      to="/scouting"
+      to={to}
       className={cn(
         "hover:text-primary hover:underline underline-offset-2 transition-colors cursor-pointer",
         className
