@@ -157,4 +157,7 @@
   .bg-arena-gold {
     background-color: hsl(var(--arena-gold));
   }
+  .bg-arena-pop {
+    background-color: hsl(var(--arena-pop));
+  }
 }
