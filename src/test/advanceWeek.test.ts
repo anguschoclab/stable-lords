@@ -206,7 +206,7 @@ describe("advanceWeek pipeline", () => {
     expect(next.recruitPool).toEqual([]);
   });
 
-  it("heals injuries and generates newsletter", () => {
+  it("heals injuries and generates newsletter", async () => {
     const state = createFreshState();
     state.roster = [
       makeTestWarrior({
