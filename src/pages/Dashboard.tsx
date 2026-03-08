@@ -543,9 +543,16 @@ function RivalsWidget() {
           <p className="text-xs text-muted-foreground italic">No rival stables yet.</p>
         ) : (
           <div className="space-y-2">
-            {rivals.slice(0, 4).map(r => {
+            {rivals.slice(0, 6).map(r => {
               const active = r.roster.filter(w => w.status === "Active").length;
               const topWarrior = [...r.roster].sort((a, b) => b.fame - a.fame)[0];
+              const tierColors: Record<string, string> = {
+                Major: "text-arena-gold border-arena-gold/40",
+                Established: "text-primary border-primary/40",
+                Minor: "text-muted-foreground border-border",
+                Legendary: "text-destructive border-destructive/40",
+              };
+              const tierClass = tierColors[r.tier ?? "Minor"] ?? tierColors.Minor;
               return (
                 <div key={r.owner.id} className="flex items-center gap-3 py-1">
                   <div className="flex-1 min-w-0">
@@ -553,6 +560,11 @@ function RivalsWidget() {
                       <StableLink name={r.owner.stableName} className="text-sm font-display font-semibold truncate">
                         {r.owner.stableName}
                       </StableLink>
+                      {r.tier && (
+                        <Badge variant="outline" className={`text-[9px] h-4 px-1 shrink-0 ${tierClass}`}>
+                          {r.tier}
+                        </Badge>
+                      )}
                       <Badge variant="outline" className="text-[9px] h-4 px-1 shrink-0">
                         {r.owner.personality ?? "Unknown"}
                       </Badge>
@@ -561,6 +573,12 @@ function RivalsWidget() {
                       <span>{active} warriors</span>
                       <span>·</span>
                       <span className="text-arena-fame">{r.owner.fame} fame</span>
+                      {r.philosophy && (
+                        <>
+                          <span>·</span>
+                          <span className="italic">{r.philosophy}</span>
+                        </>
+                      )}
                       {topWarrior && (
                         <>
                           <span>·</span>
