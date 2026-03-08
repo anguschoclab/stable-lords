@@ -107,10 +107,10 @@ export default function Dashboard() {
             Welcome back, <span className="text-foreground font-medium">{state.player.name}</span> — 
             Week {state.week}, {state.season}
           </p>
-          <div className="mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
+           <div className="mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
             <StatChip label="Stable" value={state.player.stableName} icon={<Users className="h-4 w-4 text-primary" />} />
+            <StatChip label="Gold" value={`${state.gold ?? 0}g`} icon={<Coins className="h-4 w-4 text-arena-gold" />} />
             <StatChip label="Fame" value={state.fame} icon={<Flame className="h-4 w-4 text-arena-fame" />} />
-            <StatChip label="Popularity" value={state.popularity} icon={<Star className="h-4 w-4 text-arena-pop" />} />
             <StatChip label="Warriors" value={state.roster.length} icon={<Swords className="h-4 w-4 text-arena-gold" />} />
           </div>
         </div>
