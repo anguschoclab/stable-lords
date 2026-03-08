@@ -175,6 +175,7 @@ export function processOwnerGrudges(
 export function processAIRosterManagement(
   state: GameState
 ): { updatedRivals: RivalStableData[]; gazetteItems: string[] } {
+  const meta = computeMetaDrift(state.arenaHistory, 20);
   const gazetteItems: string[] = [];
   const updatedRivals = (state.rivals || []).map(rival => {
     const r = {
