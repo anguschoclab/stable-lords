@@ -25,7 +25,8 @@ import {
   ChevronDown, Sparkles, Activity, BookOpen,
 } from "lucide-react";
 import type {
-  FightPlan, PhaseStrategy, BodyTarget, OffensiveTactic, DefensiveTactic, Warrior,
+  FightPlan, PhaseStrategy, OffensiveTactic, DefensiveTactic, Warrior,
+  type AttackTarget, type ProtectTarget,
 } from "@/types/game";
 import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/game";
 import { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from "@/engine/planBias";
