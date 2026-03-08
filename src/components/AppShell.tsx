@@ -34,13 +34,28 @@ const navItems = [
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { state, doReset, returnToTitle } = useGame();
+  const { state, doReset, returnToTitle, lastSavedAt } = useGame();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
-  // Auto-hide sidebar on small screens
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
+  const [saveFlash, setSaveFlash] = useState(false);
 
   useCoachTip(location.pathname);
+
+  // Flash the save indicator briefly when a save occurs
+  useEffect(() => {
+    if (!lastSavedAt) return;
+    setSaveFlash(true);
+    const t = setTimeout(() => setSaveFlash(false), 1500);
+    return () => clearTimeout(t);
+  }, [lastSavedAt]);
+
+  const formatSaveTime = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    } catch { return ""; }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
