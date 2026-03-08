@@ -386,6 +386,7 @@ export interface GameState {
   trainers: TrainerData[];
   hiringPool: TrainerData[];
   trainingAssignments: TrainingAssignment[];
+  seasonalGrowth: SeasonalGrowth[];
   rivals: RivalStableData[];
   scoutReports: ScoutReportData[];
   restStates: RestState[];
