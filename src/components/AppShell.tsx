@@ -53,6 +53,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useCoachTip(location.pathname);
   useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
+  useRivalryAlerts();
 
   // Flash the save indicator briefly when a save occurs
   useEffect(() => {
