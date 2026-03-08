@@ -215,17 +215,19 @@ export function getStylePassive(
       };
 
     // ── Slashing Attack: Flurry ──
-    // Bonus ATT in opening/mid, fades in late
-    case FightingStyle.SlashingAttack:
+    // BALANCE v5: Multi-hit identity — ATT persists into late (reduced), DMG scales with hits landed
+    case FightingStyle.SlashingAttack: {
+      const flurryDmg = Math.min(2, Math.floor(context.hitsLanded / 2)); // +1 DMG per 2 hits
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(context.phase !== "LATE" ? 1 : 0) + (context.phase === "OPENING" ? m.bonus : 0),
-        dmgBonus: context.phase === "OPENING" ? 1 : 0,
-        narrative: context.phase === "OPENING" && context.hitsLanded >= 2
-          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}unleashes a whirlwind of slashes!`
+        attBonus: scale(context.phase === "LATE" ? 0 : 1) + (context.phase === "OPENING" ? m.bonus : 0),
+        dmgBonus: (context.phase === "OPENING" ? 1 : 0) + flurryDmg,
+        narrative: context.hitsLanded >= 3
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}unleashes a whirlwind of slashes, each cut deeper than the last!`
           : undefined,
       };
+    }
 
     // ── Striking Attack: Reliable Power ──
     // Consistent ATT bonus, dmg vs hurt opponents
