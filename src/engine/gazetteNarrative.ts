@@ -262,6 +262,15 @@ export function generateWeeklyGazette(
     }
   }
 
+  // Rivalry narrative
+  if (rivalryPair) {
+    if (rivalryPair.count >= 5) {
+      paragraphs.push(`The bitter feud between ${rivalryPair.a} and ${rivalryPair.b} continues to captivate the arena! This marks their ${rivalryPair.count}th meeting — a rivalry for the ages.`);
+    } else {
+      paragraphs.push(`${rivalryPair.a} and ${rivalryPair.b} crossed blades for the ${rivalryPair.count}${rivalryPair.count === 3 ? "rd" : "th"} time. The crowd senses a budding rivalry.`);
+    }
+  }
+
   // Graveyard mention
   if (graveyard.length > 0) {
     const recent = graveyard.filter(w => w.deathWeek === week);
