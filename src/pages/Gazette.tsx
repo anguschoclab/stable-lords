@@ -636,6 +636,9 @@ export default function Gazette() {
       {/* Best Warrior by Style */}
       {hasContent && <BestByStyle allFights={allFights} />}
 
+      {/* Rising Stars */}
+      {hasContent && <RisingStars allFights={allFights} currentWeek={state.week} />}
+
       {!hasContent && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
