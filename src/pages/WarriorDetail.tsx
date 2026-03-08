@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair } from "lucide-react";
+import TagBadge from "@/components/TagBadge";
 import PlanBuilder from "@/components/PlanBuilder";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
 import { defaultPlanForWarrior } from "@/engine/simulate";
@@ -126,17 +127,13 @@ export default function WarriorDetail() {
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
               {warrior.flair.map((f) => (
-                <Badge key={f} variant="secondary" className="text-arena-gold border-arena-gold/30">
-                  {f}
-                </Badge>
+                <TagBadge key={f} tag={f} type="flair" />
               ))}
               {warrior.titles.map((t) => (
-                <Badge key={t} className="bg-arena-gold/20 text-arena-gold border-arena-gold/30">
-                  <Trophy className="h-3 w-3 mr-1" /> {t}
-                </Badge>
+                <TagBadge key={t} tag={t} type="title" />
               ))}
               {warrior.injuries.map((i) => (
-                <Badge key={i} variant="destructive">{i}</Badge>
+                <TagBadge key={i} tag={i} type="injury" />
               ))}
             </div>
           </div>
