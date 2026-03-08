@@ -418,7 +418,7 @@ export function simulateFight(
         log.push({ minute: min, text: `${name(attacker)} probes but finds no opening.` });
       }
       // ── Endurance cost for attempt ──
-      attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attacker.plan.OE, attacker.plan.AL) * 0.5));
+      attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, attAL) * 0.5));
 
       // Defender may riposte on whiff
       // ── 4. RIPOSTE CHECK (RIP) ──
