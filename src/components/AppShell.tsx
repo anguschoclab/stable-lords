@@ -11,6 +11,7 @@ const navItems = [
   { to: "/run-round", label: "Run Round", icon: Zap },
   { to: "/tournaments", label: "Tournaments", icon: Trophy },
   { to: "/help", label: "Help", icon: HelpCircle },
+  { to: "/hall-of-fights", label: "Hall of Fights", icon: ScrollText },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
