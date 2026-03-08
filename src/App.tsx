@@ -23,6 +23,9 @@ import StartGame from "@/pages/StartGame";
 import NotFound from "./pages/NotFound";
 import Gazette from "@/pages/Gazette";
 import HallOfFame from "@/pages/HallOfFame";
+import KillAnalytics from "@/pages/KillAnalytics";
+import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
+import TrainingPlanner from "@/pages/TrainingPlanner";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +60,9 @@ function GameRoutes() {
         <Route path="/hall-of-fights" element={<HallOfFights />} />
         <Route path="/gazette" element={<Gazette />} />
         <Route path="/hall-of-fame" element={<HallOfFame />} />
+        <Route path="/kill-analytics" element={<KillAnalytics />} />
+        <Route path="/equipment-optimizer" element={<EquipmentOptimizerPage />} />
+        <Route path="/training-planner" element={<TrainingPlanner />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
