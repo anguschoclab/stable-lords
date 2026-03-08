@@ -18,7 +18,8 @@ interface BoutViewerProps {
 }
 
 // Classify log lines for visual treatment
-function classifyEvent(text: string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" {
+function classifyEvent(text: string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" | "phase" {
+  if (text.startsWith("—") && text.includes("Phase")) return "phase";
   const t = text.toLowerCase();
   if (t.includes("kill") || t.includes("death") || t.includes("slain") || t.includes("fatal")) return "death";
   if (t.includes("knocked out") || t.includes("ko") || t.includes("unconscious") || t.includes("no longer continue")) return "ko";
