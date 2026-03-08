@@ -22,6 +22,7 @@ import WorldOverview from "@/pages/WorldOverview";
 import StartGame from "@/pages/StartGame";
 import NotFound from "./pages/NotFound";
 import Gazette from "@/pages/Gazette";
+import HallOfFame from "@/pages/HallOfFame";
 
 const queryClient = new QueryClient();
 
