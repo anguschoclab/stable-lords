@@ -14,6 +14,7 @@ import {
   SUITABILITY_LABELS,
   type SuitabilityRating,
 } from "@/engine/tacticSuitability";
+import { getMastery, type MasteryTier, type MasteryInfo } from "@/engine/stylePassives";
 import { Swords, Shield, Zap, Target, Crown, ChevronRight } from "lucide-react";
 
 // ─── Style Data ───────────────────────────────────────────────────────
@@ -22,13 +23,21 @@ const ALL_STYLES = Object.values(FightingStyle);
 const OFF_TACTICS = ["Lunge", "Slash", "Bash", "Decisiveness"] as const;
 const DEF_TACTICS = ["Dodge", "Parry", "Riposte", "Responsiveness"] as const;
 
-const MASTERY_TIERS = [
-  { tier: "Novice", fights: 0, color: "bg-muted text-muted-foreground" },
-  { tier: "Practiced", fights: 10, color: "bg-secondary text-secondary-foreground" },
-  { tier: "Veteran", fights: 20, color: "bg-primary/20 text-primary" },
-  { tier: "Master", fights: 30, color: "bg-accent/20 text-accent" },
-  { tier: "Grandmaster", fights: 50, color: "bg-destructive/20 text-destructive" },
+// Mastery tier thresholds — dynamically computed from getMastery
+const MASTERY_TIER_DATA = [
+  { fights: 0, ...getMastery(0) },
+  { fights: 10, ...getMastery(10) },
+  { fights: 20, ...getMastery(20) },
+  { fights: 30, ...getMastery(30) },
+  { fights: 50, ...getMastery(50) },
 ];
+const MASTERY_TIER_COLORS: Record<MasteryTier, string> = {
+  Novice: "bg-muted text-muted-foreground",
+  Practiced: "bg-secondary text-secondary-foreground",
+  Veteran: "bg-primary/20 text-primary",
+  Master: "bg-accent/20 text-accent",
+  Grandmaster: "bg-destructive/20 text-destructive",
+};
 
 interface StyleInfo {
   style: FightingStyle;
@@ -360,16 +369,16 @@ export default function StyleGuide() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {MASTERY_TIERS.map(({ tier, fights, color }) => (
+                {MASTERY_TIER_DATA.map(({ tier, fights, bonus, mult }) => (
                   <div key={tier} className="flex items-center gap-3">
-                    <Badge className={`${color} w-28 justify-center`}>{tier}</Badge>
+                    <Badge className={`${MASTERY_TIER_COLORS[tier]} w-28 justify-center`}>{tier}</Badge>
                     <span className="text-sm text-muted-foreground w-24">{fights}+ fights</span>
                     <span className="text-xs text-foreground">
                       {tier === "Novice" && "Base passive effects. No bonus."}
-                      {tier === "Practiced" && "×1.04 passive multiplier. Style identity starts to emerge."}
-                      {tier === "Veteran" && "+1 bonus, ×1.08 multiplier. Reliable execution of style mechanics."}
-                      {tier === "Master" && "+1 bonus, ×1.15 multiplier. Passives become a significant combat factor."}
-                      {tier === "Grandmaster" && "+1 bonus, ×1.25 multiplier. Peak mastery — passives are devastating."}
+                      {tier === "Practiced" && `×${mult} passive multiplier. Style identity starts to emerge.`}
+                      {tier === "Veteran" && `+${bonus} bonus, ×${mult} multiplier. Reliable execution of style mechanics.`}
+                      {tier === "Master" && `+${bonus} bonus, ×${mult} multiplier. Passives become a significant combat factor.`}
+                      {tier === "Grandmaster" && `+${bonus} bonus, ×${mult} multiplier. Peak mastery — passives are devastating.`}
                     </span>
                   </div>
                 ))}

@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
-import { MOOD_DESCRIPTIONS, MOOD_ICONS } from "@/engine/crowdMood";
+import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, type CrowdMood } from "@/engine/crowdMood";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
@@ -72,7 +72,17 @@ function SeasonWidget() {
             <div className="text-sm text-muted-foreground">{state.season}</div>
           </div>
           <div className="text-center">
-            <span className="text-2xl">{moodIcon}</span>
+            <div className="flex items-center gap-1 justify-center">
+              {CROWD_MOODS.map((mood) => (
+                <span
+                  key={mood}
+                  className={`text-lg transition-opacity ${mood === state.crowdMood ? "opacity-100" : "opacity-25"}`}
+                  title={mood}
+                >
+                  {MOOD_ICONS[mood]}
+                </span>
+              ))}
+            </div>
             <div className="text-[10px] text-muted-foreground mt-0.5">{state.crowdMood}</div>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair, User, Crosshair, Shirt, History, TrendingUp, ScrollText } from "lucide-react";
+import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair, User, Crosshair, Shirt, History, TrendingUp, ScrollText, Zap } from "lucide-react";
 import TagBadge from "@/components/TagBadge";
 import PlanBuilder from "@/components/PlanBuilder";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
@@ -21,6 +21,9 @@ import SubNav, { type SubNavTab } from "@/components/SubNav";
 import BoutViewer from "@/components/BoutViewer";
 import { generateWarriorStatements } from "@/data/warriorStatements";
 import { ENCUMBRANCE_LABELS, type EncumbranceClass } from "@/data/terrabloodCharts";
+import { getFavoritesDisplay, applyInsightToken } from "@/engine/favorites";
+import { getMastery } from "@/engine/stylePassives";
+import { Lightbulb, Eye } from "lucide-react";
 
 const TABS: SubNavTab[] = [
   { id: "overview", label: "Overview", icon: <User className="h-3.5 w-3.5" /> },
@@ -148,6 +151,105 @@ function WarriorStatementsPanel({ warrior }: { warrior: Warrior }) {
         <li key={i} className="text-xs text-muted-foreground italic leading-relaxed">• {line}</li>
       ))}
     </ul>
+  );
+}
+
+/** Favorites & Mastery Card — shows discovered/hinted weapon and rhythm preferences */
+function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () => void }) {
+  const { setState, state } = useGame();
+  const favDisplay = getFavoritesDisplay(warrior);
+  const totalFights = warrior.career.wins + warrior.career.losses;
+  const mastery = getMastery(totalFights);
+
+  const handleInsight = (type: "weapon" | "rhythm") => {
+    const msg = applyInsightToken(warrior, type);
+    // Persist the change
+    setState({
+      ...state,
+      roster: state.roster.map(w => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w),
+    });
+    toast.success(msg);
+    onUpdate();
+  };
+
+  if (!warrior.favorites) return null;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="font-display text-lg flex items-center gap-2">
+          <Lightbulb className="h-5 w-5 text-accent" /> Favorites & Mastery
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Mastery Tier */}
+        <div className="flex items-center justify-between pb-2 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Badge variant={mastery.tier === "Grandmaster" ? "destructive" : mastery.tier === "Master" ? "default" : "secondary"}>
+              {mastery.tier}
+            </Badge>
+            <span className="text-xs text-muted-foreground">{totalFights} fights</span>
+          </div>
+          <span className="text-[10px] text-muted-foreground">×{mastery.mult} passives</span>
+        </div>
+
+        {/* Favorite Weapon */}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Swords className="h-3 w-3" /> Favorite Weapon
+            </div>
+            {favDisplay.weapon ? (
+              <div className="text-sm font-semibold text-accent">{favDisplay.weapon}</div>
+            ) : favDisplay.weaponHint ? (
+              <div className="text-sm text-muted-foreground italic">{favDisplay.weaponHint}</div>
+            ) : (
+              <div className="text-sm text-muted-foreground/50">Not yet discovered</div>
+            )}
+          </div>
+          {!warrior.favorites.discovered.weapon && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" onClick={() => handleInsight("weapon")}>
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Use Insight Token to reveal</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+
+        {/* Favorite Rhythm */}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Zap className="h-3 w-3" /> Natural Rhythm
+            </div>
+            {favDisplay.rhythm ? (
+              <div className="text-sm font-semibold text-accent">{favDisplay.rhythm}</div>
+            ) : favDisplay.rhythmHint ? (
+              <div className="text-sm text-muted-foreground italic">{favDisplay.rhythmHint}</div>
+            ) : (
+              <div className="text-sm text-muted-foreground/50">Not yet discovered</div>
+            )}
+          </div>
+          {!warrior.favorites.discovered.rhythm && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" onClick={() => handleInsight("rhythm")}>
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Use Insight Token to reveal</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -481,6 +583,9 @@ export default function WarriorDetail() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Favorites & Mastery */}
+            <FavoritesCard warrior={warrior} onUpdate={() => {}} />
 
             {/* Canonical Warrior Statements */}
             {warrior.baseSkills && (

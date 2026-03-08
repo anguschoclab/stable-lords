@@ -15,6 +15,7 @@ import { StyleRollups } from "@/engine/stats/styleRollups";
 import { commentatorFor, recapLine, blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
 import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
 import { calculateXP, applyXP } from "@/engine/progression";
+import { checkDiscovery } from "@/engine/favorites";
 import {
   generateMatchCard,
   addRestState,
@@ -274,6 +275,18 @@ function resolveBout(
   if (!rivalStableId) {
     const xpD = calculateXP(outcome, "D", tags);
     s.roster = s.roster.map(w => w.id === opponent.id ? applyXP(w, xpD).warrior : w);
+  }
+
+  // ── Favorites Discovery ──
+  const discoveryA = checkDiscovery(s.roster.find(w => w.id === warrior.id) || warrior);
+  if (discoveryA.updated && discoveryA.hints.length > 0) {
+    s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: discoveryA.hints }];
+  }
+  if (!rivalStableId) {
+    const discoveryD = checkDiscovery(s.roster.find(w => w.id === opponent.id) || opponent);
+    if (discoveryD.updated && discoveryD.hints.length > 0) {
+      s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: discoveryD.hints }];
+    }
   }
 
   // ── Match history ──
