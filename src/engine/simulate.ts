@@ -44,18 +44,21 @@ const STYLE_ORDER = [
 ];
 
 // Row = attacker style, Col = defender style
+// BALANCE v2: Capped at ±1, anti-symmetric (A[i][j] = -A[j][i]).
+// Row sums near 0 so no style has massive aggregate advantage.
+// Per compendium: matchups are "edges" not guarantees.
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0, +1,  0, -1, -2, -2, +1,  0, -2, -2], // AB
-  [-1,  0, +1,  0, -1, -1, +2, +1, -2, -2], // BA
-  [ 0, -1,  0, +1,  0, -1, +1, +1, -1, -2], // LU
-  [+1,  0, -1,  0, +1,  0,  0, -1, -1, -2], // PL
-  [+2, +1,  0, -1,  0, +1, -1, -2, -1, -2], // PR
-  [+2, +1, +1,  0, -1,  0, -1, -2, -1, -2], // PS
-  [-1, -2, -1,  0, +1, +1,  0, +1, -1, -2], // SL
-  [ 0, -1, -1, +1, +2, +2, -1,  0, -1, -2], // ST
-  [+2, +2, +1, +1, +1, +1, +1, +1,  0, -1], // TP
-  [+2, +2, +2, +2, +2, +2, +2, +2, +1,  0], // WS
+  [ 0, +1,  0,  0, -1,  0, +1,  0, -1,  0], // AB: beats BA/SL (predictable), loses to PR/TP
+  [-1,  0, -1,  0,  0, -1, +1, +1,  0, +1], // BA: beats SL/ST/WS (power), loses to AB/LU/PS
+  [ 0, +1,  0, +1,  0, -1, +1,  0, -1, -1], // LU: beats BA/PL/SL (speed), loses to PS/TP/WS
+  [ 0,  0, -1,  0, +1,  0,  0, -1, +1,  0], // PL: beats PR/TP (patience), loses to LU/ST
+  [+1,  0,  0, -1,  0, +1, +1, -1, -1,  0], // PR: beats AB/PS/SL (counter), loses to PL/ST/TP
+  [ 0, +1, +1,  0, -1,  0, +1, -1,  0, -1], // PS: beats BA/LU/SL, loses to PR/ST/WS
+  [-1, -1, -1,  0, -1, -1,  0, +1, +1, +1], // SL: risky (low parry), beats ST/TP/WS (aggression)
+  [ 0, -1,  0, +1, +1, +1, -1,  0, -1, -1], // ST: beats PL/PR/PS (efficiency), loses to BA/TP/WS
+  [+1,  0, +1, -1, +1,  0, -1, +1,  0,  0], // TP: outlasts AB/LU/PR/ST, loses to PL/SL
+  [ 0, -1, +1,  0,  0, +1, -1, +1,  0,  0], // WS: beats LU/PS/ST (zone), loses to BA/SL
 ];
 
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
