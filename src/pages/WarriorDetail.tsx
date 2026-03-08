@@ -12,6 +12,7 @@ import TagBadge from "@/components/TagBadge";
 import PlanBuilder from "@/components/PlanBuilder";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
 import { defaultPlanForWarrior } from "@/engine/simulate";
+import { computeStreaks } from "@/engine/gazetteNarrative";
 import { DAMAGE_LABELS } from "@/engine/skillCalc";
 import { retireWarrior } from "@/state/gameStore";
 import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";

@@ -128,7 +128,7 @@ function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType): strin
 }
 
 /** Compute current win streaks from fight history */
-function computeStreaks(allFights: FightSummary[]): Map<string, number> {
+export function computeStreaks(allFights: FightSummary[]): Map<string, number> {
   const streaks = new Map<string, number>();
   const sorted = [...allFights].sort((a, b) => a.week - b.week);
   for (const f of sorted) {
