@@ -26,8 +26,21 @@ function AttrBar({ label, value, max = 25 }: { label: string; value: number; max
 export default function WarriorDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { state } = useGame();
+  const { state, setState } = useGame();
   const warrior = state.roster.find((w) => w.id === id);
+
+  const handlePlanChange = useCallback(
+    (newPlan: FightPlan) => {
+      if (!warrior) return;
+      const nextRoster = state.roster.map((w) =>
+        w.id === warrior.id ? { ...w, plan: newPlan } : w
+      );
+      setState({ ...state, roster: nextRoster });
+    },
+    [warrior, state, setState]
+  );
+
+  const currentPlan = warrior?.plan ?? (warrior ? defaultPlanForWarrior(warrior) : undefined);
 
   if (!warrior) {
     return (
