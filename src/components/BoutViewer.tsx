@@ -57,6 +57,7 @@ function getEventColor(type: ReturnType<typeof classifyEvent>) {
     case "initiative": return "border-primary/40 bg-primary/5";
     case "exhaust": return "border-muted/60 bg-muted/20";
     case "miss": return "border-border bg-secondary/30";
+    case "phase": return "border-primary/30 bg-primary/10";
     default: return "border-border bg-transparent";
   }
 }
