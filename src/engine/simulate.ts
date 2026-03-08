@@ -23,6 +23,7 @@ import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
 import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight } from "@/data/equipment";
 import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/modules/trainers";
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "./tacticSuitability";
+import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "./stylePassives";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 function mulberry32(seed: number) {
@@ -208,6 +209,7 @@ interface FighterState {
   hitsLanded: number;
   hitsTaken: number;
   ripostes: number;
+  consecutiveHits: number; // for Basher momentum, etc.
 }
 
 // ─── Skill Checks ─────────────────────────────────────────────────────────
@@ -392,14 +394,14 @@ export function simulateFight(
     hp: derivedA.hp, maxHp: derivedA.hp,
     endurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
     maxEndurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0,
+    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0,
   };
   const fD: FighterState = {
     label: "D", style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
     hp: derivedD.hp, maxHp: derivedD.hp,
     endurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
     maxEndurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0,
+    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0,
   };
 
   const log: MinuteEvent[] = [];
@@ -462,9 +464,38 @@ export function simulateFight(
     const fatA = fatiguePenalty(fA.endurance, fA.maxEndurance);
     const fatD = fatiguePenalty(fD.endurance, fD.maxEndurance);
 
-    // ── 1. INITIATIVE CONTEST ──
-    const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus;
-    const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus;
+    // ── STYLE PASSIVES & TEMPO ──
+    const tempoA = getTempoBonus(fA.style, phase as StylePhase);
+    const tempoD = getTempoBonus(fD.style, phase as StylePhase);
+
+    const passiveA = getStylePassive(fA.style, {
+      phase: phase as StylePhase, exchange: ex, hitsLanded: fA.hitsLanded,
+      hitsTaken: fA.hitsTaken, ripostes: fA.ripostes, consecutiveHits: fA.consecutiveHits,
+      hpRatio: fA.hp / fA.maxHp, endRatio: fA.endurance / fA.maxEndurance,
+      opponentStyle: fD.style, targetedLocation: tacticsA.target,
+    });
+    const passiveD = getStylePassive(fD.style, {
+      phase: phase as StylePhase, exchange: ex, hitsLanded: fD.hitsLanded,
+      hitsTaken: fD.hitsTaken, ripostes: fD.ripostes, consecutiveHits: fD.consecutiveHits,
+      hpRatio: fD.hp / fD.maxHp, endRatio: fD.endurance / fD.maxEndurance,
+      opponentStyle: fA.style, targetedLocation: tacticsD.target,
+    });
+
+    // Anti-synergy for tactic choices
+    const antiSynA = getStyleAntiSynergy(fA.style, tacticsA.offTactic, tacticsA.defTactic);
+    const antiSynD = getStyleAntiSynergy(fD.style, tacticsD.offTactic, tacticsD.defTactic);
+
+    // Emit passive narrative (occasionally)
+    if (passiveA.narrative && rng() < 0.4) {
+      log.push({ minute: min, text: `${nameA} ${passiveA.narrative}` });
+    }
+    if (passiveD.narrative && rng() < 0.4) {
+      log.push({ minute: min, text: `${nameD} ${passiveD.narrative}` });
+    }
+
+    // ── 1. INITIATIVE CONTEST — with tempo & passive ──
+    const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus;
+    const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus;
     const aGoesFirst = contestCheck(rng, iniA, iniD);
 
     const attacker = aGoesFirst ? fA : fD;
@@ -478,6 +509,10 @@ export function simulateFight(
     const attAL = aGoesFirst ? effAL_A : effAL_D;
     const defAL = aGoesFirst ? effAL_D : effAL_A;
     const attKD = aGoesFirst ? effKD_A : effKD_D;
+    const attPassive = aGoesFirst ? passiveA : passiveD;
+    const defPassive = aGoesFirst ? passiveD : passiveA;
+    const attAntiSyn = aGoesFirst ? antiSynA : antiSynD;
+    const defAntiSyn = aGoesFirst ? antiSynD : antiSynA;
 
     // Resolve per-phase tactic mods for attacker/defender
     const attTactics = aGoesFirst ? tacticsA : tacticsD;
@@ -494,12 +529,15 @@ export function simulateFight(
       }
     }
 
-    // ── 2. ATTACK ATTEMPT (ATT) — includes offensive tactic bonus ──
+    // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy ──
     const attOEmod = oeAttMod(attOE);
-    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus);
+    const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5); // Convert mult to +/- modifier
+    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod);
 
     if (!attackSuccess) {
-      // Attack whiffs
+      // Attack whiffs — reset consecutive hits
+      attacker.consecutiveHits = 0;
+
       if (rng() < 0.25) {
         log.push({ minute: min, text: `${name(attacker)} probes but finds no opening.` });
       }
@@ -507,16 +545,19 @@ export function simulateFight(
       attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, attAL) * 0.5)) + attOffMods.endCost;
 
       // Defender may riposte on whiff
-      // ── 4. RIPOSTE CHECK (RIP) ──
-      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + defDefMods.ripBonus);
+      // ── 4. RIPOSTE CHECK — with passive RIP ──
+      const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
+      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
       if (ripCheck) {
         const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-        const ripDmgRaw = computeHitDamage(rng, defender.derived.damage, ripLoc);
+        const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
         const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
         attacker.hp -= ripDmg;
         attacker.hitsTaken++;
         defender.hitsLanded++;
         defender.ripostes++;
+        defender.consecutiveHits++;
+        attacker.consecutiveHits = 0;
 
         log.push({
           minute: min,
@@ -528,46 +569,61 @@ export function simulateFight(
     } else {
       // Attack lands — defender tries to stop it
 
-      // ── 3a. PARRY CHECK (PAR) ──
+      // ── 3a. PARRY CHECK — with passive PAR + anti-synergy ──
       const defOEmod = oeDefMod(defOE);
-      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus - attOffMods.defPenalty);
+      const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
+      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty);
 
       if (parrySuccess) {
+        attacker.consecutiveHits = 0;
+
         if (rng() < 0.3) {
           log.push({ minute: min, text: `${name(defender)} ${pickText(rng, verbs(defender).parry)}.` });
         }
 
-        // Parry succeeds — defender may riposte
-        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 2 + defDefMods.ripBonus);
+        // Parry succeeds — defender may riposte (with passive RIP bonus)
+        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 2 + defDefMods.ripBonus + defPassive.ripBonus);
         if (ripAfterParry) {
           const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-          const ripDmgRaw = computeHitDamage(rng, defender.derived.damage, ripLoc);
+          const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
           const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
           attacker.hp -= ripDmg;
           attacker.hitsTaken++;
           defender.hitsLanded++;
           defender.ripostes++;
+          defender.consecutiveHits++;
           log.push({
             minute: min,
             text: `${name(defender)} ${pickText(rng, verbs(defender).riposte)} to the ${ripLoc} for ${ripDmg}!`,
           });
         }
       } else {
-        // ── 3b. DEFENSE CHECK (DEF) ──
-        const defSuccess = skillCheck(rng, defender.skills.DEF, oeDefMod(defOE) + defMatchup + defFat + defDefMods.defBonus);
+        // ── 3b. DEFENSE CHECK — with passive DEF ──
+        const defSuccess = skillCheck(rng, defender.skills.DEF, oeDefMod(defOE) + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus);
 
         if (defSuccess) {
+          attacker.consecutiveHits = 0;
           if (rng() < 0.2) {
             log.push({ minute: min, text: `${name(defender)} dodges the attack with quick footwork.` });
           }
         } else {
-          // ── 5. DAMAGE APPLICATION — with tactic dmg bonus and protect ──
+          // ── 5. DAMAGE APPLICATION — with passive DMG + crit ──
           const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
-          const rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus, hitLoc);
+          let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
+
+          // Style-specific crit (e.g. Aimed Blow precision)
+          if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
+            rawDamage = Math.round(rawDamage * 1.5);
+            log.push({ minute: min, text: `💥 CRITICAL HIT! ${name(attacker)} finds a vital weakness!` });
+            if (!tags.includes("CriticalHit")) tags.push("CriticalHit");
+          }
+
           const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
           defender.hp -= damage;
           defender.hitsTaken++;
           attacker.hitsLanded++;
+          attacker.consecutiveHits++;
+          defender.consecutiveHits = 0;
 
           log.push({
             minute: min,
@@ -582,20 +638,30 @@ export function simulateFight(
             log.push({ minute: min, text: `A devastating blow to the head staggers ${name(defender)}!` });
           }
 
-          // ── 6. DECISIVENESS CHECK (DEC) — Kill Window ──
-          if (defender.hp <= defender.maxHp * 0.3 && defender.endurance <= defender.maxEndurance * 0.4) {
+          // ── 6. DECISIVENESS CHECK — Style-specific kill mechanics ──
+          const killMech = getKillMechanic(attacker.style, {
+            phase: phase as StylePhase,
+            hitsLanded: attacker.hitsLanded,
+            consecutiveHits: attacker.consecutiveHits,
+            targetedLocation: attTactics.target,
+            hitLocation: hitLoc,
+          });
+
+          const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
+          const killWindowEnd = defender.maxEndurance * 0.4;
+
+          if (defender.hp <= killWindowHp && defender.endurance <= killWindowEnd) {
             const kdMod = Math.floor((attKD) - 5) * 0.5;
             const phaseMod = phase === "LATE" ? 3 : phase === "MID" ? 1 : 0;
-            const decSuccess = skillCheck(rng, attacker.skills.DEC, kdMod + phaseMod + attMatchup + attFat + attOffMods.decBonus);
+            const decSuccess = skillCheck(rng, attacker.skills.DEC, kdMod + phaseMod + attMatchup + attFat + attOffMods.decBonus + killMech.decBonus);
 
             if (decSuccess) {
-              // Kill window — attempt execution
               const killRoll = rng();
               const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * 0.03 : (trainerModsD?.healMod ?? 0) * 0.03;
-              const killThreshold = Math.max(0.05, 0.3 + attKD * 0.04 + (phase === "LATE" ? 0.15 : 0) - healingReduction);
+              const killThreshold = Math.max(0.05, 0.3 + attKD * 0.04 + (phase === "LATE" ? 0.15 : 0) + killMech.killBonus - healingReduction);
 
               if (killRoll < killThreshold) {
-                // KILL
+                // KILL — style-specific narrative
                 defender.hp = 0;
                 winner = attacker.label as "A" | "D";
                 by = "Kill";
@@ -603,11 +669,10 @@ export function simulateFight(
 
                 log.push({
                   minute: min,
-                  text: `${name(attacker)} sees the opening and delivers a KILLING BLOW to the ${hitLoc}! ${name(defender)} falls!`,
+                  text: `${name(attacker)} ${killMech.killNarrative}`,
                 });
                 break;
               } else {
-                // Near-kill
                 log.push({
                   minute: min,
                   text: `${name(attacker)} senses the kill window but ${name(defender)} desperately clings on!`,
@@ -631,9 +696,11 @@ export function simulateFight(
       }
     }
 
-    // ── 7. ENDURANCE & FATIGUE UPDATE ──
-    attacker.endurance -= enduranceCost(attOE, attAL);
-    defender.endurance -= Math.max(1, Math.floor(enduranceCost(defOE, defAL) * 0.6));
+    // ── 7. ENDURANCE & FATIGUE — with style-specific drain rates ──
+    const attEndMult = getEnduranceMult(attacker.style);
+    const defEndMult = getEnduranceMult(defender.style);
+    attacker.endurance -= Math.round(enduranceCost(attOE, attAL) * attEndMult);
+    defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * 0.6 * defEndMult));
 
     // Clamp endurance
     fA.endurance = Math.max(0, fA.endurance);
