@@ -47,6 +47,7 @@ function GameRoutes() {
         <Route path="/training" element={<Training />} />
         <Route path="/scouting" element={<Scouting />} />
         <Route path="/stable/:id" element={<StableDetail />} />
+        <Route path="/world" element={<WorldOverview />} />
         <Route path="/graveyard" element={<Graveyard />} />
         <Route path="/trainers" element={<Trainers />} />
         <Route path="/help" element={<Help />} />
