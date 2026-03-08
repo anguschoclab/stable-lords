@@ -205,13 +205,13 @@ export function getStylePassive(
     }
 
     // ── Parry-Strike: Efficient Counter ──
-    // Small consistent PAR + ATT
+    // BALANCE v5: Reduced from parBonus 1+mastery to just 1. No free ATT bonus.
     case FightingStyle.ParryStrike:
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        parBonus: 1 + m.bonus,
-        attBonus: scale(1),
+        parBonus: 1,
+        attBonus: context.hitsTaken > context.hitsLanded ? 1 : 0, // Only when behind (counter identity)
       };
 
     // ── Slashing Attack: Flurry ──
