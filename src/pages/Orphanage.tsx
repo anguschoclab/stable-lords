@@ -145,6 +145,12 @@ export default function Orphanage() {
         killedBy: boutResult?.outcome.winner === "A" ? boutResult.a.name : boutResult?.d.name,
       }));
 
+    // Generate AI rival stables
+    const rivals = generateRivalStables(3, Date.now()).map((r) => ({
+      owner: r.owner,
+      roster: r.roster,
+    }));
+
     const newState = {
       ...state,
       ftueComplete: true,
@@ -154,12 +160,15 @@ export default function Orphanage() {
       roster: aliveWarriors,
       graveyard: [...state.graveyard, ...deadWarriors],
       arenaHistory: boutResult ? [boutResult.summary] : [],
+      rivals,
+      scoutReports: [],
       newsletter: [
         {
           week: 1,
           title: "Arena Gazette",
           items: [
             `${stableName} enters the arena under ${ownerName}'s command!`,
+            `${rivals.length} rival stables have entered the arena!`,
             ...(boutResult
               ? [
                   `First bout: ${boutResult.a.name} vs ${boutResult.d.name} — ${
