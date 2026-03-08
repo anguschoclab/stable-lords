@@ -110,6 +110,8 @@ export function loadGameState(): GameState {
         if (!parsed.retired) parsed.retired = [];
         if (!parsed.crowdMood) parsed.crowdMood = "Calm";
         if (!parsed.tournaments) parsed.tournaments = [];
+        if (!parsed.trainers) parsed.trainers = [];
+        if (!parsed.hiringPool) parsed.hiringPool = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
           ...w,
