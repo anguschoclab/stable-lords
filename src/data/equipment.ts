@@ -133,6 +133,45 @@ export function getLoadoutWeight(loadout: EquipmentLoadout): number {
     .reduce((sum, id) => sum + (getItemById(id)?.weight ?? 0), 0);
 }
 
+/** Check weapon stat requirements against warrior attributes. Returns penalty details. */
+export interface WeaponReqCheck {
+  stat: "ST" | "DF" | "SP";
+  label: string;
+  required: number;
+  current: number;
+  deficit: number;
+}
+export interface WeaponReqResult {
+  met: boolean;
+  failures: WeaponReqCheck[];
+  attPenalty: number;        // -2 per failed requirement
+  endurancePenalty: number;  // +10% per failed requirement (as multiplier, e.g. 1.2)
+}
+
+export function checkWeaponRequirements(
+  weaponId: string,
+  attrs: { ST: number; DF: number; SP: number }
+): WeaponReqResult {
+  const item = getItemById(weaponId);
+  if (!item || item.slot !== "weapon") return { met: true, failures: [], attPenalty: 0, endurancePenalty: 1 };
+
+  const checks: WeaponReqCheck[] = [];
+  if (item.reqST && attrs.ST < item.reqST)
+    checks.push({ stat: "ST", label: "Strength", required: item.reqST, current: attrs.ST, deficit: item.reqST - attrs.ST });
+  if (item.reqDF && attrs.DF < item.reqDF)
+    checks.push({ stat: "DF", label: "Deftness", required: item.reqDF, current: attrs.DF, deficit: item.reqDF - attrs.DF });
+  if (item.reqSP && attrs.SP < item.reqSP)
+    checks.push({ stat: "SP", label: "Speed", required: item.reqSP, current: attrs.SP, deficit: item.reqSP - attrs.SP });
+
+  const failCount = checks.length;
+  return {
+    met: failCount === 0,
+    failures: checks,
+    attPenalty: failCount * -2,
+    endurancePenalty: 1 + failCount * 0.1,
+  };
+}
+
 export function isOverEncumbered(loadout: EquipmentLoadout, carryCap: number): boolean {
   return getLoadoutWeight(loadout) > carryCap;
 }
