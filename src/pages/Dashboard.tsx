@@ -398,9 +398,9 @@ function RecentBoutsWidget() {
                   </Badge>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs">
-                      <span className={`font-medium ${isPlayerA ? "text-foreground" : "text-muted-foreground"}`}>{f.a}</span>
+                      <WarriorLink name={f.a} className={`font-medium ${isPlayerA ? "text-foreground" : "text-muted-foreground"}`} />
                       <span className="text-muted-foreground mx-1.5">vs</span>
-                      <span className={`font-medium ${isPlayerD ? "text-foreground" : "text-muted-foreground"}`}>{f.d}</span>
+                      <WarriorLink name={f.d} className={`font-medium ${isPlayerD ? "text-foreground" : "text-muted-foreground"}`} />
                     </div>
                     <div className="flex gap-1 mt-0.5">
                       {f.by && <Badge variant="outline" className="text-[9px] h-3.5 px-1">{f.by}</Badge>}
