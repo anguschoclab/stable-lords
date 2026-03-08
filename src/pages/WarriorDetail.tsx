@@ -26,15 +26,89 @@ const TABS: SubNavTab[] = [
   { id: "history", label: "History", icon: <History className="h-3.5 w-3.5" /> },
 ];
 
-function AttrBar({ label, value, max = 25 }: { label: string; value: number; max?: number }) {
-  const pct = (value / max) * 100;
+/**
+ * Narrative descriptors for growth headroom.
+ * These hint at potential without showing numbers.
+ */
+function growthNarrative(current: number, potential: number | undefined): {
+  label: string;
+  color: string;
+  tooltip: string;
+} {
+  if (potential === undefined) {
+    return { label: "", color: "", tooltip: "Growth potential unknown" };
+  }
+  const gap = potential - current;
+  if (gap <= 0) return {
+    label: "Mastered",
+    color: "text-muted-foreground",
+    tooltip: "This warrior has reached their natural ceiling in this area.",
+  };
+  if (gap === 1) return {
+    label: "Nearing peak",
+    color: "text-arena-gold/70",
+    tooltip: "Little room left to grow. Training gains will be rare.",
+  };
+  if (gap === 2) return {
+    label: "Maturing",
+    color: "text-arena-gold",
+    tooltip: "Some growth remains, but progress is slowing.",
+  };
+  if (gap <= 5) return {
+    label: "Developing",
+    color: "text-primary",
+    tooltip: "Solid room for improvement through training and experience.",
+  };
+  return {
+    label: "Raw talent",
+    color: "text-arena-pop",
+    tooltip: "Tremendous untapped potential. This warrior could become exceptional.",
+  };
+}
+
+/** Overall narrative assessment of a warrior's growth ceiling */
+function overallGrowthNarrative(warrior: Warrior): string {
+  if (!warrior.potential) return "This warrior's limits are unknown.";
+  const gaps = ATTRIBUTE_KEYS.map(k => warrior.potential![k] - warrior.attributes[k]);
+  const totalGap = gaps.reduce((s, g) => s + Math.max(0, g), 0);
+  const maxedCount = gaps.filter(g => g <= 0).length;
+
+  if (maxedCount === 7) return "A fully realized warrior — there is nothing more the arena can teach.";
+  if (maxedCount >= 5) return "Nearing the end of their growth. Focus training on what remains.";
+  if (totalGap >= 30) return "Brimming with untapped potential. The right training could forge a legend.";
+  if (totalGap >= 15) return "Still growing. There are gains to be made across the board.";
+  return "Approaching their natural limits, but a few areas can still sharpen.";
+}
+
+function AttrBar({ label, value, potential, max = 25 }: { label: string; value: number; potential?: number; max?: number }) {
+  const currentPct = (value / max) * 100;
+  const growth = growthNarrative(value, potential);
+
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-muted-foreground w-20">{label}</span>
-      <div className="flex-1">
-        <Progress value={pct} className="h-2" />
+    <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-muted-foreground w-20">{label}</span>
+        <div className="flex items-center gap-2">
+          {growth.label && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className={`text-[10px] italic ${growth.color} cursor-default`}>
+                    {growth.label}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="left" className="max-w-[200px] text-xs">
+                  {growth.tooltip}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          <span className="text-sm font-mono font-semibold w-6 text-right">{value}</span>
+        </div>
       </div>
-      <span className="text-sm font-mono font-semibold w-6 text-right">{value}</span>
+      <div className="relative">
+        <Progress value={currentPct} className="h-2" />
+      </div>
     </div>
   );
 }
