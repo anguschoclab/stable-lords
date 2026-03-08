@@ -406,8 +406,12 @@ export function simulateFight(
   const classicBonusA = getClassicWeaponBonus(planA.style, (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon);
   const classicBonusD = getClassicWeaponBonus(planD.style, (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon);
 
+  // Favorite weapon/rhythm bonuses (only if warrior has discovered them)
+  const favWeaponA = warriorA ? getFavoriteWeaponBonus(warriorA) : 0;
+  const favWeaponD = warriorD ? getFavoriteWeaponBonus(warriorD) : 0;
+
   const effSkillsA: BaseSkills = {
-    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA,
+    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA + favWeaponA,
     PAR: skillsA.PAR + equipA.parMod + (trainerModsA?.parMod ?? 0),
     DEF: skillsA.DEF + equipA.defMod + (trainerModsA?.defMod ?? 0),
     INI: skillsA.INI + equipA.iniMod + (trainerModsA?.iniMod ?? 0),
