@@ -658,7 +658,7 @@ export default function Gazette() {
       {visibleIssues.map(({ week, fights, fotwId, kills, kos, rollup }) => {
         const fotw = fights.find((f) => f.id === fotwId);
         const otherFights = fights.filter((f) => f.id !== fotwId);
-        const styleEntries = Object.entries(rollup).sort(
+        const styleEntries = Object.entries(rollup as Record<string, { w: number; l: number; k: number; pct: number; fights: number }>).sort(
           ([, a], [, b]) => b.fights - a.fights
         );
 
