@@ -586,7 +586,7 @@ export function simulateFight(
         }
 
         // Parry succeeds — defender may riposte (with passive RIP bonus)
-        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 2 + defDefMods.ripBonus + defPassive.ripBonus);
+        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 4 + defDefMods.ripBonus + defPassive.ripBonus);
         if (ripAfterParry) {
           const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
           const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
