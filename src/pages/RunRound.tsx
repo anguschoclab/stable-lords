@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
