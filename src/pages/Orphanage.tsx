@@ -1,6 +1,6 @@
 /**
  * Stable Lords — Orphanage FTUE Flow
- * Warrior selection → Tutorial bout → Summary
+ * Dynamic warrior selection → Tutorial bout → Summary
  * (Stable naming now handled on Start Game page)
  */
 import React, { useState, useMemo, useCallback } from "react";
@@ -16,28 +16,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Swords, ArrowRight, ArrowLeft, Sparkles, Skull, Shield, CheckCircle2, Trophy, Zap } from "lucide-react";
-
-// ── Warrior Pool ────────────────────────────────────────────────────────────
-
-interface PoolWarrior {
-  id: string;
-  name: string;
-  style: FightingStyle;
-  attrs: { ST: number; CN: number; SZ: number; WT: number; WL: number; SP: number; DF: number };
-  lore: string;
-}
-
-const ORPHAN_POOL: PoolWarrior[] = [
-  { id: "orp_1", name: "KRAGOS", style: FightingStyle.BashingAttack, attrs: { ST: 17, CN: 14, SZ: 12, WT: 7, WL: 11, SP: 5, DF: 4 }, lore: "A hulking youth raised in the quarry pits. Swings first, asks never." },
-  { id: "orp_2", name: "SILVANE", style: FightingStyle.ParryRiposte, attrs: { ST: 9, CN: 8, SZ: 8, WT: 15, WL: 11, SP: 9, DF: 10 }, lore: "Quick-witted and patient. Waits for the perfect opening, then strikes." },
-  { id: "orp_3", name: "THORNE", style: FightingStyle.LungingAttack, attrs: { ST: 12, CN: 9, SZ: 10, WT: 11, WL: 10, SP: 13, DF: 5 }, lore: "All speed, no fear. Dashes in with reckless abandon." },
-  { id: "orp_4", name: "ASHARA", style: FightingStyle.AimedBlow, attrs: { ST: 8, CN: 7, SZ: 7, WT: 17, WL: 12, SP: 5, DF: 14 }, lore: "Precise and deadly. Targets weak points with surgical accuracy." },
-  { id: "orp_5", name: "GORLAK", style: FightingStyle.WallOfSteel, attrs: { ST: 14, CN: 13, SZ: 11, WT: 9, WL: 13, SP: 5, DF: 5 }, lore: "An iron wall. Grinds opponents down through sheer attrition." },
-  { id: "orp_6", name: "VEXIA", style: FightingStyle.SlashingAttack, attrs: { ST: 11, CN: 8, SZ: 9, WT: 10, WL: 10, SP: 11, DF: 11 }, lore: "Fluid and relentless. Her blade traces arcs that are beautiful and lethal." },
-  { id: "orp_7", name: "FERRIK", style: FightingStyle.StrikingAttack, attrs: { ST: 15, CN: 11, SZ: 10, WT: 8, WL: 12, SP: 7, DF: 7 }, lore: "Solid fundamentals. A reliable fighter who lands clean, heavy strikes." },
-  { id: "orp_8", name: "MORKA", style: FightingStyle.TotalParry, attrs: { ST: 7, CN: 16, SZ: 9, WT: 11, WL: 15, SP: 6, DF: 6 }, lore: "Impossible to put down. Endures punishment that would fell lesser warriors." },
-];
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Swords, ArrowRight, ArrowLeft, Sparkles, Skull, Shield,
+  CheckCircle2, Trophy, Zap, RefreshCw, User, MapPin, Brain,
+} from "lucide-react";
+import { generateOrphanPool, type OrphanWarrior } from "@/data/orphanPool";
 
 const STEP_LABELS = ["Choose Warriors", "First Blood", "Your Story Begins"];
 
@@ -45,15 +29,24 @@ export default function Orphanage() {
   const { state, setState, returnToTitle } = useGame();
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [poolSeed, setPoolSeed] = useState(() => Date.now());
   const [boutResult, setBoutResult] = useState<{
     a: Warrior; d: Warrior;
     outcome: ReturnType<typeof simulateFight>;
     summary: FightSummary;
   } | null>(null);
 
+  // Dynamic orphan pool — regenerates on seed change
+  const orphanPool = useMemo(() => generateOrphanPool(8, poolSeed), [poolSeed]);
+
   // Names come from state (set on start page)
   const stableName = state.player.stableName;
   const ownerName = state.player.name;
+
+  const rerollPool = useCallback(() => {
+    setPoolSeed(Date.now());
+    setSelected(new Set());
+  }, []);
 
   // ── Step 0: Choose Warriors ──────────────────────────────────────────────
 
@@ -67,8 +60,8 @@ export default function Orphanage() {
   }, []);
 
   const selectedWarriors = useMemo(
-    () => ORPHAN_POOL.filter((w) => selected.has(w.id)),
-    [selected]
+    () => orphanPool.filter((w) => selected.has(w.id)),
+    [selected, orphanPool]
   );
 
   // ── Step 1: Tutorial Bout ────────────────────────────────────────────────
@@ -106,7 +99,6 @@ export default function Orphanage() {
   // ── Step 2: Finalize & Enter Game ────────────────────────────────────────
 
   const finishFTUE = useCallback(() => {
-    // Simple seeded RNG for potential generation
     let seed = Date.now();
     const rng = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
 
@@ -117,7 +109,7 @@ export default function Orphanage() {
         pw.name,
         pw.style,
         pw.attrs,
-        { potential }
+        { potential, age: pw.age }
       );
       if (boutResult) {
         const wasA = pw.name === boutResult.a.name;
@@ -152,7 +144,6 @@ export default function Orphanage() {
         killedBy: boutResult?.outcome.winner === "A" ? boutResult.a.name : boutResult?.d.name,
       }));
 
-    // Generate AI rival stables
     const rivals = generateRivalStables(3, Date.now()).map((r) => ({
       owner: r.owner,
       roster: r.roster,
@@ -227,19 +218,29 @@ export default function Orphanage() {
                   Welcome, <span className="text-foreground font-semibold">{ownerName}</span> of <span className="text-foreground font-semibold">{stableName}</span>.
                 </p>
                 <p className="text-muted-foreground text-sm mb-4">
-                  These orphans have been training for this moment. Choose <span className="text-foreground font-semibold">3 warriors</span> to
-                  form your starting stable.
+                  These orphans have been forged by hardship — each with a unique past and fighting instinct.
+                  Choose <span className="text-foreground font-semibold">3 warriors</span> to form your starting stable.
                 </p>
-                <Badge variant="outline" className="mb-4 font-mono">
-                  {selected.size}/3 selected
-                </Badge>
+                <div className="flex items-center gap-3">
+                  <Badge variant="outline" className="font-mono">
+                    {selected.size}/3 selected
+                  </Badge>
+                  <Button variant="ghost" size="sm" onClick={rerollPool} className="gap-1.5 text-xs text-muted-foreground">
+                    <RefreshCw className="h-3 w-3" /> New batch
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
             <div className="grid gap-3">
-              {ORPHAN_POOL.map((pw) => {
+              {orphanPool.map((pw) => {
                 const isSelected = selected.has(pw.id);
                 const stats = computeWarriorStats(pw.attrs, pw.style);
+                const archetype = pw.style === FightingStyle.BashingAttack || pw.style === FightingStyle.StrikingAttack
+                  ? "Power" : pw.style === FightingStyle.LungingAttack || pw.style === FightingStyle.SlashingAttack
+                  ? "Speed" : pw.style === FightingStyle.TotalParry || pw.style === FightingStyle.WallOfSteel
+                  ? "Endurance" : "Finesse";
+
                 return (
                   <Card
                     key={pw.id}
@@ -253,30 +254,80 @@ export default function Orphanage() {
                     onClick={() => toggleWarrior(pw.id)}
                   >
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            {isSelected && <CheckCircle2 className="h-4 w-4 text-primary" />}
-                            <span className="font-display font-bold text-foreground">{pw.name}</span>
-                            <Badge variant="secondary" className="text-xs">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          {/* Name row */}
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                            {isSelected && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+                            <span className="font-display font-bold text-foreground text-lg leading-tight">{pw.name}</span>
+                            <Badge variant="secondary" className="text-[10px]">
                               {STYLE_DISPLAY_NAMES[pw.style]}
                             </Badge>
+                            <Badge variant="outline" className="text-[10px] gap-1">
+                              {archetype}
+                            </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground italic mb-2">{pw.lore}</p>
+
+                          {/* Metadata row */}
+                          <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2 flex-wrap">
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" /> Age {pw.age}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Brain className="h-3 w-3" /> {pw.trait}
+                            </span>
+                          </div>
+
+                          {/* Lore */}
+                          <p className="text-xs text-muted-foreground italic mb-2 leading-relaxed">{pw.lore}</p>
+
+                          {/* Origin */}
+                          <div className="flex items-start gap-1.5 text-[10px] text-muted-foreground/70 mb-2">
+                            <MapPin className="h-3 w-3 shrink-0 mt-0.5" />
+                            <span>{pw.origin}</span>
+                          </div>
+
+                          {/* Attributes */}
                           <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                             {ATTRIBUTE_KEYS.map((k) => (
-                              <span key={k}>
-                                <span className="font-mono text-foreground/70">{k}</span>{" "}
-                                <span className={pw.attrs[k] >= 13 ? "text-primary font-semibold" : pw.attrs[k] <= 6 ? "text-destructive" : ""}>
-                                  {pw.attrs[k]}
-                                </span>
-                              </span>
+                              <TooltipProvider key={k} delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="cursor-default">
+                                      <span className="font-mono text-foreground/70">{k}</span>{" "}
+                                      <span className={
+                                        pw.attrs[k] >= 15 ? "text-primary font-bold" :
+                                        pw.attrs[k] >= 12 ? "text-primary/80 font-semibold" :
+                                        pw.attrs[k] <= 6 ? "text-destructive" :
+                                        pw.attrs[k] <= 8 ? "text-destructive/70" : ""
+                                      }>
+                                        {pw.attrs[k]}
+                                      </span>
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="text-xs">
+                                    {ATTRIBUTE_LABELS[k]}: {pw.attrs[k]}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             ))}
                           </div>
                         </div>
-                        <div className="text-right text-xs space-y-1 ml-3">
-                          <div>HP <span className="font-mono font-semibold">{stats.derivedStats.hp}</span></div>
-                          <div>DMG <span className="font-mono font-semibold">{DAMAGE_LABELS[stats.derivedStats.damage]}</span></div>
+
+                        {/* Right stats column */}
+                        <div className="text-right text-xs space-y-1.5 ml-2 shrink-0 pt-1">
+                          <div className="rounded bg-secondary/60 px-2 py-1 border border-border/50">
+                            <div className="text-[10px] text-muted-foreground">HP</div>
+                            <div className="font-mono font-bold text-sm">{stats.derivedStats.hp}</div>
+                          </div>
+                          <div className="rounded bg-secondary/60 px-2 py-1 border border-border/50">
+                            <div className="text-[10px] text-muted-foreground">DMG</div>
+                            <div className="font-mono font-bold text-sm">{DAMAGE_LABELS[stats.derivedStats.damage]}</div>
+                          </div>
+                          <div className="rounded bg-secondary/60 px-2 py-1 border border-border/50">
+                            <div className="text-[10px] text-muted-foreground">END</div>
+                            <div className="font-mono font-bold text-sm">{stats.derivedStats.endurance}</div>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -417,7 +468,9 @@ export default function Orphanage() {
                         <Badge key={pw.id} variant={isDead ? "destructive" : "outline"} className="gap-1.5">
                           {isDead && <Skull className="h-3 w-3" />}
                           {pw.name}
-                          <span className="text-muted-foreground">{STYLE_DISPLAY_NAMES[pw.style]}</span>
+                          <span className="text-muted-foreground text-[10px]">
+                            {STYLE_DISPLAY_NAMES[pw.style]} · Age {pw.age}
+                          </span>
                         </Badge>
                       );
                     })}
