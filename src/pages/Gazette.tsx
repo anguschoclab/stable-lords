@@ -62,7 +62,7 @@ function FightCard({ fight, isFOTW }: { fight: FightSummary; isFOTW: boolean }) 
           {outcomeBadge(fight.by)}
         </div>
         <div className="flex-1 pl-3">
-          <span className={`font-display text-sm ${fight.winner === "D" ? "text-foreground font-bold" : "text-muted-foreground"}`}>
+        <span className={`font-display text-sm ${fight.winner === "D" ? "text-foreground font-bold" : "text-muted-foreground"}`}>
             {fight.d}
           </span>
           <div className="text-[10px] text-muted-foreground font-mono">{fight.styleD}</div>
