@@ -42,6 +42,7 @@ function getEventIcon(type: ReturnType<typeof classifyEvent>) {
     case "riposte": return <Swords className="h-3 w-3 text-arena-fame" />;
     case "initiative": return <Zap className="h-3 w-3 text-primary" />;
     case "exhaust": return <span className="text-[10px]">💨</span>;
+    case "phase": return <span className="text-[10px]">⚔️</span>;
     default: return <span className="h-3 w-3 rounded-full bg-muted-foreground/30 block" />;
   }
 }
