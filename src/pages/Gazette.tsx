@@ -649,8 +649,8 @@ export default function Gazette() {
         </Card>
       )}
 
-      {/* Weekly Issues */}
-      {weeklyIssues.map(({ week, fights, fotwId, kills, kos, rollup }) => {
+      {/* Weekly Issues — paginated */}
+      {visibleIssues.map(({ week, fights, fotwId, kills, kos, rollup }) => {
         const fotw = fights.find((f) => f.id === fotwId);
         const otherFights = fights.filter((f) => f.id !== fotwId);
         const styleEntries = Object.entries(rollup).sort(
@@ -752,6 +752,18 @@ export default function Gazette() {
           </article>
         );
       })}
+
+      {/* Load More button */}
+      {hasMore && (
+        <div className="flex justify-center py-4">
+          <button
+            onClick={loadMore}
+            className="px-6 py-2 rounded-lg border border-border bg-card hover:bg-secondary text-sm font-display text-foreground transition-colors"
+          >
+            Load Older Issues ({weeklyIssues.length - shown} remaining)
+          </button>
+        </div>
+      )}
     </div>
   );
 }
