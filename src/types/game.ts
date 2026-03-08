@@ -447,6 +447,7 @@ export interface GameState {
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
   recruitPool: any[]; // PoolWarrior[] from recruitment engine
+  rosterBonus: number; // extra roster slots from championships
   settings: {
     featureFlags: {
       tournaments: boolean;
