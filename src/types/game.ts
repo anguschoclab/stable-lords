@@ -375,6 +375,7 @@ export interface GameState {
   restStates: RestState[];
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
+  recruitPool: any[]; // PoolWarrior[] from recruitment engine
   settings: {
     featureFlags: {
       tournaments: boolean;

@@ -7,8 +7,8 @@ import { processTraining } from "@/engine/training";
 import { processEconomy } from "@/engine/economy";
 import { processAging } from "@/engine/aging";
 import { tickInjuries } from "@/engine/injuries";
-import { clearExpiredRest } from "@/engine/matchmaking";
-import { runAIvsAIBouts } from "@/engine/matchmaking";
+import { clearExpiredRest, runAIvsAIBouts } from "@/engine/matchmaking";
+import { partialRefreshPool, aiDraftFromPool } from "@/engine/recruitment";
 
 const SAVE_KEY = "stablelords.save.v2";
 
@@ -84,6 +84,7 @@ export function createFreshState(): GameState {
     restStates: [],
     rivalries: [],
     matchHistory: [],
+    recruitPool: [],
     settings: {
       featureFlags: {
         tournaments: true,
@@ -119,6 +120,7 @@ export function loadGameState(): GameState {
         if (!parsed.restStates) parsed.restStates = [];
         if (!parsed.rivalries) parsed.rivalries = [];
         if (!parsed.matchHistory) parsed.matchHistory = [];
+        if (!parsed.recruitPool) parsed.recruitPool = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
           ...w,
@@ -185,13 +187,37 @@ export function advanceWeek(state: GameState): GameState {
       updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Rival Arena Report", items: gazetteItems }];
     }
   }
-  
+
+  // Partial pool refresh (1-2 warriors cycled weekly)
+  const usedNames = new Set<string>();
+  for (const w of updatedState.roster) usedNames.add(w.name);
+  for (const w of updatedState.graveyard) usedNames.add(w.name);
+  for (const r of updatedState.rivals || []) for (const w of r.roster) usedNames.add(w.name);
+  updatedState.recruitPool = partialRefreshPool(updatedState.recruitPool || [], updatedState.week, usedNames);
+
+  // AI draft from pool (every 4 weeks)
+  if ((updatedState.rivals || []).length > 0 && (updatedState.recruitPool || []).length > 0) {
+    const draft = aiDraftFromPool(updatedState.recruitPool, updatedState.rivals, updatedState.week);
+    updatedState.recruitPool = draft.updatedPool;
+    updatedState.rivals = draft.updatedRivals;
+    if (draft.gazetteItems.length > 0) {
+      updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Draft Report", items: draft.gazetteItems }];
+    }
+  }
+
+  // Season change = full pool reset
   const newWeek = updatedState.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
+  const newSeason = SEASONS[seasonIdx];
+  if (newSeason !== updatedState.season) {
+    // Full pool reset on season change
+    updatedState.recruitPool = [];
+  }
+
   return {
     ...updatedState,
     week: newWeek,
-    season: SEASONS[seasonIdx],
+    season: newSeason,
   };
 }
 

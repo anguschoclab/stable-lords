@@ -89,6 +89,7 @@ export function loadFromSlot(slotId: string): GameState | null {
         if (!parsed.restStates) parsed.restStates = [];
         if (!parsed.rivalries) parsed.rivalries = [];
         if (!parsed.matchHistory) parsed.matchHistory = [];
+        if (!parsed.recruitPool) parsed.recruitPool = [];
         if (parsed.gold === undefined) parsed.gold = 500;
         if (!parsed.ledger) parsed.ledger = [];
         if (!parsed.settings) parsed.settings = { featureFlags: { tournaments: true, scouting: true } };
@@ -237,6 +238,7 @@ export function parseImportedSave(json: string): GameState {
   if (!state.restStates) state.restStates = [];
   if (!state.rivalries) state.rivalries = [];
   if (!state.matchHistory) state.matchHistory = [];
+  if (!state.recruitPool) state.recruitPool = [];
   if (!state.settings) state.settings = { featureFlags: { tournaments: true, scouting: true } };
   if (state.settings && !state.settings.featureFlags?.scouting) {
     state.settings.featureFlags = { ...state.settings.featureFlags, scouting: true };
