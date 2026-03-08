@@ -53,24 +53,26 @@ const STYLE_ORDER = [
 ];
 
 // Row = attacker style, Col = defender style
-// BALANCE v3: Lore-accurate matchups from Duelmasters canon:
-// - BA hard-counters TP (bash attacks through parries, overwhelms passive defense)
-// - AB counters TP (endurance conservation + precision finds openings in static defense)
-// - SL/LU beat TP (aggression overwhelms)
-// - TP beats reactive/patient styles (PL, PR, WS — outlasts them)
-// - BA loses to precision/counter styles (AB, PR — can read the charges)
+// BALANCE v6: Rebalanced for 35-65% target range.
+// Key changes:
+// - BA gets +2 vs TP (hard counter via bash-through), +1 vs SL/WS/PL
+// - SL gets +1 vs TP/WS/BA (flurry overwhelms)
+// - ST gets +1 vs TP/PR/PS/PL (reliable power vs counter styles)
+// - TP loses advantage vs most styles (only beats WS/PL via endurance)
+// - AB loses universal advantage (only counters TP)
+// - PR loses advantage vs BA/ST (can't counter raw power or efficient strikes)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0, +1,  0,  0, -1,  0,  0,  0, +2,  0], // AB: precision destroys TP, edge vs BA
-  [-1,  0,  0,  0,  0,  0, +1,  0, +2, +1], // BA: hard-counters TP, beats SL/WS
-  [ 0,  0,  0, +1,  0, -1,  0,  0, +1, -1], // LU: speed beats PL, weak vs PS/WS
-  [ 0,  0, -1,  0, +1,  0,  0, -1, -1,  0], // PL: beats PR, weak vs ST/TP
-  [+1,  0,  0, -1,  0,  0,  0, -1, -1,  0], // PR: counter beats AB, weak vs PL/ST/TP
-  [ 0,  0, +1,  0,  0,  0, +1, -1,  0, -1], // PS: beats LU/SL, loses to ST/WS
-  [ 0, -1,  0,  0,  0, -1,  0,  0, +1, +1], // SL: flurry beats TP/WS, weak vs BA/PS
-  [ 0,  0,  0, +1, +1, +1,  0,  0,  0,  0], // ST: efficient power, beats PL/PR/PS
-  [-2, -2, -1, +1, +1,  0, -1,  0,  0, +1], // TP: crushed by BA/AB, outlasts PL/PR
-  [ 0, -1, +1,  0,  0, +1, -1,  0, -1,  0], // WS: zone control, beats LU/PS, loses to BA/TP
+  [ 0,  0,  0,  0, -1,  0,  0,  0, +1,  0], // AB: only edge vs TP, weak vs PR
+  [ 0,  0,  0, +1,  0,  0, +1, +1, +2, +1], // BA: hard-counters TP, edge vs SL/ST/PL/WS
+  [ 0,  0,  0, +1,  0, -1,  0,  0,  0, -1], // LU: speed beats PL, weak vs PS/WS
+  [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0], // PL: weak vs BA/LU/ST
+  [+1,  0,  0,  0,  0,  0,  0, -1,  0,  0], // PR: counter beats AB, weak vs ST
+  [ 0,  0, +1,  0,  0,  0,  0, -1,  0, -1], // PS: beats LU, loses to ST/WS
+  [ 0, -1,  0,  0,  0,  0,  0,  0, +1, +1], // SL: beats TP/WS, weak vs BA
+  [ 0, -1,  0, +1, +1, +1,  0,  0, +1,  0], // ST: efficient power beats PL/PR/PS/TP, weak vs BA
+  [-1, -2,  0,  0,  0,  0, -1, -1,  0,  0], // TP: crushed by BA, weak vs AB/SL/ST
+  [ 0, -1, +1,  0,  0, +1, -1,  0,  0,  0], // WS: zone control, beats LU/PS, loses to BA/SL
 ];
 
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
@@ -200,29 +202,29 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
 }
 
 // ─── OE/AL Effects ────────────────────────────────────────────────────────
-// BALANCE v5: Increased ATT bonus, steeper PAR penalty.
-// Offense needs to land consistently; defense should rely on endurance/counters.
-const GLOBAL_ATT_BONUS = 6;    // All attacks get +6 to ensure hits land frequently
-const GLOBAL_PAR_PENALTY = -4; // Parry harder — defense identity is endurance, not blocking
+// BALANCE v6: Key changes:
+// - GLOBAL_ATT_BONUS 6 → 8 (offense needs to land even more vs defensive seeds)
+// - GLOBAL_PAR_PENALTY -4 → -6 (parrying is hard — defense is about endurance/position)
+// - AB/PR OE paradox REMOVED — they now get a modest penalty at low OE like everyone
+// - BA/SL/ST get ATT bonus from high OE (rewarding aggressive commitment)
+// - Endurance cost formula adjusted: lower base, higher OE scaling (high OE = aggressive = tiring)
+const GLOBAL_ATT_BONUS = 8;    // Attacks land frequently — fights should be violent
+const GLOBAL_PAR_PENALTY = -6; // Parry is hard — defense identity is endurance, not blocking
 
 function oeAttMod(oe: number, style?: FightingStyle): number {
-  // PR OE Paradox: PR is NOT penalized at low OE but doesn't get a bonus either
-  if (style === FightingStyle.ParryRiposte) {
-    if (oe <= 5) return 0;   // Low-mid OE: no penalty (counter stance)
-    return -1;               // High OE: loses counter identity
-  }
-  // AB: patience is a feature — no penalty at low OE
-  if (style === FightingStyle.AimedBlow) {
-    if (oe <= 5) return 0;
-    return -1;
-  }
-  return Math.floor((oe - 5) * 0.8);
+  // BALANCE v6: Removed AB/PR OE paradox. All styles use the same formula.
+  // High OE = more aggressive = bonus to ATT. Low OE = passive = slight penalty.
+  // Offensive styles (BA/SL/ST) get enhanced scaling from high OE.
+  const isAggressive = style === FightingStyle.BashingAttack || style === FightingStyle.SlashingAttack || style === FightingStyle.StrikingAttack;
+  const base = Math.floor((oe - 5) * 0.7);
+  return isAggressive ? base + 1 : base;  // Aggressive styles always get +1 ATT
 }
 function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * 0.5); }
 function alIniMod(al: number): number { return Math.floor((al - 5) * 0.6); }
 function enduranceCost(oe: number, al: number): number {
-  // BALANCE v5: Slightly increased base cost so low-OE fighters can't stall forever
-  return Math.max(2, Math.round((oe * 0.35 + al * 0.25) + 1));
+  // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
+  // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
+  return Math.max(1, Math.round((oe * 0.4 + al * 0.2)));
 }
 
 // ─── Fatigue Penalties ────────────────────────────────────────────────────

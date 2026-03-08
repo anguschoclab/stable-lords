@@ -16,19 +16,25 @@ export interface TempoProfile {
   enduranceMult: number; // multiplier on endurance drain (>1 = burns faster)
 }
 
-// BALANCE v2: Compressed endurance multiplier range from 0.70-1.20 to 0.88-1.08.
-// Previous range created 3x+ endurance advantage for TP, making offense unviable.
+// BALANCE v6: Key changes:
+// - TP endurance mult 0.88 → 0.96 (was unkillable via pure outlast)
+// - AB endurance mult 0.88 → 0.94 (still efficient but not TP-tier)
+// - PR endurance mult 0.95 → 0.98 (counter style shouldn't also outlast)
+// - BA endurance mult 1.06 → 0.98 (bashers are trained athletes, not clumsy)
+// - SL endurance mult 0.98 → 0.94 (slashers are EFFICIENT, their flurry is practiced)
+// - ST endurance mult 1.02 → 0.96 (strikers are economical with energy)
+// - LU endurance mult 1.08 → 1.02 (lungers burn energy but not THIS much)
 const STYLE_TEMPO: Record<FightingStyle, TempoProfile> = {
-  [FightingStyle.AimedBlow]:       { opening: -1, mid:  0, late:  2, enduranceMult: 0.88 },  // AB conserves energy (low activity), dominates late
-  [FightingStyle.BashingAttack]:   { opening:  1, mid:  0, late: -1, enduranceMult: 1.06 },
-  [FightingStyle.LungingAttack]:   { opening:  2, mid:  0, late: -2, enduranceMult: 1.08 },
+  [FightingStyle.AimedBlow]:       { opening: -1, mid:  0, late:  1, enduranceMult: 0.94 },  // AB: reduced late tempo from +2 to +1
+  [FightingStyle.BashingAttack]:   { opening:  2, mid:  1, late:  0, enduranceMult: 0.98 },  // BA: stronger opening, efficient stamina
+  [FightingStyle.LungingAttack]:   { opening:  3, mid:  0, late: -2, enduranceMult: 1.02 },  // LU: explosive opener
   [FightingStyle.ParryLunge]:      { opening:  0, mid:  1, late:  0, enduranceMult: 1.00 },
-  [FightingStyle.ParryRiposte]:    { opening: -1, mid:  0, late:  1, enduranceMult: 0.95 },
+  [FightingStyle.ParryRiposte]:    { opening: -1, mid:  0, late:  0, enduranceMult: 0.98 },  // PR: removed late tempo bonus
   [FightingStyle.ParryStrike]:     { opening:  0, mid:  0, late:  0, enduranceMult: 0.96 },
-  [FightingStyle.SlashingAttack]:  { opening:  1, mid:  0, late: -1, enduranceMult: 0.98 },  // SL flurry is efficient
-  [FightingStyle.StrikingAttack]:  { opening:  1, mid:  0, late:  0, enduranceMult: 1.02 },
-  [FightingStyle.TotalParry]:      { opening: -1, mid:  0, late:  1, enduranceMult: 0.88 },
-  [FightingStyle.WallOfSteel]:     { opening:  0, mid:  0, late:  1, enduranceMult: 0.90 },
+  [FightingStyle.SlashingAttack]:  { opening:  2, mid:  1, late:  0, enduranceMult: 0.96 },  // SL: slight nerf from 0.94
+  [FightingStyle.StrikingAttack]:  { opening:  1, mid:  1, late:  0, enduranceMult: 0.96 },  // ST: consistent, efficient
+  [FightingStyle.TotalParry]:      { opening: -2, mid:  0, late:  1, enduranceMult: 0.96 },  // TP: nerfed endurance from 0.88
+  [FightingStyle.WallOfSteel]:     { opening:  0, mid:  0, late:  1, enduranceMult: 0.92 },
 };
 
 export type Phase = "OPENING" | "MID" | "LATE";
@@ -120,36 +126,32 @@ export function getStylePassive(
 
   switch (style) {
     // ── Aimed Blow: Precision Master ──
-    // Modest ATT bonus when targeting; crit chance is the real payoff
+    // BALANCE v6: Reduced crit from 7-13% to 5-8%. Removed patient bonus (was too strong vs TP/WS).
+    // AB identity: targeted crits, NOT sustained advantage.
     case FightingStyle.AimedBlow: {
       const targeted = context.targetedLocation && context.targetedLocation !== "Any";
-      const vsDefensive = context.opponentStyle === FightingStyle.TotalParry || context.opponentStyle === FightingStyle.WallOfSteel;
-      const patientBonus = vsDefensive ? Math.min(2, Math.floor(context.exchange / 3)) : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(targeted ? 1 : 0) + patientBonus,
-        critChance: targeted ? 0.07 + (context.exchange > 5 ? 0.03 : 0) + (vsDefensive ? 0.03 : 0) : 0, // Reduced from 10%+5%
-        narrative: vsDefensive && context.exchange > 4
-          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}studies the predictable rhythm, each probe finding deeper gaps in the defense`
-          : targeted && context.exchange > 5
+        attBonus: scale(targeted ? 1 : 0),
+        critChance: targeted ? 0.05 + (context.exchange > 8 ? 0.03 : 0) : 0,
+        narrative: targeted && context.exchange > 5
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}studies the opponent's rhythm, waiting for the perfect opening`
           : undefined,
       };
     }
 
     // ── Bashing Attack: Momentum ──
-    // Damage ramps with consecutive hits (cap 2 base, +1 mastery)
+    // BALANCE v6: Increased base dmgBonus (+1 always), higher momentum cap, ATT bonus from consecutive hits
     case FightingStyle.BashingAttack: {
-      const momentumDmg = Math.min(2 + m.bonus, context.consecutiveHits);
-      // BA vs TP: "attack through a parry" — static defense can't handle raw force
+      const momentumDmg = Math.min(3 + m.bonus, 1 + context.consecutiveHits);
       const vsTP = context.opponentStyle === FightingStyle.TotalParry;
-      const bashThroughBonus = vsTP ? 2 : 0;  // Flat ATT bonus vs TP
+      const bashThroughBonus = vsTP ? 2 : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
         dmgBonus: scale(momentumDmg) + (vsTP ? 1 : 0),
-        attBonus: (context.consecutiveHits >= 3 ? 1 : 0) + bashThroughBonus,
+        attBonus: scale(context.consecutiveHits >= 2 ? 2 : 1) + bashThroughBonus, // Always +1 ATT, +2 after momentum
         narrative: vsTP && context.consecutiveHits >= 2
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}hammers through the defensive stance — raw power overwhelms technique!`
           : context.consecutiveHits >= 3
@@ -189,14 +191,14 @@ export function getStylePassive(
     }
 
     // ── Parry-Riposte: Riposte Specialist ──
-    // BALANCE v5: Removed ripBonus escalation and free parBonus.
-    // PR identity comes from OE paradox + riposte checks, not stacking passives.
+    // BALANCE v6: Added ATT penalty (-1). PR should NOT attack well — its damage comes from ripostes only.
     case FightingStyle.ParryRiposte: {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        ripBonus: context.ripostes >= 2 ? 1 : 0, // Modest bonus only after landing 2+ ripostes
-        parBonus: 0, // Removed — PR shouldn't get free parry bonuses
+        attBonus: -1,  // PR attacks poorly — its identity is counter-damage, not proactive striking
+        ripBonus: context.ripostes >= 2 ? 1 : 0,
+        parBonus: 0,
         narrative: context.ripostes >= 3
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}has found the rhythm — each counter deadlier than the last!`
           : undefined,
@@ -214,14 +216,14 @@ export function getStylePassive(
       };
 
     // ── Slashing Attack: Flurry ──
-    // BALANCE v5: Multi-hit identity — ATT persists into late (reduced), DMG scales with hits landed
+    // BALANCE v6b: Reduced opening ATT from +2 to +1 (was 66.3%, target ≤65%)
     case FightingStyle.SlashingAttack: {
-      const flurryDmg = Math.min(2, Math.floor(context.hitsLanded / 2)); // +1 DMG per 2 hits
+      const flurryDmg = Math.min(3, Math.floor(context.hitsLanded / 2));
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
         attBonus: scale(context.phase === "LATE" ? 0 : 1) + (context.phase === "OPENING" ? m.bonus : 0),
-        dmgBonus: (context.phase === "OPENING" ? 1 : 0) + flurryDmg,
+        dmgBonus: 1 + flurryDmg,
         narrative: context.hitsLanded >= 3
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}unleashes a whirlwind of slashes, each cut deeper than the last!`
           : undefined,
@@ -229,25 +231,25 @@ export function getStylePassive(
     }
 
     // ── Striking Attack: Reliable Power ──
-    // Consistent ATT bonus, dmg vs hurt opponents
+    // BALANCE v6: Unconditional ATT +2, dmgBonus always +1 (reliable identity)
     case FightingStyle.StrikingAttack:
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: 1 + m.bonus,
-        dmgBonus: context.hpRatio > 0.7 ? 0 : 1,
+        attBonus: 2 + m.bonus,   // Reliable, always-on attack bonus
+        dmgBonus: 1,             // Consistent damage (not conditional on opponent HP)
       };
 
     // ── Total Parry: Endurance Wall ──
-    // Modest PAR bonus (seeds already give defense); real advantage is endurance efficiency
+    // BALANCE v6b: Restored parBonus +1 (was 34.8%, need ≥35%). TP still can't attack.
     case FightingStyle.TotalParry: {
-      const lateBonus = context.phase === "LATE" ? 1 : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        parBonus: lateBonus + m.bonus,  // Reduced from 1+lateBonus — seeds carry the weight
-        defBonus: 0,                     // Removed — seeds already provide DEF 4
-        ripBonus: context.phase === "LATE" ? 1 : 0,
+        attBonus: -2,
+        parBonus: 1 + m.bonus,  // Restored +1 base parry to bring TP from 34.8% to ~36%
+        defBonus: 0,
+        ripBonus: 0,
         narrative: context.phase === "LATE" && context.endRatio > 0.5
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}stands fresh as the opponent gasps for breath!`
           : undefined,
