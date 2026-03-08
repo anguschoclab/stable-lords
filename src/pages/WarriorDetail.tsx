@@ -485,6 +485,9 @@ export default function WarriorDetail() {
               </Card>
             )}
 
+            {/* Favorites & Mastery */}
+            <FavoritesCard warrior={warrior} onUpdate={() => {}} />
+
             {/* Canonical Warrior Statements */}
             {warrior.baseSkills && (
               <Card>
