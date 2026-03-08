@@ -146,3 +146,93 @@ export function migrateLegacySave(): void {
     localStorage.removeItem(LEGACY_KEY);
   } catch { /* ignore */ }
 }
+
+// ─── Export / Import ────────────────────────────────────────────────────────
+
+export interface ExportedSave {
+  _format: "stablelords-save-v1";
+  exportedAt: string;
+  state: GameState;
+}
+
+/** Export a slot's game state as a downloadable JSON file */
+export function exportSlot(slotId: string): void {
+  const state = loadFromSlot(slotId);
+  if (!state) return;
+  const payload: ExportedSave = {
+    _format: "stablelords-save-v1",
+    exportedAt: new Date().toISOString(),
+    state,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${state.player.stableName.replace(/[^a-zA-Z0-9_-]/g, "_")}_Wk${state.week}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/** Export current active slot */
+export function exportActiveSlot(): void {
+  const slotId = getActiveSlot();
+  if (slotId) exportSlot(slotId);
+}
+
+/**
+ * Validate and parse an imported JSON file.
+ * Returns the GameState or throws with a user-friendly message.
+ */
+export function parseImportedSave(json: string): GameState {
+  let parsed: any;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Invalid file — could not parse JSON.");
+  }
+
+  // Support both wrapped format and raw GameState
+  let state: any;
+  if (parsed?._format === "stablelords-save-v1" && parsed.state) {
+    state = parsed.state;
+  } else if (parsed?.meta?.gameName) {
+    state = parsed;
+  } else {
+    throw new Error("Unrecognized save format. Expected a Stable Lords save file.");
+  }
+
+  // Basic validation
+  if (!state.player?.stableName || !state.meta?.version) {
+    throw new Error("Save file is missing required fields (player/meta).");
+  }
+
+  // Apply migrations
+  if (!state.graveyard) state.graveyard = [];
+  if (!state.retired) state.retired = [];
+  if (!state.crowdMood) state.crowdMood = "Calm";
+  if (!state.tournaments) state.tournaments = [];
+  if (!state.trainers) state.trainers = [];
+  if (!state.hiringPool) state.hiringPool = [];
+  if (state.ftueComplete === undefined) state.ftueComplete = true;
+  if (!state.coachDismissed) state.coachDismissed = [];
+  state.roster = (state.roster || []).map((w: any) => ({ ...w, status: w.status || "Active" }));
+
+  return state as GameState;
+}
+
+/**
+ * Import a save file, creating a new slot for it.
+ * Returns the new slotId or throws on error.
+ */
+export function importSaveToNewSlot(json: string): string {
+  const slots = listSaveSlots();
+  if (slots.length >= MAX_SAVE_SLOTS) {
+    throw new Error(`Maximum ${MAX_SAVE_SLOTS} save slots reached. Delete one first.`);
+  }
+  const state = parseImportedSave(json);
+  const slotId = newSlotId();
+  saveToSlot(slotId, state);
+  return slotId;
+}
