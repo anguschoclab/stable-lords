@@ -8,7 +8,7 @@ import { LoreArchive } from "@/lore/LoreArchive";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import type { TournamentEntry, TournamentBout, FightSummary } from "@/types/game";
-import { STYLE_DISPLAY_NAMES } from "@/types/game";
+import { STYLE_DISPLAY_NAMES, BASE_ROSTER_CAP } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,8 +50,27 @@ export default function Tournaments() {
     const active = state.roster.filter((w) => w.status === "Active");
     if (active.length < 2) return;
 
-    // Build bracket: pair warriors
-    const shuffled = [...active].sort(() => Math.random() - 0.5);
+    // Gather AI rival warriors for the bracket (up to 5 from rivals)
+    const rivalWarriors: { name: string; isAI: boolean }[] = [];
+    for (const rival of (state.rivals ?? [])) {
+      const eligibleRivals = rival.roster.filter((w) => w.status === "Active").slice(0, 2);
+      for (const rw of eligibleRivals) {
+        rivalWarriors.push({ name: rw.name, isAI: true });
+      }
+      if (rivalWarriors.length >= 5) break;
+    }
+
+    // Combine player + AI warriors
+    const allEntrants = [
+      ...active.map((w) => ({ name: w.name, isAI: false })),
+      ...rivalWarriors,
+    ];
+
+    // Pad to power of 2 for clean bracket (4, 8, 16)
+    const targetSize = [4, 8, 16].find((n) => n >= allEntrants.length) ?? allEntrants.length;
+
+    // Build bracket: shuffle and pair
+    const shuffled = [...allEntrants].sort(() => Math.random() - 0.5);
     const bracket: TournamentBout[] = [];
     for (let i = 0; i < shuffled.length; i += 2) {
       if (i + 1 < shuffled.length) {
@@ -60,6 +79,15 @@ export default function Tournaments() {
           matchIndex: Math.floor(i / 2),
           a: shuffled[i].name,
           d: shuffled[i + 1].name,
+        });
+      } else {
+        // Odd entrant gets a bye
+        bracket.push({
+          round: 1,
+          matchIndex: Math.floor(i / 2),
+          a: shuffled[i].name,
+          d: "(bye)",
+          winner: "A",
         });
       }
     }
@@ -93,9 +121,25 @@ export default function Tournaments() {
     let updatedState = { ...state };
     const winners: string[] = [];
 
+    // Helper: find warrior by name across player roster + rival rosters
+    const findWarrior = (name: string) => {
+      const player = updatedState.roster.find((w) => w.name === name);
+      if (player) return player;
+      for (const rival of (updatedState.rivals ?? [])) {
+        const rw = rival.roster.find((w) => w.name === name);
+        if (rw) return rw;
+      }
+      return undefined;
+    };
+
     for (const bout of roundBouts) {
-      const wA = updatedState.roster.find((w) => w.name === bout.a);
-      const wD = updatedState.roster.find((w) => w.name === bout.d);
+      if (bout.d === "(bye)") {
+        bout.winner = "A";
+        winners.push(bout.a);
+        continue;
+      }
+      const wA = findWarrior(bout.a);
+      const wD = findWarrior(bout.d);
       if (!wA || !wD) {
         bout.winner = wA ? "A" : wD ? "D" : null;
         winners.push(wA?.name ?? wD?.name ?? "");
@@ -227,19 +271,33 @@ export default function Tournaments() {
     );
 
     if (isComplete && champion) {
+      // Check if champion is a player warrior (not AI)
+      const isPlayerChampion = updatedState.roster.some((w) => w.name === champion);
+
       // Award champion
-      updatedState.roster = updatedState.roster.map((w) =>
-        w.name === champion
-          ? {
-              ...w,
-              champion: true,
-              fame: w.fame + 5,
-              popularity: w.popularity + 3,
-              titles: [...w.titles, updatedTournament.name],
-            }
-          : w
-      );
-      toast.success(`🏆 ${champion} wins the ${updatedTournament.name}!`);
+      if (isPlayerChampion) {
+        updatedState.roster = updatedState.roster.map((w) =>
+          w.name === champion
+            ? {
+                ...w,
+                champion: true,
+                fame: w.fame + 5,
+                popularity: w.popularity + 3,
+                titles: [...w.titles, updatedTournament.name],
+              }
+            : w
+        );
+
+        // +1 stable slot reward
+        updatedState.rosterBonus = (updatedState.rosterBonus ?? 0) + 1;
+        updatedState.fame = (updatedState.fame ?? 0) + 10;
+        updatedState.player = { ...updatedState.player, titles: (updatedState.player.titles ?? 0) + 1 };
+
+        toast.success(`🏆 ${champion} wins the ${updatedTournament.name}! +1 stable slot earned!`);
+      } else {
+        // AI champion
+        toast(`${champion} (rival) wins the ${updatedTournament.name}.`);
+      }
 
       // Mark fight of tournament & close newsletter
       const tourneyFights = updatedState.arenaHistory.filter(f => f.tournamentId === currentTournament.id);
@@ -277,8 +335,18 @@ export default function Tournaments() {
         <div>
           <h1 className="text-xl sm:text-2xl font-display font-bold">Seasonal Tournaments</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Compete for glory across the four seasons. Current: {state.season}
+            Compete for glory across the four seasons. Champion reward: <span className="text-primary font-semibold">+1 stable slot</span>
           </p>
+          {(state.rosterBonus ?? 0) > 0 && (
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="outline" className="text-xs text-primary border-primary/30">
+                <Trophy className="h-3 w-3 mr-1" /> {state.rosterBonus ?? 0} bonus slot{(state.rosterBonus ?? 0) !== 1 ? "s" : ""} earned
+              </Badge>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                Roster cap: {BASE_ROSTER_CAP + (state.rosterBonus ?? 0)}
+              </span>
+            </div>
+          )}
         </div>
         {canStart ? (
           <Button onClick={startTournament} className="gap-2">

@@ -6,7 +6,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "@/state/GameContext";
-import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Attributes } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, BASE_ROSTER_CAP, type Attributes } from "@/types/game";
 import { makeWarrior } from "@/state/gameStore";
 import { DAMAGE_LABELS } from "@/engine/skillCalc";
 import {
@@ -27,7 +27,6 @@ import {
 import { toast } from "sonner";
 
 const CUSTOM_COST = 200;
-const MAX_ROSTER = 10;
 
 const TIER_COLORS: Record<RecruitTier, string> = {
   Common: "bg-secondary text-secondary-foreground",
@@ -141,6 +140,7 @@ function RecruitCard({
 export default function Recruit() {
   const { state, setState } = useGame();
   const navigate = useNavigate();
+  const MAX_ROSTER = BASE_ROSTER_CAP + (state.rosterBonus ?? 0);
 
   // Gather all used names (roster + graveyard + retired + rivals)
   const usedNames = useMemo(() => {

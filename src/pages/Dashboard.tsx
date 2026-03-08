@@ -40,6 +40,12 @@ function SeasonWidget() {
   // Season change every 13 weeks
   const nextSeason = state.week + (13 - ((state.week - 1) % 13));
   events.push({ label: "Season Change", week: nextSeason, type: "season" });
+  // Tournament availability
+  const hasActiveTournament = state.tournaments.some((t) => t.season === state.season && !t.completed);
+  const hadTournamentThisSeason = state.tournaments.some((t) => t.season === state.season);
+  if (!hasActiveTournament && !hadTournamentThisSeason) {
+    events.push({ label: `${state.season} Tournament`, week: state.week, type: "bout" });
+  }
 
   return (
     <Card className="row-span-1">

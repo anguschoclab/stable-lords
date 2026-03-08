@@ -411,6 +411,8 @@ export interface MatchRecord {
   opponentStableId: string;
 }
 
+export const BASE_ROSTER_CAP = 10;
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -445,6 +447,7 @@ export interface GameState {
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
   recruitPool: any[]; // PoolWarrior[] from recruitment engine
+  rosterBonus: number; // extra roster slots from championships
   settings: {
     featureFlags: {
       tournaments: boolean;
