@@ -174,6 +174,10 @@ export function generateWeeklyGazette(
   }
   if (hotStreakers.length > 0) tags.push("Hot Streak");
 
+  // Detect rivalries — pairs who have fought 3+ times across all history
+  const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
+  if (rivalryPair) tags.push("Rivalry");
+
   // Headline — streak headlines take priority over standard ones
   let headline: string;
   if (hotStreakers.length > 0) {
