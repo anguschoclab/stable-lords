@@ -119,9 +119,9 @@ export const HallOfFights: React.FC = () => {
                           ) : (
                             <Swords className="h-4 w-4 text-muted-foreground shrink-0" />
                           )}
-                          <span className="text-sm font-medium truncate">{f.a}</span>
+                          <WarriorLink name={f.a} className="text-sm font-medium" />
                           <span className="text-xs text-muted-foreground">vs</span>
-                          <span className="text-sm font-medium truncate">{f.d}</span>
+                          <WarriorLink name={f.d} className="text-sm font-medium" />
                         </div>
                         <div className="flex items-center gap-1.5 sm:gap-2 ml-6 sm:ml-0 flex-wrap">
                           {f.flashyTags?.map((t) => (
