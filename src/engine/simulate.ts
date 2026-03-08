@@ -25,6 +25,14 @@ import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/engine/t
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "./tacticSuitability";
 import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "./stylePassives";
 import { getFavoriteWeaponBonus, getFavoriteRhythmBonus } from "./favorites";
+import {
+  narrateAttack, narrateParry, narrateDodge, narrateCounterstrike,
+  narrateHit, narrateParryBreak, damageSeverityLine, stateChangeLine,
+  fatigueLine, crowdReaction, narrateInitiative, minuteStatusLine,
+  narrateBoutEnd, tradingBlowsLine, tauntLine, conservingLine,
+  pressingLine, generateWarriorIntro, battleOpener, getWeaponDisplayName,
+  popularityLine, skillLearnLine,
+} from "./narrativePBP";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 function mulberry32(seed: number) {
