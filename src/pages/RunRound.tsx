@@ -9,7 +9,7 @@ import { LoreArchive } from "@/lore/LoreArchive";
 import { blurb } from "@/lore/AnnouncerAI";
 import { commentatorFor } from "@/ui/commentator";
 import { recapLine } from "@/ui/fightVariety";
-import { rollForInjury } from "@/engine/injuries";
+import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
 import { calculateXP, applyXP } from "@/engine/progression";
 import { pickRivalOpponent } from "@/engine/rivals";
 import type { FightSummary, Warrior, RivalStableData } from "@/types/game";
