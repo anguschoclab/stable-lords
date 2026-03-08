@@ -409,4 +409,5 @@ export interface TrainerData {
 
 export interface UIPrefs {
   autoTunePlan: boolean;
+  dashboardLayout?: string[]; // ordered widget IDs
 }

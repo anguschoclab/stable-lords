@@ -2,7 +2,7 @@
  * Stable Lords — Arena Hub (FM26-inspired modular portal)
  * Each section is a self-contained widget in a responsive grid.
  */
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { useGame } from "@/state/GameContext";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, type Warrior } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
@@ -12,13 +12,15 @@ import { Progress } from "@/components/ui/progress";
 import {
   Swords, Trophy, Users, Flame, Star, TrendingUp, UserPlus,
   ScrollText, Coins, ArrowUpRight, ArrowDownRight, Calendar,
-  Zap, Heart, Shield, ChevronRight, Skull,
+  Zap, Heart, Shield, ChevronRight, Skull, GripVertical, RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS } from "@/engine/crowdMood";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
 import { computeWeeklyBreakdown } from "@/engine/economy";
+import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
+import { cn } from "@/lib/utils";
 
 // ─── Widget: Season & Calendar ─────────────────────────────────────────────
 
@@ -417,37 +419,176 @@ function RecentBoutsWidget() {
   );
 }
 
+// ─── Widget Registry ───────────────────────────────────────────────────────
+
+type WidgetDef = {
+  id: string;
+  label: string;
+  wide?: boolean; // spans 2 columns
+  component: React.FC;
+};
+
+const WIDGET_REGISTRY: WidgetDef[] = [
+  { id: "season",   label: "Season & Schedule", component: SeasonWidget },
+  { id: "stable",   label: "Stable Overview",   component: StableWidget },
+  { id: "finances", label: "Finances",           component: FinancesWidget },
+  { id: "rankings", label: "Warrior Rankings",   component: RankingsWidget, wide: true },
+  { id: "meta",     label: "Meta Pulse",         component: MetaPulseWidget },
+  { id: "bouts",    label: "Recent Bouts",       component: RecentBoutsWidget, wide: true },
+  { id: "gazette",  label: "Arena Gazette",       component: GazetteWidget, wide: true },
+];
+
+const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);
+
+// ─── Drag & Drop Hook ─────────────────────────────────────────────────────
+
+function useDraggableWidgets() {
+  const prefs = loadUIPrefs();
+  const savedOrder = prefs.dashboardLayout ?? DEFAULT_ORDER;
+  // Ensure all widgets are present (handles new widgets added after save)
+  const validIds = new Set(DEFAULT_ORDER);
+  const order = [
+    ...savedOrder.filter(id => validIds.has(id)),
+    ...DEFAULT_ORDER.filter(id => !savedOrder.includes(id)),
+  ];
+
+  const [widgetOrder, setWidgetOrder] = useState(order);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleDragStart = useCallback((idx: number) => {
+    setDragIdx(idx);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    setDragOverIdx(idx);
+  }, []);
+
+  const handleDrop = useCallback((idx: number) => {
+    if (dragIdx === null || dragIdx === idx) {
+      setDragIdx(null);
+      setDragOverIdx(null);
+      return;
+    }
+    setWidgetOrder(prev => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIdx, 1);
+      next.splice(idx, 0, moved);
+      // Persist
+      const prefs = loadUIPrefs();
+      saveUIPrefs({ ...prefs, dashboardLayout: next });
+      return next;
+    });
+    setDragIdx(null);
+    setDragOverIdx(null);
+  }, [dragIdx]);
+
+  const handleDragEnd = useCallback(() => {
+    setDragIdx(null);
+    setDragOverIdx(null);
+  }, []);
+
+  const resetLayout = useCallback(() => {
+    setWidgetOrder(DEFAULT_ORDER);
+    const prefs = loadUIPrefs();
+    saveUIPrefs({ ...prefs, dashboardLayout: DEFAULT_ORDER });
+  }, []);
+
+  return {
+    widgetOrder,
+    dragIdx,
+    dragOverIdx,
+    isEditing,
+    setIsEditing,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+    handleDragEnd,
+    resetLayout,
+  };
+}
+
 // ─── Main Dashboard ────────────────────────────────────────────────────────
 
 export default function Dashboard() {
   const { state } = useGame();
+  const {
+    widgetOrder, dragIdx, dragOverIdx, isEditing, setIsEditing,
+    handleDragStart, handleDragOver, handleDrop, handleDragEnd, resetLayout,
+  } = useDraggableWidgets();
+
+  const widgetMap = useMemo(
+    () => new Map(WIDGET_REGISTRY.map(w => [w.id, w])),
+    []
+  );
 
   return (
     <div className="space-y-4">
-      {/* Compact header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide">
-          Arena Hub
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Welcome back, <span className="text-foreground font-medium">{state.player.name}</span>
-        </p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide">
+            Arena Hub
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Welcome back, <span className="text-foreground font-medium">{state.player.name}</span>
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {isEditing && (
+            <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground" onClick={resetLayout}>
+              <RotateCcw className="h-3 w-3" /> Reset
+            </Button>
+          )}
+          <Button
+            variant={isEditing ? "default" : "outline"}
+            size="sm"
+            className="text-xs gap-1"
+            onClick={() => setIsEditing(v => !v)}
+          >
+            <GripVertical className="h-3 w-3" />
+            {isEditing ? "Done" : "Customize"}
+          </Button>
+        </div>
       </div>
 
-      {/* Widget Grid — FM26 inspired modular layout */}
+      {/* Widget Grid */}
       <div className="grid gap-3 md:grid-cols-3">
-        {/* Row 1: Season | Stable | Finances */}
-        <SeasonWidget />
-        <StableWidget />
-        <FinancesWidget />
+        {widgetOrder.map((id, idx) => {
+          const def = widgetMap.get(id);
+          if (!def) return null;
+          const Widget = def.component;
+          const isDragging = dragIdx === idx;
+          const isDragOver = dragOverIdx === idx && dragIdx !== idx;
 
-        {/* Row 2: Rankings (2-wide) | Meta */}
-        <RankingsWidget />
-        <MetaPulseWidget />
-
-        {/* Row 3: Recent Bouts (2-wide) | Gazette */}
-        <RecentBoutsWidget />
-        <GazetteWidget />
+          return (
+            <div
+              key={id}
+              draggable={isEditing}
+              onDragStart={() => handleDragStart(idx)}
+              onDragOver={(e) => handleDragOver(e, idx)}
+              onDrop={() => handleDrop(idx)}
+              onDragEnd={handleDragEnd}
+              className={cn(
+                "transition-all duration-200",
+                def.wide && "md:col-span-2",
+                isEditing && "cursor-grab active:cursor-grabbing",
+                isDragging && "opacity-40 scale-[0.97]",
+                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-xl",
+              )}
+            >
+              {isEditing && (
+                <div className="flex items-center gap-1.5 px-2 py-1 text-[10px] text-muted-foreground">
+                  <GripVertical className="h-3 w-3" />
+                  <span className="uppercase tracking-wider font-medium">{def.label}</span>
+                </div>
+              )}
+              <Widget />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
