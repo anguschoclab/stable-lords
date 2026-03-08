@@ -47,6 +47,16 @@ function SeasonWidget() {
     events.push({ label: `${state.season} Tournament`, week: state.week, type: "bout" });
   }
 
+  // Season progress
+  const weeksIntoSeason = ((state.week - 1) % 13) + 1;
+  const seasonProgress = (weeksIntoSeason / 13) * 100;
+  const weeksRemaining = 13 - weeksIntoSeason;
+
+  const SEASON_EMOJIS: Record<string, string> = {
+    Spring: "🌱", Summer: "☀️", Fall: "🍂", Winter: "❄️",
+  };
+  const seasonEmoji = SEASON_EMOJIS[state.season] ?? "📅";
+
   return (
     <Card className="row-span-1">
       <CardHeader className="pb-2">
@@ -64,6 +74,38 @@ function SeasonWidget() {
           <div className="text-center">
             <span className="text-2xl">{moodIcon}</span>
             <div className="text-[10px] text-muted-foreground mt-0.5">{state.crowdMood}</div>
+          </div>
+        </div>
+
+        {/* Season Progress Bar */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-muted-foreground uppercase tracking-wider font-medium flex items-center gap-1">
+              {seasonEmoji} {state.season} Progress
+            </span>
+            <span className="font-mono text-muted-foreground">{weeksIntoSeason}/13</span>
+          </div>
+          <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
+              style={{ width: `${seasonProgress}%` }}
+            />
+            {/* Tick marks at quarters */}
+            {[25, 50, 75].map(pct => (
+              <div
+                key={pct}
+                className="absolute top-0 bottom-0 w-px bg-background/40"
+                style={{ left: `${pct}%` }}
+              />
+            ))}
+          </div>
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+            <Link to="/seasonal-awards" className="hover:text-primary transition-colors">
+              {weeksRemaining === 0
+                ? "🏆 Awards ceremony!"
+                : `${weeksRemaining} week${weeksRemaining !== 1 ? "s" : ""} until awards`}
+            </Link>
+            <span className="font-mono">{Math.round(seasonProgress)}%</span>
           </div>
         </div>
 
