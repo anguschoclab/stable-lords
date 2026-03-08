@@ -66,7 +66,19 @@ export default function WarriorDetail() {
     navigate("/");
   }, [warrior, state, setState, navigate]);
 
+  const handleEquipmentChange = useCallback(
+    (newLoadout: EquipmentLoadout) => {
+      if (!warrior) return;
+      const nextRoster = state.roster.map((w) =>
+        w.id === warrior.id ? { ...w, equipment: newLoadout } : w
+      );
+      setState({ ...state, roster: nextRoster });
+    },
+    [warrior, state, setState]
+  );
+
   const currentPlan = warrior?.plan ?? (warrior ? defaultPlanForWarrior(warrior) : undefined);
+  const currentLoadout = warrior?.equipment ?? DEFAULT_LOADOUT;
 
   if (!warrior) {
     return (
