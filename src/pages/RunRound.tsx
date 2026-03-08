@@ -25,6 +25,7 @@ import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock } from "lucide-react
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
+import { WarriorLink, StableLink } from "@/components/EntityLink";
 
 export default function RunRound() {
   const { state, setState } = useGame();
