@@ -682,8 +682,9 @@ export function simulateFight(
           canRiposte = true;
           attacker.consecutiveHits = 0;
 
-          if (rng() < 0.3) {
-            log.push({ minute: min, text: `${name(defender)} ${pickText(rng, verbs(defender).parry)}.` });
+          if (rng() < 0.5) {
+            log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
+            log.push({ minute: min, text: narrateParry(rng, name(defender), weaponOf(defender)) });
           }
         }
       }
