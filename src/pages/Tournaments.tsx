@@ -7,9 +7,10 @@ import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Swords, Skull, Play, UserPlus } from "lucide-react";
+import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import BoutViewer from "@/components/BoutViewer";
 
 const SEASON_NAMES: Record<string, string> = {
   Spring: "Spring Classic",
@@ -225,6 +226,8 @@ export default function Tournaments() {
     setState(updatedState);
   }, [currentTournament, state, setState]);
 
+  const [expandedBout, setExpandedBout] = useState<string | null>(null);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -276,35 +279,67 @@ export default function Tournaments() {
                       Round {round}
                     </div>
                     <div className="space-y-2">
-                      {bouts.map((bout, i) => (
-                        <div
-                          key={i}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 py-2 px-3 rounded-lg bg-secondary/50 border border-border"
-                        >
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Swords className="h-4 w-4 text-arena-gold shrink-0" />
-                            <span className={`font-medium text-sm ${bout.winner === "A" ? "text-arena-gold" : ""}`}>
-                              {bout.a}
-                            </span>
-                            <span className="text-muted-foreground text-xs">vs</span>
-                            <span className={`font-medium text-sm ${bout.winner === "D" ? "text-arena-gold" : ""}`}>
-                              {bout.d}
-                            </span>
-                          </div>
-                          {bout.winner !== undefined ? (
-                            <Badge
-                              variant="outline"
-                              className={bout.by === "Kill" ? "text-destructive" : ""}
+                      {bouts.map((bout, i) => {
+                        const boutKey = `${round}_${i}`;
+                        const isExpanded = expandedBout === boutKey;
+                        const fightSummary = bout.fightId
+                          ? state.arenaHistory.find((f) => f.id === bout.fightId)
+                          : null;
+                        const hasTranscript = fightSummary?.transcript && fightSummary.transcript.length > 0;
+
+                        return (
+                          <div key={i}>
+                            <button
+                              className={`w-full flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 py-2.5 px-3 rounded-lg border transition-colors text-left ${
+                                isExpanded ? "border-primary/40 bg-primary/5" : "border-border bg-secondary/50 hover:bg-secondary/80"
+                              }`}
+                              onClick={() => hasTranscript && setExpandedBout(isExpanded ? null : boutKey)}
                             >
-                              {bout.by === "Kill" && <Skull className="h-3 w-3 mr-1" />}
-                              {bout.winner === "A" ? bout.a : bout.winner === "D" ? bout.d : "Draw"}
-                              {bout.by && bout.by !== "Draw" ? ` (${bout.by})` : ""}
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="text-xs">Pending</Badge>
-                          )}
-                        </div>
-                      ))}
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Swords className="h-4 w-4 text-arena-gold shrink-0" />
+                                <span className={`font-medium text-sm ${bout.winner === "A" ? "text-arena-gold" : ""}`}>
+                                  {bout.a}
+                                </span>
+                                <span className="text-muted-foreground text-xs">vs</span>
+                                <span className={`font-medium text-sm ${bout.winner === "D" ? "text-arena-gold" : ""}`}>
+                                  {bout.d}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {bout.winner !== undefined ? (
+                                  <Badge
+                                    variant="outline"
+                                    className={bout.by === "Kill" ? "text-destructive" : ""}
+                                  >
+                                    {bout.by === "Kill" && <Skull className="h-3 w-3 mr-1" />}
+                                    {bout.winner === "A" ? bout.a : bout.winner === "D" ? bout.d : "Draw"}
+                                    {bout.by && bout.by !== "Draw" ? ` (${bout.by})` : ""}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="secondary" className="text-xs">Pending</Badge>
+                                )}
+                                {hasTranscript && (
+                                  isExpanded ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-primary" />
+                                )}
+                              </div>
+                            </button>
+
+                            {isExpanded && hasTranscript && fightSummary && (
+                              <div className="mt-2 animate-fade-in">
+                                <BoutViewer
+                                  nameA={fightSummary.a}
+                                  nameD={fightSummary.d}
+                                  styleA={fightSummary.styleA}
+                                  styleD={fightSummary.styleD}
+                                  log={fightSummary.transcript!.map((text, idx) => ({ minute: idx + 1, text }))}
+                                  winner={fightSummary.winner}
+                                  by={fightSummary.by}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ));

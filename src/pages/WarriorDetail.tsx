@@ -206,7 +206,7 @@ export default function WarriorDetail() {
             </p>
             <p className="font-mono text-sm text-muted-foreground mt-1">{record}</p>
             {warrior.age && (
-              <p className="text-xs text-muted-foreground mt-1">Age: {warrior.age}</p>
+              <p className="text-xs text-muted-foreground mt-1">Age: {warrior.age} · XP: {(warrior as any).xp ?? 0}</p>
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
               {warrior.flair.map((f) => (
@@ -215,9 +215,10 @@ export default function WarriorDetail() {
               {warrior.titles.map((t) => (
                 <TagBadge key={t} tag={t} type="title" />
               ))}
-              {warrior.injuries.map((i) => (
-                <TagBadge key={i} tag={i} type="injury" />
-              ))}
+              {warrior.injuries.map((i) => {
+                const injName = typeof i === "string" ? i : i.name;
+                return <TagBadge key={injName} tag={injName} type="injury" />;
+              })}
             </div>
           </div>
           <div className="flex gap-4">

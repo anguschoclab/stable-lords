@@ -26,9 +26,9 @@ export const FOCUS_ICONS: Record<TrainerFocus, string> = {
 };
 
 export const TIER_COST: Record<TrainerTier, number> = {
-  Novice: 0,
-  Seasoned: 0,
-  Master: 0,
+  Novice: 50,
+  Seasoned: 100,
+  Master: 200,
 };
 
 export const TIER_BONUS: Record<TrainerTier, number> = {

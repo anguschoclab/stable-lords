@@ -5,6 +5,8 @@ import { FightingStyle, type GameState, type Warrior, type FightSummary, type Se
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { processTraining } from "@/engine/training";
 import { processEconomy } from "@/engine/economy";
+import { processAging } from "@/engine/aging";
+import { tickInjuries } from "@/engine/injuries";
 
 const SAVE_KEY = "stablelords.save.v2";
 
@@ -75,10 +77,12 @@ export function createFreshState(): GameState {
     trainers: [],
     hiringPool: [],
     trainingAssignments: [],
+    rivals: [],
+    scoutReports: [],
     settings: {
       featureFlags: {
         tournaments: true,
-        scouting: false,
+        scouting: true,
       },
     },
   };
@@ -105,6 +109,8 @@ export function loadGameState(): GameState {
         if (!parsed.ledger) parsed.ledger = [];
         if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
         if (!parsed.coachDismissed) parsed.coachDismissed = [];
+        if (!parsed.rivals) parsed.rivals = [];
+        if (!parsed.scoutReports) parsed.scoutReports = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
           ...w,
@@ -141,13 +147,29 @@ export function resetGameState(): GameState {
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
 export function advanceWeek(state: GameState): GameState {
-  // Process training and economy before advancing
   const trained = processTraining(state);
   const economized = processEconomy(trained);
-  const newWeek = economized.week + 1;
+  const aged = processAging(economized);
+  
+  // Tick injuries
+  const injuryNews: string[] = [];
+  const rosterWithHealedInjuries = aged.roster.map((w) => {
+    const injuryObjects = (w.injuries || []).filter((i): i is import("@/types/game").InjuryData => typeof i !== "string");
+    if (injuryObjects.length === 0) return w;
+    const { active, healed } = tickInjuries(injuryObjects as any);
+    if (healed.length > 0) injuryNews.push(`${w.name} recovered from ${healed.join(", ")}.`);
+    return { ...w, injuries: active as any };
+  });
+  
+  let updatedState = { ...aged, roster: rosterWithHealedInjuries };
+  if (injuryNews.length > 0) {
+    updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Medical Report", items: injuryNews }];
+  }
+  
+  const newWeek = updatedState.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   return {
-    ...economized,
+    ...updatedState,
     week: newWeek,
     season: SEASONS[seasonIdx],
   };

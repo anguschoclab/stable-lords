@@ -148,6 +148,15 @@ export interface CareerRecord {
 
 export type WarriorStatus = "Active" | "Dead" | "Retired";
 
+export interface InjuryData {
+  id: string;
+  name: string;
+  description: string;
+  severity: "Minor" | "Moderate" | "Severe";
+  weeksRemaining: number;
+  penalties: Record<string, number>;
+}
+
 export interface Warrior {
   id: string;
   name: string;
@@ -158,7 +167,7 @@ export interface Warrior {
   fame: number;
   popularity: number;
   titles: string[];
-  injuries: string[];
+  injuries: (string | InjuryData)[];
   flair: string[];
   career: CareerRecord;
   champion: boolean;
@@ -172,10 +181,12 @@ export interface Warrior {
   };
   status: WarriorStatus;
   age?: number;
+  xp?: number;
   deathWeek?: number;
   deathCause?: string;
   killedBy?: string;
   retiredWeek?: number;
+  stableId?: string; // for AI rival warriors
 }
 
 // ─── Owner / Stable ─────────────────────────────────────────────────────────
@@ -290,6 +301,25 @@ export interface LedgerEntry {
   category: "fight" | "training" | "recruit" | "trainer" | "upkeep" | "prize" | "other";
 }
 
+export interface RivalStableData {
+  owner: Owner;
+  roster: Warrior[];
+}
+
+export interface ScoutReportData {
+  id: string;
+  warriorName: string;
+  style: string;
+  quality: "Basic" | "Detailed" | "Expert";
+  week: number;
+  attributeRanges: Record<string, [number, number]>;
+  record: string;
+  knownInjuries: string[];
+  suspectedOE?: string;
+  suspectedAL?: string;
+  notes: string;
+}
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -317,6 +347,8 @@ export interface GameState {
   trainers: TrainerData[];
   hiringPool: TrainerData[];
   trainingAssignments: TrainingAssignment[];
+  rivals: RivalStableData[];
+  scoutReports: ScoutReportData[];
   settings: {
     featureFlags: {
       tournaments: boolean;

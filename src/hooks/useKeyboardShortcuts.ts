@@ -15,11 +15,11 @@ const NAV_ROUTES = [
   "/run-round",    // 2 — Run Round
   "/recruit",      // 3 — Recruit
   "/training",     // 4 — Training
-  "/trainers",     // 5 — Trainers
-  "/tournaments",  // 6 — Tournaments
-  "/hall-of-fights",// 7 — Chronicle
-  "/graveyard",    // 8 — Hall of Warriors
-  "/help",         // 9 — Help
+  "/scouting",     // 5 — Scouting
+  "/trainers",     // 6 — Trainers
+  "/tournaments",  // 7 — Tournaments
+  "/hall-of-fights",// 8 — Chronicle
+  "/graveyard",    // 9 — Hall of Warriors
 ];
 
 interface UseKeyboardShortcutsOpts {

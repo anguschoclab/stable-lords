@@ -12,6 +12,7 @@ import {
   FOCUS_DESCRIPTIONS,
   FOCUS_ICONS,
   TIER_BONUS,
+  TIER_COST,
   generateHiringPool,
   convertRetiredToTrainer,
   type TrainerFocus,
@@ -30,7 +31,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { GraduationCap, UserPlus, UserMinus, RefreshCw, Armchair, Sparkles, Clock } from "lucide-react";
+import { GraduationCap, UserPlus, UserMinus, RefreshCw, Armchair, Sparkles, Clock, Coins } from "lucide-react";
 import { toast } from "sonner";
 
 const TIER_COLORS: Record<string, string> = {
@@ -154,12 +155,24 @@ export default function Trainers() {
   const hireTrainer = useCallback(
     (trainer: TrainerData) => {
       if (!canHire) return;
+      const cost = TIER_COST[trainer.tier as TrainerTier] ?? 50;
+      if ((state.gold ?? 0) < cost) {
+        toast.error(`Not enough gold! Need ${cost}g to hire.`);
+        return;
+      }
       setState({
         ...state,
         trainers: [...currentTrainers, trainer],
         hiringPool: hiringPool.filter((t) => t.id !== trainer.id),
+        gold: (state.gold ?? 0) - cost,
+        ledger: [...(state.ledger ?? []), {
+          week: state.week,
+          label: `Hire: ${trainer.name}`,
+          amount: -cost,
+          category: "trainer" as const,
+        }],
       });
-      toast.success(`${trainer.name} has joined your stable!`);
+      toast.success(`${trainer.name} has joined your stable! (-${cost}g)`);
     },
     [state, setState, currentTrainers, hiringPool, canHire]
   );
@@ -344,15 +357,19 @@ export default function Trainers() {
               {hiringPool.map((t) => (
                 <div key={t.id} className="relative">
                   <TrainerCard trainer={t} owned={false} />
-                  <div className="absolute top-4 right-4">
+                  <div className="absolute top-4 right-4 flex items-center gap-2">
+                    <Badge variant="outline" className="font-mono text-xs gap-1">
+                      <Coins className="h-3 w-3 text-arena-gold" />
+                      {TIER_COST[t.tier as TrainerTier] ?? 50}g
+                    </Badge>
                     <Button
                       size="sm"
-                      disabled={!canHire}
+                      disabled={!canHire || (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50)}
                       onClick={() => hireTrainer(t)}
                       className="gap-1.5"
                     >
                       <UserPlus className="h-3.5 w-3.5" />
-                      {canHire ? "Hire" : "Full"}
+                      {!canHire ? "Full" : (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50) ? "Can't Afford" : "Hire"}
                     </Button>
                   </div>
                 </div>

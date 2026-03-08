@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ const navItems = [
   { to: "/run-round", label: "Run Round", icon: Zap },
   { to: "/recruit", label: "Recruit", icon: UserPlus },
   { to: "/training", label: "Training", icon: Dumbbell },
+  { to: "/scouting", label: "Scouting", icon: Search },
   { to: "/trainers", label: "Trainers", icon: GraduationCap },
   { to: "/tournaments", label: "Tournaments", icon: Trophy },
   { to: "/hall-of-fights", label: "Chronicle", icon: ScrollText },
@@ -37,6 +39,7 @@ const navItems = [
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const { state, doReset, returnToTitle, lastSavedAt } = useGame();
+  const { theme, setTheme } = useTheme();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
@@ -138,6 +141,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               className="h-8 w-8 text-muted-foreground hover:text-foreground hidden sm:inline-flex"
             >
               <Download className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              title="Toggle theme"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             </Button>
             <Button
               variant="ghost"

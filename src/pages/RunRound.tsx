@@ -9,7 +9,10 @@ import { LoreArchive } from "@/lore/LoreArchive";
 import { blurb } from "@/lore/AnnouncerAI";
 import { commentatorFor } from "@/ui/commentator";
 import { recapLine } from "@/ui/fightVariety";
-import type { FightSummary, Warrior } from "@/types/game";
+import { rollForInjury } from "@/engine/injuries";
+import { calculateXP, applyXP } from "@/engine/progression";
+import { pickRivalOpponent } from "@/engine/rivals";
+import type { FightSummary, Warrior, RivalStableData } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -110,6 +113,42 @@ export default function RunRound() {
         const killerName = outcome.winner === "A" ? warrior.name : opponent.name;
         updatedState = killWarrior(updatedState, deadId, killerName, "Killed in arena combat");
       }
+
+      // Apply injuries
+      const injA = rollForInjury(warrior, outcome, "A");
+      const injD = rollForInjury(opponent, outcome, "D");
+      if (injA || injD) {
+        updatedState = {
+          ...updatedState,
+          roster: updatedState.roster.map((w) => {
+            if (w.id === warrior.id && injA) {
+              return { ...w, injuries: [...(w.injuries || []), injA as any] };
+            }
+            if (w.id === opponent.id && injD) {
+              return { ...w, injuries: [...(w.injuries || []), injD as any] };
+            }
+            return w;
+          }),
+        };
+      }
+
+      // Apply XP progression
+      const xpA = calculateXP(outcome, "A", tags);
+      const xpD = calculateXP(outcome, "D", tags);
+      updatedState = {
+        ...updatedState,
+        roster: updatedState.roster.map((w) => {
+          if (w.id === warrior.id) {
+            const { warrior: updated } = applyXP(w, xpA);
+            return updated;
+          }
+          if (w.id === opponent.id) {
+            const { warrior: updated } = applyXP(w, xpD);
+            return updated;
+          }
+          return w;
+        }),
+      };
 
       const summary: FightSummary = {
         id: `fight_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,

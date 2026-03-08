@@ -1,0 +1,102 @@
+/**
+ * Scouting System — gather intel on upcoming opponents.
+ * 
+ * Scouting reveals partial information about an opponent:
+ * - Style (always visible)
+ * - Approximate attribute ranges (based on scout quality)
+ * - Win/loss record
+ * - Known injuries
+ * - Suspected fight plan tendencies
+ */
+import type { Warrior } from "@/types/game";
+import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
+
+export type ScoutQuality = "Basic" | "Detailed" | "Expert";
+
+export interface ScoutReport {
+  id: string;
+  warriorName: string;
+  style: string;
+  quality: ScoutQuality;
+  week: number;
+  /** Attribute ranges — [low, high] estimates */
+  attributeRanges: Record<string, [number, number]>;
+  record: string;
+  knownInjuries: string[];
+  suspectedOE?: string; // "Low" | "Medium" | "High"
+  suspectedAL?: string;
+  notes: string;
+}
+
+const QUALITY_FUZZ: Record<ScoutQuality, number> = {
+  Basic: 5,
+  Detailed: 3,
+  Expert: 1,
+};
+
+const SCOUT_COST: Record<ScoutQuality, number> = {
+  Basic: 25,
+  Detailed: 50,
+  Expert: 100,
+};
+
+export function getScoutCost(quality: ScoutQuality): number {
+  return SCOUT_COST[quality];
+}
+
+/** Generate a scout report for a warrior */
+export function generateScoutReport(
+  warrior: Warrior,
+  quality: ScoutQuality,
+  week: number
+): ScoutReport {
+  const fuzz = QUALITY_FUZZ[quality];
+
+  const attributeRanges: Record<string, [number, number]> = {};
+  for (const key of ATTRIBUTE_KEYS) {
+    const val = warrior.attributes[key];
+    const low = Math.max(3, val - fuzz + Math.floor(Math.random() * 2));
+    const high = Math.min(25, val + fuzz - Math.floor(Math.random() * 2));
+    attributeRanges[key] = [low, high];
+  }
+
+  const record = `${warrior.career.wins}W-${warrior.career.losses}L`;
+
+  const knownInjuries: string[] = [];
+  if (quality !== "Basic") {
+    // Show injury names (not details)
+    for (const inj of warrior.injuries) {
+      if (typeof inj === "string") knownInjuries.push(inj);
+    }
+  }
+
+  let suspectedOE: string | undefined;
+  let suspectedAL: string | undefined;
+  if (quality === "Expert" && warrior.plan) {
+    suspectedOE = warrior.plan.OE >= 7 ? "High" : warrior.plan.OE >= 4 ? "Medium" : "Low";
+    suspectedAL = warrior.plan.AL >= 7 ? "High" : warrior.plan.AL >= 4 ? "Medium" : "Low";
+  }
+
+  const styleName = STYLE_DISPLAY_NAMES[warrior.style] ?? warrior.style;
+  const notes = quality === "Basic"
+    ? `${warrior.name} fights as a ${styleName}. Limited intel available.`
+    : quality === "Detailed"
+    ? `${warrior.name} is a ${styleName} with ${record}. ${warrior.fame > 3 ? "Well-known in the arena." : "Relatively unknown."}`
+    : `${warrior.name} is an experienced ${styleName} (${record}). ${
+        warrior.career.kills > 0 ? `Known killer (${warrior.career.kills} kills).` : "No kills on record."
+      }`;
+
+  return {
+    id: `scout_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+    warriorName: warrior.name,
+    style: warrior.style,
+    quality,
+    week,
+    attributeRanges,
+    record,
+    knownInjuries,
+    suspectedOE,
+    suspectedAL,
+    notes,
+  };
+}

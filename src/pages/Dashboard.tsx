@@ -65,9 +65,10 @@ function WarriorRow({ warrior, onClick }: { warrior: Warrior; onClick: () => voi
           {warrior.flair.map((f) => (
             <TagBadge key={f} tag={f} type="flair" className="text-xs" />
           ))}
-          {warrior.injuries.map((i) => (
-            <TagBadge key={i} tag={i} type="injury" className="text-xs" />
-          ))}
+          {warrior.injuries.map((i) => {
+            const name = typeof i === "string" ? i : i.name;
+            return <TagBadge key={name} tag={name} type="injury" className="text-xs" />;
+          })}
         </div>
       </td>
     </tr>

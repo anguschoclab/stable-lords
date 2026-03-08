@@ -83,6 +83,9 @@ export function loadFromSlot(slotId: string): GameState | null {
         if (!parsed.hiringPool) parsed.hiringPool = [];
         if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
         if (!parsed.coachDismissed) parsed.coachDismissed = [];
+        if (!parsed.rivals) parsed.rivals = [];
+        if (!parsed.scoutReports) parsed.scoutReports = [];
+        if (!parsed.trainingAssignments) parsed.trainingAssignments = [];
         parsed.roster = (parsed.roster || []).map((w: any) => ({ ...w, status: w.status || "Active" }));
         return parsed as GameState;
       }
@@ -217,6 +220,9 @@ export function parseImportedSave(json: string): GameState {
   if (!state.hiringPool) state.hiringPool = [];
   if (state.ftueComplete === undefined) state.ftueComplete = true;
   if (!state.coachDismissed) state.coachDismissed = [];
+  if (!state.rivals) state.rivals = [];
+  if (!state.scoutReports) state.scoutReports = [];
+  if (!state.trainingAssignments) state.trainingAssignments = [];
   state.roster = (state.roster || []).map((w: any) => ({ ...w, status: w.status || "Active" }));
 
   return state as GameState;
