@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useCoachTip } from "@/hooks/useCoachTip";
-import { getActiveSlot, deleteSlot } from "@/state/saveSlots";
+import { getActiveSlot, deleteSlot, exportActiveSlot } from "@/state/saveSlots";
 import EventLog from "@/components/EventLog";
 
 const navItems = [
