@@ -290,32 +290,40 @@ function computeHitDamage(rng: () => number, damageClass: number, location: HitL
 function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
   const weapon = getItemById(loadout.weapon);
   const armor = getItemById(loadout.armor);
-  const shield = getItemById(loadout.shield);
   const helm = getItemById(loadout.helm);
   const totalWeight = getLoadoutWeight(loadout);
   const overEncumbered = totalWeight > carryCap;
 
   let attMod = 0, parMod = 0, defMod = 0, iniMod = 0, dmgMod = 0, endMod = 0;
 
-  // Shield bonuses
-  if (shield?.id === "buckler") { parMod += 1; }
-  if (shield?.id === "small_shield") { parMod += 1; defMod += 1; }
-  if (shield?.id === "medium_shield") { defMod += 2; }
-  if (shield?.id === "large_shield") { defMod += 3; attMod -= 1; }
+  // Shield bonuses — shields are in the weapon list in canonical DM
+  // Check both the weapon slot (if it IS a shield) and the legacy shield slot
+  const shieldId = loadout.weapon;
+  const legacyShield = getItemById(loadout.shield);
+  const isShieldWeapon = ["small_shield", "medium_shield", "large_shield"].includes(shieldId);
+  
+  if (isShieldWeapon || legacyShield?.id === "buckler") {
+    if (shieldId === "small_shield" || legacyShield?.id === "buckler") { parMod += 1; }
+    if (shieldId === "small_shield") { defMod += 1; }
+    if (shieldId === "medium_shield") { defMod += 2; }
+    if (shieldId === "large_shield") { defMod += 3; attMod -= 1; }
+  }
 
-  // Heavy weapons boost damage
+  // Heavy weapons boost damage (canonical weight thresholds)
   if (weapon && weapon.weight >= 5) { dmgMod += 1; }
-  if (weapon && weapon.weight >= 7) { dmgMod += 1; }
+  if (weapon && weapon.weight >= 8) { dmgMod += 1; }
 
   // Light weapons boost initiative
   if (weapon && weapon.weight <= 2) { iniMod += 1; }
 
-  // Armor reduces incoming damage (applied elsewhere) but costs endurance
-  if (armor && armor.weight >= 4) { endMod -= 1; }
-  if (armor && armor.weight >= 6) { endMod -= 2; }
+  // Armor endurance cost (canonical weight thresholds)
+  if (armor && armor.weight >= 6) { endMod -= 1; }
+  if (armor && armor.weight >= 10) { endMod -= 2; }
+  if (armor && armor.weight >= 14) { endMod -= 3; }
 
-  // Full helm reduces INI
-  if (helm?.id === "full_helm") { iniMod -= 1; }
+  // Helm penalties
+  if (helm?.id === "full_helm") { iniMod -= 1; attMod -= 1; }
+  if (helm?.id === "helm") { iniMod -= 1; }
 
   // Over-encumbered penalty
   if (overEncumbered) {
