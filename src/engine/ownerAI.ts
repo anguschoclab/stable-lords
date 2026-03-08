@@ -2,16 +2,17 @@
  * Owner AI — Personality-driven decision-making, roster management,
  * owner rivalries, narrative events, and philosophy evolution.
  *
- * Consumes: Owner personalities, stable philosophies, match results.
+ * Consumes: Owner personalities, stable philosophies, match results, meta drift.
  * Produces: Plan adjustments, gazette events, roster changes, rivalry updates.
  */
 import type {
   GameState, Warrior, RivalStableData, FightPlan, Owner,
-  OwnerPersonality, Season, NewsletterItem,
+  OwnerPersonality, Season, NewsletterItem, MetaAdaptation,
 } from "@/types/game";
 import { FightingStyle } from "@/types/game";
 import { defaultPlanForWarrior } from "./simulate";
 import { computeWarriorStats } from "./skillCalc";
+import { computeMetaDrift, type StyleMeta } from "./metaDrift";
 
 // ─── 1) Personality-Driven Plan Adjustments ───────────────────────────────
 
