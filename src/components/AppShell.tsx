@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save } from "lucide-react";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useCoachTip } from "@/hooks/useCoachTip";
-import { getActiveSlot, deleteSlot } from "@/state/saveSlots";
+import { getActiveSlot, deleteSlot, exportActiveSlot } from "@/state/saveSlots";
 import EventLog from "@/components/EventLog";
 
 const navItems = [
@@ -125,6 +125,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 sm:hidden">
               {moodIcon} W{state.week}
             </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={exportActiveSlot}
+              title="Export Save"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hidden sm:inline-flex"
+            >
+              <Download className="h-3.5 w-3.5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

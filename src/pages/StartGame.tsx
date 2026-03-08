@@ -2,7 +2,7 @@
  * Stable Lords — Start Game Page (Title Screen)
  * New Game → name stable → Orphanage | Continue | Load | Delete saves
  */
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import { useGame } from "@/state/GameContext";
 import { createFreshState } from "@/state/gameStore";
 import {
@@ -12,6 +12,8 @@ import {
   saveToSlot,
   newSlotId,
   MAX_SAVE_SLOTS,
+  exportSlot,
+  importSaveToNewSlot,
   type SaveSlotMeta,
 } from "@/state/saveSlots";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,7 +41,10 @@ import {
   Clock,
   Users,
   Flame,
+  Download,
+  Upload,
 } from "lucide-react";
+import { toast } from "sonner";
 
 type Screen = "title" | "newGame";
 
@@ -48,6 +53,7 @@ export default function StartGame() {
   const [screen, setScreen] = useState<Screen>("title");
   const [slots, setSlots] = useState<SaveSlotMeta[]>(() => listSaveSlots());
   const [deleteTarget, setDeleteTarget] = useState<SaveSlotMeta | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
 
   // ── New Game fields ──────────────────────────────────────────────────────
   const [ownerName, setOwnerName] = useState("");
@@ -85,6 +91,28 @@ export default function StartGame() {
     saveToSlot(slotId, fresh);
     setState(fresh);
   }, [ownerName, stableName, setState]);
+
+  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const json = ev.target?.result as string;
+        const slotId = importSaveToNewSlot(json);
+        refreshSlots();
+        toast.success("Save imported! Loading now…");
+        // Auto-load the imported save
+        const state = loadFromSlot(slotId);
+        if (state) setState(state);
+      } catch (err: any) {
+        toast.error(err?.message ?? "Failed to import save file.");
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be re-imported
+    e.target.value = "";
+  }, [setState, refreshSlots]);
 
   const formatDate = (iso: string) => {
     try {
@@ -190,6 +218,23 @@ export default function StartGame() {
               <span className="text-xs text-muted-foreground ml-2">(Max {MAX_SAVE_SLOTS} saves)</span>
             )}
           </Button>
+          {/* Import Save */}
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImport}
+          />
+          <Button
+            variant="ghost"
+            onClick={() => importRef.current?.click()}
+            className="w-full gap-2 h-10 text-muted-foreground"
+            size="sm"
+          >
+            <Upload className="h-4 w-4" />
+            Import Save File
+          </Button>
         </div>
 
         {/* Save Slots */}
@@ -229,17 +274,33 @@ export default function StartGame() {
                           </span>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-destructive shrink-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteTarget(slot);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            exportSlot(slot.slotId);
+                            toast.success("Save exported!");
+                          }}
+                          title="Export save"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteTarget(slot);
+                          }}
+                          title="Delete save"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
