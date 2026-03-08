@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
-import type { MinuteEvent, FightOutcomeBy, Warrior } from "@/types/game";
+import type { MinuteEvent, FightOutcomeBy } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -51,7 +51,7 @@ function SkillBar({ label, value, max = 20 }: { label: string; value: number; ma
   );
 }
 
-function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: string; arenaHistory: import("@/types/game").FightSummary[] }) {
+function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: string; arenaHistory: FightSummary[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const fights = arenaHistory.filter((f) => f.a === warriorName || f.d === warriorName);
 
