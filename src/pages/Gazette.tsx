@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useGame } from "@/state/GameContext";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { StyleRollups } from "@/engine/stats/styleRollups";
@@ -598,6 +598,11 @@ export default function Gazette() {
       });
   }, [allFights, hallEntries]);
 
+  const PAGE_SIZE = 4;
+  const [shown, setShown] = useState(PAGE_SIZE);
+  const visibleIssues = weeklyIssues.slice(0, shown);
+  const hasMore = shown < weeklyIssues.length;
+  const loadMore = useCallback(() => setShown((s) => s + PAGE_SIZE), []);
   const hasContent = weeklyIssues.length > 0;
 
   return (
@@ -649,11 +654,11 @@ export default function Gazette() {
         </Card>
       )}
 
-      {/* Weekly Issues */}
-      {weeklyIssues.map(({ week, fights, fotwId, kills, kos, rollup }) => {
+      {/* Weekly Issues — paginated */}
+      {visibleIssues.map(({ week, fights, fotwId, kills, kos, rollup }) => {
         const fotw = fights.find((f) => f.id === fotwId);
         const otherFights = fights.filter((f) => f.id !== fotwId);
-        const styleEntries = Object.entries(rollup).sort(
+        const styleEntries = Object.entries(rollup as Record<string, { w: number; l: number; k: number; pct: number; fights: number }>).sort(
           ([, a], [, b]) => b.fights - a.fights
         );
 
@@ -752,6 +757,18 @@ export default function Gazette() {
           </article>
         );
       })}
+
+      {/* Load More button */}
+      {hasMore && (
+        <div className="flex justify-center py-4">
+          <button
+            onClick={loadMore}
+            className="px-6 py-2 rounded-lg border border-border bg-card hover:bg-secondary text-sm font-display text-foreground transition-colors"
+          >
+            Load Older Issues ({weeklyIssues.length - shown} remaining)
+          </button>
+        </div>
+      )}
     </div>
   );
 }
