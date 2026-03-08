@@ -68,7 +68,7 @@ const MATCHUP_MATRIX: number[][] = [
   [ 0,  0, +1,  0,  0,  0,  0, -1,  0, -1], // PS: beats LU, loses to ST/WS
   [ 0, -1,  0,  0,  0,  0,  0,  0, +1, +1], // SL: beats TP/WS, weak vs BA
   [ 0, -1, +1, +1, +1, +1,  0,  0, +1,  0], // ST: power beats LU/PL/PR/PS/TP, weak vs BA
-  [-1, -1,  0,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs BA/AB/SL/ST
+  [-1,  0,  0,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs AB/SL/ST, neutral vs BA now
   [ 0, -1, +1,  0,  0, +1, -1,  0,  0,  0], // WS: zone control, beats LU/PS, loses to BA/SL
 ];
 
