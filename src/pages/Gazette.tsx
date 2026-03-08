@@ -52,7 +52,7 @@ function FightCard({ fight, isFOTW }: { fight: FightSummary; isFOTW: boolean }) 
       )}
       <div className="flex items-center justify-between mt-1">
         <div className="flex-1 text-right pr-3">
-          <span className={`font-display text-sm ${f.winner === "A" ? "text-foreground font-bold" : "text-muted-foreground"}`}>
+          <span className={`font-display text-sm ${fight.winner === "A" ? "text-foreground font-bold" : "text-muted-foreground"}`}>
             {fight.a}
           </span>
           <div className="text-[10px] text-muted-foreground font-mono">{fight.styleA}</div>
