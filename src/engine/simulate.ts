@@ -782,14 +782,13 @@ export function simulateFight(
     }
 
     // ── 7. ENDURANCE & FATIGUE — with style-specific drain rates ──
-    // BALANCE v3: Defender discount reduced from 0.6 to 0.85. The old 60% discount
-    // meant TP/WS barely drained endurance while attackers exhausted themselves.
-    // Taking hits also costs endurance (damage tax) — being hit is tiring.
+    // BALANCE v5: Defender discount reduced from 0.85 to 0.92 (defense is still cheaper but not free).
+    // Damage tax increased: taking hits is exhausting regardless of style.
     const attEndMult = getEnduranceMult(attacker.style);
     const defEndMult = getEnduranceMult(defender.style);
-    const defDamageTax = defender.hitsTaken > 0 ? Math.min(2, Math.floor(defender.hitsTaken / 2)) : 0;
+    const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * 0.7)) : 0;
     attacker.endurance -= Math.round(enduranceCost(attOE, attAL) * attEndMult);
-    defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * 0.85 * defEndMult) + defDamageTax);
+    defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * 0.92 * defEndMult) + defDamageTax);
 
     // Clamp endurance
     fA.endurance = Math.max(0, fA.endurance);
