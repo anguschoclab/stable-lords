@@ -206,7 +206,7 @@ export default function WarriorDetail() {
             </p>
             <p className="font-mono text-sm text-muted-foreground mt-1">{record}</p>
             {warrior.age && (
-              <p className="text-xs text-muted-foreground mt-1">Age: {warrior.age}</p>
+              <p className="text-xs text-muted-foreground mt-1">Age: {warrior.age} · XP: {(warrior as any).xp ?? 0}</p>
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
               {warrior.flair.map((f) => (
