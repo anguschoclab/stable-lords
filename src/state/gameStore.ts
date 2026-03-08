@@ -88,6 +88,8 @@ export function createDemoState(): GameState {
     hallOfFame: [],
     crowdMood: "Calm",
     tournaments: [],
+    trainers: [],
+    hiringPool: [],
     settings: {
       featureFlags: {
         tournaments: true,
