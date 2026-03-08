@@ -88,6 +88,7 @@ export default function WorldOverview() {
       const rLosses = r.roster.reduce((s, w) => s + w.career.losses, 0);
       const rKills = r.roster.reduce((s, w) => s + w.career.kills, 0);
       const rTotal = rWins + rLosses;
+      const tmpl = templates.find(t => t.stableName === r.owner.stableName);
       rows.push({
         id: r.owner.id,
         name: r.owner.stableName,
@@ -100,6 +101,7 @@ export default function WorldOverview() {
         roster: r.roster.filter(w => w.status === "Active").length,
         tier: r.tier || "Minor",
         philosophy: r.philosophy || "",
+        motto: tmpl?.motto ?? "",
         isPlayer: false,
       });
     }
