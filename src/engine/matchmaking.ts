@@ -10,6 +10,7 @@ import { isTooInjuredToFight, type Injury } from "./injuries";
 import { simulateFight } from "./simulate";
 import { aiPlanForWarrior } from "./ownerAI";
 import { computeMetaDrift } from "./metaDrift";
+import { disallowStablemates } from "@/guards/matchmaking";
 
 // ─── Eligibility ──────────────────────────────────────────────────────────
 
