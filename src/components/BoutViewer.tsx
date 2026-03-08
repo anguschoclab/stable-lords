@@ -18,7 +18,8 @@ interface BoutViewerProps {
 }
 
 // Classify log lines for visual treatment
-function classifyEvent(text: string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" {
+function classifyEvent(text: string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" | "phase" {
+  if (text.startsWith("—") && text.includes("Phase")) return "phase";
   const t = text.toLowerCase();
   if (t.includes("kill") || t.includes("death") || t.includes("slain") || t.includes("fatal")) return "death";
   if (t.includes("knocked out") || t.includes("ko") || t.includes("unconscious") || t.includes("no longer continue")) return "ko";
@@ -41,6 +42,7 @@ function getEventIcon(type: ReturnType<typeof classifyEvent>) {
     case "riposte": return <Swords className="h-3 w-3 text-arena-fame" />;
     case "initiative": return <Zap className="h-3 w-3 text-primary" />;
     case "exhaust": return <span className="text-[10px]">💨</span>;
+    case "phase": return <span className="text-[10px]">⚔️</span>;
     default: return <span className="h-3 w-3 rounded-full bg-muted-foreground/30 block" />;
   }
 }
@@ -55,6 +57,7 @@ function getEventColor(type: ReturnType<typeof classifyEvent>) {
     case "initiative": return "border-primary/40 bg-primary/5";
     case "exhaust": return "border-muted/60 bg-muted/20";
     case "miss": return "border-border bg-secondary/30";
+    case "phase": return "border-primary/30 bg-primary/10";
     default: return "border-border bg-transparent";
   }
 }
@@ -253,30 +256,56 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
             {log.slice(0, visibleCount).map((event, i) => {
               const type = classifyEvent(event.text);
               const isLatest = i === visibleCount - 1;
+              const isPhaseEvent = type === "phase";
               return (
                 <div
                   key={i}
                   className={cn(
                     "flex items-start gap-2 px-2.5 py-1.5 rounded-md border transition-all duration-300",
                     getEventColor(type),
-                    isLatest ? "animate-fade-in ring-1 ring-primary/20" : "opacity-80"
+                    isLatest ? "animate-fade-in ring-1 ring-primary/20" : "opacity-80",
+                    isPhaseEvent && "flex-col"
                   )}
                 >
-                  <div className="mt-0.5 shrink-0">{getEventIcon(type)}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className={cn(
-                      "text-sm leading-snug",
-                      type === "death" ? "font-semibold text-arena-blood" :
-                      type === "crit" ? "font-semibold text-destructive" :
-                      type === "ko" ? "font-semibold text-arena-gold" :
-                      "text-foreground/85"
-                    )}>
-                      {event.text}
-                    </p>
+                  <div className="flex items-start gap-2 w-full">
+                    <div className="mt-0.5 shrink-0">{getEventIcon(type)}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-sm leading-snug",
+                        type === "death" ? "font-semibold text-arena-blood" :
+                        type === "crit" ? "font-semibold text-destructive" :
+                        type === "ko" ? "font-semibold text-arena-gold" :
+                        type === "phase" ? "font-bold text-primary text-xs uppercase tracking-wider" :
+                        "text-foreground/85"
+                      )}>
+                        {event.text}
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground/50 font-mono shrink-0 mt-0.5">
+                      {event.minute}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground/50 font-mono shrink-0 mt-0.5">
-                    {event.minute}
-                  </span>
+                  {/* Phase tactic & protect indicators */}
+                  {isPhaseEvent && (event.offTacticA || event.defTacticA || event.protectA || event.offTacticD || event.defTacticD || event.protectD) && (
+                    <div className="flex flex-col gap-1 w-full pl-5 pt-1">
+                      {(event.offTacticA || event.defTacticA || event.protectA) && (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-semibold text-muted-foreground w-12">{nameA}:</span>
+                          {event.offTacticA && <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-arena-gold/40 text-arena-gold">{event.offTacticA}</Badge>}
+                          {event.defTacticA && <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-arena-steel/40 text-arena-steel">{event.defTacticA}</Badge>}
+                          {event.protectA && <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/40 text-primary">🛡 {event.protectA}</Badge>}
+                        </div>
+                      )}
+                      {(event.offTacticD || event.defTacticD || event.protectD) && (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-semibold text-muted-foreground w-12">{nameD}:</span>
+                          {event.offTacticD && <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-arena-gold/40 text-arena-gold">{event.offTacticD}</Badge>}
+                          {event.defTacticD && <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-arena-steel/40 text-arena-steel">{event.defTacticD}</Badge>}
+                          {event.protectD && <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/40 text-primary">🛡 {event.protectD}</Badge>}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}

@@ -269,6 +269,14 @@ export type FightOutcomeBy = "Kill" | "KO" | "Exhaustion" | "Stoppage" | "Draw" 
 export interface MinuteEvent {
   minute: number;
   text: string;
+  /** Phase/tactic metadata for UI indicators */
+  phase?: "OPENING" | "MID" | "LATE";
+  offTacticA?: string;
+  defTacticA?: string;
+  offTacticD?: string;
+  defTacticD?: string;
+  protectA?: string;
+  protectD?: string;
 }
 
 export interface FightOutcome {

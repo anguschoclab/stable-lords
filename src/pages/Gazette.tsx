@@ -727,7 +727,7 @@ export default function Gazette() {
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
                     {(() => {
-                      const story = generateWeeklyGazette(fights, state.crowdMood as any, week, state.graveyard);
+                      const story = generateWeeklyGazette(fights, state.crowdMood as any, week, state.graveyard, state.arenaHistory);
                       return (
                         <>
                           <h3 className="text-xs font-display font-bold text-foreground">{story.headline}</h3>
