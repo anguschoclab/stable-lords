@@ -698,6 +698,41 @@ export default function Gazette() {
               </div>
 
               <div className="space-y-3">
+                {/* Weekly Power Rankings */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-display flex items-center gap-2">
+                      <Crown className="h-4 w-4 text-arena-gold" />
+                      Power Rankings
+                    </CardTitle>
+                    <p className="text-[10px] text-muted-foreground font-mono">Top 5 by fame · Week {week}</p>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    {(() => {
+                      // Accumulate fame up to this week
+                      const fameMap = new Map<string, number>();
+                      for (const af of state.arenaHistory.filter(f => f.week <= week)) {
+                        fameMap.set(af.a, (fameMap.get(af.a) ?? 0) + (af.fameDeltaA ?? 0));
+                        fameMap.set(af.d, (fameMap.get(af.d) ?? 0) + (af.fameDeltaD ?? 0));
+                      }
+                      const ranked = [...fameMap.entries()]
+                        .map(([name, fame]) => ({ name, fame }))
+                        .sort((a, b) => b.fame - a.fame)
+                        .slice(0, 5);
+                      if (ranked.length === 0) return <p className="text-xs text-muted-foreground italic">No data yet.</p>;
+                      const medals = ["🥇", "🥈", "🥉"];
+                      return ranked.map((r, i) => (
+                        <div key={r.name} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm leading-none w-5">{medals[i] ?? `${i + 1}.`}</span>
+                            <span className={`text-[11px] font-display truncate max-w-[100px] ${i === 0 ? "text-foreground font-bold" : "text-muted-foreground"}`}>{r.name}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-arena-fame">{r.fame} fame</span>
+                        </div>
+                      ));
+                    })()}
+                  </CardContent>
+                </Card>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-display flex items-center gap-2">

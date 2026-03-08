@@ -300,6 +300,28 @@ export default function RunRound() {
       };
       updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
 
+      // Check for Giant Killer flair — 3+ upset wins in career
+      if (outcome.winner) {
+        const winnerW = outcome.winner === "A" ? warrior : opponent;
+        const loserW = outcome.winner === "A" ? opponent : warrior;
+        if (loserW.fame >= winnerW.fame + 10 && loserW.fame >= winnerW.fame * 2) {
+          // Count total career upsets for this warrior
+          const upsetCount = updatedState.arenaHistory.filter(af => {
+            if (af.fameA == null || af.fameD == null || !af.winner) return false;
+            const wName = af.winner === "A" ? af.a : af.d;
+            if (wName !== winnerW.name) return false;
+            const wFame = af.winner === "A" ? af.fameA : af.fameD;
+            const lFame = af.winner === "A" ? af.fameD : af.fameA;
+            return lFame >= wFame + 10 && lFame >= wFame * 2;
+          }).length;
+          if (upsetCount >= 3 && !winnerW.flair.includes("Giant Killer")) {
+            updatedState.roster = updatedState.roster.map(w =>
+              w.id === winnerW.id ? { ...w, flair: [...w.flair, "Giant Killer"] } : w
+            );
+          }
+        }
+      }
+
       StyleMeter.recordFight({ styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
       StyleRollups.addFight({ week: state.week, styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
       ArenaHistory.append(summary);
