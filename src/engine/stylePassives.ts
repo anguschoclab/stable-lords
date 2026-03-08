@@ -241,15 +241,16 @@ export function getStylePassive(
       };
 
     // ── Total Parry: Endurance Wall ──
-    // Modest PAR bonus (seeds already give defense); real advantage is endurance efficiency
+    // BALANCE v6: Removed late PAR bonus. TP identity is endurance, not impenetrable blocking.
+    // Added ATT penalty — TP should almost never kill.
     case FightingStyle.TotalParry: {
-      const lateBonus = context.phase === "LATE" ? 1 : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        parBonus: lateBonus + m.bonus,  // Reduced from 1+lateBonus — seeds carry the weight
-        defBonus: 0,                     // Removed — seeds already provide DEF 4
-        ripBonus: context.phase === "LATE" ? 1 : 0,
+        attBonus: -2,  // TP attacks very poorly
+        parBonus: m.bonus,  // Only mastery bonus, no free late-game scaling
+        defBonus: 0,
+        ripBonus: 0,  // Removed late ripBonus — TP doesn't counter-attack well
         narrative: context.phase === "LATE" && context.endRatio > 0.5
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}stands fresh as the opponent gasps for breath!`
           : undefined,
