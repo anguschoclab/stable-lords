@@ -7,7 +7,8 @@ import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Swords, Skull, Play } from "lucide-react";
+import { Trophy, Swords, Skull, Play, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 const SEASON_NAMES: Record<string, string> = {
