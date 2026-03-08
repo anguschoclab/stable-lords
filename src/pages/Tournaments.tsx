@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useGame } from "@/state/GameContext";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { killWarrior } from "@/state/gameStore";
-import { StyleRollups } from "@/engine/stats/styleRollups";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
