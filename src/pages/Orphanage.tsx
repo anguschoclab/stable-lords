@@ -145,7 +145,9 @@ export default function Orphanage() {
         killedBy: boutResult?.outcome.winner === "A" ? boutResult.a.name : boutResult?.d.name,
       }));
 
-    const rivals = generateRivalStables(8, Date.now()).map((r) => ({
+    // Generate the large world: 23 AI stables
+    const generatedRivals = generateRivalStables(23, Date.now());
+    const rivals = generatedRivals.map((r) => ({
       owner: r.owner,
       roster: r.roster,
       motto: r.template.motto,
@@ -153,6 +155,21 @@ export default function Orphanage() {
       philosophy: r.template.philosophy,
       tier: r.template.tier,
     }));
+
+    // Collect all used names for recruit pool generation
+    const usedNames = new Set<string>();
+    for (const w of aliveWarriors) usedNames.add(w.name);
+    for (const w of deadWarriors) usedNames.add(w.name);
+    for (const r of generatedRivals) {
+      for (const w of r.roster) usedNames.add(w.name);
+    }
+
+    // Generate 100 recruit pool warriors
+    const recruitPool = generateRecruitPool(100, 1, usedNames, Date.now() + 1);
+
+    // Count world stats for gazette
+    const totalWarriors = generatedRivals.reduce((sum, r) => sum + r.roster.length, 0);
+    const totalTrainers = generatedRivals.reduce((sum, r) => sum + r.trainers.length, 0);
 
     const newState = {
       ...state,
