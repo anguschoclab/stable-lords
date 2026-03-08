@@ -60,6 +60,9 @@ function GameRoutes() {
         <Route path="/hall-of-fights" element={<HallOfFights />} />
         <Route path="/gazette" element={<Gazette />} />
         <Route path="/hall-of-fame" element={<HallOfFame />} />
+        <Route path="/kill-analytics" element={<KillAnalytics />} />
+        <Route path="/equipment-optimizer" element={<EquipmentOptimizerPage />} />
+        <Route path="/training-planner" element={<TrainingPlanner />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
