@@ -296,34 +296,19 @@ export default function RunRound() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-display font-bold">Run Round</h1>
-    const fightReady = state.roster.filter(w => {
-      if (w.status !== "Active") return false;
-      const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-      return !isTooInjuredToFight(injObjs);
-    });
-    return (
           <p className="text-muted-foreground text-sm mt-1">
             Week {state.week}, {state.season} — {fightReady.length} warriors ready ·
             Crowd: {state.crowdMood}
-            {fightReady.length < state.roster.filter(w => w.status === "Active").length && (
+            {tooInjuredCount > 0 && (
               <span className="text-destructive ml-1">
-                ({state.roster.filter(w => w.status === "Active").length - fightReady.length} too injured)
+                ({tooInjuredCount} too injured)
               </span>
             )}
           </p>
-    );
-  })()}
         </div>
         <Button
           onClick={runWeek}
-          disabled={running || (() => {
-            const fr = state.roster.filter(w => {
-              if (w.status !== "Active") return false;
-              const io = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-              return !isTooInjuredToFight(io);
-            });
-            return fr.length < 2;
-          })()}
+          disabled={running || fightReady.length < 2}
           className="gap-2 bg-primary hover:bg-primary/90 w-full sm:w-auto"
           size="lg"
         >
