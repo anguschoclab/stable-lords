@@ -1,6 +1,7 @@
 /**
  * Stable Lords — Orphanage FTUE Flow
- * Hybrid wizard: Name Stable → Pick 3 warriors → Tutorial bout → Summary
+ * Warrior selection → Tutorial bout → Summary
+ * (Stable naming now handled on Start Game page)
  */
 import React, { useState, useMemo, useCallback } from "react";
 import { useGame } from "@/state/GameContext";
@@ -11,12 +12,11 @@ import { computeWarriorStats, DAMAGE_LABELS } from "@/engine/skillCalc";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Swords, ArrowRight, ArrowLeft, Sparkles, Skull, Shield, CheckCircle2, Trophy, Zap } from "lucide-react";
 
-// ── Warrior Pool Generator ─────────────────────────────────────────────────
+// ── Warrior Pool ────────────────────────────────────────────────────────────
 
 interface PoolWarrior {
   id: string;
@@ -37,13 +37,11 @@ const ORPHAN_POOL: PoolWarrior[] = [
   { id: "orp_8", name: "MORKA", style: FightingStyle.TotalParry, attrs: { ST: 7, CN: 16, SZ: 9, WT: 11, WL: 15, SP: 6, DF: 6 }, lore: "Impossible to put down. Endures punishment that would fell lesser warriors." },
 ];
 
-const STEP_LABELS = ["Name Your Stable", "Choose Warriors", "First Blood", "Your Story Begins"];
+const STEP_LABELS = ["Choose Warriors", "First Blood", "Your Story Begins"];
 
 export default function Orphanage() {
-  const { state, setState } = useGame();
+  const { state, setState, returnToTitle } = useGame();
   const [step, setStep] = useState(0);
-  const [stableName, setStableName] = useState("");
-  const [ownerName, setOwnerName] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [boutResult, setBoutResult] = useState<{
     a: Warrior; d: Warrior;
@@ -51,11 +49,11 @@ export default function Orphanage() {
     summary: FightSummary;
   } | null>(null);
 
-  // ── Step 0: Name Stable ──────────────────────────────────────────────────
+  // Names come from state (set on start page)
+  const stableName = state.player.stableName;
+  const ownerName = state.player.name;
 
-  const canProceedStep0 = stableName.trim().length >= 2 && ownerName.trim().length >= 2;
-
-  // ── Step 1: Choose Warriors ──────────────────────────────────────────────
+  // ── Step 0: Choose Warriors ──────────────────────────────────────────────
 
   const toggleWarrior = useCallback((id: string) => {
     setSelected((prev) => {
@@ -71,7 +69,7 @@ export default function Orphanage() {
     [selected]
   );
 
-  // ── Step 2: Tutorial Bout ────────────────────────────────────────────────
+  // ── Step 1: Tutorial Bout ────────────────────────────────────────────────
 
   const runTutorialBout = useCallback(() => {
     if (selectedWarriors.length < 2) return;
@@ -103,10 +101,9 @@ export default function Orphanage() {
     setBoutResult({ a: wA, d: wB, outcome, summary });
   }, [selectedWarriors]);
 
-  // ── Step 3: Finalize & Enter Game ────────────────────────────────────────
+  // ── Step 2: Finalize & Enter Game ────────────────────────────────────────
 
   const finishFTUE = useCallback(() => {
-    // Create all 3 warriors
     const warriors = selectedWarriors.map((pw) => {
       const w = makeWarrior(
         `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}_${pw.id}`,
@@ -114,7 +111,6 @@ export default function Orphanage() {
         pw.style,
         pw.attrs
       );
-      // Apply bout results if this warrior fought
       if (boutResult) {
         const wasA = pw.name === boutResult.a.name;
         const wasD = pw.name === boutResult.d.name;
@@ -133,7 +129,6 @@ export default function Orphanage() {
       return w;
     });
 
-    // Check if anyone died in the tutorial bout
     const deadWarriorName = boutResult?.outcome.by === "Kill"
       ? (boutResult.outcome.winner === "A" ? boutResult.d.name : boutResult.a.name)
       : null;
@@ -153,11 +148,6 @@ export default function Orphanage() {
       ...state,
       ftueComplete: true,
       ftueStep: undefined,
-      player: {
-        ...state.player,
-        name: ownerName.trim(),
-        stableName: stableName.trim(),
-      },
       fame: 1,
       popularity: 1,
       roster: aliveWarriors,
@@ -168,7 +158,7 @@ export default function Orphanage() {
           week: 1,
           title: "Arena Gazette",
           items: [
-            `${stableName.trim()} enters the arena under ${ownerName.trim()}'s command!`,
+            `${stableName} enters the arena under ${ownerName}'s command!`,
             ...(boutResult
               ? [
                   `First bout: ${boutResult.a.name} vs ${boutResult.d.name} — ${
@@ -184,7 +174,6 @@ export default function Orphanage() {
       ],
     };
 
-    // Feed lore archive
     if (boutResult) {
       LoreArchive.signalFight(boutResult.summary);
     }
@@ -206,54 +195,8 @@ export default function Orphanage() {
           <Progress value={((step + 1) / STEP_LABELS.length) * 100} className="h-2" />
         </div>
 
-        {/* Step 0: Name */}
+        {/* Step 0: Choose Warriors */}
         {step === 0 && (
-          <Card className="border-primary/30">
-            <CardHeader>
-              <CardTitle className="font-display text-2xl flex items-center gap-3">
-                <Swords className="h-6 w-6 text-primary" />
-                Welcome to the Arena
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-muted-foreground leading-relaxed">
-                The orphanage doors creak open. Beyond them lies the roar of the crowd, the clash of steel,
-                and a chance to forge legends. But first — who are you, and what shall your stable be called?
-              </p>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Your Name</label>
-                  <Input
-                    placeholder="Enter your name"
-                    value={ownerName}
-                    onChange={(e) => setOwnerName(e.target.value)}
-                    maxLength={24}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Stable Name</label>
-                  <Input
-                    placeholder="e.g. The Iron Wolves, House of Blades"
-                    value={stableName}
-                    onChange={(e) => setStableName(e.target.value)}
-                    maxLength={30}
-                  />
-                </div>
-              </div>
-              <Button
-                onClick={() => setStep(1)}
-                disabled={!canProceedStep0}
-                className="w-full gap-2"
-                size="lg"
-              >
-                Enter the Orphanage <ArrowRight className="h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 1: Choose Warriors */}
-        {step === 1 && (
           <div className="space-y-4">
             <Card className="border-primary/30">
               <CardHeader className="pb-2">
@@ -263,9 +206,12 @@ export default function Orphanage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                <p className="text-muted-foreground text-sm mb-1">
+                  Welcome, <span className="text-foreground font-semibold">{ownerName}</span> of <span className="text-foreground font-semibold">{stableName}</span>.
+                </p>
                 <p className="text-muted-foreground text-sm mb-4">
                   These orphans have been training for this moment. Choose <span className="text-foreground font-semibold">3 warriors</span> to
-                  form your starting stable. Choose wisely — each brings different strengths.
+                  form your starting stable.
                 </p>
                 <Badge variant="outline" className="mb-4 font-mono">
                   {selected.size}/3 selected
@@ -323,11 +269,11 @@ export default function Orphanage() {
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setStep(0)} className="gap-2">
+              <Button variant="outline" onClick={returnToTitle} className="gap-2">
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
               <Button
-                onClick={() => { setStep(2); runTutorialBout(); }}
+                onClick={() => { setStep(1); runTutorialBout(); }}
                 disabled={selected.size < 3}
                 className="flex-1 gap-2"
                 size="lg"
@@ -339,8 +285,8 @@ export default function Orphanage() {
           </div>
         )}
 
-        {/* Step 2: Tutorial Bout */}
-        {step === 2 && boutResult && (
+        {/* Step 1: Tutorial Bout */}
+        {step === 1 && boutResult && (
           <div className="space-y-4">
             <Card className="border-primary/30">
               <CardHeader className="pb-2">
@@ -356,7 +302,6 @@ export default function Orphanage() {
               </CardContent>
             </Card>
 
-            {/* Fight Result */}
             <Card>
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-center justify-between">
@@ -369,7 +314,6 @@ export default function Orphanage() {
                   </div>
                 </div>
 
-                {/* Outcome */}
                 <div className="text-center py-4">
                   <Badge
                     className={`text-base px-4 py-1.5 ${
@@ -390,7 +334,6 @@ export default function Orphanage() {
                   )}
                 </div>
 
-                {/* Tags */}
                 {(boutResult.outcome.post?.tags ?? []).length > 0 && (
                   <div className="flex gap-2 justify-center">
                     {(boutResult.outcome.post?.tags ?? []).map((t) => (
@@ -401,7 +344,6 @@ export default function Orphanage() {
                   </div>
                 )}
 
-                {/* Fight Log */}
                 <div className="space-y-1 text-sm text-muted-foreground border-l-2 border-primary/20 pl-3 max-h-[200px] overflow-y-auto">
                   {boutResult.outcome.log.map((e, j) => (
                     <p key={j}>
@@ -414,11 +356,11 @@ export default function Orphanage() {
             </Card>
 
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setStep(1)} className="gap-2">
+              <Button variant="outline" onClick={() => setStep(0)} className="gap-2">
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
               <Button
-                onClick={() => setStep(3)}
+                onClick={() => setStep(2)}
                 className="flex-1 gap-2"
                 size="lg"
               >
@@ -428,8 +370,8 @@ export default function Orphanage() {
           </div>
         )}
 
-        {/* Step 3: Summary & Enter Game */}
-        {step === 3 && (
+        {/* Step 2: Summary & Enter Game */}
+        {step === 2 && (
           <Card className="border-primary/30">
             <CardHeader>
               <CardTitle className="font-display text-2xl flex items-center gap-3">
