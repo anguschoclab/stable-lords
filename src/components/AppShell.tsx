@@ -36,6 +36,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
 
+  // Fire coach tips based on current route
+  useCoachTip(location.pathname);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Top Nav */}

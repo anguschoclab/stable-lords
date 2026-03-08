@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { GameProvider } from "@/state/GameContext";
+import { GameProvider, useGame } from "@/state/GameContext";
 import AppShell from "@/components/AppShell";
 import Dashboard from "@/pages/Dashboard";
 import RunRound from "@/pages/RunRound";
@@ -14,9 +14,36 @@ import HallOfFights from "@/lore/HallOfFights";
 import Recruit from "@/pages/Recruit";
 import Graveyard from "@/pages/Graveyard";
 import Trainers from "@/pages/Trainers";
+import Orphanage from "@/pages/Orphanage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function GameRoutes() {
+  const { state } = useGame();
+
+  // Gate: if FTUE not complete, show Orphanage flow
+  if (!state.ftueComplete) {
+    return <Orphanage />;
+  }
+
+  return (
+    <AppShell>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/run-round" element={<RunRound />} />
+        <Route path="/tournaments" element={<Tournaments />} />
+        <Route path="/recruit" element={<Recruit />} />
+        <Route path="/graveyard" element={<Graveyard />} />
+        <Route path="/trainers" element={<Trainers />} />
+        <Route path="/help" element={<Help />} />
+        <Route path="/warrior/:id" element={<WarriorDetail />} />
+        <Route path="/hall-of-fights" element={<HallOfFights />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AppShell>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -25,20 +52,7 @@ const App = () => (
       <Sonner />
       <GameProvider>
         <BrowserRouter>
-          <AppShell>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/run-round" element={<RunRound />} />
-              <Route path="/tournaments" element={<Tournaments />} />
-              <Route path="/recruit" element={<Recruit />} />
-              <Route path="/graveyard" element={<Graveyard />} />
-              <Route path="/trainers" element={<Trainers />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/warrior/:id" element={<WarriorDetail />} />
-              <Route path="/hall-of-fights" element={<HallOfFights />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppShell>
+          <GameRoutes />
         </BrowserRouter>
       </GameProvider>
     </TooltipProvider>
