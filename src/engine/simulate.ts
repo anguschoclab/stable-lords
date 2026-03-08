@@ -394,14 +394,14 @@ export function simulateFight(
     hp: derivedA.hp, maxHp: derivedA.hp,
     endurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
     maxEndurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0,
+    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0,
   };
   const fD: FighterState = {
     label: "D", style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
     hp: derivedD.hp, maxHp: derivedD.hp,
     endurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
     maxEndurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0,
+    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0,
   };
 
   const log: MinuteEvent[] = [];
