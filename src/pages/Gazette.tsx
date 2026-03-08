@@ -500,6 +500,72 @@ function BestByStyle({ allFights }: { allFights: FightSummary[] }) {
   );
 }
 
+/* ── Rising Stars ────────────────────────────────────────── */
+
+function RisingStars({ allFights, currentWeek }: { allFights: FightSummary[]; currentWeek: number }) {
+  const stars = useMemo(() => {
+    const cutoff = Math.max(1, currentWeek - 2); // last 3 weeks inclusive
+    const recent = allFights.filter((f) => f.week >= cutoff);
+
+    const m = new Map<string, { name: string; fame: number; wins: number; losses: number; bouts: number }>();
+    for (const f of recent) {
+      for (const side of ["A", "D"] as const) {
+        const name = side === "A" ? f.a : f.d;
+        const entry = m.get(name) ?? { name, fame: 0, wins: 0, losses: 0, bouts: 0 };
+        entry.fame += (side === "A" ? f.fameDeltaA : f.fameDeltaD) ?? 0;
+        entry.bouts++;
+        if (f.winner === side) entry.wins++;
+        else if (f.winner !== null) entry.losses++;
+        m.set(name, entry);
+      }
+    }
+
+    return [...m.values()]
+      .filter((w) => w.fame > 0)
+      .sort((a, b) => b.fame - a.fame)
+      .slice(0, 8);
+  }, [allFights, currentWeek]);
+
+  if (stars.length === 0) return null;
+
+  const maxFame = Math.max(...stars.map((s) => s.fame), 1);
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-arena-pop" /> Rising Stars
+        </CardTitle>
+        <p className="text-[10px] text-muted-foreground font-mono">
+          Biggest fame gains over the last 3 weeks
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-2">
+        {stars.map((s, i) => {
+          const barW = (s.fame / maxFame) * 100;
+          return (
+            <div key={s.name} className="space-y-0.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-arena-pop font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
+                  <span className={`text-xs font-display truncate max-w-[140px] ${i === 0 ? "text-foreground font-semibold" : "text-foreground"}`}>{s.name}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
+                  <span className="text-arena-pop font-semibold">+{s.fame}</span>
+                  <span>{s.wins}W-{s.losses}L</span>
+                </div>
+              </div>
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-arena-pop/70 transition-all" style={{ width: `${barW}%` }} />
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}
+
 /* ── main page ───────────────────────────────────────────── */
 
 export default function Gazette() {
@@ -569,6 +635,9 @@ export default function Gazette() {
 
       {/* Best Warrior by Style */}
       {hasContent && <BestByStyle allFights={allFights} />}
+
+      {/* Rising Stars */}
+      {hasContent && <RisingStars allFights={allFights} currentWeek={state.week} />}
 
       {!hasContent && (
         <Card className="border-dashed">
