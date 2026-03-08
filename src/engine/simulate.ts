@@ -618,10 +618,12 @@ export function simulateFight(
     } else {
       // Attack lands — defender tries to stop it
 
-      // ── 3a. PARRY CHECK — with passive PAR + anti-synergy ──
+      // ── 3a. PARRY CHECK — with passive PAR + anti-synergy + Bash bypass ──
       const defOEmod = oeDefMod(defOE);
       const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
-      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY);
+      // Bash tactic: "attack through a parry" — reduces defender's parry effectiveness (compendium §BA)
+      const bashBypass = attOffMods.parryBypass ?? 0;
+      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef);
 
       if (parrySuccess) {
         attacker.consecutiveHits = 0;
