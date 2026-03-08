@@ -495,7 +495,7 @@ export function simulateFight(
 
           // ── 6. DECISIVENESS CHECK (DEC) — Kill Window ──
           if (defender.hp <= defender.maxHp * 0.3 && defender.endurance <= defender.maxEndurance * 0.4) {
-            const kdMod = Math.floor((attacker.plan.killDesire ?? 5) - 5) * 0.5;
+            const kdMod = Math.floor((attKD) - 5) * 0.5;
             const phaseMod = phase === "LATE" ? 3 : phase === "MID" ? 1 : 0;
             const decSuccess = skillCheck(rng, attacker.skills.DEC, kdMod + phaseMod + attMatchup + attFat);
 
