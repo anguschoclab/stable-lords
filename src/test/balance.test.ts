@@ -56,8 +56,11 @@ describe("Style Balance", () => {
       const planA = defaultPlanForWarrior(wA);
       const planD = defaultPlanForWarrior(wD);
 
+      const idxA = ALL_STYLES.indexOf(styleA);
+      const idxD = ALL_STYLES.indexOf(styleD);
+
       for (let i = 0; i < FIGHTS_PER_MATCHUP; i++) {
-        const seed = (styleA.length * 1000 + styleD.length * 100 + i) * 31337 + i;
+        const seed = (idxA * 10 + idxD) * 100000 + i * 7919 + 42;
         const outcome = simulateFight(planA, planD, wA, wD, seed);
 
         styleFights[styleA]++;
