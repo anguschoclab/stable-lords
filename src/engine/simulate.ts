@@ -487,7 +487,8 @@ export function simulateFight(
             if (decSuccess) {
               // Kill window — attempt execution
               const killRoll = rng();
-              const killThreshold = 0.3 + (attacker.plan.killDesire ?? 5) * 0.04 + (phase === "LATE" ? 0.15 : 0);
+              const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * 0.03 : (trainerModsD?.healMod ?? 0) * 0.03;
+              const killThreshold = Math.max(0.05, 0.3 + (attacker.plan.killDesire ?? 5) * 0.04 + (phase === "LATE" ? 0.15 : 0) - healingReduction);
 
               if (killRoll < killThreshold) {
                 // KILL
