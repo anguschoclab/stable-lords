@@ -276,12 +276,27 @@ export interface GameState {
   hallOfFame: HallEntry[];
   crowdMood: CrowdMoodType;
   tournaments: TournamentEntry[];
+  trainers: TrainerData[];
+  hiringPool: TrainerData[];
   settings: {
     featureFlags: {
       tournaments: boolean;
       scouting: boolean;
     };
   };
+}
+
+/** Trainer as stored in game state (mirrors modules/trainers Trainer shape) */
+export interface TrainerData {
+  id: string;
+  name: string;
+  tier: string;
+  focus: string;
+  fame: number;
+  contractWeeksLeft: number;
+  retiredFromWarrior?: string;
+  retiredFromStyle?: string;
+  styleBonusStyle?: string;
 }
 
 // ─── UI Preferences ─────────────────────────────────────────────────────────
