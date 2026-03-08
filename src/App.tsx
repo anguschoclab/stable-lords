@@ -41,6 +41,7 @@ function GameRoutes() {
         <Route path="/run-round" element={<RunRound />} />
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/recruit" element={<Recruit />} />
+        <Route path="/training" element={<Training />} />
         <Route path="/graveyard" element={<Graveyard />} />
         <Route path="/trainers" element={<Trainers />} />
         <Route path="/help" element={<Help />} />
