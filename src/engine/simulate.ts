@@ -543,9 +543,10 @@ export function simulateFight(
             log.push({ minute: min, text: `${name(defender)} dodges the attack with quick footwork.` });
           }
         } else {
-          // ── 5. DAMAGE APPLICATION ──
-          const hitLoc = rollHitLocation(rng, attacker.plan.target);
-          const damage = computeHitDamage(rng, attacker.derived.damage, hitLoc);
+          // ── 5. DAMAGE APPLICATION — with tactic dmg bonus and protect ──
+          const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
+          const rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus, hitLoc);
+          const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
           defender.hp -= damage;
           defender.hitsTaken++;
           attacker.hitsLanded++;
