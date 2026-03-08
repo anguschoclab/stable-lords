@@ -78,10 +78,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setStateRaw((prev) => {
       const next = advanceWeek(prev);
       const slotId = getActiveSlot();
-      if (slotId) saveToSlot(slotId, next);
+      if (slotId) { saveToSlot(slotId, next); markSaved(); }
       return next;
     });
-  }, []);
+  }, [markSaved]);
 
   const doAppendFight = useCallback((summary: FightSummary) => {
     setStateRaw((prev) => {
