@@ -75,12 +75,31 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
-              onClick={doReset}
+              onClick={() => setResetOpen(true)}
               title="Reset Save"
               className="text-muted-foreground hover:text-destructive"
             >
               <RotateCcw className="h-4 w-4" />
             </Button>
+            <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-display">Reset Save Data?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all your warriors, trainers, fight history, and tournament progress. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => { doReset(); setResetOpen(false); }}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Reset Everything
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </header>

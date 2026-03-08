@@ -112,6 +112,26 @@ export default function Trainers() {
   const hiringPool = state.hiringPool ?? [];
   const canHire = currentTrainers.length < TRAINER_MAX_PER_STABLE;
 
+  // Auto-populate hiring pool on first visit if empty
+  React.useEffect(() => {
+    if ((state.hiringPool ?? []).length === 0) {
+      const pool = generateHiringPool(4, state.week * 1000 + Date.now());
+      const poolData: TrainerData[] = pool.map((t) => ({
+        id: t.id,
+        name: t.name,
+        tier: t.tier,
+        focus: t.focus,
+        fame: t.fame,
+        contractWeeksLeft: t.contractWeeksLeft,
+        retiredFromWarrior: t.retiredFromWarrior,
+        retiredFromStyle: t.retiredFromStyle,
+        styleBonusStyle: t.styleBonusStyle,
+      }));
+      setState({ ...state, hiringPool: poolData });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Refresh hiring pool
   const refreshPool = useCallback(() => {
     const pool = generateHiringPool(4, state.week * 1000 + Date.now());
