@@ -5,6 +5,7 @@
 import React, { useMemo } from "react";
 import { useGame } from "@/state/GameContext";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
+import { StyleRollups, type StyleRecord } from "@/engine/stats/styleRollups";
 import type { FightSummary, Warrior } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
