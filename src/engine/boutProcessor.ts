@@ -15,6 +15,7 @@ import { StyleRollups } from "@/engine/stats/styleRollups";
 import { commentatorFor, recapLine, blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
 import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
 import { calculateXP, applyXP } from "@/engine/progression";
+import { checkDiscovery } from "@/engine/favorites";
 import {
   generateMatchCard,
   addRestState,
