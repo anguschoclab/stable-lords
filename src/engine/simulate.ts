@@ -558,10 +558,30 @@ export function simulateFight(
       }
     }
 
-    // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy ──
-    const attOEmod = oeAttMod(attOE);
+    // ── TACTIC OVERUSE PENALTY (compendium: "tactics sparingly") ──
+    // Using the same tactic for 2+ consecutive exchanges degrades its effectiveness
+    const curTacticKeyA = (aGoesFirst ? tacticsA.offTactic : tacticsD.offTactic) + "|" + (aGoesFirst ? tacticsA.defTactic : tacticsD.defTactic);
+    const curTacticKeyD = (!aGoesFirst ? tacticsA.offTactic : tacticsD.offTactic) + "|" + (!aGoesFirst ? tacticsA.defTactic : tacticsD.defTactic);
+    if (curTacticKeyA === lastTacticA && curTacticKeyA !== "none|none") {
+      tacticStreakA++;
+    } else {
+      tacticStreakA = 0;
+      lastTacticA = curTacticKeyA;
+    }
+    if (curTacticKeyD === lastTacticD && curTacticKeyD !== "none|none") {
+      tacticStreakD++;
+    } else {
+      tacticStreakD = 0;
+      lastTacticD = curTacticKeyD;
+    }
+    // Penalty: -1 per consecutive exchange using same tactic (cap -3)
+    const tacticOveruseAtt = aGoesFirst ? Math.min(3, tacticStreakA) : Math.min(3, tacticStreakD);
+    const tacticOveruseDef = aGoesFirst ? Math.min(3, tacticStreakD) : Math.min(3, tacticStreakA);
+
+    // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy + PR OE paradox ──
+    const attOEmod = oeAttMod(attOE, attacker.style);
     const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
-    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus + GLOBAL_ATT_BONUS);
+    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus + GLOBAL_ATT_BONUS - tacticOveruseAtt);
 
     if (!attackSuccess) {
       // Attack whiffs — reset consecutive hits
