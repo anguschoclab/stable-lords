@@ -14,11 +14,11 @@ const STYLE_SEEDS: Record<FightingStyle, [number, number, number, number, number
   // BALANCE v5: Offensive ATT boosted to 8, defensive PAR/DEF compressed to 2-3.
   // Riposte seeds capped at 2 for counter styles (identity via passives).
   // Goal: offense lands hits frequently; defense wins via endurance/counters, not blocking everything.
-  [FightingStyle.AimedBlow]:       [ 6,  2,  2,  3,  2,  4],  // 19 — precision via crit, not raw ATT
-  [FightingStyle.BashingAttack]:   [ 8,  1,  2,  4,  1,  3],  // 19 — highest ATT, lowest PAR (raw power)
-  [FightingStyle.LungingAttack]:   [ 8,  1,  2,  5,  1,  3],  // 20 — fast, aggressive, fragile
+  [FightingStyle.AimedBlow]:       [ 5,  2,  2,  3,  2,  4],  // 18 — precision via crit, lower ATT
+  [FightingStyle.BashingAttack]:   [ 8,  1,  2,  4,  1,  3],  // 19 — highest ATT, raw power
+  [FightingStyle.LungingAttack]:   [ 8,  1,  2,  5,  1,  3],  // 20 — fast, aggressive
   [FightingStyle.ParryLunge]:      [ 5,  3,  2,  3,  2,  3],  // 18 — balanced hybrid
-  [FightingStyle.ParryRiposte]:    [ 3,  3,  2,  3,  2,  2],  // 15 — RIP 2 (counter via passives, not seeds)
+  [FightingStyle.ParryRiposte]:    [ 3,  2,  2,  3,  2,  2],  // 14 — PAR reduced to 2, counter via passives only
   [FightingStyle.ParryStrike]:     [ 5,  3,  3,  3,  2,  3],  // 19 — efficient counter, PAR 3 (not 4)
   [FightingStyle.SlashingAttack]:  [ 8,  1,  2,  4,  1,  3],  // 19 — offensive, multi-hit identity
   [FightingStyle.StrikingAttack]:  [ 8,  2,  2,  4,  1,  3],  // 20 — reliable power

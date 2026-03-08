@@ -123,14 +123,13 @@ export function getStylePassive(
     // Modest ATT bonus when targeting; crit chance is the real payoff
     case FightingStyle.AimedBlow: {
       const targeted = context.targetedLocation && context.targetedLocation !== "Any";
-      // AB vs defensive styles (TP/WS): patient precision — accuracy increases over time
       const vsDefensive = context.opponentStyle === FightingStyle.TotalParry || context.opponentStyle === FightingStyle.WallOfSteel;
       const patientBonus = vsDefensive ? Math.min(2, Math.floor(context.exchange / 3)) : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(targeted ? 1 : 0) + (targeted ? m.bonus : 0) + patientBonus,
-        critChance: targeted ? 0.10 + (context.exchange > 5 ? 0.05 : 0) + (m.bonus * 0.03) + (vsDefensive ? 0.05 : 0) : 0,
+        attBonus: scale(targeted ? 1 : 0) + patientBonus,
+        critChance: targeted ? 0.07 + (context.exchange > 5 ? 0.03 : 0) + (vsDefensive ? 0.03 : 0) : 0, // Reduced from 10%+5%
         narrative: vsDefensive && context.exchange > 4
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}studies the predictable rhythm, each probe finding deeper gaps in the defense`
           : targeted && context.exchange > 5

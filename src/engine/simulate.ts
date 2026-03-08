@@ -53,14 +53,14 @@ const STYLE_ORDER = [
 // - BA loses to precision/counter styles (AB, PR — can read the charges)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0, +1,  0,  0, -1,  0,  0,  0, +2,  0], // AB: precision destroys TP, slight edge vs BA
-  [-1,  0,  0,  0,  0,  0, +1, +1, +2, +1], // BA: hard-counters TP, beats SL/ST/WS
-  [ 0,  0,  0, +1,  0, -1, +1,  0, +1, -1], // LU: speed beats PL/SL, weak vs PS/WS
-  [ 0,  0, -1,  0, +1,  0,  0,  0, -1,  0], // PL: beats PR, TP outlasts
-  [+1,  0,  0, -1,  0, +1,  0, -1, -1,  0], // PR: counter beats AB/PS, TP outlasts, ST overpowers
-  [ 0,  0, +1,  0, -1,  0, +1,  0,  0, -1], // PS: beats LU/SL, loses to PR/WS
-  [ 0, -1, -1,  0,  0, -1,  0, +1, +1, +1], // SL: flurry beats TP/ST/WS, weak vs BA/LU/PS
-  [ 0, -1,  0,  0, +1,  0, -1,  0,  0,  0], // ST: efficient, beats PR, weak vs BA/SL
+  [ 0, +1,  0,  0, -1,  0,  0,  0, +2,  0], // AB: precision destroys TP, edge vs BA
+  [-1,  0,  0,  0,  0,  0, +1,  0, +2, +1], // BA: hard-counters TP, beats SL/WS
+  [ 0,  0,  0, +1,  0, -1,  0,  0, +1, -1], // LU: speed beats PL, weak vs PS/WS
+  [ 0,  0, -1,  0, +1,  0,  0, -1, -1,  0], // PL: beats PR, weak vs ST/TP
+  [+1,  0,  0, -1,  0,  0,  0, -1, -1,  0], // PR: counter beats AB, weak vs PL/ST/TP
+  [ 0,  0, +1,  0,  0,  0, +1, -1,  0, -1], // PS: beats LU/SL, loses to ST/WS
+  [ 0, -1,  0,  0,  0, -1,  0,  0, +1, +1], // SL: flurry beats TP/WS, weak vs BA/PS
+  [ 0,  0,  0, +1, +1, +1,  0,  0,  0,  0], // ST: efficient power, beats PL/PR/PS
   [-2, -2, -1, +1, +1,  0, -1,  0,  0, +1], // TP: crushed by BA/AB, outlasts PL/PR
   [ 0, -1, +1,  0,  0, +1, -1,  0, -1,  0], // WS: zone control, beats LU/PS, loses to BA/TP
 ];
