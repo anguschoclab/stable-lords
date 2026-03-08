@@ -120,6 +120,7 @@ export function loadGameState(): GameState {
         if (!parsed.restStates) parsed.restStates = [];
         if (!parsed.rivalries) parsed.rivalries = [];
         if (!parsed.matchHistory) parsed.matchHistory = [];
+        if (!parsed.recruitPool) parsed.recruitPool = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
           ...w,
