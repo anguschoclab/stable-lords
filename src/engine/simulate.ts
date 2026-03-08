@@ -377,8 +377,18 @@ export function simulateFight(
   const favWeaponA = warriorA ? getFavoriteWeaponBonus(warriorA) : 0;
   const favWeaponD = warriorD ? getFavoriteWeaponBonus(warriorD) : 0;
 
+  // Weapon requirement penalties (STR/DFT/SPD minimums)
+  const weaponReqA = checkWeaponRequirements(
+    (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon,
+    { ST: attrsA.ST, DF: attrsA.DF, SP: attrsA.SP }
+  );
+  const weaponReqD = checkWeaponRequirements(
+    (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon,
+    { ST: attrsD.ST, DF: attrsD.DF, SP: attrsD.SP }
+  );
+
   const effSkillsA: BaseSkills = {
-    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA + favWeaponA,
+    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA + favWeaponA + weaponReqA.attPenalty,
     PAR: skillsA.PAR + equipA.parMod + (trainerModsA?.parMod ?? 0),
     DEF: skillsA.DEF + equipA.defMod + (trainerModsA?.defMod ?? 0),
     INI: skillsA.INI + equipA.iniMod + (trainerModsA?.iniMod ?? 0),
@@ -386,7 +396,7 @@ export function simulateFight(
     DEC: skillsA.DEC + (trainerModsA?.decMod ?? 0),
   };
   const effSkillsD: BaseSkills = {
-    ATT: skillsD.ATT + equipD.attMod + (trainerModsD?.attMod ?? 0) + classicBonusD + favWeaponD,
+    ATT: skillsD.ATT + equipD.attMod + (trainerModsD?.attMod ?? 0) + classicBonusD + favWeaponD + weaponReqD.attPenalty,
     PAR: skillsD.PAR + equipD.parMod + (trainerModsD?.parMod ?? 0),
     DEF: skillsD.DEF + equipD.defMod + (trainerModsD?.defMod ?? 0),
     INI: skillsD.INI + equipD.iniMod + (trainerModsD?.iniMod ?? 0),

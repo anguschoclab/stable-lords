@@ -450,7 +450,7 @@ function biasedAttrs(
 
 // ─── Trainer Generation ───────────────────────────────────────────────────
 
-export interface StableTrainer {
+interface StableTrainer {
   id: string;
   name: string;
   tier: "Novice" | "Seasoned" | "Master";

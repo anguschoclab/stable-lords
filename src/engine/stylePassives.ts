@@ -84,7 +84,7 @@ export function getMastery(totalFights: number): MasteryInfo {
 // The matchup matrix and base skill seeds are the PRIMARY differentiators.
 // Passives add FLAVOR, not dominance.
 
-export interface StylePassiveResult {
+interface StylePassiveResult {
   attBonus: number;
   parBonus: number;
   defBonus: number;
