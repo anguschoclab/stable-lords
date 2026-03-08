@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe } from "lucide-react";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,7 @@ const navItems = [
   { to: "/tournaments", label: "Tournaments", icon: Trophy },
   { to: "/world", label: "World", icon: Globe },
   { to: "/hall-of-fights", label: "Chronicle", icon: ScrollText },
+  { to: "/gazette", label: "Gazette", icon: Newspaper },
   { to: "/graveyard", label: "Hall of Warriors", icon: Skull },
   { to: "/help", label: "Help", icon: HelpCircle },
 ];
