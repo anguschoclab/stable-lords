@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useGame } from "@/state/GameContext";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { StyleRollups } from "@/engine/stats/styleRollups";
@@ -6,8 +6,9 @@ import { LoreArchive } from "@/lore/LoreArchive";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Newspaper, Trophy, Swords, TrendingUp, Skull, Flame, Star } from "lucide-react";
-import type { FightSummary, HallEntry } from "@/types/game";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Newspaper, Trophy, Swords, TrendingUp, Skull, Flame, Star, ChevronDown, BarChart3 } from "lucide-react";
+import type { FightSummary } from "@/types/game";
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -43,6 +44,9 @@ function scoreFight(f: FightSummary): number {
 /* ── components ──────────────────────────────────────────── */
 
 function FightCard({ fight, isFOTW }: { fight: FightSummary; isFOTW: boolean }) {
+  const hasTranscript = fight.transcript && fight.transcript.length > 0;
+  const [open, setOpen] = useState(false);
+
   return (
     <div className={`relative rounded-lg border p-4 transition-colors ${isFOTW ? "border-accent glow-gold bg-accent/5" : "border-border bg-card"}`}>
       {isFOTW && (
@@ -62,7 +66,7 @@ function FightCard({ fight, isFOTW }: { fight: FightSummary; isFOTW: boolean }) 
           {outcomeBadge(fight.by)}
         </div>
         <div className="flex-1 pl-3">
-        <span className={`font-display text-sm ${fight.winner === "D" ? "text-foreground font-bold" : "text-muted-foreground"}`}>
+          <span className={`font-display text-sm ${fight.winner === "D" ? "text-foreground font-bold" : "text-muted-foreground"}`}>
             {fight.d}
           </span>
           <div className="text-[10px] text-muted-foreground font-mono">{fight.styleD}</div>
@@ -76,6 +80,26 @@ function FightCard({ fight, isFOTW }: { fight: FightSummary; isFOTW: boolean }) 
             </Badge>
           ))}
         </div>
+      )}
+
+      {/* Expandable transcript */}
+      {hasTranscript && (
+        <Collapsible open={open} onOpenChange={setOpen} className="mt-2">
+          <CollapsibleTrigger className="flex items-center gap-1 mx-auto text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer group">
+            <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+            {open ? "Hide" : "Read"} blow-by-blow
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="mt-2 border-t border-border/50 pt-2 space-y-1 max-h-60 overflow-y-auto">
+              {fight.transcript!.map((line, i) => (
+                <p key={i} className="text-[11px] leading-relaxed text-muted-foreground font-mono">
+                  <span className="text-muted-foreground/40 mr-2 select-none">{i + 1}.</span>
+                  {line}
+                </p>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   );
@@ -102,6 +126,79 @@ function StyleTrendRow({ style, w, l, k, pct, fights }: { style: string; w: numb
   );
 }
 
+/* ── All-time meta chart ─────────────────────────────────── */
+
+function AllTimeMetaChart({ allFights }: { allFights: FightSummary[] }) {
+  const meta = useMemo(() => {
+    const m: Record<string, { w: number; l: number; k: number; fights: number }> = {};
+    const ensure = (s: string) => {
+      if (!m[s]) m[s] = { w: 0, l: 0, k: 0, fights: 0 };
+    };
+    for (const f of allFights) {
+      ensure(f.styleA);
+      ensure(f.styleD);
+      m[f.styleA].fights++;
+      m[f.styleD].fights++;
+      if (f.winner === "A") { m[f.styleA].w++; m[f.styleD].l++; }
+      else if (f.winner === "D") { m[f.styleD].w++; m[f.styleA].l++; }
+      if (f.by === "Kill") {
+        if (f.winner === "A") m[f.styleA].k++;
+        else if (f.winner === "D") m[f.styleD].k++;
+      }
+    }
+    return Object.entries(m)
+      .map(([style, d]) => ({ style, ...d, pct: d.fights > 0 ? d.w / d.fights : 0 }))
+      .sort((a, b) => b.fights - a.fights);
+  }, [allFights]);
+
+  if (meta.length === 0) return null;
+
+  const maxFights = Math.max(...meta.map((m) => m.fights), 1);
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-arena-fame" />
+          All-Time Style Meta
+        </CardTitle>
+        <p className="text-[10px] text-muted-foreground font-mono">
+          Cumulative across {allFights.length} recorded bouts
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-2">
+        {meta.map((s) => {
+          const winPct = (s.pct * 100).toFixed(0);
+          const usageWidth = (s.fights / maxFights) * 100;
+          return (
+            <div key={s.style} className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-display text-foreground">{s.style}</span>
+                <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
+                  <span>{s.fights} bout{s.fights !== 1 ? "s" : ""}</span>
+                  <span className="text-primary font-semibold">{winPct}% W</span>
+                  {s.k > 0 && <span className="text-arena-blood">{s.k}K</span>}
+                </div>
+              </div>
+              {/* Stacked bar: wins vs losses */}
+              <div className="h-3 bg-muted rounded-full overflow-hidden flex" style={{ width: `${usageWidth}%`, minWidth: "2rem" }}>
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${s.pct * 100}%` }}
+                />
+                <div
+                  className="h-full bg-destructive/40 transition-all"
+                  style={{ width: `${(1 - s.pct) * 100}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}
+
 /* ── main page ───────────────────────────────────────────── */
 
 export default function Gazette() {
@@ -110,7 +207,6 @@ export default function Gazette() {
   const allFights = useMemo(() => ArenaHistory.all(), [state.week]);
   const hallEntries = useMemo(() => LoreArchive.allHall(), [state.week]);
 
-  // Group fights by week, descending
   const weeklyIssues = useMemo(() => {
     const byWeek = new Map<number, FightSummary[]>();
     for (const f of allFights) {
@@ -121,22 +217,16 @@ export default function Gazette() {
     return [...byWeek.entries()]
       .sort(([a], [b]) => b - a)
       .map(([week, fights]) => {
-        // Find fight of the week
         const fotwEntry = hallEntries.find(
           (h) => h.week === week && h.label === "Fight of the Week"
         );
         let fotwId = fotwEntry?.fightId ?? null;
-        // Fallback: highest scored fight
         if (!fotwId && fights.length > 0) {
           fotwId = fights.reduce((best, f) => (scoreFight(f) > scoreFight(best) ? f : best), fights[0]).id;
         }
-
         const kills = fights.filter((f) => f.by === "Kill").length;
         const kos = fights.filter((f) => f.by === "KO").length;
-
-        // Style rollups for this week
         const rollup = StyleRollups.getWeekRollup(week);
-
         return { week, fights, fotwId, kills, kos, rollup };
       });
   }, [allFights, hallEntries]);
@@ -167,6 +257,9 @@ export default function Gazette() {
         </div>
       </div>
 
+      {/* All-Time Meta Chart */}
+      {hasContent && <AllTimeMetaChart allFights={allFights} />}
+
       {!hasContent && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
@@ -187,7 +280,6 @@ export default function Gazette() {
 
         return (
           <article key={week} className="space-y-4">
-            {/* Week Header */}
             <div className="flex items-end gap-3 border-b-2 border-accent/30 pb-2">
               <h2 className="font-display text-xl text-foreground leading-none">
                 Week {week}
@@ -210,22 +302,16 @@ export default function Gazette() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {/* Left column: Fights */}
               <div className="lg:col-span-2 space-y-3">
-                {/* Fight of the Week highlight */}
                 {fotw && <FightCard fight={fotw} isFOTW />}
-
-                {/* Other fights */}
                 {otherFights.map((f) => (
                   <FightCard key={f.id} fight={f} isFOTW={false} />
                 ))}
-
                 {fights.length === 0 && (
                   <p className="text-xs text-muted-foreground italic">No bouts this week.</p>
                 )}
               </div>
 
-              {/* Right column: Style Trends */}
               <div className="space-y-3">
                 <Card>
                   <CardHeader className="pb-2">
@@ -247,7 +333,6 @@ export default function Gazette() {
                   </CardContent>
                 </Card>
 
-                {/* Headlines / flavor */}
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-display flex items-center gap-2">
@@ -259,14 +344,8 @@ export default function Gazette() {
                     {fotw && (
                       <p className="text-xs text-foreground">
                         <span className="font-semibold">{winnerName(fotw)}</span>
-                        {fotw.by === "Kill"
-                          ? " slays "
-                          : fotw.by === "KO"
-                          ? " knocks out "
-                          : " defeats "}
-                        <span className="font-semibold">
-                          {fotw.winner === "A" ? fotw.d : fotw.a}
-                        </span>{" "}
+                        {fotw.by === "Kill" ? " slays " : fotw.by === "KO" ? " knocks out " : " defeats "}
+                        <span className="font-semibold">{fotw.winner === "A" ? fotw.d : fotw.a}</span>{" "}
                         in the bout of the week!
                       </p>
                     )}
