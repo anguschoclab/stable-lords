@@ -43,8 +43,10 @@ import {
   Flame,
   Download,
   Upload,
+  Dices,
 } from "lucide-react";
 import { toast } from "sonner";
+import { randomOwnerName, randomStableName } from "@/data/randomNames";
 
 type Screen = "title" | "newGame";
 
