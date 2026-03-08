@@ -136,10 +136,12 @@ export function resetGameState(): GameState {
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
 export function advanceWeek(state: GameState): GameState {
-  const newWeek = state.week + 1;
+  // Process training before advancing
+  const trained = processTraining(state);
+  const newWeek = trained.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   return {
-    ...state,
+    ...trained,
     week: newWeek,
     season: SEASONS[seasonIdx],
   };
