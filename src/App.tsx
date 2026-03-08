@@ -15,14 +15,20 @@ import Recruit from "@/pages/Recruit";
 import Graveyard from "@/pages/Graveyard";
 import Trainers from "@/pages/Trainers";
 import Orphanage from "@/pages/Orphanage";
+import StartGame from "@/pages/StartGame";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 function GameRoutes() {
-  const { state } = useGame();
+  const { state, atTitleScreen } = useGame();
 
-  // Gate: if FTUE not complete, show Orphanage flow
+  // No active game → show title / start screen
+  if (atTitleScreen) {
+    return <StartGame />;
+  }
+
+  // FTUE not complete → Orphanage flow (stable already named on start page)
   if (!state.ftueComplete) {
     return <Orphanage />;
   }
