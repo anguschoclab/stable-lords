@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut } from "lucide-react";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -19,9 +19,10 @@ import {
 
 import { useCoachTip } from "@/hooks/useCoachTip";
 import { getActiveSlot, deleteSlot } from "@/state/saveSlots";
+import EventLog from "@/components/EventLog";
 
 const navItems = [
-  { to: "/", label: "Arena Hub", icon: LayoutDashboard },
+  { to: "/", label: "Hub", icon: LayoutDashboard },
   { to: "/run-round", label: "Run Round", icon: Zap },
   { to: "/recruit", label: "Recruit", icon: UserPlus },
   { to: "/trainers", label: "Trainers", icon: GraduationCap },
@@ -36,23 +37,35 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { state, doReset, returnToTitle } = useGame();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Fire coach tips based on current route
   useCoachTip(location.pathname);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Nav */}
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* ─── Top Nav Bar ─── */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2">
+        <div className="flex h-12 items-center justify-between px-4">
+          {/* Left: Logo + Nav */}
+          <div className="flex items-center gap-1">
+            <Link to="/" className="flex items-center gap-2 mr-4">
               <Swords className="h-5 w-5 text-arena-gold" />
-              <span className="font-display font-bold text-lg tracking-wide">
+              <span className="font-display font-bold text-base tracking-wide hidden sm:inline">
                 Stable Lords
               </span>
             </Link>
-            <nav className="hidden md:flex items-center gap-1">
+
+            {/* Toggle sidebar on mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-8 w-8 text-muted-foreground"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+            </Button>
+
+            <nav className="hidden md:flex items-center">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const active = location.pathname === item.to;
@@ -61,41 +74,47 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     key={item.to}
                     to={item.to}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors",
                       active
                         ? "bg-secondary text-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-3.5 w-3.5" />
                     {item.label}
                   </Link>
                 );
               })}
             </nav>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="outline" className="text-xs font-mono text-muted-foreground gap-1">
+
+          {/* Right: Status + Actions */}
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 hidden sm:flex">
               {moodIcon} Wk {state.week} · {state.season}
+            </Badge>
+            <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 sm:hidden">
+              {moodIcon} W{state.week}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
               onClick={returnToTitle}
               title="Return to Title Screen"
-              className="text-muted-foreground hover:text-foreground"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3.5 w-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setResetOpen(true)}
               title="Delete Save"
-              className="text-muted-foreground hover:text-destructive"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-3.5 w-3.5" />
             </Button>
+
             <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -122,11 +141,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </AlertDialog>
           </div>
         </div>
-      </header>
 
-      {/* Mobile Nav */}
-      <nav className="md:hidden sticky top-14 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="container flex gap-1 py-2 overflow-x-auto">
+        {/* Mobile nav row */}
+        <nav className="md:hidden border-t border-border/50 flex gap-0.5 px-2 py-1.5 overflow-x-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.to;
@@ -135,26 +152,58 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
+                  "flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium whitespace-nowrap transition-colors",
                   active
                     ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:bg-secondary/50"
+                    : "text-muted-foreground hover:bg-secondary/40"
                 )}
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className="h-3 w-3" />
                 {item.label}
               </Link>
             );
           })}
-        </div>
-      </nav>
+        </nav>
+      </header>
 
-      {/* Main Content */}
-      <main className="container py-6">{children}</main>
+      {/* ─── Body: Sidebar + Main ─── */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Event Log Sidebar */}
+        <aside
+          className={cn(
+            "border-r border-border bg-background/50 flex-shrink-0 transition-all duration-200 overflow-hidden",
+            sidebarOpen ? "w-72 lg:w-80" : "w-0"
+          )}
+        >
+          <div className="h-[calc(100vh-3rem)] md:h-[calc(100vh-3rem)] sticky top-12">
+            <EventLog />
+          </div>
+        </aside>
+
+        {/* Sidebar toggle (desktop) */}
+        <div className="hidden md:flex flex-col">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 m-1 text-muted-foreground hover:text-foreground"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            title={sidebarOpen ? "Hide event log" : "Show event log"}
+          >
+            {sidebarOpen ? <PanelLeftClose className="h-3.5 w-3.5" /> : <PanelLeft className="h-3.5 w-3.5" />}
+          </Button>
+        </div>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+            {children}
+          </div>
+        </main>
+      </div>
 
       {/* Footer */}
-      <footer className="border-t border-border py-4">
-        <div className="container text-xs text-muted-foreground">
+      <footer className="border-t border-border py-3 flex-shrink-0">
+        <div className="px-4 sm:px-6 text-xs text-muted-foreground">
           Stable Lords v2.0 — Local save only
         </div>
       </footer>
