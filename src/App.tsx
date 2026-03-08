@@ -21,6 +21,7 @@ import StableDetail from "@/pages/StableDetail";
 import WorldOverview from "@/pages/WorldOverview";
 import StartGame from "@/pages/StartGame";
 import NotFound from "./pages/NotFound";
+import Gazette from "@/pages/Gazette";
 
 const queryClient = new QueryClient();
 
