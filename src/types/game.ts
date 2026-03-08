@@ -320,6 +320,29 @@ export interface ScoutReportData {
   notes: string;
 }
 
+/** Mandatory rest after certain bout outcomes */
+export interface RestState {
+  warriorId: string;
+  restUntilWeek: number;
+}
+
+/** Auto-detected cross-stable rivalry */
+export interface Rivalry {
+  stableIdA: string;
+  stableIdB: string;
+  intensity: number; // 1-5
+  reason: string;
+  startWeek: number;
+}
+
+/** Record of a past match pairing for repeat-avoidance */
+export interface MatchRecord {
+  week: number;
+  playerWarriorId: string;
+  opponentWarriorId: string;
+  opponentStableId: string;
+}
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -349,6 +372,9 @@ export interface GameState {
   trainingAssignments: TrainingAssignment[];
   rivals: RivalStableData[];
   scoutReports: ScoutReportData[];
+  restStates: RestState[];
+  rivalries: Rivalry[];
+  matchHistory: MatchRecord[];
   settings: {
     featureFlags: {
       tournaments: boolean;

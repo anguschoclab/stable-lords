@@ -7,6 +7,8 @@ import { processTraining } from "@/engine/training";
 import { processEconomy } from "@/engine/economy";
 import { processAging } from "@/engine/aging";
 import { tickInjuries } from "@/engine/injuries";
+import { clearExpiredRest } from "@/engine/matchmaking";
+import { runAIvsAIBouts } from "@/engine/matchmaking";
 
 const SAVE_KEY = "stablelords.save.v2";
 
@@ -79,6 +81,9 @@ export function createFreshState(): GameState {
     trainingAssignments: [],
     rivals: [],
     scoutReports: [],
+    restStates: [],
+    rivalries: [],
+    matchHistory: [],
     settings: {
       featureFlags: {
         tournaments: true,
@@ -111,6 +116,9 @@ export function loadGameState(): GameState {
         if (!parsed.coachDismissed) parsed.coachDismissed = [];
         if (!parsed.rivals) parsed.rivals = [];
         if (!parsed.scoutReports) parsed.scoutReports = [];
+        if (!parsed.restStates) parsed.restStates = [];
+        if (!parsed.rivalries) parsed.rivalries = [];
+        if (!parsed.matchHistory) parsed.matchHistory = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
           ...w,
@@ -164,6 +172,18 @@ export function advanceWeek(state: GameState): GameState {
   let updatedState = { ...aged, roster: rosterWithHealedInjuries };
   if (injuryNews.length > 0) {
     updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Medical Report", items: injuryNews }];
+  }
+
+  // Clear expired rest states
+  updatedState.restStates = clearExpiredRest(updatedState.restStates || [], updatedState.week);
+
+  // Run AI vs AI background bouts
+  if ((updatedState.rivals || []).length > 0) {
+    const { updatedRivals, gazetteItems } = runAIvsAIBouts(updatedState);
+    updatedState.rivals = updatedRivals;
+    if (gazetteItems.length > 0) {
+      updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Rival Arena Report", items: gazetteItems }];
+    }
   }
   
   const newWeek = updatedState.week + 1;
