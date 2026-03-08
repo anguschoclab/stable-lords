@@ -535,8 +535,8 @@ export function simulateFight(
 
     // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy ──
     const attOEmod = oeAttMod(attOE);
-    const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5); // Convert mult to +/- modifier
-    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod);
+    const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
+    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus);
 
     if (!attackSuccess) {
       // Attack whiffs — reset consecutive hits
