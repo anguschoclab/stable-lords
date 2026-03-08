@@ -234,6 +234,9 @@ export function parseImportedSave(json: string): GameState {
   if (!state.trainingAssignments) state.trainingAssignments = [];
   if (state.gold === undefined) state.gold = 500;
   if (!state.ledger) state.ledger = [];
+  if (!state.restStates) state.restStates = [];
+  if (!state.rivalries) state.rivalries = [];
+  if (!state.matchHistory) state.matchHistory = [];
   if (!state.settings) state.settings = { featureFlags: { tournaments: true, scouting: true } };
   if (state.settings && !state.settings.featureFlags?.scouting) {
     state.settings.featureFlags = { ...state.settings.featureFlags, scouting: true };
