@@ -215,9 +215,10 @@ export default function WarriorDetail() {
               {warrior.titles.map((t) => (
                 <TagBadge key={t} tag={t} type="title" />
               ))}
-              {warrior.injuries.map((i) => (
-                <TagBadge key={i} tag={i} type="injury" />
-              ))}
+              {warrior.injuries.map((i) => {
+                const injName = typeof i === "string" ? i : i.name;
+                return <TagBadge key={injName} tag={injName} type="injury" />;
+              })}
             </div>
           </div>
           <div className="flex gap-4">

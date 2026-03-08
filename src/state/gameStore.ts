@@ -75,10 +75,12 @@ export function createFreshState(): GameState {
     trainers: [],
     hiringPool: [],
     trainingAssignments: [],
+    rivals: [],
+    scoutReports: [],
     settings: {
       featureFlags: {
         tournaments: true,
-        scouting: false,
+        scouting: true,
       },
     },
   };
