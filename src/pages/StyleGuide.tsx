@@ -369,16 +369,16 @@ export default function StyleGuide() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {MASTERY_TIERS.map(({ tier, fights, color }) => (
+                {MASTERY_TIER_DATA.map(({ tier, fights, bonus, mult }) => (
                   <div key={tier} className="flex items-center gap-3">
-                    <Badge className={`${color} w-28 justify-center`}>{tier}</Badge>
+                    <Badge className={`${MASTERY_TIER_COLORS[tier]} w-28 justify-center`}>{tier}</Badge>
                     <span className="text-sm text-muted-foreground w-24">{fights}+ fights</span>
                     <span className="text-xs text-foreground">
                       {tier === "Novice" && "Base passive effects. No bonus."}
-                      {tier === "Practiced" && "×1.04 passive multiplier. Style identity starts to emerge."}
-                      {tier === "Veteran" && "+1 bonus, ×1.08 multiplier. Reliable execution of style mechanics."}
-                      {tier === "Master" && "+1 bonus, ×1.15 multiplier. Passives become a significant combat factor."}
-                      {tier === "Grandmaster" && "+1 bonus, ×1.25 multiplier. Peak mastery — passives are devastating."}
+                      {tier === "Practiced" && `×${mult} passive multiplier. Style identity starts to emerge.`}
+                      {tier === "Veteran" && `+${bonus} bonus, ×${mult} multiplier. Reliable execution of style mechanics.`}
+                      {tier === "Master" && `+${bonus} bonus, ×${mult} multiplier. Passives become a significant combat factor.`}
+                      {tier === "Grandmaster" && `+${bonus} bonus, ×${mult} multiplier. Peak mastery — passives are devastating.`}
                     </span>
                   </div>
                 ))}

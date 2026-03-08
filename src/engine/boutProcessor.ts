@@ -277,6 +277,18 @@ function resolveBout(
     s.roster = s.roster.map(w => w.id === opponent.id ? applyXP(w, xpD).warrior : w);
   }
 
+  // ── Favorites Discovery ──
+  const discoveryA = checkDiscovery(s.roster.find(w => w.id === warrior.id) || warrior);
+  if (discoveryA.updated && discoveryA.hints.length > 0) {
+    s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: discoveryA.hints }];
+  }
+  if (!rivalStableId) {
+    const discoveryD = checkDiscovery(s.roster.find(w => w.id === opponent.id) || opponent);
+    if (discoveryD.updated && discoveryD.hints.length > 0) {
+      s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: discoveryD.hints }];
+    }
+  }
+
   // ── Match history ──
   if (rivalStableId) {
     s.matchHistory = addMatchRecord(s.matchHistory || [], warrior.id, opponent.id, rivalStableId, week);

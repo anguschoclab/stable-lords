@@ -387,6 +387,49 @@ export default function KillAnalytics() {
           )}
         </>
       )}
+
+      {/* Rolling Win Rates by Style (StyleRecord) */}
+      <RollingStyleStats />
     </div>
+  );
+}
+
+/** Rolling 10-fight style performance using StyleRecord */
+function RollingStyleStats() {
+  const rollingStats: StyleRecord[] = useMemo(() => StyleRollups.last10(), []);
+
+  if (rollingStats.length === 0) return null;
+
+  return (
+    <Card className="mt-6">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-primary" /> Rolling Style Performance (Last 10)
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {rollingStats
+            .sort((a, b) => (b.W / (b.fights || 1)) - (a.W / (a.fights || 1)))
+            .map((rec) => {
+              const winRate = rec.fights > 0 ? Math.round((rec.W / rec.fights) * 100) : 0;
+              return (
+                <div key={rec.style} className="flex items-center gap-3">
+                  <span className="text-xs font-display w-20 truncate">
+                    {STYLE_DISPLAY_NAMES[rec.style as keyof typeof STYLE_DISPLAY_NAMES] ?? rec.style}
+                  </span>
+                  <div className="flex-1">
+                    <Progress value={winRate} className="h-2" />
+                  </div>
+                  <span className="text-[10px] font-mono w-12 text-right">{winRate}%</span>
+                  <span className="text-[10px] text-muted-foreground w-16">
+                    {rec.W}W-{rec.L}L{rec.K > 0 ? `-${rec.K}K` : ""}
+                  </span>
+                </div>
+              );
+            })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

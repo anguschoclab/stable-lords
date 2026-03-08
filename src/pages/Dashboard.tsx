@@ -72,7 +72,17 @@ function SeasonWidget() {
             <div className="text-sm text-muted-foreground">{state.season}</div>
           </div>
           <div className="text-center">
-            <span className="text-2xl">{moodIcon}</span>
+            <div className="flex items-center gap-1 justify-center">
+              {CROWD_MOODS.map((mood) => (
+                <span
+                  key={mood}
+                  className={`text-lg transition-opacity ${mood === state.crowdMood ? "opacity-100" : "opacity-25"}`}
+                  title={mood}
+                >
+                  {MOOD_ICONS[mood]}
+                </span>
+              ))}
+            </div>
             <div className="text-[10px] text-muted-foreground mt-0.5">{state.crowdMood}</div>
           </div>
         </div>
