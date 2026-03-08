@@ -42,7 +42,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [saveFlash, setSaveFlash] = useState(false);
 
+  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
+
   useCoachTip(location.pathname);
+  useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
 
   // Flash the save indicator briefly when a save occurs
   useEffect(() => {
