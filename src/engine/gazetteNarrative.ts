@@ -127,11 +127,31 @@ function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType): strin
   return `${winner} defeated ${loser ?? fight.d} in a ${adj} contest.`;
 }
 
+/** Compute current win streaks from fight history */
+function computeStreaks(allFights: FightSummary[]): Map<string, number> {
+  const streaks = new Map<string, number>();
+  const sorted = [...allFights].sort((a, b) => a.week - b.week);
+  for (const f of sorted) {
+    if (f.winner === "A") {
+      streaks.set(f.a, (streaks.get(f.a) ?? 0) >= 0 ? (streaks.get(f.a) ?? 0) + 1 : 1);
+      streaks.set(f.d, (streaks.get(f.d) ?? 0) <= 0 ? (streaks.get(f.d) ?? 0) - 1 : -1);
+    } else if (f.winner === "D") {
+      streaks.set(f.d, (streaks.get(f.d) ?? 0) >= 0 ? (streaks.get(f.d) ?? 0) + 1 : 1);
+      streaks.set(f.a, (streaks.get(f.a) ?? 0) <= 0 ? (streaks.get(f.a) ?? 0) - 1 : -1);
+    } else {
+      streaks.set(f.a, 0);
+      streaks.set(f.d, 0);
+    }
+  }
+  return streaks;
+}
+
 export function generateWeeklyGazette(
   fights: FightSummary[],
   mood: CrowdMoodType,
   week: number,
-  graveyard: Warrior[]
+  graveyard: Warrior[],
+  allFights?: FightSummary[]
 ): GazetteStory {
   const tone = MOOD_TONE[mood];
   const kills = fights.filter(f => f.by === "Kill");
@@ -143,9 +163,29 @@ export function generateWeeklyGazette(
   if (fights.some(f => f.flashyTags?.includes("Dominance"))) tags.push("Dominance");
   if (knockouts.length >= 3) tags.push("KO Fest");
 
-  // Headline
+  // Detect active streaks (5+) among this week's winners
+  const streaks = allFights ? computeStreaks(allFights) : new Map<string, number>();
+  const hotStreakers: { name: string; streak: number }[] = [];
+  for (const f of fights) {
+    if (!f.winner) continue;
+    const winnerName = f.winner === "A" ? f.a : f.d;
+    const s = streaks.get(winnerName) ?? 0;
+    if (s >= 5) hotStreakers.push({ name: winnerName, streak: s });
+  }
+  if (hotStreakers.length > 0) tags.push("Hot Streak");
+
+  // Headline — streak headlines take priority over standard ones
   let headline: string;
-  if (kills.length >= 2) {
+  if (hotStreakers.length > 0) {
+    const top = hotStreakers.sort((a, b) => b.streak - a.streak)[0];
+    if (top.streak >= 10) {
+      headline = `Week ${week}: UNSTOPPABLE! ${top.name} Extends Legendary ${top.streak}-Win Streak!`;
+    } else if (top.streak >= 7) {
+      headline = `Week ${week}: ${top.name} Is On Fire — ${top.streak} Consecutive Victories!`;
+    } else {
+      headline = `Week ${week}: ${top.name} Rides a ${top.streak}-Win Streak Into Glory!`;
+    }
+  } else if (kills.length >= 2) {
     headline = `Week ${week}: Blood Runs Deep — ${kills.length} Warriors Fall!`;
   } else if (kills.length === 1) {
     const k = kills[0];
