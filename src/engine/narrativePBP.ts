@@ -17,7 +17,7 @@
  */
 
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
-import { getItemById } from "@/data/equipment";
+import { getItemById, getItemByCode } from "@/data/equipment";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
