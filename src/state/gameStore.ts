@@ -7,6 +7,8 @@ import { processTraining } from "@/engine/training";
 import { processEconomy } from "@/engine/economy";
 import { processAging } from "@/engine/aging";
 import { tickInjuries } from "@/engine/injuries";
+import { clearExpiredRest } from "@/engine/matchmaking";
+import { runAIvsAIBouts } from "@/engine/matchmaking";
 
 const SAVE_KEY = "stablelords.save.v2";
 
