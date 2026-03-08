@@ -1,6 +1,7 @@
 /**
- * Stable Lords — Equipment Database
- * Weapons, armor, shields, helms with style restrictions and encumbrance costs.
+ * Stable Lords — Canonical Equipment Database
+ * Weapons, armor, shields, helms with codes, weights, style restrictions.
+ * Based on canonical Duelmasters equipment tables.
  */
 import { FightingStyle } from "@/types/game";
 
@@ -10,71 +11,79 @@ export type EquipmentSlot = "weapon" | "armor" | "shield" | "helm";
 
 export interface EquipmentItem {
   id: string;
+  code: string;           // canonical 2-letter code (DA, EP, BS, etc.)
   name: string;
   slot: EquipmentSlot;
-  weight: number;          // encumbrance cost
-  statMods?: Partial<Record<string, number>>; // e.g. ATT +1, DEF -1
+  weight: number;          // canonical encumbrance cost
   description: string;
   twoHanded?: boolean;     // weapons only — blocks shield slot
   restrictedStyles?: FightingStyle[]; // styles that CANNOT use this
   preferredStyles?: FightingStyle[];  // styles that get a bonus with this
 }
 
-// ─── Weapons ────────────────────────────────────────────────────────────────
+// ─── Single-Handed Weapons ──────────────────────────────────────────────────
 
 export const WEAPONS: EquipmentItem[] = [
-  // Light weapons
-  { id: "dagger",       name: "Dagger",         slot: "weapon", weight: 1, description: "Fast, light. Favored by aimed-blow and lungers.", preferredStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
-  { id: "short_sword",  name: "Short Sword",    slot: "weapon", weight: 2, description: "Versatile light blade. No restrictions." },
-  { id: "epee",         name: "Epée",           slot: "weapon", weight: 1, description: "Thrusting weapon for precise styles.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.ParryLunge, FightingStyle.ParryRiposte] },
-  { id: "rapier",       name: "Rapier",         slot: "weapon", weight: 2, description: "Elegant thrusting blade.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.ParryLunge] },
+  // Light weapons (weight 1-2)
+  { id: "dagger",       code: "DA", name: "Dagger",         slot: "weapon", weight: 1, description: "Fast, light. Favored by aimed-blow and lungers.", preferredStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
+  { id: "epee",         code: "EP", name: "Epée",           slot: "weapon", weight: 2, description: "Thrusting weapon for precise styles.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.ParryLunge, FightingStyle.ParryRiposte] },
+  { id: "hatchet",      code: "HA", name: "Hatchet",        slot: "weapon", weight: 2, description: "Light chopping weapon. Quick and versatile.", preferredStyles: [FightingStyle.StrikingAttack] },
+  { id: "short_sword",  code: "SH", name: "Shortsword",     slot: "weapon", weight: 2, description: "Versatile light blade. No restrictions." },
+  { id: "small_shield", code: "SM", name: "Small Shield",   slot: "weapon", weight: 2, description: "Off-hand small shield used as weapon-slot blocker.", preferredStyles: [FightingStyle.TotalParry, FightingStyle.WallOfSteel] },
+  { id: "war_hammer",   code: "WH", name: "War Hammer",     slot: "weapon", weight: 2, description: "Light crushing weapon. Armor-piercing.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow] },
 
-  // Medium weapons
-  { id: "scimitar",     name: "Scimitar",       slot: "weapon", weight: 3, description: "Curved slashing blade.", preferredStyles: [FightingStyle.SlashingAttack, FightingStyle.StrikingAttack] },
-  { id: "broadsword",   name: "Broadsword",     slot: "weapon", weight: 4, description: "Standard arena sword. Well-balanced.", preferredStyles: [FightingStyle.ParryStrike, FightingStyle.WallOfSteel] },
-  { id: "longsword",    name: "Longsword",      slot: "weapon", weight: 4, description: "Versatile blade, good reach.", preferredStyles: [FightingStyle.ParryStrike, FightingStyle.SlashingAttack] },
-  { id: "mace",         name: "Mace",           slot: "weapon", weight: 4, description: "Heavy crushing weapon.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow] },
-
-  // Heavy weapons
-  { id: "morning_star", name: "Morning Star",   slot: "weapon", weight: 5, description: "Spiked crushing weapon.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
-  { id: "battle_axe",   name: "Battle Axe",     slot: "weapon", weight: 5, description: "Devastating chopping weapon.", preferredStyles: [FightingStyle.BashingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow] },
-  { id: "war_hammer",   name: "War Hammer",     slot: "weapon", weight: 5, description: "Armor-piercing blunt weapon.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
+  // Medium weapons (weight 3-4)
+  { id: "scimitar",     code: "SC", name: "Scimitar",       slot: "weapon", weight: 3, description: "Curved slashing blade.", preferredStyles: [FightingStyle.SlashingAttack, FightingStyle.StrikingAttack] },
+  { id: "mace",         code: "MA", name: "Mace",           slot: "weapon", weight: 3, description: "Crushing weapon. Reliable and brutal.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow] },
+  { id: "longsword",    code: "LO", name: "Longsword",      slot: "weapon", weight: 3, description: "Versatile blade, good reach.", preferredStyles: [FightingStyle.ParryStrike, FightingStyle.ParryLunge, FightingStyle.SlashingAttack] },
+  { id: "battle_axe",   code: "BA", name: "Battle Axe",     slot: "weapon", weight: 4, description: "Devastating chopping weapon.", preferredStyles: [FightingStyle.BashingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow] },
+  { id: "broadsword",   code: "BS", name: "Broadsword",     slot: "weapon", weight: 4, description: "Standard arena sword. Well-balanced.", preferredStyles: [FightingStyle.ParryStrike, FightingStyle.WallOfSteel, FightingStyle.StrikingAttack] },
+  { id: "medium_shield",code: "ME", name: "Medium Shield",  slot: "weapon", weight: 4, description: "Standard shield. +2 DEF.", preferredStyles: [FightingStyle.TotalParry, FightingStyle.WallOfSteel], restrictedStyles: [FightingStyle.LungingAttack] },
+  { id: "morning_star", code: "MS", name: "Morning Star",   slot: "weapon", weight: 4, description: "Spiked crushing weapon.", preferredStyles: [FightingStyle.BashingAttack, FightingStyle.WallOfSteel], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
+  { id: "short_spear",  code: "SS", name: "Short Spear",    slot: "weapon", weight: 4, description: "Thrusting polearm. Good reach.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.StrikingAttack] },
+  { id: "war_flail",    code: "WF", name: "War Flail",      slot: "weapon", weight: 4, description: "Chained striking weapon. Hard to parry.", preferredStyles: [FightingStyle.BashingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow] },
+  { id: "large_shield", code: "LG", name: "Large Shield",   slot: "weapon", weight: 6, description: "Tower shield. +3 DEF, -1 ATT.", preferredStyles: [FightingStyle.TotalParry], restrictedStyles: [FightingStyle.LungingAttack, FightingStyle.SlashingAttack, FightingStyle.AimedBlow] },
 
   // Two-handed weapons
-  { id: "greatsword",   name: "Greatsword",     slot: "weapon", weight: 6, twoHanded: true, description: "Massive two-handed blade. No shield.", preferredStyles: [FightingStyle.SlashingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.TotalParry] },
-  { id: "halberd",      name: "Halberd",        slot: "weapon", weight: 7, twoHanded: true, description: "Polearm with devastating reach. No shield.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.TotalParry, FightingStyle.ParryRiposte] },
-  { id: "maul",         name: "Maul",           slot: "weapon", weight: 7, twoHanded: true, description: "Giant war hammer. No shield.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack, FightingStyle.TotalParry, FightingStyle.ParryRiposte] },
+  { id: "quarterstaff", code: "QS", name: "Quarterstaff",   slot: "weapon", weight: 4, twoHanded: true, description: "Balanced staff. Fast two-handed option.", preferredStyles: [FightingStyle.AimedBlow, FightingStyle.ParryStrike, FightingStyle.WallOfSteel] },
+  { id: "great_axe",    code: "GA", name: "Great Axe",      slot: "weapon", weight: 5, twoHanded: true, description: "Massive chopping weapon. No shield.", preferredStyles: [FightingStyle.BashingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.TotalParry] },
+  { id: "greatsword",   code: "GS", name: "Greatsword",     slot: "weapon", weight: 6, twoHanded: true, description: "Massive two-handed blade. No shield.", preferredStyles: [FightingStyle.SlashingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.TotalParry] },
+  { id: "long_spear",   code: "LS", name: "Long Spear",     slot: "weapon", weight: 6, twoHanded: true, description: "Maximum reach polearm. No shield.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.TotalParry, FightingStyle.ParryRiposte] },
+  { id: "halberd",      code: "HL", name: "Halberd",        slot: "weapon", weight: 8, twoHanded: true, description: "Polearm with devastating reach. No shield.", preferredStyles: [FightingStyle.LungingAttack, FightingStyle.StrikingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.TotalParry, FightingStyle.ParryRiposte] },
+  { id: "maul",         code: "ML", name: "Maul",           slot: "weapon", weight: 8, twoHanded: true, description: "Giant war hammer. No shield.", preferredStyles: [FightingStyle.BashingAttack], restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack, FightingStyle.TotalParry, FightingStyle.ParryRiposte] },
 ];
 
 // ─── Armor ──────────────────────────────────────────────────────────────────
 
 export const ARMORS: EquipmentItem[] = [
-  { id: "none_armor",   name: "None",           slot: "armor", weight: 0, description: "No armor. Maximum speed." },
-  { id: "leather",      name: "Leather",        slot: "armor", weight: 1, description: "Light protection. Minimal encumbrance." },
-  { id: "studded",      name: "Studded Leather", slot: "armor", weight: 2, description: "Reinforced leather. Good balance." },
-  { id: "ring_mail",    name: "Ring Mail",      slot: "armor", weight: 3, description: "Linked rings over padding." },
-  { id: "chain_mail",   name: "Chain Mail",     slot: "armor", weight: 4, description: "Interlocking metal rings. Standard protection." },
-  { id: "scale_mail",   name: "Scale Mail",     slot: "armor", weight: 5, description: "Overlapping metal plates. Heavy." },
-  { id: "plate_mail",   name: "Plate Mail",     slot: "armor", weight: 7, description: "Full plate armor. Maximum protection, heavy.", restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
-];
-
-// ─── Shields ────────────────────────────────────────────────────────────────
-
-export const SHIELDS: EquipmentItem[] = [
-  { id: "none_shield",  name: "None",           slot: "shield", weight: 0, description: "No shield. Free off-hand." },
-  { id: "buckler",      name: "Buckler",        slot: "shield", weight: 1, description: "Small round shield. +1 PAR." },
-  { id: "small_shield", name: "Small Shield",   slot: "shield", weight: 2, description: "Light wooden shield. +1 PAR, +1 DEF." },
-  { id: "medium_shield",name: "Medium Shield",  slot: "shield", weight: 3, description: "Standard shield. +2 DEF.", restrictedStyles: [FightingStyle.LungingAttack] },
-  { id: "large_shield", name: "Large Shield",   slot: "shield", weight: 4, description: "Tower shield. +3 DEF, -1 ATT.", restrictedStyles: [FightingStyle.LungingAttack, FightingStyle.SlashingAttack, FightingStyle.AimedBlow] },
+  { id: "none_armor",    code: "",   name: "None",            slot: "armor", weight: 0,  description: "No armor. Maximum speed." },
+  { id: "leather",       code: "ALE",name: "Leather",         slot: "armor", weight: 2,  description: "Light protection. Minimal encumbrance." },
+  { id: "padded_leather",code: "APL",name: "Padded Leather",  slot: "armor", weight: 4,  description: "Reinforced leather. Good balance." },
+  { id: "ring_mail",     code: "ARM",name: "Ringmail",        slot: "armor", weight: 6,  description: "Linked rings over padding." },
+  { id: "scale_mail",    code: "ASM",name: "Scalemail",       slot: "armor", weight: 8,  description: "Overlapping metal scales. Heavy." },
+  { id: "chain_mail",    code: "ACM",name: "Chainmail",       slot: "armor", weight: 10, description: "Interlocking metal rings. Standard heavy protection." },
+  { id: "plate_mail",    code: "APM",name: "Platemail",       slot: "armor", weight: 12, description: "Full plate mail. Very heavy.", restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack] },
+  { id: "plate_armor",   code: "APA",name: "Plate Armor",     slot: "armor", weight: 14, description: "Maximum protection. Extremely heavy.", restrictedStyles: [FightingStyle.AimedBlow, FightingStyle.LungingAttack, FightingStyle.SlashingAttack] },
 ];
 
 // ─── Helms ──────────────────────────────────────────────────────────────────
 
 export const HELMS: EquipmentItem[] = [
-  { id: "none_helm",    name: "None",           slot: "helm", weight: 0, description: "No helm. Risky but light." },
-  { id: "leather_cap",  name: "Leather Cap",    slot: "helm", weight: 1, description: "Basic head protection." },
-  { id: "steel_cap",    name: "Steel Cap",      slot: "helm", weight: 2, description: "Open-faced metal helm." },
-  { id: "full_helm",    name: "Full Helm",      slot: "helm", weight: 3, description: "Enclosed helm. Great protection, reduces visibility.", restrictedStyles: [FightingStyle.AimedBlow] },
+  { id: "none_helm",    code: "",  name: "None",         slot: "helm", weight: 0, description: "No helm. Risky but light." },
+  { id: "leather_cap",  code: "L", name: "Leather Cap",  slot: "helm", weight: 1, description: "Basic head protection." },
+  { id: "steel_cap",    code: "S", name: "Steel Cap",    slot: "helm", weight: 2, description: "Open-faced metal helm." },
+  { id: "helm",         code: "H", name: "Helm",         slot: "helm", weight: 3, description: "Standard enclosed helm." },
+  { id: "full_helm",    code: "FF",name: "Full Helm",    slot: "helm", weight: 4, description: "Fully enclosed helm. Great protection, reduces visibility.", restrictedStyles: [FightingStyle.AimedBlow] },
+];
+
+// ─── Shields (offhand — separate from weapon-slot shields) ──────────────────
+// NOTE: In canonical Duelmasters, shields are listed alongside weapons.
+// Small Shield, Medium Shield, and Large Shield appear in the weapons list above.
+// This array provides "no shield" for the offhand slot when using a one-handed weapon
+// without a shield, or when the weapon IS a shield.
+
+export const SHIELDS: EquipmentItem[] = [
+  { id: "none_shield",  code: "",  name: "None", slot: "shield", weight: 0, description: "No shield. Free off-hand." },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -83,6 +92,10 @@ export const ALL_EQUIPMENT: EquipmentItem[] = [...WEAPONS, ...ARMORS, ...SHIELDS
 
 export function getItemById(id: string): EquipmentItem | undefined {
   return ALL_EQUIPMENT.find((item) => item.id === id);
+}
+
+export function getItemByCode(code: string): EquipmentItem | undefined {
+  return ALL_EQUIPMENT.find((item) => item.code === code);
 }
 
 export function getAvailableItems(slot: EquipmentSlot, style: FightingStyle): EquipmentItem[] {
@@ -125,12 +138,12 @@ export function isOverEncumbered(loadout: EquipmentLoadout, carryCap: number): b
  * Using the classic weapon grants a +1 ATT bonus in combat.
  */
 export const STYLE_CLASSIC_WEAPONS: Record<string, string> = {
-  [FightingStyle.AimedBlow]:       "dagger",        // Quarterstaff (mapped to dagger as precision weapon)
+  [FightingStyle.AimedBlow]:       "quarterstaff",   // Quarterstaff (canonical AB weapon)
   [FightingStyle.BashingAttack]:   "mace",           // Mace
-  [FightingStyle.LungingAttack]:   "epee",           // Short Spear → Epée (closest jabbing weapon)
+  [FightingStyle.LungingAttack]:   "short_spear",    // Short Spear
   [FightingStyle.ParryLunge]:      "longsword",      // Longsword
   [FightingStyle.ParryRiposte]:    "epee",           // Epée
-  [FightingStyle.ParryStrike]:     "broadsword",     // Broad weapon variety
+  [FightingStyle.ParryStrike]:     "broadsword",     // Broadsword
   [FightingStyle.SlashingAttack]:  "scimitar",       // Scimitar
   [FightingStyle.StrikingAttack]:  "broadsword",     // Broadsword
   [FightingStyle.TotalParry]:      "short_sword",    // Shield emphasis (weapon secondary)

@@ -140,7 +140,12 @@ export interface ArmorEncumbrance {
 
 // ─── Fight Plan ─────────────────────────────────────────────────────────────
 
-export type BodyTarget = "Head" | "Chest" | "Abdomen" | "Arms" | "Legs" | "Any";
+/** Granular attack locations — individual limbs for targeting */
+export type AttackTarget = "Head" | "Chest" | "Abdomen" | "Right Arm" | "Left Arm" | "Right Leg" | "Left Leg" | "Any";
+/** Grouped protect locations — broader defensive coverage */
+export type ProtectTarget = "Head" | "Body" | "Arms" | "Legs" | "Any";
+/** @deprecated Use AttackTarget or ProtectTarget. Kept for backward compat. */
+export type BodyTarget = AttackTarget;
 export type OffensiveTactic = "Lunge" | "Slash" | "Bash" | "Decisiveness" | "none";
 export type DefensiveTactic = "Dodge" | "Parry" | "Riposte" | "Responsiveness" | "none";
 
