@@ -126,19 +126,16 @@ export function getStylePassive(
 
   switch (style) {
     // ── Aimed Blow: Precision Master ──
-    // Modest ATT bonus when targeting; crit chance is the real payoff
+    // BALANCE v6: Reduced crit from 7-13% to 5-8%. Removed patient bonus (was too strong vs TP/WS).
+    // AB identity: targeted crits, NOT sustained advantage.
     case FightingStyle.AimedBlow: {
       const targeted = context.targetedLocation && context.targetedLocation !== "Any";
-      const vsDefensive = context.opponentStyle === FightingStyle.TotalParry || context.opponentStyle === FightingStyle.WallOfSteel;
-      const patientBonus = vsDefensive ? Math.min(2, Math.floor(context.exchange / 3)) : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(targeted ? 1 : 0) + patientBonus,
-        critChance: targeted ? 0.07 + (context.exchange > 5 ? 0.03 : 0) + (vsDefensive ? 0.03 : 0) : 0, // Reduced from 10%+5%
-        narrative: vsDefensive && context.exchange > 4
-          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}studies the predictable rhythm, each probe finding deeper gaps in the defense`
-          : targeted && context.exchange > 5
+        attBonus: scale(targeted ? 1 : 0),
+        critChance: targeted ? 0.05 + (context.exchange > 8 ? 0.03 : 0) : 0,
+        narrative: targeted && context.exchange > 5
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}studies the opponent's rhythm, waiting for the perfect opening`
           : undefined,
       };
