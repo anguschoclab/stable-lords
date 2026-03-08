@@ -553,12 +553,15 @@ export default function Scouting() {
       </div>
 
       <Tabs defaultValue="scout" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg">
           <TabsTrigger value="scout" className="gap-1.5">
             <Eye className="h-3.5 w-3.5" /> Scout Intel
           </TabsTrigger>
           <TabsTrigger value="compare" className="gap-1.5">
-            <ArrowLeftRight className="h-3.5 w-3.5" /> Compare Stables
+            <ArrowLeftRight className="h-3.5 w-3.5" /> Stables
+          </TabsTrigger>
+          <TabsTrigger value="warriors" className="gap-1.5">
+            <UserRoundSearch className="h-3.5 w-3.5" /> Warriors
           </TabsTrigger>
         </TabsList>
 
