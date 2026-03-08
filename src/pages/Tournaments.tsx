@@ -327,6 +327,45 @@ export default function Tournaments() {
     setState(updatedState);
   }, [currentTournament, state, setState]);
 
+  /** Auto-resolve AI-vs-AI rounds, stopping when a round has a player warrior */
+  const skipToMyBouts = useCallback(() => {
+    if (!currentTournament) return;
+    const playerNames = new Set(state.roster.map(w => w.name));
+
+    // Keep running rounds as long as no player warrior is in the current round
+    let iterations = 0;
+    const maxIterations = 20; // safety limit
+
+    const checkAndRun = () => {
+      const bracket = state.tournaments.find(t => t.id === currentTournament.id)?.bracket ?? currentTournament.bracket;
+      const unresolved = bracket.filter(b => b.winner === undefined);
+      if (unresolved.length === 0) return;
+
+      const currentRound = Math.min(...unresolved.map(b => b.round));
+      const roundBouts = unresolved.filter(b => b.round === currentRound);
+
+      // Check if any bout in this round involves a player warrior
+      const hasPlayerBout = roundBouts.some(b =>
+        playerNames.has(b.a) || playerNames.has(b.d)
+      );
+
+      if (hasPlayerBout) {
+        toast(`⚔️ Your warriors are up next in Round ${currentRound}!`);
+        return;
+      }
+
+      // No player bouts — auto-resolve this round
+      runNextRound();
+      iterations++;
+      if (iterations < maxIterations) {
+        // Re-check after state update via setTimeout
+        setTimeout(checkAndRun, 10);
+      }
+    };
+
+    checkAndRun();
+  }, [currentTournament, state, runNextRound]);
+
   const [expandedBout, setExpandedBout] = useState<string | null>(null);
 
   return (
