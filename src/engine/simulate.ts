@@ -139,30 +139,39 @@ function pickText(rng: () => number, texts: string[]): string {
   return texts[Math.floor(rng() * texts.length)];
 }
 
-const HIT_LOCATIONS = ["head", "chest", "abdomen", "arms", "legs"] as const;
+const HIT_LOCATIONS = ["head", "chest", "abdomen", "right arm", "left arm", "right leg", "left leg"] as const;
 type HitLocation = typeof HIT_LOCATIONS[number];
+
+/** Maps a grouped protect target to the granular hit locations it covers */
+function protectCovers(protect?: string): string[] {
+  if (!protect || protect === "Any") return [];
+  const p = protect.toLowerCase();
+  if (p === "head") return ["head"];
+  if (p === "body") return ["chest", "abdomen"];
+  if (p === "arms") return ["right arm", "left arm"];
+  if (p === "legs") return ["right leg", "left leg"];
+  return [];
+}
 
 function rollHitLocation(rng: () => number, target?: string, protect?: string): HitLocation {
   if (target && target !== "Any") {
     const t = target.toLowerCase() as HitLocation;
     if (HIT_LOCATIONS.includes(t)) {
-      // 60% chance to hit intended target, but if defender is protecting that area, reduce to 40%
-      const hitChance = (protect && protect !== "Any" && protect.toLowerCase() === t) ? 0.4 : 0.6;
+      const covered = protectCovers(protect);
+      const hitChance = covered.includes(t) ? 0.4 : 0.6;
       if (rng() < hitChance) return t;
     }
   }
   return HIT_LOCATIONS[Math.floor(rng() * HIT_LOCATIONS.length)];
 }
 
-/** Protect reduces crit damage on the protected area but increases damage taken elsewhere */
+/** Protect reduces damage on covered locations but increases damage taken elsewhere */
 function applyProtectMod(damage: number, location: HitLocation, protect?: string): number {
   if (!protect || protect === "Any") return damage;
-  const protectedLoc = protect.toLowerCase();
-  if (location === protectedLoc) {
-    // Protected area: reduce damage by 25%
+  const covered = protectCovers(protect);
+  if (covered.includes(location)) {
     return Math.max(1, Math.round(damage * 0.75));
   } else {
-    // Unprotected areas: increase damage by 10%
     return Math.round(damage * 1.1);
   }
 }
