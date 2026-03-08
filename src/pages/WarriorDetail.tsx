@@ -21,6 +21,9 @@ import SubNav, { type SubNavTab } from "@/components/SubNav";
 import BoutViewer from "@/components/BoutViewer";
 import { generateWarriorStatements } from "@/data/warriorStatements";
 import { ENCUMBRANCE_LABELS, type EncumbranceClass } from "@/data/terrabloodCharts";
+import { getFavoritesDisplay, applyInsightToken } from "@/engine/favorites";
+import { getMastery } from "@/engine/stylePassives";
+import { Lightbulb, Eye } from "lucide-react";
 
 const TABS: SubNavTab[] = [
   { id: "overview", label: "Overview", icon: <User className="h-3.5 w-3.5" /> },
