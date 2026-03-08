@@ -155,12 +155,24 @@ export default function Trainers() {
   const hireTrainer = useCallback(
     (trainer: TrainerData) => {
       if (!canHire) return;
+      const cost = TIER_COST[trainer.tier as TrainerTier] ?? 50;
+      if ((state.gold ?? 0) < cost) {
+        toast.error(`Not enough gold! Need ${cost}g to hire.`);
+        return;
+      }
       setState({
         ...state,
         trainers: [...currentTrainers, trainer],
         hiringPool: hiringPool.filter((t) => t.id !== trainer.id),
+        gold: (state.gold ?? 0) - cost,
+        ledger: [...(state.ledger ?? []), {
+          week: state.week,
+          label: `Hire: ${trainer.name}`,
+          amount: -cost,
+          category: "trainer" as const,
+        }],
       });
-      toast.success(`${trainer.name} has joined your stable!`);
+      toast.success(`${trainer.name} has joined your stable! (-${cost}g)`);
     },
     [state, setState, currentTrainers, hiringPool, canHire]
   );
