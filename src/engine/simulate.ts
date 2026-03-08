@@ -134,15 +134,64 @@ function pickText(rng: () => number, texts: string[]): string {
 const HIT_LOCATIONS = ["head", "chest", "abdomen", "arms", "legs"] as const;
 type HitLocation = typeof HIT_LOCATIONS[number];
 
-function rollHitLocation(rng: () => number, target?: string): HitLocation {
+function rollHitLocation(rng: () => number, target?: string, protect?: string): HitLocation {
   if (target && target !== "Any") {
     const t = target.toLowerCase() as HitLocation;
     if (HIT_LOCATIONS.includes(t)) {
-      // 60% chance to hit intended target
-      if (rng() < 0.6) return t;
+      // 60% chance to hit intended target, but if defender is protecting that area, reduce to 40%
+      const hitChance = (protect && protect !== "Any" && protect.toLowerCase() === t) ? 0.4 : 0.6;
+      if (rng() < hitChance) return t;
     }
   }
   return HIT_LOCATIONS[Math.floor(rng() * HIT_LOCATIONS.length)];
+}
+
+/** Protect reduces crit damage on the protected area but increases damage taken elsewhere */
+function applyProtectMod(damage: number, location: HitLocation, protect?: string): number {
+  if (!protect || protect === "Any") return damage;
+  const protectedLoc = protect.toLowerCase();
+  if (location === protectedLoc) {
+    // Protected area: reduce damage by 25%
+    return Math.max(1, Math.round(damage * 0.75));
+  } else {
+    // Unprotected areas: increase damage by 10%
+    return Math.round(damage * 1.1);
+  }
+}
+
+// ─── Tactic Modifiers ─────────────────────────────────────────────────────
+function getOffensiveTacticMods(tactic: OffensiveTactic | undefined, style: FightingStyle) {
+  if (!tactic || tactic === "none") return { attBonus: 0, dmgBonus: 0, defPenalty: 0, endCost: 0, decBonus: 0 };
+  const mult = suitabilityMultiplier(getOffensiveSuitability(style, tactic));
+  switch (tactic) {
+    case "Lunge":        return { attBonus: Math.round(2 * mult), dmgBonus: 0, defPenalty: Math.round(1 * mult), endCost: 2, decBonus: 0 };
+    case "Slash":        return { attBonus: 0, dmgBonus: Math.round(2 * mult), defPenalty: 0, endCost: 1, decBonus: 0 };
+    case "Bash":         return { attBonus: Math.round(1 * mult), dmgBonus: Math.round(1 * mult), defPenalty: Math.round(2 * mult), endCost: 2, decBonus: 0 };
+    case "Decisiveness": return { attBonus: 0, dmgBonus: 0, defPenalty: 0, endCost: 1, decBonus: Math.round(3 * mult) };
+    default:             return { attBonus: 0, dmgBonus: 0, defPenalty: 0, endCost: 0, decBonus: 0 };
+  }
+}
+
+function getDefensiveTacticMods(tactic: DefensiveTactic | undefined, style: FightingStyle) {
+  if (!tactic || tactic === "none") return { parBonus: 0, defBonus: 0, ripBonus: 0, iniBonus: 0 };
+  const mult = suitabilityMultiplier(getDefensiveSuitability(style, tactic));
+  switch (tactic) {
+    case "Parry":          return { parBonus: Math.round(3 * mult), defBonus: 0, ripBonus: -Math.round(1 * mult), iniBonus: 0 };
+    case "Dodge":          return { parBonus: -Math.round(1 * mult), defBonus: Math.round(3 * mult), ripBonus: 0, iniBonus: 0 };
+    case "Riposte":        return { parBonus: Math.round(1 * mult), defBonus: 0, ripBonus: Math.round(3 * mult), iniBonus: 0 };
+    case "Responsiveness": return { parBonus: 0, defBonus: 0, ripBonus: 0, iniBonus: Math.round(2 * mult) };
+    default:               return { parBonus: 0, defBonus: 0, ripBonus: 0, iniBonus: 0 };
+  }
+}
+
+/** Resolve effective tactics for a fighter in the current phase */
+function resolveEffectiveTactics(plan: FightPlan, phaseKey: "opening" | "mid" | "late") {
+  const phase = plan.phases?.[phaseKey];
+  return {
+    offTactic: (phase?.offensiveTactic ?? plan.offensiveTactic ?? "none") as OffensiveTactic,
+    defTactic: (phase?.defensiveTactic ?? plan.defensiveTactic ?? "none") as DefensiveTactic,
+    target: phase?.target ?? plan.target ?? "Any",
+  };
 }
 
 // ─── Fighter State ────────────────────────────────────────────────────────
