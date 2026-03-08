@@ -567,6 +567,9 @@ export default function Gazette() {
       {/* Style Matchup Heatmap */}
       {hasContent && <StyleMatchupHeatmap allFights={allFights} />}
 
+      {/* Best Warrior by Style */}
+      {hasContent && <BestByStyle allFights={allFights} />}
+
       {!hasContent && (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
