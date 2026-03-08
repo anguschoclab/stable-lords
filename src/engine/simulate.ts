@@ -189,12 +189,60 @@ function fatiguePenalty(endurance: number, maxEndurance: number): number {
   return -7; // collapse territory
 }
 
-// ─── Damage Calculation ──────────────────────────────────────────────────
-function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {
-  const base = damageClass + 1; // 2-6 range
-  const locMult = location === "head" ? 1.5 : location === "chest" ? 1.2 : location === "abdomen" ? 1.1 : 0.8;
-  const variance = 0.7 + rng() * 0.6; // 0.7-1.3
-  return Math.max(1, Math.round(base * locMult * variance));
+// ─── Equipment Bonuses ────────────────────────────────────────────────────
+function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
+  const weapon = getItemById(loadout.weapon);
+  const armor = getItemById(loadout.armor);
+  const shield = getItemById(loadout.shield);
+  const helm = getItemById(loadout.helm);
+  const totalWeight = getLoadoutWeight(loadout);
+  const overEncumbered = totalWeight > carryCap;
+
+  let attMod = 0, parMod = 0, defMod = 0, iniMod = 0, dmgMod = 0, endMod = 0;
+
+  // Shield bonuses
+  if (shield?.id === "buckler") { parMod += 1; }
+  if (shield?.id === "small_shield") { parMod += 1; defMod += 1; }
+  if (shield?.id === "medium_shield") { defMod += 2; }
+  if (shield?.id === "large_shield") { defMod += 3; attMod -= 1; }
+
+  // Heavy weapons boost damage
+  if (weapon && weapon.weight >= 5) { dmgMod += 1; }
+  if (weapon && weapon.weight >= 7) { dmgMod += 1; }
+
+  // Light weapons boost initiative
+  if (weapon && weapon.weight <= 2) { iniMod += 1; }
+
+  // Armor reduces incoming damage (applied elsewhere) but costs endurance
+  if (armor && armor.weight >= 4) { endMod -= 1; }
+  if (armor && armor.weight >= 6) { endMod -= 2; }
+
+  // Full helm reduces INI
+  if (helm?.id === "full_helm") { iniMod -= 1; }
+
+  // Over-encumbered penalty
+  if (overEncumbered) {
+    const excess = totalWeight - carryCap;
+    iniMod -= Math.min(4, excess);
+    defMod -= Math.min(2, Math.floor(excess / 2));
+    endMod -= Math.min(3, excess);
+  }
+
+  return { attMod, parMod, defMod, iniMod, dmgMod, endMod };
+}
+
+// ─── Trainer Bonuses ──────────────────────────────────────────────────────
+function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
+  const bonus = getTrainingBonus(trainers as any, style);
+  return {
+    attMod: bonus.Aggression,                  // Aggression → ATT
+    parMod: Math.floor(bonus.Defense * 0.6),   // Defense → PAR
+    defMod: Math.floor(bonus.Defense * 0.4),   // Defense → DEF
+    iniMod: Math.floor(bonus.Mind * 0.6),      // Mind → INI
+    decMod: Math.floor(bonus.Mind * 0.4),      // Mind → DEC
+    endMod: bonus.Endurance * 2,               // Endurance → flat endurance
+    healMod: bonus.Healing,                    // Healing → reduces kill chance
+  };
 }
 
 // ─── Default Plan ─────────────────────────────────────────────────────────
@@ -228,7 +276,8 @@ export function simulateFight(
   planD: FightPlan,
   warriorA?: Warrior,
   warriorD?: Warrior,
-  seed?: number
+  seed?: number,
+  trainers?: TrainerData[]
 ): FightOutcome {
   const rng = mulberry32(seed ?? (Date.now() ^ Math.floor(Math.random() * 1e9)));
 
