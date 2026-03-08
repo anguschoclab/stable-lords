@@ -289,6 +289,11 @@ export function generateWeeklyGazette(
     }
   }
 
+  // Rising star narrative
+  for (const star of risingStars) {
+    paragraphs.push(`All eyes turn to ${star}, who has burst onto the scene with three consecutive victories to open their career. A rising star — or a flash in the pan? Only the arena will tell.`);
+  }
+
   // Graveyard mention
   if (graveyard.length > 0) {
     const recent = graveyard.filter(w => w.deathWeek === week);
