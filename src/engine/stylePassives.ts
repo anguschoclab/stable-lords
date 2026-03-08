@@ -190,15 +190,14 @@ export function getStylePassive(
     }
 
     // ── Parry-Riposte: Riposte Specialist ──
-    // RIP bonus after ripostes (capped conservatively — identity is counter, not wall)
+    // BALANCE v5: Removed ripBonus escalation and free parBonus.
+    // PR identity comes from OE paradox + riposte checks, not stacking passives.
     case FightingStyle.ParryRiposte: {
-      const ripEscalation = Math.min(1 + m.bonus, context.ripostes);
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        ripBonus: scale(ripEscalation),
-        // PR OE paradox flavor: low OE grants slight parry boost (counter-ready stance)
-        parBonus: context.endRatio > 0.6 ? 1 : 0,
+        ripBonus: context.ripostes >= 2 ? 1 : 0, // Modest bonus only after landing 2+ ripostes
+        parBonus: 0, // Removed — PR shouldn't get free parry bonuses
         narrative: context.ripostes >= 3
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}has found the rhythm — each counter deadlier than the last!`
           : undefined,
