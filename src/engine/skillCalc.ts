@@ -4,8 +4,24 @@
  *
  * Base Skills: ATT, PAR, DEF, INI, RIP, DEC
  * Derived: HP, Endurance, Damage, Encumbrance
+ *
+ * Now uses canonical Terrablood lookup charts for derived stats.
  */
 import { FightingStyle, type Attributes, type BaseSkills, type DerivedStats } from "@/types/game";
+import {
+  computeHP as canonicalHP,
+  computeDamageClass,
+  getDamageRating,
+  computeEncumbranceCapacity,
+  computeEnduranceValue,
+  computeEnduranceTier,
+  getHPRating,
+  computeEncumbranceClass,
+  type DamageRating,
+  type HPRating,
+  type EnduranceTier,
+  type EncumbranceClass,
+} from "@/data/terrabloodCharts";
 
 // ─── Style Seed Offsets (canonical approximations from Terrablood) ────────
 // Each style has base offsets for [ATT, PAR, DEF, INI, RIP, DEC]
@@ -73,41 +89,39 @@ export function computeBaseSkills(attrs: Attributes, style: FightingStyle): Base
   };
 }
 
-// ─── Derived Stats ───────────────────────────────────────────────────────
+// ─── Derived Stats (Canonical Terrablood Charts) ────────────────────────
 
-/** HP = f(CN, SZ, WL) per pid=39 */
+/** HP = CN*2 + SZmod + WLmod (100% accuracy, n=3650) */
 export function computeHP(attrs: Attributes): number {
-  const { CN, SZ, WL } = attrs;
-  // Base HP from CN, modified by SZ and WL
-  return Math.max(10, Math.round(CN * 1.5 + SZ * 0.5 + WL * 0.3 + 5));
+  return canonicalHP(attrs.CN, attrs.SZ, attrs.WL);
 }
 
-/** Endurance = f(CN, WL, ST) per pid=40 — BALANCE v2: increased base for longer fights */
+/** Endurance from canonical (ST+CN) × WL chart */
 export function computeEndurance(attrs: Attributes): number {
-  const { CN, WL, ST } = attrs;
-  return Math.max(10, Math.round(CN * 1.2 + WL * 1.5 + ST * 0.5 + 8));
+  return computeEnduranceValue(attrs.ST, attrs.CN, attrs.WL);
 }
 
-/** Damage class = f(ST, SZ) per pid=41 — returns 1-5 scale */
+/** Damage class from canonical ST × SZ chart (returns 1-9 scale) */
 export function computeDamage(attrs: Attributes): number {
-  const { ST, SZ } = attrs;
-  const raw = ST + Math.floor(SZ / 2);
-  if (raw >= 30) return 5; // Tremendous
-  if (raw >= 24) return 4; // Great
-  if (raw >= 18) return 3; // Good
-  if (raw >= 12) return 2; // Normal
-  return 1; // Little
+  return computeDamageClass(attrs.ST, attrs.SZ);
 }
 
-export const DAMAGE_LABELS = ["", "Little", "Normal", "Good", "Great", "Tremendous"];
-
-/** Encumbrance capacity = f(ST, CN, SZ) per pid=42-45 */
+/** Encumbrance capacity from canonical ST × CN chart */
 export function computeEncumbrance(attrs: Attributes): number {
-  const { ST, CN, SZ } = attrs;
-  // Higher = can carry more. Scale 1-10.
-  const raw = Math.round(ST * 0.8 + CN * 0.4 - SZ * 0.2 + 5);
-  return Math.max(1, Math.min(10, raw));
+  return computeEncumbranceCapacity(attrs.ST, attrs.CN);
 }
+
+// Re-export chart labels for UI
+export {
+  getDamageRating, getHPRating, computeEncumbranceClass,
+  computeEnduranceTier, ENDURANCE_LABELS,
+  type DamageRating, type HPRating, type EnduranceTier, type EncumbranceClass,
+} from "@/data/terrabloodCharts";
+
+export const DAMAGE_LABELS = [
+  "", "Little", "Normal", "Good", "Great", "Tremendous",
+  "Awesome", "Devastating", "Superhuman", "Unearthly",
+];
 
 /** Convenience: compute all derived stats */
 export function computeDerivedStats(attrs: Attributes): DerivedStats {
