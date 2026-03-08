@@ -623,22 +623,48 @@ export function simulateFight(
       }
     } else {
       // Attack lands — defender tries to stop it
+      // BALANCE v2: PAR and DEF are MUTUALLY EXCLUSIVE.
+      // - Dodge tactic → skip PAR, use DEF at full skill
+      // - Otherwise → PAR only; if PAR fails, the hit lands (no second chance)
+      // This eliminates the multiplicative double-defense that crushed offensive styles.
 
-      // ── 3a. PARRY CHECK — with passive PAR + anti-synergy + Bash bypass ──
       const defOEmod = oeDefMod(defOE);
       const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
-      // Bash tactic: "attack through a parry" — reduces defender's parry effectiveness (compendium §BA)
       const bashBypass = attOffMods.parryBypass ?? 0;
-      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef);
 
-      if (parrySuccess) {
-        attacker.consecutiveHits = 0;
+      const isDodging = defTactics.defTactic === "Dodge";
 
-        if (rng() < 0.3) {
-          log.push({ minute: min, text: `${name(defender)} ${pickText(rng, verbs(defender).parry)}.` });
+      let defended = false;
+      let canRiposte = false;
+
+      if (isDodging) {
+        // ── 3b. DODGE PATH — full DEF skill, no parry attempt ──
+        const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus - tacticOveruseDef);
+        if (defSuccess) {
+          defended = true;
+          attacker.consecutiveHits = 0;
+          if (rng() < 0.3) {
+            log.push({ minute: min, text: `${name(defender)} dodges the attack with quick footwork.` });
+          }
+          // Dodge doesn't enable riposte (you're out of position)
         }
+      } else {
+        // ── 3a. PARRY PATH — PAR check; if it fails, the hit lands ──
+        const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef);
 
-        // Parry succeeds — defender may riposte (with passive RIP bonus)
+        if (parrySuccess) {
+          defended = true;
+          canRiposte = true;
+          attacker.consecutiveHits = 0;
+
+          if (rng() < 0.3) {
+            log.push({ minute: min, text: `${name(defender)} ${pickText(rng, verbs(defender).parry)}.` });
+          }
+        }
+      }
+
+      if (defended && canRiposte) {
+        // Parry succeeds — defender may riposte
         const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 4 + defDefMods.ripBonus + defPassive.ripBonus);
         if (ripAfterParry) {
           const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
@@ -654,19 +680,9 @@ export function simulateFight(
             text: `${name(defender)} ${pickText(rng, verbs(defender).riposte)} to the ${ripLoc} for ${ripDmg}!`,
           });
         }
-      } else {
-        // ── 3b. DEFENSE CHECK — with passive DEF ──
-        // BALANCE: After a failed parry attempt, the defender is off-balance.
-        // DEF skill is reduced to 40% to prevent PAR+DEF multiplicative stacking.
-        const defSkillAfterParry = Math.round(defender.skills.DEF * 0.4);
-        const defSuccess = skillCheck(rng, defSkillAfterParry, oeDefMod(defOE) + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus);
+      }
 
-        if (defSuccess) {
-          attacker.consecutiveHits = 0;
-          if (rng() < 0.2) {
-            log.push({ minute: min, text: `${name(defender)} dodges the attack with quick footwork.` });
-          }
-        } else {
+      if (!defended) {
           // ── 5. DAMAGE APPLICATION — with passive DMG + crit ──
           const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
           let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
