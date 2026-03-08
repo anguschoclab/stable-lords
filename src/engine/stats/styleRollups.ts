@@ -1,9 +1,15 @@
 /**
  * Style rollup tracking — records win/loss/kill rates per style over time.
+ * Consolidated: also serves as the style meter (formerly src/metrics/StyleMeter.ts).
  */
 const KEY_WEEK = "sl.styleRollups.week";
+const KEY_ROLLING = "sl.metrics.style.week10";
+const KEY_TOUR = "sl.metrics.style.tournaments";
 
 type Bucket = { w: number; l: number; k: number; pct: number; fights: number };
+type RollingBucket = { W: number; L: number; K: number; fights: number };
+
+// ── Week-based rollups ────────────────────────────────────────────────────
 
 function loadWeek(week: number): Record<string, Bucket> {
   try {
@@ -23,14 +29,54 @@ function ensure(style: string, m: Record<string, Bucket>): Bucket {
   return m[style];
 }
 
+// ── Rolling window (last 10 fights per style) ─────────────────────────────
+
+function loadRolling(): Record<string, RollingBucket[]> {
+  try {
+    return JSON.parse(localStorage.getItem(KEY_ROLLING) || "{}");
+  } catch {
+    return {};
+  }
+}
+function saveRolling(m: Record<string, RollingBucket[]>) {
+  localStorage.setItem(KEY_ROLLING, JSON.stringify(m));
+}
+
+function loadTour(): Record<string, Record<string, RollingBucket>> {
+  try {
+    return JSON.parse(localStorage.getItem(KEY_TOUR) || "{}");
+  } catch {
+    return {};
+  }
+}
+function saveTour(m: Record<string, Record<string, RollingBucket>>) {
+  localStorage.setItem(KEY_TOUR, JSON.stringify(m));
+}
+
+// ── Public types ──────────────────────────────────────────────────────────
+
+export type StyleRecord = {
+  style: string;
+  W: number;
+  L: number;
+  K: number;
+  P: number;
+  fights: number;
+};
+
+// ── Combined API ──────────────────────────────────────────────────────────
+
 export const StyleRollups = {
+  /** Record a fight in both week-rollup and rolling-window trackers */
   addFight(opts: {
     week: number;
     styleA: string;
     styleD: string;
     winner: "A" | "D" | null;
     by: string | null;
+    isTournament?: string | null;
   }) {
+    // Week rollup
     const wkMap = loadWeek(opts.week);
     const ea = ensure(opts.styleA, wkMap);
     const ed = ensure(opts.styleD, wkMap);
@@ -50,9 +96,78 @@ export const StyleRollups = {
     ea.pct = ea.fights ? ea.w / ea.fights : 0;
     ed.pct = ed.fights ? ed.w / ed.fights : 0;
     saveWeek(opts.week, wkMap);
+
+    // Rolling window (last 10)
+    const rolling = loadRolling();
+    const kill = opts.by === "Kill";
+    const addRolling = (s: string, win: boolean, killed: boolean) => {
+      rolling[s] = rolling[s] || [];
+      rolling[s].push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
+      while (rolling[s].length > 10) rolling[s].shift();
+    };
+    addRolling(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
+    addRolling(opts.styleD, opts.winner === "D", kill && opts.winner === "D");
+    saveRolling(rolling);
+
+    // Tournament tracking
+    if (opts.isTournament) {
+      const tour = loadTour();
+      const tid = opts.isTournament;
+      tour[tid] = tour[tid] || {};
+      const bump = (s: string, win: boolean, killed: boolean) => {
+        tour[tid][s] = tour[tid][s] || { W: 0, L: 0, K: 0, fights: 0 };
+        const b = tour[tid][s];
+        b.W += win ? 1 : 0;
+        b.L += win ? 0 : 1;
+        b.K += killed ? 1 : 0;
+        b.fights += 1;
+      };
+      bump(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
+      bump(opts.styleD, opts.winner === "D", kill && opts.winner === "D");
+      saveTour(tour);
+    }
   },
 
   getWeekRollup(week: number): Record<string, Bucket> {
     return loadWeek(week);
+  },
+
+  /** Last 10 fights per style (rolling window) */
+  last10(): StyleRecord[] {
+    const rolling = loadRolling();
+    const rows: StyleRecord[] = [];
+    Object.keys(rolling).forEach((s) => {
+      const agg = rolling[s].reduce(
+        (a, b) => ({ W: a.W + b.W, L: a.L + b.L, K: a.K + b.K, fights: a.fights + b.fights }),
+        { W: 0, L: 0, K: 0, fights: 0 }
+      );
+      rows.push({
+        style: s,
+        W: agg.W,
+        L: agg.L,
+        K: agg.K,
+        P: agg.fights ? Math.round((agg.W / agg.fights) * 100) : 0,
+        fights: agg.fights,
+      });
+    });
+    return rows.sort((a, b) => b.P - a.P);
+  },
+
+  /** Tournament-specific stats */
+  tournament(tid: string): StyleRecord[] {
+    const tour = loadTour()[tid] || {};
+    const rows: StyleRecord[] = [];
+    Object.keys(tour).forEach((s) => {
+      const b = tour[s];
+      rows.push({
+        style: s,
+        W: b.W,
+        L: b.L,
+        K: b.K,
+        P: b.fights ? Math.round((b.W / b.fights) * 100) : 0,
+        fights: b.fights,
+      });
+    });
+    return rows.sort((a, b) => b.P - a.P);
   },
 };

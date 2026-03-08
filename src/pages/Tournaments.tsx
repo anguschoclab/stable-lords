@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useGame } from "@/state/GameContext";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { killWarrior } from "@/state/gameStore";
-import { StyleMeter } from "@/metrics/StyleMeter";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
@@ -190,7 +189,7 @@ export default function Tournaments() {
       NewsletterFeed.appendFightResult({ summary, transcript: outcome.log.map((e) => e.text) });
 
       // Track metrics
-      StyleMeter.recordFight({ styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by, isTournament: currentTournament.id });
+      StyleRollups.addFight({ week: state.week, styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by, isTournament: currentTournament.id });
 
       // Fame accumulation for stable
       if (outcome.winner) {
@@ -414,8 +413,7 @@ export default function Tournaments() {
         updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
         ArenaHistory.append(summary);
         LoreArchive.signalFight(summary);
-        StyleRollups.addFight({ week: state.week, styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by });
-        StyleMeter.recordFight({ styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by, isTournament: currentTournament.id });
+        StyleRollups.addFight({ week: state.week, styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by, isTournament: currentTournament.id });
       }
 
       // Create next round

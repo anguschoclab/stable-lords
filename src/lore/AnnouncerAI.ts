@@ -1,6 +1,9 @@
 /**
- * Announcer AI — generates flavourful blurbs for fight outcomes.
+ * Announcer AI — generates flavourful blurbs, hype lines, and recap narration.
+ * Consolidated from: AnnouncerAI.ts, ui/commentator.ts, ui/fightVariety.ts
  */
+
+// ── Tone-aware blurbs ─────────────────────────────────────────────────────
 
 const exclaim = [
   "Great heavens!",
@@ -47,4 +50,38 @@ export function blurb(opts: {
   if (t === "grim")
     return `${w} overcomes ${l}${by}, the arena falls hushed.`;
   return `${w} bests ${l}${by}.`;
+}
+
+// ── Short hype lines (formerly ui/commentator.ts) ─────────────────────────
+
+export function commentatorFor(
+  tag: "KO" | "Kill" | "Flashy" | "Upset"
+): string {
+  switch (tag) {
+    case "KO":
+      return "What a knockout! The crowd erupts!";
+    case "Kill":
+      return "A fatal finish—steel and silence. The arena gasps.";
+    case "Flashy":
+      return "Spectacle! Flourishes and feints—pure theatre!";
+    case "Upset":
+      return "An upset for the ages! The favorite falls.";
+  }
+}
+
+// ── Recap narration (formerly ui/fightVariety.ts) ─────────────────────────
+
+export function recapLine(
+  winner: string,
+  loser: string,
+  minutes: number
+): string {
+  const choices = [
+    `${winner} dismantled ${loser} in a brisk ${minutes}-minute clash.`,
+    `${loser} could not weather ${winner}'s onslaught—done in ${minutes}.`,
+    `${winner} outfoxed ${loser} and sealed it in ${minutes}.`,
+    `${winner} turned the tide and toppled ${loser} after ${minutes} minutes.`,
+    `${winner} took center stage, leaving ${loser} reeling in ${minutes}.`,
+  ];
+  return choices[Math.floor(Math.random() * choices.length)];
 }

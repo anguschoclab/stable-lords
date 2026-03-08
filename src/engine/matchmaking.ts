@@ -10,7 +10,11 @@ import { isTooInjuredToFight, type Injury } from "./injuries";
 import { simulateFight } from "./simulate";
 import { aiPlanForWarrior } from "./ownerAI";
 import { computeMetaDrift } from "./metaDrift";
-import { disallowStablemates } from "@/guards/matchmaking";
+
+/** Stablemates cannot fight each other */
+function disallowStablemates(aStableId: string, dStableId: string): boolean {
+  return !!aStableId && !!dStableId && aStableId === dStableId;
+}
 
 // ─── Eligibility ──────────────────────────────────────────────────────────
 

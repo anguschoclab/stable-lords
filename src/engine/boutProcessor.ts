@@ -8,15 +8,11 @@ import type { GameState, FightSummary, Warrior } from "@/types/game";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
 import { killWarrior } from "@/state/gameStore";
-import { StyleMeter } from "@/metrics/StyleMeter";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { StyleRollups } from "@/engine/stats/styleRollups";
-import { commentatorFor } from "@/ui/commentator";
-import { recapLine } from "@/ui/fightVariety";
-import { blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
-import { disallowStablemates } from "@/guards/matchmaking";
+import { commentatorFor, recapLine, blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
 import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
 import { calculateXP, applyXP } from "@/engine/progression";
 import {
@@ -88,7 +84,8 @@ export function generatePairings(state: GameState): BoutPairing[] {
       for (let j = i + 1; j < activeWarriors.length; j++) {
         if (paired.has(activeWarriors[j].id)) continue;
         // Guard: stablemates cannot fight each other
-        if (disallowStablemates(activeWarriors[i].stableId ?? "", activeWarriors[j].stableId ?? "")) continue;
+        const sameStable = (activeWarriors[i].stableId ?? "") === (activeWarriors[j].stableId ?? "") && !!(activeWarriors[i].stableId);
+        if (sameStable) continue;
         pairings.push({ a: activeWarriors[i], d: activeWarriors[j], isRivalry: false });
         paired.add(activeWarriors[i].id);
         paired.add(activeWarriors[j].id);
@@ -327,7 +324,6 @@ function resolveBout(
   s.arenaHistory = [...s.arenaHistory, fightSummary];
 
   // ── Side-effect singletons ──
-  StyleMeter.recordFight({ styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
   StyleRollups.addFight({ week, styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
   ArenaHistory.append(fightSummary);
   LoreArchive.signalFight(fightSummary);

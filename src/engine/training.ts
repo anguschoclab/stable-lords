@@ -13,8 +13,8 @@ import type { GameState, TrainingAssignment, SeasonalGrowth, Warrior, InjuryData
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { canGrow, diminishingReturnsFactor } from "@/engine/potential";
-import type { TrainerFocus } from "@/modules/trainers";
-import { TIER_BONUS } from "@/modules/trainers";
+import type { TrainerFocus } from "@/engine/trainers";
+import { TIER_BONUS } from "@/engine/trainers";
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
