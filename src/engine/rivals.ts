@@ -584,6 +584,8 @@ export function generateRivalStables(count: number, seed: number): RivalStable[]
       renown: tmpl.tier === "Legendary" ? 5 : tmpl.tier === "Major" ? 2 : 0,
       titles: tmpl.tier === "Legendary" ? 2 + Math.floor(rng() * 3) : tmpl.tier === "Major" ? Math.floor(rng() * 3) : 0,
       personality: tmpl.personality,
+      metaAdaptation: tmpl.metaAdaptation,
+      favoredStyles: tmpl.preferredStyles,
     };
 
     // Generate warriors — target ~10 per stable
