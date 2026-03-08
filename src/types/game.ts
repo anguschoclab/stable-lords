@@ -214,6 +214,23 @@ export interface InjuryData {
  */
 export type AttributePotential = Record<keyof Attributes, number>;
 
+/** Hidden favorite preferences — discovered through gameplay */
+export interface WarriorFavorites {
+  /** Favorite weapon item ID — grants +1 ATT when used */
+  weaponId: string;
+  /** Favorite OE/AL rhythm — grants +1 INI when matched */
+  rhythm: { oe: number; al: number };
+  /** Discovery state */
+  discovered: {
+    weapon: boolean;
+    rhythm: boolean;
+    /** Number of hints shown (weapon) */
+    weaponHints: number;
+    /** Number of hints shown (rhythm) */
+    rhythmHints: number;
+  };
+}
+
 export interface Warrior {
   id: string;
   name: string;
@@ -246,6 +263,8 @@ export interface Warrior {
   killedBy?: string;
   retiredWeek?: number;
   stableId?: string; // for AI rival warriors
+  /** Hidden favorite weapon & rhythm — discovered through bouts */
+  favorites?: WarriorFavorites;
 }
 
 // ─── Owner / Stable ─────────────────────────────────────────────────────────
