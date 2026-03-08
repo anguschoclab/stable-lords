@@ -215,6 +215,20 @@ export function generateWeeklyGazette(
   }
   if (risingStars.length > 0) tags.push("Rising Star");
 
+  // Detect upsets — low-fame warrior beats high-fame warrior (fame ratio >= 2x, min 10 fame gap)
+  const upsets: { winner: string; loser: string; winnerFame: number; loserFame: number }[] = [];
+  for (const f of fights) {
+    if (!f.winner || f.fameA == null || f.fameD == null) continue;
+    const winnerFame = f.winner === "A" ? f.fameA : f.fameD;
+    const loserFame = f.winner === "A" ? f.fameD : f.fameA;
+    const winnerName = f.winner === "A" ? f.a : f.d;
+    const loserName = f.winner === "A" ? f.d : f.a;
+    if (loserFame >= winnerFame + 10 && loserFame >= winnerFame * 2) {
+      upsets.push({ winner: winnerName, loser: loserName, winnerFame, loserFame });
+    }
+  }
+  if (upsets.length > 0) tags.push("Upset");
+
   // Headline — streak headlines take priority over standard ones
   let headline: string;
   if (hotStreakers.length > 0) {
@@ -234,6 +248,9 @@ export function generateWeeklyGazette(
     }
   } else if (risingStars.length > 0) {
     headline = `Week ${week}: RISING STAR! ${risingStars[0]} Opens Career with a Perfect 3-0!`;
+  } else if (upsets.length > 0) {
+    const u = upsets[0];
+    headline = `Week ${week}: UPSET! ${u.winner} Topples the Mighty ${u.loser}!`;
   } else if (kills.length >= 2) {
     headline = `Week ${week}: Blood Runs Deep — ${kills.length} Warriors Fall!`;
   } else if (kills.length === 1) {
@@ -292,6 +309,11 @@ export function generateWeeklyGazette(
   // Rising star narrative
   for (const star of risingStars) {
     paragraphs.push(`All eyes turn to ${star}, who has burst onto the scene with three consecutive victories to open their career. A rising star — or a flash in the pan? Only the arena will tell.`);
+  }
+
+  // Upset narrative
+  for (const u of upsets) {
+    paragraphs.push(`In a stunning upset, ${u.winner} (fame: ${u.winnerFame}) defeated the celebrated ${u.loser} (fame: ${u.loserFame})! The crowd roared in disbelief as the underdog proved that fame means nothing once steel is drawn.`);
   }
 
   // Graveyard mention

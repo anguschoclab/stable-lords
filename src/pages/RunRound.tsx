@@ -291,6 +291,8 @@ export default function RunRound() {
         flashyTags: tags,
         fameDeltaA: fameA,
         fameDeltaD: fameD,
+        fameA: warrior.fame,
+        fameD: opponent.fame,
         popularityDeltaA: popA,
         popularityDeltaD: popD,
         transcript: outcome.log.map(e => e.text),

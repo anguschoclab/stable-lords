@@ -311,6 +311,8 @@ export interface FightSummary {
   fameDeltaD?: number;
   popularityDeltaA?: number;
   popularityDeltaD?: number;
+  fameA?: number;
+  fameD?: number;
   transcript?: string[];
   createdAt: string;
 }
