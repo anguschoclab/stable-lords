@@ -186,13 +186,10 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
     }
     // Fallback: use pickRivalOpponent for broader cross-stable search
     if (!found && rivals.length > 0) {
-      const pick = pickRivalOpponent(
-        rivals.map(r => ({ owner: r.owner, roster: r.roster, template: { stableName: r.owner.stableName, ownerName: r.owner.name, motto: "", personality: r.owner.personality ?? "Pragmatic", philosophy: r.philosophy ?? "Balanced", preferredStyles: r.owner.favoredStyles ?? [], tier: r.tier ?? "Minor", rosterRange: [6, 12] as [number, number], trainerRange: [1, 3] as [number, number], fameRange: [0, 50] as [number, number], attrBias: {}, metaAdaptation: r.owner.metaAdaptation ?? "Opportunist", warriorNames: [] }, trainers: [] })),
-        new Set([...paired, a.warrior.id])
-      );
-      if (pick) {
+      const pick = pickRivalOpponent(rivals, paired);
+      if (pick && !disallowStablemates(a.stableId, pick.rival.owner.id)) {
         const dIdx = pool.findIndex(p => p.warrior.id === pick.warrior.id);
-        if (dIdx >= 0 && !disallowStablemates(a.stableId, pool[dIdx].stableId)) {
+        if (dIdx >= 0) {
           boutPairs.push({ a, d: pool[dIdx] });
           paired.add(a.warrior.id);
           paired.add(pool[dIdx].warrior.id);
