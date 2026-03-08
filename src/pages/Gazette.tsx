@@ -200,6 +200,227 @@ function AllTimeMetaChart({ allFights }: { allFights: FightSummary[] }) {
   );
 }
 
+/* ── Warrior Leaderboard ─────────────────────────────────── */
+
+function WarriorLeaderboard({ allFights }: { allFights: FightSummary[] }) {
+  const leaders = useMemo(() => {
+    const m = new Map<string, { name: string; wins: number; losses: number; kills: number; streak: number; bestStreak: number; fame: number }>();
+    const ensure = (n: string) => {
+      if (!m.has(n)) m.set(n, { name: n, wins: 0, losses: 0, kills: 0, streak: 0, bestStreak: 0, fame: 0 });
+      return m.get(n)!;
+    };
+
+    // Process in chronological order for streaks
+    const sorted = [...allFights].sort((a, b) => a.week - b.week);
+    for (const f of sorted) {
+      const a = ensure(f.a);
+      const d = ensure(f.d);
+      a.fame += f.fameDeltaA ?? 0;
+      d.fame += f.fameDeltaD ?? 0;
+
+      if (f.winner === "A") {
+        a.wins++; d.losses++;
+        a.streak = a.streak >= 0 ? a.streak + 1 : 1;
+        d.streak = d.streak <= 0 ? d.streak - 1 : -1;
+        if (f.by === "Kill") a.kills++;
+      } else if (f.winner === "D") {
+        d.wins++; a.losses++;
+        d.streak = d.streak >= 0 ? d.streak + 1 : 1;
+        a.streak = a.streak <= 0 ? a.streak - 1 : -1;
+        if (f.by === "Kill") d.kills++;
+      } else {
+        a.streak = 0; d.streak = 0;
+      }
+      a.bestStreak = Math.max(a.bestStreak, a.streak);
+      d.bestStreak = Math.max(d.bestStreak, d.streak);
+    }
+
+    return [...m.values()];
+  }, [allFights]);
+
+  if (leaders.length === 0) return null;
+
+  const byFame = [...leaders].sort((a, b) => b.fame - a.fame).slice(0, 5);
+  const byKills = [...leaders].filter((l) => l.kills > 0).sort((a, b) => b.kills - a.kills).slice(0, 5);
+  const byStreak = [...leaders].filter((l) => l.bestStreak > 1).sort((a, b) => b.bestStreak - a.bestStreak).slice(0, 5);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Fame leaders */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-display flex items-center gap-2">
+            <Crown className="h-4 w-4 text-arena-gold" /> Top by Fame
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {byFame.map((l, i) => (
+            <div key={l.name} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-arena-gold font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
+                <span className="text-xs font-display text-foreground truncate max-w-[120px]">{l.name}</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-mono">
+                <span className="text-arena-fame">{l.fame} fame</span>
+                <span className="text-muted-foreground">{l.wins}W-{l.losses}L</span>
+              </div>
+            </div>
+          ))}
+          {byFame.length === 0 && <p className="text-xs text-muted-foreground italic">No data yet.</p>}
+        </CardContent>
+      </Card>
+
+      {/* Kill leaders */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-display flex items-center gap-2">
+            <Skull className="h-4 w-4 text-arena-blood" /> Deadliest Fighters
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {byKills.map((l, i) => (
+            <div key={l.name} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-arena-blood font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
+                <span className="text-xs font-display text-foreground truncate max-w-[120px]">{l.name}</span>
+              </div>
+              <span className="text-[10px] font-mono text-arena-blood">{l.kills} kill{l.kills !== 1 ? "s" : ""}</span>
+            </div>
+          ))}
+          {byKills.length === 0 && <p className="text-xs text-muted-foreground italic">No kills yet.</p>}
+        </CardContent>
+      </Card>
+
+      {/* Streak leaders */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-display flex items-center gap-2">
+            <Zap className="h-4 w-4 text-arena-pop" /> Longest Win Streaks
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {byStreak.map((l, i) => (
+            <div key={l.name} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-arena-pop font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
+                <span className="text-xs font-display text-foreground truncate max-w-[120px]">{l.name}</span>
+              </div>
+              <div className="flex items-center gap-1 text-[10px] font-mono">
+                <span className="text-arena-pop">{l.bestStreak} streak</span>
+                {l.streak > 1 && <Badge variant="outline" className="text-[8px] px-1 py-0 text-arena-pop border-arena-pop/30">ACTIVE</Badge>}
+              </div>
+            </div>
+          ))}
+          {byStreak.length === 0 && <p className="text-xs text-muted-foreground italic">No streaks yet.</p>}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+/* ── Style Matchup Heatmap ───────────────────────────────── */
+
+function StyleMatchupHeatmap({ allFights }: { allFights: FightSummary[] }) {
+  const { styles, matrix } = useMemo(() => {
+    // matrix[attacker][defender] = { wins, total }
+    const m = new Map<string, Map<string, { wins: number; total: number }>>();
+    const styleSet = new Set<string>();
+
+    for (const f of allFights) {
+      styleSet.add(f.styleA);
+      styleSet.add(f.styleD);
+
+      // A vs D
+      if (!m.has(f.styleA)) m.set(f.styleA, new Map());
+      if (!m.has(f.styleD)) m.set(f.styleD, new Map());
+
+      const adEntry = m.get(f.styleA)!.get(f.styleD) ?? { wins: 0, total: 0 };
+      const daEntry = m.get(f.styleD)!.get(f.styleA) ?? { wins: 0, total: 0 };
+      adEntry.total++;
+      daEntry.total++;
+      if (f.winner === "A") adEntry.wins++;
+      else if (f.winner === "D") daEntry.wins++;
+      m.get(f.styleA)!.set(f.styleD, adEntry);
+      m.get(f.styleD)!.set(f.styleA, daEntry);
+    }
+
+    const styles = [...styleSet].sort();
+    return { styles, matrix: m };
+  }, [allFights]);
+
+  if (styles.length < 2) return null;
+
+  function cellColor(pct: number): string {
+    if (pct >= 0.7) return "bg-primary/80 text-primary-foreground";
+    if (pct >= 0.55) return "bg-primary/40 text-foreground";
+    if (pct >= 0.45) return "bg-muted text-muted-foreground";
+    if (pct >= 0.3) return "bg-destructive/30 text-foreground";
+    return "bg-destructive/60 text-destructive-foreground";
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <Grid3X3 className="h-4 w-4 text-primary" /> Style Matchup Heatmap
+        </CardTitle>
+        <p className="text-[10px] text-muted-foreground font-mono">
+          Row style win % vs column style · hover for details
+        </p>
+      </CardHeader>
+      <CardContent className="pt-0 overflow-x-auto">
+        <table className="w-full border-collapse text-[10px]">
+          <thead>
+            <tr>
+              <th className="p-1 text-left font-display text-muted-foreground sticky left-0 bg-card z-10">vs ↓</th>
+              {styles.map((s) => (
+                <th key={s} className="p-1 font-display text-muted-foreground text-center whitespace-nowrap" style={{ writingMode: "vertical-lr", transform: "rotate(180deg)", maxWidth: "2rem" }}>
+                  {s}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {styles.map((rowStyle) => (
+              <tr key={rowStyle}>
+                <td className="p-1 font-display text-foreground whitespace-nowrap sticky left-0 bg-card z-10 border-r border-border/30">
+                  {rowStyle}
+                </td>
+                {styles.map((colStyle) => {
+                  if (rowStyle === colStyle) {
+                    return <td key={colStyle} className="p-1 text-center bg-border/20 text-muted-foreground/30">—</td>;
+                  }
+                  const entry = matrix.get(rowStyle)?.get(colStyle);
+                  if (!entry || entry.total === 0) {
+                    return <td key={colStyle} className="p-1 text-center text-muted-foreground/30">·</td>;
+                  }
+                  const pct = entry.wins / entry.total;
+                  return (
+                    <td key={colStyle} className="p-0.5">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className={`rounded px-1 py-0.5 text-center font-mono font-semibold cursor-default ${cellColor(pct)}`}>
+                            {Math.round(pct * 100)}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-xs">
+                          <span className="font-display">{rowStyle}</span> vs <span className="font-display">{colStyle}</span>
+                          <br />
+                          {entry.wins}W / {entry.total} bouts ({Math.round(pct * 100)}%)
+                        </TooltipContent>
+                      </Tooltip>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+
 /* ── main page ───────────────────────────────────────────── */
 
 export default function Gazette() {
