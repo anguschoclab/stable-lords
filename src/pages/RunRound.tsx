@@ -29,6 +29,13 @@ export default function RunRound() {
   >([]);
   const [running, setRunning] = useState(false);
 
+  const fightReady = state.roster.filter(w => {
+    if (w.status !== "Active") return false;
+    const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
+    return !isTooInjuredToFight(injObjs);
+  });
+  const tooInjuredCount = state.roster.filter(w => w.status === "Active").length - fightReady.length;
+
   const runWeek = () => {
     if (running || state.roster.length < 2) return;
     setRunning(true);
