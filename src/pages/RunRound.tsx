@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import { useGame } from "@/state/GameContext";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
-import { sendSignal } from "@/engine/signals";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
 import { killWarrior } from "@/state/gameStore";
+import { StyleMeter } from "@/metrics/StyleMeter";
+import { LoreArchive } from "@/lore/LoreArchive";
+import { blurb } from "@/lore/AnnouncerAI";
+import { commentatorFor } from "@/ui/commentator";
+import { recapLine } from "@/ui/fightVariety";
 import type { FightSummary, Warrior } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Swords, Zap, Skull } from "lucide-react";
+import { Swords, Zap, Skull, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 
 export default function RunRound() {
   const { state, setState } = useGame();
   const [results, setResults] = useState<
-    { a: Warrior; d: Warrior; outcome: ReturnType<typeof simulateFight> }[]
+    { a: Warrior; d: Warrior; outcome: ReturnType<typeof simulateFight>; announcement?: string }[]
   >([]);
   const [running, setRunning] = useState(false);
 
@@ -26,17 +30,31 @@ export default function RunRound() {
     const weekResults: typeof results = [];
     let updatedState = { ...state };
     const moodMods = getMoodModifiers(state.crowdMood as any);
+    const activeWarriors = updatedState.roster.filter(w => w.status === "Active");
 
-    for (let i = 0; i < state.roster.length; i++) {
-      const warrior = updatedState.roster[i];
-      if (!warrior || warrior.status !== "Active") continue;
-      const opponentIdx = (i + 1) % updatedState.roster.length;
-      const opponent = updatedState.roster[opponentIdx];
-      if (!opponent || opponent.status !== "Active") continue;
+    // Build pairings — avoid repeat matchups where possible
+    const paired = new Set<string>();
+    const pairings: [Warrior, Warrior][] = [];
+    for (let i = 0; i < activeWarriors.length; i++) {
+      if (paired.has(activeWarriors[i].id)) continue;
+      for (let j = i + 1; j < activeWarriors.length; j++) {
+        if (paired.has(activeWarriors[j].id)) continue;
+        pairings.push([activeWarriors[i], activeWarriors[j]]);
+        paired.add(activeWarriors[i].id);
+        paired.add(activeWarriors[j].id);
+        break;
+      }
+    }
 
-      const planA = warrior.plan ?? defaultPlanForWarrior(warrior);
-      const planD = opponent.plan ?? defaultPlanForWarrior(opponent);
-      const outcome = simulateFight(planA, planD, warrior, opponent);
+    for (const [warrior, opponent] of pairings) {
+      // Check both still active after previous fights (death may have occurred)
+      const currentW = updatedState.roster.find(w => w.id === warrior.id);
+      const currentO = updatedState.roster.find(w => w.id === opponent.id);
+      if (!currentW || currentW.status !== "Active" || !currentO || currentO.status !== "Active") continue;
+
+      const planA = currentW.plan ?? defaultPlanForWarrior(currentW);
+      const planD = currentO.plan ?? defaultPlanForWarrior(currentO);
+      const outcome = simulateFight(planA, planD, currentW, currentO, undefined, updatedState.trainers);
 
       const tags = outcome.post?.tags ?? [];
       const rawFameA = fameFromTags(outcome.winner === "A" ? tags : []);
@@ -91,7 +109,7 @@ export default function RunRound() {
       }
 
       const summary: FightSummary = {
-        id: `fight_${Date.now()}_${i}`,
+        id: `fight_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         week: state.week,
         title: `${warrior.name} vs ${opponent.name}`,
         a: warrior.name,
@@ -109,7 +127,56 @@ export default function RunRound() {
         createdAt: new Date().toISOString(),
       };
       updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
-      weekResults.push({ a: warrior, d: opponent, outcome });
+
+      // Feed style tracking
+      StyleMeter.recordFight({
+        styleA: warrior.style,
+        styleD: opponent.style,
+        winner: outcome.winner,
+        by: outcome.by,
+      });
+
+      // Feed lore archive
+      LoreArchive.signalFight(summary);
+
+      // Generate announcer commentary
+      let announcement: string | undefined;
+      if (outcome.by === "Kill") {
+        announcement = commentatorFor("Kill");
+      } else if (outcome.by === "KO") {
+        announcement = commentatorFor("KO");
+      } else if (tags.includes("Flashy")) {
+        announcement = commentatorFor("Flashy");
+      } else if (tags.includes("Comeback")) {
+        announcement = commentatorFor("Upset");
+      } else if (outcome.winner) {
+        const winnerName = outcome.winner === "A" ? warrior.name : opponent.name;
+        const loserName = outcome.winner === "A" ? opponent.name : warrior.name;
+        announcement = recapLine(winnerName, loserName, outcome.minutes);
+      }
+
+      weekResults.push({ a: warrior, d: opponent, outcome, announcement });
+    }
+
+    // Mark fight of the week
+    if (weekResults.length > 0) {
+      let bestIdx = 0;
+      let bestScore = -1;
+      weekResults.forEach((r, i) => {
+        let score = 0;
+        const t = r.outcome.post?.tags ?? [];
+        if (t.includes("Kill")) score += 5;
+        if (t.includes("KO")) score += 3;
+        if (t.includes("Flashy")) score += 2;
+        if (t.includes("Comeback")) score += 4;
+        if (score > bestScore) { bestScore = score; bestIdx = i; }
+      });
+      if (bestScore > 0) {
+        const bestFight = updatedState.arenaHistory[updatedState.arenaHistory.length - weekResults.length + bestIdx];
+        if (bestFight) {
+          LoreArchive.markFightOfWeek(state.week, bestFight.id);
+        }
+      }
     }
 
     // Update crowd mood
@@ -121,12 +188,34 @@ export default function RunRound() {
       contractWeeksLeft: Math.max(0, t.contractWeeksLeft - 1),
     })).filter((t) => t.contractWeeksLeft > 0);
 
-    // Newsletter
+    // Newsletter with top movers
     const highlights = weekResults.map((r) => {
       const winner = r.outcome.winner === "A" ? r.a.name : r.outcome.winner === "D" ? r.d.name : "Draw";
       const deathNote = r.outcome.by === "Kill" ? " ☠️" : "";
       return `${r.a.name} vs ${r.d.name}: ${winner} ${r.outcome.by ? `by ${r.outcome.by}` : "(Draw)"}${deathNote}`;
     });
+
+    // Top movers: warriors who gained the most fame this week
+    const fameChanges = new Map<string, { name: string; fame: number; pop: number }>();
+    for (const r of weekResults) {
+      const isAWinner = r.outcome.winner === "A";
+      const isDWinner = r.outcome.winner === "D";
+      if (isAWinner) {
+        const existing = fameChanges.get(r.a.name) ?? { name: r.a.name, fame: 0, pop: 0 };
+        existing.fame += (r.outcome.post?.tags ?? []).includes("Kill") ? 3 : 1;
+        fameChanges.set(r.a.name, existing);
+      }
+      if (isDWinner) {
+        const existing = fameChanges.get(r.d.name) ?? { name: r.d.name, fame: 0, pop: 0 };
+        existing.fame += (r.outcome.post?.tags ?? []).includes("Kill") ? 3 : 1;
+        fameChanges.set(r.d.name, existing);
+      }
+    }
+    const topMovers = [...fameChanges.values()].sort((a, b) => b.fame - a.fame).slice(0, 3);
+    if (topMovers.length > 0) {
+      highlights.push(`⭐ Top Mover: ${topMovers[0].name} (+${topMovers[0].fame} fame)`);
+    }
+
     updatedState.newsletter = [
       ...updatedState.newsletter,
       { week: state.week, title: "Arena Chronicle", items: highlights },
@@ -204,6 +293,15 @@ export default function RunRound() {
                       : "Draw"}
                   </Badge>
                 </div>
+
+                {/* Announcer commentary */}
+                {r.announcement && (
+                  <div className="flex items-start gap-2 mb-3 p-2.5 rounded-md bg-secondary/50 border border-border">
+                    <Megaphone className="h-4 w-4 text-arena-gold mt-0.5 shrink-0" />
+                    <p className="text-sm italic text-foreground/80">{r.announcement}</p>
+                  </div>
+                )}
+
                 <div className="space-y-1 text-sm text-muted-foreground border-l-2 border-primary/20 pl-3">
                   {r.outcome.log.map((e, j) => (
                     <p key={j}>

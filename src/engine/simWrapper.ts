@@ -4,18 +4,20 @@
 import { simulateFight } from "./simulate";
 import { sendSignal } from "./signals";
 import { fameFromTags } from "./fame";
-import type { FightPlan, FightOutcome } from "@/types/game";
+import type { FightPlan, FightOutcome, Warrior, TrainerData } from "@/types/game";
 
 export function simulateFightAndSignal(
   planA: FightPlan,
-  planD: FightPlan
+  planD: FightPlan,
+  warriorA?: Warrior,
+  warriorD?: Warrior,
+  seed?: number,
+  trainers?: TrainerData[]
 ): FightOutcome {
-  const out = simulateFight(planA, planD);
+  const out = simulateFight(planA, planD, warriorA, warriorD, seed, trainers);
   const tags = out.post?.tags ?? [];
-  const famA = fameFromTags(tags);
-  const famD = fameFromTags(
-    out.winner === "D" ? tags : []
-  );
+  const famA = fameFromTags(out.winner === "A" ? tags : []);
+  const famD = fameFromTags(out.winner === "D" ? tags : []);
 
   sendSignal({
     type: "fight:result",
