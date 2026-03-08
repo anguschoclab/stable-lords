@@ -65,7 +65,7 @@ export default function Graveyard() {
                   <div className="text-sm text-muted-foreground mt-2">
                     {w.career.wins}W-{w.career.losses}L-{w.career.kills}K
                     {w.deathCause && <> · {w.deathCause}</>}
-                    {w.killedBy && <> · Slain by {w.killedBy}</>}
+                    {w.killedBy && <> · Slain by <WarriorLink name={w.killedBy} /></>}
                   </div>
                 </CardContent>
               </Card>
