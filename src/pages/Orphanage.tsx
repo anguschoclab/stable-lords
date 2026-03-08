@@ -10,6 +10,7 @@ import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightSummary } from "@/types/game";
 import { computeWarriorStats, DAMAGE_LABELS } from "@/engine/skillCalc";
+import { generatePotential } from "@/engine/potential";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
