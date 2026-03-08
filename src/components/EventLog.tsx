@@ -1,6 +1,7 @@
 /**
  * FM26-inspired Event Log sidebar.
- * Derives events from game state (fights, deaths, recruits, newsletters).
+ * Derives events from game state (fights, deaths, recruits, newsletters, training, injuries).
+ * Every event is clickable → navigates to the relevant page/entity.
  */
 import React, { useMemo } from "react";
 import { useGame } from "@/state/GameContext";
@@ -15,11 +16,14 @@ import {
   AlertTriangle,
   Star,
   ScrollText,
+  Dumbbell,
+  Heart,
+  ChevronRight,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
-type EventType = "fight" | "kill" | "death" | "recruit" | "tournament" | "news" | "injury" | "retirement";
+type EventType = "fight" | "kill" | "death" | "recruit" | "tournament" | "news" | "injury" | "retirement" | "training" | "recovery";
 
 interface GameEvent {
   id: string;
@@ -29,20 +33,36 @@ interface GameEvent {
   subtitle?: string;
   icon: React.ElementType;
   iconColor: string;
-  linkTo?: string;
-  read?: boolean;
+  linkTo: string;
 }
 
 const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }> = {
-  fight: { icon: Swords, color: "text-primary" },
-  kill: { icon: Skull, color: "text-arena-blood" },
-  death: { icon: Skull, color: "text-destructive" },
-  recruit: { icon: UserPlus, color: "text-arena-pop" },
-  tournament: { icon: Trophy, color: "text-arena-gold" },
-  news: { icon: Newspaper, color: "text-muted-foreground" },
-  injury: { icon: AlertTriangle, color: "text-amber-400" },
-  retirement: { icon: Star, color: "text-arena-fame" },
+  fight:      { icon: Swords,        color: "text-primary" },
+  kill:       { icon: Skull,         color: "text-arena-blood" },
+  death:      { icon: Skull,         color: "text-destructive" },
+  recruit:    { icon: UserPlus,      color: "text-arena-pop" },
+  tournament: { icon: Trophy,        color: "text-arena-gold" },
+  news:       { icon: Newspaper,     color: "text-muted-foreground" },
+  injury:     { icon: AlertTriangle, color: "text-amber-400" },
+  retirement: { icon: Star,          color: "text-arena-fame" },
+  training:   { icon: Dumbbell,      color: "text-primary" },
+  recovery:   { icon: Heart,         color: "text-arena-pop" },
 };
+
+/** Resolve warrior ID from name across roster, graveyard, retired, rivals */
+function resolveWarriorLink(name: string, state: any): string {
+  const w = state.roster?.find((w: any) => w.name === name);
+  if (w) return `/warrior/${w.id}`;
+  const d = state.graveyard?.find((w: any) => w.name === name);
+  if (d) return `/warrior/${d.id}`;
+  const r = state.retired?.find((w: any) => w.name === name);
+  if (r) return `/warrior/${r.id}`;
+  for (const rival of state.rivals ?? []) {
+    const rw = rival.roster?.find((w: any) => w.name === name);
+    if (rw) return `/warrior/${rw.id}`;
+  }
+  return "/hall-of-fights";
+}
 
 export default function EventLog() {
   const { state } = useGame();
@@ -51,7 +71,7 @@ export default function EventLog() {
   const events = useMemo(() => {
     const all: GameEvent[] = [];
 
-    // Fight results
+    // Fight results → Hall of Fights
     state.arenaHistory.forEach((f) => {
       const isKill = f.by === "Kill";
       const winnerName = f.winner === "A" ? f.a : f.winner === "D" ? f.d : null;
@@ -60,14 +80,14 @@ export default function EventLog() {
         week: f.week,
         type: isKill ? "kill" : "fight",
         title: winnerName ? `${winnerName} defeats ${f.winner === "A" ? f.d : f.a}` : `${f.a} vs ${f.d} — Draw`,
-        subtitle: isKill ? `Kill by ${f.by}` : `Victory by ${f.by ?? "decision"}`,
+        subtitle: isKill ? `Killed in combat` : `Victory by ${f.by ?? "decision"}`,
         icon: EVENT_ICONS[isKill ? "kill" : "fight"].icon,
         iconColor: EVENT_ICONS[isKill ? "kill" : "fight"].color,
         linkTo: "/hall-of-fights",
       });
     });
 
-    // Deaths
+    // Deaths → Warrior detail (fallen)
     state.graveyard.forEach((w) => {
       all.push({
         id: `death-${w.id}`,
@@ -77,11 +97,11 @@ export default function EventLog() {
         subtitle: w.killedBy ? `Killed by ${w.killedBy}` : w.deathCause ?? "Died in combat",
         icon: EVENT_ICONS.death.icon,
         iconColor: EVENT_ICONS.death.color,
-        linkTo: "/graveyard",
+        linkTo: `/warrior/${w.id}`,
       });
     });
 
-    // Retirements
+    // Retirements → Warrior detail (retired)
     state.retired.forEach((w) => {
       all.push({
         id: `retire-${w.id}`,
@@ -91,11 +111,46 @@ export default function EventLog() {
         subtitle: `${w.career.wins}W-${w.career.losses}L career`,
         icon: EVENT_ICONS.retirement.icon,
         iconColor: EVENT_ICONS.retirement.color,
-        linkTo: "/graveyard",
+        linkTo: `/warrior/${w.id}`,
       });
     });
 
-    // Newsletter items
+    // Injuries on active warriors → Warrior detail
+    state.roster.forEach((w) => {
+      if (!w.injuries || w.injuries.length === 0) return;
+      w.injuries.forEach((inj, idx) => {
+        if (typeof inj === "string") return;
+        all.push({
+          id: `injury-${w.id}-${inj.id ?? idx}`,
+          week: state.week, // approximate — injuries don't always store week
+          type: "injury",
+          title: `${w.name} — ${inj.name}`,
+          subtitle: `${inj.severity} · ${inj.weeksRemaining}w recovery`,
+          icon: EVENT_ICONS.injury.icon,
+          iconColor: EVENT_ICONS.injury.color,
+          linkTo: `/warrior/${w.id}`,
+        });
+      });
+    });
+
+    // Training assignments → Training page
+    (state.trainingAssignments ?? []).forEach((a) => {
+      const w = state.roster.find((w) => w.id === a.warriorId);
+      if (!w) return;
+      const isRecovery = a.type === "recovery";
+      all.push({
+        id: `train-${a.warriorId}`,
+        week: state.week,
+        type: isRecovery ? "recovery" : "training",
+        title: isRecovery ? `${w.name} recovering` : `${w.name} training${a.attribute ? ` ${a.attribute}` : ""}`,
+        subtitle: isRecovery ? "Active recovery from injuries" : "Assigned to training grounds",
+        icon: EVENT_ICONS[isRecovery ? "recovery" : "training"].icon,
+        iconColor: EVENT_ICONS[isRecovery ? "recovery" : "training"].color,
+        linkTo: "/training",
+      });
+    });
+
+    // Newsletter items → Hall of Fights (closest narrative page)
     state.newsletter.forEach((n) => {
       all.push({
         id: `news-${n.week}-${n.title}`,
@@ -105,10 +160,11 @@ export default function EventLog() {
         subtitle: n.items[0]?.slice(0, 60) ?? "",
         icon: EVENT_ICONS.news.icon,
         iconColor: EVENT_ICONS.news.color,
+        linkTo: "/hall-of-fights",
       });
     });
 
-    // Tournaments
+    // Tournaments → Tournaments page
     state.tournaments.filter((t) => t.completed).forEach((t) => {
       all.push({
         id: `tourney-${t.id}`,
@@ -126,7 +182,7 @@ export default function EventLog() {
     all.sort((a, b) => b.week - a.week || b.id.localeCompare(a.id));
 
     return all;
-  }, [state.arenaHistory, state.graveyard, state.retired, state.newsletter, state.tournaments]);
+  }, [state.arenaHistory, state.graveyard, state.retired, state.newsletter, state.tournaments, state.roster, state.trainingAssignments, state.week]);
 
   // Group by week
   const grouped = useMemo(() => {
@@ -173,12 +229,10 @@ export default function EventLog() {
                   return (
                     <button
                       key={event.id}
-                      onClick={() => event.linkTo && navigate(event.linkTo)}
+                      onClick={() => navigate(event.linkTo)}
                       className={cn(
                         "w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors border-b border-border/30",
-                        event.linkTo
-                          ? "hover:bg-secondary/60 cursor-pointer"
-                          : "cursor-default",
+                        "hover:bg-secondary/60 cursor-pointer group",
                       )}
                     >
                       <div className={cn("mt-0.5 shrink-0", event.iconColor)}>
@@ -194,6 +248,7 @@ export default function EventLog() {
                           </div>
                         )}
                       </div>
+                      <ChevronRight className="h-3 w-3 text-muted-foreground/0 group-hover:text-muted-foreground/60 transition-colors mt-0.5 shrink-0" />
                     </button>
                   );
                 })}
