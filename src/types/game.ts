@@ -96,6 +96,21 @@ export interface DerivedStats {
 
 export type ShieldSize = "None" | "Small" | "Medium" | "Large";
 
+/** Weight class for armor encumbrance calculations (per Design Bible §Equipment) */
+export type ArmorWeight = "None" | "Light" | "Medium" | "Heavy" | "Ultra-Heavy";
+
+/** Maps armor weight classes to encumbrance penalty ranges */
+export const ARMOR_WEIGHT_MAP: Record<ArmorWeight, { minWeight: number; maxWeight: number; speedPenalty: number }> = {
+  "None":        { minWeight: 0, maxWeight: 0, speedPenalty: 0 },
+  "Light":       { minWeight: 1, maxWeight: 2, speedPenalty: 1 },
+  "Medium":      { minWeight: 3, maxWeight: 4, speedPenalty: 2 },
+  "Heavy":       { minWeight: 5, maxWeight: 6, speedPenalty: 4 },
+  "Ultra-Heavy": { minWeight: 7, maxWeight: 10, speedPenalty: 6 },
+};
+
+/** Equipment slot identifiers */
+export type EquipmentSlot = "weapon" | "armor" | "shield" | "helm";
+
 export interface Weapon {
   name: string;
   twoHanded?: boolean;
@@ -106,6 +121,21 @@ export interface Gear {
   shield: ShieldSize;
   armor: string;
   helm: string;
+}
+
+/**
+ * Resolved encumbrance breakdown for a warrior's full loadout.
+ * Used by the engine to apply speed/fatigue penalties.
+ */
+export interface ArmorEncumbrance {
+  /** Total encumbrance points from all gear */
+  totalWeight: number;
+  /** Effective speed penalty applied to SP-based calculations */
+  speedPenalty: number;
+  /** Fatigue multiplier — heavier loadouts drain endurance faster */
+  fatigueMult: number;
+  /** Armor weight class for display/categorization */
+  weightClass: ArmorWeight;
 }
 
 // ─── Fight Plan ─────────────────────────────────────────────────────────────
