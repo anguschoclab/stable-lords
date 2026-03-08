@@ -4,14 +4,15 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useGame } from "@/state/GameContext";
 import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/scouting";
-import type { Warrior, ScoutReportData, RivalStableData } from "@/types/game";
+import { ArenaHistory } from "@/engine/history/arenaHistory";
+import type { Warrior, ScoutReportData, RivalStableData, FightSummary } from "@/types/game";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Eye, Shield, Coins, Users, Swords, ArrowLeftRight, Trophy, Skull, TrendingUp } from "lucide-react";
+import { Search, Eye, Shield, Coins, Users, Swords, ArrowLeftRight, Trophy, Skull, TrendingUp, UserRoundSearch } from "lucide-react";
 import { toast } from "sonner";
 
 const QUALITIES: ScoutQuality[] = ["Basic", "Detailed", "Expert"];
