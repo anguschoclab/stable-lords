@@ -201,6 +201,11 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
                     {record.kills > 0 && <span className="text-destructive ml-1">☠{record.kills}</span>}
                   </span>
                 )}
+                {record && record.losses >= 3 && (
+                  <Badge variant="destructive" className="text-[10px] gap-1">
+                    💀 Nemesis
+                  </Badge>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {f.by && <Badge variant="outline" className="text-xs">{f.by}</Badge>}
