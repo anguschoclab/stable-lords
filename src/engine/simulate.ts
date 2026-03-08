@@ -409,7 +409,7 @@ export function simulateFight(
     }
 
     // ── 2. ATTACK ATTEMPT (ATT) ──
-    const attOEmod = oeAttMod(attacker.plan.OE);
+    const attOEmod = oeAttMod(attOE);
     const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat);
 
     if (!attackSuccess) {
