@@ -4,11 +4,12 @@ import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Warrior } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
 import TagBadge from "@/components/TagBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Swords, Trophy, Users, Flame, Star, TrendingUp, UserPlus, LayoutDashboard, ScrollText } from "lucide-react";
+import { Swords, Trophy, Users, Flame, Star, TrendingUp, UserPlus, LayoutDashboard, ScrollText, Coins, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS } from "@/engine/crowdMood";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
+import { computeWeeklyBreakdown } from "@/engine/economy";
 import SubNav, { type SubNavTab } from "@/components/SubNav";
 
 const TABS: SubNavTab[] = [
