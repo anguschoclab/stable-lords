@@ -133,6 +133,8 @@ export interface CareerRecord {
   kills: number;
 }
 
+export type WarriorStatus = "Active" | "Dead" | "Retired";
+
 export interface Warrior {
   id: string;
   name: string;
@@ -149,6 +151,12 @@ export interface Warrior {
   champion: boolean;
   plan?: FightPlan;
   gear?: Gear;
+  status: WarriorStatus;
+  age?: number;
+  deathWeek?: number;
+  deathCause?: string;
+  killedBy?: string;
+  retiredWeek?: number;
 }
 
 // ─── Owner / Stable ─────────────────────────────────────────────────────────
