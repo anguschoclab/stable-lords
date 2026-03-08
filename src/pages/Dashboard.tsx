@@ -86,11 +86,11 @@ function SeasonWidget() {
       </CardContent>
     </Card>
   );
-});
+}
 
 // ─── Widget: Stable Overview ───────────────────────────────────────────────
 
-const StableWidget = React.memo(function StableWidget() {
+function StableWidget() {
   const { state } = useGame();
   const activeWarriors = state.roster.filter(w => w.status === "Active").length;
   const totalWins = state.roster.reduce((s, w) => s + w.career.wins, 0);
