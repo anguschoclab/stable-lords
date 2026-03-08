@@ -393,11 +393,24 @@ export default function RunRound() {
 
     updatedState.newsletter = [...updatedState.newsletter, { week: state.week, title: "Arena Gazette", items: highlights }];
 
-    // Advance week
-    const newWeek = state.week + 1;
-    const seasons = ["Spring", "Summer", "Fall", "Winter"] as const;
-    updatedState.week = newWeek;
-    updatedState.season = seasons[Math.floor((newWeek - 1) / 13) % 4];
+    // Accumulate stable fame from warrior fame deltas
+    let stableFameDelta = 0;
+    for (const r of weekResults) {
+      if (r.outcome.winner === "A") {
+        stableFameDelta += (r.outcome.post?.tags ?? []).includes("Kill") ? 3 : 1;
+      }
+    }
+    updatedState.fame = (updatedState.fame ?? 0) + stableFameDelta;
+    updatedState.player = {
+      ...updatedState.player,
+      fame: (updatedState.player.fame ?? 0) + stableFameDelta,
+    };
+
+    // Close newsletter issue
+    NewsletterFeed.closeWeekToIssue(state.week);
+
+    // Now run full advanceWeek processing (training, economy, aging, injuries, AI bouts, recruit pool, tier progression, week increment)
+    updatedState = advanceWeek(updatedState);
 
     setState(updatedState);
     setResults(weekResults);
