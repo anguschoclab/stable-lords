@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useGame } from "@/state/GameContext";
+import { advanceWeek } from "@/state/gameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
 import { killWarrior } from "@/state/gameStore";
