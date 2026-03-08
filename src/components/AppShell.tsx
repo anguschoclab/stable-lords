@@ -37,7 +37,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { state, doReset, returnToTitle } = useGame();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Auto-hide sidebar on small screens
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
 
   useCoachTip(location.pathname);
 
@@ -169,13 +170,23 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* ─── Body: Sidebar + Main ─── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Event Log Sidebar */}
+        {/* Mobile overlay sidebar */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden fixed inset-0 z-30 bg-black/40"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         <aside
           className={cn(
-            "border-r border-border bg-background/50 flex-shrink-0 transition-all duration-200 overflow-hidden",
-            sidebarOpen ? "w-72 lg:w-80" : "w-0"
+            "border-r border-border bg-background flex-shrink-0 transition-all duration-200 overflow-hidden z-40",
+            "md:relative md:z-auto",
+            sidebarOpen
+              ? "fixed inset-y-0 left-0 w-72 md:static md:w-64 lg:w-72"
+              : "w-0"
           )}
         >
-          <div className="h-[calc(100vh-3rem)] md:h-[calc(100vh-3rem)] sticky top-12">
+          <div className="h-full md:h-[calc(100vh-3rem)] md:sticky md:top-12">
             <EventLog />
           </div>
         </aside>

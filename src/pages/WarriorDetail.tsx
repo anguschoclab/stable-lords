@@ -106,12 +106,12 @@ export default function WarriorDetail() {
       </div>
 
       {/* Hero */}
-      <div className="relative rounded-xl border border-border bg-gradient-to-br from-secondary via-card to-secondary p-8 overflow-hidden">
+      <div className="relative rounded-xl border border-border bg-gradient-to-br from-secondary via-card to-secondary p-4 sm:p-8 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-arena-fame/5 to-arena-gold/5" />
-        <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-display font-bold tracking-wide">{warrior.name}</h1>
+        <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide break-all">{warrior.name}</h1>
               {warrior.champion && (
                 <Badge className="bg-arena-gold text-black gap-1">
                   <Trophy className="h-3 w-3" /> Champion
@@ -152,7 +152,7 @@ export default function WarriorDetail() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {/* Attributes */}
         <Card>
           <CardHeader className="pb-3">

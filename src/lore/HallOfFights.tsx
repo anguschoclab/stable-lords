@@ -110,19 +110,19 @@ export const HallOfFights: React.FC = () => {
                     return (
                       <div
                         key={f.id}
-                        className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 py-2 border-b border-border last:border-0"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           {isKill ? (
-                            <Skull className="h-4 w-4 text-destructive" />
+                            <Skull className="h-4 w-4 text-destructive shrink-0" />
                           ) : (
-                            <Swords className="h-4 w-4 text-muted-foreground" />
+                            <Swords className="h-4 w-4 text-muted-foreground shrink-0" />
                           )}
-                          <span className="text-sm font-medium">{f.a}</span>
+                          <span className="text-sm font-medium truncate">{f.a}</span>
                           <span className="text-xs text-muted-foreground">vs</span>
-                          <span className="text-sm font-medium">{f.d}</span>
+                          <span className="text-sm font-medium truncate">{f.d}</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2 ml-6 sm:ml-0 flex-wrap">
                           {f.flashyTags?.map((t) => (
                             <Badge key={t} variant="secondary" className="text-[10px]">
                               {t}
@@ -130,7 +130,7 @@ export const HallOfFights: React.FC = () => {
                           ))}
                           <Badge
                             variant={isKill ? "destructive" : isKO ? "default" : "outline"}
-                            className="text-xs"
+                            className="text-xs whitespace-nowrap"
                           >
                             {f.winner
                               ? `${f.winner === "A" ? f.a : f.d} — ${f.by}`

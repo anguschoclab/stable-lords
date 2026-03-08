@@ -92,14 +92,14 @@ export default function Dashboard() {
         <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-secondary via-card to-secondary p-8">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5" />
         <div className="relative">
-          <h1 className="text-3xl md:text-4xl font-display font-bold tracking-wide">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold tracking-wide">
             Arena Hub
           </h1>
           <p className="mt-2 text-muted-foreground">
             Welcome back, <span className="text-foreground font-medium">{state.player.name}</span> — 
             Week {state.week}, {state.season}
           </p>
-          <div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
             <StatChip label="Stable" value={state.player.stableName} icon={<Users className="h-4 w-4 text-primary" />} />
             <StatChip label="Fame" value={state.fame} icon={<Flame className="h-4 w-4 text-arena-fame" />} />
             <StatChip label="Popularity" value={state.popularity} icon={<Star className="h-4 w-4 text-arena-pop" />} />

@@ -304,14 +304,12 @@ export default function Orphanage() {
 
             <Card>
               <CardContent className="p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="font-display font-bold">{boutResult.a.name}</span>
-                    <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[boutResult.a.style]}</Badge>
-                    <span className="text-muted-foreground text-sm">vs</span>
-                    <span className="font-display font-bold">{boutResult.d.name}</span>
-                    <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[boutResult.d.style]}</Badge>
-                  </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-display font-bold">{boutResult.a.name}</span>
+                  <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[boutResult.a.style]}</Badge>
+                  <span className="text-muted-foreground text-sm">vs</span>
+                  <span className="font-display font-bold">{boutResult.d.name}</span>
+                  <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[boutResult.d.style]}</Badge>
                 </div>
 
                 <div className="text-center py-4">
