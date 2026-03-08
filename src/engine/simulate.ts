@@ -441,6 +441,23 @@ export function simulateFight(
     const offModsD = getOffensiveTacticMods(tacticsD.offTactic, fD.style);
     const defModsD = getDefensiveTacticMods(tacticsD.defTactic, fD.style);
 
+    // Emit phase-change indicator event
+    if (phase !== lastPhase) {
+      lastPhase = phase;
+      const phaseLabel = phase === "OPENING" ? "Opening" : phase === "MID" ? "Mid-Bout" : "Late Bout";
+      log.push({
+        minute: min,
+        text: `— ${phaseLabel} Phase —`,
+        phase,
+        offTacticA: tacticsA.offTactic !== "none" ? tacticsA.offTactic : undefined,
+        defTacticA: tacticsA.defTactic !== "none" ? tacticsA.defTactic : undefined,
+        offTacticD: tacticsD.offTactic !== "none" ? tacticsD.offTactic : undefined,
+        defTacticD: tacticsD.defTactic !== "none" ? tacticsD.defTactic : undefined,
+        protectA: fA.plan.protect && fA.plan.protect !== "Any" ? fA.plan.protect : undefined,
+        protectD: fD.plan.protect && fD.plan.protect !== "Any" ? fD.plan.protect : undefined,
+      });
+    }
+
     // Fatigue penalties
     const fatA = fatiguePenalty(fA.endurance, fA.maxEndurance);
     const fatD = fatiguePenalty(fD.endurance, fD.maxEndurance);
