@@ -6,7 +6,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "@/state/GameContext";
-import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Attributes } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, BASE_ROSTER_CAP, type Attributes } from "@/types/game";
 import { makeWarrior } from "@/state/gameStore";
 import { DAMAGE_LABELS } from "@/engine/skillCalc";
 import {
