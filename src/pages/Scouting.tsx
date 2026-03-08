@@ -759,9 +759,14 @@ export default function Scouting() {
           )}
         </TabsContent>
 
-        {/* Compare Tab */}
+        {/* Compare Stables Tab */}
         <TabsContent value="compare" className="mt-4">
           <StableComparison rivals={rivals} />
+        </TabsContent>
+
+        {/* Compare Warriors Tab */}
+        <TabsContent value="warriors" className="mt-4">
+          <WarriorComparison rivals={rivals} playerRoster={state.roster} />
         </TabsContent>
       </Tabs>
     </div>
