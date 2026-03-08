@@ -461,6 +461,14 @@ export function simulateFight(
     const defAL = aGoesFirst ? effAL_D : effAL_A;
     const attKD = aGoesFirst ? effKD_A : effKD_D;
 
+    // Resolve per-phase tactic mods for attacker/defender
+    const attTactics = aGoesFirst ? tacticsA : tacticsD;
+    const defTactics = aGoesFirst ? tacticsD : tacticsA;
+    const attOffMods = aGoesFirst ? offModsA : offModsD;
+    const defOffMods = aGoesFirst ? offModsD : offModsA;
+    const attDefMods = aGoesFirst ? defModsA : defModsD;
+    const defDefMods = aGoesFirst ? defModsD : defModsA;
+
     // Narrate initiative swings
     if (ex === 0 || (ex > 0 && rng() < 0.3)) {
       if (aGoesFirst && ex <= 1) {
