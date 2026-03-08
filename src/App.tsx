@@ -13,6 +13,7 @@ import WarriorDetail from "@/pages/WarriorDetail";
 import HallOfFights from "@/lore/HallOfFights";
 import Recruit from "@/pages/Recruit";
 import Graveyard from "@/pages/Graveyard";
+import Training from "@/pages/Training";
 import Trainers from "@/pages/Trainers";
 import Orphanage from "@/pages/Orphanage";
 import StartGame from "@/pages/StartGame";
