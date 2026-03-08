@@ -15,8 +15,11 @@ import {
   type MinuteEvent,
   type BaseSkills,
   type DerivedStats,
+  type TrainerData,
 } from "@/types/game";
 import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
+import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight } from "@/data/equipment";
+import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/modules/trainers";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 function mulberry32(seed: number) {
