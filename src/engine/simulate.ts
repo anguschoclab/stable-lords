@@ -44,21 +44,24 @@ const STYLE_ORDER = [
 ];
 
 // Row = attacker style, Col = defender style
-// BALANCE v2: Capped at ±1, anti-symmetric (A[i][j] = -A[j][i]).
-// Row sums near 0 so no style has massive aggregate advantage.
-// Per compendium: matchups are "edges" not guarantees.
+// BALANCE v3: Lore-accurate matchups from Duelmasters canon:
+// - BA hard-counters TP (bash attacks through parries, overwhelms passive defense)
+// - AB counters TP (endurance conservation + precision finds openings in static defense)
+// - SL/LU beat TP (aggression overwhelms)
+// - TP beats reactive/patient styles (PL, PR, WS — outlasts them)
+// - BA loses to precision/counter styles (AB, PR — can read the charges)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0, +1,  0,  0, -1,  0, +1,  0, -1,  0], // AB: beats BA/SL (predictable), loses to PR/TP
-  [-1,  0, -1,  0,  0, -1, +1, +1,  0, +1], // BA: beats SL/ST/WS (power), loses to AB/LU/PS
-  [ 0, +1,  0, +1,  0, -1, +1,  0, -1, -1], // LU: beats BA/PL/SL (speed), loses to PS/TP/WS
-  [ 0,  0, -1,  0, +1,  0,  0, -1, +1,  0], // PL: beats PR/TP (patience), loses to LU/ST
-  [+1,  0,  0, -1,  0, +1, +1, -1, -1,  0], // PR: beats AB/PS/SL (counter), loses to PL/ST/TP
+  [ 0, +1,  0,  0, -1,  0, +1,  0, +2,  0], // AB: precision destroys TP (endurance+accuracy), beats BA/SL
+  [-1,  0, -1,  0,  0, -1, +1, +1, +2, +1], // BA: hard-counters TP (bash through parry), beats SL/ST/WS
+  [ 0, +1,  0, +1,  0, -1, +1,  0, +1, -1], // LU: aggression beats TP, speed beats BA/PL/SL
+  [ 0,  0, -1,  0, +1,  0,  0, -1, -1,  0], // PL: patience beats PR, but TP outlasts PL
+  [+1,  0,  0, -1,  0, +1, +1, -1, -1,  0], // PR: counter beats AB/PS/SL, TP outlasts PR
   [ 0, +1, +1,  0, -1,  0, +1, -1,  0, -1], // PS: beats BA/LU/SL, loses to PR/ST/WS
-  [-1, -1, -1,  0, -1, -1,  0, +1, +1, +1], // SL: risky (low parry), beats ST/TP/WS (aggression)
-  [ 0, -1,  0, +1, +1, +1, -1,  0, -1, -1], // ST: beats PL/PR/PS (efficiency), loses to BA/TP/WS
-  [+1,  0, +1, -1, +1,  0, -1, +1,  0,  0], // TP: outlasts AB/LU/PR/ST, loses to PL/SL
-  [ 0, -1, +1,  0,  0, +1, -1, +1,  0,  0], // WS: beats LU/PS/ST (zone), loses to BA/SL
+  [-1, -1, -1,  0, -1, -1,  0, +1, +1, +1], // SL: aggression beats TP/ST/WS, risky vs parry styles
+  [ 0, -1,  0, +1, +1, +1, -1,  0,  0, -1], // ST: efficient, beats PL/PR/PS, neutral vs TP
+  [-2, -2, -1, +1, +1,  0, -1,  0,  0, +1], // TP: crushed by BA/AB, outlasts PL/PR, loses to aggression
+  [ 0, -1, +1,  0,  0, +1, -1, +1, -1,  0], // WS: zone control, loses to BA/TP
 ];
 
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
