@@ -22,7 +22,7 @@ export function autoTuneFromBias(plan: FightPlan, bias: Bias): Partial<FightPlan
       tuned.OE = Math.max(plan.OE, 7);
       break;
     case "guard-break":
-      tuned.target = "Arms";
+      tuned.target = "Right Arm";
       tuned.OE = Math.max(plan.OE, 8);
       break;
     default:

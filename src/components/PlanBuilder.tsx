@@ -38,7 +38,8 @@ import {
 import { STYLE_PRESETS, type StylePreset } from "@/engine/stylePresets";
 import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
 
-const BODY_TARGETS: BodyTarget[] = ["Any", "Head", "Chest", "Abdomen", "Arms", "Legs"];
+const ATTACK_TARGETS: AttackTarget[] = ["Any", "Head", "Chest", "Abdomen", "Right Arm", "Left Arm", "Right Leg", "Left Leg"];
+const PROTECT_TARGETS: ProtectTarget[] = ["Any", "Head", "Body", "Arms", "Legs"];
 const OFFENSIVE_TACTICS: OffensiveTactic[] = ["none", "Lunge", "Slash", "Bash", "Decisiveness"];
 const DEFENSIVE_TACTICS: DefensiveTactic[] = ["none", "Dodge", "Parry", "Riposte", "Responsiveness"];
 const BIASES: { value: Bias; label: string }[] = [
