@@ -212,8 +212,15 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
             losses: roster[idx].career.losses + (won ? 0 : 1),
             kills: roster[idx].career.kills + (killed ? 1 : 0),
           },
-          fame: Math.max(0, roster[idx].fame + (won ? 1 : 0)),
+          fame: Math.max(0, roster[idx].fame + (won ? (killed ? 3 : 1) : 0)),
         };
+        // Accumulate stable-level fame on the owner
+        if (won) {
+          updatedRivals[stableIdx].owner = {
+            ...updatedRivals[stableIdx].owner,
+            fame: (updatedRivals[stableIdx].owner.fame ?? 0) + (killed ? 3 : 1),
+          };
+        }
       }
     };
 
