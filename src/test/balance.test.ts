@@ -75,7 +75,8 @@ describe("Style Balance", () => {
           matchupWins[styleA][styleD]++;
         } else if (outcome.winner === "D") {
           styleWins[styleD]++;
-          matchupWins[styleD][styleA]++;
+          // D's win is recorded when the loop runs with D as styleA
+          // Do NOT double-count here into matchupWins[styleD][styleA]
         }
         // draws count as fights but no wins
       }
