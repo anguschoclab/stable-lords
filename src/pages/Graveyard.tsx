@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skull, Armchair, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
+import { WarriorLink } from "@/components/EntityLink";
 
 export default function Graveyard() {
   const { state } = useGame();
