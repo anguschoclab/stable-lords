@@ -144,6 +144,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              title="Toggle theme"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={returnToTitle}
               title="Return to Title Screen"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
