@@ -2,16 +2,17 @@
  * Owner AI — Personality-driven decision-making, roster management,
  * owner rivalries, narrative events, and philosophy evolution.
  *
- * Consumes: Owner personalities, stable philosophies, match results.
+ * Consumes: Owner personalities, stable philosophies, match results, meta drift.
  * Produces: Plan adjustments, gazette events, roster changes, rivalry updates.
  */
 import type {
   GameState, Warrior, RivalStableData, FightPlan, Owner,
-  OwnerPersonality, Season, NewsletterItem,
+  OwnerPersonality, Season, NewsletterItem, MetaAdaptation,
 } from "@/types/game";
 import { FightingStyle } from "@/types/game";
 import { defaultPlanForWarrior } from "./simulate";
 import { computeWarriorStats } from "./skillCalc";
+import { computeMetaDrift, type StyleMeta } from "./metaDrift";
 
 // ─── 1) Personality-Driven Plan Adjustments ───────────────────────────────
 
@@ -34,6 +35,14 @@ const PHILOSOPHY_PLAN_MODS: Record<string, Partial<FightPlan>> = {
   "Cunning":        { OE: -1, AL: 1, killDesire: -1 },
   "Endurance":      { OE: -1, AL: -2, killDesire: -1 },
   "Specialist":     { OE: 0, AL: 1, killDesire: 1 },
+};
+
+/** Flavor quotes for recruitment based on meta adaptation */
+const META_RECRUIT_QUOTES: Record<MetaAdaptation, string> = {
+  MetaChaser: "\"Everyone's using this style — so will we!\"",
+  Traditionalist: "\"We train them our way, always.\"",
+  Opportunist: "\"The right warrior for the right moment.\"",
+  Innovator: "\"They won't see this coming.\"",
 };
 
 function clamp(v: number, lo: number, hi: number): number {
@@ -174,6 +183,7 @@ export function processOwnerGrudges(
 export function processAIRosterManagement(
   state: GameState
 ): { updatedRivals: RivalStableData[]; gazetteItems: string[] } {
+  const meta = computeMetaDrift(state.arenaHistory, 20);
   const gazetteItems: string[] = [];
   const updatedRivals = (state.rivals || []).map(rival => {
     const r = {
@@ -238,11 +248,13 @@ export function processAIRosterManagement(
     const recruitChance = personality === "Aggressive" ? 0.4 : personality === "Pragmatic" ? 0.25 : 0.15;
 
     if (currentActive < minRoster && Math.random() < recruitChance) {
-      const newWarrior = generateAIRecruit(r, state.week);
+      const adaptation = r.owner.metaAdaptation ?? "Opportunist";
+      const newWarrior = generateAIRecruit(r, state.week, meta);
       if (newWarrior) {
         r.roster.push(newWarrior);
+        const adaptQuote = META_RECRUIT_QUOTES[adaptation] ?? "\"A new warrior joins.\"";
         gazetteItems.push(
-          `📢 ${r.owner.stableName} recruits ${newWarrior.name} (${newWarrior.style}) — ${personality === "Aggressive" ? "\"Fresh blood for the arena!\"" : "\"A calculated addition.\""}`
+          `📢 ${r.owner.stableName} recruits ${newWarrior.name} (${newWarrior.style}) — ${adaptQuote}`
         );
       }
     }
@@ -256,11 +268,14 @@ export function processAIRosterManagement(
   return { updatedRivals, gazetteItems };
 }
 
-/** Generate a new warrior matching the stable's philosophy and preferred styles */
-function generateAIRecruit(rival: RivalStableData, week: number): Warrior | null {
+/** Generate a new warrior matching the stable's philosophy, favored styles, and meta awareness */
+function generateAIRecruit(rival: RivalStableData, week: number, meta?: StyleMeta): Warrior | null {
   const philosophy = rival.philosophy ?? "Balanced";
-  const preferredStyles = getPhilosophyStyles(philosophy);
-  const style = preferredStyles[Math.floor(Math.random() * preferredStyles.length)];
+  const adaptation = rival.owner.metaAdaptation ?? "Opportunist";
+  const favoredStyles = rival.owner.favoredStyles ?? [];
+
+  // Pick style based on meta adaptation behavior
+  const style = pickRecruitStyle(adaptation, philosophy, favoredStyles, meta);
 
   const attrs = generateRecruitAttrs(philosophy);
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
@@ -288,6 +303,64 @@ function generateAIRecruit(rival: RivalStableData, week: number): Warrior | null
     age: 17 + Math.floor(Math.random() * 5),
     stableId: rival.owner.id,
   };
+}
+
+/**
+ * Pick a recruit's fighting style based on the owner's meta adaptation type.
+ * - MetaChaser: recruits dominant meta styles
+ * - Traditionalist: always recruits from favored styles, ignores meta
+ * - Opportunist: blends favored styles with meta-rising styles
+ * - Innovator: recruits counter-meta styles (styles that beat what's dominant)
+ */
+function pickRecruitStyle(
+  adaptation: MetaAdaptation,
+  philosophy: string,
+  favoredStyles: FightingStyle[],
+  meta?: StyleMeta,
+): FightingStyle {
+  const philosophyStyles = getPhilosophyStyles(philosophy);
+  const allStyles = Object.values(FightingStyle);
+
+  switch (adaptation) {
+    case "Traditionalist": {
+      // Always pick from favored styles, never deviate
+      const pool = favoredStyles.length > 0 ? favoredStyles : philosophyStyles;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    case "MetaChaser": {
+      // Pick from the top-performing styles in the meta
+      if (meta) {
+        const sorted = allStyles.slice().sort((a, b) => (meta[b] ?? 0) - (meta[a] ?? 0));
+        const top = sorted.slice(0, 3);
+        return top[Math.floor(Math.random() * top.length)];
+      }
+      return philosophyStyles[Math.floor(Math.random() * philosophyStyles.length)];
+    }
+    case "Innovator": {
+      // Counter-meta: pick styles that are currently weak (opponents won't expect them)
+      // or styles that naturally counter the dominant ones
+      if (meta) {
+        const sorted = allStyles.slice().sort((a, b) => (meta[a] ?? 0) - (meta[b] ?? 0));
+        const underdogs = sorted.slice(0, 4);
+        return underdogs[Math.floor(Math.random() * underdogs.length)];
+      }
+      // Without meta data, innovate from non-philosophy styles
+      const nonStandard = allStyles.filter(s => !philosophyStyles.includes(s));
+      return nonStandard.length > 0
+        ? nonStandard[Math.floor(Math.random() * nonStandard.length)]
+        : philosophyStyles[Math.floor(Math.random() * philosophyStyles.length)];
+    }
+    case "Opportunist":
+    default: {
+      // 50/50 blend: half the time pick from favored, half from meta-rising
+      if (meta && Math.random() < 0.5) {
+        const rising = allStyles.filter(s => (meta[s] ?? 0) >= 2);
+        if (rising.length > 0) return rising[Math.floor(Math.random() * rising.length)];
+      }
+      const pool = favoredStyles.length > 0 ? favoredStyles : philosophyStyles;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
 }
 
 function getPhilosophyStyles(philosophy: string): FightingStyle[] {
@@ -470,8 +543,14 @@ export function evolvePhilosophies(
 
   const gazetteItems: string[] = [];
   const recentFights = state.arenaHistory.filter(f => f.week >= state.week - 13);
+  const meta = computeMetaDrift(state.arenaHistory, 20);
 
   const updatedRivals = (state.rivals || []).map(rival => {
+    const adaptation = rival.owner.metaAdaptation ?? "Opportunist";
+
+    // Traditionalists NEVER change philosophy
+    if (adaptation === "Traditionalist") return rival;
+
     const names = new Set(rival.roster.map(w => w.name));
     const wins = recentFights.filter(f =>
       (names.has(f.a) && f.winner === "A") || (names.has(f.d) && f.winner === "D")
@@ -487,11 +566,26 @@ export function evolvePhilosophies(
     const currentPhilosophy = rival.philosophy ?? "Balanced";
     const driftOptions = PHILOSOPHY_DRIFT[currentPhilosophy] ?? ["Balanced"];
 
-    // Only drift if losing badly (< 35% win rate), 30% chance
-    if (winRate < 0.35 && Math.random() < 0.3) {
-      const newPhilosophy = driftOptions[Math.floor(Math.random() * driftOptions.length)];
+    // Drift thresholds vary by adaptation type
+    const driftThreshold = adaptation === "MetaChaser" ? 0.45 : adaptation === "Innovator" ? 0.40 : 0.35;
+    const driftChance = adaptation === "MetaChaser" ? 0.5 : adaptation === "Innovator" ? 0.35 : 0.3;
+
+    if (winRate < driftThreshold && Math.random() < driftChance) {
+      let newPhilosophy: string;
+
+      if (adaptation === "MetaChaser") {
+        // Chase whatever philosophy aligns with the dominant meta style
+        newPhilosophy = pickMetaAlignedPhilosophy(meta) ?? driftOptions[Math.floor(Math.random() * driftOptions.length)];
+      } else if (adaptation === "Innovator") {
+        // Pick a philosophy that counters the meta
+        newPhilosophy = pickCounterMetaPhilosophy(meta) ?? driftOptions[Math.floor(Math.random() * driftOptions.length)];
+      } else {
+        newPhilosophy = driftOptions[Math.floor(Math.random() * driftOptions.length)];
+      }
+
+      const adaptLabel = adaptation === "MetaChaser" ? "chasing the meta" : adaptation === "Innovator" ? "innovating against the meta" : "seeking a new path";
       gazetteItems.push(
-        `🔄 ${rival.owner.stableName} shifts strategy from ${currentPhilosophy} to ${newPhilosophy} — "${rival.owner.name} seeks a new path after a losing ${state.season}."`
+        `🔄 ${rival.owner.stableName} shifts from ${currentPhilosophy} to ${newPhilosophy} — ${rival.owner.name} is ${adaptLabel} after a losing ${state.season}.`
       );
       return { ...rival, philosophy: newPhilosophy };
     }
@@ -500,4 +594,45 @@ export function evolvePhilosophies(
   });
 
   return { updatedRivals, gazetteItems };
+}
+
+/** Find the philosophy that best aligns with the current dominant meta styles */
+function pickMetaAlignedPhilosophy(meta: StyleMeta): string | null {
+  const philosophyStyleMap: Record<string, FightingStyle[]> = {
+    "Brute Force": [FightingStyle.BashingAttack, FightingStyle.StrikingAttack, FightingStyle.LungingAttack],
+    "Speed Kills": [FightingStyle.LungingAttack, FightingStyle.SlashingAttack, FightingStyle.AimedBlow],
+    "Iron Defense": [FightingStyle.TotalParry, FightingStyle.WallOfSteel, FightingStyle.ParryStrike],
+    "Spectacle": [FightingStyle.SlashingAttack, FightingStyle.ParryRiposte, FightingStyle.LungingAttack],
+    "Cunning": [FightingStyle.ParryRiposte, FightingStyle.AimedBlow, FightingStyle.ParryLunge],
+    "Endurance": [FightingStyle.WallOfSteel, FightingStyle.TotalParry, FightingStyle.ParryStrike],
+  };
+
+  let best: string | null = null;
+  let bestScore = -Infinity;
+  for (const [phil, styles] of Object.entries(philosophyStyleMap)) {
+    const score = styles.reduce((sum, s) => sum + (meta[s] ?? 0), 0);
+    if (score > bestScore) { bestScore = score; best = phil; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
+/** Find a philosophy that counters the current meta (styles that are declining = opponents not prepared) */
+function pickCounterMetaPhilosophy(meta: StyleMeta): string | null {
+  const philosophyStyleMap: Record<string, FightingStyle[]> = {
+    "Brute Force": [FightingStyle.BashingAttack, FightingStyle.StrikingAttack, FightingStyle.LungingAttack],
+    "Speed Kills": [FightingStyle.LungingAttack, FightingStyle.SlashingAttack, FightingStyle.AimedBlow],
+    "Iron Defense": [FightingStyle.TotalParry, FightingStyle.WallOfSteel, FightingStyle.ParryStrike],
+    "Spectacle": [FightingStyle.SlashingAttack, FightingStyle.ParryRiposte, FightingStyle.LungingAttack],
+    "Cunning": [FightingStyle.ParryRiposte, FightingStyle.AimedBlow, FightingStyle.ParryLunge],
+    "Endurance": [FightingStyle.WallOfSteel, FightingStyle.TotalParry, FightingStyle.ParryStrike],
+  };
+
+  // Pick the philosophy whose styles are least popular (counter-pick)
+  let best: string | null = null;
+  let bestScore = Infinity;
+  for (const [phil, styles] of Object.entries(philosophyStyleMap)) {
+    const score = styles.reduce((sum, s) => sum + (meta[s] ?? 0), 0);
+    if (score < bestScore) { bestScore = score; best = phil; }
+  }
+  return best;
 }

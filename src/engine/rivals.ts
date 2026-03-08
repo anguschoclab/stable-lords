@@ -9,7 +9,7 @@
  * Each stable has a unique identity: name, motto, origin, owner personality,
  * coaching philosophy, preferred styles, attribute bias, and themed warrior names.
  */
-import { FightingStyle, type Warrior, type Owner, type OwnerPersonality } from "@/types/game";
+import { FightingStyle, type Warrior, type Owner, type OwnerPersonality, type MetaAdaptation } from "@/types/game";
 import { computeWarriorStats } from "./skillCalc";
 
 // ─── Stable Template ──────────────────────────────────────────────────────
@@ -28,6 +28,8 @@ export interface StableTemplate {
   rosterRange: [number, number];
   tier: "Minor" | "Established" | "Major" | "Legendary";
   trainerRange: [number, number];
+  /** How this owner reacts to meta shifts */
+  metaAdaptation: MetaAdaptation;
 }
 
 // ─── 24 Stable Templates ─────────────────────────────────────────────────
@@ -48,6 +50,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [8, 12],
     tier: "Legendary",
     trainerRange: [4, 5],
+    metaAdaptation: "Traditionalist", // Ancient house, sticks to proven methods
   },
 
   // ═══ MAJOR (5) ═══
@@ -65,6 +68,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [8, 11],
     tier: "Major",
     trainerRange: [3, 5],
+    metaAdaptation: "Traditionalist", // Stubbornly brute force
   },
   {
     stableName: "House of Blades",
@@ -80,6 +84,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [8, 11],
     tier: "Major",
     trainerRange: [3, 5],
+    metaAdaptation: "Innovator", // Always seeking new techniques
   },
   {
     stableName: "The Blood Ravens",
@@ -95,6 +100,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [8, 11],
     tier: "Major",
     trainerRange: [3, 4],
+    metaAdaptation: "MetaChaser", // Chases whatever kills best
   },
   {
     stableName: "Crimson Tide",
@@ -110,6 +116,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [8, 11],
     tier: "Major",
     trainerRange: [3, 5],
+    metaAdaptation: "Opportunist", // Flexible, reads the room
   },
   {
     stableName: "The Warlords",
@@ -125,6 +132,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [8, 11],
     tier: "Major",
     trainerRange: [3, 5],
+    metaAdaptation: "MetaChaser", // Military intelligence — adapts to what works
   },
 
   // ═══ ESTABLISHED (9) ═══
@@ -142,6 +150,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "Opportunist", // Follows the crowd's taste
   },
   {
     stableName: "Steel Serpents",
@@ -157,6 +166,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "Innovator", // Counter-meta specialists
   },
   {
     stableName: "Ash Reapers",
@@ -172,6 +182,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "Traditionalist", // Stubborn survivors
   },
   {
     stableName: "Storm Breakers",
@@ -187,6 +198,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [2, 4],
+    metaAdaptation: "MetaChaser", // Aggressive trend followers
   },
   {
     stableName: "The Night Watch",
@@ -202,6 +214,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "Traditionalist", // Disciplined, never changes
   },
   {
     stableName: "Thunder Guard",
@@ -217,6 +230,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "Opportunist", // Pragmatic, will shift if needed
   },
   {
     stableName: "The Bone Crushers",
@@ -232,6 +246,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [2, 4],
+    metaAdaptation: "Traditionalist", // Only knows brute force
   },
   {
     stableName: "Scarlet Masquerade",
@@ -247,6 +262,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "Innovator", // Always reinventing their act
   },
   {
     stableName: "Blackwater Company",
@@ -262,6 +278,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
+    metaAdaptation: "MetaChaser", // Follows the money / what wins
   },
 
   // ═══ MINOR (8) ═══
@@ -279,6 +296,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Opportunist", // Former champion reads the field
   },
   {
     stableName: "Dawn Hammers",
@@ -294,6 +312,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Traditionalist", // Zealots never change
   },
   {
     stableName: "Shadow Company",
@@ -309,6 +328,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Innovator", // Assassins adapt and counter
   },
   {
     stableName: "Frost Giants",
@@ -324,6 +344,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Traditionalist", // Big and stubborn
   },
   {
     stableName: "Red Dust Wanderers",
@@ -339,6 +360,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Traditionalist", // Nomads stick to their ways
   },
   {
     stableName: "The Hollow Men",
@@ -354,6 +376,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "MetaChaser", // Desperate — will try anything that works
   },
   {
     stableName: "Gilded Thorns",
@@ -369,6 +392,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Innovator", // Artistic experimentation
   },
   {
     stableName: "Ironback Syndicate",
@@ -384,6 +408,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
+    metaAdaptation: "Opportunist", // Crime boss follows the money
   },
 ];
 
@@ -559,6 +584,8 @@ export function generateRivalStables(count: number, seed: number): RivalStable[]
       renown: tmpl.tier === "Legendary" ? 5 : tmpl.tier === "Major" ? 2 : 0,
       titles: tmpl.tier === "Legendary" ? 2 + Math.floor(rng() * 3) : tmpl.tier === "Major" ? Math.floor(rng() * 3) : 0,
       personality: tmpl.personality,
+      metaAdaptation: tmpl.metaAdaptation,
+      favoredStyles: tmpl.preferredStyles,
     };
 
     // Generate warriors — target ~10 per stable

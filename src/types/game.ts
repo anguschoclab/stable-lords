@@ -252,6 +252,9 @@ export interface Warrior {
 
 export type OwnerPersonality = "Aggressive" | "Methodical" | "Showman" | "Pragmatic" | "Tactician";
 
+/** How an owner adapts to the meta — affects recruitment and strategy drift */
+export type MetaAdaptation = "MetaChaser" | "Traditionalist" | "Opportunist" | "Innovator";
+
 export interface Owner {
   id: string;
   name: string;
@@ -260,6 +263,10 @@ export interface Owner {
   renown: number;
   titles: number;
   personality?: OwnerPersonality;
+  /** How this owner responds to meta shifts */
+  metaAdaptation?: MetaAdaptation;
+  /** Styles this owner personally favors regardless of meta */
+  favoredStyles?: FightingStyle[];
 }
 
 // ─── Fight Results ──────────────────────────────────────────────────────────
