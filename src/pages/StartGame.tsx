@@ -146,22 +146,48 @@ export default function StartGame() {
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Your Name</label>
-                  <Input
-                    placeholder="Enter your name"
-                    value={ownerName}
-                    onChange={(e) => setOwnerName(e.target.value)}
-                    maxLength={24}
-                    autoFocus
-                  />
+                  <div className="flex gap-1.5">
+                    <Input
+                      placeholder="Enter your name"
+                      value={ownerName}
+                      onChange={(e) => setOwnerName(e.target.value)}
+                      maxLength={24}
+                      autoFocus
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      type="button"
+                      onClick={() => setOwnerName(randomOwnerName())}
+                      title="Random name"
+                      className="shrink-0"
+                    >
+                      <Dices className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Stable Name</label>
-                  <Input
-                    placeholder="e.g. The Iron Wolves, House of Blades"
-                    value={stableName}
-                    onChange={(e) => setStableName(e.target.value)}
-                    maxLength={30}
-                  />
+                  <div className="flex gap-1.5">
+                    <Input
+                      placeholder="e.g. The Iron Wolves, House of Blades"
+                      value={stableName}
+                      onChange={(e) => setStableName(e.target.value)}
+                      maxLength={30}
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      type="button"
+                      onClick={() => setStableName(randomStableName())}
+                      title="Random name"
+                      className="shrink-0"
+                    >
+                      <Dices className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 

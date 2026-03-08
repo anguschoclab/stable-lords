@@ -138,13 +138,25 @@ export default function WarriorBuilder({
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
                 <Label>Warrior Name</Label>
-                <Input
-                  placeholder="Enter name (2+ characters)"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={20}
-                  className="font-mono uppercase"
-                />
+                <div className="flex gap-1.5">
+                  <Input
+                    placeholder="Enter name (2+ characters)"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    maxLength={20}
+                    className="font-mono uppercase flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    type="button"
+                    onClick={() => setName(randomWarriorName())}
+                    title="Random name"
+                    className="shrink-0"
+                  >
+                    <Dices className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Fighting Style</Label>
