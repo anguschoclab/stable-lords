@@ -105,7 +105,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Right: Status + Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Auto-save indicator */}
+            {lastSavedAt && (
+              <div
+                className={cn(
+                  "hidden sm:flex items-center gap-1 text-[10px] font-mono transition-colors duration-500",
+                  saveFlash ? "text-arena-pop" : "text-muted-foreground/50"
+                )}
+                title={`Last saved: ${new Date(lastSavedAt).toLocaleString()}`}
+              >
+                <Save className={cn("h-3 w-3 transition-transform duration-300", saveFlash && "scale-110")} />
+                <span>{formatSaveTime(lastSavedAt)}</span>
+              </div>
+            )}
             <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 hidden sm:flex">
               {moodIcon} Wk {state.week} · {state.season}
             </Badge>
