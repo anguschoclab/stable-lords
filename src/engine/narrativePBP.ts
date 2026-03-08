@@ -50,7 +50,8 @@ export function richHitLocation(rng: RNG, location: string): string {
 
 export function getWeaponDisplayName(equipId?: string): string {
   if (!equipId || equipId === "fists" || equipId === "none") return "OPEN HAND";
-  const item = getItemById(equipId);
+  // Try by ID first, then by canonical code (e.g. "BS" → "Broadsword")
+  const item = getItemById(equipId) ?? getItemByCode(equipId);
   return item?.name?.toUpperCase() ?? "WEAPON";
 }
 
