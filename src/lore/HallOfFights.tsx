@@ -166,9 +166,9 @@ export const HallOfFights: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-sm">
-                      <span className="font-medium">{f.a}</span>
+                      <WarriorLink name={f.a} className="font-medium" />
                       {" vs "}
-                      <span className="font-medium">{f.d}</span>
+                      <WarriorLink name={f.d} className="font-medium" />
                       {f.by && ` — ${f.winner === "A" ? f.a : f.d} by ${f.by}`}
                     </div>
                     {f.flashyTags && f.flashyTags.length > 0 && (

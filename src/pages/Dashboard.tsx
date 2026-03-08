@@ -592,7 +592,7 @@ function RivalsWidget() {
                         {won ? "W" : f.winner ? "L" : "D"}
                       </Badge>
                       <span className="text-[11px] truncate">
-                        {playerIsA ? f.a : f.d} vs {playerIsA ? f.d : f.a}
+                        <WarriorLink name={playerIsA ? f.a : f.d} /> vs <WarriorLink name={playerIsA ? f.d : f.a} />
                       </span>
                     </div>
                   );

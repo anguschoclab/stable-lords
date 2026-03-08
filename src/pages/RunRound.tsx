@@ -450,8 +450,10 @@ export default function RunRound() {
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground text-xs">Fame {mp.rivalWarrior.fame}</span>
                     <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[mp.rivalWarrior.style]}</Badge>
-                    <span className="font-semibold">{mp.rivalWarrior.name}</span>
-                    <span className="text-xs text-muted-foreground">({mp.rivalStable.owner.stableName})</span>
+                    <WarriorLink name={mp.rivalWarrior.name} id={mp.rivalWarrior.id} className="font-semibold" />
+                    <StableLink name={mp.rivalStable.owner.stableName} className="text-xs text-muted-foreground">
+                      ({mp.rivalStable.owner.stableName})
+                    </StableLink>
                   </div>
                 </div>
               ))}

@@ -87,7 +87,7 @@ export default function Graveyard() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-display font-semibold text-foreground">{w.name}</span>
+                      <WarriorLink name={w.name} id={w.id} className="font-display font-semibold text-foreground" />
                       <span className="text-sm text-muted-foreground ml-2">
                         {STYLE_DISPLAY_NAMES[w.style]}
                       </span>
