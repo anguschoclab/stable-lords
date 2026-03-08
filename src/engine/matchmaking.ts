@@ -187,8 +187,16 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
   const rivalries = state.rivalries || [];
 
   for (const { a, d } of boutPairs) {
-    const planA = a.warrior.plan ?? defaultPlanForWarrior(a.warrior);
-    const planD = d.warrior.plan ?? defaultPlanForWarrior(d.warrior);
+    // Use personality-driven plans for AI warriors
+    const stableA = rivals.find((_, idx) => idx === a.stableIdx);
+    const stableD = rivals.find((_, idx) => idx === d.stableIdx);
+    const persA = stableA?.owner?.personality ?? "Pragmatic";
+    const philA = stableA?.philosophy ?? "Balanced";
+    const persD = stableD?.owner?.personality ?? "Pragmatic";
+    const philD = stableD?.philosophy ?? "Balanced";
+
+    const planA = a.warrior.plan ?? aiPlanForWarrior(a.warrior, persA, philA);
+    const planD = d.warrior.plan ?? aiPlanForWarrior(d.warrior, persD, philD);
     const outcome = simulateFight(planA, planD, a.warrior, d.warrior);
 
     const isKill = outcome.by === "Kill";
