@@ -15,8 +15,11 @@ import {
   type MinuteEvent,
   type BaseSkills,
   type DerivedStats,
+  type TrainerData,
 } from "@/types/game";
 import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
+import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight } from "@/data/equipment";
+import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/modules/trainers";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 function mulberry32(seed: number) {
@@ -194,6 +197,62 @@ function computeHitDamage(rng: () => number, damageClass: number, location: HitL
   return Math.max(1, Math.round(base * locMult * variance));
 }
 
+// ─── Equipment Bonuses ────────────────────────────────────────────────────
+function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
+  const weapon = getItemById(loadout.weapon);
+  const armor = getItemById(loadout.armor);
+  const shield = getItemById(loadout.shield);
+  const helm = getItemById(loadout.helm);
+  const totalWeight = getLoadoutWeight(loadout);
+  const overEncumbered = totalWeight > carryCap;
+
+  let attMod = 0, parMod = 0, defMod = 0, iniMod = 0, dmgMod = 0, endMod = 0;
+
+  // Shield bonuses
+  if (shield?.id === "buckler") { parMod += 1; }
+  if (shield?.id === "small_shield") { parMod += 1; defMod += 1; }
+  if (shield?.id === "medium_shield") { defMod += 2; }
+  if (shield?.id === "large_shield") { defMod += 3; attMod -= 1; }
+
+  // Heavy weapons boost damage
+  if (weapon && weapon.weight >= 5) { dmgMod += 1; }
+  if (weapon && weapon.weight >= 7) { dmgMod += 1; }
+
+  // Light weapons boost initiative
+  if (weapon && weapon.weight <= 2) { iniMod += 1; }
+
+  // Armor reduces incoming damage (applied elsewhere) but costs endurance
+  if (armor && armor.weight >= 4) { endMod -= 1; }
+  if (armor && armor.weight >= 6) { endMod -= 2; }
+
+  // Full helm reduces INI
+  if (helm?.id === "full_helm") { iniMod -= 1; }
+
+  // Over-encumbered penalty
+  if (overEncumbered) {
+    const excess = totalWeight - carryCap;
+    iniMod -= Math.min(4, excess);
+    defMod -= Math.min(2, Math.floor(excess / 2));
+    endMod -= Math.min(3, excess);
+  }
+
+  return { attMod, parMod, defMod, iniMod, dmgMod, endMod };
+}
+
+// ─── Trainer Bonuses ──────────────────────────────────────────────────────
+function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
+  const bonus = getTrainingBonus(trainers as any, style);
+  return {
+    attMod: bonus.Aggression,                  // Aggression → ATT
+    parMod: Math.floor(bonus.Defense * 0.6),   // Defense → PAR
+    defMod: Math.floor(bonus.Defense * 0.4),   // Defense → DEF
+    iniMod: Math.floor(bonus.Mind * 0.6),      // Mind → INI
+    decMod: Math.floor(bonus.Mind * 0.4),      // Mind → DEC
+    endMod: bonus.Endurance * 2,               // Endurance → flat endurance
+    healMod: bonus.Healing,                    // Healing → reduces kill chance
+  };
+}
+
 // ─── Default Plan ─────────────────────────────────────────────────────────
 export function defaultPlanForWarrior(w: Warrior): FightPlan {
   // Style-aware defaults from spec
@@ -225,7 +284,8 @@ export function simulateFight(
   planD: FightPlan,
   warriorA?: Warrior,
   warriorD?: Warrior,
-  seed?: number
+  seed?: number,
+  trainers?: TrainerData[]
 ): FightOutcome {
   const rng = mulberry32(seed ?? (Date.now() ^ Math.floor(Math.random() * 1e9)));
 
@@ -248,17 +308,45 @@ export function simulateFight(
   const matchupA = getMatchupBonus(planA.style, planD.style);
   const matchupD = getMatchupBonus(planD.style, planA.style);
 
+  // Equipment bonuses
+  const equipA = getEquipmentMods(warriorA?.equipment ?? DEFAULT_LOADOUT, derivedA.encumbrance);
+  const equipD = getEquipmentMods(warriorD?.equipment ?? DEFAULT_LOADOUT, derivedD.encumbrance);
+
+  // Trainer bonuses (shared stable trainers apply to both player warriors)
+  const trainerModsA = trainers ? getTrainerMods(trainers, planA.style) : null;
+  const trainerModsD = trainers ? getTrainerMods(trainers, planD.style) : null;
+
+  // Apply bonuses to effective skills
+  const effSkillsA: BaseSkills = {
+    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0),
+    PAR: skillsA.PAR + equipA.parMod + (trainerModsA?.parMod ?? 0),
+    DEF: skillsA.DEF + equipA.defMod + (trainerModsA?.defMod ?? 0),
+    INI: skillsA.INI + equipA.iniMod + (trainerModsA?.iniMod ?? 0),
+    RIP: skillsA.RIP,
+    DEC: skillsA.DEC + (trainerModsA?.decMod ?? 0),
+  };
+  const effSkillsD: BaseSkills = {
+    ATT: skillsD.ATT + equipD.attMod + (trainerModsD?.attMod ?? 0),
+    PAR: skillsD.PAR + equipD.parMod + (trainerModsD?.parMod ?? 0),
+    DEF: skillsD.DEF + equipD.defMod + (trainerModsD?.defMod ?? 0),
+    INI: skillsD.INI + equipD.iniMod + (trainerModsD?.iniMod ?? 0),
+    RIP: skillsD.RIP,
+    DEC: skillsD.DEC + (trainerModsD?.decMod ?? 0),
+  };
+
   // Fighter state
   const fA: FighterState = {
-    label: "A", style: planA.style, skills: skillsA, derived: derivedA, plan: planA,
+    label: "A", style: planA.style, skills: effSkillsA, derived: { ...derivedA, damage: derivedA.damage + equipA.dmgMod }, plan: planA,
     hp: derivedA.hp, maxHp: derivedA.hp,
-    endurance: derivedA.endurance, maxEndurance: derivedA.endurance,
+    endurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
+    maxEndurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
     hitsLanded: 0, hitsTaken: 0, ripostes: 0,
   };
   const fD: FighterState = {
-    label: "D", style: planD.style, skills: skillsD, derived: derivedD, plan: planD,
+    label: "D", style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
     hp: derivedD.hp, maxHp: derivedD.hp,
-    endurance: derivedD.endurance, maxEndurance: derivedD.endurance,
+    endurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
+    maxEndurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
     hitsLanded: 0, hitsTaken: 0, ripostes: 0,
   };
 
@@ -399,7 +487,8 @@ export function simulateFight(
             if (decSuccess) {
               // Kill window — attempt execution
               const killRoll = rng();
-              const killThreshold = 0.3 + (attacker.plan.killDesire ?? 5) * 0.04 + (phase === "LATE" ? 0.15 : 0);
+              const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * 0.03 : (trainerModsD?.healMod ?? 0) * 0.03;
+              const killThreshold = Math.max(0.05, 0.3 + (attacker.plan.killDesire ?? 5) * 0.04 + (phase === "LATE" ? 0.15 : 0) - healingReduction);
 
               if (killRoll < killThreshold) {
                 // KILL
