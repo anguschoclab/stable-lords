@@ -128,7 +128,7 @@ function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType): strin
 }
 
 /** Compute current win streaks from fight history */
-function computeStreaks(allFights: FightSummary[]): Map<string, number> {
+export function computeStreaks(allFights: FightSummary[]): Map<string, number> {
   const streaks = new Map<string, number>();
   const sorted = [...allFights].sort((a, b) => a.week - b.week);
   for (const f of sorted) {
@@ -144,6 +144,27 @@ function computeStreaks(allFights: FightSummary[]): Map<string, number> {
     }
   }
   return streaks;
+}
+
+/** Detect if any fight this week involves warriors who have faced each other 3+ times */
+function detectRivalryMatchup(
+  weekFights: FightSummary[],
+  allFights: FightSummary[]
+): { a: string; b: string; count: number } | null {
+  const pairCounts = new Map<string, number>();
+  for (const f of allFights) {
+    const key = [f.a, f.d].sort().join("||");
+    pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
+  }
+  let best: { a: string; b: string; count: number } | null = null;
+  for (const f of weekFights) {
+    const key = [f.a, f.d].sort().join("||");
+    const count = pairCounts.get(key) ?? 0;
+    if (count >= 3 && (!best || count > best.count)) {
+      best = { a: f.a, b: f.d, count };
+    }
+  }
+  return best;
 }
 
 export function generateWeeklyGazette(
@@ -174,6 +195,10 @@ export function generateWeeklyGazette(
   }
   if (hotStreakers.length > 0) tags.push("Hot Streak");
 
+  // Detect rivalries — pairs who have fought 3+ times across all history
+  const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
+  if (rivalryPair) tags.push("Rivalry");
+
   // Headline — streak headlines take priority over standard ones
   let headline: string;
   if (hotStreakers.length > 0) {
@@ -184,6 +209,12 @@ export function generateWeeklyGazette(
       headline = `Week ${week}: ${top.name} Is On Fire — ${top.streak} Consecutive Victories!`;
     } else {
       headline = `Week ${week}: ${top.name} Rides a ${top.streak}-Win Streak Into Glory!`;
+    }
+  } else if (rivalryPair) {
+    if (rivalryPair.count >= 5) {
+      headline = `Week ${week}: RIVALRY ERUPTS! ${rivalryPair.a} vs ${rivalryPair.b} — Chapter ${rivalryPair.count}!`;
+    } else {
+      headline = `Week ${week}: Old Foes Meet Again — ${rivalryPair.a} vs ${rivalryPair.b} (Bout ${rivalryPair.count})`;
     }
   } else if (kills.length >= 2) {
     headline = `Week ${week}: Blood Runs Deep — ${kills.length} Warriors Fall!`;
@@ -228,6 +259,15 @@ export function generateWeeklyGazette(
       paragraphs.push(`${s.name} continues an incredible run of form with ${s.streak} consecutive victories. Can anyone stop this warrior?`);
     } else {
       paragraphs.push(`${s.name} is building momentum with ${s.streak} wins in a row — a warrior to watch closely.`);
+    }
+  }
+
+  // Rivalry narrative
+  if (rivalryPair) {
+    if (rivalryPair.count >= 5) {
+      paragraphs.push(`The bitter feud between ${rivalryPair.a} and ${rivalryPair.b} continues to captivate the arena! This marks their ${rivalryPair.count}th meeting — a rivalry for the ages.`);
+    } else {
+      paragraphs.push(`${rivalryPair.a} and ${rivalryPair.b} crossed blades for the ${rivalryPair.count}${rivalryPair.count === 3 ? "rd" : "th"} time. The crowd senses a budding rivalry.`);
     }
   }
 

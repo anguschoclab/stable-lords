@@ -12,6 +12,7 @@ import TagBadge from "@/components/TagBadge";
 import PlanBuilder from "@/components/PlanBuilder";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
 import { defaultPlanForWarrior } from "@/engine/simulate";
+import { computeStreaks } from "@/engine/gazetteNarrative";
 import { DAMAGE_LABELS } from "@/engine/skillCalc";
 import { retireWarrior } from "@/state/gameStore";
 import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";
@@ -252,6 +253,15 @@ export default function WarriorDetail() {
 
   const record = `${warrior.career.wins}W - ${warrior.career.losses}L - ${warrior.career.kills}K`;
 
+  // Compute current streak
+  const streakMap = computeStreaks(state.arenaHistory);
+  const streakVal = streakMap.get(warrior.name) ?? 0;
+  const streakLabel = streakVal > 0
+    ? `🔥 ${streakVal}W streak`
+    : streakVal < 0
+    ? `${Math.abs(streakVal)}L streak`
+    : null;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -279,7 +289,17 @@ export default function WarriorDetail() {
             <p className="text-lg text-muted-foreground font-display">
               {STYLE_DISPLAY_NAMES[warrior.style]}
             </p>
-            <p className="font-mono text-sm text-muted-foreground mt-1">{record}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="font-mono text-sm text-muted-foreground">{record}</p>
+              {streakLabel && (
+                <Badge
+                  variant={streakVal > 0 ? "default" : "destructive"}
+                  className={`text-xs gap-1 ${streakVal > 0 ? "bg-arena-gold text-black" : ""}`}
+                >
+                  {streakLabel}
+                </Badge>
+              )}
+            </div>
             {warrior.age && (
               <p className="text-xs text-muted-foreground mt-1">Age: {warrior.age} · XP: {(warrior as any).xp ?? 0}</p>
             )}
