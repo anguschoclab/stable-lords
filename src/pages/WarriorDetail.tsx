@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "@/state/GameContext";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightPlan, type FightSummary } from "@/types/game";
@@ -131,6 +131,29 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const fights = arenaHistory.filter((f) => f.a === warriorName || f.d === warriorName);
 
+  // Compute head-to-head records per opponent
+  const h2h = useMemo(() => {
+    const map = new Map<string, { wins: number; losses: number; draws: number; kills: number; deaths: number }>();
+    for (const f of fights) {
+      const isA = f.a === warriorName;
+      const opponent = isA ? f.d : f.a;
+      if (!map.has(opponent)) map.set(opponent, { wins: 0, losses: 0, draws: 0, kills: 0, deaths: 0 });
+      const rec = map.get(opponent)!;
+      const won = (isA && f.winner === "A") || (!isA && f.winner === "D");
+      const lost = (isA && f.winner === "D") || (!isA && f.winner === "A");
+      if (won) {
+        rec.wins++;
+        if (f.by === "Kill") rec.kills++;
+      } else if (lost) {
+        rec.losses++;
+        if (f.by === "Kill") rec.deaths++;
+      } else {
+        rec.draws++;
+      }
+    }
+    return map;
+  }, [fights, warriorName]);
+
   if (fights.length === 0) {
     return (
       <Card>
@@ -151,6 +174,8 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
         const won = (isA && f.winner === "A") || (!isA && f.winner === "D");
         const isExpanded = expandedId === f.id;
         const hasTranscript = f.transcript && f.transcript.length > 0;
+        const opponent = isA ? f.d : f.a;
+        const record = h2h.get(opponent);
 
         return (
           <div key={f.id}>
@@ -168,8 +193,14 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
                   {won ? "W" : f.winner ? "L" : "D"}
                 </Badge>
                 <span className="text-sm">
-                  vs <span className="font-medium">{isA ? f.d : f.a}</span>
+                  vs <span className="font-medium">{opponent}</span>
                 </span>
+                {record && (record.wins + record.losses + record.draws) >= 2 && (
+                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+                    H2H: {record.wins}-{record.losses}{record.draws > 0 ? `-${record.draws}` : ""}
+                    {record.kills > 0 && <span className="text-destructive ml-1">☠{record.kills}</span>}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {f.by && <Badge variant="outline" className="text-xs">{f.by}</Badge>}

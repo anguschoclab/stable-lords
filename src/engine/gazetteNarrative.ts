@@ -199,6 +199,22 @@ export function generateWeeklyGazette(
   const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
   if (rivalryPair) tags.push("Rivalry");
 
+  // Detect rising stars — warriors whose total career is exactly 3 wins, 0 losses
+  const risingStars: string[] = [];
+  if (allFights) {
+    for (const f of fights) {
+      if (!f.winner) continue;
+      const winnerName = f.winner === "A" ? f.a : f.d;
+      const allByWarrior = allFights.filter(af => af.a === winnerName || af.d === winnerName);
+      if (allByWarrior.length !== 3) continue;
+      const allWins = allByWarrior.every(af =>
+        (af.a === winnerName && af.winner === "A") || (af.d === winnerName && af.winner === "D")
+      );
+      if (allWins) risingStars.push(winnerName);
+    }
+  }
+  if (risingStars.length > 0) tags.push("Rising Star");
+
   // Headline — streak headlines take priority over standard ones
   let headline: string;
   if (hotStreakers.length > 0) {
@@ -216,6 +232,8 @@ export function generateWeeklyGazette(
     } else {
       headline = `Week ${week}: Old Foes Meet Again — ${rivalryPair.a} vs ${rivalryPair.b} (Bout ${rivalryPair.count})`;
     }
+  } else if (risingStars.length > 0) {
+    headline = `Week ${week}: RISING STAR! ${risingStars[0]} Opens Career with a Perfect 3-0!`;
   } else if (kills.length >= 2) {
     headline = `Week ${week}: Blood Runs Deep — ${kills.length} Warriors Fall!`;
   } else if (kills.length === 1) {
@@ -269,6 +287,11 @@ export function generateWeeklyGazette(
     } else {
       paragraphs.push(`${rivalryPair.a} and ${rivalryPair.b} crossed blades for the ${rivalryPair.count}${rivalryPair.count === 3 ? "rd" : "th"} time. The crowd senses a budding rivalry.`);
     }
+  }
+
+  // Rising star narrative
+  for (const star of risingStars) {
+    paragraphs.push(`All eyes turn to ${star}, who has burst onto the scene with three consecutive victories to open their career. A rising star — or a flash in the pan? Only the arena will tell.`);
   }
 
   // Graveyard mention
