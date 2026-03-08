@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "@/state/GameContext";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightPlan } from "@/types/game";
@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair } from "lucide-react";
+import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair, User, Crosshair, Shirt, History } from "lucide-react";
 import TagBadge from "@/components/TagBadge";
 import PlanBuilder from "@/components/PlanBuilder";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
@@ -15,6 +15,14 @@ import { DAMAGE_LABELS } from "@/engine/skillCalc";
 import { retireWarrior } from "@/state/gameStore";
 import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";
 import { toast } from "sonner";
+import SubNav, { type SubNavTab } from "@/components/SubNav";
+
+const TABS: SubNavTab[] = [
+  { id: "overview", label: "Overview", icon: <User className="h-3.5 w-3.5" /> },
+  { id: "strategy", label: "Strategy", icon: <Crosshair className="h-3.5 w-3.5" /> },
+  { id: "equipment", label: "Equipment", icon: <Shirt className="h-3.5 w-3.5" /> },
+  { id: "history", label: "History", icon: <History className="h-3.5 w-3.5" /> },
+];
 
 function AttrBar({ label, value, max = 25 }: { label: string; value: number; max?: number }) {
   const pct = (value / max) * 100;
@@ -47,6 +55,7 @@ export default function WarriorDetail() {
   const navigate = useNavigate();
   const { state, setState } = useGame();
   const warrior = state.roster.find((w) => w.id === id);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const handlePlanChange = useCallback(
     (newPlan: FightPlan) => {
@@ -152,79 +161,85 @@ export default function WarriorDetail() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-        {/* Attributes */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" /> Attributes
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {ATTRIBUTE_KEYS.map((key) => (
-              <AttrBar
-                key={key}
-                label={ATTRIBUTE_LABELS[key]}
-                value={warrior.attributes[key]}
-              />
-            ))}
-            <div className="pt-2 text-xs text-muted-foreground">
-              Total: {ATTRIBUTE_KEYS.reduce((sum, k) => sum + warrior.attributes[k], 0)} / 70
-            </div>
-          </CardContent>
-        </Card>
+      {/* Sub-navigation tabs */}
+      <SubNav tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Base Skills + Physicals */}
-        <div className="space-y-4">
-          {warrior.baseSkills && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="font-display text-lg flex items-center gap-2">
-                  <Swords className="h-5 w-5 text-arena-gold" /> Base Skills
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {Object.entries(warrior.baseSkills).map(([key, val]) => (
-                  <SkillBar key={key} label={key} value={val} />
-                ))}
-              </CardContent>
-            </Card>
-          )}
+      {/* Overview Tab */}
+      {activeTab === "overview" && (
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+          {/* Attributes */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" /> Attributes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {ATTRIBUTE_KEYS.map((key) => (
+                <AttrBar
+                  key={key}
+                  label={ATTRIBUTE_LABELS[key]}
+                  value={warrior.attributes[key]}
+                />
+              ))}
+              <div className="pt-2 text-xs text-muted-foreground">
+                Total: {ATTRIBUTE_KEYS.reduce((sum, k) => sum + warrior.attributes[k], 0)} / 70
+              </div>
+            </CardContent>
+          </Card>
 
-          {warrior.derivedStats && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="font-display text-lg flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-destructive" /> Physicals
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-lg bg-secondary p-3 border border-border">
-                    <div className="text-xs text-muted-foreground">Hit Points</div>
-                    <div className="text-lg font-bold">{warrior.derivedStats.hp}</div>
+          {/* Base Skills + Physicals */}
+          <div className="space-y-4">
+            {warrior.baseSkills && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-display text-lg flex items-center gap-2">
+                    <Swords className="h-5 w-5 text-arena-gold" /> Base Skills
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {Object.entries(warrior.baseSkills).map(([key, val]) => (
+                    <SkillBar key={key} label={key} value={val} />
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {warrior.derivedStats && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-display text-lg flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-destructive" /> Physicals
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-lg bg-secondary p-3 border border-border">
+                      <div className="text-xs text-muted-foreground">Hit Points</div>
+                      <div className="text-lg font-bold">{warrior.derivedStats.hp}</div>
+                    </div>
+                    <div className="rounded-lg bg-secondary p-3 border border-border">
+                      <div className="text-xs text-muted-foreground">Endurance</div>
+                      <div className="text-lg font-bold">{warrior.derivedStats.endurance}</div>
+                    </div>
+                    <div className="rounded-lg bg-secondary p-3 border border-border">
+                      <div className="text-xs text-muted-foreground">Damage</div>
+                      <div className="text-lg font-bold">{DAMAGE_LABELS[warrior.derivedStats.damage]}</div>
+                    </div>
+                    <div className="rounded-lg bg-secondary p-3 border border-border">
+                      <div className="text-xs text-muted-foreground">Carry Cap</div>
+                      <div className="text-lg font-bold">{warrior.derivedStats.encumbrance}</div>
+                    </div>
                   </div>
-                  <div className="rounded-lg bg-secondary p-3 border border-border">
-                    <div className="text-xs text-muted-foreground">Endurance</div>
-                    <div className="text-lg font-bold">{warrior.derivedStats.endurance}</div>
-                  </div>
-                  <div className="rounded-lg bg-secondary p-3 border border-border">
-                    <div className="text-xs text-muted-foreground">Damage</div>
-                    <div className="text-lg font-bold">{DAMAGE_LABELS[warrior.derivedStats.damage]}</div>
-                  </div>
-                  <div className="rounded-lg bg-secondary p-3 border border-border">
-                    <div className="text-xs text-muted-foreground">Carry Cap</div>
-                    <div className="text-lg font-bold">{warrior.derivedStats.encumbrance}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Strategy / Plan Builder */}
-      {currentPlan && (
+      {/* Strategy Tab */}
+      {activeTab === "strategy" && currentPlan && (
         <PlanBuilder
           plan={currentPlan}
           onPlanChange={handlePlanChange}
@@ -232,8 +247,8 @@ export default function WarriorDetail() {
         />
       )}
 
-      {/* Equipment Loadout */}
-      {warrior.derivedStats && (
+      {/* Equipment Tab */}
+      {activeTab === "equipment" && warrior.derivedStats && (
         <EquipmentLoadoutUI
           loadout={currentLoadout}
           style={warrior.style}
@@ -242,59 +257,61 @@ export default function WarriorDetail() {
         />
       )}
 
-      {/* Fight History */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="font-display text-lg flex items-center gap-2">
-            <Swords className="h-5 w-5 text-arena-gold" /> Fight History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {state.arenaHistory.filter(
-            (f) => f.a === warrior.name || f.d === warrior.name
-          ).length === 0 ? (
-            <p className="text-sm text-muted-foreground">No recorded bouts yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {state.arenaHistory
-                .filter((f) => f.a === warrior.name || f.d === warrior.name)
-                .slice(-10)
-                .reverse()
-                .map((f) => {
-                  const isA = f.a === warrior.name;
-                  const won =
-                    (isA && f.winner === "A") || (!isA && f.winner === "D");
-                  return (
-                    <div
-                      key={f.id}
-                      className="flex items-center justify-between py-2 border-b border-border last:border-0"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={won ? "default" : f.winner ? "destructive" : "secondary"}
-                          className="text-xs w-8 justify-center"
-                        >
-                          {won ? "W" : f.winner ? "L" : "D"}
-                        </Badge>
-                        <span className="text-sm">
-                          vs <span className="font-medium">{isA ? f.d : f.a}</span>
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {f.by && (
-                          <Badge variant="outline" className="text-xs">
-                            {f.by}
+      {/* History Tab */}
+      {activeTab === "history" && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-lg flex items-center gap-2">
+              <Swords className="h-5 w-5 text-arena-gold" /> Fight History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {state.arenaHistory.filter(
+              (f) => f.a === warrior.name || f.d === warrior.name
+            ).length === 0 ? (
+              <p className="text-sm text-muted-foreground">No recorded bouts yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {state.arenaHistory
+                  .filter((f) => f.a === warrior.name || f.d === warrior.name)
+                  .slice(-10)
+                  .reverse()
+                  .map((f) => {
+                    const isA = f.a === warrior.name;
+                    const won =
+                      (isA && f.winner === "A") || (!isA && f.winner === "D");
+                    return (
+                      <div
+                        key={f.id}
+                        className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={won ? "default" : f.winner ? "destructive" : "secondary"}
+                            className="text-xs w-8 justify-center"
+                          >
+                            {won ? "W" : f.winner ? "L" : "D"}
                           </Badge>
-                        )}
-                        <span className="text-xs text-muted-foreground">Wk {f.week}</span>
+                          <span className="text-sm">
+                            vs <span className="font-medium">{isA ? f.d : f.a}</span>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {f.by && (
+                            <Badge variant="outline" className="text-xs">
+                              {f.by}
+                            </Badge>
+                          )}
+                          <span className="text-xs text-muted-foreground">Wk {f.week}</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                    );
+                  })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
