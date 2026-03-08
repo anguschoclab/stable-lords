@@ -266,11 +266,11 @@ function PhaseSliders({
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="space-y-1">
           <Label className="text-xs flex items-center gap-1"><Crosshair className="h-3 w-3" /> Target</Label>
-          <Select value={phaseTarget} onValueChange={v => update("target", v as BodyTarget)}>
-            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {BODY_TARGETS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-            </SelectContent>
+           <Select value={phaseTarget} onValueChange={v => update("target", v as AttackTarget)}>
+             <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+             <SelectContent>
+               {ATTACK_TARGETS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1">
