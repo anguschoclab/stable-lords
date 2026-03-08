@@ -80,8 +80,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
+              onClick={returnToTitle}
+              title="Return to Title Screen"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setResetOpen(true)}
-              title="Reset Save"
+              title="Delete Save"
               className="text-muted-foreground hover:text-destructive"
             >
               <RotateCcw className="h-4 w-4" />
@@ -89,18 +98,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="font-display">Reset Save Data?</AlertDialogTitle>
+                  <AlertDialogTitle className="font-display">Delete This Save?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete all your warriors, trainers, fight history, and tournament progress. This action cannot be undone.
+                    This will permanently delete "{state.player.stableName}" and all its warriors, fight history, and tournament progress. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={() => { doReset(); setResetOpen(false); }}
+                    onClick={() => {
+                      // Delete the current slot then return to title
+                      const { getActiveSlot, deleteSlot } = require("@/state/saveSlots");
+                      const slotId = getActiveSlot();
+                      if (slotId) deleteSlot(slotId);
+                      doReset();
+                      setResetOpen(false);
+                    }}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Reset Everything
+                    Delete Save
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
