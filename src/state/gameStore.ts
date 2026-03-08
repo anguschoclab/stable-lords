@@ -95,6 +95,8 @@ export function loadGameState(): GameState {
         if (!parsed.tournaments) parsed.tournaments = [];
         if (!parsed.trainers) parsed.trainers = [];
         if (!parsed.hiringPool) parsed.hiringPool = [];
+        if (parsed.ftueComplete === undefined) parsed.ftueComplete = true; // existing saves already past FTUE
+        if (!parsed.coachDismissed) parsed.coachDismissed = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
           ...w,
@@ -106,9 +108,9 @@ export function loadGameState(): GameState {
   } catch {
     // corrupt save, re-seed
   }
-  const demo = createDemoState();
-  saveGameState(demo);
-  return demo;
+  const fresh = createFreshState();
+  saveGameState(fresh);
+  return fresh;
 }
 
 export function saveGameState(state: GameState): void {
