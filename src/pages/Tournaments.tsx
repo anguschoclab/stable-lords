@@ -121,9 +121,25 @@ export default function Tournaments() {
     let updatedState = { ...state };
     const winners: string[] = [];
 
+    // Helper: find warrior by name across player roster + rival rosters
+    const findWarrior = (name: string) => {
+      const player = updatedState.roster.find((w) => w.name === name);
+      if (player) return player;
+      for (const rival of (updatedState.rivals ?? [])) {
+        const rw = rival.roster.find((w) => w.name === name);
+        if (rw) return rw;
+      }
+      return undefined;
+    };
+
     for (const bout of roundBouts) {
-      const wA = updatedState.roster.find((w) => w.name === bout.a);
-      const wD = updatedState.roster.find((w) => w.name === bout.d);
+      if (bout.d === "(bye)") {
+        bout.winner = "A";
+        winners.push(bout.a);
+        continue;
+      }
+      const wA = findWarrior(bout.a);
+      const wD = findWarrior(bout.d);
       if (!wA || !wD) {
         bout.winner = wA ? "A" : wD ? "D" : null;
         winners.push(wA?.name ?? wD?.name ?? "");
