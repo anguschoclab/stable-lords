@@ -241,16 +241,15 @@ export function getStylePassive(
       };
 
     // ── Total Parry: Endurance Wall ──
-    // BALANCE v6: Removed late PAR bonus. TP identity is endurance, not impenetrable blocking.
-    // Added ATT penalty — TP should almost never kill.
+    // BALANCE v6b: Restored parBonus +1 (was 34.8%, need ≥35%). TP still can't attack.
     case FightingStyle.TotalParry: {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: -2,  // TP attacks very poorly
-        parBonus: m.bonus,  // Only mastery bonus, no free late-game scaling
+        attBonus: -2,
+        parBonus: 1 + m.bonus,  // Restored +1 base parry to bring TP from 34.8% to ~36%
         defBonus: 0,
-        ripBonus: 0,  // Removed late ripBonus — TP doesn't counter-attack well
+        ripBonus: 0,
         narrative: context.phase === "LATE" && context.endRatio > 0.5
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}stands fresh as the opponent gasps for breath!`
           : undefined,
