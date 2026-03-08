@@ -66,6 +66,7 @@ function GameRoutes() {
         <Route path="/equipment-optimizer" element={<EquipmentOptimizerPage />} />
         <Route path="/training-planner" element={<TrainingPlanner />} />
         <Route path="/seasonal-awards" element={<SeasonalAwards />} />
+        <Route path="/tournament-awards" element={<TournamentAwards />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
