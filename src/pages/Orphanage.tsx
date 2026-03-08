@@ -8,6 +8,7 @@ import { useGame } from "@/state/GameContext";
 import { makeWarrior } from "@/state/gameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
+import { generateRecruitPool } from "@/engine/recruitment";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightSummary } from "@/types/game";
 import { computeWarriorStats, DAMAGE_LABELS } from "@/engine/skillCalc";
 import { generatePotential } from "@/engine/potential";
@@ -144,7 +145,9 @@ export default function Orphanage() {
         killedBy: boutResult?.outcome.winner === "A" ? boutResult.a.name : boutResult?.d.name,
       }));
 
-    const rivals = generateRivalStables(8, Date.now()).map((r) => ({
+    // Generate the large world: 23 AI stables
+    const generatedRivals = generateRivalStables(23, Date.now());
+    const rivals = generatedRivals.map((r) => ({
       owner: r.owner,
       roster: r.roster,
       motto: r.template.motto,
@@ -152,6 +155,21 @@ export default function Orphanage() {
       philosophy: r.template.philosophy,
       tier: r.template.tier,
     }));
+
+    // Collect all used names for recruit pool generation
+    const usedNames = new Set<string>();
+    for (const w of aliveWarriors) usedNames.add(w.name);
+    for (const w of deadWarriors) usedNames.add(w.name);
+    for (const r of generatedRivals) {
+      for (const w of r.roster) usedNames.add(w.name);
+    }
+
+    // Generate 100 recruit pool warriors
+    const recruitPool = generateRecruitPool(100, 1, usedNames, Date.now() + 1);
+
+    // Count world stats for gazette
+    const totalWarriors = generatedRivals.reduce((sum, r) => sum + r.roster.length, 0);
+    const totalTrainers = generatedRivals.reduce((sum, r) => sum + r.trainers.length, 0);
 
     const newState = {
       ...state,
@@ -163,14 +181,17 @@ export default function Orphanage() {
       graveyard: [...state.graveyard, ...deadWarriors],
       arenaHistory: boutResult ? [boutResult.summary] : [],
       rivals,
+      recruitPool,
       scoutReports: [],
       newsletter: [
         {
           week: 1,
-          title: "Arena Gazette",
+          title: "Arena Gazette — Grand Opening",
           items: [
-            `${stableName} enters the arena under ${ownerName}'s command!`,
-            `${rivals.length} rival stables have entered the arena!`,
+            `🏟️ ${stableName} enters the arena under ${ownerName}'s command!`,
+            `⚔️ ${rivals.length} rival stables with ${totalWarriors} warriors compete for glory!`,
+            `🏋️ ${totalTrainers} trainers stand ready across all stables.`,
+            `📋 ${recruitPool.length} orphans await in the recruitment pool.`,
             ...(boutResult
               ? [
                   `First bout: ${boutResult.a.name} vs ${boutResult.d.name} — ${
