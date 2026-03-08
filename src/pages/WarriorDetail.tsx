@@ -330,10 +330,20 @@ export default function WarriorDetail() {
                   key={key}
                   label={ATTRIBUTE_LABELS[key]}
                   value={warrior.attributes[key]}
+                  potential={warrior.potential?.[key]}
                 />
               ))}
               <div className="pt-2 text-xs text-muted-foreground">
                 Total: {ATTRIBUTE_KEYS.reduce((sum, k) => sum + warrior.attributes[k], 0)} / 70
+              </div>
+              {/* Narrative growth assessment */}
+              <div className="pt-2 border-t border-border mt-2">
+                <div className="flex items-start gap-2 text-xs">
+                  <TrendingUp className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                  <p className="text-muted-foreground italic leading-relaxed">
+                    {overallGrowthNarrative(warrior)}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
