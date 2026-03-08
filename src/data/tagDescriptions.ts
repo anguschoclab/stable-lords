@@ -8,6 +8,7 @@ export const FLAIR_DESCRIPTIONS: Record<string, string> = {
   Comeback: "Survived near-death to win — earns +1 Fame and +1 Popularity when triggered.",
   RiposteChain: "Master counter-fighter — earned by landing 3+ ripostes in a single bout. +1 Fame.",
   Dominance: "Overwhelming victor — earned by landing 5+ hits in a winning bout. +1 Fame.",
+  "Giant Killer": "Slayer of legends — earned by winning 3+ upset victories against far more famous opponents.",
 };
 
 export const TITLE_DESCRIPTIONS: Record<string, string> = {
