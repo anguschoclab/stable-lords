@@ -220,6 +220,17 @@ export function generateWeeklyGazette(
     paragraphs.push(generateFightNarrative(fight, mood));
   }
 
+  // Streak narratives
+  for (const s of hotStreakers) {
+    if (s.streak >= 10) {
+      paragraphs.push(`The arena trembles before ${s.name}, who has now won an astonishing ${s.streak} bouts in a row! Legends speak of such dominance only in whispers.`);
+    } else if (s.streak >= 7) {
+      paragraphs.push(`${s.name} continues an incredible run of form with ${s.streak} consecutive victories. Can anyone stop this warrior?`);
+    } else {
+      paragraphs.push(`${s.name} is building momentum with ${s.streak} wins in a row — a warrior to watch closely.`);
+    }
+  }
+
   // Graveyard mention
   if (graveyard.length > 0) {
     const recent = graveyard.filter(w => w.deathWeek === week);
