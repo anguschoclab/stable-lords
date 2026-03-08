@@ -149,6 +149,9 @@ export interface PhaseStrategy {
   OE: number;
   AL: number;
   killDesire: number;
+  offensiveTactic?: OffensiveTactic;
+  defensiveTactic?: DefensiveTactic;
+  target?: BodyTarget;
 }
 
 export interface FightPlan {
