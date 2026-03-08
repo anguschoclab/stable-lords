@@ -509,6 +509,100 @@ function TrainingWidget() {
   );
 }
 
+// ─── Widget: Rival Stables ─────────────────────────────────────────────────
+
+function RivalsWidget() {
+  const { state } = useGame();
+  const rivals = state.rivals ?? [];
+
+  // Find recent bouts involving rival warriors
+  const recentRivalBouts = useMemo(() => {
+    const rosterNames = new Set(state.roster.map(w => w.name));
+    return state.arenaHistory
+      .filter(f => {
+        const aIsPlayer = rosterNames.has(f.a);
+        const dIsPlayer = rosterNames.has(f.d);
+        return (aIsPlayer && !dIsPlayer) || (!aIsPlayer && dIsPlayer);
+      })
+      .slice(-3)
+      .reverse();
+  }, [state.arenaHistory, state.roster]);
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="font-display text-base flex items-center gap-2">
+          <Skull className="h-4 w-4 text-destructive" /> Rival Stables
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {rivals.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">No rival stables yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {rivals.slice(0, 4).map(r => {
+              const active = r.roster.filter(w => w.status === "Active").length;
+              const topWarrior = [...r.roster].sort((a, b) => b.fame - a.fame)[0];
+              return (
+                <div key={r.owner.id} className="flex items-center gap-3 py-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-display font-semibold truncate">
+                        {r.owner.stableName}
+                      </span>
+                      <Badge variant="outline" className="text-[9px] h-4 px-1 shrink-0">
+                        {r.owner.personality ?? "Unknown"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-muted-foreground">
+                      <span>{active} warriors</span>
+                      <span>·</span>
+                      <span className="text-arena-fame">{r.owner.fame} fame</span>
+                      {topWarrior && (
+                        <>
+                          <span>·</span>
+                          <span className="truncate">★ {topWarrior.name}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Recent rival bouts */}
+            {recentRivalBouts.length > 0 && (
+              <div className="pt-2 mt-1 border-t border-border/50">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">
+                  Recent vs Rivals
+                </div>
+                {recentRivalBouts.map(f => {
+                  const rosterNames = new Set(state.roster.map(w => w.name));
+                  const playerIsA = rosterNames.has(f.a);
+                  const won = (playerIsA && f.winner === "A") || (!playerIsA && f.winner === "D");
+                  return (
+                    <div key={f.id} className="flex items-center gap-2 py-0.5">
+                      <Badge
+                        variant={won ? "default" : f.winner ? "destructive" : "secondary"}
+                        className="text-[9px] w-5 h-4 justify-center p-0"
+                      >
+                        {won ? "W" : f.winner ? "L" : "D"}
+                      </Badge>
+                      <span className="text-[11px] truncate">
+                        {playerIsA ? f.a : f.d} vs {playerIsA ? f.d : f.a}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
 type WidgetDef = {
@@ -523,6 +617,7 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "stable",   label: "Stable Overview",   component: StableWidget },
   { id: "finances", label: "Finances",           component: FinancesWidget },
   { id: "training", label: "Training Status",    component: TrainingWidget },
+  { id: "rivals",   label: "Rival Stables",      component: RivalsWidget },
   { id: "rankings", label: "Warrior Rankings",   component: RankingsWidget, wide: true },
   { id: "meta",     label: "Meta Pulse",         component: MetaPulseWidget },
   { id: "bouts",    label: "Recent Bouts",       component: RecentBoutsWidget, wide: true },
