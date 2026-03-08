@@ -473,12 +473,14 @@ export function simulateFight(
       hitsTaken: fA.hitsTaken, ripostes: fA.ripostes, consecutiveHits: fA.consecutiveHits,
       hpRatio: fA.hp / fA.maxHp, endRatio: fA.endurance / fA.maxEndurance,
       opponentStyle: fD.style, targetedLocation: tacticsA.target,
+      totalFights: warriorA ? (warriorA.career.wins + warriorA.career.losses) : 0,
     });
     const passiveD = getStylePassive(fD.style, {
       phase: phase as StylePhase, exchange: ex, hitsLanded: fD.hitsLanded,
       hitsTaken: fD.hitsTaken, ripostes: fD.ripostes, consecutiveHits: fD.consecutiveHits,
       hpRatio: fD.hp / fD.maxHp, endRatio: fD.endurance / fD.maxEndurance,
       opponentStyle: fA.style, targetedLocation: tacticsD.target,
+      totalFights: warriorD ? (warriorD.career.wins + warriorD.career.losses) : 0,
     });
 
     // Anti-synergy for tactic choices
