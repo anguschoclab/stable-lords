@@ -202,8 +202,8 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
     const philD = stableD?.philosophy ?? "Balanced";
     const adaptD = stableD?.owner?.metaAdaptation ?? "Opportunist";
 
-    const planA = a.warrior.plan ?? aiPlanForWarrior(a.warrior, persA, philA, { meta, adaptation: adaptA });
-    const planD = d.warrior.plan ?? aiPlanForWarrior(d.warrior, persD, philD, { meta, adaptation: adaptD });
+    const planA = a.warrior.plan ?? aiPlanForWarrior(a.warrior, persA, philA, { meta, adaptation: adaptA }, d.warrior.style);
+    const planD = d.warrior.plan ?? aiPlanForWarrior(d.warrior, persD, philD, { meta, adaptation: adaptD }, a.warrior.style);
     const outcome = simulateFight(planA, planD, a.warrior, d.warrior);
 
     const isKill = outcome.by === "Kill";
