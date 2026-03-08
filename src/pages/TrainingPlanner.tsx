@@ -97,9 +97,9 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
 
   // Best attributes to train (sorted by gain chance descending, excluding capped)
   const ranked = ATTRIBUTE_KEYS
-    .filter(k => k !== "SZ")
+    .filter((k): k is Exclude<keyof Attributes, "SZ"> => k !== "SZ")
     .map(k => ({
-      key: k,
+      key: k as keyof Attributes,
       val: warrior.attributes[k],
       pot: warrior.potential?.[k],
       chance: computeGainChance(warrior, k, trainers),

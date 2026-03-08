@@ -23,6 +23,9 @@ import StartGame from "@/pages/StartGame";
 import NotFound from "./pages/NotFound";
 import Gazette from "@/pages/Gazette";
 import HallOfFame from "@/pages/HallOfFame";
+import KillAnalytics from "@/pages/KillAnalytics";
+import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
+import TrainingPlanner from "@/pages/TrainingPlanner";
 
 const queryClient = new QueryClient();
 
