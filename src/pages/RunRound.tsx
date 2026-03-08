@@ -296,7 +296,10 @@ export default function RunRound() {
       updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
 
       StyleMeter.recordFight({ styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
+      StyleRollups.addFight({ week: state.week, styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
+      ArenaHistory.append(summary);
       LoreArchive.signalFight(summary);
+      NewsletterFeed.appendFightResult({ summary, transcript: outcome.log.map(e => e.text) });
 
       let announcement: string | undefined;
       if (outcome.by === "Kill") announcement = commentatorFor("Kill");
