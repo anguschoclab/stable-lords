@@ -79,6 +79,9 @@ export function createFreshState(): GameState {
     trainingAssignments: [],
     rivals: [],
     scoutReports: [],
+    restStates: [],
+    rivalries: [],
+    matchHistory: [],
     settings: {
       featureFlags: {
         tournaments: true,
