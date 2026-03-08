@@ -240,11 +240,13 @@ export function processAIRosterManagement(
     const recruitChance = personality === "Aggressive" ? 0.4 : personality === "Pragmatic" ? 0.25 : 0.15;
 
     if (currentActive < minRoster && Math.random() < recruitChance) {
-      const newWarrior = generateAIRecruit(r, state.week);
+      const adaptation = r.owner.metaAdaptation ?? "Opportunist";
+      const newWarrior = generateAIRecruit(r, state.week, meta);
       if (newWarrior) {
         r.roster.push(newWarrior);
+        const adaptQuote = META_RECRUIT_QUOTES[adaptation] ?? "\"A new warrior joins.\"";
         gazetteItems.push(
-          `📢 ${r.owner.stableName} recruits ${newWarrior.name} (${newWarrior.style}) — ${personality === "Aggressive" ? "\"Fresh blood for the arena!\"" : "\"A calculated addition.\""}`
+          `📢 ${r.owner.stableName} recruits ${newWarrior.name} (${newWarrior.style}) — ${adaptQuote}`
         );
       }
     }
