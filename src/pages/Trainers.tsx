@@ -12,6 +12,7 @@ import {
   FOCUS_DESCRIPTIONS,
   FOCUS_ICONS,
   TIER_BONUS,
+  TIER_COST,
   generateHiringPool,
   convertRetiredToTrainer,
   type TrainerFocus,
