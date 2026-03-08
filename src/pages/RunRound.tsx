@@ -36,7 +36,12 @@ export default function RunRound() {
     const weekResults: typeof results = [];
     let updatedState = { ...state };
     const moodMods = getMoodModifiers(state.crowdMood as any);
-    const activeWarriors = updatedState.roster.filter(w => w.status === "Active");
+    const activeWarriors = updatedState.roster.filter(w => {
+      if (w.status !== "Active") return false;
+      const injuryObjects = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
+      if (isTooInjuredToFight(injuryObjects)) return false;
+      return true;
+    });
 
     // Build pairings — avoid repeat matchups where possible
     const paired = new Set<string>();
