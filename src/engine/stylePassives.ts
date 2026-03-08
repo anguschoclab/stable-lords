@@ -178,13 +178,15 @@ export function getStylePassive(
     }
 
     // ── Parry-Riposte: Riposte Specialist ──
-    // RIP bonus after ripostes (escalating but capped low)
+    // RIP bonus after ripostes (capped conservatively — identity is counter, not wall)
     case FightingStyle.ParryRiposte: {
-      const ripEscalation = Math.min(2 + m.bonus, context.ripostes);
+      const ripEscalation = Math.min(1 + m.bonus, context.ripostes);
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        ripBonus: scale(1 + ripEscalation),
+        ripBonus: scale(ripEscalation),
+        // PR OE paradox flavor: low OE grants slight parry boost (counter-ready stance)
+        parBonus: context.endRatio > 0.6 ? 1 : 0,
         narrative: context.ripostes >= 3
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}has found the rhythm — each counter deadlier than the last!`
           : undefined,
