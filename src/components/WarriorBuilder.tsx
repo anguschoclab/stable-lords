@@ -104,9 +104,7 @@ export default function WarriorBuilder({
     // Random style
     const styles = Object.values(FightingStyle);
     setStyle(styles[Math.floor(Math.random() * styles.length)]);
-    // Random name
-    const names = ["KRAGOS", "VEXIA", "THORNE", "MORKA", "DUSKBANE", "FERRIK", "ASHARA", "GORLAK", "SILVANE", "WRAITH"];
-    setName(names[Math.floor(Math.random() * names.length)]);
+    setName(randomWarriorName());
   }, []);
 
   const handleCreate = useCallback(() => {
