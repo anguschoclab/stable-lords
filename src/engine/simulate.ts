@@ -370,13 +370,23 @@ export function simulateFight(
     const phase = getPhase(ex, MAX_EXCHANGES);
     const min = minute(ex);
 
+    // Phase-based OE/AL/KD resolution
+    const phaseKeyA = phase === "OPENING" ? "opening" : phase === "MID" ? "mid" : "late";
+    const phaseKeyD = phase === "OPENING" ? "opening" : phase === "MID" ? "mid" : "late";
+    const effOE_A = fA.plan.phases?.[phaseKeyA]?.OE ?? fA.plan.OE;
+    const effAL_A = fA.plan.phases?.[phaseKeyA]?.AL ?? fA.plan.AL;
+    const effKD_A = fA.plan.phases?.[phaseKeyA]?.killDesire ?? fA.plan.killDesire ?? 5;
+    const effOE_D = fD.plan.phases?.[phaseKeyD]?.OE ?? fD.plan.OE;
+    const effAL_D = fD.plan.phases?.[phaseKeyD]?.AL ?? fD.plan.AL;
+    const effKD_D = fD.plan.phases?.[phaseKeyD]?.killDesire ?? fD.plan.killDesire ?? 5;
+
     // Fatigue penalties
     const fatA = fatiguePenalty(fA.endurance, fA.maxEndurance);
     const fatD = fatiguePenalty(fD.endurance, fD.maxEndurance);
 
     // ── 1. INITIATIVE CONTEST ──
-    const iniA = fA.skills.INI + alIniMod(fA.plan.AL) + matchupA + fatA;
-    const iniD = fD.skills.INI + alIniMod(fD.plan.AL) + matchupD + fatD;
+    const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA;
+    const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD;
     const aGoesFirst = contestCheck(rng, iniA, iniD);
 
     const attacker = aGoesFirst ? fA : fD;
@@ -385,6 +395,11 @@ export function simulateFight(
     const defMatchup = aGoesFirst ? matchupD : matchupA;
     const attFat = aGoesFirst ? fatA : fatD;
     const defFat = aGoesFirst ? fatD : fatA;
+    const attOE = aGoesFirst ? effOE_A : effOE_D;
+    const defOE = aGoesFirst ? effOE_D : effOE_A;
+    const attAL = aGoesFirst ? effAL_A : effAL_D;
+    const defAL = aGoesFirst ? effAL_D : effAL_A;
+    const attKD = aGoesFirst ? effKD_A : effKD_D;
 
     // Narrate initiative swings
     if (ex === 0 || (ex > 0 && rng() < 0.3)) {

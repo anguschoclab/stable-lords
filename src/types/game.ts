@@ -114,15 +114,28 @@ export type BodyTarget = "Head" | "Chest" | "Abdomen" | "Arms" | "Legs" | "Any";
 export type OffensiveTactic = "Lunge" | "Slash" | "Bash" | "Decisiveness" | "none";
 export type DefensiveTactic = "Dodge" | "Parry" | "Riposte" | "Responsiveness" | "none";
 
+/** Per-phase OE/AL/KD overrides for Opening, Mid, and Late bout phases */
+export interface PhaseStrategy {
+  OE: number;
+  AL: number;
+  killDesire: number;
+}
+
 export interface FightPlan {
   style: FightingStyle;
-  OE: number;      // Offensive Effort 1-10
+  OE: number;      // Offensive Effort 1-10 (default / fallback)
   AL: number;      // Activity Level 1-10
   killDesire?: number; // Kill Desire 1-10
   target?: BodyTarget;
   offensiveTactic?: OffensiveTactic;
   defensiveTactic?: DefensiveTactic;
   gear?: Gear;
+  /** Phase-based overrides. If set, these override the base OE/AL/KD for each phase. */
+  phases?: {
+    opening?: PhaseStrategy;
+    mid?: PhaseStrategy;
+    late?: PhaseStrategy;
+  };
 }
 
 // ─── Warrior ────────────────────────────────────────────────────────────────
