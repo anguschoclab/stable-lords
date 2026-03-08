@@ -81,7 +81,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               variant="ghost"
               size="icon"
               className="md:hidden h-8 w-8 text-muted-foreground"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
             >
               {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
             </Button>
