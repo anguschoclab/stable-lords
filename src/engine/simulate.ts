@@ -202,29 +202,29 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
 }
 
 // ─── OE/AL Effects ────────────────────────────────────────────────────────
-// BALANCE v5: Increased ATT bonus, steeper PAR penalty.
-// Offense needs to land consistently; defense should rely on endurance/counters.
-const GLOBAL_ATT_BONUS = 6;    // All attacks get +6 to ensure hits land frequently
-const GLOBAL_PAR_PENALTY = -4; // Parry harder — defense identity is endurance, not blocking
+// BALANCE v6: Key changes:
+// - GLOBAL_ATT_BONUS 6 → 8 (offense needs to land even more vs defensive seeds)
+// - GLOBAL_PAR_PENALTY -4 → -6 (parrying is hard — defense is about endurance/position)
+// - AB/PR OE paradox REMOVED — they now get a modest penalty at low OE like everyone
+// - BA/SL/ST get ATT bonus from high OE (rewarding aggressive commitment)
+// - Endurance cost formula adjusted: lower base, higher OE scaling (high OE = aggressive = tiring)
+const GLOBAL_ATT_BONUS = 8;    // Attacks land frequently — fights should be violent
+const GLOBAL_PAR_PENALTY = -6; // Parry is hard — defense identity is endurance, not blocking
 
 function oeAttMod(oe: number, style?: FightingStyle): number {
-  // PR OE Paradox: PR is NOT penalized at low OE but doesn't get a bonus either
-  if (style === FightingStyle.ParryRiposte) {
-    if (oe <= 5) return 0;   // Low-mid OE: no penalty (counter stance)
-    return -1;               // High OE: loses counter identity
-  }
-  // AB: patience is a feature — no penalty at low OE
-  if (style === FightingStyle.AimedBlow) {
-    if (oe <= 5) return 0;
-    return -1;
-  }
-  return Math.floor((oe - 5) * 0.8);
+  // BALANCE v6: Removed AB/PR OE paradox. All styles use the same formula.
+  // High OE = more aggressive = bonus to ATT. Low OE = passive = slight penalty.
+  // Offensive styles (BA/SL/ST) get enhanced scaling from high OE.
+  const isAggressive = style === FightingStyle.BashingAttack || style === FightingStyle.SlashingAttack || style === FightingStyle.StrikingAttack;
+  const base = Math.floor((oe - 5) * 0.7);
+  return isAggressive ? base + 1 : base;  // Aggressive styles always get +1 ATT
 }
 function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * 0.5); }
 function alIniMod(al: number): number { return Math.floor((al - 5) * 0.6); }
 function enduranceCost(oe: number, al: number): number {
-  // BALANCE v5: Slightly increased base cost so low-OE fighters can't stall forever
-  return Math.max(2, Math.round((oe * 0.35 + al * 0.25) + 1));
+  // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
+  // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
+  return Math.max(1, Math.round((oe * 0.4 + al * 0.2)));
 }
 
 // ─── Fatigue Penalties ────────────────────────────────────────────────────
