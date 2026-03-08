@@ -70,6 +70,8 @@ export function createFreshState(): GameState {
     tournaments: [],
     trainers: [],
     hiringPool: [],
+    trainingAssignments: [],
+    hiringPool: [],
     settings: {
       featureFlags: {
         tournaments: true,
