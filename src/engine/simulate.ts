@@ -490,10 +490,11 @@ export function simulateFight(
 
       // Defender may riposte on whiff
       // ── 4. RIPOSTE CHECK (RIP) ──
-      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat);
+      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + defDefMods.ripBonus);
       if (ripCheck) {
-        const ripLoc = rollHitLocation(rng, defender.plan.target);
-        const ripDmg = computeHitDamage(rng, defender.derived.damage, ripLoc);
+        const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
+        const ripDmgRaw = computeHitDamage(rng, defender.derived.damage, ripLoc);
+        const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
         attacker.hp -= ripDmg;
         attacker.hitsTaken++;
         defender.hitsLanded++;
