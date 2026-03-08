@@ -16,6 +16,7 @@ import { retireWarrior } from "@/state/gameStore";
 import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";
 import { toast } from "sonner";
 import SubNav, { type SubNavTab } from "@/components/SubNav";
+import BoutViewer from "@/components/BoutViewer";
 
 const TABS: SubNavTab[] = [
   { id: "overview", label: "Overview", icon: <User className="h-3.5 w-3.5" /> },
