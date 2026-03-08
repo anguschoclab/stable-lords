@@ -9,6 +9,7 @@ import type {
 import { isTooInjuredToFight, type Injury } from "./injuries";
 import { simulateFight } from "./simulate";
 import { aiPlanForWarrior } from "./ownerAI";
+import { computeMetaDrift } from "./metaDrift";
 
 // ─── Eligibility ──────────────────────────────────────────────────────────
 
@@ -184,20 +185,25 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
     roster: r.roster.map(w => ({ ...w, career: { ...w.career } })),
   }));
 
+  // Compute current meta for plan adjustments
+  const meta = computeMetaDrift(state.arenaHistory, 20);
+
   // Check for existing rivalries between AI stables
   const rivalries = state.rivalries || [];
 
   for (const { a, d } of boutPairs) {
-    // Use personality-driven plans for AI warriors
+    // Use personality-driven plans for AI warriors with meta awareness
     const stableA = rivals.find((_, idx) => idx === a.stableIdx);
     const stableD = rivals.find((_, idx) => idx === d.stableIdx);
     const persA = stableA?.owner?.personality ?? "Pragmatic";
     const philA = stableA?.philosophy ?? "Balanced";
+    const adaptA = stableA?.owner?.metaAdaptation ?? "Opportunist";
     const persD = stableD?.owner?.personality ?? "Pragmatic";
     const philD = stableD?.philosophy ?? "Balanced";
+    const adaptD = stableD?.owner?.metaAdaptation ?? "Opportunist";
 
-    const planA = a.warrior.plan ?? aiPlanForWarrior(a.warrior, persA, philA);
-    const planD = d.warrior.plan ?? aiPlanForWarrior(d.warrior, persD, philD);
+    const planA = a.warrior.plan ?? aiPlanForWarrior(a.warrior, persA, philA, { meta, adaptation: adaptA });
+    const planD = d.warrior.plan ?? aiPlanForWarrior(d.warrior, persD, philD, { meta, adaptation: adaptD });
     const outcome = simulateFight(planA, planD, a.warrior, d.warrior);
 
     const isKill = outcome.by === "Kill";

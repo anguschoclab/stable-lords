@@ -50,23 +50,50 @@ function clamp(v: number, lo: number, hi: number): number {
 }
 
 /**
- * Generate a personality- and philosophy-aware fight plan for an AI warrior.
- * Replaces raw `defaultPlanForWarrior` for rival bouts.
+ * Generate a personality-, philosophy-, and meta-aware fight plan for an AI warrior.
+ * MetaChasers boost OE for dominant styles, reduce for declining.
+ * Innovators do the opposite — lean into counter-meta tactics.
+ * Traditionalists and Opportunists use base personality/philosophy only.
  */
 export function aiPlanForWarrior(
   w: Warrior,
   personality: OwnerPersonality,
-  philosophy: string
+  philosophy: string,
+  metaContext?: { meta: StyleMeta; adaptation: MetaAdaptation }
 ): FightPlan {
   const base = defaultPlanForWarrior(w);
   const pMod = PERSONALITY_PLAN_MODS[personality] ?? {};
   const phMod = PHILOSOPHY_PLAN_MODS[philosophy] ?? {};
 
+  let metaOE = 0;
+  let metaAL = 0;
+  let metaKD = 0;
+
+  if (metaContext && w.style) {
+    const drift = metaContext.meta[w.style as FightingStyle] ?? 0;
+
+    switch (metaContext.adaptation) {
+      case "MetaChaser":
+        // If warrior's style is dominant, push harder; if declining, play safer
+        metaOE = drift > 3 ? 2 : drift < -3 ? -2 : 0;
+        metaAL = drift > 3 ? 1 : drift < -3 ? -1 : 0;
+        metaKD = drift > 3 ? 1 : 0;
+        break;
+      case "Innovator":
+        // Counter-meta: if style is declining (underestimated), push aggressively
+        metaOE = drift < -2 ? 2 : drift > 3 ? -1 : 0;
+        metaAL = drift < -2 ? 1 : drift > 3 ? -1 : 0;
+        metaKD = drift < -3 ? 1 : 0;
+        break;
+      // Traditionalist & Opportunist: no mid-fight meta adjustments
+    }
+  }
+
   return {
     ...base,
-    OE: clamp((base.OE ?? 5) + (pMod.OE ?? 0) + (phMod.OE ?? 0), 1, 10),
-    AL: clamp((base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0), 1, 10),
-    killDesire: clamp((base.killDesire ?? 5) + (pMod.killDesire ?? 0) + (phMod.killDesire ?? 0), 1, 10),
+    OE: clamp((base.OE ?? 5) + (pMod.OE ?? 0) + (phMod.OE ?? 0) + metaOE, 1, 10),
+    AL: clamp((base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0) + metaAL, 1, 10),
+    killDesire: clamp((base.killDesire ?? 5) + (pMod.killDesire ?? 0) + (phMod.killDesire ?? 0) + metaKD, 1, 10),
   };
 }
 
