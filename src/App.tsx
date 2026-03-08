@@ -27,6 +27,7 @@ import KillAnalytics from "@/pages/KillAnalytics";
 import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
 import TrainingPlanner from "@/pages/TrainingPlanner";
 import SeasonalAwards from "@/pages/SeasonalAwards";
+import TournamentAwards from "@/pages/TournamentAwards";
 
 const queryClient = new QueryClient();
 
