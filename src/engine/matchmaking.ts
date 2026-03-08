@@ -10,6 +10,7 @@ import { isTooInjuredToFight, type Injury } from "./injuries";
 import { simulateFight } from "./simulate";
 import { aiPlanForWarrior } from "./ownerAI";
 import { computeMetaDrift } from "./metaDrift";
+import { disallowStablemates } from "@/guards/matchmaking";
 
 // ─── Eligibility ──────────────────────────────────────────────────────────
 
@@ -169,7 +170,7 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
   for (const a of pool) {
     if (paired.has(a.warrior.id) || boutPairs.length >= maxBouts) break;
     for (const d of pool) {
-      if (paired.has(d.warrior.id) || a.stableId === d.stableId) continue;
+      if (paired.has(d.warrior.id) || disallowStablemates(a.stableId, d.stableId)) continue;
       boutPairs.push({ a, d });
       paired.add(a.warrior.id);
       paired.add(d.warrior.id);

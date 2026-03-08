@@ -15,6 +15,8 @@ import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import { commentatorFor } from "@/ui/commentator";
 import { recapLine } from "@/ui/fightVariety";
+import { blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
+import { disallowStablemates } from "@/guards/matchmaking";
 import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
 import { calculateXP, applyXP } from "@/engine/progression";
 import {
@@ -85,6 +87,8 @@ export function generatePairings(state: GameState): BoutPairing[] {
       if (paired.has(activeWarriors[i].id)) continue;
       for (let j = i + 1; j < activeWarriors.length; j++) {
         if (paired.has(activeWarriors[j].id)) continue;
+        // Guard: stablemates cannot fight each other
+        if (disallowStablemates(activeWarriors[i].stableId ?? "", activeWarriors[j].stableId ?? "")) continue;
         pairings.push({ a: activeWarriors[i], d: activeWarriors[j], isRivalry: false });
         paired.add(activeWarriors[i].id);
         paired.add(activeWarriors[j].id);
@@ -329,8 +333,16 @@ function resolveBout(
   LoreArchive.signalFight(fightSummary);
   NewsletterFeed.appendFightResult({ summary: fightSummary, transcript: outcome.log.map(e => e.text) });
 
-  // ── Announcement ──
+  // ── Announcement (commentator + AnnouncerAI blurb) ──
   let announcement: string | undefined;
+  const announceTone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") || tags.includes("Comeback") ? "hype" : "neutral");
+  const announcerBlurb = blurb({
+    tone: announceTone,
+    winner: outcome.winner === "A" ? warrior.name : outcome.winner === "D" ? opponent.name : undefined,
+    loser: outcome.winner === "A" ? opponent.name : outcome.winner === "D" ? warrior.name : undefined,
+    by: outcome.by ?? undefined,
+  });
+
   if (outcome.by === "Kill") announcement = commentatorFor("Kill");
   else if (outcome.by === "KO") announcement = commentatorFor("KO");
   else if (tags.includes("Flashy")) announcement = commentatorFor("Flashy");
@@ -339,6 +351,11 @@ function resolveBout(
     const winnerName = outcome.winner === "A" ? warrior.name : opponent.name;
     const loserName = outcome.winner === "A" ? opponent.name : warrior.name;
     announcement = recapLine(winnerName, loserName, outcome.minutes);
+  }
+
+  // Append announcer flavour to the fight summary transcript
+  if (announcerBlurb) {
+    fightSummary.transcript = [...fightSummary.transcript, `🎙️ ${announcerBlurb}`];
   }
 
   return {
