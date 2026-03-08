@@ -88,6 +88,7 @@ export function createFreshState(): GameState {
     matchHistory: [],
     recruitPool: [],
     rosterBonus: 0,
+    ownerGrudges: [],
     settings: {
       featureFlags: {
         tournaments: true,
