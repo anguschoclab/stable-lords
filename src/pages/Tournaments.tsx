@@ -139,6 +139,12 @@ export default function Tournaments() {
       };
       updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
 
+      // Write to localStorage archives so Gazette/Chronicle can see tournament fights
+      ArenaHistory.append(summary);
+      LoreArchive.signalFight(summary);
+      StyleRollups.addFight({ week: state.week, styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by });
+      NewsletterFeed.appendFightResult({ summary, transcript: outcome.log.map((e) => e.text) });
+
       // Track metrics
       StyleMeter.recordFight({ styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by, isTournament: currentTournament.id });
 
