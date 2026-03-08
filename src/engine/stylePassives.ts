@@ -31,7 +31,7 @@ const STYLE_TEMPO: Record<FightingStyle, TempoProfile> = {
   [FightingStyle.ParryLunge]:      { opening:  0, mid:  1, late:  0, enduranceMult: 1.00 },
   [FightingStyle.ParryRiposte]:    { opening: -1, mid:  0, late:  0, enduranceMult: 0.98 },  // PR: removed late tempo bonus
   [FightingStyle.ParryStrike]:     { opening:  0, mid:  0, late:  0, enduranceMult: 0.96 },
-  [FightingStyle.SlashingAttack]:  { opening:  2, mid:  1, late:  0, enduranceMult: 0.94 },  // SL: strong opening + efficient
+  [FightingStyle.SlashingAttack]:  { opening:  2, mid:  1, late:  0, enduranceMult: 0.96 },  // SL: slight nerf from 0.94
   [FightingStyle.StrikingAttack]:  { opening:  1, mid:  1, late:  0, enduranceMult: 0.96 },  // ST: consistent, efficient
   [FightingStyle.TotalParry]:      { opening: -2, mid:  0, late:  1, enduranceMult: 0.96 },  // TP: nerfed endurance from 0.88
   [FightingStyle.WallOfSteel]:     { opening:  0, mid:  0, late:  1, enduranceMult: 0.92 },
