@@ -87,6 +87,8 @@ export function generatePairings(state: GameState): BoutPairing[] {
       if (paired.has(activeWarriors[i].id)) continue;
       for (let j = i + 1; j < activeWarriors.length; j++) {
         if (paired.has(activeWarriors[j].id)) continue;
+        // Guard: stablemates cannot fight each other
+        if (disallowStablemates(activeWarriors[i].stableId ?? "", activeWarriors[j].stableId ?? "")) continue;
         pairings.push({ a: activeWarriors[i], d: activeWarriors[j], isRivalry: false });
         paired.add(activeWarriors[i].id);
         paired.add(activeWarriors[j].id);
