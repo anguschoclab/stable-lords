@@ -519,11 +519,11 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
 
           <div className="space-y-1.5">
             <Label className="text-sm flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Protect</Label>
-            <Select value={plan.protect ?? "Any"} onValueChange={v => updateField("protect", v as BodyTarget)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {BODY_TARGETS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-              </SelectContent>
+             <Select value={plan.protect ?? "Any"} onValueChange={v => updateField("protect", v as ProtectTarget)}>
+               <SelectTrigger><SelectValue /></SelectTrigger>
+               <SelectContent>
+                 {PROTECT_TARGETS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+               </SelectContent>
             </Select>
           </div>
 
