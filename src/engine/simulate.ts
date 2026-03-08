@@ -536,7 +536,7 @@ export function simulateFight(
         }
       } else {
         // ── 3b. DEFENSE CHECK (DEF) ──
-        const defSuccess = skillCheck(rng, defender.skills.DEF, oeDefMod(defOE) + defMatchup + defFat);
+        const defSuccess = skillCheck(rng, defender.skills.DEF, oeDefMod(defOE) + defMatchup + defFat + defDefMods.defBonus);
 
         if (defSuccess) {
           if (rng() < 0.2) {
