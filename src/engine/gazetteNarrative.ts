@@ -199,6 +199,22 @@ export function generateWeeklyGazette(
   const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
   if (rivalryPair) tags.push("Rivalry");
 
+  // Detect rising stars — warriors whose total career is exactly 3 wins, 0 losses
+  const risingStars: string[] = [];
+  if (allFights) {
+    for (const f of fights) {
+      if (!f.winner) continue;
+      const winnerName = f.winner === "A" ? f.a : f.d;
+      const allByWarrior = allFights.filter(af => af.a === winnerName || af.d === winnerName);
+      if (allByWarrior.length !== 3) continue;
+      const allWins = allByWarrior.every(af =>
+        (af.a === winnerName && af.winner === "A") || (af.d === winnerName && af.winner === "D")
+      );
+      if (allWins) risingStars.push(winnerName);
+    }
+  }
+  if (risingStars.length > 0) tags.push("Rising Star");
+
   // Headline — streak headlines take priority over standard ones
   let headline: string;
   if (hotStreakers.length > 0) {
