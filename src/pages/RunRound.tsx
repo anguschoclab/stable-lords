@@ -10,7 +10,8 @@ import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart, ChevronDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -171,13 +172,14 @@ export default function RunRound() {
         </Card>
       )}
 
-      {/* Autosim results summary */}
+      {/* Autosim Recap */}
       {autosimResult && !autosimming && (
-        <Card className={`border-${autosimResult.stopReason === "max_weeks" ? "primary" : autosimResult.stopReason === "player_death" ? "destructive" : "amber-500"}/40`}>
-          <CardContent className="p-4 space-y-3">
+        <Card className="border-primary/40">
+          <CardContent className="p-4 space-y-4">
+            {/* Header */}
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-display font-semibold">
-                Autosim Complete — {autosimResult.weeksSimmed} week{autosimResult.weeksSimmed !== 1 ? "s" : ""}
+                Autosim Recap — {autosimResult.weeksSimmed} week{autosimResult.weeksSimmed !== 1 ? "s" : ""}
               </h3>
               <Badge variant={autosimResult.stopReason === "max_weeks" ? "default" : "destructive"} className="text-xs">
                 {autosimResult.stopReason === "max_weeks" ? "Completed" :
@@ -190,6 +192,8 @@ export default function RunRound() {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">{autosimResult.stopDetail}</p>
+
+            {/* Aggregate stats */}
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg bg-secondary p-2 text-center">
                 <div className="text-lg font-bold">{autosimResult.weekSummaries.reduce((s, w) => s + w.bouts, 0)}</div>
@@ -204,6 +208,57 @@ export default function RunRound() {
                 <div className="text-[10px] text-muted-foreground">Injuries</div>
               </div>
             </div>
+
+            {/* Week-by-week expandable details */}
+            <div className="space-y-1">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Week-by-Week Breakdown</h4>
+              {autosimResult.weekSummaries.map((ws, i) => {
+                const hasEvents = ws.deaths > 0 || ws.injuries > 0;
+                return (
+                  <Collapsible key={i}>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full py-1.5 px-2 rounded hover:bg-muted/50 text-xs group transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-muted-foreground w-14">Wk {ws.week}</span>
+                        <span className="font-medium">{ws.bouts} bout{ws.bouts !== 1 ? "s" : ""}</span>
+                        {ws.deaths > 0 && (
+                          <span className="flex items-center gap-0.5 text-destructive">
+                            <Skull className="h-3 w-3" /> {ws.deaths}
+                          </span>
+                        )}
+                        {ws.injuries > 0 && (
+                          <span className="flex items-center gap-0.5 text-amber-500">
+                            <Heart className="h-3 w-3" /> {ws.injuries}
+                          </span>
+                        )}
+                        {!hasEvents && ws.bouts > 0 && (
+                          <span className="text-muted-foreground">— clean week</span>
+                        )}
+                      </div>
+                      <ChevronDown className="h-3 w-3 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="ml-16 pb-2 space-y-1 text-xs text-muted-foreground border-l-2 border-border pl-3">
+                        {ws.bouts === 0 && <p>No bouts this week.</p>}
+                        {ws.deathNames.length > 0 && (
+                          <p className="text-destructive">
+                            ☠️ Fallen: {ws.deathNames.join(", ")}
+                          </p>
+                        )}
+                        {ws.injuryNames.length > 0 && (
+                          <p className="text-amber-500">
+                            🩹 Injured: {ws.injuryNames.join(", ")}
+                          </p>
+                        )}
+                        {ws.deaths === 0 && ws.injuries === 0 && ws.bouts > 0 && (
+                          <p>All warriors fought without incident.</p>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                );
+              })}
+            </div>
+
             <Button variant="outline" size="sm" onClick={() => setAutosimResult(null)} className="w-full text-xs">
               Dismiss
             </Button>
