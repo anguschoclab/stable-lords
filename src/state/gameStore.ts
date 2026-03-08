@@ -158,8 +158,6 @@ export function resetGameState(): GameState {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
-
 /**
  * Advance the game by one week using a strict, immutable reducer-style pipeline.
  *
