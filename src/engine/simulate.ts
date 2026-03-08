@@ -227,6 +227,13 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
 }
 
 // ─── OE/AL Effects ────────────────────────────────────────────────────────
+// BALANCE: Global offense/defense tuning constants.
+// The combat chain (ATT→PAR→DEF→DMG) inherently favors defense because
+// defenders get TWO independent checks (PAR then DEF). These constants
+// compensate so aggressive styles remain viable.
+const GLOBAL_ATT_BONUS = 3;   // All attacks get +3 to offset double-defense
+const GLOBAL_PAR_PENALTY = -2; // Parry is slightly harder to reward aggression
+
 function oeAttMod(oe: number): number { return Math.floor((oe - 5) * 0.8); }
 function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * 0.5); }
 function alIniMod(al: number): number { return Math.floor((al - 5) * 0.6); }
@@ -496,9 +503,11 @@ export function simulateFight(
     }
 
     // ── 1. INITIATIVE CONTEST — with tempo & passive ──
+    // Initiative winner gets a pressing advantage (+1 ATT) to reward aggressive styles
     const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus;
     const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus;
     const aGoesFirst = contestCheck(rng, iniA, iniD);
+    const iniPressBonus = 1; // Initiative winner presses the attack
 
     const attacker = aGoesFirst ? fA : fD;
     const defender = aGoesFirst ? fD : fA;
@@ -533,8 +542,8 @@ export function simulateFight(
 
     // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy ──
     const attOEmod = oeAttMod(attOE);
-    const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5); // Convert mult to +/- modifier
-    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod);
+    const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
+    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus + GLOBAL_ATT_BONUS);
 
     if (!attackSuccess) {
       // Attack whiffs — reset consecutive hits
@@ -546,10 +555,10 @@ export function simulateFight(
       // ── Endurance cost for attempt ──
       attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, attAL) * 0.5)) + attOffMods.endCost;
 
-      // Defender may riposte on whiff
+      // Defender may riposte on whiff — harder than after parry (off-tempo)
       // ── 4. RIPOSTE CHECK — with passive RIP ──
       const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
-      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
+      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 3 + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
       if (ripCheck) {
         const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
         const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
@@ -574,7 +583,7 @@ export function simulateFight(
       // ── 3a. PARRY CHECK — with passive PAR + anti-synergy ──
       const defOEmod = oeDefMod(defOE);
       const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
-      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty);
+      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY);
 
       if (parrySuccess) {
         attacker.consecutiveHits = 0;
@@ -584,7 +593,7 @@ export function simulateFight(
         }
 
         // Parry succeeds — defender may riposte (with passive RIP bonus)
-        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 2 + defDefMods.ripBonus + defPassive.ripBonus);
+        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 4 + defDefMods.ripBonus + defPassive.ripBonus);
         if (ripAfterParry) {
           const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
           const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
@@ -601,7 +610,10 @@ export function simulateFight(
         }
       } else {
         // ── 3b. DEFENSE CHECK — with passive DEF ──
-        const defSuccess = skillCheck(rng, defender.skills.DEF, oeDefMod(defOE) + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus);
+        // BALANCE: After a failed parry attempt, the defender is off-balance.
+        // DEF skill is reduced to 40% to prevent PAR+DEF multiplicative stacking.
+        const defSkillAfterParry = Math.round(defender.skills.DEF * 0.4);
+        const defSuccess = skillCheck(rng, defSkillAfterParry, oeDefMod(defOE) + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus);
 
         if (defSuccess) {
           attacker.consecutiveHits = 0;
