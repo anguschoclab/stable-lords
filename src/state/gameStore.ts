@@ -4,6 +4,7 @@
 import { FightingStyle, type GameState, type Warrior, type FightSummary, type Season } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { processTraining } from "@/engine/training";
+import { processEconomy } from "@/engine/economy";
 
 const SAVE_KEY = "stablelords.save.v2";
 
@@ -59,6 +60,8 @@ export function createFreshState(): GameState {
     },
     fame: 0,
     popularity: 0,
+    gold: 500,
+    ledger: [],
     week: 1,
     season: "Spring",
     roster: [],
@@ -98,7 +101,9 @@ export function loadGameState(): GameState {
         if (!parsed.trainers) parsed.trainers = [];
         if (!parsed.hiringPool) parsed.hiringPool = [];
         if (!parsed.trainingAssignments) parsed.trainingAssignments = [];
-        if (parsed.ftueComplete === undefined) parsed.ftueComplete = true; // existing saves already past FTUE
+        if (parsed.gold === undefined) parsed.gold = 500;
+        if (!parsed.ledger) parsed.ledger = [];
+        if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
         if (!parsed.coachDismissed) parsed.coachDismissed = [];
         // Ensure all warriors have status
         parsed.roster = (parsed.roster || []).map((w: any) => ({
@@ -136,12 +141,13 @@ export function resetGameState(): GameState {
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
 export function advanceWeek(state: GameState): GameState {
-  // Process training before advancing
+  // Process training and economy before advancing
   const trained = processTraining(state);
-  const newWeek = trained.week + 1;
+  const economized = processEconomy(trained);
+  const newWeek = economized.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   return {
-    ...trained,
+    ...economized,
     week: newWeek,
     season: SEASONS[seasonIdx],
   };

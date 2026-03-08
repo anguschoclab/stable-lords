@@ -282,6 +282,14 @@ export interface TrainingAssignment {
   attribute: keyof Attributes;
 }
 
+/** A single ledger entry for the economy log */
+export interface LedgerEntry {
+  week: number;
+  label: string;
+  amount: number;
+  category: "fight" | "training" | "recruit" | "trainer" | "upkeep" | "prize" | "other";
+}
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -290,10 +298,12 @@ export interface GameState {
   };
   ftueComplete: boolean;
   ftueStep?: number;
-  coachDismissed: string[]; // IDs of dismissed coach tips
+  coachDismissed: string[];
   player: Owner;
   fame: number;
   popularity: number;
+  gold: number;
+  ledger: LedgerEntry[];
   week: number;
   season: Season;
   roster: Warrior[];
