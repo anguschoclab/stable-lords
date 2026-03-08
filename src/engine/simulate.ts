@@ -442,7 +442,7 @@ export function simulateFight(
       // Attack lands — defender tries to stop it
 
       // ── 3a. PARRY CHECK (PAR) ──
-      const defOEmod = oeDefMod(defender.plan.OE);
+      const defOEmod = oeDefMod(defOE);
       const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat);
 
       if (parrySuccess) {
