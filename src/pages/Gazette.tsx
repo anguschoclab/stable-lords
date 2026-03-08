@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useGame } from "@/state/GameContext";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { StyleRollups } from "@/engine/stats/styleRollups";
