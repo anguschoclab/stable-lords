@@ -494,7 +494,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
             {(Object.entries(PHASE_META) as [keyof typeof PHASE_META, typeof PHASE_META[keyof typeof PHASE_META]][]).map(([key, meta]) => (
               <TabsContent key={key} value={key} className="mt-4 space-y-3">
                 <p className="text-xs text-muted-foreground">{meta.desc}</p>
-                <PhaseSliders phase={plan.phases?.[key]} baseOE={plan.OE} baseAL={plan.AL} baseKD={plan.killDesire ?? 5} onChange={p => updatePhase(key, p)} />
+                <PhaseSliders phase={plan.phases?.[key]} baseOE={plan.OE} baseAL={plan.AL} baseKD={plan.killDesire ?? 5} style={plan.style} basePlan={plan} onChange={p => updatePhase(key, p)} />
               </TabsContent>
             ))}
           </Tabs>
