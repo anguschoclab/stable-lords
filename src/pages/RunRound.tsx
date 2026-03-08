@@ -36,7 +36,7 @@ export default function RunRound() {
 
       const planA = warrior.plan ?? defaultPlanForWarrior(warrior);
       const planD = opponent.plan ?? defaultPlanForWarrior(opponent);
-      const outcome = simulateFight(planA, planD);
+      const outcome = simulateFight(planA, planD, warrior, opponent);
 
       const tags = outcome.post?.tags ?? [];
       const rawFameA = fameFromTags(outcome.winner === "A" ? tags : []);
