@@ -50,8 +50,27 @@ export default function Tournaments() {
     const active = state.roster.filter((w) => w.status === "Active");
     if (active.length < 2) return;
 
-    // Build bracket: pair warriors
-    const shuffled = [...active].sort(() => Math.random() - 0.5);
+    // Gather AI rival warriors for the bracket (up to 5 from rivals)
+    const rivalWarriors: { name: string; isAI: boolean }[] = [];
+    for (const rival of (state.rivals ?? [])) {
+      const eligibleRivals = rival.roster.filter((w) => w.status === "Active").slice(0, 2);
+      for (const rw of eligibleRivals) {
+        rivalWarriors.push({ name: rw.name, isAI: true });
+      }
+      if (rivalWarriors.length >= 5) break;
+    }
+
+    // Combine player + AI warriors
+    const allEntrants = [
+      ...active.map((w) => ({ name: w.name, isAI: false })),
+      ...rivalWarriors,
+    ];
+
+    // Pad to power of 2 for clean bracket (4, 8, 16)
+    const targetSize = [4, 8, 16].find((n) => n >= allEntrants.length) ?? allEntrants.length;
+
+    // Build bracket: shuffle and pair
+    const shuffled = [...allEntrants].sort(() => Math.random() - 0.5);
     const bracket: TournamentBout[] = [];
     for (let i = 0; i < shuffled.length; i += 2) {
       if (i + 1 < shuffled.length) {
@@ -60,6 +79,15 @@ export default function Tournaments() {
           matchIndex: Math.floor(i / 2),
           a: shuffled[i].name,
           d: shuffled[i + 1].name,
+        });
+      } else {
+        // Odd entrant gets a bye
+        bracket.push({
+          round: 1,
+          matchIndex: Math.floor(i / 2),
+          a: shuffled[i].name,
+          d: "(bye)",
+          winner: "A",
         });
       }
     }
