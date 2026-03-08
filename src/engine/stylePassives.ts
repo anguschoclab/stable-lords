@@ -216,14 +216,14 @@ export function getStylePassive(
       };
 
     // ── Slashing Attack: Flurry ──
-    // BALANCE v5: Multi-hit identity — ATT persists into late (reduced), DMG scales with hits landed
+    // BALANCE v6: Higher base ATT (+2 opening/mid), persistent dmgBonus, strong multi-hit identity
     case FightingStyle.SlashingAttack: {
-      const flurryDmg = Math.min(2, Math.floor(context.hitsLanded / 2)); // +1 DMG per 2 hits
+      const flurryDmg = Math.min(3, Math.floor(context.hitsLanded / 2)); // +1 DMG per 2 hits, cap 3
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(context.phase === "LATE" ? 0 : 1) + (context.phase === "OPENING" ? m.bonus : 0),
-        dmgBonus: (context.phase === "OPENING" ? 1 : 0) + flurryDmg,
+        attBonus: scale(context.phase === "LATE" ? 1 : 2) + (context.phase === "OPENING" ? m.bonus : 0),
+        dmgBonus: 1 + flurryDmg,  // Always +1 base, scaling with hits
         narrative: context.hitsLanded >= 3
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}unleashes a whirlwind of slashes, each cut deeper than the last!`
           : undefined,
