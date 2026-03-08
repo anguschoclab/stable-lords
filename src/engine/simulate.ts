@@ -583,7 +583,7 @@ export function simulateFight(
       // ── 3a. PARRY CHECK — with passive PAR + anti-synergy ──
       const defOEmod = oeDefMod(defOE);
       const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
-      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty);
+      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY);
 
       if (parrySuccess) {
         attacker.consecutiveHits = 0;
