@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -34,13 +34,28 @@ const navItems = [
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { state, doReset, returnToTitle } = useGame();
+  const { state, doReset, returnToTitle, lastSavedAt } = useGame();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
-  // Auto-hide sidebar on small screens
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
+  const [saveFlash, setSaveFlash] = useState(false);
 
   useCoachTip(location.pathname);
+
+  // Flash the save indicator briefly when a save occurs
+  useEffect(() => {
+    if (!lastSavedAt) return;
+    setSaveFlash(true);
+    const t = setTimeout(() => setSaveFlash(false), 1500);
+    return () => clearTimeout(t);
+  }, [lastSavedAt]);
+
+  const formatSaveTime = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    } catch { return ""; }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -90,7 +105,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Right: Status + Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Auto-save indicator */}
+            {lastSavedAt && (
+              <div
+                className={cn(
+                  "hidden sm:flex items-center gap-1 text-[10px] font-mono transition-colors duration-500",
+                  saveFlash ? "text-arena-pop" : "text-muted-foreground/50"
+                )}
+                title={`Last saved: ${new Date(lastSavedAt).toLocaleString()}`}
+              >
+                <Save className={cn("h-3 w-3 transition-transform duration-300", saveFlash && "scale-110")} />
+                <span>{formatSaveTime(lastSavedAt)}</span>
+              </div>
+            )}
             <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 hidden sm:flex">
               {moodIcon} Wk {state.week} · {state.season}
             </Badge>
