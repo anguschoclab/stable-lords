@@ -167,6 +167,7 @@ export function generateRecruit(
 
   const { baseSkills, derivedStats } = computeWarriorStats(attributes, style);
   const potential = generatePotential(attributes, tier, rng);
+  const favorites = generateFavorites(style, rng);
 
   return {
     id: `recruit_${Date.now()}_${Math.floor(rng() * 1e6)}`,
@@ -181,6 +182,7 @@ export function generateRecruit(
     age: 16 + Math.floor(rng() * 6),
     lore: generateLore(rng, style),
     addedWeek: week,
+    favorites,
   };
 }
 
