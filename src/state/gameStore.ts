@@ -206,11 +206,56 @@ export function advanceWeek(state: GameState): GameState {
     }
   }
 
-  // Season change = full pool reset
+  // ─── Stable Tier Progression (every 13 weeks / season change) ──────────
   const newWeek = updatedState.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   const newSeason = SEASONS[seasonIdx];
+
   if (newSeason !== updatedState.season) {
+    const promotionNews: string[] = [];
+    updatedState.rivals = (updatedState.rivals || []).map(r => {
+      const totalWins = r.roster.reduce((s, w) => s + w.career.wins, 0);
+      const totalKills = r.roster.reduce((s, w) => s + w.career.kills, 0);
+      const totalFights = r.roster.reduce((s, w) => s + w.career.wins + w.career.losses, 0);
+      const activeCount = r.roster.filter(w => w.status === "Active").length;
+
+      let newTier = r.tier;
+
+      // Minor → Established: 15+ total wins, 2+ kills, 5+ active warriors
+      if (r.tier === "Minor" && totalWins >= 15 && totalKills >= 2 && activeCount >= 5) {
+        newTier = "Established";
+        promotionNews.push(`📈 ${r.owner.stableName} has risen to Established status! Their ${totalWins} victories and growing kill count demand respect.`);
+      }
+      // Established → Major: 30+ wins, 5+ kills, 7+ active, 60%+ win rate
+      else if (r.tier === "Established" && totalWins >= 30 && totalKills >= 5 && activeCount >= 7 && totalFights > 0 && (totalWins / totalFights) >= 0.6) {
+        newTier = "Major";
+        promotionNews.push(`🏆 ${r.owner.stableName} ascends to Major stable status! ${r.owner.name}'s warriors are now a dominant force in the arena.`);
+      }
+      // Demotion: Major → Established if < 4 active warriors
+      else if (r.tier === "Major" && activeCount < 4) {
+        newTier = "Established";
+        promotionNews.push(`📉 ${r.owner.stableName} has been downgraded to Established — their roster has thinned dangerously.`);
+      }
+      // Demotion: Established → Minor if < 3 active warriors
+      else if (r.tier === "Established" && activeCount < 3) {
+        newTier = "Minor";
+        promotionNews.push(`📉 ${r.owner.stableName} falls to Minor status. Can ${r.owner.name} rebuild?`);
+      }
+
+      if (newTier !== r.tier) {
+        return { ...r, tier: newTier as any };
+      }
+      return r;
+    });
+
+    if (promotionNews.length > 0) {
+      updatedState.newsletter = [...updatedState.newsletter, {
+        week: newWeek,
+        title: "Stable Rankings Update",
+        items: promotionNews,
+      }];
+    }
+
     // Full pool reset on season change
     updatedState.recruitPool = [];
   }
