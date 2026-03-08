@@ -156,7 +156,7 @@ export interface PhaseStrategy {
   killDesire: number;
   offensiveTactic?: OffensiveTactic;
   defensiveTactic?: DefensiveTactic;
-  target?: BodyTarget;
+  target?: AttackTarget;
 }
 
 export interface FightPlan {
@@ -164,8 +164,8 @@ export interface FightPlan {
   OE: number;      // Offensive Effort 1-10 (default / fallback)
   AL: number;      // Activity Level 1-10
   killDesire?: number; // Kill Desire 1-10
-  target?: BodyTarget;
-  protect?: BodyTarget;  // Prioritize defense of a body location
+  target?: AttackTarget;
+  protect?: ProtectTarget;  // Prioritize defense of a body location
   offensiveTactic?: OffensiveTactic;
   defensiveTactic?: DefensiveTactic;
   gear?: Gear;
