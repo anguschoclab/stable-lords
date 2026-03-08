@@ -135,6 +135,16 @@ export default function Tournaments() {
       };
       updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
 
+      // Track metrics
+      StyleMeter.recordFight({ styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by, isTournament: currentTournament.id });
+
+      // Fame accumulation for stable
+      if (outcome.winner) {
+        const fameData = fameFromTags(tags);
+        updatedState.fame = (updatedState.fame ?? 0) + fameData.fame;
+        updatedState.player = { ...updatedState.player, fame: (updatedState.player.fame ?? 0) + fameData.fame };
+      }
+
       // Update records
       updatedState = {
         ...updatedState,
