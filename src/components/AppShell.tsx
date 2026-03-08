@@ -37,7 +37,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { state, doReset, returnToTitle } = useGame();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Auto-hide sidebar on small screens
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
 
   useCoachTip(location.pathname);
 
