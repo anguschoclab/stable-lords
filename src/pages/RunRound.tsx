@@ -282,28 +282,29 @@ export default function RunRound() {
           {results.map((r, i) => (
             <Card key={i} className="overflow-hidden">
               <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <Swords className="h-5 w-5 text-arena-gold" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Swords className="h-5 w-5 text-arena-gold shrink-0" />
                     <span className="font-display font-semibold">{r.a.name}</span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                       {STYLE_DISPLAY_NAMES[r.a.style]}
                     </Badge>
                     <span className="text-muted-foreground">vs</span>
                     <span className="font-display font-semibold">{r.d.name}</span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                       {STYLE_DISPLAY_NAMES[r.d.style]}
                     </Badge>
                   </div>
                   <Badge
                     variant={r.outcome.winner ? "default" : "secondary"}
-                    className={
+                    className={cn(
+                      "shrink-0 self-start sm:self-auto",
                       r.outcome.by === "Kill"
                         ? "bg-arena-blood text-white gap-1"
                         : r.outcome.by === "KO"
                         ? "bg-arena-gold text-black"
                         : ""
-                    }
+                    )}
                   >
                     {r.outcome.by === "Kill" && <Skull className="h-3 w-3" />}
                     {r.outcome.winner
