@@ -1,7 +1,8 @@
 /**
  * Detects rivalry intensity escalation and fires toast notifications.
+ * Blood Feud level (4-5) triggers screen shake + impact SFX via Web Audio API.
  */
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useCallback } from "react";
 import { useGame } from "@/state/GameContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -17,6 +18,85 @@ const INTENSITY_LABELS: Record<number, string> = {
   4: "Bitter",
   5: "Blood Feud",
 };
+
+/** Synthesize an impact/war-drum sound using Web Audio API */
+function playImpactSFX(intensity: number) {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+    // Low rumble / war drum hit
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(intensity >= 5 ? 55 : 80, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.6, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.5);
+
+    // Noise burst for attack transient
+    const bufferSize = ctx.sampleRate * 0.08;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const noiseData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      noiseData[i] = (Math.random() * 2 - 1) * 0.3;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.4, ctx.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    noise.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start(ctx.currentTime);
+
+    // Blood feud gets a second deeper hit
+    if (intensity >= 5) {
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(40, ctx.currentTime + 0.15);
+      osc2.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.7);
+      gain2.gain.setValueAtTime(0.5, ctx.currentTime + 0.15);
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(ctx.currentTime + 0.15);
+      osc2.stop(ctx.currentTime + 0.7);
+    }
+
+    // Cleanup
+    setTimeout(() => ctx.close(), 1000);
+  } catch {
+    // Web Audio not available — fail silently
+  }
+}
+
+/** Apply screen shake + red flash to the document */
+function triggerScreenShake(intensity: number) {
+  const root = document.getElementById("root");
+  if (!root) return;
+
+  // Screen shake
+  root.classList.add("animate-screen-shake");
+
+  // Blood-red flash overlay
+  const overlay = document.createElement("div");
+  overlay.className = "fixed inset-0 pointer-events-none z-[9999] animate-blood-flash";
+  overlay.style.backgroundColor = intensity >= 5
+    ? "hsl(0 70% 50% / 0.2)"
+    : "hsl(0 70% 50% / 0.12)";
+  document.body.appendChild(overlay);
+
+  // Cleanup
+  setTimeout(() => {
+    root.classList.remove("animate-screen-shake");
+    overlay.remove();
+  }, 800);
+}
 
 export function useRivalryAlerts() {
   const { state } = useGame();
@@ -70,9 +150,20 @@ export function useRivalryAlerts() {
       const oldIntensity = prev.get(r.stableName) ?? 0;
       if (r.intensity > oldIntensity && oldIntensity > 0) {
         const label = INTENSITY_LABELS[r.intensity] ?? "Escalated";
+
+        // Dramatic effects for Bitter (4) and Blood Feud (5)
+        if (r.intensity >= 4) {
+          triggerScreenShake(r.intensity);
+          playImpactSFX(r.intensity);
+        }
+
         toast({
-          title: `🔥 Rivalry Escalated: ${r.stableName}`,
-          description: `Your feud with ${r.stableName} has intensified to "${label}" (${r.intensity}/5)!`,
+          title: r.intensity >= 5
+            ? `💀 BLOOD FEUD: ${r.stableName}`
+            : `🔥 Rivalry Escalated: ${r.stableName}`,
+          description: r.intensity >= 5
+            ? `The hatred between your stables has reached its peak. There will be no mercy.`
+            : `Your feud with ${r.stableName} has intensified to "${label}" (${r.intensity}/5)!`,
           variant: r.intensity >= 4 ? "destructive" : "default",
         });
       }
