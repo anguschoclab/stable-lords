@@ -116,138 +116,133 @@ export function getStylePassive(
   }
   switch (style) {
     // ── Aimed Blow: Precision Master ──
-    // Bonus ATT when targeting specific locations; crit chance scales with patience
     case FightingStyle.AimedBlow: {
       const targeted = context.targetedLocation && context.targetedLocation !== "Any";
+      const baseCrit = targeted ? 0.15 + (context.exchange > 5 ? 0.1 : 0) : 0;
       return {
         ...EMPTY_PASSIVE,
-        attBonus: targeted ? 2 : 0,
-        critChance: targeted ? 0.15 + (context.exchange > 5 ? 0.1 : 0) : 0,
+        mastery: m.tier,
+        attBonus: scale(targeted ? 2 : 0) + (targeted ? m.bonus : 0), // signature: ATT on targeted
+        critChance: baseCrit + (m.bonus * 0.03), // mastery increases crit chance
         narrative: targeted && context.exchange > 5
-          ? "studies the opponent's rhythm, waiting for the perfect opening"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}studies the opponent's rhythm, waiting for the perfect opening`
           : undefined,
       };
     }
 
     // ── Bashing Attack: Momentum ──
-    // Consecutive hits increase damage; overwhelm bonus when opponent is hurt
     case FightingStyle.BashingAttack: {
-      const momentumDmg = Math.min(3, context.consecutiveHits);
-      const overwhelm = context.hpRatio < 0.5 ? 0 : (1 - context.hpRatio) < 0.5 ? 0 : 0;
-      // Overwhelm: bonus when OPPONENT is hurt (checked externally, but we add dmg on consecutive)
+      const momentumDmg = Math.min(3 + m.bonus, context.consecutiveHits); // mastery raises momentum cap
       return {
         ...EMPTY_PASSIVE,
-        dmgBonus: momentumDmg,
-        attBonus: context.consecutiveHits >= 2 ? 1 : 0,
+        mastery: m.tier,
+        dmgBonus: scale(momentumDmg),
+        attBonus: scale(context.consecutiveHits >= 2 ? 1 : 0),
         narrative: context.consecutiveHits >= 3
-          ? "builds devastating momentum, each blow harder than the last!"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}builds devastating momentum, each blow harder than the last!`
           : undefined,
       };
     }
 
     // ── Lunging Attack: First Strike ──
-    // Big INI bonus in early exchanges, fades fast
     case FightingStyle.LungingAttack: {
       const earlyBonus = context.exchange <= 3 ? 3 : context.exchange <= 6 ? 1 : 0;
       return {
         ...EMPTY_PASSIVE,
-        iniBonus: earlyBonus,
-        attBonus: context.exchange === 0 ? 2 : 0, // First-strike bonus
+        mastery: m.tier,
+        iniBonus: scale(earlyBonus) + (context.exchange <= 3 ? m.bonus : 0), // signature: INI in opening
+        attBonus: scale(context.exchange === 0 ? 2 : 0),
         narrative: context.exchange === 0
-          ? "explodes forward with a devastating opening lunge!"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}explodes forward with a devastating opening lunge!`
           : undefined,
       };
     }
 
     // ── Parry-Lunge: Counter-Lunge ──
-    // After taking a hit, gets ATT bonus next exchange (counter-attack specialist)
     case FightingStyle.ParryLunge: {
       const counterReady = context.hitsTaken > 0 && context.hitsTaken > context.hitsLanded;
       return {
         ...EMPTY_PASSIVE,
-        attBonus: counterReady ? 2 : 0,
-        iniBonus: counterReady ? 1 : 0,
-        parBonus: 1, // Always slightly better at parrying
+        mastery: m.tier,
+        attBonus: scale(counterReady ? 2 : 0) + (counterReady ? m.bonus : 0), // signature: counter ATT
+        iniBonus: scale(counterReady ? 1 : 0),
+        parBonus: scale(1),
         narrative: counterReady
-          ? "absorbs the blow, coiling for a devastating counter-lunge"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}absorbs the blow, coiling for a devastating counter-lunge`
           : undefined,
       };
     }
 
     // ── Parry-Riposte: Riposte Specialist ──
-    // Escalating RIP bonus after each successful riposte; bonus RIP after parry
     case FightingStyle.ParryRiposte: {
-      const ripEscalation = Math.min(4, context.ripostes);
+      const ripEscalation = Math.min(4 + m.bonus, context.ripostes); // mastery raises escalation cap
       return {
         ...EMPTY_PASSIVE,
-        ripBonus: 3 + ripEscalation, // Significant riposte advantage + scaling
-        parBonus: 1,
+        mastery: m.tier,
+        ripBonus: scale(3 + ripEscalation), // signature: RIP
+        parBonus: scale(1) + m.bonus,
         narrative: context.ripostes >= 3
-          ? "has found the rhythm — each counter deadlier than the last!"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}has found the rhythm — each counter deadlier than the last!`
           : undefined,
       };
     }
 
     // ── Parry-Strike: Efficient Counter ──
-    // Reduced endurance cost and consistent PAR/ATT bonuses
-    case FightingStyle.ParryStrike: {
+    case FightingStyle.ParryStrike:
       return {
         ...EMPTY_PASSIVE,
-        parBonus: 2,
-        attBonus: 1,
-        // Endurance efficiency is handled via enduranceMult in tempo
+        mastery: m.tier,
+        parBonus: scale(2) + m.bonus, // signature: PAR
+        attBonus: scale(1),
       };
-    }
 
     // ── Slashing Attack: Flurry ──
-    // Extra damage on high AL settings; bonus in early/mid phases
-    case FightingStyle.SlashingAttack: {
+    case FightingStyle.SlashingAttack:
       return {
         ...EMPTY_PASSIVE,
-        dmgBonus: context.phase === "OPENING" ? 1 : 0,
-        attBonus: context.phase !== "LATE" ? 1 : -1,
+        mastery: m.tier,
+        dmgBonus: scale(context.phase === "OPENING" ? 1 : 0) + (context.phase === "OPENING" ? m.bonus : 0), // signature: opening DMG
+        attBonus: scale(context.phase !== "LATE" ? 1 : -1),
         narrative: context.phase === "OPENING" && context.hitsLanded >= 2
-          ? "unleashes a whirlwind of slashes!"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}unleashes a whirlwind of slashes!`
           : undefined,
       };
-    }
 
     // ── Striking Attack: Reliable Power ──
-    // Consistent bonuses, slight DEC advantage for finishing fights
-    case FightingStyle.StrikingAttack: {
+    case FightingStyle.StrikingAttack:
       return {
         ...EMPTY_PASSIVE,
-        attBonus: 1,
-        dmgBonus: context.hpRatio > 0.7 ? 0 : 1, // Bonus damage vs hurt opponents
+        mastery: m.tier,
+        attBonus: scale(1) + m.bonus, // signature: consistent ATT
+        dmgBonus: scale(context.hpRatio > 0.7 ? 0 : 1),
       };
-    }
 
     // ── Total Parry: Endurance Wall ──
-    // Massive PAR/DEF bonuses; practically immune to early kills; grows stronger as fight drags
     case FightingStyle.TotalParry: {
       const lateBonus = context.phase === "LATE" ? 3 : context.phase === "MID" ? 1 : 0;
       return {
         ...EMPTY_PASSIVE,
-        parBonus: 3 + lateBonus,
-        defBonus: 2 + lateBonus,
-        ripBonus: context.phase === "LATE" ? 2 : 0, // Late-fight riposte capability
+        mastery: m.tier,
+        parBonus: scale(3 + lateBonus) + m.bonus, // signature: PAR
+        defBonus: scale(2 + lateBonus) + m.bonus,
+        ripBonus: scale(context.phase === "LATE" ? 2 : 0),
         narrative: context.phase === "LATE" && context.endRatio > 0.5
-          ? "stands fresh as the opponent gasps for breath!"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}stands fresh as the opponent gasps for breath!`
           : undefined,
       };
     }
 
     // ── Wall of Steel: Blade Barrier ──
-    // Passive DEF/PAR scaling, gets harder to hit over time
     case FightingStyle.WallOfSteel: {
-      const wallBonus = Math.min(3, Math.floor(context.exchange / 3));
+      const wallBonus = Math.min(3 + m.bonus, Math.floor(context.exchange / 3)); // mastery raises wall cap
       return {
         ...EMPTY_PASSIVE,
-        defBonus: 2 + wallBonus,
-        parBonus: 1 + wallBonus,
-        ripBonus: 1 + Math.floor(wallBonus / 2),
+        mastery: m.tier,
+        defBonus: scale(2 + wallBonus),
+        parBonus: scale(1 + wallBonus),
+        ripBonus: scale(1 + Math.floor(wallBonus / 2)),
         narrative: wallBonus >= 2
-          ? "the constant blade motion becomes an impenetrable wall!"
+          ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}the constant blade motion becomes an impenetrable wall!`
           : undefined,
       };
     }
