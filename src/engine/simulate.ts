@@ -53,24 +53,26 @@ const STYLE_ORDER = [
 ];
 
 // Row = attacker style, Col = defender style
-// BALANCE v3: Lore-accurate matchups from Duelmasters canon:
-// - BA hard-counters TP (bash attacks through parries, overwhelms passive defense)
-// - AB counters TP (endurance conservation + precision finds openings in static defense)
-// - SL/LU beat TP (aggression overwhelms)
-// - TP beats reactive/patient styles (PL, PR, WS — outlasts them)
-// - BA loses to precision/counter styles (AB, PR — can read the charges)
+// BALANCE v6: Rebalanced for 35-65% target range.
+// Key changes:
+// - BA gets +2 vs TP (hard counter via bash-through), +1 vs SL/WS/PL
+// - SL gets +1 vs TP/WS/BA (flurry overwhelms)
+// - ST gets +1 vs TP/PR/PS/PL (reliable power vs counter styles)
+// - TP loses advantage vs most styles (only beats WS/PL via endurance)
+// - AB loses universal advantage (only counters TP)
+// - PR loses advantage vs BA/ST (can't counter raw power or efficient strikes)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0, +1,  0,  0, -1,  0,  0,  0, +2,  0], // AB: precision destroys TP, edge vs BA
-  [-1,  0,  0,  0,  0,  0, +1,  0, +2, +1], // BA: hard-counters TP, beats SL/WS
-  [ 0,  0,  0, +1,  0, -1,  0,  0, +1, -1], // LU: speed beats PL, weak vs PS/WS
-  [ 0,  0, -1,  0, +1,  0,  0, -1, -1,  0], // PL: beats PR, weak vs ST/TP
-  [+1,  0,  0, -1,  0,  0,  0, -1, -1,  0], // PR: counter beats AB, weak vs PL/ST/TP
-  [ 0,  0, +1,  0,  0,  0, +1, -1,  0, -1], // PS: beats LU/SL, loses to ST/WS
-  [ 0, -1,  0,  0,  0, -1,  0,  0, +1, +1], // SL: flurry beats TP/WS, weak vs BA/PS
-  [ 0,  0,  0, +1, +1, +1,  0,  0,  0,  0], // ST: efficient power, beats PL/PR/PS
-  [-2, -2, -1, +1, +1,  0, -1,  0,  0, +1], // TP: crushed by BA/AB, outlasts PL/PR
-  [ 0, -1, +1,  0,  0, +1, -1,  0, -1,  0], // WS: zone control, beats LU/PS, loses to BA/TP
+  [ 0,  0,  0,  0, -1,  0,  0,  0, +1,  0], // AB: only edge vs TP, weak vs PR
+  [ 0,  0,  0, +1,  0,  0, +1, +1, +2, +1], // BA: hard-counters TP, edge vs SL/ST/PL/WS
+  [ 0,  0,  0, +1,  0, -1,  0,  0,  0, -1], // LU: speed beats PL, weak vs PS/WS
+  [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0], // PL: weak vs BA/LU/ST
+  [+1,  0,  0,  0,  0,  0,  0, -1,  0,  0], // PR: counter beats AB, weak vs ST
+  [ 0,  0, +1,  0,  0,  0,  0, -1,  0, -1], // PS: beats LU, loses to ST/WS
+  [ 0, -1,  0,  0,  0,  0,  0,  0, +1, +1], // SL: beats TP/WS, weak vs BA
+  [ 0, -1,  0, +1, +1, +1,  0,  0, +1,  0], // ST: efficient power beats PL/PR/PS/TP, weak vs BA
+  [-1, -2,  0,  0,  0,  0, -1, -1,  0,  0], // TP: crushed by BA, weak vs AB/SL/ST
+  [ 0, -1, +1,  0,  0, +1, -1,  0,  0,  0], // WS: zone control, beats LU/PS, loses to BA/SL
 ];
 
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
