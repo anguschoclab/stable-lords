@@ -721,6 +721,35 @@ export default function Gazette() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-display flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-arena-gold" />
+                      Arena Chronicle
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-2">
+                    {(() => {
+                      const story = generateWeeklyGazette(fights, state.crowdMood as any, week, state.graveyard);
+                      return (
+                        <>
+                          <h3 className="text-xs font-display font-bold text-foreground">{story.headline}</h3>
+                          {story.tags.length > 0 && (
+                            <div className="flex gap-1 flex-wrap">
+                              {story.tags.map(t => (
+                                <Badge key={t} variant="outline" className="text-[9px] text-arena-gold border-arena-gold/30">{t}</Badge>
+                              ))}
+                            </div>
+                          )}
+                          {story.body.split("\n\n").map((p, i) => (
+                            <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">{p}</p>
+                          ))}
+                        </>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-display flex items-center gap-2">
                       <Trophy className="h-4 w-4 text-arena-gold" />
                       Headlines
                     </CardTitle>
