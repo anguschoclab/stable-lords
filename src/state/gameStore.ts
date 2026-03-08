@@ -157,119 +157,138 @@ export function resetGameState(): GameState {
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
+/**
+ * Advance the game by one week using a strict, immutable reducer-style pipeline.
+ *
+ * ┌────────────────────────────────────────────────────────────────┐
+ * │  WEEKLY ADVANCE PIPELINE — Guaranteed Execution Order         │
+ * │                                                               │
+ * │  Step 1: Training        — Apply attribute gains from drills  │
+ * │  Step 2: Economy         — Process income, expenses, ledger   │
+ * │  Step 3: Aging           — Tick warrior ages, apply decline   │
+ * │  Step 4: Injuries        — Heal active injuries, tick timers  │
+ * │  Step 5: Rest States     — Clear expired mandatory rest       │
+ * │  Step 6: AI Bouts        — Rival-vs-rival background fights  │
+ * │  Step 7: Recruitment     — Refresh orphan pool, AI drafting   │
+ * │  Step 8: Hall of Fame    — Yearly induction (every 52 weeks)  │
+ * │  Step 9: Tier Progression— Promote/demote rival stables       │
+ * │  Step 10: Clock Advance  — Increment week counter & season    │
+ * │                                                               │
+ * │  Each step receives the output of the previous step.          │
+ * │  No step mutates the original state reference.                │
+ * └────────────────────────────────────────────────────────────────┘
+ *
+ * @param state - Current immutable game state
+ * @returns New game state after all pipeline steps
+ */
 export function advanceWeek(state: GameState): GameState {
-  const trained = processTraining(state);
-  const economized = processEconomy(trained);
-  const aged = processAging(economized);
-  
-  // Tick injuries
+  // ── Step 1: Training ──────────────────────────────────────────────────
+  const afterTraining = processTraining(state);
+
+  // ── Step 2: Economy ───────────────────────────────────────────────────
+  const afterEconomy = processEconomy(afterTraining);
+
+  // ── Step 3: Aging ─────────────────────────────────────────────────────
+  const afterAging = processAging(afterEconomy);
+
+  // ── Step 4: Injuries ──────────────────────────────────────────────────
   const injuryNews: string[] = [];
-  const rosterWithHealedInjuries = aged.roster.map((w) => {
+  const rosterWithHealedInjuries = afterAging.roster.map((w) => {
     const injuryObjects = (w.injuries || []).filter((i): i is import("@/types/game").InjuryData => typeof i !== "string");
     if (injuryObjects.length === 0) return w;
     const { active, healed } = tickInjuries(injuryObjects as any);
     if (healed.length > 0) injuryNews.push(`${w.name} recovered from ${healed.join(", ")}.`);
     return { ...w, injuries: active as any };
   });
-  
-  let updatedState = { ...aged, roster: rosterWithHealedInjuries };
+
+  let s = { ...afterAging, roster: rosterWithHealedInjuries };
   if (injuryNews.length > 0) {
-    updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Medical Report", items: injuryNews }];
+    s.newsletter = [...s.newsletter, { week: s.week, title: "Medical Report", items: injuryNews }];
   }
 
-  // Clear expired rest states
-  updatedState.restStates = clearExpiredRest(updatedState.restStates || [], updatedState.week);
+  // ── Step 5: Rest States ───────────────────────────────────────────────
+  s.restStates = clearExpiredRest(s.restStates || [], s.week);
 
-  // Run AI vs AI background bouts
-  if ((updatedState.rivals || []).length > 0) {
-    const { updatedRivals, gazetteItems } = runAIvsAIBouts(updatedState);
-    updatedState.rivals = updatedRivals;
+  // ── Step 6: AI Bouts ──────────────────────────────────────────────────
+  if ((s.rivals || []).length > 0) {
+    const { updatedRivals, gazetteItems } = runAIvsAIBouts(s);
+    s.rivals = updatedRivals;
     if (gazetteItems.length > 0) {
-      updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Rival Arena Report", items: gazetteItems }];
+      s.newsletter = [...s.newsletter, { week: s.week, title: "Rival Arena Report", items: gazetteItems }];
     }
   }
 
-  // Partial pool refresh (1-2 warriors cycled weekly)
+  // ── Step 7: Recruitment ───────────────────────────────────────────────
   const usedNames = new Set<string>();
-  for (const w of updatedState.roster) usedNames.add(w.name);
-  for (const w of updatedState.graveyard) usedNames.add(w.name);
-  for (const r of updatedState.rivals || []) for (const w of r.roster) usedNames.add(w.name);
-  updatedState.recruitPool = partialRefreshPool(updatedState.recruitPool || [], updatedState.week, usedNames);
+  for (const w of s.roster) usedNames.add(w.name);
+  for (const w of s.graveyard) usedNames.add(w.name);
+  for (const r of s.rivals || []) for (const w of r.roster) usedNames.add(w.name);
+  s.recruitPool = partialRefreshPool(s.recruitPool || [], s.week, usedNames);
 
-  // AI draft from pool (every 4 weeks)
-  if ((updatedState.rivals || []).length > 0 && (updatedState.recruitPool || []).length > 0) {
-    const draft = aiDraftFromPool(updatedState.recruitPool, updatedState.rivals, updatedState.week);
-    updatedState.recruitPool = draft.updatedPool;
-    updatedState.rivals = draft.updatedRivals;
+  if ((s.rivals || []).length > 0 && (s.recruitPool || []).length > 0) {
+    const draft = aiDraftFromPool(s.recruitPool, s.rivals, s.week);
+    s.recruitPool = draft.updatedPool;
+    s.rivals = draft.updatedRivals;
     if (draft.gazetteItems.length > 0) {
-      updatedState.newsletter = [...updatedState.newsletter, { week: updatedState.week, title: "Draft Report", items: draft.gazetteItems }];
+      s.newsletter = [...s.newsletter, { week: s.week, title: "Draft Report", items: draft.gazetteItems }];
     }
   }
 
-  // ─── Stable Tier Progression (every 13 weeks / season change) ──────────
-  const newWeek = updatedState.week + 1;
+  // ── Step 8: Hall of Fame (every 52 weeks) ─────────────────────────────
+  const newWeek = s.week + 1;
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   const newSeason = SEASONS[seasonIdx];
 
-  // ─── Hall of Fame Induction (every 52 weeks / year boundary) ──────────
   if (newWeek % 52 === 0) {
     const yearNum = Math.floor(newWeek / 52);
     const hofNews: string[] = [];
 
-    // Best warrior by fame across all rosters (player + rivals)
     const allWarriors = [
-      ...updatedState.roster,
-      ...updatedState.graveyard,
-      ...updatedState.retired,
-      ...(updatedState.rivals || []).flatMap(r => r.roster),
+      ...s.roster,
+      ...s.graveyard,
+      ...s.retired,
+      ...(s.rivals || []).flatMap(r => r.roster),
     ];
     const bestByFame = [...allWarriors].sort((a, b) => (b.fame ?? 0) - (a.fame ?? 0))[0];
     if (bestByFame && (bestByFame.fame ?? 0) > 0) {
       hofNews.push(`🏛️ HALL OF FAME: ${bestByFame.name} (${bestByFame.style}) inducted as Year ${yearNum}'s greatest warrior with ${bestByFame.fame} fame!`);
     }
 
-    // Best killer
     const bestKiller = [...allWarriors].filter(w => w.career.kills > 0).sort((a, b) => b.career.kills - a.career.kills)[0];
     if (bestKiller && bestKiller.name !== bestByFame?.name) {
       hofNews.push(`💀 DEADLIEST BLADE: ${bestKiller.name} earns the "Deadliest Blade" honor with ${bestKiller.career.kills} kills in Year ${yearNum}.`);
     }
 
-    // Most wins
     const bestWins = [...allWarriors].filter(w => w.career.wins > 0).sort((a, b) => b.career.wins - a.career.wins)[0];
     if (bestWins && bestWins.name !== bestByFame?.name && bestWins.name !== bestKiller?.name) {
       hofNews.push(`⚔️ IRON CHAMPION: ${bestWins.name} recorded the most victories (${bestWins.career.wins}) in Year ${yearNum}.`);
     }
 
-    // Tournament champions this year
-    const yearTournaments = updatedState.tournaments.filter(t => t.completed && t.champion && t.week >= newWeek - 52);
+    const yearTournaments = s.tournaments.filter(t => t.completed && t.champion && t.week >= newWeek - 52);
     for (const t of yearTournaments) {
       hofNews.push(`🏆 ${t.champion} won the ${t.name} (Week ${t.week}).`);
     }
 
-    // Best stable
     const stables = [
-      { name: updatedState.player.stableName, fame: updatedState.player.fame ?? 0 },
-      ...(updatedState.rivals || []).map(r => ({ name: r.owner.stableName, fame: r.roster.reduce((s, w) => s + (w.fame ?? 0), 0) })),
+      { name: s.player.stableName, fame: s.player.fame ?? 0 },
+      ...(s.rivals || []).map(r => ({ name: r.owner.stableName, fame: r.roster.reduce((sum, w) => sum + (w.fame ?? 0), 0) })),
     ].sort((a, b) => b.fame - a.fame);
     if (stables[0] && stables[0].fame > 0) {
       hofNews.push(`🏟️ STABLE OF THE YEAR: ${stables[0].name} dominated Year ${yearNum} with ${stables[0].fame} total fame.`);
     }
 
     if (hofNews.length > 0) {
-      updatedState.newsletter = [...updatedState.newsletter, {
-        week: newWeek,
-        title: `Year ${yearNum} Hall of Fame Inductions`,
-        items: hofNews,
-      }];
+      s.newsletter = [...s.newsletter, { week: newWeek, title: `Year ${yearNum} Hall of Fame Inductions`, items: hofNews }];
     }
   }
 
-  if (newSeason !== updatedState.season) {
+  // ── Step 9: Tier Progression (on season change) ───────────────────────
+  if (newSeason !== s.season) {
     const promotionNews: string[] = [];
-    updatedState.rivals = (updatedState.rivals || []).map(r => {
-      const totalWins = r.roster.reduce((s, w) => s + w.career.wins, 0);
-      const totalKills = r.roster.reduce((s, w) => s + w.career.kills, 0);
-      const totalFights = r.roster.reduce((s, w) => s + w.career.wins + w.career.losses, 0);
+    s.rivals = (s.rivals || []).map(r => {
+      const totalWins = r.roster.reduce((sum, w) => sum + w.career.wins, 0);
+      const totalKills = r.roster.reduce((sum, w) => sum + w.career.kills, 0);
+      const totalFights = r.roster.reduce((sum, w) => sum + w.career.wins + w.career.losses, 0);
       const activeCount = r.roster.filter(w => w.status === "Active").length;
 
       let newTier = r.tier;
@@ -298,19 +317,16 @@ export function advanceWeek(state: GameState): GameState {
     });
 
     if (promotionNews.length > 0) {
-      updatedState.newsletter = [...updatedState.newsletter, {
-        week: newWeek,
-        title: "Stable Rankings Update",
-        items: promotionNews,
-      }];
+      s.newsletter = [...s.newsletter, { week: newWeek, title: "Stable Rankings Update", items: promotionNews }];
     }
 
     // Full pool reset on season change
-    updatedState.recruitPool = [];
+    s.recruitPool = [];
   }
 
+  // ── Step 10: Clock Advance ────────────────────────────────────────────
   return {
-    ...updatedState,
+    ...s,
     week: newWeek,
     season: newSeason,
   };
