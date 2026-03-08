@@ -119,3 +119,25 @@ export function getLoadoutWeight(loadout: EquipmentLoadout): number {
 export function isOverEncumbered(loadout: EquipmentLoadout, carryCap: number): boolean {
   return getLoadoutWeight(loadout) > carryCap;
 }
+
+/**
+ * Classic/canonical weapon per fighting style from the Fighting Styles Compendium.
+ * Using the classic weapon grants a +1 ATT bonus in combat.
+ */
+export const STYLE_CLASSIC_WEAPONS: Record<string, string> = {
+  [FightingStyle.AimedBlow]:       "dagger",        // Quarterstaff (mapped to dagger as precision weapon)
+  [FightingStyle.BashingAttack]:   "mace",           // Mace
+  [FightingStyle.LungingAttack]:   "epee",           // Short Spear → Epée (closest jabbing weapon)
+  [FightingStyle.ParryLunge]:      "longsword",      // Longsword
+  [FightingStyle.ParryRiposte]:    "epee",           // Epée
+  [FightingStyle.ParryStrike]:     "broadsword",     // Broad weapon variety
+  [FightingStyle.SlashingAttack]:  "scimitar",       // Scimitar
+  [FightingStyle.StrikingAttack]:  "broadsword",     // Broadsword
+  [FightingStyle.TotalParry]:      "short_sword",    // Shield emphasis (weapon secondary)
+  [FightingStyle.WallOfSteel]:     "morning_star",   // Morning Star
+};
+
+/** Returns +1 if the warrior is using their style's classic weapon, 0 otherwise */
+export function getClassicWeaponBonus(style: FightingStyle, weaponId: string): number {
+  return STYLE_CLASSIC_WEAPONS[style] === weaponId ? 1 : 0;
+}
