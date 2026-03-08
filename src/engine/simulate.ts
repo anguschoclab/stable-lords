@@ -240,13 +240,11 @@ const GLOBAL_PAR_PENALTY = -2; // Parry is slightly harder to reward aggression
 
 function oeAttMod(oe: number, style?: FightingStyle): number {
   // PR OE Paradox: PR attacks MORE at low OE via counterstrikes (compendium §PR)
-  // "PR may attack more with low OE by counterstriking than with high OE"
   if (style === FightingStyle.ParryRiposte) {
-    // Invert: low OE = bonus (counter-ready), high OE = penalty (loses identity)
-    if (oe <= 3) return 2;   // Low OE: +2 ATT from counter-focus
-    if (oe <= 5) return 1;   // Mid-low: +1
-    if (oe <= 7) return 0;   // Mid: neutral
-    return -1;               // High OE: loses counter identity
+    if (oe <= 3) return 1;   // Low OE: +1 ATT from counter-focus
+    if (oe <= 5) return 0;   // Mid: neutral
+    if (oe <= 7) return -1;  // High OE: loses counter identity
+    return -2;               // Very high OE: completely wrong for PR
   }
   return Math.floor((oe - 5) * 0.8);
 }
