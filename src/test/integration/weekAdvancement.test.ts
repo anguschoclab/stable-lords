@@ -438,10 +438,10 @@ describe("Week Advancement Integration", () => {
   describe("Newsletter System", () => {
     it("should accumulate newsletter entries chronologically", () => {
       // Setup state with a condition that triggers a newsletter (e.g. training injury)
-      let state = {
+      let state: GameState = {
         ...initialState,
         trainingAssignments: [
-          { warriorId: "w1", type: "attribute" as const, attribute: "ST" as const },
+          { warriorId: "w1", type: "attribute", attribute: "ST" },
         ],
       };
       
