@@ -3,17 +3,22 @@
  *
  * Generates fight narration in the authentic style of Duelmasters/Duel II arena reports.
  * Based on canonical PBP examples from Terrablood archives:
- *   joro.txt, bchief.txt, beast.txt, lao.txt, mstroke.txt, ninja.txt, rouge.txt, ftf26_fg.htm
+ *   v0.1: joro.txt, bchief.txt, beast.txt, lao.txt, mstroke.txt, ninja.txt, rouge.txt
+ *   v0.2: FTF26 Tournament Archive (FURIOUS GEORGE — 17 bouts, 14-3 record)
  *
  * Key narrative patterns preserved:
  * - Pre-bout warrior introductions (height, armor, weapon, style, suitability)
  * - Weapon-specific attack verbs ("slashes with his SCIMITAR!", "bashes with his MAUL!")
  * - Rich defense vocabulary (dodge, parry, block, counterstrike)
- * - Crowd reactions (jeers, cheers, voice from the stands)
+ * - Positional movement ("leaps to his left!", "shifts to his right")
+ * - Crowd reactions (jeers, cheers, derision, encouragement)
+ * - Warrior taunts mid-combat
  * - Minute markers with status assessments
  * - Desperation / bleeding / panic state changes
- * - Damage severity descriptors
- * - Kill / stoppage / surrender narration
+ * - Damage severity descriptors ("What a massive blow!", "deadly attack!")
+ * - Armor deflection mechanics
+ * - Kill / KO / stoppage / surrender narration
+ * - Stalemate/filler lines for action resets
  */
 
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
@@ -31,12 +36,12 @@ function pick<T>(rng: RNG, arr: T[]): T {
 
 /** Map engine hit locations to rich canonical body part names */
 const HIT_LOC_VARIANTS: Record<string, string[]> = {
-  "head":      ["HEAD", "JAW", "TEMPLE", "FOREHEAD", "SKULL"],
-  "chest":     ["CHEST", "RIBS", "UPPER BODY", "BREAST"],
-  "abdomen":   ["STOMACH", "ABDOMEN", "PELVIS", "KIDNEYS", "GROIN"],
+  "head":      ["HEAD", "JAW", "TEMPLE", "FOREHEAD", "SKULL", "FACE", "THROAT", "NECK", "side of the HEAD"],
+  "chest":     ["CHEST", "RIBS", "RIGHT RIBCAGE", "LEFT RIBCAGE", "upper BODY", "BREAST"],
+  "abdomen":   ["STOMACH", "ABDOMEN", "PELVIS", "KIDNEYS", "GROIN", "BELLY", "LOWER BODY"],
   "right arm": ["RIGHT ARM", "RIGHT FOREARM", "RIGHT BICEPS", "RIGHT ELBOW", "RIGHT HAND"],
   "left arm":  ["LEFT ARM", "LEFT FOREARM", "LEFT BICEPS", "LEFT ELBOW", "LEFT HAND"],
-  "right leg": ["RIGHT LEG", "RIGHT THIGH", "RIGHT KNEE", "RIGHT SHIN"],
+  "right leg": ["RIGHT LEG", "RIGHT THIGH", "RIGHT KNEE", "RIGHT SHIN", "RIGHT BUTTOCKS"],
   "left leg":  ["LEFT LEG", "LEFT THIGH", "LEFT KNEE", "LEFT SHIN"],
 };
 
@@ -91,11 +96,13 @@ function szToHeight(sz: number): string {
 
 const ARMOR_INTRO_VERBS = [
   "will wear a fine, well-oiled suit of",
+  "will wear",
   "has been given a suit of",
   "has chosen to wear finely crafted",
   "is checking the straps of his",
   "has drawn on a suit of",
-  "has received a suit of well-made",
+  "has put on a suit of",
+  "is clad in",
 ];
 
 const WEAPON_INTRO_VERBS = [
@@ -104,10 +111,11 @@ const WEAPON_INTRO_VERBS = [
   "has selected a %W",
   "stands balancing a %W",
   "walks out, swinging a %W",
+  "is swinging a %W",
   "is drawing a %W from its sheath",
   "tests the balance of a %W",
   "grins down his %W at his foe",
-  "cradels a %W",
+  "grins down his %W at her foe",
 ];
 
 const HELM_DESCS: Record<string, string[]> = {
@@ -171,9 +179,11 @@ const BATTLE_OPENERS = [
   "Those in the stands shift their attention to the warriors.",
   "The audience falls silent as the dueling begins.",
   "The audience rises as the fighting begins.",
+  "The warriors advance on each other.",
+  "The time for the fight has come.",
+  "The signal is given for the duel to begin.",
+  "The battle begins",
   "The crowd watches intently as the warriors square off.",
-  "A hush falls over the arena as the combatants face each other.",
-  "The arena erupts with anticipation as the warriors take their positions.",
 ];
 
 export function battleOpener(rng: RNG): string {
@@ -204,10 +214,15 @@ const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N makes a slashing attack using his %W!",
     "%N ducks low, his %W slicing suddenly upwards!",
     "%N makes a brilliant twisting thrust with his %W!",
+    "%N times a devilish cunning attack, %W leaping with deadly force!",
     "%N's %W lunges with awesome cutting power!",
     "%N strikes using his %W!",
+    "%N lunges forward wielding a %W!",
+    "%N lunges with his %W!",
     "%N whirls and strikes backhandedly with his %W!",
     "%N drives his %W in a forward slash!",
+    "%N leaps into the air taking a furious slash with his %W!",
+    "%N leaps forward, swinging his %W into a veritable wall of blades!",
     "%N's %W flashes as he takes a sudden vicious slash at his foe!",
   ],
   bash: [
@@ -228,15 +243,19 @@ const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N lunges wielding an %W!",
     "%N thrusts with his %W!",
     "%N lunges with his %W!",
+    "%N lunges forward with his %W!",
     "%N stabs powerfully upward with his %W!",
     "%N uses his %W to make a deadly jab at his foe!",
     "%N unleashes his %W in a piercingly accurate thrust!",
     "%N strikes forward with his %W, all his weight behind the blow!",
+    "%N thrusts his %W forward with an unbelievably deadly force!",
+    "%N feints, then springs viciously forward with his %W!",
+    "%N catapults forward, %W stabbing cruelly at his foe!",
+    "%N leaps into an incredible flesh-splitting lunge with his %W!",
     "%N catapults forward, %W flashing in a deadly assault!",
     "%N lunges forward, %W thrusting with incredible speed and accuracy!",
     "%N dives forward, %W stabbing repeatedly with his charge!",
     "%N makes a lunging attack with his %W!",
-    "%N lashes out with his %W in a lightning quick assault!",
   ],
   fist: [
     "%N PUNCHES from the waist with unbelievable quickness!",
@@ -368,6 +387,7 @@ export function damageSeverityLine(rng: RNG, damage: number, maxHp: number): str
   if (ratio >= 0.35) return pick(rng, [
     "It was a deadly attack!",
     "What a massive blow!",
+    "What a devastating attack!",
     "Spectators cringe as the horrific power of the blow strikes home!",
   ]);
   if (ratio >= 0.25) return pick(rng, [
@@ -381,6 +401,7 @@ export function damageSeverityLine(rng: RNG, damage: number, maxHp: number): str
   ]);
   if (ratio <= 0.05) return pick(rng, [
     "The attack is a glancing blow only.",
+    "The stroke lands ineffectively.",
     "The assault fails to do much damage.",
   ]);
   return null;
@@ -394,6 +415,7 @@ export function stateChangeLine(rng: RNG, name: string, hpRatio: number, prevHpR
     return pick(rng, [
       `${name} is on the verge of shock!!`,
       `${name} is severely hurt!!`,
+      `${name} is dangerously stunned!`,
       `${name} is badly hurt!`,
     ]);
   }
@@ -401,6 +423,9 @@ export function stateChangeLine(rng: RNG, name: string, hpRatio: number, prevHpR
     return pick(rng, [
       `${name} appears DESPERATE!`,
       `${name} appears desperate!`,
+      `${name} appears to be getting DESPERATE!`,
+      `${name}'s eyes flame with DESPERATION!`,
+      `Our ${name} fights with DESPERATION!`,
       `${name} begins to panic and fights desperately!`,
       `${name} is becoming frantic!!!`,
       `${name} is becoming frantically careless!!!`,
@@ -409,7 +434,12 @@ export function stateChangeLine(rng: RNG, name: string, hpRatio: number, prevHpR
   if (hpRatio <= 0.6 && prevHpRatio > 0.6) {
     return pick(rng, [
       `${name} has sustained serious wounds!`,
+      `${name} has been sorely wounded!`,
       `${name} whitens with the pain of his wounds.`,
+      `${name} whitens with the pain of the wounds.`,
+      `${name} falls back, eyes flaring with renewed determination!`,
+      `${name} loses composure, and cries out in pain!`,
+      `${name} gasps, 'Gods!! Please give me the strength to finish this fight!'`,
       `${name} winces and smiles feebly.`,
       `${name} is bleeding badly!`,
       `${name} falls back, unable to take the punishment.`,
@@ -429,7 +459,12 @@ export function fatigueLine(rng: RNG, name: string, endRatio: number): string | 
   if (endRatio <= 0.3) return pick(rng, [
     `${name} is breathing heavily.`,
     `${name} is still wearing with exhaustion!`,
+    `${name} pauses to regain his strength.`,
     `There is a lull in the action, as both warriors pause to catch their breath.`,
+  ]);
+  if (endRatio <= 0.5) return pick(rng, [
+    `${name} slows his pace to conserve energy.`,
+    `${name} forgoes the offensive to save his strength.`,
   ]);
   return null;
 }
@@ -447,6 +482,7 @@ const CROWD_REACTIONS_POSITIVE = [
 const CROWD_REACTIONS_NEGATIVE = [
   "The crowd jeers '%N'.",
   "There are scattered boo's for %N.",
+  "Furious cries of derision are rising from the crowd!",
   "%N's fans fall silent.",
   "From the stands a voice yells '%N, you stupid idiot!'",
 ];
@@ -474,6 +510,7 @@ const INI_WIN_TEMPLATES = [
   "%N rushes to his opponent's weak side!",
   "%N leaps to his left!",
   "%N leaps to his right!",
+  "%N leaps forward!",
   "%N is moving constantly without pause!",
   "%N is moving in circles around his opponent!",
   "%N shifts continually back and forth!",
@@ -585,19 +622,37 @@ export function skillLearnLine(rng: RNG, name: string): string {
 const TRADING_BLOWS = [
   "The two warriors fiercely trade attacks and parrys.",
   "Both attack, weapons strike and rebound, strike and rebound.",
+  "Both attack; weapons strike and rebound, strike and rebound.",
   "The warriors attack together, almost grappling with each other.",
   "The weapons lock together in a struggle for supremacy.",
+  "The weapons lock together in a test of strength.",
 ];
 
 export function tradingBlowsLine(rng: RNG): string {
   return pick(rng, TRADING_BLOWS);
 }
 
+// ─── Stalemate / Action Reset Lines ─────────────────────────────────────────
+
+const STALEMATE_LINES = [
+  "The fighters slowly circle each other, looking for a weakness.",
+  "The fighter's slowly circle each other, looking for a weakness.",
+  "The fighters step back from each other for a moment.",
+  "The action comes to a halt as the warriors reorient themselves.",
+  "The warriors stand quietly and study each other.",
+];
+
+export function stalemateLine(rng: RNG): string {
+  return pick(rng, STALEMATE_LINES);
+}
+
 // ─── Taunt / Quote Lines ────────────────────────────────────────────────────
 
 const WINNER_TAUNTS = [
+  "%N says, 'Another blow and I'll send you to Ahringol!'",
   "%N says, 'And that is how a real warrior fights. Pay attention next time.'",
   "%N says, 'That was a well fought, and honorable fight.'",
+  "%N laughs, 'Oh, this is PRICELESS! Did someone actually tell you you could FIGHT?'",
   "%N growls, 'Are you even human?'",
   "%N grates, 'Try that again, dog!'",
   "%N salutes the audience, then offers a hand to his fallen foe.",
@@ -605,6 +660,7 @@ const WINNER_TAUNTS = [
 
 const LOSER_TAUNTS = [
   "%N spits 'May maggots partake of your corpse as they have with your ancestors!'",
+  "%N exclaims, 'Give it up now, wimp, before I rip your face off!'",
   "%N bellows his frustration.",
   "%N mutters a desperate prayer!",
   "%N reels with the fury of combat!",
