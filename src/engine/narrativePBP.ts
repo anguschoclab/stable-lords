@@ -111,10 +111,11 @@ const WEAPON_INTRO_VERBS = [
   "has selected a %W",
   "stands balancing a %W",
   "walks out, swinging a %W",
+  "is swinging a %W",
   "is drawing a %W from its sheath",
   "tests the balance of a %W",
   "grins down his %W at his foe",
-  "cradels a %W",
+  "grins down his %W at her foe",
 ];
 
 const HELM_DESCS: Record<string, string[]> = {
