@@ -96,11 +96,13 @@ function szToHeight(sz: number): string {
 
 const ARMOR_INTRO_VERBS = [
   "will wear a fine, well-oiled suit of",
+  "will wear",
   "has been given a suit of",
   "has chosen to wear finely crafted",
   "is checking the straps of his",
   "has drawn on a suit of",
-  "has received a suit of well-made",
+  "has put on a suit of",
+  "is clad in",
 ];
 
 const WEAPON_INTRO_VERBS = [
