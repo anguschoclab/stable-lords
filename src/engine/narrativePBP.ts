@@ -179,9 +179,11 @@ const BATTLE_OPENERS = [
   "Those in the stands shift their attention to the warriors.",
   "The audience falls silent as the dueling begins.",
   "The audience rises as the fighting begins.",
+  "The warriors advance on each other.",
+  "The time for the fight has come.",
+  "The signal is given for the duel to begin.",
+  "The battle begins",
   "The crowd watches intently as the warriors square off.",
-  "A hush falls over the arena as the combatants face each other.",
-  "The arena erupts with anticipation as the warriors take their positions.",
 ];
 
 export function battleOpener(rng: RNG): string {
