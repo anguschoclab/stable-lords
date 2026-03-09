@@ -345,10 +345,10 @@ describe("Week Advancement Integration", () => {
     });
 
     it("should maintain warrior stats consistency during training", () => {
-      const state = {
+      const state: GameState = {
         ...initialState,
         trainingAssignments: [
-          { warriorId: "w1", type: "attribute" as const, attribute: "ST" as const },
+          { warriorId: "w1", type: "attribute", attribute: "ST" },
         ],
       };
       
@@ -356,7 +356,7 @@ describe("Week Advancement Integration", () => {
       for (let i = 0; i < 10; i++) {
         current = {
           ...advanceWeek(current),
-          trainingAssignments: [{ warriorId: "w1", type: "attribute" as const, attribute: "ST" as const }],
+          trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }],
         };
         
         // Verify stats are always defined and valid
