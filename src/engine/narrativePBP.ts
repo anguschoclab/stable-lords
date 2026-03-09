@@ -622,12 +622,28 @@ export function skillLearnLine(rng: RNG, name: string): string {
 const TRADING_BLOWS = [
   "The two warriors fiercely trade attacks and parrys.",
   "Both attack, weapons strike and rebound, strike and rebound.",
+  "Both attack; weapons strike and rebound, strike and rebound.",
   "The warriors attack together, almost grappling with each other.",
   "The weapons lock together in a struggle for supremacy.",
+  "The weapons lock together in a test of strength.",
 ];
 
 export function tradingBlowsLine(rng: RNG): string {
   return pick(rng, TRADING_BLOWS);
+}
+
+// ─── Stalemate / Action Reset Lines ─────────────────────────────────────────
+
+const STALEMATE_LINES = [
+  "The fighters slowly circle each other, looking for a weakness.",
+  "The fighter's slowly circle each other, looking for a weakness.",
+  "The fighters step back from each other for a moment.",
+  "The action comes to a halt as the warriors reorient themselves.",
+  "The warriors stand quietly and study each other.",
+];
+
+export function stalemateLine(rng: RNG): string {
+  return pick(rng, STALEMATE_LINES);
 }
 
 // ─── Taunt / Quote Lines ────────────────────────────────────────────────────
