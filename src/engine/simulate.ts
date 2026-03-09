@@ -306,10 +306,10 @@ function enduranceCost(oe: number, al: number): number {
 // ─── Fatigue Penalties ────────────────────────────────────────────────────
 function fatiguePenalty(endurance: number, maxEndurance: number): number {
   const ratio = endurance / maxEndurance;
-  if (ratio > 0.5) return 0;
-  if (ratio > 0.25) return -2;
-  if (ratio > 0.1) return -4;
-  return -7; // collapse territory
+  if (ratio > FATIGUE_MODERATE_THRESHOLD) return 0;
+  if (ratio > FATIGUE_HEAVY_THRESHOLD) return FATIGUE_MODERATE_PENALTY;
+  if (ratio > FATIGUE_COLLAPSE_THRESHOLD) return FATIGUE_HEAVY_PENALTY;
+  return FATIGUE_COLLAPSE_PENALTY;
 }
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
