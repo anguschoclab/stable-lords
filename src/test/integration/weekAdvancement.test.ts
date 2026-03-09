@@ -166,10 +166,10 @@ describe("Week Advancement Integration", () => {
     });
 
     it("should clear seasonal growth on season change", () => {
-      let state = {
+      let state: GameState = {
         ...initialState,
         seasonalGrowth: [
-          { warriorId: "w1", season: "Spring" as const, gains: { ST: 2, CN: 1 } },
+          { warriorId: "w1", season: "Spring", gains: { ST: 2, CN: 1 } },
         ],
       };
       

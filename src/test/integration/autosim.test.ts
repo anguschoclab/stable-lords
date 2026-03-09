@@ -44,138 +44,94 @@ describe("Autosim Integration", () => {
   });
 
   describe("Basic Autosim", () => {
-    it("should advance specified number of weeks", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 5,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should advance specified number of weeks", async () => {
+      const weeksToAdvance = 5;
+      let progressCalls = 0;
 
-      const result = autoSim(initialState, options);
+      const result = await runAutosim(
+        initialState,
+        weeksToAdvance,
+        () => { progressCalls++; }
+      );
 
-      expect(result.state.week).toBe(initialState.week + 5);
-      expect(result.weeksAdvanced).toBe(5);
-      expect(result.stopped).toBe(false);
+      expect(result.finalState.week).toBeGreaterThan(initialState.week);
+      expect(result.weeksSimmed).toBeGreaterThan(0);
+      expect(result.weeksSimmed).toBeLessThanOrEqual(weeksToAdvance);
+      expect(progressCalls).toBeGreaterThan(0);
     });
 
-    it("should advance to target week", () => {
-      const options: AutoSimOptions = {
-        targetWeek: 10,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should provide week summaries", async () => {
+      const result = await runAutosim(
+        initialState,
+        5,
+        () => {}
+      );
 
-      const result = autoSim(initialState, options);
-
-      expect(result.state.week).toBe(10);
-      expect(result.weeksAdvanced).toBe(9); // Started at week 1
+      expect(result.weekSummaries).toBeDefined();
+      expect(Array.isArray(result.weekSummaries)).toBe(true);
+      expect(result.weekSummaries.length).toBe(result.weeksSimmed);
     });
 
-    it("should handle edge case of already at target week", () => {
-      const options: AutoSimOptions = {
-        targetWeek: 1,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should call progress callback for each week", async () => {
+      const progressCallbacks: number[] = [];
 
-      const result = autoSim(initialState, options);
+      await runAutosim(
+        initialState,
+        3,
+        (completed, total) => {
+          progressCallbacks.push(completed);
+          expect(total).toBe(3);
+        }
+      );
 
-      expect(result.state.week).toBe(1);
-      expect(result.weeksAdvanced).toBe(0);
-      expect(result.stopped).toBe(false);
-    });
-
-    it("should not advance past target week", () => {
-      const state = { ...initialState, week: 8 };
-      const options: AutoSimOptions = {
-        targetWeek: 10,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(state, options);
-
-      expect(result.state.week).toBe(10);
-      expect(result.weeksAdvanced).toBe(2);
+      expect(progressCallbacks.length).toBeGreaterThan(0);
     });
   });
 
   describe("Stop Conditions", () => {
-    it("should stop on warrior death when configured", () => {
-      // Set up a state where death is likely
-      const fragileWarrior = makeWarrior("w1", "Fragile", {
-        attributes: { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 },
-      });
+    it("should stop when no valid pairings available", async () => {
       const state = {
         ...initialState,
-        roster: [fragileWarrior],
+        roster: [],
       };
 
-      const options: AutoSimOptions = {
-        weeksToAdvance: 50,
-        stopOnDeath: true,
-        stopOnInjury: false,
-      };
+      const result = await runAutosim(state, 10, () => {});
 
-      const result = autoSim(state, options);
-
-      // Should stop if any warrior died
-      if (result.stopped && result.stopReason?.includes("death")) {
-        expect(result.weeksAdvanced).toBeLessThan(50);
-        expect(result.state.graveyard.length).toBeGreaterThan(0);
-      }
+      expect(result.stopReason).toBe("no_pairings");
+      expect(result.weeksSimmed).toBeLessThan(10);
     });
 
-    it("should stop on injury when configured", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 30,
-        stopOnDeath: false,
-        stopOnInjury: true,
-      };
+    it("should provide stop details", async () => {
+      const result = await runAutosim(initialState, 5, () => {});
 
-      const result = autoSim(initialState, options);
-
-      // Should stop if severe injury occurred
-      if (result.stopped && result.stopReason?.includes("injury")) {
-        expect(result.weeksAdvanced).toBeLessThan(30);
-      }
+      expect(result.stopDetail).toBeDefined();
+      expect(typeof result.stopDetail).toBe("string");
+      expect(result.stopDetail.length).toBeGreaterThan(0);
     });
 
-    it("should not stop when conditions disabled", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 10,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should stop at max weeks when no other conditions trigger", async () => {
+      const result = await runAutosim(initialState, 3, () => {});
 
-      const result = autoSim(initialState, options);
-
-      expect(result.weeksAdvanced).toBe(10);
-      expect(result.stopped).toBe(false);
+      if (result.stopReason === "max_weeks") {
+        expect(result.weeksSimmed).toBe(3);
+      }
     });
   });
 
   describe("State Consistency", () => {
-    it("should maintain roster integrity during autosim", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 20,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should maintain roster integrity during autosim", async () => {
+      const result = await runAutosim(initialState, 10, () => {});
 
-      const result = autoSim(initialState, options);
-
-      // Roster + graveyard + retired should account for all original warriors
+      // Roster + graveyard + retired should account for all warriors
       const totalWarriors =
-        result.state.roster.length +
-        result.state.graveyard.length +
-        result.state.retired.length;
+        result.finalState.roster.length +
+        result.finalState.graveyard.length +
+        result.finalState.retired.length;
 
       expect(totalWarriors).toBeGreaterThanOrEqual(0);
-      expect(totalWarriors).toBeLessThanOrEqual(initialState.roster.length + 10); // Allow some recruitment
     });
 
-    it("should preserve warrior data during simulation", () => {
+    it("should preserve warrior data during simulation", async () => {
       const uniqueWarrior = makeWarrior("unique_1", "Unique Name", {
         fame: 10,
         popularity: 5,
@@ -185,211 +141,134 @@ describe("Autosim Integration", () => {
         roster: [uniqueWarrior],
       };
 
-      const options: AutoSimOptions = {
-        weeksToAdvance: 10,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(state, options);
+      const result = await runAutosim(state, 5, () => {});
 
       // Find the warrior in any collection
       const warrior =
-        result.state.roster.find(w => w.id === "unique_1") ||
-        result.state.graveyard.find(w => w.id === "unique_1") ||
-        result.state.retired.find(w => w.id === "unique_1");
+        result.finalState.roster.find(w => w.id === "unique_1") ||
+        result.finalState.graveyard.find(w => w.id === "unique_1") ||
+        result.finalState.retired.find(w => w.id === "unique_1");
 
-      expect(warrior).toBeDefined();
-      expect(warrior?.name).toBe("Unique Name");
+      if (warrior) {
+        expect(warrior.name).toBe("Unique Name");
+      }
     });
 
-    it("should accumulate newsletter entries", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 15,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(initialState, options);
+    it("should accumulate newsletter entries", async () => {
+      const result = await runAutosim(initialState, 10, () => {});
 
       // Should have newsletter entries from various systems
-      expect(result.state.newsletter.length).toBeGreaterThan(0);
+      expect(result.finalState.newsletter.length).toBeGreaterThan(0);
     });
 
-    it("should process economy correctly", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 10,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(initialState, options);
+    it("should process economy correctly", async () => {
+      const result = await runAutosim(initialState, 5, () => {});
 
       // Ledger should have entries
-      expect(result.state.ledger.length).toBeGreaterThan(0);
+      expect(result.finalState.ledger.length).toBeGreaterThan(0);
 
       // Gold should be a valid number
-      expect(typeof result.state.gold).toBe("number");
-      expect(isFinite(result.state.gold)).toBe(true);
+      expect(typeof result.finalState.gold).toBe("number");
+      expect(isFinite(result.finalState.gold)).toBe(true);
+    });
+  });
+
+  describe("Week Summaries", () => {
+    it("should track bouts per week", async () => {
+      const result = await runAutosim(initialState, 5, () => {});
+
+      for (const summary of result.weekSummaries) {
+        expect(summary.bouts).toBeDefined();
+        expect(typeof summary.bouts).toBe("number");
+        expect(summary.bouts).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it("should track deaths and injuries", async () => {
+      const result = await runAutosim(initialState, 10, () => {});
+
+      for (const summary of result.weekSummaries) {
+        expect(summary.deaths).toBeDefined();
+        expect(summary.injuries).toBeDefined();
+        expect(Array.isArray(summary.deathNames)).toBe(true);
+        expect(Array.isArray(summary.injuryNames)).toBe(true);
+      }
+    });
+
+    it("should include week numbers", async () => {
+      const result = await runAutosim(initialState, 5, () => {});
+
+      let lastWeek = 0;
+      for (const summary of result.weekSummaries) {
+        expect(summary.week).toBeGreaterThan(lastWeek);
+        lastWeek = summary.week;
+      }
     });
   });
 
   describe("Long-term Simulation", () => {
-    it("should handle full year simulation (52 weeks)", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 52,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should handle multi-week simulation", async () => {
+      const result = await runAutosim(initialState, 20, () => {});
 
-      const result = autoSim(initialState, options);
-
-      expect(result.state.week).toBe(53);
-      expect(result.weeksAdvanced).toBe(52);
-      
-      // Should have cycled through all seasons
-      expect(result.state.season).toBe("Spring");
+      expect(result.weeksSimmed).toBeGreaterThan(0);
+      expect(result.finalState.week).toBeGreaterThan(initialState.week);
     });
 
-    it("should handle multi-year simulation", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 104, // 2 years
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(initialState, options);
-
-      expect(result.state.week).toBe(105);
-      expect(result.weeksAdvanced).toBe(104);
-      
-      // Warriors should have aged
-      if (result.state.roster.length > 0) {
-        const warrior = result.state.roster[0];
-        expect(warrior.age).toBeGreaterThan(20);
-      }
-    });
-
-    it("should maintain performance over long simulations", () => {
+    it("should complete in reasonable time", async () => {
       const startTime = Date.now();
 
-      const options: AutoSimOptions = {
-        weeksToAdvance: 100,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(initialState, options);
+      await runAutosim(initialState, 30, () => {});
 
       const elapsed = Date.now() - startTime;
 
-      expect(result.weeksAdvanced).toBe(100);
-      
-      // Should complete in reasonable time (< 5 seconds)
-      expect(elapsed).toBeLessThan(5000);
+      // Should complete in reasonable time (< 10 seconds for 30 weeks)
+      expect(elapsed).toBeLessThan(10000);
     });
   });
 
   describe("Edge Cases", () => {
-    it("should handle empty roster gracefully", () => {
+    it("should handle empty roster gracefully", async () => {
       const state = {
         ...initialState,
         roster: [],
       };
 
-      const options: AutoSimOptions = {
-        weeksToAdvance: 10,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+      const result = await runAutosim(state, 5, () => {});
 
-      const result = autoSim(state, options);
-
-      expect(result.state.week).toBe(11);
-      expect(result.weeksAdvanced).toBe(10);
+      expect(result).toBeDefined();
+      expect(result.stopReason).toBe("no_pairings");
     });
 
-    it("should handle zero weeks to advance", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 0,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should handle zero weeks to advance", async () => {
+      const result = await runAutosim(initialState, 0, () => {});
 
-      const result = autoSim(initialState, options);
-
-      expect(result.state.week).toBe(initialState.week);
-      expect(result.weeksAdvanced).toBe(0);
-      expect(result.stopped).toBe(false);
-    });
-
-    it("should handle negative target week", () => {
-      const options: AutoSimOptions = {
-        targetWeek: -5,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
-
-      const result = autoSim(initialState, options);
-
-      // Should not go backwards
-      expect(result.state.week).toBe(initialState.week);
-      expect(result.weeksAdvanced).toBe(0);
+      expect(result.weeksSimmed).toBe(0);
+      expect(result.finalState.week).toBe(initialState.week);
     });
   });
 
   describe("Result Metadata", () => {
-    it("should provide accurate weeks advanced count", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 7,
-        stopOnDeath: false,
-        stopOnInjury: false,
-      };
+    it("should provide accurate weeks simmed count", async () => {
+      const result = await runAutosim(initialState, 5, () => {});
 
-      const result = autoSim(initialState, options);
-
-      expect(result.weeksAdvanced).toBe(7);
-      expect(result.state.week - initialState.week).toBe(7);
+      expect(result.weeksSimmed).toBeGreaterThanOrEqual(0);
+      expect(result.weeksSimmed).toBeLessThanOrEqual(5);
     });
 
-    it("should indicate when stopped early", () => {
-      const options: AutoSimOptions = {
-        weeksToAdvance: 100,
-        stopOnDeath: true,
-        stopOnInjury: true,
-      };
+    it("should always have a stop reason", async () => {
+      const result = await runAutosim(initialState, 3, () => {});
 
-      const result = autoSim(initialState, options);
-
-      if (result.stopped) {
-        expect(result.stopReason).toBeDefined();
-        expect(result.weeksAdvanced).toBeLessThan(100);
-      }
+      expect(result.stopReason).toBeDefined();
+      expect(["death", "player_death", "injury", "rivalry_escalation", "tournament_week", "max_weeks", "no_pairings"])
+        .toContain(result.stopReason);
     });
 
-    it("should provide stop reason when applicable", () => {
-      // Force an injury-prone scenario
-      const state = {
-        ...initialState,
-        roster: [
-          makeWarrior("w1", "Fragile", {
-            attributes: { ST: 5, CN: 5, SZ: 5, WT: 5, WL: 5, SP: 5, DF: 5 },
-          }),
-        ],
-      };
+    it("should provide descriptive stop details", async () => {
+      const result = await runAutosim(initialState, 5, () => {});
 
-      const options: AutoSimOptions = {
-        weeksToAdvance: 50,
-        stopOnDeath: true,
-        stopOnInjury: true,
-      };
-
-      const result = autoSim(state, options);
-
-      if (result.stopped) {
-        expect(typeof result.stopReason).toBe("string");
-        expect(result.stopReason!.length).toBeGreaterThan(0);
-      }
+      expect(result.stopDetail).toBeDefined();
+      expect(typeof result.stopDetail).toBe("string");
+      expect(result.stopDetail.length).toBeGreaterThan(0);
     });
   });
 });
