@@ -292,15 +292,15 @@ function oeAttMod(oe: number, style?: FightingStyle): number {
   // High OE = more aggressive = bonus to ATT. Low OE = passive = slight penalty.
   // Offensive styles (BA/SL/ST) get enhanced scaling from high OE.
   const isAggressive = style === FightingStyle.BashingAttack || style === FightingStyle.SlashingAttack || style === FightingStyle.StrikingAttack;
-  const base = Math.floor((oe - 5) * 0.7);
+  const base = Math.floor((oe - 5) * OE_ATT_SCALING);
   return isAggressive ? base + 1 : base;  // Aggressive styles always get +1 ATT
 }
-function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * 0.5); }
-function alIniMod(al: number): number { return Math.floor((al - 5) * 0.6); }
+function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * OE_DEF_SCALING); }
+function alIniMod(al: number): number { return Math.floor((al - 5) * AL_INI_SCALING); }
 function enduranceCost(oe: number, al: number): number {
   // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
   // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
-  return Math.max(1, Math.round((oe * 0.4 + al * 0.2)));
+  return Math.max(1, Math.round((oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING)));
 }
 
 // ─── Fatigue Penalties ────────────────────────────────────────────────────
