@@ -72,6 +72,9 @@ function GameRoutes() {
         <Route path="/seasonal-awards" element={<SeasonalAwards />} />
         <Route path="/tournament-awards" element={<TournamentAwards />} />
         <Route path="/style-guide" element={<StyleGuide />} />
+        <Route path="/arena-hub" element={<ArenaHub />} />
+        <Route path="/stable-ledger" element={<StableLedger />} />
+        <Route path="/stable-hall" element={<StableHall />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>

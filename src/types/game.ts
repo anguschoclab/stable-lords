@@ -526,6 +526,19 @@ export interface TrainerData {
   styleBonusStyle?: string;
 }
 
+// ─── Insight Tokens ─────────────────────────────────────────────────────────
+
+export type InsightTokenType = "Weapon" | "Rhythm";
+
+export interface InsightToken {
+  id: string;
+  type: InsightTokenType;
+  warriorId: string;
+  warriorName: string;
+  detail: string; // e.g. "Favors Broadsword" or "OE 6 / AL 8"
+  discoveredWeek: number;
+}
+
 // ─── UI Preferences ─────────────────────────────────────────────────────────
 
 export interface UIPrefs {
