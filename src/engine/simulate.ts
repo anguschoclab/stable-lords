@@ -314,9 +314,12 @@ function fatiguePenalty(endurance: number, maxEndurance: number): number {
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
 function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {
-  const base = damageClass + 1; // 2-6 range
-  const locMult = location === "head" ? 1.5 : location === "chest" ? 1.2 : location === "abdomen" ? 1.1 : 0.8;
-  const variance = 0.7 + rng() * 0.6; // 0.7-1.3
+  const base = damageClass + DAMAGE_BASE_MIN;
+  const locMult = location === "head" ? DAMAGE_HEAD_MULT 
+    : location === "chest" ? DAMAGE_CHEST_MULT 
+    : location === "abdomen" ? DAMAGE_ABDOMEN_MULT 
+    : DAMAGE_LIMB_MULT;
+  const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
   return Math.max(1, Math.round(base * locMult * variance));
 }
 
