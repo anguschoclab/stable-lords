@@ -482,6 +482,7 @@ const CROWD_REACTIONS_POSITIVE = [
 const CROWD_REACTIONS_NEGATIVE = [
   "The crowd jeers '%N'.",
   "There are scattered boo's for %N.",
+  "Furious cries of derision are rising from the crowd!",
   "%N's fans fall silent.",
   "From the stands a voice yells '%N, you stupid idiot!'",
 ];
