@@ -780,8 +780,7 @@ export function simulateFight(
 
       if (defended && canRiposte) {
         // Parry succeeds — defender may riposte (harder check than before)
-        // BALANCE v5: Penalty from -4 to -5 to reduce counter-damage frequency
-        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 5 + defDefMods.ripBonus + defPassive.ripBonus);
+        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_PARRY_PENALTY + defDefMods.ripBonus + defPassive.ripBonus);
         if (ripAfterParry) {
           const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
           const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
