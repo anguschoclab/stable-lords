@@ -347,16 +347,16 @@ function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
   }
 
   // Heavy weapons boost damage (canonical weight thresholds)
-  if (weapon && weapon.weight >= 5) { dmgMod += 1; }
-  if (weapon && weapon.weight >= 8) { dmgMod += 1; }
+  if (weapon && weapon.weight >= HEAVY_WEAPON_THRESHOLD_1) { dmgMod += 1; }
+  if (weapon && weapon.weight >= HEAVY_WEAPON_THRESHOLD_2) { dmgMod += 1; }
 
   // Light weapons boost initiative
-  if (weapon && weapon.weight <= 2) { iniMod += 1; }
+  if (weapon && weapon.weight <= LIGHT_WEAPON_THRESHOLD) { iniMod += 1; }
 
   // Armor endurance cost (canonical weight thresholds)
-  if (armor && armor.weight >= 6) { endMod -= 1; }
-  if (armor && armor.weight >= 10) { endMod -= 2; }
-  if (armor && armor.weight >= 14) { endMod -= 3; }
+  if (armor && armor.weight >= HEAVY_ARMOR_THRESHOLD_1) { endMod -= 1; }
+  if (armor && armor.weight >= HEAVY_ARMOR_THRESHOLD_2) { endMod -= 2; }
+  if (armor && armor.weight >= HEAVY_ARMOR_THRESHOLD_3) { endMod -= 3; }
 
   // Helm penalties
   if (helm?.id === "full_helm") { iniMod -= 1; attMod -= 1; }
