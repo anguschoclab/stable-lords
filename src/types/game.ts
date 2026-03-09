@@ -504,6 +504,7 @@ export interface GameState {
   recruitPool: any[]; // PoolWarrior[] from recruitment engine
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
+  insightTokens: InsightToken[]; // discovered weapon/rhythm insights
   settings: {
     featureFlags: {
       tournaments: boolean;
