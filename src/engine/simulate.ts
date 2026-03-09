@@ -83,8 +83,8 @@ function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): numb
 type Phase = "OPENING" | "MID" | "LATE";
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const ratio = exchange / maxExchanges;
-  if (ratio < 0.25) return "OPENING";
-  if (ratio < 0.65) return "MID";
+  if (ratio < PHASE_OPENING_THRESHOLD) return "OPENING";
+  if (ratio < PHASE_MID_THRESHOLD) return "MID";
   return "LATE";
 }
 
@@ -113,7 +113,7 @@ function rollHitLocation(rng: () => number, target?: string, protect?: string): 
     const t = target.toLowerCase() as HitLocation;
     if (HIT_LOCATIONS.includes(t)) {
       const covered = protectCovers(protect);
-      const hitChance = covered.includes(t) ? 0.4 : 0.6;
+      const hitChance = covered.includes(t) ? TARGET_MISS_CHANCE : TARGET_HIT_CHANCE;
       if (rng() < hitChance) return t;
     }
   }
@@ -125,9 +125,9 @@ function applyProtectMod(damage: number, location: HitLocation, protect?: string
   if (!protect || protect === "Any") return damage;
   const covered = protectCovers(protect);
   if (covered.includes(location)) {
-    return Math.max(1, Math.round(damage * 0.75));
+    return Math.max(1, Math.round(damage * PROTECT_DAMAGE_REDUCTION));
   } else {
-    return Math.round(damage * 1.1);
+    return Math.round(damage * PROTECT_DAMAGE_PENALTY);
   }
 }
 
@@ -198,6 +198,87 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
   return rollA > rollD;
 }
 
+// ─── Combat Constants ─────────────────────────────────────────────────────
+
+/** Global attack bonus — offenses lands frequently (fights should be violent) */
+const GLOBAL_ATT_BONUS = 8;
+/** Global parry penalty — parrying is hard (defense identity is endurance, not blocking) */
+const GLOBAL_PAR_PENALTY = -6;
+/** Initiative winner gets a pressing advantage to reward aggressive styles */
+const INITIATIVE_PRESS_BONUS = 1;
+
+// Phase detection thresholds
+const PHASE_OPENING_THRESHOLD = 0.25; // First 25% of exchanges
+const PHASE_MID_THRESHOLD = 0.65;      // Middle 40% of exchanges
+
+// Target & Protect mechanics
+const TARGET_HIT_CHANCE = 0.6;         // Chance to hit targeted location
+const TARGET_MISS_CHANCE = 0.4;        // Chance to hit elsewhere when targeting
+const PROTECT_DAMAGE_REDUCTION = 0.75; // Protected locations take 25% less damage
+const PROTECT_DAMAGE_PENALTY = 1.1;    // Unprotected locations take 10% more damage
+
+// OE/AL Modifiers
+const OE_ATT_SCALING = 0.7;            // Attack bonus per OE point above 5
+const OE_DEF_SCALING = 0.5;            // Defense penalty per OE point above 6
+const AL_INI_SCALING = 0.6;            // Initiative bonus per AL point above 5
+const ENDURANCE_OE_SCALING = 0.4;      // OE contribution to endurance cost
+const ENDURANCE_AL_SCALING = 0.2;      // AL contribution to endurance cost
+
+// Fatigue thresholds and penalties
+const FATIGUE_MODERATE_THRESHOLD = 0.5; // Endurance ratio for moderate fatigue
+const FATIGUE_HEAVY_THRESHOLD = 0.25;   // Endurance ratio for heavy fatigue
+const FATIGUE_COLLAPSE_THRESHOLD = 0.1; // Endurance ratio for near-collapse
+const FATIGUE_MODERATE_PENALTY = -2;    // Skill penalty at moderate fatigue
+const FATIGUE_HEAVY_PENALTY = -4;       // Skill penalty at heavy fatigue
+const FATIGUE_COLLAPSE_PENALTY = -7;    // Skill penalty at collapse
+
+// Damage calculations
+const DAMAGE_BASE_MIN = 1;             // Minimum damage class offset
+const DAMAGE_HEAD_MULT = 1.5;          // Head hit damage multiplier
+const DAMAGE_CHEST_MULT = 1.2;         // Chest hit damage multiplier
+const DAMAGE_ABDOMEN_MULT = 1.1;       // Abdomen hit damage multiplier
+const DAMAGE_LIMB_MULT = 0.8;          // Limb hit damage multiplier
+const DAMAGE_VARIANCE_MIN = 0.7;       // Minimum damage variance
+const DAMAGE_VARIANCE_MAX = 1.3;       // Maximum damage variance (MIN + 0.6)
+
+// Equipment weight thresholds
+const HEAVY_WEAPON_THRESHOLD_1 = 5;    // First heavy weapon damage bonus (≥5 weight)
+const HEAVY_WEAPON_THRESHOLD_2 = 8;    // Second heavy weapon damage bonus (≥8 weight)
+const LIGHT_WEAPON_THRESHOLD = 2;      // Light weapon initiative bonus (≤2 weight)
+const HEAVY_ARMOR_THRESHOLD_1 = 6;     // First armor endurance penalty (≥6 weight)
+const HEAVY_ARMOR_THRESHOLD_2 = 10;    // Second armor endurance penalty (≥10 weight)
+const HEAVY_ARMOR_THRESHOLD_3 = 14;    // Third armor endurance penalty (≥14 weight)
+
+// Riposte penalties (harder to riposte than normal attack)
+const RIPOSTE_WHIFF_PENALTY = -6;      // Penalty to riposte on whiffed attack
+const RIPOSTE_PARRY_PENALTY = -5;      // Penalty to riposte after successful parry
+
+// Endurance mechanics
+const DEFENDER_ENDURANCE_DISCOUNT = 0.92; // Defending costs 8% less endurance
+const DAMAGE_TAX_SCALING = 0.7;           // Endurance tax per hit taken
+
+// Kill window mechanics
+const KILL_WINDOW_HP_DEFAULT = 0.3;       // Default HP% threshold for kill window
+const KILL_WINDOW_ENDURANCE = 0.4;        // Endurance% threshold for kill window
+const KILL_DESIRE_SCALING = 0.04;         // Kill threshold increase per KD point
+const KILL_PHASE_LATE_BONUS = 0.15;       // Kill threshold bonus in late phase
+const KILL_THRESHOLD_MIN = 0.05;          // Minimum kill threshold
+const KILL_THRESHOLD_BASE = 0.3;          // Base kill threshold before modifiers
+const TRAINER_HEALING_REDUCTION = 0.03;   // Kill threshold reduction per healing trainer point
+
+// Tactic overuse
+const TACTIC_OVERUSE_CAP = 3;             // Maximum penalty for tactic overuse
+
+// Bout structure
+const MAX_EXCHANGES = 15;                 // Maximum exchanges before decision
+const EXCHANGES_PER_MINUTE = 3;           // Exchanges per minute
+
+// Critical hit
+const CRIT_DAMAGE_MULT = 1.5;             // Critical hit damage multiplier
+
+// Decision thresholds
+const DECISION_HIT_MARGIN = 2;            // Hits advantage needed for clear decision
+
 // ─── OE/AL Effects ────────────────────────────────────────────────────────
 // BALANCE v6: Key changes:
 // - GLOBAL_ATT_BONUS 6 → 8 (offense needs to land even more vs defensive seeds)
@@ -205,39 +286,40 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
 // - AB/PR OE paradox REMOVED — they now get a modest penalty at low OE like everyone
 // - BA/SL/ST get ATT bonus from high OE (rewarding aggressive commitment)
 // - Endurance cost formula adjusted: lower base, higher OE scaling (high OE = aggressive = tiring)
-const GLOBAL_ATT_BONUS = 8;    // Attacks land frequently — fights should be violent
-const GLOBAL_PAR_PENALTY = -6; // Parry is hard — defense identity is endurance, not blocking
 
 function oeAttMod(oe: number, style?: FightingStyle): number {
   // BALANCE v6: Removed AB/PR OE paradox. All styles use the same formula.
   // High OE = more aggressive = bonus to ATT. Low OE = passive = slight penalty.
   // Offensive styles (BA/SL/ST) get enhanced scaling from high OE.
   const isAggressive = style === FightingStyle.BashingAttack || style === FightingStyle.SlashingAttack || style === FightingStyle.StrikingAttack;
-  const base = Math.floor((oe - 5) * 0.7);
+  const base = Math.floor((oe - 5) * OE_ATT_SCALING);
   return isAggressive ? base + 1 : base;  // Aggressive styles always get +1 ATT
 }
-function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * 0.5); }
-function alIniMod(al: number): number { return Math.floor((al - 5) * 0.6); }
+function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * OE_DEF_SCALING); }
+function alIniMod(al: number): number { return Math.floor((al - 5) * AL_INI_SCALING); }
 function enduranceCost(oe: number, al: number): number {
   // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
   // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
-  return Math.max(1, Math.round((oe * 0.4 + al * 0.2)));
+  return Math.max(1, Math.round((oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING)));
 }
 
 // ─── Fatigue Penalties ────────────────────────────────────────────────────
 function fatiguePenalty(endurance: number, maxEndurance: number): number {
   const ratio = endurance / maxEndurance;
-  if (ratio > 0.5) return 0;
-  if (ratio > 0.25) return -2;
-  if (ratio > 0.1) return -4;
-  return -7; // collapse territory
+  if (ratio > FATIGUE_MODERATE_THRESHOLD) return 0;
+  if (ratio > FATIGUE_HEAVY_THRESHOLD) return FATIGUE_MODERATE_PENALTY;
+  if (ratio > FATIGUE_COLLAPSE_THRESHOLD) return FATIGUE_HEAVY_PENALTY;
+  return FATIGUE_COLLAPSE_PENALTY;
 }
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
 function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {
-  const base = damageClass + 1; // 2-6 range
-  const locMult = location === "head" ? 1.5 : location === "chest" ? 1.2 : location === "abdomen" ? 1.1 : 0.8;
-  const variance = 0.7 + rng() * 0.6; // 0.7-1.3
+  const base = damageClass + DAMAGE_BASE_MIN;
+  const locMult = location === "head" ? DAMAGE_HEAD_MULT 
+    : location === "chest" ? DAMAGE_CHEST_MULT 
+    : location === "abdomen" ? DAMAGE_ABDOMEN_MULT 
+    : DAMAGE_LIMB_MULT;
+  const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
   return Math.max(1, Math.round(base * locMult * variance));
 }
 
@@ -265,16 +347,16 @@ function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
   }
 
   // Heavy weapons boost damage (canonical weight thresholds)
-  if (weapon && weapon.weight >= 5) { dmgMod += 1; }
-  if (weapon && weapon.weight >= 8) { dmgMod += 1; }
+  if (weapon && weapon.weight >= HEAVY_WEAPON_THRESHOLD_1) { dmgMod += 1; }
+  if (weapon && weapon.weight >= HEAVY_WEAPON_THRESHOLD_2) { dmgMod += 1; }
 
   // Light weapons boost initiative
-  if (weapon && weapon.weight <= 2) { iniMod += 1; }
+  if (weapon && weapon.weight <= LIGHT_WEAPON_THRESHOLD) { iniMod += 1; }
 
   // Armor endurance cost (canonical weight thresholds)
-  if (armor && armor.weight >= 6) { endMod -= 1; }
-  if (armor && armor.weight >= 10) { endMod -= 2; }
-  if (armor && armor.weight >= 14) { endMod -= 3; }
+  if (armor && armor.weight >= HEAVY_ARMOR_THRESHOLD_1) { endMod -= 1; }
+  if (armor && armor.weight >= HEAVY_ARMOR_THRESHOLD_2) { endMod -= 2; }
+  if (armor && armor.weight >= HEAVY_ARMOR_THRESHOLD_3) { endMod -= 3; }
 
   // Helm penalties
   if (helm?.id === "full_helm") { iniMod -= 1; attMod -= 1; }
@@ -551,11 +633,10 @@ export function simulateFight(
     }
 
     // ── 1. INITIATIVE CONTEST — with tempo & passive ──
-    // Initiative winner gets a pressing advantage (+1 ATT) to reward aggressive styles
     const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus;
     const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus;
     const aGoesFirst = contestCheck(rng, iniA, iniD);
-    const iniPressBonus = 1; // Initiative winner presses the attack
+    const iniPressBonus = INITIATIVE_PRESS_BONUS;
 
     const attacker = aGoesFirst ? fA : fD;
     const defender = aGoesFirst ? fD : fA;
@@ -611,9 +692,9 @@ export function simulateFight(
       tacticStreakD = 0;
       lastTacticD = curTacticKeyD;
     }
-    // Penalty: -1 per consecutive exchange using same tactic (cap -3)
-    const tacticOveruseAtt = aGoesFirst ? Math.min(3, tacticStreakA) : Math.min(3, tacticStreakD);
-    const tacticOveruseDef = aGoesFirst ? Math.min(3, tacticStreakD) : Math.min(3, tacticStreakA);
+    // Penalty: -1 per consecutive exchange using same tactic (cap at TACTIC_OVERUSE_CAP)
+    const tacticOveruseAtt = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, tacticStreakA) : Math.min(TACTIC_OVERUSE_CAP, tacticStreakD);
+    const tacticOveruseDef = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, tacticStreakD) : Math.min(TACTIC_OVERUSE_CAP, tacticStreakA);
 
     // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy + PR OE paradox ──
     const attOEmod = oeAttMod(attOE, attacker.style);
@@ -632,9 +713,8 @@ export function simulateFight(
       attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, attAL) * 0.5)) + attOffMods.endCost;
 
       // Defender may riposte on whiff — HARD check (off-tempo, attacker recovering)
-      // BALANCE v5: Increased penalty from -3 to -6 to reduce free counter-damage
       const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
-      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 6 + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
+      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_WHIFF_PENALTY + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
       if (ripCheck) {
         const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
         const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
@@ -700,8 +780,7 @@ export function simulateFight(
 
       if (defended && canRiposte) {
         // Parry succeeds — defender may riposte (harder check than before)
-        // BALANCE v5: Penalty from -4 to -5 to reduce counter-damage frequency
-        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat - 5 + defDefMods.ripBonus + defPassive.ripBonus);
+        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_PARRY_PENALTY + defDefMods.ripBonus + defPassive.ripBonus);
         if (ripAfterParry) {
           const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
           const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
@@ -727,7 +806,7 @@ export function simulateFight(
 
           // Style-specific crit (e.g. Aimed Blow precision)
           if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
-            rawDamage = Math.round(rawDamage * 1.5);
+            rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
             log.push({ minute: min, text: `💥 CRITICAL HIT! ${name(attacker)} finds a vital weakness!` });
             if (!tags.includes("CriticalHit")) tags.push("CriticalHit");
           }
@@ -782,7 +861,7 @@ export function simulateFight(
           });
 
           const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
-          const killWindowEnd = defender.maxEndurance * 0.4;
+          const killWindowEnd = defender.maxEndurance * KILL_WINDOW_ENDURANCE;
 
           if (defender.hp <= killWindowHp && defender.endurance <= killWindowEnd) {
             const kdMod = Math.floor((attKD) - 5) * 0.5;
@@ -791,8 +870,8 @@ export function simulateFight(
 
             if (decSuccess) {
               const killRoll = rng();
-              const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * 0.03 : (trainerModsD?.healMod ?? 0) * 0.03;
-              const killThreshold = Math.max(0.05, 0.3 + attKD * 0.04 + (phase === "LATE" ? 0.15 : 0) + killMech.killBonus - healingReduction);
+              const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * TRAINER_HEALING_REDUCTION : (trainerModsD?.healMod ?? 0) * TRAINER_HEALING_REDUCTION;
+              const killThreshold = Math.max(KILL_THRESHOLD_MIN, KILL_THRESHOLD_BASE + attKD * KILL_DESIRE_SCALING + (phase === "LATE" ? KILL_PHASE_LATE_BONUS : 0) + killMech.killBonus - healingReduction);
 
               if (killRoll < killThreshold) {
                 // KILL — style-specific narrative
@@ -831,12 +910,12 @@ export function simulateFight(
     // Damage tax increased: taking hits is exhausting regardless of style.
     const attEndMult = getEnduranceMult(attacker.style);
     const defEndMult = getEnduranceMult(defender.style);
-    const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * 0.7)) : 0;
+    const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * DAMAGE_TAX_SCALING)) : 0;
     // Weapon requirement endurance penalty (×1.1 per failed req)
     const attWepEndMult = attacker.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
     const defWepEndMult = defender.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
     attacker.endurance -= Math.round(enduranceCost(attOE, attAL) * attEndMult * attWepEndMult);
-    defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * 0.92 * defEndMult * defWepEndMult) + defDamageTax);
+    defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * DEFENDER_ENDURANCE_DISCOUNT * defEndMult * defWepEndMult) + defDamageTax);
 
     // Clamp endurance
     fA.endurance = Math.max(0, fA.endurance);
@@ -889,11 +968,11 @@ export function simulateFight(
   // If no winner after all exchanges — decision or draw
   if (!winner) {
     const min = minute(MAX_EXCHANGES);
-    if (fA.hitsLanded > fD.hitsLanded + 2) {
+    if (fA.hitsLanded > fD.hitsLanded + DECISION_HIT_MARGIN) {
       winner = "A";
       by = "Stoppage";
       log.push({ minute: min, text: `Time! ${nameA} is awarded the decision on points.` });
-    } else if (fD.hitsLanded > fA.hitsLanded + 2) {
+    } else if (fD.hitsLanded > fA.hitsLanded + DECISION_HIT_MARGIN) {
       winner = "D";
       by = "Stoppage";
       log.push({ minute: min, text: `Time! ${nameD} is awarded the decision on points.` });
