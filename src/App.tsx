@@ -29,6 +29,9 @@ import TrainingPlanner from "@/pages/TrainingPlanner";
 import SeasonalAwards from "@/pages/SeasonalAwards";
 import TournamentAwards from "@/pages/TournamentAwards";
 import StyleGuide from "@/pages/StyleGuide";
+import ArenaHub from "@/pages/ArenaHub";
+import StableLedger from "@/pages/StableLedger";
+import StableHall from "@/pages/StableHall";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +72,9 @@ function GameRoutes() {
         <Route path="/seasonal-awards" element={<SeasonalAwards />} />
         <Route path="/tournament-awards" element={<TournamentAwards />} />
         <Route path="/style-guide" element={<StyleGuide />} />
+        <Route path="/arena-hub" element={<ArenaHub />} />
+        <Route path="/stable-ledger" element={<StableLedger />} />
+        <Route path="/stable-hall" element={<StableHall />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>

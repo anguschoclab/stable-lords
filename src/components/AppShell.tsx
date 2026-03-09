@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper, Crown, Shield, BarChart3, Target, Award, BookOpen } from "lucide-react";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper, Crown, Shield, BarChart3, Target, Award, BookOpen, Eye, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,9 @@ import { useRivalryAlerts } from "@/hooks/useRivalryAlerts";
 
 const navItems = [
   { to: "/", label: "Hub", icon: LayoutDashboard },
+  { to: "/arena-hub", label: "Arena", icon: Eye },
+  { to: "/stable-hall", label: "Stable Hall", icon: Landmark },
+  { to: "/stable-ledger", label: "Ledger", icon: BookOpen },
   { to: "/run-round", label: "Run Round", icon: Zap },
   { to: "/recruit", label: "Recruit", icon: UserPlus },
   { to: "/training", label: "Training", icon: Dumbbell },

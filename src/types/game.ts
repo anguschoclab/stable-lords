@@ -504,6 +504,7 @@ export interface GameState {
   recruitPool: any[]; // PoolWarrior[] from recruitment engine
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
+  insightTokens: InsightToken[]; // discovered weapon/rhythm insights
   settings: {
     featureFlags: {
       tournaments: boolean;
@@ -523,6 +524,19 @@ export interface TrainerData {
   retiredFromWarrior?: string;
   retiredFromStyle?: string;
   styleBonusStyle?: string;
+}
+
+// ─── Insight Tokens ─────────────────────────────────────────────────────────
+
+export type InsightTokenType = "Weapon" | "Rhythm";
+
+export interface InsightToken {
+  id: string;
+  type: InsightTokenType;
+  warriorId: string;
+  warriorName: string;
+  detail: string; // e.g. "Favors Broadsword" or "OE 6 / AL 8"
+  discoveredWeek: number;
 }
 
 // ─── UI Preferences ─────────────────────────────────────────────────────────

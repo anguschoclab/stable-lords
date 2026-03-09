@@ -62,6 +62,7 @@ function makeState(overrides?: Partial<GameState>): GameState {
     recruitPool: [],
     rosterBonus: 0,
     ownerGrudges: [],
+    insightTokens: [],
     settings: { featureFlags: { tournaments: true, scouting: true } },
     ...overrides,
   };
