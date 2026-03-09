@@ -3,17 +3,22 @@
  *
  * Generates fight narration in the authentic style of Duelmasters/Duel II arena reports.
  * Based on canonical PBP examples from Terrablood archives:
- *   joro.txt, bchief.txt, beast.txt, lao.txt, mstroke.txt, ninja.txt, rouge.txt, ftf26_fg.htm
+ *   v0.1: joro.txt, bchief.txt, beast.txt, lao.txt, mstroke.txt, ninja.txt, rouge.txt
+ *   v0.2: FTF26 Tournament Archive (FURIOUS GEORGE — 17 bouts, 14-3 record)
  *
  * Key narrative patterns preserved:
  * - Pre-bout warrior introductions (height, armor, weapon, style, suitability)
  * - Weapon-specific attack verbs ("slashes with his SCIMITAR!", "bashes with his MAUL!")
  * - Rich defense vocabulary (dodge, parry, block, counterstrike)
- * - Crowd reactions (jeers, cheers, voice from the stands)
+ * - Positional movement ("leaps to his left!", "shifts to his right")
+ * - Crowd reactions (jeers, cheers, derision, encouragement)
+ * - Warrior taunts mid-combat
  * - Minute markers with status assessments
  * - Desperation / bleeding / panic state changes
- * - Damage severity descriptors
- * - Kill / stoppage / surrender narration
+ * - Damage severity descriptors ("What a massive blow!", "deadly attack!")
+ * - Armor deflection mechanics
+ * - Kill / KO / stoppage / surrender narration
+ * - Stalemate/filler lines for action resets
  */
 
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
