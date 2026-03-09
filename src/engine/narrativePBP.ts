@@ -510,6 +510,7 @@ const INI_WIN_TEMPLATES = [
   "%N rushes to his opponent's weak side!",
   "%N leaps to his left!",
   "%N leaps to his right!",
+  "%N leaps forward!",
   "%N is moving constantly without pause!",
   "%N is moving in circles around his opponent!",
   "%N shifts continually back and forth!",
