@@ -29,6 +29,9 @@ import TrainingPlanner from "@/pages/TrainingPlanner";
 import SeasonalAwards from "@/pages/SeasonalAwards";
 import TournamentAwards from "@/pages/TournamentAwards";
 import StyleGuide from "@/pages/StyleGuide";
+import ArenaHub from "@/pages/ArenaHub";
+import StableLedger from "@/pages/StableLedger";
+import StableHall from "@/pages/StableHall";
 
 const queryClient = new QueryClient();
 
