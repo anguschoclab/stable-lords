@@ -910,7 +910,7 @@ export function simulateFight(
     // Damage tax increased: taking hits is exhausting regardless of style.
     const attEndMult = getEnduranceMult(attacker.style);
     const defEndMult = getEnduranceMult(defender.style);
-    const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * 0.7)) : 0;
+    const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * DAMAGE_TAX_SCALING)) : 0;
     // Weapon requirement endurance penalty (×1.1 per failed req)
     const attWepEndMult = attacker.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
     const defWepEndMult = defender.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
