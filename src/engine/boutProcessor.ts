@@ -16,6 +16,7 @@ import { commentatorFor, recapLine, blurb, type AnnounceTone } from "@/lore/Anno
 import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
 import { calculateXP, applyXP } from "@/engine/progression";
 import { checkDiscovery } from "@/engine/favorites";
+import { WEAPONS } from "@/data/equipment";
 import {
   generateMatchCard,
   addRestState,
@@ -278,14 +279,72 @@ function resolveBout(
   }
 
   // ── Favorites Discovery ──
-  const discoveryA = checkDiscovery(s.roster.find(w => w.id === warrior.id) || warrior);
-  if (discoveryA.updated && discoveryA.hints.length > 0) {
-    s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: discoveryA.hints }];
+  {
+    const wA = s.roster.find(w => w.id === warrior.id);
+    if (wA) {
+      const disc = checkDiscovery(wA);
+      if (disc.updated) {
+        // Persist mutated favorites back into roster
+        s.roster = s.roster.map(w => w.id === wA.id ? { ...w, favorites: wA.favorites } : w);
+        if (disc.hints.length > 0) {
+          s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: disc.hints }];
+        }
+        // Create InsightTokens for full reveals
+        if (disc.weaponRevealed && wA.favorites) {
+          const weaponItem = WEAPONS.find((wp) => wp.id === wA.favorites!.weaponId);
+          s.insightTokens = [...(s.insightTokens || []), {
+            id: `it_${wA.id}_weapon_${week}`,
+            type: "Weapon" as const,
+            warriorId: wA.id,
+            warriorName: wA.name,
+            detail: `Favorite weapon: ${weaponItem?.name ?? wA.favorites.weaponId} (+1 ATT)`,
+            discoveredWeek: week,
+          }];
+        }
+        if (disc.rhythmRevealed && wA.favorites) {
+          s.insightTokens = [...(s.insightTokens || []), {
+            id: `it_${wA.id}_rhythm_${week}`,
+            type: "Rhythm" as const,
+            warriorId: wA.id,
+            warriorName: wA.name,
+            detail: `Natural rhythm: OE ${wA.favorites.rhythm.oe} / AL ${wA.favorites.rhythm.al} (+1 INI)`,
+            discoveredWeek: week,
+          }];
+        }
+      }
+    }
   }
   if (!rivalStableId) {
-    const discoveryD = checkDiscovery(s.roster.find(w => w.id === opponent.id) || opponent);
-    if (discoveryD.updated && discoveryD.hints.length > 0) {
-      s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: discoveryD.hints }];
+    const wD = s.roster.find(w => w.id === opponent.id);
+    if (wD) {
+      const disc = checkDiscovery(wD);
+      if (disc.updated) {
+        s.roster = s.roster.map(w => w.id === wD.id ? { ...w, favorites: wD.favorites } : w);
+        if (disc.hints.length > 0) {
+          s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: disc.hints }];
+        }
+        if (disc.weaponRevealed && wD.favorites) {
+          const weaponItem = WEAPONS.find((wp) => wp.id === wD.favorites!.weaponId);
+          s.insightTokens = [...(s.insightTokens || []), {
+            id: `it_${wD.id}_weapon_${week}`,
+            type: "Weapon" as const,
+            warriorId: wD.id,
+            warriorName: wD.name,
+            detail: `Favorite weapon: ${weaponItem?.name ?? wD.favorites.weaponId} (+1 ATT)`,
+            discoveredWeek: week,
+          }];
+        }
+        if (disc.rhythmRevealed && wD.favorites) {
+          s.insightTokens = [...(s.insightTokens || []), {
+            id: `it_${wD.id}_rhythm_${week}`,
+            type: "Rhythm" as const,
+            warriorId: wD.id,
+            warriorName: wD.name,
+            detail: `Natural rhythm: OE ${wD.favorites.rhythm.oe} / AL ${wD.favorites.rhythm.al} (+1 INI)`,
+            discoveredWeek: week,
+          }];
+        }
+      }
     }
   }
 

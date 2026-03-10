@@ -71,21 +71,26 @@ const RHYTHM_REVEAL_FIGHTS = 18;
 export interface DiscoveryResult {
   updated: boolean;
   hints: string[];
+  weaponRevealed: boolean;
+  rhythmRevealed: boolean;
 }
 
 /** Check if a warrior should discover more about their favorites after a bout */
 export function checkDiscovery(warrior: Warrior): DiscoveryResult {
   const totalFights = warrior.career.wins + warrior.career.losses;
   const fav = warrior.favorites;
-  if (!fav) return { updated: false, hints: [] };
+  if (!fav) return { updated: false, hints: [], weaponRevealed: false, rhythmRevealed: false };
 
   const hints: string[] = [];
   let updated = false;
+  let weaponRevealed = false;
+  let rhythmRevealed = false;
 
   // Weapon discovery
   if (!fav.discovered.weapon) {
     if (totalFights >= WEAPON_REVEAL_FIGHTS) {
       fav.discovered.weapon = true;
+      weaponRevealed = true;
       const weaponItem = WEAPONS.find(w => w.id === fav.weaponId);
       hints.push(`💡 ${warrior.name} has discovered their favorite weapon: ${weaponItem?.name ?? fav.weaponId}! (+1 ATT when equipped)`);
       updated = true;
@@ -107,6 +112,7 @@ export function checkDiscovery(warrior: Warrior): DiscoveryResult {
   if (!fav.discovered.rhythm) {
     if (totalFights >= RHYTHM_REVEAL_FIGHTS) {
       fav.discovered.rhythm = true;
+      rhythmRevealed = true;
       hints.push(`💡 ${warrior.name} has found their natural rhythm: OE ${fav.rhythm.oe}, AL ${fav.rhythm.al}! (+1 INI when matched)`);
       updated = true;
     } else if (totalFights >= RHYTHM_HINT_FIGHTS * 2 && fav.discovered.rhythmHints < 2) {
@@ -121,7 +127,7 @@ export function checkDiscovery(warrior: Warrior): DiscoveryResult {
     }
   }
 
-  return { updated, hints };
+  return { updated, hints, weaponRevealed, rhythmRevealed };
 }
 
 // ─── Combat Bonuses ─────────────────────────────────────────────────────

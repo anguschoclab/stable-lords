@@ -3,6 +3,7 @@
  */
 import { FightingStyle, type GameState, type Warrior, type FightSummary, type Season } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
+import { generateFavorites } from "@/engine/favorites";
 import { processTraining } from "@/engine/training";
 import { processEconomy } from "@/engine/economy";
 import { processAging } from "@/engine/aging";
@@ -26,6 +27,7 @@ function makeWarrior(
   overrides?: Partial<Warrior>
 ): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
+  const favorites = generateFavorites(style, Math.random);
   return {
     id,
     name,
@@ -42,6 +44,7 @@ function makeWarrior(
     champion: false,
     status: "Active",
     age: 18 + Math.floor(Math.random() * 8),
+    favorites,
     ...overrides,
   };
 }
