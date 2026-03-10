@@ -886,6 +886,133 @@ function RivalryWidget() {
   );
 }
 
+// ─── Widget: Crowd Mood Meter ──────────────────────────────────────────────
+
+function CrowdMoodWidget() {
+  const { state } = useGame();
+  const mood = state.crowdMood as CrowdMood;
+  const mods = useMemo(() => getMoodModifiers(mood), [mood]);
+  const icon = MOOD_ICONS[mood] ?? "😐";
+  const desc = MOOD_DESCRIPTIONS[mood] ?? "";
+
+  // Radial gauge: map mood to an angle (0-180 arc)
+  const MOOD_ANGLE: Record<CrowdMood, number> = {
+    Solemn: 20,
+    Calm: 55,
+    Theatrical: 90,
+    Festive: 130,
+    Bloodthirsty: 165,
+  };
+  const angle = MOOD_ANGLE[mood] ?? 90;
+
+  // Format modifier as percentage label
+  const fmtMod = (v: number) => {
+    const pct = Math.round((v - 1) * 100);
+    if (pct === 0) return "—";
+    return `${pct > 0 ? "+" : ""}${pct}%`;
+  };
+  const fmtKill = (v: number) => {
+    const pct = Math.round(v * 100);
+    if (pct === 0) return "—";
+    return `${pct > 0 ? "+" : ""}${pct}%`;
+  };
+
+  const modColor = (v: number) =>
+    v > 1 ? "text-arena-pop" : v < 1 ? "text-destructive" : "text-muted-foreground";
+  const killColor = (v: number) =>
+    v > 0 ? "text-destructive" : v < 0 ? "text-arena-pop" : "text-muted-foreground";
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="font-display text-base flex items-center gap-2">
+          <Heart className="h-4 w-4 text-destructive" /> Crowd Mood
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {/* Radial gauge */}
+        <div className="flex justify-center">
+          <div className="relative w-40 h-24">
+            {/* Arc background */}
+            <svg viewBox="0 0 160 90" className="w-full h-full">
+              {/* Track */}
+              <path
+                d="M 15 80 A 65 65 0 0 1 145 80"
+                fill="none"
+                stroke="hsl(var(--muted))"
+                strokeWidth="10"
+                strokeLinecap="round"
+              />
+              {/* Gradient colored arc segments */}
+              <defs>
+                <linearGradient id="moodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" />
+                  <stop offset="40%" stopColor="hsl(var(--accent))" />
+                  <stop offset="70%" stopColor="hsl(var(--arena-gold, 45 93% 47%))" />
+                  <stop offset="100%" stopColor="hsl(var(--destructive))" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M 15 80 A 65 65 0 0 1 145 80"
+                fill="none"
+                stroke="url(#moodGrad)"
+                strokeWidth="10"
+                strokeLinecap="round"
+                opacity="0.3"
+              />
+              {/* Needle */}
+              <line
+                x1="80"
+                y1="80"
+                x2={80 + 50 * Math.cos(Math.PI - (angle * Math.PI) / 180)}
+                y2={80 - 50 * Math.sin(Math.PI - (angle * Math.PI) / 180)}
+                stroke="hsl(var(--foreground))"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                className="transition-all duration-700"
+              />
+              {/* Center dot */}
+              <circle cx="80" cy="80" r="4" fill="hsl(var(--foreground))" />
+            </svg>
+            {/* Labels at ends */}
+            <span className="absolute bottom-0 left-0 text-[9px] text-muted-foreground">🕯️</span>
+            <span className="absolute bottom-0 right-0 text-[9px] text-muted-foreground">🩸</span>
+          </div>
+        </div>
+
+        {/* Current mood */}
+        <div className="text-center">
+          <div className="text-2xl">{icon}</div>
+          <div className="font-display font-bold text-sm">{mood}</div>
+          <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{desc}</p>
+        </div>
+
+        {/* Modifier breakdown */}
+        <div className="grid grid-cols-3 gap-1.5 text-center">
+          <div className="rounded-md bg-secondary/60 p-1.5 border border-border/50">
+            <div className={`text-sm font-mono font-bold ${modColor(mods.fameMultiplier)}`}>
+              {fmtMod(mods.fameMultiplier)}
+            </div>
+            <div className="text-[9px] text-muted-foreground uppercase">Fame</div>
+          </div>
+          <div className="rounded-md bg-secondary/60 p-1.5 border border-border/50">
+            <div className={`text-sm font-mono font-bold ${modColor(mods.popMultiplier)}`}>
+              {fmtMod(mods.popMultiplier)}
+            </div>
+            <div className="text-[9px] text-muted-foreground uppercase">Pop</div>
+          </div>
+          <div className="rounded-md bg-secondary/60 p-1.5 border border-border/50">
+            <div className={`text-sm font-mono font-bold ${killColor(mods.killChanceBonus)}`}>
+              {fmtKill(mods.killChanceBonus)}
+            </div>
+            <div className="text-[9px] text-muted-foreground uppercase">Kill %</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
 type WidgetDef = {
@@ -906,10 +1033,12 @@ const MemoRankingsWidget = React.memo(RankingsWidget);
 const MemoMetaPulseWidget = React.memo(MetaPulseWidget);
 const MemoRecentBoutsWidget = React.memo(RecentBoutsWidget);
 const MemoGazetteWidget = React.memo(GazetteWidget);
+const MemoCrowdMoodWidget = React.memo(CrowdMoodWidget);
 
 const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
   { id: "stable",   label: "Stable Overview",   component: MemoStableWidget },
+  { id: "crowd",    label: "Crowd Mood",         component: MemoCrowdMoodWidget },
   { id: "finances", label: "Finances",           component: MemoFinancesWidget },
   { id: "training", label: "Training Status",    component: MemoTrainingWidget },
   { id: "rivals",    label: "Rival Stables",      component: MemoRivalsWidget },
