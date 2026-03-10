@@ -27,6 +27,7 @@ function makeWarrior(
   overrides?: Partial<Warrior>
 ): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
+  const favorites = generateFavorites(style, Math.random);
   return {
     id,
     name,
@@ -43,6 +44,7 @@ function makeWarrior(
     champion: false,
     status: "Active",
     age: 18 + Math.floor(Math.random() * 8),
+    favorites,
     ...overrides,
   };
 }
