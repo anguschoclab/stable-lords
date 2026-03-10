@@ -83,6 +83,8 @@ export function checkDiscovery(warrior: Warrior): DiscoveryResult {
 
   const hints: string[] = [];
   let updated = false;
+  let weaponRevealed = false;
+  let rhythmRevealed = false;
 
   // Weapon discovery
   if (!fav.discovered.weapon) {
