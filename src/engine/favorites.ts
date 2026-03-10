@@ -71,6 +71,8 @@ const RHYTHM_REVEAL_FIGHTS = 18;
 export interface DiscoveryResult {
   updated: boolean;
   hints: string[];
+  weaponRevealed: boolean;
+  rhythmRevealed: boolean;
 }
 
 /** Check if a warrior should discover more about their favorites after a bout */
