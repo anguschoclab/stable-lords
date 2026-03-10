@@ -112,6 +112,7 @@ export function checkDiscovery(warrior: Warrior): DiscoveryResult {
   if (!fav.discovered.rhythm) {
     if (totalFights >= RHYTHM_REVEAL_FIGHTS) {
       fav.discovered.rhythm = true;
+      rhythmRevealed = true;
       hints.push(`💡 ${warrior.name} has found their natural rhythm: OE ${fav.rhythm.oe}, AL ${fav.rhythm.al}! (+1 INI when matched)`);
       updated = true;
     } else if (totalFights >= RHYTHM_HINT_FIGHTS * 2 && fav.discovered.rhythmHints < 2) {
