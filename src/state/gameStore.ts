@@ -3,6 +3,7 @@
  */
 import { FightingStyle, type GameState, type Warrior, type FightSummary, type Season } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
+import { generateFavorites } from "@/engine/favorites";
 import { processTraining } from "@/engine/training";
 import { processEconomy } from "@/engine/economy";
 import { processAging } from "@/engine/aging";
