@@ -324,7 +324,7 @@ function resolveBout(
           s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: disc.hints }];
         }
         if (disc.weaponRevealed && wD.favorites) {
-          const weaponItem = (await import("@/data/equipment")).WEAPONS.find((wp: any) => wp.id === wD.favorites!.weaponId);
+          const weaponItem = WEAPONS.find((wp) => wp.id === wD.favorites!.weaponId);
           s.insightTokens = [...(s.insightTokens || []), {
             id: `it_${wD.id}_weapon_${week}`,
             type: "Weapon" as const,
