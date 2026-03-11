@@ -63,6 +63,7 @@ function makeState(overrides?: Partial<GameState>): GameState {
     rosterBonus: 0,
     ownerGrudges: [],
     insightTokens: [],
+    moodHistory: [],
     settings: { featureFlags: { tournaments: true, scouting: true } },
     ...overrides,
   };

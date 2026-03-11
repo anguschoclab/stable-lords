@@ -528,6 +528,8 @@ export function processWeekBouts(state: GameState): ProcessedWeek {
 
   // ── Crowd mood ──
   s.crowdMood = computeCrowdMood(s.arenaHistory);
+  const history = [...(s.moodHistory || []), { week: s.week, mood: s.crowdMood }];
+  s.moodHistory = history.slice(-20); // keep last 20 weeks
 
   // ── Fight of the week ──
   if (results.length > 0) {

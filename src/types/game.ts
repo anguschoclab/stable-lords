@@ -505,6 +505,7 @@ export interface GameState {
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
   insightTokens: InsightToken[]; // discovered weapon/rhythm insights
+  moodHistory: { week: number; mood: CrowdMoodType }[]; // last N weeks of crowd mood
   settings: {
     featureFlags: {
       tournaments: boolean;

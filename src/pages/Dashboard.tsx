@@ -891,6 +891,7 @@ function RivalryWidget() {
 function CrowdMoodWidget() {
   const { state } = useGame();
   const mood = state.crowdMood as CrowdMood;
+  const moodHistory = state.moodHistory || [];
   const mods = useMemo(() => getMoodModifiers(mood), [mood]);
   const icon = MOOD_ICONS[mood] ?? "😐";
   const desc = MOOD_DESCRIPTIONS[mood] ?? "";
@@ -1008,6 +1009,57 @@ function CrowdMoodWidget() {
             <div className="text-[9px] text-muted-foreground uppercase">Kill %</div>
           </div>
         </div>
+
+        {/* Mood History Sparkline */}
+        {moodHistory.length >= 2 && (() => {
+          const MOOD_Y: Record<string, number> = { Solemn: 4, Calm: 3, Theatrical: 2, Festive: 1, Bloodthirsty: 0 };
+          const MOOD_COLOR: Record<string, string> = {
+            Solemn: "hsl(var(--primary))",
+            Calm: "hsl(var(--muted-foreground))",
+            Theatrical: "hsl(var(--accent-foreground))",
+            Festive: "hsl(var(--arena-pop, 142 71% 45%))",
+            Bloodthirsty: "hsl(var(--destructive))",
+          };
+          const last10 = moodHistory.slice(-10);
+          const w = 200, h = 40, px = 8, py = 4;
+          const stepX = (w - px * 2) / Math.max(last10.length - 1, 1);
+          const stepY = (h - py * 2) / 4;
+          const pts = last10.map((entry, i) => ({
+            x: px + i * stepX,
+            y: py + (MOOD_Y[entry.mood] ?? 2) * stepY,
+            mood: entry.mood as CrowdMood,
+            week: entry.week,
+          }));
+          const polyline = pts.map(p => `${p.x},${p.y}`).join(" ");
+
+          return (
+            <div className="mt-1">
+              <div className="text-[9px] text-muted-foreground uppercase mb-1">Mood History</div>
+              <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-10">
+                {/* Grid lines */}
+                {[0,1,2,3,4].map(i => (
+                  <line key={i} x1={px} x2={w-px} y1={py + i*stepY} y2={py + i*stepY}
+                    stroke="hsl(var(--border))" strokeWidth="0.5" strokeDasharray="2,2" opacity="0.4" />
+                ))}
+                {/* Line */}
+                <polyline points={polyline} fill="none" stroke="hsl(var(--foreground))" strokeWidth="1.5"
+                  strokeLinejoin="round" strokeLinecap="round" opacity="0.6" />
+                {/* Dots */}
+                {pts.map((p, i) => (
+                  <circle key={i} cx={p.x} cy={p.y} r="3"
+                    fill={MOOD_COLOR[p.mood] ?? "hsl(var(--foreground))"}
+                    stroke="hsl(var(--background))" strokeWidth="1">
+                    <title>Week {p.week}: {p.mood}</title>
+                  </circle>
+                ))}
+              </svg>
+              {/* Y-axis labels */}
+              <div className="flex justify-between text-[8px] text-muted-foreground -mt-0.5 px-1">
+                <span>🩸</span><span>🎉</span><span>🎭</span><span>😐</span><span>🕯️</span>
+              </div>
+            </div>
+          );
+        })()}
       </CardContent>
     </Card>
   );

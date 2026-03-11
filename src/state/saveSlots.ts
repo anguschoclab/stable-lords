@@ -98,6 +98,7 @@ export function loadFromSlot(slotId: string): GameState | null {
         }
         if (!parsed.seasonalGrowth) parsed.seasonalGrowth = [];
         if (parsed.rosterBonus === undefined) parsed.rosterBonus = 0;
+        if (!parsed.moodHistory) parsed.moodHistory = [];
         // Migrate old training assignments (add type field)
         if (parsed.trainingAssignments) {
           parsed.trainingAssignments = parsed.trainingAssignments.map((a: any) => ({
@@ -253,6 +254,7 @@ export function parseImportedSave(json: string): GameState {
     state.settings.featureFlags = { ...state.settings.featureFlags, scouting: true };
   }
   if (state.rosterBonus === undefined) state.rosterBonus = 0;
+  if (!state.moodHistory) state.moodHistory = [];
   state.roster = (state.roster || []).map((w: any) => ({ ...w, status: w.status || "Active" }));
 
   return state as GameState;
