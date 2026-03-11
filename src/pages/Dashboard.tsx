@@ -891,6 +891,7 @@ function RivalryWidget() {
 function CrowdMoodWidget() {
   const { state } = useGame();
   const mood = state.crowdMood as CrowdMood;
+  const moodHistory = state.moodHistory || [];
   const mods = useMemo(() => getMoodModifiers(mood), [mood]);
   const icon = MOOD_ICONS[mood] ?? "😐";
   const desc = MOOD_DESCRIPTIONS[mood] ?? "";
