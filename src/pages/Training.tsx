@@ -222,7 +222,7 @@ export default function Training() {
   };
 
   const assignedCount = assignments.length;
-  const recoveryCount = assignments.filter(a => a.type === "recovery").length;
+  const recoveryCount = assignments.reduce((count, a) => a.type === "recovery" ? count + 1 : count, 0);
   const trainingCount = assignedCount - recoveryCount;
 
   return (
@@ -270,18 +270,23 @@ export default function Training() {
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {state.roster.filter(w => w.status === "Active").map((warrior) => (
-            <WarriorTrainingCard
-              key={warrior.id}
-              warrior={warrior}
-              assignment={assignmentMap.get(warrior.id)}
-              seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
-              trainers={state.trainers ?? []}
-              onAssign={(attr) => handleAssign(warrior.id, attr)}
-              onAssignRecovery={() => handleAssignRecovery(warrior.id)}
-              onClear={() => handleClear(warrior.id)}
-            />
-          ))}
+          {state.roster.reduce<React.ReactNode[]>((acc, warrior) => {
+            if (warrior.status === "Active") {
+              acc.push(
+                <WarriorTrainingCard
+                  key={warrior.id}
+                  warrior={warrior}
+                  assignment={assignmentMap.get(warrior.id)}
+                  seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
+                  trainers={state.trainers ?? []}
+                  onAssign={(attr) => handleAssign(warrior.id, attr)}
+                  onAssignRecovery={() => handleAssignRecovery(warrior.id)}
+                  onClear={() => handleClear(warrior.id)}
+                />
+              );
+            }
+            return acc;
+          }, [])}
         </div>
       )}
     </div>
