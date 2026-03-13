@@ -776,7 +776,7 @@ function RivalryWidget() {
       winCounts.set(rivalName, entry);
     }
     return [...winCounts.values()].sort((a, b) => b.wins - a.wins || b.kills - a.kills)[0] ?? null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [state.arenaHistory, rosterNames, rivalWarriorStable]);
 
   const intensityColor = (n: number) =>

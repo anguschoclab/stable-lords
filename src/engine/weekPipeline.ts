@@ -94,7 +94,7 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
     return newTier !== r.tier ? { ...r, tier: newTier as any } : r;
   });
 
-  let s = { ...state, rivals: updatedRivals, recruitPool: [] as any[] };
+  const s = { ...state, rivals: updatedRivals, recruitPool: [] as any[] };
   if (promotionNews.length > 0) {
     s.newsletter = [...s.newsletter, { week: newWeek, title: "Stable Rankings Update", items: promotionNews }];
   }

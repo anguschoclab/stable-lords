@@ -333,7 +333,7 @@ export default function Tournaments() {
 
     // We'll simulate multiple rounds in a single pass
     let updatedState = { ...state };
-    let bracket = [...currentTournament.bracket];
+    const bracket = [...currentTournament.bracket];
     let roundsSkipped = 0;
 
     const findWarrior = (name: string) => {
