@@ -1070,6 +1070,8 @@ function CrowdMoodWidget() {
 function StableComparisonWidget() {
   const { state } = useGame();
 
+  const playerNames = useMemo(() => new Set(state.roster.map(w => w.name)), [state.roster]);
+
   const playerStats = useMemo(() => {
     const active = state.roster.filter(w => w.status === "Active");
     const wins = state.roster.reduce((s, w) => s + w.career.wins, 0);
@@ -1078,15 +1080,46 @@ function StableComparisonWidget() {
     return { name: state.player.stableName, warriors: active.length, wins, kills, avgFame, isPlayer: true };
   }, [state.roster, state.player.stableName]);
 
-  const rivalStats = useMemo(() => {
-    return (state.rivals ?? []).slice(0, 3).map(r => {
+  // Build rival name sets and H2H records
+  const { rivalStats, h2hRecords } = useMemo(() => {
+    const rivals = (state.rivals ?? []).slice(0, 3);
+    const h2h: Record<string, { wins: number; losses: number; kills: number; deaths: number }> = {};
+
+    const stats = rivals.map(r => {
+      const rivalNameSet = new Set(r.roster.map(w => w.name));
       const active = r.roster.filter(w => w.status === "Active");
       const wins = r.roster.reduce((s, w) => s + w.career.wins, 0);
       const kills = r.roster.reduce((s, w) => s + w.career.kills, 0);
       const avgFame = active.length > 0 ? Math.round(active.reduce((s, w) => s + w.fame, 0) / active.length) : 0;
+
+      // Compute H2H from arena history
+      const record = { wins: 0, losses: 0, kills: 0, deaths: 0 };
+      for (const f of state.arenaHistory) {
+        const aIsPlayer = playerNames.has(f.a);
+        const dIsPlayer = playerNames.has(f.d);
+        const aIsRival = rivalNameSet.has(f.a);
+        const dIsRival = rivalNameSet.has(f.d);
+
+        if ((aIsPlayer && dIsRival) || (dIsPlayer && aIsRival)) {
+          const playerIsA = aIsPlayer;
+          const playerWon = (playerIsA && f.winner === "A") || (!playerIsA && f.winner === "D");
+          const playerLost = (playerIsA && f.winner === "D") || (!playerIsA && f.winner === "A");
+          if (playerWon) {
+            record.wins++;
+            if (f.by === "Kill") record.kills++;
+          } else if (playerLost) {
+            record.losses++;
+            if (f.by === "Kill") record.deaths++;
+          }
+        }
+      }
+      h2h[r.owner.stableName] = record;
+
       return { name: r.owner.stableName, warriors: active.length, wins, kills, avgFame, isPlayer: false };
     });
-  }, [state.rivals]);
+
+    return { rivalStats: stats, h2hRecords: h2h };
+  }, [state.rivals, state.arenaHistory, playerNames]);
 
   const allStables = [playerStats, ...rivalStats];
   if (rivalStats.length === 0) {
@@ -1114,7 +1147,7 @@ function StableComparisonWidget() {
           <Users className="h-4 w-4 text-primary" /> Stable Comparison
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="space-y-3">
           {/* Header row */}
           <div className="grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-b border-border pb-1.5">
@@ -1152,6 +1185,53 @@ function StableComparisonWidget() {
             </div>
           ))}
         </div>
+
+        {/* H2H Breakdown */}
+        {rivalStats.some(r => {
+          const rec = h2hRecords[r.name];
+          return rec && (rec.wins + rec.losses) > 0;
+        }) && (
+          <div className="space-y-2 pt-2 border-t border-border">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+              <Swords className="h-3 w-3" /> Head-to-Head
+            </div>
+            {rivalStats.map(r => {
+              const rec = h2hRecords[r.name];
+              if (!rec || (rec.wins + rec.losses) === 0) return null;
+              const total = rec.wins + rec.losses;
+              const winPct = Math.round((rec.wins / total) * 100);
+
+              return (
+                <div key={r.name} className="flex items-center gap-3">
+                  <span className="text-xs text-foreground/80 w-28 truncate" title={r.name}>vs {r.name}</span>
+                  <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden flex">
+                    <div
+                      className="h-full bg-arena-pop transition-all"
+                      style={{ width: `${winPct}%` }}
+                      title={`${rec.wins} wins`}
+                    />
+                    <div
+                      className="h-full bg-destructive/70 transition-all"
+                      style={{ width: `${100 - winPct}%` }}
+                      title={`${rec.losses} losses`}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-xs font-mono font-semibold text-arena-pop">{rec.wins}W</span>
+                    <span className="text-[10px] text-muted-foreground">-</span>
+                    <span className="text-xs font-mono font-semibold text-destructive">{rec.losses}L</span>
+                    {(rec.kills > 0 || rec.deaths > 0) && (
+                      <span className="text-[10px] font-mono text-muted-foreground ml-1">
+                        {rec.kills > 0 && <span className="text-arena-gold">☠{rec.kills}</span>}
+                        {rec.deaths > 0 && <span className="text-destructive ml-0.5">💀{rec.deaths}</span>}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
