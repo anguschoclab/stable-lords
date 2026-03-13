@@ -69,18 +69,22 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+          .map(([theme, prefix]) => {
+            const safeId = id.replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+
+            return `
+${prefix} [data-chart=${safeId}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+    const safeColor = color?.replace(/[^a-zA-Z0-9._%()#\s,/-]/g, "\\$&");
+    return safeColor ? `  --color-${safeKey}: ${safeColor};` : null;
   })
   .join("\n")}
 }
-`,
-          )
+`;
+          })
           .join("\n"),
       }}
     />
