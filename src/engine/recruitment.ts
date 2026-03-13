@@ -267,7 +267,7 @@ export function aiDraftFromPool(
   // AI recruitment every 4 weeks
   if (week % 4 !== 0) return { updatedPool: pool, updatedRivals: rivals, gazetteItems: [] };
 
-  const remainingPool = [...pool];
+  let remainingPool = [...pool];
   const updatedRivals = rivals.map(r => ({ ...r, roster: [...r.roster] }));
   const gazetteItems: string[] = [];
 

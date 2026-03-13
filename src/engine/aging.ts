@@ -18,7 +18,7 @@ const FORCED_RETIRE_MAX = 40;
 export function processAging(state: GameState): GameState {
   const ageEvents: string[] = [];
   let roster = [...state.roster];
-  const graveyard = [...state.graveyard];
+  let graveyard = [...state.graveyard];
   const retired = [...state.retired];
 
   // Age warriors every 52 weeks

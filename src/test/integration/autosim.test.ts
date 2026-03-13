@@ -3,8 +3,18 @@
  * 
  * Tests the autosim system that allows multi-week advancement with stop conditions.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createFreshState } from "@/state/gameStore";
+
+// Mock localStorage for Vitest since autosim triggers stat rollup saves
+globalThis.localStorage = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  length: 0,
+  key: vi.fn()
+};
 import { runAutosim } from "@/engine/autosim";
 import { FightingStyle, type GameState, type Warrior } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";

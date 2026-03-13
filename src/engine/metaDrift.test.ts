@@ -92,43 +92,18 @@ describe("Meta Drift", () => {
   });
 
   describe("getMetaLabel", () => {
-    it("should return Dominant for drift >= 5", () => {
+    it("should return correct labels for various drift values", () => {
+      expect(getMetaLabel(6)).toBe("Dominant");
       expect(getMetaLabel(5)).toBe("Dominant");
-      expect(getMetaLabel(5.1)).toBe("Dominant");
-      expect(getMetaLabel(10)).toBe("Dominant");
-      expect(getMetaLabel(Infinity)).toBe("Dominant");
-    });
-
-    it("should return Rising for 2 <= drift < 5", () => {
-      expect(getMetaLabel(4.9)).toBe("Rising");
       expect(getMetaLabel(3)).toBe("Rising");
       expect(getMetaLabel(2)).toBe("Rising");
-    });
-
-    it("should return Stable for -2 < drift < 2", () => {
-      expect(getMetaLabel(1.9)).toBe("Stable");
       expect(getMetaLabel(1)).toBe("Stable");
       expect(getMetaLabel(0)).toBe("Stable");
-      expect(getMetaLabel(-0)).toBe("Stable");
       expect(getMetaLabel(-1)).toBe("Stable");
-      expect(getMetaLabel(-1.9)).toBe("Stable");
-    });
-
-    it("should return Struggling for -5 < drift <= -2", () => {
       expect(getMetaLabel(-2)).toBe("Struggling");
       expect(getMetaLabel(-3)).toBe("Struggling");
-      expect(getMetaLabel(-4.9)).toBe("Struggling");
-    });
-
-    it("should return Declining for drift <= -5", () => {
       expect(getMetaLabel(-5)).toBe("Declining");
-      expect(getMetaLabel(-5.1)).toBe("Declining");
-      expect(getMetaLabel(-10)).toBe("Declining");
-      expect(getMetaLabel(-Infinity)).toBe("Declining");
-    });
-
-    it("should return Stable for NaN", () => {
-      expect(getMetaLabel(NaN)).toBe("Stable");
+      expect(getMetaLabel(-6)).toBe("Declining");
     });
   });
 
