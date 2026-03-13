@@ -1065,6 +1065,98 @@ function CrowdMoodWidget() {
   );
 }
 
+// ─── Widget: Stable Comparison ─────────────────────────────────────────────
+
+function StableComparisonWidget() {
+  const { state } = useGame();
+
+  const playerStats = useMemo(() => {
+    const active = state.roster.filter(w => w.status === "Active");
+    const wins = state.roster.reduce((s, w) => s + w.career.wins, 0);
+    const kills = state.roster.reduce((s, w) => s + w.career.kills, 0);
+    const avgFame = active.length > 0 ? Math.round(active.reduce((s, w) => s + w.fame, 0) / active.length) : 0;
+    return { name: state.player.stableName, warriors: active.length, wins, kills, avgFame, isPlayer: true };
+  }, [state.roster, state.player.stableName]);
+
+  const rivalStats = useMemo(() => {
+    return (state.rivals ?? []).slice(0, 3).map(r => {
+      const active = r.roster.filter(w => w.status === "Active");
+      const wins = r.roster.reduce((s, w) => s + w.career.wins, 0);
+      const kills = r.roster.reduce((s, w) => s + w.career.kills, 0);
+      const avgFame = active.length > 0 ? Math.round(active.reduce((s, w) => s + w.fame, 0) / active.length) : 0;
+      return { name: r.owner.stableName, warriors: active.length, wins, kills, avgFame, isPlayer: false };
+    });
+  }, [state.rivals]);
+
+  const allStables = [playerStats, ...rivalStats];
+  if (rivalStats.length === 0) {
+    return (
+      <Card className="md:col-span-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="font-display text-base flex items-center gap-2">
+            <Users className="h-4 w-4 text-primary" /> Stable Comparison
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-muted-foreground italic">No rival stables to compare yet.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const maxWins = Math.max(...allStables.map(s => s.wins), 1);
+  const maxFame = Math.max(...allStables.map(s => s.avgFame), 1);
+
+  return (
+    <Card className="md:col-span-2">
+      <CardHeader className="pb-2">
+        <CardTitle className="font-display text-base flex items-center gap-2">
+          <Users className="h-4 w-4 text-primary" /> Stable Comparison
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {/* Header row */}
+          <div className="grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-b border-border pb-1.5">
+            <span>Stable</span>
+            <span className="text-center">Size</span>
+            <span className="text-center">Victories</span>
+            <span className="text-center">Kills</span>
+            <span className="text-center">Avg Fame</span>
+          </div>
+          {allStables.map((s, i) => (
+            <div
+              key={i}
+              className={`grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 items-center py-1.5 rounded-md px-1.5 ${
+                s.isPlayer ? "bg-primary/5 border border-primary/20" : "hover:bg-secondary/40"
+              }`}
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                {s.isPlayer && <Shield className="h-3 w-3 text-primary shrink-0" />}
+                <span className={`text-sm truncate ${s.isPlayer ? "font-semibold" : ""}`}>{s.name}</span>
+              </div>
+              <div className="text-center text-sm font-mono">{s.warriors}</div>
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-arena-pop rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
+                </div>
+                <span className="text-xs font-mono w-6 text-right">{s.wins}</span>
+              </div>
+              <div className="text-center text-sm font-mono text-destructive">{s.kills}</div>
+              <div className="flex items-center gap-1.5">
+                <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-arena-fame rounded-full transition-all" style={{ width: `${(s.avgFame / maxFame) * 100}%` }} />
+                </div>
+                <span className="text-xs font-mono w-6 text-right">{s.avgFame}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
 type WidgetDef = {
