@@ -10,6 +10,7 @@ import {
 import {
   migrateLegacySave,
   getActiveSlot,
+  setActiveSlot,
   loadFromSlot,
   saveToSlot,
   listSaveSlots,
@@ -24,6 +25,7 @@ export interface GameStoreState {
 
 export interface GameStoreActions {
   setState: (next: GameState) => void;
+  loadGame: (slotId: string, state: GameState) => void;
   doAdvanceWeek: () => void;
   doAppendFight: (summary: FightSummary) => void;
   doUpdateWarrior: (
@@ -71,6 +73,16 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
           });
         }
       }
+    },
+
+    loadGame: (slotId: string, state: GameState) => {
+      setActiveSlot(slotId);
+      set((draft) => {
+        draft.state = state;
+        draft.activeSlotId = slotId;
+        draft.atTitleScreen = false;
+        draft.lastSavedAt = new Date().toISOString();
+      });
     },
 
     setState: (next: GameState) => {
