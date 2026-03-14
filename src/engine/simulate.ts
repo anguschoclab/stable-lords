@@ -35,6 +35,13 @@ import {
 } from "./narrativePBP";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
+/**
+ * Creates a seeded pseudo-random number generator (PRNG) using the mulberry32 algorithm.
+ * Provides deterministic randomness for fight simulations.
+ *
+ * @param seed - The initial seed value.
+ * @returns A function that generates a pseudo-random float between 0 (inclusive) and 1 (exclusive).
+ */
 function mulberry32(seed: number) {
   return () => {
     seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -71,6 +78,14 @@ const MATCHUP_MATRIX: number[][] = [
   [ 0,  0, +1,  0, +1, +1,  0,  0,  0,  0], // WS: zone control, beats LU/PS/PR
 ];
 
+/**
+ * Retrieves the stylistic matchup bonus or penalty between an attacking and defending style.
+ * Uses the pre-defined `MATCHUP_MATRIX`.
+ *
+ * @param attStyle - The fighting style of the attacker.
+ * @param defStyle - The fighting style of the defender.
+ * @returns The bonus (+1), neutral (0), or penalty (-1) for the attacker.
+ */
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
   const ai = STYLE_ORDER.indexOf(attStyle);
   const di = STYLE_ORDER.indexOf(defStyle);
@@ -80,6 +95,14 @@ function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): numb
 
 // ─── Phase detection ──────────────────────────────────────────────────────
 type Phase = "OPENING" | "MID" | "LATE";
+/**
+ * Determines the current phase of the fight based on the exchange ratio.
+ * Used to trigger phase-specific passive abilities and narrative events.
+ *
+ * @param exchange - The current exchange number.
+ * @param maxExchanges - The maximum expected exchanges for the bout.
+ * @returns The string literal representing the current phase ("OPENING", "MID", or "LATE").
+ */
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const ratio = exchange / maxExchanges;
   if (ratio < PHASE_OPENING_THRESHOLD) return "OPENING";
@@ -97,6 +120,13 @@ const HIT_LOCATIONS = ["head", "chest", "abdomen", "right arm", "left arm", "rig
 type HitLocation = typeof HIT_LOCATIONS[number];
 
 /** Maps a grouped protect target to the granular hit locations it covers */
+/**
+ * Expands a general protection target (e.g., "head", "body", "arms", "legs", "vital")
+ * into a list of specific `HitLocation` strings it covers.
+ *
+ * @param protect - The generalized body part targeted for protection by the defender's tactic.
+ * @returns An array of specific hit locations covered by the protection, or an empty array if none.
+ */
 function protectCovers(protect?: string): string[] {
   if (!protect || protect === "Any") return [];
   const p = protect.toLowerCase();
@@ -390,6 +420,13 @@ function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
 }
 
 // ─── Default Plan ─────────────────────────────────────────────────────────
+/**
+ * Generates a sensible default fight plan for a given warrior based on their style and capabilities.
+ * Used when a manager fails to provide a specific plan or as a fallback for AI logic.
+ *
+ * @param w - The warrior to generate the plan for.
+ * @returns A complete `FightPlan` object configured for the warrior's default strategy.
+ */
 export function defaultPlanForWarrior(w: Warrior): FightPlan {
   // Style-aware defaults from spec
   const styleDefaults: Partial<Record<FightingStyle, Partial<FightPlan>>> = {
@@ -415,6 +452,19 @@ export function defaultPlanForWarrior(w: Warrior): FightPlan {
 }
 
 // ─── Main Simulation ──────────────────────────────────────────────────────
+/**
+ * Core function to simulate a complete fight between two warriors.
+ * Processes initialization, pre-fight setups, minute-by-minute exchanges,
+ * stat tracking, and final outcome determination.
+ *
+ * @param w1 - The first warrior participating in the fight.
+ * @param w2 - The second warrior participating in the fight.
+ * @param plan1 - The tactical plan provided by the first warrior's manager.
+ * @param plan2 - The tactical plan provided by the second warrior's manager.
+ * @param seed - The random seed ensuring the fight result is deterministic.
+ * @param logPrefix - Optional string used for debugging output prefixes.
+ * @returns A comprehensive `FightOutcome` object containing the winner, detailed logs, statistics, and narrative events.
+ */
 export function simulateFight(
   planA: FightPlan,
   planD: FightPlan,
