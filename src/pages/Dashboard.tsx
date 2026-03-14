@@ -127,7 +127,7 @@ function SeasonWidget() {
               <div className="flex items-center gap-2">
                 <div className={`h-1.5 w-1.5 rounded-full ${
                   ev.type === "bout" ? "bg-destructive" :
-                  ev.type === "season" ? "bg-primary" : "bg-accent"
+                  ev.type === "season" ? "bg-primary" : "bg-arena-pop"
                 }`} />
                 <span className="text-foreground/80">{ev.label}</span>
               </div>
@@ -150,45 +150,68 @@ function SeasonWidget() {
 
 function StableWidget() {
   const { state } = useGame();
-  const activeWarriors = state.roster.filter(w => w.status === "Active").length;
-  const totalWins = state.roster.reduce((s, w) => s + w.career.wins, 0);
-  const totalKills = state.roster.reduce((s, w) => s + w.career.kills, 0);
+  const activeWarriors = state.roster.filter(w => w.status === "Active");
+  // Sort warriors by fame or wins for the "Top 5" list
+  const topWarriors = [...activeWarriors].sort((a, b) => b.fame - a.fame).slice(0, 5);
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="font-display text-base flex items-center gap-2">
-          <Shield className="h-4 w-4 text-primary" /> {state.player.stableName}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Warriors</div>
-            <div className="text-lg font-bold">{activeWarriors}</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Fame</div>
-            <div className="text-lg font-bold text-arena-fame">{state.fame}</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Victories</div>
-            <div className="text-lg font-bold text-accent">{totalWins}</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Kills</div>
-            <div className="text-lg font-bold text-destructive">{totalKills}</div>
-          </div>
+    <Card className="flex flex-col h-full border-border/50 shadow-sm">
+      <CardHeader className="pb-2 border-b border-border/20 bg-secondary/10">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display text-sm tracking-wide flex items-center gap-2">
+            <Shield className="h-4 w-4 text-primary" /> STABLE OVERVIEW
+          </CardTitle>
+          <span className="text-[10px] text-muted-foreground font-mono bg-secondary px-1.5 py-0.5 rounded">
+            {activeWarriors.length}/{BASE_ROSTER_CAP + state.rosterBonus} ACTIVE
+          </span>
         </div>
-        <div className="mt-3 flex gap-2">
-          <Link to="/recruit" className="flex-1">
-            <Button variant="outline" size="sm" className="w-full gap-1 text-xs">
-              <UserPlus className="h-3 w-3" /> Recruit
+      </CardHeader>
+      <CardContent className="p-0 flex-1 flex flex-col">
+        <div className="flex-1">
+          {topWarriors.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">No active warriors.</div>
+          ) : (
+            <div className="divide-y divide-border/20">
+              {topWarriors.map(w => {
+                 const hasInjuries = w.injuries && w.injuries.length > 0;
+                 return (
+                  <div key={w.id} className="p-2.5 flex items-center gap-3 hover:bg-secondary/20 transition-colors">
+                    <div className="w-6 h-6 rounded-full bg-secondary/80 border border-border flex items-center justify-center shrink-0">
+                      <span className="text-[10px] font-bold">{w.name.charAt(0)}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <Link to={`/warrior/${w.id}`} className="text-xs font-bold truncate hover:underline">{w.name}</Link>
+                        <span className="text-[10px] font-mono whitespace-nowrap">
+                           <span className="text-arena-pop">{w.career.wins}</span>-<span className="text-muted-foreground">{w.career.losses}</span>-<span className="text-destructive">{w.career.kills}</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-[10px] text-muted-foreground truncate">{STYLE_DISPLAY_NAMES[w.style as keyof typeof STYLE_DISPLAY_NAMES] || w.style}</span>
+                        {hasInjuries ? (
+                           <span className="text-[9px] uppercase tracking-wider bg-destructive/10 text-destructive px-1 rounded font-bold">Injured</span>
+                        ) : (
+                           <span className="text-[9px] uppercase tracking-wider bg-green-500/10 text-green-500 px-1 rounded font-bold">Healthy</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                 )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Actions stuck to bottom */}
+        <div className="p-2.5 border-t border-border/20 bg-background/50 grid grid-cols-2 gap-2 mt-auto">
+          <Link to="/recruit">
+            <Button variant="secondary" size="sm" className="w-full h-7 text-[10px] uppercase tracking-wider font-bold">
+              <UserPlus className="h-3 w-3 mr-1" /> Recruit
             </Button>
           </Link>
-          <Link to="/training" className="flex-1">
-            <Button variant="outline" size="sm" className="w-full gap-1 text-xs">
-              <TrendingUp className="h-3 w-3" /> Train
+          <Link to="/stable-hall">
+            <Button variant="outline" size="sm" className="w-full h-7 text-[10px] uppercase tracking-wider font-bold">
+              <Users className="h-3 w-3 mr-1" /> View All
             </Button>
           </Link>
         </div>
@@ -296,7 +319,7 @@ function FinancesWidget() {
 
         <div className="grid grid-cols-2 gap-2 text-center">
           <div className="rounded-md bg-secondary/60 p-2 border border-border/50">
-            <div className="text-sm font-semibold text-accent flex items-center justify-center gap-0.5">
+            <div className="text-sm font-semibold text-arena-pop flex items-center justify-center gap-0.5">
               <ArrowUpRight className="h-3 w-3" /> {breakdown.totalIncome}g
             </div>
             <div className="text-[10px] text-muted-foreground">Income</div>
@@ -311,7 +334,7 @@ function FinancesWidget() {
 
         <div className="flex justify-between items-center pt-1 border-t border-border/50">
           <span className="text-xs text-muted-foreground">Net / week</span>
-          <span className={`text-sm font-mono font-bold ${breakdown.net >= 0 ? "text-accent" : "text-destructive"}`}>
+          <span className={`text-sm font-mono font-bold ${breakdown.net >= 0 ? "text-arena-pop" : "text-destructive"}`}>
             {breakdown.net >= 0 ? "+" : ""}{breakdown.net}g
           </span>
         </div>
@@ -418,66 +441,78 @@ function GazetteWidget() {
 
 function RecentBoutsWidget() {
   const { state } = useGame();
-  const recent = state.arenaHistory.slice(-4).reverse();
+
+  // Get the last 5 bouts involving the player's stable
+  const recentBouts = useMemo(() => {
+    return state.arenaHistory
+      .filter(bout => bout.a === state.player.stableName || bout.d === state.player.stableName)
+      .slice(0, 5);
+  }, [state.arenaHistory, state.player.stableName]);
 
   return (
-    <Card className="md:col-span-2">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="font-display text-base flex items-center gap-2">
-          <Swords className="h-4 w-4 text-destructive" /> Recent Bouts
-        </CardTitle>
-        <Link to="/hall-of-fights">
-          <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1 text-muted-foreground">
-            View All <ChevronRight className="h-3 w-3" />
-          </Button>
-        </Link>
+    <Card className="flex flex-col h-full border-border/50 shadow-sm col-span-1 md:col-span-2">
+      <CardHeader className="pb-2 border-b border-border/20 bg-secondary/10">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display text-sm tracking-wide flex items-center gap-2">
+            <ScrollText className="h-4 w-4 text-primary" /> RECENT BOUTS
+          </CardTitle>
+          <span className="text-[10px] text-muted-foreground font-mono">LAST 5 MATCHES</span>
+        </div>
       </CardHeader>
-      <CardContent>
-        {recent.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">No bouts recorded yet.</p>
-        ) : (
-          <div className="space-y-2">
-            {recent.map((f) => {
-              const isPlayerA = state.roster.some(w => w.name === f.a);
-              const isPlayerD = state.roster.some(w => w.name === f.d);
-              const playerWarrior = isPlayerA ? f.a : isPlayerD ? f.d : null;
-              const won = playerWarrior && (
-                (playerWarrior === f.a && f.winner === "A") ||
-                (playerWarrior === f.d && f.winner === "D")
-              );
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-[10px] text-muted-foreground uppercase bg-secondary/5 border-b border-border/20 font-bold tracking-wider">
+              <tr>
+                <th className="px-4 py-2">Week</th>
+                <th className="px-4 py-2">Fighter</th>
+                <th className="px-4 py-2">Opponent</th>
+                <th className="px-4 py-2">Result</th>
+                <th className="px-4 py-2 text-right">Method</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/20">
+              {recentBouts.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs">No match history available</td>
+                </tr>
+              ) : (
+                recentBouts.map((bout) => {
+                  const isPlayerA = bout.a === state.player.stableName;
+                  const playerWon = (isPlayerA && bout.winner === "A") || (!isPlayerA && bout.winner === "D");
+                  const resultColor = playerWon ? "text-arena-pop" : "text-destructive";
 
-              return (
-                <div key={f.id} className="flex items-center gap-3 py-1.5">
-                  <Badge
-                    variant={won ? "default" : f.winner ? "destructive" : "secondary"}
-                    className="text-[10px] w-6 h-5 justify-center p-0"
-                  >
-                    {won ? "W" : f.winner ? "L" : "D"}
-                  </Badge>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs">
-                      <WarriorLink name={f.a} className={`font-medium ${isPlayerA ? "text-foreground" : "text-muted-foreground"}`} />
-                      <span className="text-muted-foreground mx-1.5">vs</span>
-                      <WarriorLink name={f.d} className={`font-medium ${isPlayerD ? "text-foreground" : "text-muted-foreground"}`} />
-                    </div>
-                    <div className="flex gap-1 mt-0.5">
-                      {f.by && <Badge variant="outline" className="text-[9px] h-3.5 px-1">{f.by}</Badge>}
-                      {f.flashyTags?.slice(0, 2).map(t => (
-                        <Badge key={t} variant="outline" className="text-[9px] h-3.5 px-1">{t}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground font-mono shrink-0">Wk {f.week}</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                  return (
+                    <tr key={bout.id} className="hover:bg-secondary/10 transition-colors">
+                      <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">Wk {bout.week}</td>
+                      <td className="px-4 py-2.5 font-bold">
+                        {isPlayerA ? bout.a : bout.d}
+                      </td>
+                      <td className="px-4 py-2.5 text-muted-foreground text-xs">
+                         {isPlayerA ? bout.d : bout.a}
+                      </td>
+                      <td className={`px-4 py-2.5 font-bold ${resultColor}`}>
+                         {playerWon ? "WIN" : "LOSS"}
+                      </td>
+                      <td className="px-4 py-2.5 text-right font-mono text-[10px] uppercase text-muted-foreground">
+                        {bout.by || "DECISION"}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="p-2 border-t border-border/20 bg-background/50 text-center">
+            <Link to="/hall-of-fights" className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors font-bold flex items-center justify-center gap-1">
+               Full History <ChevronRight className="h-3 w-3" />
+            </Link>
+        </div>
       </CardContent>
     </Card>
   );
 }
-
 // ─── Widget: Training Status ───────────────────────────────────────────────
 
 function TrainingWidget() {
@@ -553,7 +588,7 @@ function TrainingWidget() {
                     </div>
                   </div>
                   <div className="shrink-0">
-                    <div className={`h-2 w-2 rounded-full ${atCeiling ? "bg-muted-foreground" : "bg-accent animate-pulse"}`} />
+                    <div className={`h-2 w-2 rounded-full ${atCeiling ? "bg-muted-foreground" : "bg-arena-pop animate-pulse"}`} />
                   </div>
                 </div>
               );
@@ -804,7 +839,7 @@ function RivalryWidget() {
             <p className="text-[10px] text-muted-foreground">Fight rival stables to forge vendettas and blood feuds.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="space-y-3">
               {rivalries.slice(0, 4).map(r => (
                 <div key={r.ownerId} className="space-y-1.5">
@@ -919,9 +954,9 @@ function CrowdMoodWidget() {
   };
 
   const modColor = (v: number) =>
-    v > 1 ? "text-accent" : v < 1 ? "text-destructive" : "text-muted-foreground";
+    v > 1 ? "text-arena-pop" : v < 1 ? "text-destructive" : "text-muted-foreground";
   const killColor = (v: number) =>
-    v > 0 ? "text-destructive" : v < 0 ? "text-accent" : "text-muted-foreground";
+    v > 0 ? "text-destructive" : v < 0 ? "text-arena-pop" : "text-muted-foreground";
 
   return (
     <Card>
@@ -1171,7 +1206,7 @@ function StableComparisonWidget() {
               <div className="text-center text-sm font-mono">{s.warriors}</div>
               <div className="flex items-center gap-1.5">
                 <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
+                  <div className="h-full bg-arena-pop rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
                 </div>
                 <span className="text-xs font-mono w-6 text-right">{s.wins}</span>
               </div>
@@ -1206,7 +1241,7 @@ function StableComparisonWidget() {
                   <span className="text-xs text-foreground/80 w-28 truncate" title={r.name}>vs {r.name}</span>
                   <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden flex">
                     <div
-                      className="h-full bg-accent transition-all"
+                      className="h-full bg-arena-pop transition-all"
                       style={{ width: `${winPct}%` }}
                       title={`${rec.wins} wins`}
                     />
@@ -1217,7 +1252,7 @@ function StableComparisonWidget() {
                     />
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-xs font-mono font-semibold text-accent">{rec.wins}W</span>
+                    <span className="text-xs font-mono font-semibold text-arena-pop">{rec.wins}W</span>
                     <span className="text-[10px] text-muted-foreground">-</span>
                     <span className="text-xs font-mono font-semibold text-destructive">{rec.losses}L</span>
                     {(rec.kills > 0 || rec.deaths > 0) && (
@@ -1363,57 +1398,52 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-4">
-      {/* Top Header Panel */}
-      <Card className="border-primary/20 glow-neon-blue bg-card/80 backdrop-blur-sm">
-        <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Swords className="h-8 w-8 text-primary glow-neon-green rounded-full p-1 bg-primary/10" />
-            <div>
-              <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide">
-                Arena Hub
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Stable: <span className="text-foreground font-medium">{state.player.stableName}</span>
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-6 text-sm">
-             <div className="text-center">
-                <div className="text-muted-foreground text-xs uppercase tracking-wider">Time</div>
-                <div className="font-mono font-bold">Wk {state.week} · {state.season}</div>
-             </div>
-             <div className="text-center">
-                <div className="text-muted-foreground text-xs uppercase tracking-wider">Gold</div>
-                <div className="font-mono font-bold text-primary glow-neon-green">{state.gold}</div>
-             </div>
-             <div className="text-center">
-                <div className="text-muted-foreground text-xs uppercase tracking-wider">Fame</div>
-                <div className="font-mono font-bold text-arena-fame">{state.player.fame}</div>
-             </div>
-          </div>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-secondary/30 p-4 rounded-xl border border-border/50">
+        <div className="flex-1">
+          <h1 className="text-2xl font-display font-bold tracking-wide flex items-center gap-2 text-foreground">
+            Arena Hub
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Welcome back, <span className="text-foreground font-medium">{state.player.name}</span> of <span className="text-primary font-bold">{state.player.stableName}</span>
+          </p>
+        </div>
 
-          <div className="flex items-center gap-1.5 self-start sm:self-auto">
-            {isEditing && (
-              <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:text-foreground" onClick={resetLayout}>
-                <RotateCcw className="h-3 w-3" /> Reset
-              </Button>
-            )}
-            <Button
-              variant={isEditing ? "default" : "outline"}
-              size="sm"
-              className="text-xs gap-1 border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-colors"
-              onClick={() => setIsEditing(v => !v)}
-            >
-              <GripVertical className="h-3 w-3" />
-              {isEditing ? "Done" : "Customize"}
+        <div className="flex items-center gap-4 text-sm bg-background/50 px-4 py-2 rounded-lg border border-border/40 shrink-0 shadow-inner">
+           <div className="flex items-center gap-2 border-r border-border/50 pr-4">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Gold</span>
+              <span className="font-mono text-arena-gold font-bold">{state.gold.toLocaleString()} G</span>
+           </div>
+           <div className="flex items-center gap-2 border-r border-border/50 pr-4">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Fame</span>
+              <span className="font-mono text-arena-fame font-bold">{state.fame.toLocaleString()}</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Pop</span>
+              <span className="font-mono text-arena-pop font-bold">{Math.round(state.popularity)}%</span>
+           </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {isEditing && (
+            <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors" onClick={resetLayout}>
+              <RotateCcw className="h-3 w-3" /> Reset
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+          <Button
+            variant={isEditing ? "default" : "secondary"}
+            size="sm"
+            className={cn("text-xs gap-1 transition-colors shadow-sm", isEditing && "bg-primary text-primary-foreground")}
+            onClick={() => setIsEditing(v => !v)}
+          >
+            <GripVertical className="h-3 w-3" />
+            {isEditing ? "Done" : "Customize"}
+          </Button>
+        </div>
+      </div>
 
-      {/* Widget Grid - Strict 3 Column */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Widget Grid */}
+      <div className="grid gap-4 md:grid-cols-3 auto-rows-min">
         {widgetOrder.map((id, idx) => {
           const def = widgetMap.get(id);
           if (!def) return null;
@@ -1430,25 +1460,20 @@ export default function Dashboard() {
               onDrop={() => handleDrop(idx)}
               onDragEnd={handleDragEnd}
               className={cn(
-                "transition-all duration-300",
-                def.wide ? "md:col-span-2 lg:col-span-2" : "md:col-span-1 lg:col-span-1",
+                "transition-all duration-200",
+                def.wide && "md:col-span-2",
                 isEditing && "cursor-grab active:cursor-grabbing",
-                isDragging && "opacity-40 scale-[0.98]",
-                isDragOver && "ring-2 ring-primary/80 ring-offset-2 ring-offset-background rounded-xl shadow-[0_0_15px_rgba(var(--primary),0.5)]",
+                isDragging && "opacity-40 scale-[0.97]",
+                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-xl",
               )}
             >
               {isEditing && (
-                <div className="flex items-center justify-between bg-primary/10 border border-primary/20 border-b-0 rounded-t-xl px-3 py-1.5 text-xs text-primary font-medium">
-                  <div className="flex items-center gap-2">
-                    <GripVertical className="h-3 w-3" />
-                    <span className="uppercase tracking-wider">{def.label}</span>
-                  </div>
-                  {def.wide && <Badge variant="outline" className="text-[9px] border-primary/30 text-primary">WIDE</Badge>}
+                <div className="flex items-center gap-1.5 px-2 py-1 text-[10px] text-muted-foreground">
+                  <GripVertical className="h-3 w-3" />
+                  <span className="uppercase tracking-wider font-medium">{def.label}</span>
                 </div>
               )}
-              <div className={cn("h-full", isEditing && "rounded-t-none overflow-hidden ring-1 ring-primary/20")}>
-                <Widget />
-              </div>
+              <Widget />
             </div>
           );
         })}

@@ -109,8 +109,8 @@ export default function Trainers() {
   const { state, setState } = useGame();
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
-  const currentTrainers = useMemo(() => state.trainers ?? [], [state.trainers]);
-  const hiringPool = useMemo(() => state.hiringPool ?? [], [state.hiringPool]);
+  const currentTrainers = state.trainers ?? [];
+  const hiringPool = state.hiringPool ?? [];
   const canHire = currentTrainers.length < TRAINER_MAX_PER_STABLE;
 
   // Auto-populate hiring pool on first visit if empty
@@ -135,7 +135,7 @@ export default function Trainers() {
 
   // Refresh hiring pool
   const refreshPool = useCallback(() => {
-    const pool = generateHiringPool(5, state.week * 1000 + Date.now());
+    const pool = generateHiringPool(4, state.week * 1000 + Date.now());
     // Convert Trainer to TrainerData
     const poolData: TrainerData[] = pool.map((t) => ({
       id: t.id,
@@ -150,7 +150,7 @@ export default function Trainers() {
     }));
     setState({ ...state, hiringPool: poolData });
     toast.success("New trainers are available for hire!");
-  }, [state, setState]); // currentTrainers and hiringPool are not used inside this callback, but let's check.
+  }, [state, setState]);
 
   const hireTrainer = useCallback(
     (trainer: TrainerData) => {
@@ -174,7 +174,7 @@ export default function Trainers() {
       });
       toast.success(`${trainer.name} has joined your stable! (-${cost}g)`);
     },
-    [state, setState, canHire, currentTrainers, hiringPool]
+    [state, setState, canHire]
   );
 
   const fireTrainer = useCallback(
