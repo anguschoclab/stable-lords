@@ -56,27 +56,33 @@ function breakpointBonus(val: number): number {
 /**
  * Compute base skills from attributes + fighting style.
  * Deterministic — no randomness.
+ *
+ * SEED COMPRESSION (Balance v8):
+ * Defensive skills (PAR, DEF, RIP) use compressed attribute scaling —
+ * only 2 contributing attributes instead of 3, with no ×2 primary.
+ * This ensures offense scales more aggressively from attributes than defense,
+ * so defensive identity comes from style seeds + passives, not raw stat stacking.
  */
 export function computeBaseSkills(attrs: Attributes, style: FightingStyle): BaseSkills {
   const seed = STYLE_SEEDS[style];
   const { ST, CN, SZ, WT, WL, SP, DF } = attrs;
 
-  // ATT: WT primary, DF secondary, ST tertiary
+  // ATT: WT primary (×2), DF secondary, ST tertiary — FULL offensive scaling
   const ATT = seed[0] + breakpointBonus(WT) * 2 + breakpointBonus(DF) + breakpointBonus(ST);
 
-  // PAR: WT primary, DF secondary, WL tertiary
-  const PAR = seed[1] + breakpointBonus(WT) * 2 + breakpointBonus(DF) + breakpointBonus(WL);
+  // PAR: WT + DF only — COMPRESSED (was WT×2 + DF + WL = 4 bonus, now 2 bonus)
+  const PAR = seed[1] + breakpointBonus(WT) + breakpointBonus(DF);
 
-  // DEF: SP primary, DF secondary, WT tertiary
-  const DEF = seed[2] + breakpointBonus(SP) * 2 + breakpointBonus(DF) + breakpointBonus(WT);
+  // DEF: SP + DF only — COMPRESSED (was SP×2 + DF + WT = 4 bonus, now 2 bonus)
+  const DEF = seed[2] + breakpointBonus(SP) + breakpointBonus(DF);
 
-  // INI: SP primary, WT secondary, DF tertiary
+  // INI: SP primary (×2), WT secondary, DF tertiary — FULL offensive scaling
   const INI = seed[3] + breakpointBonus(SP) * 2 + breakpointBonus(WT) + breakpointBonus(DF);
 
-  // RIP: DF primary, WT secondary, SP tertiary
-  const RIP = seed[4] + breakpointBonus(DF) * 2 + breakpointBonus(WT) + breakpointBonus(SP);
+  // RIP: DF + WT only — COMPRESSED (was DF×2 + WT + SP = 4 bonus, now 2 bonus)
+  const RIP = seed[4] + breakpointBonus(DF) + breakpointBonus(WT);
 
-  // DEC: WT primary, WL secondary
+  // DEC: WT primary (×2), WL secondary — unchanged (offensive/kill skill)
   const DEC = seed[5] + breakpointBonus(WT) * 2 + breakpointBonus(WL);
 
   return {

@@ -200,10 +200,12 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
 
-/** Global attack bonus — offenses lands frequently (fights should be violent) */
-const GLOBAL_ATT_BONUS = 8;
+/** Global attack bonus — offense lands frequently (fights should be violent) */
+// BALANCE v8: Reduced from 8 → 4 because seed compression already favors offense via attribute scaling.
+const GLOBAL_ATT_BONUS = 4;
 /** Global parry penalty — parrying is hard (defense identity is endurance, not blocking) */
-const GLOBAL_PAR_PENALTY = -6;
+// BALANCE v8: Reduced from -6 → -2 because PAR attribute scaling is already halved.
+const GLOBAL_PAR_PENALTY = -2;
 /** Initiative winner gets a pressing advantage to reward aggressive styles */
 const INITIATIVE_PRESS_BONUS = 1;
 
