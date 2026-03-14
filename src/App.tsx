@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GameProvider, useGame } from "@/state/GameContext";
 import AppShell from "@/components/AppShell";
+import ResolutionReveal from "@/components/ResolutionReveal";
 import Dashboard from "@/pages/Dashboard";
 import RunRound from "@/pages/RunRound";
 import Tournaments from "@/pages/Tournaments";
@@ -49,7 +50,9 @@ function GameRoutes() {
   }
 
   return (
-    <AppShell>
+    <>
+      <ResolutionReveal />
+      <AppShell>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/run-round" element={<RunRound />} />
@@ -78,6 +81,7 @@ function GameRoutes() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
+    </>
   );
 }
 

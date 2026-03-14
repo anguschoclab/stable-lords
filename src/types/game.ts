@@ -329,6 +329,14 @@ export interface FightOutcome {
 export interface FightSummary {
   id: string;
   week: number;
+  phase: "planning" | "resolution";
+  pendingResolutionData?: {
+    gazette: any[];
+    injuries: string[];
+    deaths: string[];
+    bouts: any[];
+    promotions: string[];
+  };
   tournamentId?: string | null;
   title: string;
   a: string;

@@ -72,6 +72,7 @@ export function createFreshState(): GameState {
     gold: 500,
     ledger: [],
     week: 1,
+    phase: "planning",
     season: "Spring",
     roster: [],
     graveyard: [],
@@ -374,3 +375,11 @@ export function retireWarrior(state: GameState, warriorId: string): GameState {
 }
 
 export { makeWarrior };
+
+export function clearResolutionPhase(state: GameState): GameState {
+  return {
+    ...state,
+    phase: "planning",
+    pendingResolutionData: undefined,
+  };
+}
