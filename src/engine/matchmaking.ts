@@ -46,7 +46,15 @@ function pairingScore(
     (rv.stableIdA === playerStableId && rv.stableIdB === rivalStableId) ||
     (rv.stableIdB === playerStableId && rv.stableIdA === rivalStableId)
   );
-  if (hasRivalry) score += 50;
+  if (hasRivalry) {
+    const rivalry = rivalries.find(rv =>
+      (rv.stableIdA === playerStableId && rv.stableIdB === rivalStableId) ||
+      (rv.stableIdB === playerStableId && rv.stableIdA === rivalStableId)
+    );
+
+    // Give intense rivalries / blood feuds (intensity >= 4) a massive booking score boost
+    score += (rivalry && rivalry.intensity >= 4) ? 200 : 50;
+  }
 
   // Style diversity bonus — +20 if this style matchup hasn't occurred in last 4 weeks
   const recentStylePairs = recentHistory
