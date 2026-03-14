@@ -53,23 +53,22 @@ const STYLE_ORDER = [
 ];
 
 // Row = attacker style, Col = defender style
-// BALANCE v7: Further tuned to eliminate >80% matchups.
-// Changes from v6:
-// - BA vs TP: +2 → +1 (still a counter, not a stomp)
-// - ST vs LU: 0 → +1 (power overwhelms speed)
-// - PR vs AB: +1 → 0 (PR shouldn't hard-counter AB)
+// BALANCE v8: Tuned after seed compression.
+// - TP vs LU: 0 → -1 (lungers should pressure TP with speed)
+// - WS vs BA: -1 → 0 (WS zone control shouldn't auto-lose to BA)
+// - SL vs WS: +1 → 0 (reduced SL dominance over WS)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0,  0,  0,  0, -1,  0,  0,  0, +1,  0], // AB: only edge vs TP, weak vs PR
-  [ 0,  0,  0, +1,  0,  0, +1, +1,  0, +1], // BA: edge vs SL/ST/PL/WS, neutral vs TP (inherent advantage suffices)
-  [ 0,  0,  0, +1,  0, -1,  0,  0,  0, -1], // LU: speed beats PL, weak vs PS/WS
+  [ 0,  0,  0,  0, +1,  0,  0,  0, +1,  0], // AB: precision reads counters — edge vs PR/TP
+  [ 0,  0,  0, +1, +1,  0, +1, +1,  0,  0], // BA: power overwhelms — edge vs SL/ST/PL/PR
+  [ 0,  0,  0, +1, +1, -1,  0,  0, +1, -1], // LU: speed beats PL/TP/PR, weak vs PS/WS
   [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0], // PL: weak vs BA/LU/ST
-  [ 0,  0,  0,  0,  0,  0,  0, -1,  0,  0], // PR: neutral vs AB now, weak vs ST
+  [-1, -1,  0,  0,  0,  0,  0, -1,  0, -1], // PR: weak vs AB/BA/ST/WS — counter style needs the right matchup
   [ 0,  0, +1,  0,  0,  0,  0, -1,  0, -1], // PS: beats LU, loses to ST/WS
-  [ 0, -1,  0,  0,  0,  0,  0,  0, +1, +1], // SL: beats TP/WS, weak vs BA
+  [ 0, -1,  0,  0,  0,  0,  0,  0, +1,  0], // SL: beats TP, weak vs BA
   [ 0, -1, +1, +1, +1, +1,  0,  0, +1,  0], // ST: power beats LU/PL/PR/PS/TP, weak vs BA
-  [-1,  0,  0,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs AB/SL/ST, neutral vs BA now
-  [ 0, -1, +1,  0,  0, +1, -1,  0,  0,  0], // WS: zone control, beats LU/PS, loses to BA/SL
+  [-1,  0, -1,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs AB/LU/SL/ST
+  [ 0,  0, +1,  0, +1, +1,  0,  0,  0,  0], // WS: zone control, beats LU/PS/PR
 ];
 
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
@@ -200,10 +199,12 @@ function contestCheck(rng: () => number, a: number, d: number, modA: number = 0,
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
 
-/** Global attack bonus — offenses lands frequently (fights should be violent) */
-const GLOBAL_ATT_BONUS = 8;
+/** Global attack bonus — offense lands frequently (fights should be violent) */
+// BALANCE v8: Reduced from 8 → 4 because seed compression already favors offense via attribute scaling.
+const GLOBAL_ATT_BONUS = 4;
 /** Global parry penalty — parrying is hard (defense identity is endurance, not blocking) */
-const GLOBAL_PAR_PENALTY = -6;
+// BALANCE v8: Reduced from -6 → -2 because PAR attribute scaling is already halved.
+const GLOBAL_PAR_PENALTY = -2;
 /** Initiative winner gets a pressing advantage to reward aggressive styles */
 const INITIATIVE_PRESS_BONUS = 1;
 
@@ -250,8 +251,9 @@ const HEAVY_ARMOR_THRESHOLD_2 = 10;    // Second armor endurance penalty (≥10 
 const HEAVY_ARMOR_THRESHOLD_3 = 14;    // Third armor endurance penalty (≥14 weight)
 
 // Riposte penalties (harder to riposte than normal attack)
-const RIPOSTE_WHIFF_PENALTY = -6;      // Penalty to riposte on whiffed attack
-const RIPOSTE_PARRY_PENALTY = -5;      // Penalty to riposte after successful parry
+// BALANCE v8: Kept harsh — ripostes should be rare events, not routine.
+const RIPOSTE_WHIFF_PENALTY = -5;      // Penalty to riposte on whiffed attack
+const RIPOSTE_PARRY_PENALTY = -4;      // Penalty to riposte after successful parry
 
 // Endurance mechanics
 const DEFENDER_ENDURANCE_DISCOUNT = 0.92; // Defending costs 8% less endurance

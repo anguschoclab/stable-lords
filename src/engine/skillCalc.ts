@@ -27,19 +27,20 @@ import {
 // Each style has base offsets for [ATT, PAR, DEF, INI, RIP, DEC]
 const STYLE_SEEDS: Record<FightingStyle, [number, number, number, number, number, number]> = {
   //                                          ATT PAR DEF INI RIP DEC
-  // BALANCE v5: Offensive ATT boosted to 8, defensive PAR/DEF compressed to 2-3.
-  // Riposte seeds capped at 2 for counter styles (identity via passives).
-  // Goal: offense lands hits frequently; defense wins via endurance/counters, not blocking everything.
-  [FightingStyle.AimedBlow]:       [ 5,  2,  2,  3,  2,  4],  // 18 — precision via crit, lower ATT
+  // BALANCE v8: Seeds re-tuned after defensive attribute compression.
+  // PR RIP seed reduced (riposte identity via passives, not raw skill).
+  // WS ATT/DEF boosted (zone-control identity needs baseline offense).
+  // TP DEF reduced (endurance identity, not dodge-walling).
+  [FightingStyle.AimedBlow]:       [ 5,  2,  2,  3,  2,  4],  // 18 — precision via crit
   [FightingStyle.BashingAttack]:   [ 8,  1,  2,  4,  1,  3],  // 19 — highest ATT, raw power
   [FightingStyle.LungingAttack]:   [ 8,  1,  2,  5,  1,  3],  // 20 — fast, aggressive
   [FightingStyle.ParryLunge]:      [ 5,  3,  2,  3,  2,  3],  // 18 — balanced hybrid
-  [FightingStyle.ParryRiposte]:    [ 3,  2,  2,  3,  2,  2],  // 14 — PAR reduced to 2, counter via passives only
-  [FightingStyle.ParryStrike]:     [ 5,  3,  3,  3,  2,  3],  // 19 — efficient counter, PAR 3 (not 4)
-  [FightingStyle.SlashingAttack]:  [ 8,  1,  2,  4,  1,  3],  // 19 — offensive, multi-hit identity
+  [FightingStyle.ParryRiposte]:    [ 3,  2,  2,  2,  1,  2],  // 12 — INI 3→2, slowest counter style
+  [FightingStyle.ParryStrike]:     [ 5,  3,  3,  3,  2,  3],  // 19 — efficient counter
+  [FightingStyle.SlashingAttack]:  [ 8,  1,  2,  4,  1,  3],  // 19 — offensive, multi-hit
   [FightingStyle.StrikingAttack]:  [ 8,  2,  2,  4,  1,  3],  // 20 — reliable power
-  [FightingStyle.TotalParry]:      [ 2,  3,  3,  2,  2,  2],  // 14 — DEF 3 (was 4), identity is endurance
-  [FightingStyle.WallOfSteel]:     [ 3,  2,  3,  3,  2,  3],  // 16 — DEF+endurance, moderate parry
+  [FightingStyle.TotalParry]:      [ 2,  3,  2,  2,  2,  2],  // 13 — DEF 3→2, identity is endurance
+  [FightingStyle.WallOfSteel]:     [ 4,  2,  4,  3,  2,  3],  // 18 — ATT 3→4, DEF 3→4, zone control
 };
 
 // ─── Attribute → Skill Breakpoint Contributions ──────────────────────────
@@ -56,27 +57,33 @@ function breakpointBonus(val: number): number {
 /**
  * Compute base skills from attributes + fighting style.
  * Deterministic — no randomness.
+ *
+ * SEED COMPRESSION (Balance v8):
+ * Defensive skills (PAR, DEF, RIP) use compressed attribute scaling —
+ * only 2 contributing attributes instead of 3, with no ×2 primary.
+ * This ensures offense scales more aggressively from attributes than defense,
+ * so defensive identity comes from style seeds + passives, not raw stat stacking.
  */
 export function computeBaseSkills(attrs: Attributes, style: FightingStyle): BaseSkills {
   const seed = STYLE_SEEDS[style];
   const { ST, CN, SZ, WT, WL, SP, DF } = attrs;
 
-  // ATT: WT primary, DF secondary, ST tertiary
+  // ATT: WT primary (×2), DF secondary, ST tertiary — FULL offensive scaling
   const ATT = seed[0] + breakpointBonus(WT) * 2 + breakpointBonus(DF) + breakpointBonus(ST);
 
-  // PAR: WT primary, DF secondary, WL tertiary
-  const PAR = seed[1] + breakpointBonus(WT) * 2 + breakpointBonus(DF) + breakpointBonus(WL);
+  // PAR: WT + DF only — COMPRESSED (was WT×2 + DF + WL = 4 bonus, now 2 bonus)
+  const PAR = seed[1] + breakpointBonus(WT) + breakpointBonus(DF);
 
-  // DEF: SP primary, DF secondary, WT tertiary
-  const DEF = seed[2] + breakpointBonus(SP) * 2 + breakpointBonus(DF) + breakpointBonus(WT);
+  // DEF: SP + DF only — COMPRESSED (was SP×2 + DF + WT = 4 bonus, now 2 bonus)
+  const DEF = seed[2] + breakpointBonus(SP) + breakpointBonus(DF);
 
-  // INI: SP primary, WT secondary, DF tertiary
+  // INI: SP primary (×2), WT secondary, DF tertiary — FULL offensive scaling
   const INI = seed[3] + breakpointBonus(SP) * 2 + breakpointBonus(WT) + breakpointBonus(DF);
 
-  // RIP: DF primary, WT secondary, SP tertiary
-  const RIP = seed[4] + breakpointBonus(DF) * 2 + breakpointBonus(WT) + breakpointBonus(SP);
+  // RIP: DF + WT only — COMPRESSED (was DF×2 + WT + SP = 4 bonus, now 2 bonus)
+  const RIP = seed[4] + breakpointBonus(DF) + breakpointBonus(WT);
 
-  // DEC: WT primary, WL secondary
+  // DEC: WT primary (×2), WL secondary — unchanged (offensive/kill skill)
   const DEC = seed[5] + breakpointBonus(WT) * 2 + breakpointBonus(WL);
 
   return {
