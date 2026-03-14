@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeStreaks } from "./gazetteNarrative";
+import { computeStreaks } from "@/engine/gazetteNarrative";
 import type { FightSummary } from "@/types/game";
 
 describe("computeStreaks", () => {

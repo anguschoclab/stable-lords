@@ -10,7 +10,7 @@ import {
   getKillMechanic,
   type Phase,
   type MasteryTier,
-} from "./stylePassives";
+} from "@/engine/stylePassives";
 import { FightingStyle } from "@/types/game";
 
 describe("Style Passives", () => {
