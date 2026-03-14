@@ -4,7 +4,7 @@
  */
 import React, { useMemo, useState, useCallback } from "react";
 import { useGame } from "@/state/GameContext";
-import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior } from "@/types/game";
+import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, BASE_ROSTER_CAP, type Warrior } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
 import TagBadge from "@/components/TagBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
