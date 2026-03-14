@@ -71,7 +71,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
             onClick={isRecovery ? onClear : onAssignRecovery}
             className={`w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors border ${
               isRecovery
-                ? "border-arena-pop bg-arena-pop/10 text-foreground"
+                ? "border-destructive bg-destructive/20 text-foreground glow-neon-red"
                 : "border-border hover:border-arena-pop/50 hover:bg-secondary/50 cursor-pointer"
             }`}
           >
@@ -82,7 +82,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
                 — accelerated healing, no risk
               </span>
             </div>
-            {isRecovery && <Check className="h-3.5 w-3.5 text-arena-pop" />}
+            {isRecovery && <Check className="h-3.5 w-3.5 text-destructive drop-shadow-[0_0_5px_hsl(var(--destructive))]" />}
           </button>
         )}
 
@@ -111,7 +111,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
                         onClick={() => onAssign(key)}
                         className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition-colors border ${
                           isSelected
-                            ? "border-primary bg-primary/10 text-foreground"
+                            ? "border-primary bg-primary/20 text-foreground glow-neon-green"
                             : disabled
                             ? "border-border bg-muted/30 text-muted-foreground cursor-not-allowed"
                             : "border-border hover:border-primary/50 hover:bg-secondary/50 cursor-pointer"
@@ -122,13 +122,13 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
                           {ATTRIBUTE_LABELS[key]}
                         </span>
                         <div className="flex-1">
-                          <Progress value={(val / 25) * 100} className="h-1.5" />
+                          <Progress value={(val / 25) * 100} className="h-1.5 [&>div]:bg-accent [&>div]:shadow-[0_0_8px_hsl(var(--accent))]" />
                         </div>
                         <span className="text-xs font-mono w-5 text-right">{val}</span>
                         {!disabled && !isSelected && (
                           <span className="text-[9px] text-muted-foreground w-8 text-right">{chance}%</span>
                         )}
-                        {isSelected && <Check className="h-3.5 w-3.5 text-primary" />}
+                        {isSelected && <Check className="h-3.5 w-3.5 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />}
                         {maxed && <span className="text-[10px] text-muted-foreground">MAX</span>}
                         {seasonCapped && !maxed && !isSZ && (
                           <span className="text-[9px] text-arena-gold">3/3</span>
@@ -229,7 +229,7 @@ export default function Training() {
     <div className="space-y-6">
       {/* Header */}
       <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-secondary via-card to-secondary p-6 sm:p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 glow-neon-blue rounded-xl mix-blend-overlay" />
         <div className="relative">
           <div className="flex items-center gap-3 mb-2">
             <Dumbbell className="h-6 w-6 text-primary" />
