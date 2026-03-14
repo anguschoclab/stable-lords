@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
 

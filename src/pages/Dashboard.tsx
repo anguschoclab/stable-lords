@@ -15,7 +15,7 @@ import {
   Zap, Heart, Shield, ChevronRight, Skull, GripVertical, RotateCcw, Dumbbell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
@@ -232,7 +232,7 @@ function RankingsWidget() {
               <button
                 key={w.id}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary/40 transition-colors text-left"
-                onClick={() => navigate(`/warrior/${w.id}`)}
+                onClick={() => navigate({ to: `/warrior/${w.id}` })}
               >
                 {/* Rank */}
                 <span className={`text-sm font-mono font-bold w-5 text-center ${

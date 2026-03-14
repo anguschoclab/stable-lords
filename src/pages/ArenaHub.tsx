@@ -4,7 +4,7 @@
  */
 import React, { useMemo } from "react";
 import { useGame } from "@/state/GameContext";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Warrior } from "@/types/game";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

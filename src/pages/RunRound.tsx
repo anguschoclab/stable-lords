@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart, ChevronDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
 import { WarriorLink, StableLink } from "@/components/EntityLink";

@@ -4,7 +4,7 @@
  */
 import React, { useState, useMemo } from "react";
 import { useGame } from "@/state/GameContext";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, type InsightToken, type TrainerData, type LedgerEntry } from "@/types/game";
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { TIER_COST as TRAINER_TIER_COST } from "@/engine/trainers";
