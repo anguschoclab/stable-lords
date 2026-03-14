@@ -4,7 +4,7 @@
  */
 import React, { useMemo } from "react";
 import { useGame } from "@/state/GameContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, type Warrior } from "@/types/game";
 import { computeStableReputation } from "@/engine/stableReputation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -101,7 +101,7 @@ function RosterWall() {
               return (
                 <button
                   key={w.id}
-                  onClick={() => navigate(`/warrior/${w.id}`)}
+                  onClick={() => navigate({ to: `/warrior/${w.id}` })}
                   className="flex items-start gap-3 p-3 rounded-lg border border-border hover:border-primary/40 bg-card transition-colors text-left group"
                 >
                   {/* Rank badge */}

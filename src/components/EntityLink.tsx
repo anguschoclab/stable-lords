@@ -3,7 +3,7 @@
  * Resolves names to IDs by searching roster, graveyard, retired, and rival rosters.
  */
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { useGame } from "@/state/GameContext";
 import { cn } from "@/lib/utils";
 

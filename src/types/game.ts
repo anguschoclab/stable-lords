@@ -295,6 +295,15 @@ export interface Owner {
 
 // ─── Fight Results ──────────────────────────────────────────────────────────
 
+
+export type DeathCauseBucket =
+  | "FATAL_DAMAGE"
+  | "EXECUTION"
+  | "CRITICAL_CHAIN"
+  | "FATIGUE_COLLAPSE"
+  | "ARMOR_FAILURE"
+  | "RIVALRY_FINISH";
+
 export type FightOutcomeBy = "Kill" | "KO" | "Exhaustion" | "Stoppage" | "Draw" | null;
 
 export interface MinuteEvent {
@@ -321,7 +330,11 @@ export interface FightOutcome {
     hitsA?: number;
     hitsD?: number;
     gotKillA?: boolean;
+
     gotKillD?: boolean;
+    causeBucket?: DeathCauseBucket;
+    fatalHitLocation?: string;
+    fatalExchangeIndex?: number;
     tags?: string[];
   };
 }

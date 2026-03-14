@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeMetaDrift, createDefaultMeta, getMetaLabel, getMetaColor } from "./metaDrift";
+import { computeMetaDrift, createDefaultMeta, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
 import { FightingStyle, type FightSummary } from "@/types/game";
 
 function makeFight(overrides: Partial<FightSummary>): FightSummary {

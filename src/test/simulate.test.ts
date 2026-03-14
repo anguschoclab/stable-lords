@@ -3,9 +3,9 @@
  * phase transitions, tactic modifiers, and outcome consistency.
  */
 import { describe, it, expect } from "vitest";
-import { simulateFight, defaultPlanForWarrior } from "./simulate";
+import { simulateFight, defaultPlanForWarrior } from "@/engine/simulate";
 import { FightingStyle, type Warrior, type FightPlan } from "@/types/game";
-import { computeWarriorStats } from "./skillCalc";
+import { computeWarriorStats } from "@/engine/skillCalc";
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────
 

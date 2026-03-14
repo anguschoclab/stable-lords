@@ -53,6 +53,15 @@ function clamp(v: number, lo: number, hi: number): number {
  * Generate a personality-, philosophy-, meta-, and matchup-aware fight plan for an AI warrior.
  * Now includes per-style matchup heuristics from the Fighting Styles Compendium.
  */
+/**
+ * Top-level planning logic for an AI manager generating a fight plan for a warrior.
+ * Analyzes the warrior's current state, their opponent, and the manager's philosophy.
+ *
+ * @param w - The AI manager's warrior.
+ * @param ownerPhil - The underlying strategic philosophy governing AI behavior.
+ * @param enemy - The opponent warrior being analyzed to adapt the fight plan.
+ * @returns A comprehensive `FightPlan` object tailored by the AI.
+ */
 export function aiPlanForWarrior(
   w: Warrior,
   personality: OwnerPersonality,
@@ -227,6 +236,14 @@ const PERSONALITY_CLASH: Record<OwnerPersonality, OwnerPersonality[]> = {
  * Detect and escalate owner-to-owner grudges based on personality clashes
  * and recent kill/loss history between stables.
  */
+/**
+ * Updates and processes rivalries and grudges for AI owners based on recent outcomes.
+ * AI managers track wins and losses and develop grudges against specific factions.
+ *
+ * @param weekId - The current week ID of the simulation.
+ * @param recentBouts - A list of bout outcomes to analyze for new grudges.
+ * @param factions - The global state object containing all factions and their data.
+ */
 export function processOwnerGrudges(
   state: GameState,
   existingGrudges: OwnerGrudge[]
@@ -312,6 +329,14 @@ export function processOwnerGrudges(
  * - Aggressive owners recruit more frequently
  * - Methodical owners retire underperformers
  * - Pragmatic owners maintain optimal roster size
+ */
+/**
+ * Manages the roster of AI owners by evaluating current warriors, recruiting new talent,
+ * and releasing underperforming assets based on current owner philosophy and budget.
+ *
+ * @param globalState - The mutable global application state containing game rules and all factions.
+ * @param randomSeed - A deterministic random seed for generation and selection logic.
+ * @returns An array of narrative events related to roster management.
  */
 export function processAIRosterManagement(
   state: GameState
@@ -557,6 +582,14 @@ interface NarrativeContext {
  * Generate personality-driven gazette events based on recent performance.
  * Runs once per season change.
  */
+/**
+ * Generates narrative events reflecting current owner state, grudges, and philosophy shifts.
+ * Used for the newspaper/gazette system to add flavor and context to the world simulation.
+ *
+ * @param globalState - The global application state object.
+ * @param seed - Deterministic random seed for text generation.
+ * @returns An array of string narratives representing owner activities.
+ */
 export function generateOwnerNarratives(
   state: GameState,
   newSeason: Season
@@ -667,6 +700,13 @@ const PHILOSOPHY_DRIFT: Record<string, string[]> = {
  * Evolve stable philosophies based on season results.
  * Losing stables adapt; winning stables double down.
  * Runs on season change.
+ */
+/**
+ * Iterates over AI factions and slightly evolves their underlying philosophies over time.
+ * Models long-term shifting strategies and trends in the AI manager pool.
+ *
+ * @param globalState - The global application state object.
+ * @param randomSeed - Deterministic random seed used for generating philosophical drift.
  */
 export function evolvePhilosophies(
   state: GameState,

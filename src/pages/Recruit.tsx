@@ -4,7 +4,7 @@
  * Implements Stable_Lords_Orphanage_Recruitment_Spec_v1.0
  */
 import React, { useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { useGame } from "@/state/GameContext";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, BASE_ROSTER_CAP, type Attributes } from "@/types/game";
 import { makeWarrior } from "@/state/gameStore";
@@ -253,7 +253,7 @@ export default function Recruit() {
         }],
       });
       toast.success(`${data.name} has joined your stable! (-${CUSTOM_COST}g)`);
-      navigate(`/warrior/${id}`);
+      navigate({ to: `/warrior/${id}` });
     },
     [state, setState, navigate, gold, rosterFull]
   );
@@ -263,7 +263,7 @@ export default function Recruit() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1.5 text-muted-foreground">
+          <Button variant="ghost" size="sm" onClick={() => history.back()} className="gap-1.5 text-muted-foreground">
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
           <h1 className="text-xl font-display font-bold">Recruit Warriors</h1>

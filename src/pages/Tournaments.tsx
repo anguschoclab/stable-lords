@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
 
@@ -482,14 +482,14 @@ export default function Tournaments() {
 
       {/* Active Tournament */}
       {currentTournament && (
-        <Card className="border-primary/50 glow-primary">
+        <Card className="border-accent/40 shadow-[0_0_25px_-5px_hsl(var(--accent)/0.4)] backdrop-blur-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="font-display text-lg flex items-center justify-between">
+            <CardTitle className="font-display text-lg flex items-center justify-between text-accent drop-shadow-[0_0_8px_hsl(var(--accent)/0.6)]">
               <span className="flex items-center gap-2">
                 <span className="text-xl">{SEASON_ICONS[state.season]}</span>
                 {currentTournament.name}
               </span>
-              <Badge className="bg-primary text-primary-foreground text-xs">Active</Badge>
+              <Badge className="bg-primary text-primary-foreground text-xs animate-pulse glow-neon-green border border-primary/50 shadow-[0_0_10px_hsl(var(--primary)/0.5)]">LIVE</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -527,11 +527,11 @@ export default function Tournaments() {
                             >
                               <div className="flex items-center gap-2 flex-wrap">
                                 <Swords className="h-4 w-4 text-arena-gold shrink-0" />
-                                <span className={`font-medium text-sm ${bout.winner === "A" ? "text-arena-gold" : ""}`}>
+                                <span className={`font-medium text-sm transition-all ${bout.winner === "A" ? "text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)] scale-105" : bout.winner === "D" ? "text-muted-foreground opacity-50" : "text-foreground"}`}>
                                   {bout.a}
                                 </span>
                                 <span className="text-muted-foreground text-xs">vs</span>
-                                <span className={`font-medium text-sm ${bout.winner === "D" ? "text-arena-gold" : ""}`}>
+                                <span className={`font-medium text-sm transition-all ${bout.winner === "D" ? "text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)] scale-105" : bout.winner === "A" ? "text-muted-foreground opacity-50" : "text-foreground"}`}>
                                   {bout.d}
                                 </span>
                               </div>
@@ -596,7 +596,7 @@ export default function Tournaments() {
           return (
             <Card
               key={s}
-              className={s === state.season ? "border-primary/50 glow-primary" : "opacity-70"}
+              className={s === state.season ? "border-primary/50 shadow-[0_0_20px_hsl(var(--primary)/0.3)] bg-primary/5" : "opacity-60 grayscale hover:grayscale-0 transition-all duration-300"}
             >
               <CardHeader className="pb-2">
                 <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -616,7 +616,7 @@ export default function Tournaments() {
                       <div key={t.id} className="text-sm flex items-center gap-2">
                         <Trophy className="h-3.5 w-3.5 text-arena-gold" />
                         <span className="text-muted-foreground">Champion:</span>
-                        <span className="font-semibold">{t.champion ?? "—"}</span>
+                        <span className="font-display font-semibold text-arena-gold drop-shadow-[0_0_5px_hsl(var(--arena-gold)/0.5)]">{t.champion ?? "—"}</span>
                       </div>
                     ))}
                   </div>

@@ -8,7 +8,7 @@
  *   ?           — Navigate to Help
  */
 import { useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 const NAV_ROUTES = [
   "/",             // 1 — Hub
@@ -44,7 +44,7 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
       // Space → go to Run Round
       if (key === " ") {
         e.preventDefault();
-        navigate("/run-round");
+        navigate({ to: "/run-round" });
         return;
       }
 
@@ -58,7 +58,7 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
       // ? → help
       if (key === "?") {
         e.preventDefault();
-        navigate("/help");
+        navigate({ to: "/help" });
         return;
       }
 
@@ -66,7 +66,7 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
       const num = parseInt(key, 10);
       if (num >= 1 && num <= 9 && num <= NAV_ROUTES.length) {
         e.preventDefault();
-        navigate(NAV_ROUTES[num - 1]);
+        navigate({ to: NAV_ROUTES[num - 1] });
         return;
       }
     },
