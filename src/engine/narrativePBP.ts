@@ -276,6 +276,19 @@ const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
   ],
 };
 
+/**
+ * Generates a colorful and dramatic play-by-play narrative for an attack attempt.
+ * Contextualizes the weapon, style, and phase of combat.
+ *
+ * @param att - The attacking warrior.
+ * @param def - The defending warrior.
+ * @param attTactic - The specific offensive tactic being used.
+ * @param style - The fighting style of the attacker.
+ * @param phase - The current phase of the fight.
+ * @param rng - A pseudo-random number generator for text selection.
+ * @param wpBonus - Any weapon bonuses applied to the attack.
+ * @returns A string describing the attack attempt.
+ */
 export function narrateAttack(rng: RNG, attackerName: string, weaponId?: string): string {
   const wType = getWeaponType(weaponId);
   const wName = getWeaponDisplayName(weaponId);
@@ -300,6 +313,17 @@ const PARRY_SHIELD_TEMPLATES = [
   "%D blocks the blow with his %W.",
 ];
 
+/**
+ * Generates narrative text for a successful parry by the defender.
+ *
+ * @param att - The attacking warrior.
+ * @param def - The defending warrior.
+ * @param defTactic - The specific defensive tactic used.
+ * @param style - The fighting style of the defender.
+ * @param isPerfect - Indicates whether the parry was perfectly executed.
+ * @param rng - A pseudo-random number generator for text selection.
+ * @returns A string describing the successful defense.
+ */
 export function narrateParry(rng: RNG, defenderName: string, weaponId?: string): string {
   const wName = getWeaponDisplayName(weaponId);
   const isShield = weaponId && ["small_shield", "medium_shield", "large_shield"].includes(weaponId);
@@ -329,6 +353,15 @@ const DODGE_TEMPLATES = [
   "%D ducks under the blow and falls instantaneously into a roll to his feet!",
 ];
 
+/**
+ * Generates narrative text describing a successful dodge or evasion.
+ *
+ * @param att - The attacking warrior.
+ * @param def - The defending warrior.
+ * @param defTactic - The specific defensive tactic used.
+ * @param rng - A pseudo-random number generator for text selection.
+ * @returns A string describing the evasion.
+ */
 export function narrateDodge(rng: RNG, defenderName: string): string {
   return pick(rng, DODGE_TEMPLATES).replace(/%D/g, defenderName);
 }
@@ -370,6 +403,18 @@ const PARRY_BREAK_TEMPLATES = [
   "%A twists his %W around the parry!",
 ];
 
+/**
+ * Generates narrative text for a successful hit on a target location.
+ * Provides flavor text based on the weapon, hit location, and damage dealt.
+ *
+ * @param att - The attacking warrior.
+ * @param def - The defending warrior.
+ * @param loc - The body part that was hit.
+ * @param dmg - The calculated damage amount.
+ * @param phase - The current phase of the fight.
+ * @param rng - A pseudo-random number generator for text selection.
+ * @returns A string describing the successful hit.
+ */
 export function narrateHit(rng: RNG, defenderName: string, location: string): string {
   const richLoc = richHitLocation(rng, location);
   return pick(rng, HIT_TEMPLATES).replace(/%D/g, defenderName).replace(/%L/g, richLoc);
@@ -492,6 +537,14 @@ const CROWD_REACTIONS_ENCOURAGE = [
   "From the stands a voice yells 'Come on %N!'",
 ];
 
+/**
+ * Generates a crowd reaction narrative line based on the severity of action.
+ * Typically called after massive hits or significant moments.
+ *
+ * @param rng - A pseudo-random number generator for text selection.
+ * @param isHuge - Boolean indicating if the event was extraordinary.
+ * @returns A string representing the crowd's reaction.
+ */
 export function crowdReaction(rng: RNG, loserName: string, winnerName: string, hpRatio: number): string | null {
   if (rng() > 0.25) return null; // Only trigger ~25% of the time
   
@@ -526,6 +579,15 @@ const INI_FEINT_TEMPLATES = [
   "%N feints an attack, trying to disrupt the rhythm of the fight!",
 ];
 
+/**
+ * Narrates the start of a combat minute and who seizes initiative.
+ * Sets the tone for the upcoming series of exchanges.
+ *
+ * @param p - The warrior who won the initiative.
+ * @param p2 - The warrior who lost the initiative.
+ * @param rng - A pseudo-random number generator for text selection.
+ * @returns A string describing the shift in momentum.
+ */
 export function narrateInitiative(rng: RNG, winnerName: string, isFeint: boolean): string {
   if (isFeint) return pick(rng, INI_FEINT_TEMPLATES).replace(/%N/g, winnerName);
   return pick(rng, INI_WIN_TEMPLATES).replace(/%N/g, winnerName);
