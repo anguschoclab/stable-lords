@@ -127,7 +127,7 @@ function SeasonWidget() {
               <div className="flex items-center gap-2">
                 <div className={`h-1.5 w-1.5 rounded-full ${
                   ev.type === "bout" ? "bg-destructive" :
-                  ev.type === "season" ? "bg-primary" : "bg-arena-pop"
+                  ev.type === "season" ? "bg-primary" : "bg-accent"
                 }`} />
                 <span className="text-foreground/80">{ev.label}</span>
               </div>
@@ -173,7 +173,7 @@ function StableWidget() {
           </div>
           <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Victories</div>
-            <div className="text-lg font-bold text-arena-pop">{totalWins}</div>
+            <div className="text-lg font-bold text-accent">{totalWins}</div>
           </div>
           <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Kills</div>
@@ -296,7 +296,7 @@ function FinancesWidget() {
 
         <div className="grid grid-cols-2 gap-2 text-center">
           <div className="rounded-md bg-secondary/60 p-2 border border-border/50">
-            <div className="text-sm font-semibold text-arena-pop flex items-center justify-center gap-0.5">
+            <div className="text-sm font-semibold text-accent flex items-center justify-center gap-0.5">
               <ArrowUpRight className="h-3 w-3" /> {breakdown.totalIncome}g
             </div>
             <div className="text-[10px] text-muted-foreground">Income</div>
@@ -311,7 +311,7 @@ function FinancesWidget() {
 
         <div className="flex justify-between items-center pt-1 border-t border-border/50">
           <span className="text-xs text-muted-foreground">Net / week</span>
-          <span className={`text-sm font-mono font-bold ${breakdown.net >= 0 ? "text-arena-pop" : "text-destructive"}`}>
+          <span className={`text-sm font-mono font-bold ${breakdown.net >= 0 ? "text-accent" : "text-destructive"}`}>
             {breakdown.net >= 0 ? "+" : ""}{breakdown.net}g
           </span>
         </div>
@@ -553,7 +553,7 @@ function TrainingWidget() {
                     </div>
                   </div>
                   <div className="shrink-0">
-                    <div className={`h-2 w-2 rounded-full ${atCeiling ? "bg-muted-foreground" : "bg-arena-pop animate-pulse"}`} />
+                    <div className={`h-2 w-2 rounded-full ${atCeiling ? "bg-muted-foreground" : "bg-accent animate-pulse"}`} />
                   </div>
                 </div>
               );
@@ -919,9 +919,9 @@ function CrowdMoodWidget() {
   };
 
   const modColor = (v: number) =>
-    v > 1 ? "text-arena-pop" : v < 1 ? "text-destructive" : "text-muted-foreground";
+    v > 1 ? "text-accent" : v < 1 ? "text-destructive" : "text-muted-foreground";
   const killColor = (v: number) =>
-    v > 0 ? "text-destructive" : v < 0 ? "text-arena-pop" : "text-muted-foreground";
+    v > 0 ? "text-destructive" : v < 0 ? "text-accent" : "text-muted-foreground";
 
   return (
     <Card>
@@ -1171,7 +1171,7 @@ function StableComparisonWidget() {
               <div className="text-center text-sm font-mono">{s.warriors}</div>
               <div className="flex items-center gap-1.5">
                 <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-arena-pop rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
+                  <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
                 </div>
                 <span className="text-xs font-mono w-6 text-right">{s.wins}</span>
               </div>
@@ -1206,7 +1206,7 @@ function StableComparisonWidget() {
                   <span className="text-xs text-foreground/80 w-28 truncate" title={r.name}>vs {r.name}</span>
                   <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden flex">
                     <div
-                      className="h-full bg-arena-pop transition-all"
+                      className="h-full bg-accent transition-all"
                       style={{ width: `${winPct}%` }}
                       title={`${rec.wins} wins`}
                     />
@@ -1217,7 +1217,7 @@ function StableComparisonWidget() {
                     />
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-xs font-mono font-semibold text-arena-pop">{rec.wins}W</span>
+                    <span className="text-xs font-mono font-semibold text-accent">{rec.wins}W</span>
                     <span className="text-[10px] text-muted-foreground">-</span>
                     <span className="text-xs font-mono font-semibold text-destructive">{rec.losses}L</span>
                     {(rec.kills > 0 || rec.deaths > 0) && (
@@ -1363,36 +1363,57 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide">
-            Arena Hub
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Welcome back, <span className="text-foreground font-medium">{state.player.name}</span>
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          {isEditing && (
-            <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground" onClick={resetLayout}>
-              <RotateCcw className="h-3 w-3" /> Reset
-            </Button>
-          )}
-          <Button
-            variant={isEditing ? "default" : "outline"}
-            size="sm"
-            className="text-xs gap-1"
-            onClick={() => setIsEditing(v => !v)}
-          >
-            <GripVertical className="h-3 w-3" />
-            {isEditing ? "Done" : "Customize"}
-          </Button>
-        </div>
-      </div>
+      {/* Top Header Panel */}
+      <Card className="border-primary/20 glow-neon-blue bg-card/80 backdrop-blur-sm">
+        <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Swords className="h-8 w-8 text-primary glow-neon-green rounded-full p-1 bg-primary/10" />
+            <div>
+              <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide">
+                Arena Hub
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Stable: <span className="text-foreground font-medium">{state.player.stableName}</span>
+              </p>
+            </div>
+          </div>
 
-      {/* Widget Grid */}
-      <div className="grid gap-3 md:grid-cols-3">
+          <div className="flex items-center gap-6 text-sm">
+             <div className="text-center">
+                <div className="text-muted-foreground text-xs uppercase tracking-wider">Time</div>
+                <div className="font-mono font-bold">Wk {state.week} · {state.season}</div>
+             </div>
+             <div className="text-center">
+                <div className="text-muted-foreground text-xs uppercase tracking-wider">Gold</div>
+                <div className="font-mono font-bold text-primary glow-neon-green">{state.gold}</div>
+             </div>
+             <div className="text-center">
+                <div className="text-muted-foreground text-xs uppercase tracking-wider">Fame</div>
+                <div className="font-mono font-bold text-arena-fame">{state.player.fame}</div>
+             </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+            {isEditing && (
+              <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:text-foreground" onClick={resetLayout}>
+                <RotateCcw className="h-3 w-3" /> Reset
+              </Button>
+            )}
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              size="sm"
+              className="text-xs gap-1 border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-colors"
+              onClick={() => setIsEditing(v => !v)}
+            >
+              <GripVertical className="h-3 w-3" />
+              {isEditing ? "Done" : "Customize"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Widget Grid - Strict 3 Column */}
+      <div className="grid gap-4 md:grid-cols-3">
         {widgetOrder.map((id, idx) => {
           const def = widgetMap.get(id);
           if (!def) return null;
@@ -1409,20 +1430,25 @@ export default function Dashboard() {
               onDrop={() => handleDrop(idx)}
               onDragEnd={handleDragEnd}
               className={cn(
-                "transition-all duration-200",
-                def.wide && "md:col-span-2",
+                "transition-all duration-300",
+                def.wide ? "md:col-span-2 lg:col-span-2" : "md:col-span-1 lg:col-span-1",
                 isEditing && "cursor-grab active:cursor-grabbing",
-                isDragging && "opacity-40 scale-[0.97]",
-                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-xl",
+                isDragging && "opacity-40 scale-[0.98]",
+                isDragOver && "ring-2 ring-primary/80 ring-offset-2 ring-offset-background rounded-xl shadow-[0_0_15px_rgba(var(--primary),0.5)]",
               )}
             >
               {isEditing && (
-                <div className="flex items-center gap-1.5 px-2 py-1 text-[10px] text-muted-foreground">
-                  <GripVertical className="h-3 w-3" />
-                  <span className="uppercase tracking-wider font-medium">{def.label}</span>
+                <div className="flex items-center justify-between bg-primary/10 border border-primary/20 border-b-0 rounded-t-xl px-3 py-1.5 text-xs text-primary font-medium">
+                  <div className="flex items-center gap-2">
+                    <GripVertical className="h-3 w-3" />
+                    <span className="uppercase tracking-wider">{def.label}</span>
+                  </div>
+                  {def.wide && <Badge variant="outline" className="text-[9px] border-primary/30 text-primary">WIDE</Badge>}
                 </div>
               )}
-              <Widget />
+              <div className={cn("h-full", isEditing && "rounded-t-none overflow-hidden ring-1 ring-primary/20")}>
+                <Widget />
+              </div>
             </div>
           );
         })}
