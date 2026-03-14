@@ -2,7 +2,7 @@
  * Plan Bias Tests
  */
 import { describe, it, expect } from "vitest";
-import { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from "./planBias";
+import { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from "@/engine/planBias";
 import { FightingStyle, type FightPlan } from "@/types/game";
 
 describe("Plan Bias", () => {

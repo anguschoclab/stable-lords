@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { processAging } from "./aging";
+import { processAging } from "@/engine/aging";
 import type { GameState, Warrior, Attributes } from "@/types/game";
 import { FightingStyle } from "@/types/game";
-import { computeWarriorStats } from "./skillCalc";
+import { computeWarriorStats } from "@/engine/skillCalc";
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────
 

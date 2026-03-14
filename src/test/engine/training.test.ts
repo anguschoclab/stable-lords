@@ -2,9 +2,9 @@
  * Training System Tests — comprehensive coverage of attribute training mechanics
  */
 import { describe, it, expect } from "vitest";
-import { processTraining, computeGainChance } from "./training";
+import { processTraining, computeGainChance } from "@/engine/training";
 import { FightingStyle, type GameState, type Warrior, type TrainingAssignment } from "@/types/game";
-import { computeWarriorStats } from "./skillCalc";
+import { computeWarriorStats } from "@/engine/skillCalc";
 
 function makeWarrior(attrs: any, overrides?: Partial<Warrior>): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, FightingStyle.StrikingAttack);

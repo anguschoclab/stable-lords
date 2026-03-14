@@ -2,9 +2,9 @@
  * Scouting System Tests
  */
 import { describe, it, expect } from "vitest";
-import { generateScoutReport, getScoutCost, type ScoutQuality } from "./scouting";
+import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/scouting";
 import { FightingStyle, type Warrior } from "@/types/game";
-import { computeWarriorStats } from "./skillCalc";
+import { computeWarriorStats } from "@/engine/skillCalc";
 
 function makeWarrior(overrides?: Partial<Warrior>): Warrior {
   const attrs = { ST: 15, CN: 12, SZ: 10, WT: 14, WL: 13, SP: 16, DF: 11 };

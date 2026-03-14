@@ -11,9 +11,9 @@ import {
   type TrainerTier,
   TIER_COST,
   TIER_BONUS,
-} from "./trainers";
+} from "@/engine/trainers";
 import { FightingStyle, type Warrior } from "@/types/game";
-import { computeWarriorStats } from "./skillCalc";
+import { computeWarriorStats } from "@/engine/skillCalc";
 
 function makeWarrior(style: FightingStyle, overrides?: Partial<Warrior>): Warrior {
   const attrs = { ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 12, DF: 12 };
