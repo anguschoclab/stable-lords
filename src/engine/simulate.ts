@@ -252,8 +252,9 @@ const HEAVY_ARMOR_THRESHOLD_2 = 10;    // Second armor endurance penalty (≥10 
 const HEAVY_ARMOR_THRESHOLD_3 = 14;    // Third armor endurance penalty (≥14 weight)
 
 // Riposte penalties (harder to riposte than normal attack)
-const RIPOSTE_WHIFF_PENALTY = -6;      // Penalty to riposte on whiffed attack
-const RIPOSTE_PARRY_PENALTY = -5;      // Penalty to riposte after successful parry
+// BALANCE v8: Reduced from -6/-5 → -4/-3 because RIP scaling is already compressed.
+const RIPOSTE_WHIFF_PENALTY = -4;      // Penalty to riposte on whiffed attack
+const RIPOSTE_PARRY_PENALTY = -3;      // Penalty to riposte after successful parry
 
 // Endurance mechanics
 const DEFENDER_ENDURANCE_DISCOUNT = 0.92; // Defending costs 8% less endurance
