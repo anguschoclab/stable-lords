@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Swords, Skull, Sparkles, ScrollText, Zap } from "lucide-react";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { WarriorLink } from "@/components/EntityLink";
 

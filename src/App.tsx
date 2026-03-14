@@ -2,36 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { RouterProvider } from "@tanstack/react-router";
+import { router } from "@/router";
 import { GameProvider, useGame } from "@/state/GameContext";
-import AppShell from "@/components/AppShell";
-import Dashboard from "@/pages/Dashboard";
-import RunRound from "@/pages/RunRound";
-import Tournaments from "@/pages/Tournaments";
-import Help from "@/pages/Help";
-import WarriorDetail from "@/pages/WarriorDetail";
-import HallOfFights from "@/lore/HallOfFights";
-import Recruit from "@/pages/Recruit";
-import Graveyard from "@/pages/Graveyard";
-import Training from "@/pages/Training";
-import Trainers from "@/pages/Trainers";
-import Orphanage from "@/pages/Orphanage";
-import Scouting from "@/pages/Scouting";
-import StableDetail from "@/pages/StableDetail";
-import WorldOverview from "@/pages/WorldOverview";
 import StartGame from "@/pages/StartGame";
-import NotFound from "./pages/NotFound";
-import Gazette from "@/pages/Gazette";
-import HallOfFame from "@/pages/HallOfFame";
-import KillAnalytics from "@/pages/KillAnalytics";
-import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
-import TrainingPlanner from "@/pages/TrainingPlanner";
-import SeasonalAwards from "@/pages/SeasonalAwards";
-import TournamentAwards from "@/pages/TournamentAwards";
-import StyleGuide from "@/pages/StyleGuide";
-import ArenaHub from "@/pages/ArenaHub";
-import StableLedger from "@/pages/StableLedger";
-import StableHall from "@/pages/StableHall";
+import Orphanage from "@/pages/Orphanage";
 
 const queryClient = new QueryClient();
 
@@ -48,37 +23,7 @@ function GameRoutes() {
     return <Orphanage />;
   }
 
-  return (
-    <AppShell>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/run-round" element={<RunRound />} />
-        <Route path="/tournaments" element={<Tournaments />} />
-        <Route path="/recruit" element={<Recruit />} />
-        <Route path="/training" element={<Training />} />
-        <Route path="/scouting" element={<Scouting />} />
-        <Route path="/stable/:id" element={<StableDetail />} />
-        <Route path="/world" element={<WorldOverview />} />
-        <Route path="/graveyard" element={<Graveyard />} />
-        <Route path="/trainers" element={<Trainers />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/warrior/:id" element={<WarriorDetail />} />
-        <Route path="/hall-of-fights" element={<HallOfFights />} />
-        <Route path="/gazette" element={<Gazette />} />
-        <Route path="/hall-of-fame" element={<HallOfFame />} />
-        <Route path="/kill-analytics" element={<KillAnalytics />} />
-        <Route path="/equipment-optimizer" element={<EquipmentOptimizerPage />} />
-        <Route path="/training-planner" element={<TrainingPlanner />} />
-        <Route path="/seasonal-awards" element={<SeasonalAwards />} />
-        <Route path="/tournament-awards" element={<TournamentAwards />} />
-        <Route path="/style-guide" element={<StyleGuide />} />
-        <Route path="/arena-hub" element={<ArenaHub />} />
-        <Route path="/stable-ledger" element={<StableLedger />} />
-        <Route path="/stable-hall" element={<StableHall />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </AppShell>
-  );
+  return <RouterProvider router={router} />;
 }
 
 const App = () => (
@@ -87,9 +32,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <GameProvider>
-        <BrowserRouter>
-          <GameRoutes />
-        </BrowserRouter>
+        <GameRoutes />
       </GameProvider>
     </TooltipProvider>
   </QueryClientProvider>

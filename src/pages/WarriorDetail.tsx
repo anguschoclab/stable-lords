@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useGame } from "@/state/GameContext";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightPlan, type FightSummary } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -616,7 +616,7 @@ export default function WarriorDetail() {
     const updated = retireWarrior(state, warrior.id);
     setState(updated);
     toast.success(`${warrior.name} has been retired with honor.`);
-    navigate("/");
+    navigate({ to: "/" });
   }, [warrior, state, setState, navigate]);
 
   const handleEquipmentChange = useCallback(
@@ -637,7 +637,7 @@ export default function WarriorDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
         <p className="text-muted-foreground">Warrior not found.</p>
-        <Button variant="outline" onClick={() => navigate("/")}>
+        <Button variant="outline" onClick={() => navigate({ to: "/" })}>
           <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
         </Button>
       </div>
@@ -658,7 +658,7 @@ export default function WarriorDetail() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
+        <Button variant="ghost" onClick={() => navigate({ to: "/" })} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
         <Button variant="outline" size="sm" onClick={handleRetire} className="gap-1.5 text-muted-foreground hover:text-destructive">

@@ -5,7 +5,7 @@
  */
 import React, { useMemo } from "react";
 import { useGame } from "@/state/GameContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
   Swords,
@@ -266,7 +266,7 @@ export default function EventLog() {
                   return (
                     <button
                       key={event.id}
-                      onClick={() => navigate(event.linkTo)}
+                      onClick={() => navigate({ to: event.linkTo })}
                       className={cn(
                         "w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors border-b border-border/30",
                         "hover:bg-secondary/60 cursor-pointer group",
