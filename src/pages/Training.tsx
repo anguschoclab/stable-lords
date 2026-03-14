@@ -30,38 +30,37 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
   const isTraining = assignment?.type === "attribute";
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="font-display text-base">
+    <Card className="overflow-hidden border-border/40 bg-background shadow-sm hover:border-primary/50 transition-colors flex flex-col">
+      <CardHeader className="pb-3 border-b border-border/20 bg-secondary/10 px-4 py-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
               <WarriorLink name={warrior.name} id={warrior.id}>{warrior.name}</WarriorLink>
-            </CardTitle>
-            {warrior.champion && <Trophy className="h-3.5 w-3.5 text-arena-gold" />}
-            {hasInjury && (
-              <TooltipProvider delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-                  </TooltipTrigger>
-                  <TooltipContent className="text-xs">
-                    {warrior.injuries.map(i => typeof i === "string" ? i : i.name).join(", ")}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+              {warrior.champion && <Trophy className="h-3 w-3 text-arena-gold" />}
+            </div>
+            <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
+                <span className="text-[10px] font-bold uppercase tracking-wider">{STYLE_DISPLAY_NAMES[warrior.style]}</span>
+                <span className="text-border/60">|</span>
+                <span className="text-[10px] font-mono">AGE {warrior.age}</span>
+            </div>
           </div>
-          <Badge variant="outline" className="text-xs font-mono">
-            {STYLE_DISPLAY_NAMES[warrior.style]}
-          </Badge>
+          {hasInjury && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="bg-destructive/10 text-destructive px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border border-destructive/20 shadow-sm">
+                     <AlertTriangle className="h-3 w-3" /> Injured
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="text-xs max-w-xs font-mono">
+                  {warrior.injuries.map(i => typeof i === "string" ? i : i.name).join(", ")}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-        {warrior.age && (
-          <div className="text-[10px] text-muted-foreground">
-            Age {warrior.age} · XP {(warrior as any).xp ?? 0}
-          </div>
-        )}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 p-4 bg-secondary/5 flex-1">
         {atCap && !assignment && (
           <p className="text-xs text-muted-foreground italic">Attribute cap reached (80). No further training possible.</p>
         )}
