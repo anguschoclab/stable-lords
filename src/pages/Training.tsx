@@ -189,6 +189,8 @@ export default function Training() {
     return map;
   }, [state.seasonalGrowth, state.season]);
 
+  const assignments = state.trainingAssignments ?? [];
+
   const handleAssign = (warriorId: string, attribute: keyof Attributes) => {
     if (attribute === "SZ") return;
     const warrior = state.roster.find(w => w.id === warriorId);
