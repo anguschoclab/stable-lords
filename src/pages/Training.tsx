@@ -30,38 +30,37 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
   const isTraining = assignment?.type === "attribute";
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="font-display text-base">
+    <Card className="overflow-hidden border-border/40 bg-background shadow-sm hover:border-primary/50 transition-colors flex flex-col">
+      <CardHeader className="pb-3 border-b border-border/20 bg-secondary/10 px-4 py-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
               <WarriorLink name={warrior.name} id={warrior.id}>{warrior.name}</WarriorLink>
-            </CardTitle>
-            {warrior.champion && <Trophy className="h-3.5 w-3.5 text-arena-gold" />}
-            {hasInjury && (
-              <TooltipProvider delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-                  </TooltipTrigger>
-                  <TooltipContent className="text-xs">
-                    {warrior.injuries.map(i => typeof i === "string" ? i : i.name).join(", ")}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+              {warrior.champion && <Trophy className="h-3 w-3 text-arena-gold" />}
+            </div>
+            <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
+                <span className="text-[10px] font-bold uppercase tracking-wider">{STYLE_DISPLAY_NAMES[warrior.style]}</span>
+                <span className="text-border/60">|</span>
+                <span className="text-[10px] font-mono">AGE {warrior.age}</span>
+            </div>
           </div>
-          <Badge variant="outline" className="text-xs font-mono">
-            {STYLE_DISPLAY_NAMES[warrior.style]}
-          </Badge>
+          {hasInjury && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="bg-destructive/10 text-destructive px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border border-destructive/20 shadow-sm">
+                     <AlertTriangle className="h-3 w-3" /> Injured
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="text-xs max-w-xs font-mono">
+                  {warrior.injuries.map(i => typeof i === "string" ? i : i.name).join(", ")}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-        {warrior.age && (
-          <div className="text-[10px] text-muted-foreground">
-            Age {warrior.age} · XP {(warrior as any).xp ?? 0}
-          </div>
-        )}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 p-4 bg-secondary/5 flex-1">
         {atCap && !assignment && (
           <p className="text-xs text-muted-foreground italic">Attribute cap reached (80). No further training possible.</p>
         )}
@@ -72,7 +71,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
             onClick={isRecovery ? onClear : onAssignRecovery}
             className={`w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors border ${
               isRecovery
-                ? "border-arena-pop bg-arena-pop/10 text-foreground"
+                ? "border-destructive bg-destructive/20 text-foreground glow-neon-red"
                 : "border-border hover:border-arena-pop/50 hover:bg-secondary/50 cursor-pointer"
             }`}
           >
@@ -83,7 +82,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
                 — accelerated healing, no risk
               </span>
             </div>
-            {isRecovery && <Check className="h-3.5 w-3.5 text-arena-pop" />}
+            {isRecovery && <Check className="h-3.5 w-3.5 text-destructive drop-shadow-[0_0_5px_hsl(var(--destructive))]" />}
           </button>
         )}
 
@@ -112,7 +111,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
                         onClick={() => onAssign(key)}
                         className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition-colors border ${
                           isSelected
-                            ? "border-primary bg-primary/10 text-foreground"
+                            ? "border-primary bg-primary/20 text-foreground glow-neon-green"
                             : disabled
                             ? "border-border bg-muted/30 text-muted-foreground cursor-not-allowed"
                             : "border-border hover:border-primary/50 hover:bg-secondary/50 cursor-pointer"
@@ -123,13 +122,13 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
                           {ATTRIBUTE_LABELS[key]}
                         </span>
                         <div className="flex-1">
-                          <Progress value={(val / 25) * 100} className="h-1.5" />
+                          <Progress value={(val / 25) * 100} className="h-1.5 [&>div]:bg-accent [&>div]:shadow-[0_0_8px_hsl(var(--accent))]" />
                         </div>
                         <span className="text-xs font-mono w-5 text-right">{val}</span>
                         {!disabled && !isSelected && (
                           <span className="text-[9px] text-muted-foreground w-8 text-right">{chance}%</span>
                         )}
-                        {isSelected && <Check className="h-3.5 w-3.5 text-primary" />}
+                        {isSelected && <Check className="h-3.5 w-3.5 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />}
                         {maxed && <span className="text-[10px] text-muted-foreground">MAX</span>}
                         {seasonCapped && !maxed && !isSZ && (
                           <span className="text-[9px] text-arena-gold">3/3</span>
@@ -230,7 +229,7 @@ export default function Training() {
     <div className="space-y-6">
       {/* Header */}
       <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-secondary via-card to-secondary p-6 sm:p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 glow-neon-blue rounded-xl mix-blend-overlay" />
         <div className="relative">
           <div className="flex items-center gap-3 mb-2">
             <Dumbbell className="h-6 w-6 text-primary" />

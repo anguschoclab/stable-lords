@@ -211,6 +211,8 @@ interface FighterState {
   hitsTaken: number;
   ripostes: number;
   consecutiveHits: number; // for Basher momentum, etc.
+  armHits: number;
+  legHits: number;
 }
 
 // ─── Skill Checks ─────────────────────────────────────────────────────────
@@ -544,14 +546,14 @@ export function simulateFight(
     hp: derivedA.hp, maxHp: derivedA.hp,
     endurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
     maxEndurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0,
+    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0, armHits: 0, legHits: 0,
   };
   const fD: FighterState = {
     label: "D", style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
     hp: derivedD.hp, maxHp: derivedD.hp,
     endurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
     maxEndurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0,
+    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0, armHits: 0, legHits: 0,
   };
 
   const log: MinuteEvent[] = [];
@@ -566,6 +568,9 @@ export function simulateFight(
   let tacticStreakA = 0;
   let tacticStreakD = 0;
   let by: FightOutcome["by"] = null;
+  let causeBucket: any = undefined;
+  let fatalHitLocation: string | undefined = undefined;
+  let fatalExchangeIndex: number | undefined = undefined;
 
   // Narration helpers
   const name = (f: FighterState) => f.label === "A" ? nameA : nameD;
@@ -685,8 +690,8 @@ export function simulateFight(
     }
 
     // ── 1. INITIATIVE CONTEST — with tempo & passive ──
-    const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus;
-    const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus;
+    const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits;
+    const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits;
     const aGoesFirst = contestCheck(rng, iniA, iniD);
     const iniPressBonus = INITIATIVE_PRESS_BONUS;
 
@@ -751,7 +756,7 @@ export function simulateFight(
     // ── 2. ATTACK ATTEMPT — with passive ATT + anti-synergy + PR OE paradox ──
     const attOEmod = oeAttMod(attOE, attacker.style);
     const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
-    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus + GLOBAL_ATT_BONUS - tacticOveruseAtt);
+    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus + GLOBAL_ATT_BONUS - tacticOveruseAtt - attacker.armHits);
 
     if (!attackSuccess) {
       // Attack whiffs — reset consecutive hits
@@ -805,7 +810,7 @@ export function simulateFight(
 
       if (isDodging) {
         // ── 3b. DODGE PATH — full DEF skill, no parry attempt ──
-        const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus - tacticOveruseDef);
+        const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus - tacticOveruseDef - defender.legHits);
         if (defSuccess) {
           defended = true;
           attacker.consecutiveHits = 0;
@@ -816,7 +821,7 @@ export function simulateFight(
         }
       } else {
         // ── 3a. PARRY PATH — PAR check; if it fails, the hit lands ──
-        const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef);
+        const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef - defender.armHits);
 
         if (parrySuccess) {
           defended = true;
@@ -869,6 +874,8 @@ export function simulateFight(
           attacker.hitsLanded++;
           attacker.consecutiveHits++;
           defender.consecutiveHits = 0;
+          if (hitLoc === "right arm" || hitLoc === "left arm") defender.armHits++;
+          if (hitLoc === "right leg" || hitLoc === "left leg") defender.legHits++;
 
           // Canonical PBP narration: attack + hit + damage severity + state changes
           log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
@@ -930,6 +937,9 @@ export function simulateFight(
                 defender.hp = 0;
                 winner = attacker.label as "A" | "D";
                 by = "Kill";
+                causeBucket = "EXECUTION";
+                fatalHitLocation = hitLoc;
+                fatalExchangeIndex = ex;
                 tags.push("Kill");
 
                 // KILL — canonical PBP narration
@@ -949,6 +959,9 @@ export function simulateFight(
           if (defender.hp <= 0) {
             winner = attacker.label as "A" | "D";
             by = "KO";
+            causeBucket = "FATAL_DAMAGE";
+            fatalHitLocation = hitLoc;
+            fatalExchangeIndex = ex;
             tags.push("KO");
             const koLines = narrateBoutEnd(rng, "KO", name(attacker), name(defender));
             for (const l of koLines) log.push({ minute: min, text: l });
@@ -1072,6 +1085,9 @@ export function simulateFight(
       gotKillA: winner === "A" && by === "Kill",
       gotKillD: winner === "D" && by === "Kill",
       tags: uniqueTags,
+      causeBucket,
+      fatalHitLocation,
+      fatalExchangeIndex,
     },
   };
 }
