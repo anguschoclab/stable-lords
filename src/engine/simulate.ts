@@ -31,7 +31,7 @@ import {
   fatigueLine, crowdReaction, narrateInitiative, minuteStatusLine,
   narrateBoutEnd, tradingBlowsLine, tauntLine, conservingLine,
   pressingLine, generateWarriorIntro, battleOpener, getWeaponDisplayName,
-  popularityLine, skillLearnLine,
+  popularityLine, skillLearnLine, narrateInsightHint,
 } from "./narrativePBP";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
@@ -880,6 +880,23 @@ export function simulateFight(
           // Canonical PBP narration: attack + hit + damage severity + state changes
           log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
           log.push({ minute: min, text: narrateHit(rng, name(defender), hitLoc) });
+
+          // Insight hint generation based on stat differences
+          if (damage > 0 && rng() < 0.2) {
+            let attribute = null;
+            if (attacker.attributes.ST - defender.attributes.ST > 5) attribute = "ST";
+            else if (defender.attributes.SP - attacker.attributes.SP > 5) attribute = "SP";
+            else if (defender.attributes.DF - attacker.attributes.DF > 5) attribute = "DF";
+            else if (defender.hp / defender.maxHp < 0.3) attribute = "WL";
+
+            if (attribute) {
+              const hint = narrateInsightHint(rng, attribute);
+              if (hint) {
+                log.push({ minute: min, text: `🔍 ${hint}` });
+                if (!tags.includes(`Insight_${attribute}`)) tags.push(`Insight_${attribute}`);
+              }
+            }
+          }
 
           const sevLine3 = damageSeverityLine(rng, damage, defender.maxHp);
           if (sevLine3) log.push({ minute: min, text: sevLine3 });
