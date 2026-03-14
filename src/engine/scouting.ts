@@ -3,7 +3,7 @@
  * 
  * Scouting reveals partial information about an opponent:
  * - Style (always visible)
- * - Approximate attribute ranges (based on scout quality)
+ * - Approximate attribute text descriptions (based on scout quality)
  * - Win/loss record
  * - Known injuries
  * - Suspected fight plan tendencies
@@ -19,8 +19,8 @@ export interface ScoutReport {
   style: string;
   quality: ScoutQuality;
   week: number;
-  /** Attribute ranges — [low, high] estimates */
-  attributeRanges: Record<string, [number, number]>;
+  /** Attribute ranges mapped to text descriptions */
+  attributeRanges: Record<string, string>;
   record: string;
   knownInjuries: string[];
   suspectedOE?: string; // "Low" | "Medium" | "High"
@@ -44,6 +44,26 @@ export function getScoutCost(quality: ScoutQuality): number {
   return SCOUT_COST[quality];
 }
 
+/** Converts a numerical stat into a qualitative text description */
+export function getAttributeDescription(value: number): string {
+  if (value <= 5) return "Pathetic";
+  if (value <= 8) return "Weak";
+  if (value <= 11) return "Average";
+  if (value <= 14) return "Good";
+  if (value <= 17) return "Great";
+  if (value <= 20) return "Exceptional";
+  return "Monstrous";
+}
+
+/** Converts a stat range into a textual description */
+export function getAttributeRangeDescription(low: number, high: number): string {
+  const lowDesc = getAttributeDescription(low);
+  const highDesc = getAttributeDescription(high);
+
+  if (lowDesc === highDesc) return lowDesc;
+  return `${lowDesc} to ${highDesc}`;
+}
+
 /** Generate a scout report for a warrior */
 export function generateScoutReport(
   warrior: Warrior,
@@ -52,12 +72,12 @@ export function generateScoutReport(
 ): ScoutReport {
   const fuzz = QUALITY_FUZZ[quality];
 
-  const attributeRanges: Record<string, [number, number]> = {};
+  const attributeRanges: Record<string, string> = {};
   for (const key of ATTRIBUTE_KEYS) {
     const val = warrior.attributes[key];
     const low = Math.max(3, val - fuzz + Math.floor(Math.random() * 2));
     const high = Math.min(25, val + fuzz - Math.floor(Math.random() * 2));
-    attributeRanges[key] = [low, high];
+    attributeRanges[key] = getAttributeRangeDescription(low, high);
   }
 
   const record = `${warrior.career.wins}W-${warrior.career.losses}L`;

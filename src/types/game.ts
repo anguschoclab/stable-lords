@@ -444,7 +444,7 @@ export interface ScoutReportData {
   style: string;
   quality: "Basic" | "Detailed" | "Expert";
   week: number;
-  attributeRanges: Record<string, [number, number]>;
+  attributeRanges: Record<string, string>;
   record: string;
   knownInjuries: string[];
   suspectedOE?: string;
@@ -548,7 +548,7 @@ export interface TrainerData {
 
 // ─── Insight Tokens ─────────────────────────────────────────────────────────
 
-export type InsightTokenType = "Weapon" | "Rhythm";
+export type InsightTokenType = "Weapon" | "Rhythm" | "StatHint";
 
 export interface InsightToken {
   id: string;

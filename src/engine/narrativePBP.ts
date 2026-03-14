@@ -752,3 +752,45 @@ const PRESSING_TEMPLATES = [
 export function pressingLine(rng: RNG, name: string): string {
   return pick(rng, PRESSING_TEMPLATES).replace(/%N/g, name);
 }
+
+// ─── Insight Narration ──────────────────────────────────────────────────────
+
+const INSIGHT_ST_HINTS = [
+  "His parry shatters under your monstrous strength!",
+  "Your blade meets staggering resistance, his strength is undeniable.",
+  "He carelessly bats away your strike with raw power.",
+];
+
+const INSIGHT_SP_HINTS = [
+  "His sluggish movements fail to catch your swift strike.",
+  "He moves with blinding speed, leaving you swinging at shadows.",
+  "Your reflexes seem barely enough to keep up with his pace.",
+];
+
+const INSIGHT_DF_HINTS = [
+  "He clumsily overextends, leaving himself wide open.",
+  "His flawless footwork and deft parry leave you bewildered.",
+  "His clumsy defense makes him an easy target.",
+];
+
+const INSIGHT_WL_HINTS = [
+  "Despite the punishment, his iron will keeps him standing.",
+  "He seems to waver, his resolve breaking under your assault.",
+];
+
+export function narrateInsightHint(rng: RNG, attribute: string): string | null {
+  if (rng() > 0.4) return null; // 40% chance to reveal an insight
+
+  switch(attribute) {
+    case 'ST':
+      return pick(rng, INSIGHT_ST_HINTS);
+    case 'SP':
+      return pick(rng, INSIGHT_SP_HINTS);
+    case 'DF':
+      return pick(rng, INSIGHT_DF_HINTS);
+    case 'WL':
+      return pick(rng, INSIGHT_WL_HINTS);
+    default:
+      return null;
+  }
+}

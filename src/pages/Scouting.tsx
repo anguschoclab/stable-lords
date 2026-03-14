@@ -716,9 +716,9 @@ export default function Scouting() {
                                 <div key={key} className="flex items-center gap-2">
                                   <span className="text-xs text-muted-foreground w-8 font-mono">{key}</span>
                                   <div className="flex-1">
-                                    <Progress value={(((range[0] + range[1]) / 2) / 25) * 100} className="h-1.5" />
+                                    <div className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">{range}</div>
                                   </div>
-                                  <span className="text-xs font-mono w-12 text-right">{range[0]}-{range[1]}</span>
+
                                 </div>
                               );
                             })}
