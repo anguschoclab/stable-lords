@@ -51,7 +51,7 @@ import { randomOwnerName, randomStableName } from "@/data/randomNames";
 type Screen = "title" | "newGame";
 
 export default function StartGame() {
-  const { setState } = useGame();
+  const { loadGame } = useGame();
   const [screen, setScreen] = useState<Screen>("title");
   const [slots, setSlots] = useState<SaveSlotMeta[]>(() => listSaveSlots());
   const [deleteTarget, setDeleteTarget] = useState<SaveSlotMeta | null>(null);
@@ -73,9 +73,9 @@ export default function StartGame() {
   const loadSlot = useCallback(
     (slotId: string) => {
       const state = loadFromSlot(slotId);
-      if (state) setState(state);
+      if (state) loadGame(slotId, state);
     },
-    [setState]
+    [loadGame]
   );
 
   const handleDelete = useCallback(() => {
@@ -91,8 +91,8 @@ export default function StartGame() {
     fresh.player.stableName = stableName.trim();
     const slotId = newSlotId();
     saveToSlot(slotId, fresh);
-    setState(fresh);
-  }, [ownerName, stableName, setState]);
+    loadGame(slotId, fresh);
+  }, [ownerName, stableName, loadGame]);
 
   const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,7 +106,7 @@ export default function StartGame() {
         toast.success("Save imported! Loading now…");
         // Auto-load the imported save
         const state = loadFromSlot(slotId);
-        if (state) setState(state);
+        if (state) loadGame(slotId, state);
       } catch (err: any) {
         toast.error(err?.message ?? "Failed to import save file.");
       }
@@ -114,7 +114,7 @@ export default function StartGame() {
     reader.readAsText(file);
     // Reset input so same file can be re-imported
     e.target.value = "";
-  }, [setState, refreshSlots]);
+  }, [loadGame, refreshSlots]);
 
   const formatDate = (iso: string) => {
     try {
