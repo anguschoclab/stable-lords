@@ -40,29 +40,29 @@ function OverviewTab() {
   return (
     <div className="space-y-4">
       {/* Treasury */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card>
-          <CardContent className="py-3 px-4 text-center">
-            <div className="text-2xl font-display font-bold text-arena-gold">{gold}g</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Treasury</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <Card className="border-border/40 shadow-sm bg-background">
+          <CardContent className="py-4 px-4 text-center bg-secondary/5">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Treasury</div>
+            <div className="text-3xl font-mono font-bold text-arena-gold leading-none">{gold.toLocaleString()}G</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="py-3 px-4 text-center">
-            <div className="text-2xl font-display font-bold">{activeWarriors.length}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Active</div>
+        <Card className="border-border/40 shadow-sm bg-background">
+          <CardContent className="py-4 px-4 text-center bg-secondary/5">
+             <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Active Roster</div>
+            <div className="text-3xl font-mono font-bold leading-none text-foreground">{activeWarriors.length}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="py-3 px-4 text-center">
-            <div className="text-2xl font-display font-bold text-arena-pop">{totalWins}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Wins</div>
+        <Card className="border-border/40 shadow-sm bg-background">
+          <CardContent className="py-4 px-4 text-center bg-secondary/5">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Total Victories</div>
+            <div className="text-3xl font-mono font-bold text-arena-pop leading-none">{totalWins}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="py-3 px-4 text-center">
-            <div className="text-2xl font-display font-bold text-destructive">{totalKills}</div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Kills</div>
+        <Card className="border-border/40 shadow-sm bg-background">
+          <CardContent className="py-4 px-4 text-center bg-secondary/5">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Total Fatalities</div>
+            <div className="text-3xl font-mono font-bold text-destructive leading-none">{totalKills}</div>
           </CardContent>
         </Card>
       </div>
