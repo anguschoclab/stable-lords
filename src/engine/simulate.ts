@@ -53,23 +53,22 @@ const STYLE_ORDER = [
 ];
 
 // Row = attacker style, Col = defender style
-// BALANCE v7: Further tuned to eliminate >80% matchups.
-// Changes from v6:
-// - BA vs TP: +2 → +1 (still a counter, not a stomp)
-// - ST vs LU: 0 → +1 (power overwhelms speed)
-// - PR vs AB: +1 → 0 (PR shouldn't hard-counter AB)
+// BALANCE v8: Tuned after seed compression.
+// - TP vs LU: 0 → -1 (lungers should pressure TP with speed)
+// - WS vs BA: -1 → 0 (WS zone control shouldn't auto-lose to BA)
+// - SL vs WS: +1 → 0 (reduced SL dominance over WS)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
   [ 0,  0,  0,  0, -1,  0,  0,  0, +1,  0], // AB: only edge vs TP, weak vs PR
-  [ 0,  0,  0, +1,  0,  0, +1, +1,  0, +1], // BA: edge vs SL/ST/PL/WS, neutral vs TP (inherent advantage suffices)
-  [ 0,  0,  0, +1,  0, -1,  0,  0,  0, -1], // LU: speed beats PL, weak vs PS/WS
+  [ 0,  0,  0, +1,  0,  0, +1, +1,  0,  0], // BA: edge vs SL/ST/PL, neutral vs WS now
+  [ 0,  0,  0, +1,  0, -1,  0,  0, +1, -1], // LU: speed beats PL and TP, weak vs PS/WS
   [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0], // PL: weak vs BA/LU/ST
-  [ 0,  0,  0,  0,  0,  0,  0, -1,  0,  0], // PR: neutral vs AB now, weak vs ST
+  [ 0,  0,  0,  0,  0,  0,  0, -1,  0,  0], // PR: neutral vs AB, weak vs ST
   [ 0,  0, +1,  0,  0,  0,  0, -1,  0, -1], // PS: beats LU, loses to ST/WS
-  [ 0, -1,  0,  0,  0,  0,  0,  0, +1, +1], // SL: beats TP/WS, weak vs BA
+  [ 0, -1,  0,  0,  0,  0,  0,  0, +1,  0], // SL: beats TP, weak vs BA, neutral vs WS now
   [ 0, -1, +1, +1, +1, +1,  0,  0, +1,  0], // ST: power beats LU/PL/PR/PS/TP, weak vs BA
-  [-1,  0,  0,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs AB/SL/ST, neutral vs BA now
-  [ 0, -1, +1,  0,  0, +1, -1,  0,  0,  0], // WS: zone control, beats LU/PS, loses to BA/SL
+  [-1,  0, -1,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs AB/LU/SL/ST (LU added)
+  [ 0,  0, +1,  0,  0, +1,  0,  0,  0,  0], // WS: zone control, beats LU/PS
 ];
 
 function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
