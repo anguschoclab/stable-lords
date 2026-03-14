@@ -150,45 +150,68 @@ function SeasonWidget() {
 
 function StableWidget() {
   const { state } = useGame();
-  const activeWarriors = state.roster.filter(w => w.status === "Active").length;
-  const totalWins = state.roster.reduce((s, w) => s + w.career.wins, 0);
-  const totalKills = state.roster.reduce((s, w) => s + w.career.kills, 0);
+  const activeWarriors = state.roster.filter(w => w.status === "Active");
+  // Sort warriors by fame or wins for the "Top 5" list
+  const topWarriors = [...activeWarriors].sort((a, b) => b.fame - a.fame).slice(0, 5);
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="font-display text-base flex items-center gap-2">
-          <Shield className="h-4 w-4 text-primary" /> {state.player.stableName}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Warriors</div>
-            <div className="text-lg font-bold">{activeWarriors}</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Fame</div>
-            <div className="text-lg font-bold text-arena-fame">{state.fame}</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Victories</div>
-            <div className="text-lg font-bold text-arena-pop">{totalWins}</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-2.5 border border-border/50">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Kills</div>
-            <div className="text-lg font-bold text-destructive">{totalKills}</div>
-          </div>
+    <Card className="flex flex-col h-full border-border/50 shadow-sm">
+      <CardHeader className="pb-2 border-b border-border/20 bg-secondary/10">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display text-sm tracking-wide flex items-center gap-2">
+            <Shield className="h-4 w-4 text-primary" /> STABLE OVERVIEW
+          </CardTitle>
+          <span className="text-[10px] text-muted-foreground font-mono bg-secondary px-1.5 py-0.5 rounded">
+            {activeWarriors.length}/{BASE_ROSTER_CAP + state.rosterBonus} ACTIVE
+          </span>
         </div>
-        <div className="mt-3 flex gap-2">
-          <Link to="/recruit" className="flex-1">
-            <Button variant="outline" size="sm" className="w-full gap-1 text-xs">
-              <UserPlus className="h-3 w-3" /> Recruit
+      </CardHeader>
+      <CardContent className="p-0 flex-1 flex flex-col">
+        <div className="flex-1">
+          {topWarriors.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">No active warriors.</div>
+          ) : (
+            <div className="divide-y divide-border/20">
+              {topWarriors.map(w => {
+                 const hasInjuries = w.injuries && w.injuries.length > 0;
+                 return (
+                  <div key={w.id} className="p-2.5 flex items-center gap-3 hover:bg-secondary/20 transition-colors">
+                    <div className="w-6 h-6 rounded-full bg-secondary/80 border border-border flex items-center justify-center shrink-0">
+                      <span className="text-[10px] font-bold">{w.name.charAt(0)}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <Link to={`/warrior/${w.id}`} className="text-xs font-bold truncate hover:underline">{w.name}</Link>
+                        <span className="text-[10px] font-mono whitespace-nowrap">
+                           <span className="text-arena-pop">{w.career.wins}</span>-<span className="text-muted-foreground">{w.career.losses}</span>-<span className="text-destructive">{w.career.kills}</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-[10px] text-muted-foreground truncate">{STYLE_DISPLAY_NAMES[w.style as keyof typeof STYLE_DISPLAY_NAMES] || w.style}</span>
+                        {hasInjuries ? (
+                           <span className="text-[9px] uppercase tracking-wider bg-destructive/10 text-destructive px-1 rounded font-bold">Injured</span>
+                        ) : (
+                           <span className="text-[9px] uppercase tracking-wider bg-green-500/10 text-green-500 px-1 rounded font-bold">Healthy</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                 )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Actions stuck to bottom */}
+        <div className="p-2.5 border-t border-border/20 bg-background/50 grid grid-cols-2 gap-2 mt-auto">
+          <Link to="/recruit">
+            <Button variant="secondary" size="sm" className="w-full h-7 text-[10px] uppercase tracking-wider font-bold">
+              <UserPlus className="h-3 w-3 mr-1" /> Recruit
             </Button>
           </Link>
-          <Link to="/training" className="flex-1">
-            <Button variant="outline" size="sm" className="w-full gap-1 text-xs">
-              <TrendingUp className="h-3 w-3" /> Train
+          <Link to="/stable-hall">
+            <Button variant="outline" size="sm" className="w-full h-7 text-[10px] uppercase tracking-wider font-bold">
+              <Users className="h-3 w-3 mr-1" /> View All
             </Button>
           </Link>
         </div>
@@ -418,66 +441,78 @@ function GazetteWidget() {
 
 function RecentBoutsWidget() {
   const { state } = useGame();
-  const recent = state.arenaHistory.slice(-4).reverse();
+
+  // Get the last 5 bouts involving the player's stable
+  const recentBouts = useMemo(() => {
+    return state.arenaHistory
+      .filter(bout => bout.a === state.player.stableName || bout.d === state.player.stableName)
+      .slice(0, 5);
+  }, [state.arenaHistory, state.player.stableName]);
 
   return (
-    <Card className="md:col-span-2">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="font-display text-base flex items-center gap-2">
-          <Swords className="h-4 w-4 text-destructive" /> Recent Bouts
-        </CardTitle>
-        <Link to="/hall-of-fights">
-          <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1 text-muted-foreground">
-            View All <ChevronRight className="h-3 w-3" />
-          </Button>
-        </Link>
+    <Card className="flex flex-col h-full border-border/50 shadow-sm col-span-1 md:col-span-2">
+      <CardHeader className="pb-2 border-b border-border/20 bg-secondary/10">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display text-sm tracking-wide flex items-center gap-2">
+            <ScrollText className="h-4 w-4 text-primary" /> RECENT BOUTS
+          </CardTitle>
+          <span className="text-[10px] text-muted-foreground font-mono">LAST 5 MATCHES</span>
+        </div>
       </CardHeader>
-      <CardContent>
-        {recent.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">No bouts recorded yet.</p>
-        ) : (
-          <div className="space-y-2">
-            {recent.map((f) => {
-              const isPlayerA = state.roster.some(w => w.name === f.a);
-              const isPlayerD = state.roster.some(w => w.name === f.d);
-              const playerWarrior = isPlayerA ? f.a : isPlayerD ? f.d : null;
-              const won = playerWarrior && (
-                (playerWarrior === f.a && f.winner === "A") ||
-                (playerWarrior === f.d && f.winner === "D")
-              );
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-[10px] text-muted-foreground uppercase bg-secondary/5 border-b border-border/20 font-bold tracking-wider">
+              <tr>
+                <th className="px-4 py-2">Week</th>
+                <th className="px-4 py-2">Fighter</th>
+                <th className="px-4 py-2">Opponent</th>
+                <th className="px-4 py-2">Result</th>
+                <th className="px-4 py-2 text-right">Method</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/20">
+              {recentBouts.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs">No match history available</td>
+                </tr>
+              ) : (
+                recentBouts.map((bout) => {
+                  const isPlayerA = bout.a === state.player.stableName;
+                  const playerWon = (isPlayerA && bout.winner === "A") || (!isPlayerA && bout.winner === "D");
+                  const resultColor = playerWon ? "text-arena-pop" : "text-destructive";
 
-              return (
-                <div key={f.id} className="flex items-center gap-3 py-1.5">
-                  <Badge
-                    variant={won ? "default" : f.winner ? "destructive" : "secondary"}
-                    className="text-[10px] w-6 h-5 justify-center p-0"
-                  >
-                    {won ? "W" : f.winner ? "L" : "D"}
-                  </Badge>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs">
-                      <WarriorLink name={f.a} className={`font-medium ${isPlayerA ? "text-foreground" : "text-muted-foreground"}`} />
-                      <span className="text-muted-foreground mx-1.5">vs</span>
-                      <WarriorLink name={f.d} className={`font-medium ${isPlayerD ? "text-foreground" : "text-muted-foreground"}`} />
-                    </div>
-                    <div className="flex gap-1 mt-0.5">
-                      {f.by && <Badge variant="outline" className="text-[9px] h-3.5 px-1">{f.by}</Badge>}
-                      {f.flashyTags?.slice(0, 2).map(t => (
-                        <Badge key={t} variant="outline" className="text-[9px] h-3.5 px-1">{t}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground font-mono shrink-0">Wk {f.week}</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                  return (
+                    <tr key={bout.id} className="hover:bg-secondary/10 transition-colors">
+                      <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">Wk {bout.week}</td>
+                      <td className="px-4 py-2.5 font-bold">
+                        {isPlayerA ? bout.a : bout.d}
+                      </td>
+                      <td className="px-4 py-2.5 text-muted-foreground text-xs">
+                         {isPlayerA ? bout.d : bout.a}
+                      </td>
+                      <td className={`px-4 py-2.5 font-bold ${resultColor}`}>
+                         {playerWon ? "WIN" : "LOSS"}
+                      </td>
+                      <td className="px-4 py-2.5 text-right font-mono text-[10px] uppercase text-muted-foreground">
+                        {bout.by || "DECISION"}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="p-2 border-t border-border/20 bg-background/50 text-center">
+            <Link to="/hall-of-fights" className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors font-bold flex items-center justify-center gap-1">
+               Full History <ChevronRight className="h-3 w-3" />
+            </Link>
+        </div>
       </CardContent>
     </Card>
   );
 }
-
 // ─── Widget: Training Status ───────────────────────────────────────────────
 
 function TrainingWidget() {
@@ -804,7 +839,7 @@ function RivalryWidget() {
             <p className="text-[10px] text-muted-foreground">Fight rival stables to forge vendettas and blood feuds.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="space-y-3">
               {rivalries.slice(0, 4).map(r => (
                 <div key={r.ownerId} className="space-y-1.5">
@@ -1364,25 +1399,41 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-secondary/30 p-4 rounded-xl border border-border/50">
+        <div className="flex-1">
+          <h1 className="text-2xl font-display font-bold tracking-wide flex items-center gap-2 text-foreground">
             Arena Hub
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Welcome back, <span className="text-foreground font-medium">{state.player.name}</span>
+          <p className="text-sm text-muted-foreground mt-1">
+            Welcome back, <span className="text-foreground font-medium">{state.player.name}</span> of <span className="text-primary font-bold">{state.player.stableName}</span>
           </p>
         </div>
-        <div className="flex items-center gap-1.5">
+
+        <div className="flex items-center gap-4 text-sm bg-background/50 px-4 py-2 rounded-lg border border-border/40 shrink-0 shadow-inner">
+           <div className="flex items-center gap-2 border-r border-border/50 pr-4">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Gold</span>
+              <span className="font-mono text-arena-gold font-bold">{state.gold.toLocaleString()} G</span>
+           </div>
+           <div className="flex items-center gap-2 border-r border-border/50 pr-4">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Fame</span>
+              <span className="font-mono text-arena-fame font-bold">{state.fame.toLocaleString()}</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Pop</span>
+              <span className="font-mono text-arena-pop font-bold">{Math.round(state.popularity)}%</span>
+           </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
           {isEditing && (
-            <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground" onClick={resetLayout}>
+            <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors" onClick={resetLayout}>
               <RotateCcw className="h-3 w-3" /> Reset
             </Button>
           )}
           <Button
-            variant={isEditing ? "default" : "outline"}
+            variant={isEditing ? "default" : "secondary"}
             size="sm"
-            className="text-xs gap-1"
+            className={cn("text-xs gap-1 transition-colors shadow-sm", isEditing && "bg-primary text-primary-foreground")}
             onClick={() => setIsEditing(v => !v)}
           >
             <GripVertical className="h-3 w-3" />
@@ -1392,7 +1443,7 @@ export default function Dashboard() {
       </div>
 
       {/* Widget Grid */}
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 auto-rows-min">
         {widgetOrder.map((id, idx) => {
           const def = widgetMap.get(id);
           if (!def) return null;
