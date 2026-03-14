@@ -26,6 +26,7 @@ interface GameContextValue {
   lastSavedAt: string | null;
   setState: (next: GameState) => void;
   doAdvanceWeek: () => void;
+  doClearResolution: () => void;
   doAppendFight: (summary: FightSummary) => void;
   doUpdateWarrior: (
     warriorId: string,
@@ -73,6 +74,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
       markSaved();
     }
   }, [markSaved]);
+
+  const doClearResolution = useCallback(() => {
+    setState((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        phase: "planning",
+        pendingResolutionData: undefined,
+      };
+    });
+  }, []);
 
   const doAdvanceWeek = useCallback(() => {
     setStateRaw((prev) => {

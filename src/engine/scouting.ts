@@ -8,7 +8,7 @@
  * - Known injuries
  * - Suspected fight plan tendencies
  */
-import type { Warrior } from "@/types/game";
+import type { Warrior, InsightToken, InsightTokenType } from "@/types/game";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 
 export type ScoutQuality = "Basic" | "Detailed" | "Expert";
@@ -49,7 +49,7 @@ export function generateScoutReport(
   warrior: Warrior,
   quality: ScoutQuality,
   week: number
-): ScoutReport {
+): { report: ScoutReport; newInsights: InsightToken[] } {
   const fuzz = QUALITY_FUZZ[quality];
 
   const attributeRanges: Record<string, [number, number]> = {};
@@ -86,17 +86,62 @@ export function generateScoutReport(
         warrior.career.kills > 0 ? `Known killer (${warrior.career.kills} kills).` : "No kills on record."
       }`;
 
-  return {
-    id: `scout_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+
+  const newInsights: InsightToken[] = [];
+
+  // Basic scouting reveals Style
+  newInsights.push({
+    id: `is_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    type: "Style",
+    warriorId: warrior.id,
     warriorName: warrior.name,
-    style: warrior.style,
-    quality,
-    week,
-    attributeRanges,
-    record,
-    knownInjuries,
-    suspectedOE,
-    suspectedAL,
-    notes,
+    detail: `Identified as ${styleName}`,
+    discoveredWeek: week
+  });
+
+  // Detailed scouting reveals 2 random attributes
+  if (quality === "Detailed" || quality === "Expert") {
+    const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - Math.random()).slice(0, quality === "Expert" ? 4 : 2);
+    attrsToReveal.forEach(attr => {
+      newInsights.push({
+        id: `ia_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        type: "Attribute",
+        warriorId: warrior.id,
+        warriorName: warrior.name,
+        targetKey: attr,
+        detail: `Discovered exact ${ATTRIBUTE_LABELS[attr] ?? attr}`,
+        discoveredWeek: week
+      });
+    });
+  }
+
+  // Expert scouting reveals Tactics
+  if (quality === "Expert" && warrior.plan) {
+    newInsights.push({
+      id: `it_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      type: "Tactic",
+      warriorId: warrior.id,
+      warriorName: warrior.name,
+      detail: `Suspected OE: ${suspectedOE}, AL: ${suspectedAL}`,
+      discoveredWeek: week
+    });
+  }
+
+  return {
+    report: {
+      id: `scout_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+      warriorName: warrior.name,
+      style: warrior.style,
+      quality,
+      week,
+      attributeRanges,
+      record,
+      knownInjuries,
+      suspectedOE,
+      suspectedAL,
+      notes,
+    },
+    newInsights
   };
+
 }

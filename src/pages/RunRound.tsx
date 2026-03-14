@@ -62,15 +62,33 @@ export default function RunRound() {
     // Run full advanceWeek pipeline (training, economy, aging, injuries, AI bouts, etc.)
     updatedState = advanceWeek(updatedState);
 
+    // Extract the latest gazette generated during this week's simulation
+    // This is simple since weekPipeline or advanceWeek already pushed it to state.newsletter
+    // We only want the items from the exact week we just completed.
+    const weekNewsletter = updatedState.newsletter.filter(n => n.week === state.week);
+
+    // Filter injuries/deaths from the player's roster specifically
+    const playerDeaths = processed.summary.deathNames || [];
+    const playerInjuries = processed.summary.injuryNames || [];
+    const playerPromotions = []; // Could add logic if needed
+
+    updatedState = {
+      ...updatedState,
+      phase: "resolution",
+      pendingResolutionData: {
+        gazette: weekNewsletter,
+        injuries: playerInjuries,
+        deaths: playerDeaths,
+        bouts: processed.results,
+        promotions: playerPromotions,
+      }
+    };
+
     setState(updatedState);
-    setResults(processed.results);
+    // setResults(processed.results); // handled in resolution phase now
     setRunning(false);
 
-    const deaths = processed.summary.deaths;
-    const rivalBouts = processed.results.filter(r => r.rivalStable).length;
-    toast.success(
-      `Week ${state.week} complete! ${processed.summary.bouts} bouts (${rivalBouts} cross-stable).${deaths > 0 ? ` ${deaths} death(s)!` : ""}`
-    );
+    // Replaced toast with the Grand Submission UI flow.
   }, [running, state, setState]);
 
   const startAutosim = useCallback(async (weeks: number) => {
@@ -118,12 +136,12 @@ export default function RunRound() {
         <div className="flex gap-2 w-full sm:w-auto">
           <Button
             onClick={runWeek}
-            disabled={running || autosimming || (fightReady.length < 1 && matchCard.length === 0)}
+            disabled={running || autosimming || state.phase === "resolution" || (fightReady.length < 1 && matchCard.length === 0)}
             className="gap-2 bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
             size="lg"
           >
             <Zap className="h-4 w-4" />
-            Simulate Round
+            Submit Cycle
           </Button>
           <Button
             variant="outline"
@@ -353,34 +371,7 @@ export default function RunRound() {
         </Card>
       )}
 
-      {/* Results */}
-      {results.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-display font-semibold">Results — Week {state.week - 1}</h2>
-          {results.map((r, i) => (
-            <div key={i} className="space-y-1">
-              {r.isRivalry && (
-                <div className="flex items-center gap-1 text-xs text-destructive font-semibold">
-                  <Flame className="h-3 w-3" /> Rivalry Bout{r.rivalStable ? ` — vs ${r.rivalStable}` : ""}
-                </div>
-              )}
-              {r.rivalStable && !r.isRivalry && (
-                <div className="text-xs text-muted-foreground">vs {r.rivalStable}</div>
-              )}
-              <BoutViewer
-                nameA={r.a.name}
-                nameD={r.d.name}
-                styleA={r.a.style}
-                styleD={r.d.style}
-                log={r.outcome.log}
-                winner={r.outcome.winner}
-                by={r.outcome.by}
-                announcement={r.announcement}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Results moved to Resolution Phase Modal */}
     </div>
   );
 }

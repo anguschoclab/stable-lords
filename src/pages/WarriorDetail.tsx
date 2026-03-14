@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { obfuscateWarrior } from "@/lib/obfuscation";
 import { useGame } from "@/state/GameContext";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightPlan, type FightSummary } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,8 +75,8 @@ function growthNarrative(current: number, potential: number | undefined): {
 
 /** Overall narrative assessment of a warrior's growth ceiling */
 function overallGrowthNarrative(warrior: Warrior): string {
-  if (!warrior.potential) return "This warrior's limits are unknown.";
-  const gaps = ATTRIBUTE_KEYS.map(k => warrior.potential![k] - warrior.attributes[k]);
+  if (!displayWarrior.potential) return "This warrior's limits are unknown.";
+  const gaps = ATTRIBUTE_KEYS.map(k => displayWarrior.potential![k] - displayWarrior.attributes[k]);
   const totalGap = gaps.reduce((s, g) => s + Math.max(0, g), 0);
   const maxedCount = gaps.filter(g => g <= 0).length;
 
@@ -133,9 +134,9 @@ function SkillBar({ label, value, max = 20 }: { label: string; value: number; ma
 }
 
 function WarriorStatementsPanel({ warrior }: { warrior: Warrior }) {
-  if (!warrior.baseSkills) return null;
+  if (!displayWarrior.baseSkills) return null;
   const statements = generateWarriorStatements(
-    warrior.attributes.WT, warrior.attributes.SP, warrior.attributes.DF, warrior.baseSkills
+    displayWarrior.attributes.WT, displayWarrior.attributes.SP, displayWarrior.attributes.DF, displayWarrior.baseSkills
   );
   const lines = [
     statements.initiative, statements.riposte, statements.attack,
@@ -265,7 +266,7 @@ function DiscoveryProgressBar({
 function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () => void }) {
   const { setState, state } = useGame();
   const favDisplay = getFavoritesDisplay(warrior);
-  const totalFights = warrior.career.wins + warrior.career.losses;
+  const totalFights = displayWarrior.career.wins + displayWarrior.career.losses;
   const mastery = getMastery(totalFights);
   const progress = getDiscoveryProgress(totalFights);
 
@@ -274,13 +275,13 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
     // Persist the change
     setState({
       ...state,
-      roster: state.roster.map(w => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w),
+      roster: state.roster.map(w => w.id === displayWarrior.id ? { ...w, favorites: displayWarrior.favorites } : w),
     });
     toast.success(msg);
     onUpdate();
   };
 
-  if (!warrior.favorites) return null;
+  if (!displayWarrior.favorites) return null;
 
   return (
     <Card>
@@ -349,7 +350,7 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
               <div className="text-sm text-muted-foreground/50">Not yet discovered</div>
             )}
           </div>
-          {!warrior.favorites.discovered.weapon && (
+          {!displayWarrior.favorites.discovered.weapon && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -377,7 +378,7 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
               <div className="text-sm text-muted-foreground/50">Not yet discovered</div>
             )}
           </div>
-          {!warrior.favorites.discovered.rhythm && (
+          {!displayWarrior.favorites.discovered.rhythm && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -399,7 +400,7 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
 function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHistory: FightSummary[] }) {
   const milestones = useMemo(() => {
     const events: { week: number; label: string; icon: React.ReactNode; color: string }[] = [];
-    const fights = arenaHistory.filter(f => f.a === warrior.name || f.d === warrior.name);
+    const fights = arenaHistory.filter(f => f.a === displayWarrior.name || f.d === displayWarrior.name);
     // Sort chronologically
     const sorted = [...fights].sort((a, b) => a.week - b.week);
 
@@ -410,7 +411,7 @@ function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHist
 
     // First win
     const firstWin = sorted.find(f => {
-      const isA = f.a === warrior.name;
+      const isA = f.a === displayWarrior.name;
       return (isA && f.winner === "A") || (!isA && f.winner === "D");
     });
     if (firstWin) {
@@ -419,7 +420,7 @@ function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHist
 
     // First kill
     const firstKill = sorted.find(f => {
-      const isA = f.a === warrior.name;
+      const isA = f.a === displayWarrior.name;
       return ((isA && f.winner === "A") || (!isA && f.winner === "D")) && f.by === "Kill";
     });
     if (firstKill) {
@@ -427,21 +428,21 @@ function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHist
     }
 
     // Championship
-    if (warrior.champion) {
+    if (displayWarrior.champion) {
       const champFight = sorted.find(f => f.tournamentId && (
-        (f.a === warrior.name && f.winner === "A") || (f.d === warrior.name && f.winner === "D")
+        (f.a === displayWarrior.name && f.winner === "A") || (f.d === displayWarrior.name && f.winner === "D")
       ));
-      events.push({ week: champFight?.week ?? warrior.career.wins, label: "Champion", icon: <Star className="h-3.5 w-3.5" />, color: "bg-arena-fame" });
+      events.push({ week: champFight?.week ?? displayWarrior.career.wins, label: "Champion", icon: <Star className="h-3.5 w-3.5" />, color: "bg-arena-fame" });
     }
 
     // Retirement
-    if (warrior.status === "Retired" && warrior.retiredWeek) {
-      events.push({ week: warrior.retiredWeek, label: "Retired", icon: <Armchair className="h-3.5 w-3.5" />, color: "bg-muted-foreground" });
+    if (displayWarrior.status === "Retired" && displayWarrior.retiredWeek) {
+      events.push({ week: displayWarrior.retiredWeek, label: "Retired", icon: <Armchair className="h-3.5 w-3.5" />, color: "bg-muted-foreground" });
     }
 
     // Death
-    if (warrior.status === "Dead" && warrior.deathWeek) {
-      events.push({ week: warrior.deathWeek, label: warrior.deathCause ?? "Fallen", icon: <Skull className="h-3.5 w-3.5" />, color: "bg-destructive" });
+    if (displayWarrior.status === "Dead" && displayWarrior.deathWeek) {
+      events.push({ week: displayWarrior.deathWeek, label: displayWarrior.deathCause ?? "Fallen", icon: <Skull className="h-3.5 w-3.5" />, color: "bg-destructive" });
     }
 
     // Deduplicate by label, keep earliest
@@ -597,14 +598,40 @@ export default function WarriorDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { state, setState } = useGame();
-  const warrior = state.roster.find((w) => w.id === id);
+
+  // Find warrior in roster, graveyard, retired, OR rival stables
+  const warrior = useMemo(() => {
+    let w = state.roster.find((w) => w.id === id) ||
+            state.graveyard.find((w) => w.id === id) ||
+            state.retired.find((w) => w.id === id);
+    if (w) return w;
+    for (const rs of state.rivals || []) {
+      w = rs.roster.find((w) => w.id === id);
+      if (w) return w;
+    }
+    return undefined;
+  }, [id, state.roster, state.graveyard, state.retired, state.rivals]);
+
+  const isPlayerOwned = useMemo(() => {
+    if (!warrior) return false;
+    return !!(state.roster.find((w) => w.id === id) || state.graveyard.find((w) => w.id === id) || state.retired.find((w) => w.id === id));
+  }, [warrior, id, state.roster, state.graveyard, state.retired]);
+
+  const displayWarrior = useMemo(() => {
+    if (!warrior) return null;
+    return obfuscateWarrior(warrior, state.insightTokens, isPlayerOwned);
+  }, [warrior, state.insightTokens, isPlayerOwned]);
+
+  // Import our obfuscator
+  // Wait, I need to make sure I add the import at the top
+
   const [activeTab, setActiveTab] = useState("overview");
 
   const handlePlanChange = useCallback(
     (newPlan: FightPlan) => {
       if (!warrior) return;
       const nextRoster = state.roster.map((w) =>
-        w.id === warrior.id ? { ...w, plan: newPlan } : w
+        w.id === displayWarrior.id ? { ...w, plan: newPlan } : w
       );
       setState({ ...state, roster: nextRoster });
     },
@@ -613,9 +640,9 @@ export default function WarriorDetail() {
 
   const handleRetire = useCallback(() => {
     if (!warrior) return;
-    const updated = retireWarrior(state, warrior.id);
+    const updated = retireWarrior(state, displayWarrior.id);
     setState(updated);
-    toast.success(`${warrior.name} has been retired with honor.`);
+    toast.success(`${displayWarrior.name} has been retired with honor.`);
     navigate("/");
   }, [warrior, state, setState, navigate]);
 
@@ -623,7 +650,7 @@ export default function WarriorDetail() {
     (newLoadout: EquipmentLoadout) => {
       if (!warrior) return;
       const nextRoster = state.roster.map((w) =>
-        w.id === warrior.id ? { ...w, equipment: newLoadout } : w
+        w.id === displayWarrior.id ? { ...w, equipment: newLoadout } : w
       );
       setState({ ...state, roster: nextRoster });
     },
@@ -644,11 +671,11 @@ export default function WarriorDetail() {
     );
   }
 
-  const record = `${warrior.career.wins}W - ${warrior.career.losses}L - ${warrior.career.kills}K`;
+  const record = `${displayWarrior.career.wins}W - ${displayWarrior.career.losses}L - ${displayWarrior.career.kills}K`;
 
   // Compute current streak
   const streakMap = computeStreaks(state.arenaHistory);
-  const streakVal = streakMap.get(warrior.name) ?? 0;
+  const streakVal = streakMap.get(displayWarrior.name) ?? 0;
   const streakLabel = streakVal > 0
     ? `🔥 ${streakVal}W streak`
     : streakVal < 0
@@ -672,15 +699,15 @@ export default function WarriorDetail() {
         <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
           <div className="min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide break-all">{warrior.name}</h1>
-              {warrior.champion && (
+              <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide break-all">{displayWarrior.name}</h1>
+              {displayWarrior.champion && (
                 <Badge className="bg-arena-gold text-black gap-1">
                   <Trophy className="h-3 w-3" /> Champion
                 </Badge>
               )}
             </div>
             <p className="text-lg text-muted-foreground font-display">
-              {STYLE_DISPLAY_NAMES[warrior.style]}
+              {(displayWarrior.style === "UNKNOWN" ? "Unknown Style" : STYLE_DISPLAY_NAMES[displayWarrior.style])}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <p className="font-mono text-sm text-muted-foreground">{record}</p>
@@ -693,17 +720,17 @@ export default function WarriorDetail() {
                 </Badge>
               )}
             </div>
-            {warrior.age && (
-              <p className="text-xs text-muted-foreground mt-1">Age: {warrior.age} · XP: {(warrior as any).xp ?? 0}</p>
+            {displayWarrior.age && (
+              <p className="text-xs text-muted-foreground mt-1">Age: {displayWarrior.age} · XP: {(warrior as any).xp ?? 0}</p>
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
-              {warrior.flair.map((f) => (
+              {displayWarrior.flair.map((f) => (
                 <TagBadge key={f} tag={f} type="flair" />
               ))}
-              {warrior.titles.map((t) => (
+              {displayWarrior.titles.map((t) => (
                 <TagBadge key={t} tag={t} type="title" />
               ))}
-              {warrior.injuries.map((i) => {
+              {displayWarrior.injuries.map((i) => {
                 const injName = typeof i === "string" ? i : i.name;
                 return <TagBadge key={injName} tag={injName} type="injury" />;
               })}
@@ -712,12 +739,12 @@ export default function WarriorDetail() {
           <div className="flex gap-4">
             <div className="text-center">
               <Flame className="h-6 w-6 text-arena-fame mx-auto mb-1" />
-              <div className="text-2xl font-bold">{warrior.fame}</div>
+              <div className="text-2xl font-bold">{displayWarrior.fame}</div>
               <div className="text-xs text-muted-foreground">Fame</div>
             </div>
             <div className="text-center">
               <Star className="h-6 w-6 text-arena-pop mx-auto mb-1" />
-              <div className="text-2xl font-bold">{warrior.popularity}</div>
+              <div className="text-2xl font-bold">{displayWarrior.popularity}</div>
               <div className="text-xs text-muted-foreground">Pop</div>
             </div>
           </div>
@@ -742,12 +769,12 @@ export default function WarriorDetail() {
                 <AttrBar
                   key={key}
                   label={ATTRIBUTE_LABELS[key]}
-                  value={warrior.attributes[key]}
-                  potential={warrior.potential?.[key]}
+                  value={displayWarrior.attrs[key]}
+                  potential={displayWarrior.potential?.[key]}
                 />
               ))}
               <div className="pt-2 text-xs text-muted-foreground">
-                Total: {ATTRIBUTE_KEYS.reduce((sum, k) => sum + warrior.attributes[k], 0)} / 70
+                Total: {ATTRIBUTE_KEYS.reduce((sum, k) => sum + displayWarrior.attributes[k], 0)} / 70
               </div>
               {/* Narrative growth assessment */}
               <div className="pt-2 border-t border-border mt-2">
@@ -763,7 +790,7 @@ export default function WarriorDetail() {
 
           {/* Base Skills + Physicals */}
           <div className="space-y-4">
-            {warrior.baseSkills && (
+            {displayWarrior.baseSkills && (
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -771,14 +798,14 @@ export default function WarriorDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {Object.entries(warrior.baseSkills).map(([key, val]) => (
+                  {Object.entries(displayWarrior.baseSkills).map(([key, val]) => (
                     <SkillBar key={key} label={key} value={val} />
                   ))}
                 </CardContent>
               </Card>
             )}
 
-            {warrior.derivedStats && (
+            {displayWarrior.derivedStats && (
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -789,25 +816,25 @@ export default function WarriorDetail() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="rounded-lg bg-secondary p-3 border border-border">
                       <div className="text-xs text-muted-foreground">Hit Points</div>
-                      <div className="text-lg font-bold">{warrior.derivedStats.hp}</div>
-                      <div className="text-[10px] text-muted-foreground">{getHPRating(warrior.derivedStats.hp)}</div>
+                      <div className="text-lg font-bold">{displayWarrior.derivedStats.hp}</div>
+                      <div className="text-[10px] text-muted-foreground">{getHPRating(displayWarrior.derivedStats.hp)}</div>
                     </div>
                     <div className="rounded-lg bg-secondary p-3 border border-border">
                       <div className="text-xs text-muted-foreground">Endurance</div>
-                      <div className="text-lg font-bold">{warrior.derivedStats.endurance}</div>
+                      <div className="text-lg font-bold">{displayWarrior.derivedStats.endurance}</div>
                       <div className="text-[10px] text-muted-foreground">
-                        {ENDURANCE_LABELS[computeEnduranceTier(warrior.attributes.ST, warrior.attributes.CN, warrior.attributes.WL)]}
+                        {ENDURANCE_LABELS[computeEnduranceTier(displayWarrior.attributes.ST, displayWarrior.attributes.CN, displayWarrior.attributes.WL)]}
                       </div>
                     </div>
                     <div className="rounded-lg bg-secondary p-3 border border-border">
                       <div className="text-xs text-muted-foreground">Damage</div>
-                      <div className="text-lg font-bold">{getDamageRating(warrior.derivedStats.damage)}</div>
+                      <div className="text-lg font-bold">{getDamageRating(displayWarrior.derivedStats.damage)}</div>
                     </div>
                     <div className="rounded-lg bg-secondary p-3 border border-border">
                       <div className="text-xs text-muted-foreground">Carry Cap</div>
-                      <div className="text-lg font-bold">{warrior.derivedStats.encumbrance}</div>
+                      <div className="text-lg font-bold">{displayWarrior.derivedStats.encumbrance}</div>
                       <div className="text-[10px] text-muted-foreground">
-                        {ENCUMBRANCE_LABELS[computeEncumbranceClass(warrior.attributes.ST, warrior.attributes.CN)]}
+                        {ENCUMBRANCE_LABELS[computeEncumbranceClass(displayWarrior.attributes.ST, displayWarrior.attributes.CN)]}
                       </div>
                     </div>
                   </div>
@@ -819,7 +846,7 @@ export default function WarriorDetail() {
             <FavoritesCard warrior={warrior} onUpdate={() => {}} />
 
             {/* Canonical Warrior Statements */}
-            {warrior.baseSkills && (
+            {displayWarrior.baseSkills && (
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -840,17 +867,17 @@ export default function WarriorDetail() {
         <PlanBuilder
           plan={currentPlan}
           onPlanChange={handlePlanChange}
-          warriorName={warrior.name}
+          warriorName={displayWarrior.name}
         />
       )}
 
       {/* Equipment Tab */}
-      {activeTab === "equipment" && warrior.derivedStats && (
+      {activeTab === "equipment" && displayWarrior.derivedStats && (
         <EquipmentLoadoutUI
           loadout={currentLoadout}
-          style={warrior.style}
-          carryCap={warrior.derivedStats.encumbrance}
-          warriorAttrs={{ ST: warrior.attributes.ST, DF: warrior.attributes.DF, SP: warrior.attributes.SP }}
+          style={displayWarrior.style}
+          carryCap={displayWarrior.derivedStats.encumbrance}
+          warriorAttrs={{ ST: displayWarrior.attributes.ST, DF: displayWarrior.attributes.DF, SP: displayWarrior.attributes.SP }}
           onChange={handleEquipmentChange}
         />
       )}
@@ -859,7 +886,7 @@ export default function WarriorDetail() {
       {activeTab === "history" && (
         <div className="space-y-4">
           <CareerTimeline warrior={warrior} arenaHistory={state.arenaHistory} />
-          <WarriorFightHistory warriorName={warrior.name} arenaHistory={state.arenaHistory} />
+          <WarriorFightHistory warriorName={displayWarrior.name} arenaHistory={state.arenaHistory} />
         </div>
       )}
     </div>
