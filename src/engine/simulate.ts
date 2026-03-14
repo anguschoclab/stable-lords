@@ -59,13 +59,13 @@ const STYLE_ORDER = [
 // - SL vs WS: +1 → 0 (reduced SL dominance over WS)
 const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [ 0,  0,  0,  0, -1,  0,  0,  0, +1,  0], // AB: only edge vs TP, weak vs PR
-  [ 0,  0,  0, +1, +1,  0, +1, +1,  0,  0], // BA: edge vs SL/ST/PL/PR — power overwhelms counters
+  [ 0,  0,  0,  0, +1,  0,  0,  0, +1,  0], // AB: precision reads counters — edge vs PR/TP
+  [ 0,  0,  0, +1, +1,  0, +1, +1,  0,  0], // BA: power overwhelms — edge vs SL/ST/PL/PR
   [ 0,  0,  0, +1, +1, -1,  0,  0, +1, -1], // LU: speed beats PL/TP/PR, weak vs PS/WS
   [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0], // PL: weak vs BA/LU/ST
-  [+1,  0,  0,  0,  0,  0,  0, -1,  0,  0], // PR: edge vs AB (reads precision), weak vs ST
+  [-1, -1,  0,  0,  0,  0,  0, -1,  0, -1], // PR: weak vs AB/BA/ST/WS — counter style needs the right matchup
   [ 0,  0, +1,  0,  0,  0,  0, -1,  0, -1], // PS: beats LU, loses to ST/WS
-  [ 0, -1,  0,  0,  0,  0,  0,  0, +1,  0], // SL: beats TP, weak vs BA, neutral vs WS
+  [ 0, -1,  0,  0,  0,  0,  0,  0, +1,  0], // SL: beats TP, weak vs BA
   [ 0, -1, +1, +1, +1, +1,  0,  0, +1,  0], // ST: power beats LU/PL/PR/PS/TP, weak vs BA
   [-1,  0, -1,  0,  0,  0, -1, -1,  0,  0], // TP: weak vs AB/LU/SL/ST
   [ 0,  0, +1,  0, +1, +1,  0,  0,  0,  0], // WS: zone control, beats LU/PS/PR
