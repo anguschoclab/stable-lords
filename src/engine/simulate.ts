@@ -14,6 +14,7 @@ import {
   type FightOutcome,
   type MinuteEvent,
   type BaseSkills,
+  type Attributes,
   type DerivedStats,
   type TrainerData,
   type OffensiveTactic,
@@ -198,6 +199,7 @@ function resolveEffectiveTactics(plan: FightPlan, phaseKey: "opening" | "mid" | 
 
 // ─── Fighter State ────────────────────────────────────────────────────────
 interface FighterState {
+  attributes: Attributes;
   label: string; // "A" or "D"
   style: FightingStyle;
   skills: BaseSkills;
@@ -542,14 +544,14 @@ export function simulateFight(
 
   // Fighter state
   const fA: FighterState = {
-    label: "A", style: planA.style, skills: effSkillsA, derived: { ...derivedA, damage: derivedA.damage + equipA.dmgMod }, plan: planA,
+    label: "A", attributes: attrsA, style: planA.style, skills: effSkillsA, derived: { ...derivedA, damage: derivedA.damage + equipA.dmgMod }, plan: planA,
     hp: derivedA.hp, maxHp: derivedA.hp,
     endurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
     maxEndurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
     hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0, armHits: 0, legHits: 0,
   };
   const fD: FighterState = {
-    label: "D", style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
+    label: "D", attributes: attrsD, style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
     hp: derivedD.hp, maxHp: derivedD.hp,
     endurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
     maxEndurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
