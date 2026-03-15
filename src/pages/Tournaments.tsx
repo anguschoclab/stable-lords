@@ -11,7 +11,7 @@ import { STYLE_DISPLAY_NAMES, BASE_ROSTER_CAP } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward } from "lucide-react";
+import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward, Shield } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
@@ -41,6 +41,9 @@ export default function Tournaments() {
     () => state.tournaments.find((t) => t.season === state.season && !t.completed),
     [state.tournaments, state.season]
   );
+
+  const activeWarriors = useMemo(() => state.roster.filter((w) => w.status === "Active"), [state.roster]);
+  const canStart = !currentTournament && activeWarriors.length >= 2;
 
   const pastTournaments = useMemo(
     () => state.tournaments.filter((t) => t.completed).reverse(),

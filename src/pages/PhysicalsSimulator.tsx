@@ -9,8 +9,8 @@ import { FightingStyle, STYLE_DISPLAY_NAMES, STYLE_ABBREV } from '@/types/game';
 import { computeWarriorStats } from '@/engine/skillCalc';
 
 export default function PhysicalsSimulator() {
-  const [styleA, setStyleA] = useState<FightingStyle>("Bash Artist");
-  const [styleB, setStyleB] = useState<FightingStyle>("Parry Riposte");
+  const [styleA, setStyleA] = useState<FightingStyle>(FightingStyle.BashingAttack);
+  const [styleB, setStyleB] = useState<FightingStyle>(FightingStyle.ParryRiposte);
 
   const [statsA, setStatsA] = useState({ strength: 10, quickness: 10, vitality: 10 });
   const [statsB, setStatsB] = useState({ strength: 10, quickness: 10, vitality: 10 });
@@ -18,11 +18,11 @@ export default function PhysicalsSimulator() {
   // Simulate 10 minutes of intense combat (10 exchanges, 2 actions per minute each)
   const simulation = useMemo(() => {
     // Generate mock warriors for calculation
-    const wA = { id: 'A', name: 'Fighter A', style: styleA, attr: statsA, career: { wins: 0, losses: 0, kills: 0 }, skills: { [styleA]: 20 }, fame: 10, tags: [], status: 'Active', popularAppeal: 10, birthWeek: 1, potential: 100, injuries: [], contractCost: 10 };
-    const wB = { id: 'B', name: 'Fighter B', style: styleB, attr: statsB, career: { wins: 0, losses: 0, kills: 0 }, skills: { [styleB]: 20 }, fame: 10, tags: [], status: 'Active', popularAppeal: 10, birthWeek: 1, potential: 100, injuries: [], contractCost: 10 };
+    const wA = { id: 'A', name: 'Fighter A', style: styleA, attr: { ST: statsA.strength, SP: statsA.quickness, CN: statsA.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 }, career: { wins: 0, losses: 0, kills: 0 }, skills: { [styleA]: 20 }, fame: 10, tags: [], status: 'Active', popularAppeal: 10, birthWeek: 1, potential: 100, injuries: [], contractCost: 10 };
+    const wB = { id: 'B', name: 'Fighter B', style: styleB, attr: { ST: statsB.strength, SP: statsB.quickness, CN: statsB.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 }, career: { wins: 0, losses: 0, kills: 0 }, skills: { [styleB]: 20 }, fame: 10, tags: [], status: 'Active', popularAppeal: 10, birthWeek: 1, potential: 100, injuries: [], contractCost: 10 };
 
-    const calcA = computeWarriorStats(wA as any);
-    const calcB = computeWarriorStats(wB as any);
+    const calcA = computeWarriorStats(wA.attr, wA.style);
+    const calcB = computeWarriorStats(wB.attr, wB.style);
 
     let endA = calcA.endurance;
     let endB = calcB.endurance;

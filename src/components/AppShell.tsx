@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper, Crown, Shield, BarChart3, Target, Award, BookOpen, Eye, Landmark, Settings, Users, Code, DownloadCloud, Activity } from "lucide-react";
+import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper, Crown, Shield, BarChart3, Target, Award, BookOpen, Eye, Landmark, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/state/GameContext";
 import { Badge } from "@/components/ui/badge";
@@ -50,11 +50,7 @@ const navItems = [
   { to: "/style-guide", label: "Style Guide", icon: BookOpen },
   { to: "/design-bible", label: "Design Bible", icon: BookOpen },
   { to: "/physicals-simulator", label: "Physicals", icon: Zap },
-  { to: "/mods", label: "Mods", icon: Code },
-  { to: "/import-export", label: "Import", icon: DownloadCloud },
-  { to: "/telemetry", label: "Logs", icon: Activity },
   { to: "/admin-tools", label: "Admin Tools", icon: Settings },
-  { to: "/settings", label: "Settings", icon: Settings },
   { to: "/help", label: "Help", icon: HelpCircle },
 ];
 
