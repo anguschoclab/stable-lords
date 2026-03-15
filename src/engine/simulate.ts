@@ -36,13 +36,18 @@ import {
 } from "./narrativePBP";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
-/**
- * Creates a seeded pseudo-random number generator (PRNG) using the mulberry32 algorithm.
- * Provides deterministic randomness for fight simulations.
- *
- * @param seed - The initial seed value.
- * @returns A function that generates a pseudo-random float between 0 (inclusive) and 1 (exclusive).
- */
+// ─── High-Performance Secure PRNG Seed ────────────────────────────────────
+const secureSeedPool = new Uint32Array(256);
+let secureSeedIndex = 256;
+
+function getSecureSeed(): number {
+  if (secureSeedIndex >= 256) {
+    globalThis.crypto.getRandomValues(secureSeedPool);
+    secureSeedIndex = 0;
+  }
+  return secureSeedPool[secureSeedIndex++];
+}
+
 function mulberry32(seed: number) {
   return () => {
     seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -411,7 +416,7 @@ function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
 
 // ─── Trainer Bonuses ──────────────────────────────────────────────────────
 function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
-  const bonus = getTrainingBonus(trainers as any, style);
+  const bonus = getTrainingBonus(trainers as TrainerData[], style);
   return {
     attMod: bonus.Aggression,                  // Aggression → ATT
     parMod: Math.floor(bonus.Defense * 0.6),   // Defense → PAR
@@ -477,7 +482,7 @@ export function simulateFight(
   seed?: number,
   trainers?: TrainerData[]
 ): FightOutcome {
-  const rng = mulberry32(seed ?? (Date.now() ^ Math.floor(Math.random() * 1e9)));
+  const rng = mulberry32(seed ?? (Date.now() ^ getSecureSeed()));
 
   // Compute skills from warriors or generate defaults
   const attrsA = warriorA?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
