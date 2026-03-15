@@ -57,9 +57,12 @@ function pairingScore(
   }
 
   // Style diversity bonus — +20 if this style matchup hasn't occurred in last 4 weeks
-  const recentStylePairs = recentHistory
-    .filter(f => f.week >= week - 4)
-    .map(f => `${f.styleA}|${f.styleD}`);
+  const recentStylePairs = recentHistory.reduce((acc, f) => {
+    if (f.week >= week - 4) {
+      acc.push(`${f.styleA}|${f.styleD}`);
+    }
+    return acc;
+  }, [] as string[]);
   const thisPair = `${p.style}|${r.style}`;
   const reversePair = `${r.style}|${p.style}`;
   if (!recentStylePairs.includes(thisPair) && !recentStylePairs.includes(reversePair)) {

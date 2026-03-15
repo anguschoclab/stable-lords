@@ -41,16 +41,19 @@ interface StyleKillStats {
 /* ── Data Extraction ─────────────────────────────────────── */
 
 function extractKills(fights: FightSummary[]): KillRecord[] {
-  return fights
-    .filter(f => f.by === "Kill" && f.winner)
-    .map(f => ({
-      week: f.week,
-      killer: f.winner === "A" ? f.a : f.d,
-      killerStyle: f.winner === "A" ? f.styleA : f.styleD,
-      victim: f.winner === "A" ? f.d : f.a,
-      victimStyle: f.winner === "A" ? f.styleD : f.styleA,
-      fightId: f.id,
-    }));
+  return fights.reduce((acc, f) => {
+    if (f.by === "Kill" && f.winner) {
+      acc.push({
+        week: f.week,
+        killer: f.winner === "A" ? f.a : f.d,
+        killerStyle: f.winner === "A" ? f.styleA : f.styleD,
+        victim: f.winner === "A" ? f.d : f.a,
+        victimStyle: f.winner === "A" ? f.styleD : f.styleA,
+        fightId: f.id,
+      });
+    }
+    return acc;
+  }, [] as KillRecord[]);
 }
 
 function extractLocationData(fights: FightSummary[]): LocationBreakdown[] {
@@ -145,7 +148,8 @@ function KillTrendChart({ points }: { points: { week: number; cumulative: number
         return <line key={pct} x1={pad.l} y1={y} x2={w - pad.r} y2={y} stroke="hsl(var(--border))" strokeWidth="0.3" />;
       })}
       <path d={pathD} fill="none" stroke="hsl(var(--destructive))" strokeWidth="2" />
-      {points.filter((_, i) => i === 0 || i === points.length - 1).map((p, i) => {
+      {[points[0], points[points.length - 1]].map((p, i) => {
+        if (!p) return null;
         const x = pad.l + ((points.indexOf(p)) / (points.length - 1)) * cw;
         const y = pad.t + ch - (p.cumulative / max) * ch;
         return <circle key={i} cx={x} cy={y} r="3" fill="hsl(var(--destructive))" />;
@@ -314,11 +318,12 @@ export default function KillAnalytics() {
               <p className="text-[10px] text-muted-foreground font-mono">Kills vs deaths by fighting style</p>
             </CardHeader>
             <CardContent className="space-y-3">
-              {styleStats.filter(s => s.kills > 0 || s.deaths > 0).map(s => {
+              {styleStats.reduce((acc, s) => {
+              if (s.kills > 0 || s.deaths > 0) {
                 const maxKD = Math.max(...styleStats.map(x => x.kills + x.deaths), 1);
                 const killWidth = (s.kills / maxKD) * 100;
                 const deathWidth = (s.deaths / maxKD) * 100;
-                return (
+                acc.push(
                   <div key={s.style} className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-display text-foreground">
@@ -336,7 +341,9 @@ export default function KillAnalytics() {
                     </div>
                   </div>
                 );
-              })}
+              }
+              return acc;
+            }, [] as React.ReactNode[])}
             </CardContent>
           </Card>
 

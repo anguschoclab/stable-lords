@@ -233,15 +233,20 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
         {/* Burn Warnings */}
         {burns.filter(b => b.severity !== "low").length > 0 && (
           <div className="mt-3 pt-2 border-t border-border/50 space-y-1">
-            {burns.filter(b => b.severity !== "low").map((b, i) => (
-              <div key={i} className={`flex items-center gap-2 text-[10px] ${
-                b.severity === "high" ? "text-destructive" : "text-amber-500"
-              }`}>
-                <AlertTriangle className="h-3 w-3 shrink-0" />
-                <span className="font-medium">{ATTRIBUTE_LABELS[b.attribute]}:</span>
-                <span>{b.reason}</span>
-              </div>
-            ))}
+            {burns.reduce((acc, b, i) => {
+              if (b.severity !== "low") {
+                acc.push(
+                  <div key={i} className={`flex items-center gap-2 text-[10px] ${
+                    b.severity === "high" ? "text-destructive" : "text-amber-500"
+                  }`}>
+                    <AlertTriangle className="h-3 w-3 shrink-0" />
+                    <span className="font-medium">{ATTRIBUTE_LABELS[b.attribute]}:</span>
+                    <span>{b.reason}</span>
+                  </div>
+                );
+              }
+              return acc;
+            }, [] as React.ReactNode[])}
           </div>
         )}
       </CardContent>

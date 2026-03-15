@@ -316,7 +316,12 @@ export default function Tournaments() {
         items: [
           `🏆 ${champion} is crowned champion of the ${updatedTournament.name}!`,
           `${tourneyFights.length} bouts fought across ${currentRound} rounds.`,
-          ...tourneyFights.filter(f => f.by === "Kill").map(f => `☠️ ${f.winner === "A" ? f.a : f.d} slew ${f.winner === "A" ? f.d : f.a} during the tournament.`),
+          ...tourneyFights.reduce((acc, f) => {
+          if (f.by === "Kill") {
+            acc.push(`☠️ ${f.winner === "A" ? f.a : f.d} slew ${f.winner === "A" ? f.d : f.a} during the tournament.`);
+          }
+          return acc;
+        }, [] as string[]),
         ],
       }];
     } else {

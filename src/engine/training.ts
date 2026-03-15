@@ -261,7 +261,12 @@ export function processTraining(state: GameState): GameState {
   }
 
   // Build newsletter
-  const newsItems = results.filter(r => r.type !== "blocked").map(r => r.message);
+  const newsItems = results.reduce((acc, r) => {
+    if (r.type !== "blocked") {
+      acc.push(r.message);
+    }
+    return acc;
+  }, [] as string[]);
   const newsletter = newsItems.length > 0
     ? [...state.newsletter, { week: state.week, title: "Training Report", items: newsItems }]
     : state.newsletter;
