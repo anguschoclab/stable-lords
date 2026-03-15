@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart, ChevronDown } from "lucide-react";
+import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart, ChevronDown, Crosshair, Ban, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -115,7 +115,47 @@ export default function RunRound() {
     toast(`${stopEmoji[result.stopReason] ?? "⏹"} Autosim stopped after ${result.weeksSimmed} week(s): ${result.stopDetail}`);
   }, [autosimming, running, state, setState]);
 
+
   const activeRivalries = (state.rivalries || []).filter(r => r.intensity > 0);
+
+  const availableRivals = useMemo(() => {
+    const list: { id: string; name: string; isStable: boolean; stableName?: string }[] = [];
+    for (const r of state.rivals || []) {
+      list.push({ id: r.owner.id, name: r.owner.stableName, isStable: true });
+      for (const w of r.roster) {
+        if (w.status === "Active") {
+          list.push({ id: w.id, name: w.name, isStable: false, stableName: r.owner.stableName });
+        }
+      }
+    }
+    return list.sort((a, b) => a.name.localeCompare(b.name));
+  }, [state.rivals]);
+
+  const [challengeSelection, setChallengeSelection] = useState<string>("");
+  const [avoidSelection, setAvoidSelection] = useState<string>("");
+
+  const addChallenge = useCallback(() => {
+    if (!challengeSelection) return;
+    if (state.playerChallenges?.includes(challengeSelection)) return;
+    setState({ ...state, playerChallenges: [...(state.playerChallenges || []), challengeSelection] });
+    setChallengeSelection("");
+  }, [challengeSelection, state, setState]);
+
+  const addAvoid = useCallback(() => {
+    if (!avoidSelection) return;
+    if (state.playerAvoids?.includes(avoidSelection)) return;
+    setState({ ...state, playerAvoids: [...(state.playerAvoids || []), avoidSelection] });
+    setAvoidSelection("");
+  }, [avoidSelection, state, setState]);
+
+  const removeChallenge = useCallback((id: string) => {
+    setState({ ...state, playerChallenges: (state.playerChallenges || []).filter(x => x !== id) });
+  }, [state, setState]);
+
+  const removeAvoid = useCallback((id: string) => {
+    setState({ ...state, playerAvoids: (state.playerAvoids || []).filter(x => x !== id) });
+  }, [state, setState]);
+
 
   return (
     <div className="space-y-6">
@@ -302,7 +342,95 @@ export default function RunRound() {
         </Card>
       )}
 
+
+      {/* Challenge / Avoid Assistant */}
+      {!running && !autosimming && results.length === 0 && matchCard.length > 0 && (
+        <Card className="border-primary/20">
+          <CardContent className="p-4 space-y-4">
+            <h3 className="text-sm font-semibold flex items-center gap-1.5">
+              <Crosshair className="h-4 w-4 text-primary" /> Challenge / Avoid Assistant
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Direct your stable's matchmaking focus. The arena booking agent will heavily prioritize challenges and try to honor avoid requests, though no match is guaranteed.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <div className="text-xs font-semibold text-arena-pop">Challenges (Prioritize)</div>
+                <div className="flex gap-2">
+                  <select
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    value={challengeSelection}
+                    onChange={e => setChallengeSelection(e.target.value)}
+                  >
+                    <option value="">Select target to challenge...</option>
+                    {availableRivals.map(r => (
+                      <option key={r.id} value={r.id}>
+                        {r.isStable ? `[Stable] ${r.name}` : `${r.name} (${r.stableName})`}
+                      </option>
+                    ))}
+                  </select>
+                  <Button variant="secondary" size="sm" onClick={addChallenge}>Add</Button>
+                </div>
+                {state.playerChallenges && state.playerChallenges.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {state.playerChallenges.map(id => {
+                      const entity = availableRivals.find(r => r.id === id);
+                      return (
+                        <Badge key={id} variant="outline" className="gap-1.5 text-xs">
+                          <Crosshair className="h-3 w-3 text-arena-pop" />
+                          {entity ? (entity.isStable ? `[Stable] ${entity.name}` : entity.name) : id}
+                          <button onClick={() => removeChallenge(id)} className="text-muted-foreground hover:text-destructive ml-1">
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-xs font-semibold text-destructive">Avoid (Penalize)</div>
+                <div className="flex gap-2">
+                  <select
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    value={avoidSelection}
+                    onChange={e => setAvoidSelection(e.target.value)}
+                  >
+                    <option value="">Select target to avoid...</option>
+                    {availableRivals.map(r => (
+                      <option key={r.id} value={r.id}>
+                        {r.isStable ? `[Stable] ${r.name}` : `${r.name} (${r.stableName})`}
+                      </option>
+                    ))}
+                  </select>
+                  <Button variant="secondary" size="sm" onClick={addAvoid}>Add</Button>
+                </div>
+                {state.playerAvoids && state.playerAvoids.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {state.playerAvoids.map(id => {
+                      const entity = availableRivals.find(r => r.id === id);
+                      return (
+                        <Badge key={id} variant="outline" className="gap-1.5 text-xs">
+                          <Ban className="h-3 w-3 text-destructive" />
+                          {entity ? (entity.isStable ? `[Stable] ${entity.name}` : entity.name) : id}
+                          <button onClick={() => removeAvoid(id)} className="text-muted-foreground hover:text-destructive ml-1">
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Pre-Bout Match Card */}
+
       {results.length === 0 && matchCard.length > 0 && (
         <Card>
           <CardContent className="p-4 space-y-3">

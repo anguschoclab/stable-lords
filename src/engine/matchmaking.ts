@@ -34,7 +34,9 @@ function pairingScore(
   p: Warrior, r: Warrior, rivalStableId: string,
   rivalries: Rivalry[], matchHistory: MatchRecord[],
   playerStableId: string, week: number, rng: () => number,
-  recentHistory: FightSummary[]
+  recentHistory: FightSummary[],
+  playerChallenges: string[] = [],
+  playerAvoids: string[] = []
 ): number {
   let score = 100;
 
@@ -69,11 +71,22 @@ function pairingScore(
     score += 20;
   }
 
+
   // Repeat penalty — -100 if fought in last 2 weeks
   const recentMatch = matchHistory.some(m =>
     m.playerWarriorId === p.id && m.opponentWarriorId === r.id && m.week >= week - 2
   );
   if (recentMatch) score -= 100;
+
+  // Challenge / Avoid Assistant modifiers
+  // Extremely heavy weights so they basically override other considerations if possible
+  if (playerChallenges.includes(r.id) || playerChallenges.includes(rivalStableId)) {
+    score += 500;
+  }
+  if (playerAvoids.includes(r.id) || playerAvoids.includes(rivalStableId)) {
+    score -= 500;
+  }
+
 
   // Random jitter (0-15)
   score += Math.floor(rng() * 16);
@@ -127,7 +140,9 @@ export function generateMatchCard(state: GameState): MatchPairing[] {
       const s = pairingScore(
         pw, rc.warrior, rc.stable.owner.id,
         rivalries, matchHistory, state.player.id, state.week, rng,
-        state.arenaHistory
+        state.arenaHistory,
+        state.playerChallenges,
+        state.playerAvoids
       );
       if (s > bestScore) { bestScore = s; bestCandidate = rc; }
     }
