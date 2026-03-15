@@ -74,6 +74,7 @@ const styleGuideRoute = new Route({ getParentRoute: () => rootRoute, path: "/sty
 const arenaHubRoute = new Route({ getParentRoute: () => rootRoute, path: "/arena-hub", component: ArenaHub });
 const stableLedgerRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-ledger", component: StableLedger });
 const stableHallRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-hall", component: StableHall });
+const schedulingAssistantRoute = new Route({ getParentRoute: () => rootRoute, path: "/scheduling-assistant", component: SchedulingAssistant });
 
 
 const ownersRoute = new Route({ getParentRoute: () => rootRoute, path: "/owners", component: Owners });
