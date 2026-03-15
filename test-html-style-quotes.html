@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div class="test">Test</div>
+  <style>
+    .test {
+      content: &quot;hello&quot;;
+    }
+  </style>
+  <script>
+    console.log(window.getComputedStyle(document.querySelector('.test'), '::before').content);
+  </script>
+</body>
+</html>
