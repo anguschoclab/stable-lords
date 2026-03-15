@@ -370,3 +370,44 @@ describe("Rivalry-Weighted Booking", () => {
     expect(hasRivalryCoverage).toBe(true);
   });
 });
+
+
+describe("Challenge / Avoid Assistant", () => {
+  it("prioritizes challenged warriors regardless of other factors", () => {
+    const state = createMockGameState();
+    state.week = 10;
+    state.roster = [createWarrior("w1", { fame: 10 })];
+
+    // r1 is perfect fame match. r2 is terrible match but is challenged.
+    state.rivals = [
+      createRivalStable("s1", "S1", [createWarrior("r1", { fame: 10 })]),
+      createRivalStable("s2", "S2", [createWarrior("r2", { fame: 100 })]),
+    ];
+
+    // Ordinarily w1 pairs with r1. But we challenge r2.
+    state.playerChallenges = ["r2"];
+
+    const card = generateMatchCard(state);
+    expect(card.length).toBe(1);
+    expect(card[0].rivalWarrior.id).toBe("r2");
+  });
+
+  it("avoids avoided warriors", () => {
+    const state = createMockGameState();
+    state.week = 10;
+    state.roster = [createWarrior("w1", { fame: 10 })];
+
+    // r1 is perfect fame match. r2 is terrible match.
+    state.rivals = [
+      createRivalStable("s1", "S1", [createWarrior("r1", { fame: 10 })]),
+      createRivalStable("s2", "S2", [createWarrior("r2", { fame: 100 })]),
+    ];
+
+    // Ordinarily w1 pairs with r1. But we avoid r1.
+    state.playerAvoids = ["r1"];
+
+    const card = generateMatchCard(state);
+    expect(card.length).toBe(1);
+    expect(card[0].rivalWarrior.id).toBe("r2");
+  });
+});

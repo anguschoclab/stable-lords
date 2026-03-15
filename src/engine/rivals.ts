@@ -182,7 +182,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [3, 4],
-    metaAdaptation: "Traditionalist", // Stubborn survivors
+    metaAdaptation: "Opportunist", // Will adapt to survive
   },
   {
     stableName: "Storm Breakers",
@@ -246,7 +246,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [7, 10],
     tier: "Established",
     trainerRange: [2, 4],
-    metaAdaptation: "Traditionalist", // Only knows brute force
+    metaAdaptation: "MetaChaser", // Wants whatever kills fastest
   },
   {
     stableName: "Scarlet Masquerade",
@@ -344,7 +344,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
-    metaAdaptation: "Traditionalist", // Big and stubborn
+    metaAdaptation: "Innovator", // Big and constantly trying weird builds
   },
   {
     stableName: "Red Dust Wanderers",
@@ -360,7 +360,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     rosterRange: [6, 9],
     tier: "Minor",
     trainerRange: [2, 3],
-    metaAdaptation: "Traditionalist", // Nomads stick to their ways
+    metaAdaptation: "Opportunist", // Scavenges what works
   },
   {
     stableName: "The Hollow Men",

@@ -28,7 +28,13 @@ import StyleGuide from "@/pages/StyleGuide";
 import ArenaHub from "@/pages/ArenaHub";
 import StableLedger from "@/pages/StableLedger";
 import StableHall from "@/pages/StableHall";
-import SchedulingAssistant from "@/pages/SchedulingAssistant";
+import Owners from "@/pages/Owners";
+import ArchivesStyles from "@/pages/ArchivesStyles";
+import Settings from "@/pages/Settings";
+import Mods from "@/pages/Mods";
+import ImportExport from "@/pages/ImportExport";
+import Telemetry from "@/pages/Telemetry";
+
 
 // Create a root route
 const rootRoute = new RootRoute({
@@ -70,6 +76,14 @@ const stableLedgerRoute = new Route({ getParentRoute: () => rootRoute, path: "/s
 const stableHallRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-hall", component: StableHall });
 const schedulingAssistantRoute = new Route({ getParentRoute: () => rootRoute, path: "/scheduling-assistant", component: SchedulingAssistant });
 
+
+const ownersRoute = new Route({ getParentRoute: () => rootRoute, path: "/owners", component: Owners });
+const archivesStylesRoute = new Route({ getParentRoute: () => rootRoute, path: "/archives/styles", component: ArchivesStyles });
+const settingsRoute = new Route({ getParentRoute: () => rootRoute, path: "/settings", component: Settings });
+const modsRoute = new Route({ getParentRoute: () => rootRoute, path: "/mods", component: Mods });
+const importExportRoute = new Route({ getParentRoute: () => rootRoute, path: "/import-export", component: ImportExport });
+const telemetryRoute = new Route({ getParentRoute: () => rootRoute, path: "/telemetry", component: Telemetry });
+
 // Create the route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -99,7 +113,13 @@ const routeTree = rootRoute.addChildren([
   arenaHubRoute,
   stableLedgerRoute,
   stableHallRoute,
-  schedulingAssistantRoute,
+
+  ownersRoute,
+  archivesStylesRoute,
+  settingsRoute,
+  modsRoute,
+  importExportRoute,
+  telemetryRoute,
 ]);
 
 // Create the router

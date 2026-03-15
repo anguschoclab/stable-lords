@@ -523,6 +523,8 @@ export interface GameState {
   restStates: RestState[];
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
+  playerChallenges: string[]; // IDs of rival warriors or stables to prioritize
+  playerAvoids: string[]; // IDs of rival warriors or stables to avoid
   recruitPool: PoolWarrior[]; // from recruitment engine
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
