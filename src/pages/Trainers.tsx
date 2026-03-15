@@ -109,8 +109,8 @@ export default function Trainers() {
   const { state, setState } = useGame();
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
-  const currentTrainers = state.trainers ?? [];
-  const hiringPool = state.hiringPool ?? [];
+  const currentTrainers = useMemo(() => state.trainers ?? [], [state.trainers]);
+  const hiringPool = useMemo(() => state.hiringPool ?? [], [state.hiringPool]);
   const canHire = currentTrainers.length < TRAINER_MAX_PER_STABLE;
 
   // Auto-populate hiring pool on first visit if empty
@@ -174,12 +174,12 @@ export default function Trainers() {
       });
       toast.success(`${trainer.name} has joined your stable! (-${cost}g)`);
     },
-    [state, setState, canHire]
+    [state, setState, canHire, currentTrainers, hiringPool]
   );
 
   const fireTrainer = useCallback(
     (trainerId: string) => {
-      const currentTrainers = state.trainers ?? [];
+
       const trainer = currentTrainers.find((t) => t.id === trainerId);
       setState({
         ...state,
@@ -187,7 +187,7 @@ export default function Trainers() {
       });
       if (trainer) toast.success(`${trainer.name} has been released.`);
     },
-    [state, setState]
+    [state, setState, currentTrainers]
   );
 
   const convertableRetired = useMemo(

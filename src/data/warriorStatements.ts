@@ -217,8 +217,8 @@ function getQuicknessStatement(defBase: number, parBase: number, wt: number): st
     return "Is very slow on his feet";
   }
 
-  let speed = "";
-  let qualifier = "";
+  let speed;
+  let qualifier;
 
   if (defBase >= 35) {
     speed = "is incredibly quick and elusive on his feet";
