@@ -145,9 +145,10 @@ export default function StartGame() {
 
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Your Name</label>
+                  <label htmlFor="owner-name" className="text-sm font-medium">Your Name</label>
                   <div className="flex gap-1.5">
                     <Input
+                      id="owner-name"
                       placeholder="Enter your name"
                       value={ownerName}
                       onChange={(e) => setOwnerName(e.target.value)}
@@ -161,6 +162,7 @@ export default function StartGame() {
                       type="button"
                       onClick={() => setOwnerName(randomOwnerName())}
                       title="Random name"
+                      aria-label="Randomize your name"
                       className="shrink-0"
                     >
                       <Dices className="h-4 w-4" />
@@ -168,9 +170,10 @@ export default function StartGame() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Stable Name</label>
+                  <label htmlFor="stable-name" className="text-sm font-medium">Stable Name</label>
                   <div className="flex gap-1.5">
                     <Input
+                      id="stable-name"
                       placeholder="e.g. The Iron Wolves, House of Blades"
                       value={stableName}
                       onChange={(e) => setStableName(e.target.value)}
@@ -183,6 +186,7 @@ export default function StartGame() {
                       type="button"
                       onClick={() => setStableName(randomStableName())}
                       title="Random name"
+                      aria-label="Randomize stable name"
                       className="shrink-0"
                     >
                       <Dices className="h-4 w-4" />
@@ -313,6 +317,7 @@ export default function StartGame() {
                             toast.success("Save exported!");
                           }}
                           title="Export save"
+                          aria-label={`Export save for ${slot.stableName}`}
                         >
                           <Download className="h-3.5 w-3.5" />
                         </Button>
@@ -325,6 +330,7 @@ export default function StartGame() {
                             setDeleteTarget(slot);
                           }}
                           title="Delete save"
+                          aria-label={`Delete save for ${slot.stableName}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
