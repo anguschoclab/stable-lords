@@ -28,6 +28,7 @@ import StyleGuide from "@/pages/StyleGuide";
 import ArenaHub from "@/pages/ArenaHub";
 import StableLedger from "@/pages/StableLedger";
 import StableHall from "@/pages/StableHall";
+import SchedulingAssistant from "@/pages/SchedulingAssistant";
 
 // Create a root route
 const rootRoute = new RootRoute({
@@ -67,6 +68,7 @@ const styleGuideRoute = new Route({ getParentRoute: () => rootRoute, path: "/sty
 const arenaHubRoute = new Route({ getParentRoute: () => rootRoute, path: "/arena-hub", component: ArenaHub });
 const stableLedgerRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-ledger", component: StableLedger });
 const stableHallRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-hall", component: StableHall });
+const schedulingAssistantRoute = new Route({ getParentRoute: () => rootRoute, path: "/scheduling-assistant", component: SchedulingAssistant });
 
 // Create the route tree
 const routeTree = rootRoute.addChildren([
@@ -97,6 +99,7 @@ const routeTree = rootRoute.addChildren([
   arenaHubRoute,
   stableLedgerRoute,
   stableHallRoute,
+  schedulingAssistantRoute,
 ]);
 
 // Create the router
