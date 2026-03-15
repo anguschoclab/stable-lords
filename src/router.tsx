@@ -15,6 +15,9 @@ import StableDetail from "@/pages/StableDetail";
 import WorldOverview from "@/pages/WorldOverview";
 import NotFound from "./pages/NotFound";
 import Gazette from "@/pages/Gazette";
+import DesignBible from "@/pages/DesignBible";
+import PhysicalsSimulator from "@/pages/PhysicalsSimulator";
+import AdminTools from "@/pages/AdminTools";
 import HallOfFame from "@/pages/HallOfFame";
 import KillAnalytics from "@/pages/KillAnalytics";
 import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
@@ -51,6 +54,9 @@ const helpRoute = new Route({ getParentRoute: () => rootRoute, path: "/help", co
 const warriorDetailRoute = new Route({ getParentRoute: () => rootRoute, path: "/warrior/$id", component: WarriorDetail });
 const hallOfFightsRoute = new Route({ getParentRoute: () => rootRoute, path: "/hall-of-fights", component: HallOfFights });
 const gazetteRoute = new Route({ getParentRoute: () => rootRoute, path: "/gazette", component: Gazette });
+const designBibleRoute = new Route({ getParentRoute: () => rootRoute, path: "/design-bible", component: DesignBible });
+const physicalsSimulatorRoute = new Route({ getParentRoute: () => rootRoute, path: "/physicals-simulator", component: PhysicalsSimulator });
+const adminToolsRoute = new Route({ getParentRoute: () => rootRoute, path: "/admin-tools", component: AdminTools });
 const hallOfFameRoute = new Route({ getParentRoute: () => rootRoute, path: "/hall-of-fame", component: HallOfFame });
 const killAnalyticsRoute = new Route({ getParentRoute: () => rootRoute, path: "/kill-analytics", component: KillAnalytics });
 const equipmentOptimizerRoute = new Route({ getParentRoute: () => rootRoute, path: "/equipment-optimizer", component: EquipmentOptimizerPage });
@@ -78,6 +84,9 @@ const routeTree = rootRoute.addChildren([
   warriorDetailRoute,
   hallOfFightsRoute,
   gazetteRoute,
+  designBibleRoute,
+  physicalsSimulatorRoute,
+  adminToolsRoute,
   hallOfFameRoute,
   killAnalyticsRoute,
   equipmentOptimizerRoute,

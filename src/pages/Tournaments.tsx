@@ -11,10 +11,13 @@ import { STYLE_DISPLAY_NAMES, BASE_ROSTER_CAP } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward } from "lucide-react";
+import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward, Shield } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertCircle } from "lucide-react";
 
 const SEASON_NAMES: Record<string, string> = {
   Spring: "Spring Classic",
@@ -32,6 +35,7 @@ const SEASON_ICONS: Record<string, string> = {
 
 export default function Tournaments() {
   const { state, setState } = useGame();
+  const [prepModeOpen, setPrepModeOpen] = useState(false);
 
   const currentTournament = useMemo(
     () => state.tournaments.find((t) => t.season === state.season && !t.completed),
@@ -43,7 +47,7 @@ export default function Tournaments() {
     [state.tournaments]
   );
 
-  const canStart = !currentTournament && state.roster.filter((w) => w.status === "Active").length >= 2;
+
 
   const startTournament = useCallback(() => {
     const active = state.roster.filter((w) => w.status === "Active");
@@ -473,9 +477,55 @@ export default function Tournaments() {
           )}
         </div>
         {canStart ? (
-          <Button onClick={startTournament} className="gap-2">
-            <Trophy className="h-4 w-4" /> Start {SEASON_NAMES[state.season]}
-          </Button>
+
+          <Dialog open={prepModeOpen} onOpenChange={setPrepModeOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2 border-primary/50 text-primary hover:bg-primary/10">
+                <Shield className="h-4 w-4" /> Prep Mode
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="font-display text-xl flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" /> Tournament Prep Mode
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="text-sm text-muted-foreground bg-secondary/30 p-3 rounded-lg border border-border">
+                  Review your active roster before committing to the {SEASON_NAMES[state.season]}.
+                  Ensure fame limits (FE Freeze) and equipment classes are set.
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+                  {activeWarriors.map((w) => (
+                    <Card key={w.id} className="border-border">
+                      <CardHeader className="p-3 pb-2 border-b border-border bg-secondary/10 flex flex-row items-center justify-between">
+                        <div className="font-display font-semibold text-sm">{w.name}</div>
+                        <Badge variant="outline" className="text-[10px]">{STYLE_DISPLAY_NAMES[w.style]}</Badge>
+                      </CardHeader>
+                      <CardContent className="p-3 space-y-2">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">Fame:</span>
+                          <span className={w.fame > 80 ? "text-destructive font-bold flex items-center gap-1" : "font-mono"}>
+                             {w.fame} {w.fame > 80 && <TooltipProvider><Tooltip><TooltipTrigger><AlertCircle className="h-3 w-3"/></TooltipTrigger><TooltipContent>Nearing FE Freeze</TooltipContent></Tooltip></TooltipProvider>}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">Record:</span>
+                          <span className="font-mono">{w.career.wins}W - {w.career.losses}L</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button onClick={() => { setPrepModeOpen(false); startTournament(); }} className="gap-2">
+                    <Trophy className="h-4 w-4" /> Start {SEASON_NAMES[state.season]}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
         ) : !currentTournament && state.roster.filter((w) => w.status === "Active").length < 2 ? (
           <Link to="/recruit">
             <Button variant="outline" className="gap-2">
