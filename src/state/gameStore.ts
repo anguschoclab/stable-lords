@@ -137,7 +137,7 @@ export function loadGameState(): GameState {
         if (!parsed.insightTokens) parsed.insightTokens = [];
         if (!parsed.moodHistory) parsed.moodHistory = [];
         // Ensure all warriors have status
-        parsed.roster = (parsed.roster || []).map((w: any) => ({
+        parsed.roster = (parsed.roster || []).map((w: Partial<Warrior>) => ({
           ...w,
           status: w.status || "Active",
         }));
@@ -208,9 +208,9 @@ export function advanceWeek(state: GameState): GameState {
   const rosterWithHealedInjuries = afterAging.roster.map((w) => {
     const injuryObjects = (w.injuries || []).filter((i): i is import("@/types/game").InjuryData => typeof i !== "string");
     if (injuryObjects.length === 0) return w;
-    const { active, healed } = tickInjuries(injuryObjects as any);
+    const { active, healed } = tickInjuries(injuryObjects);
     if (healed.length > 0) injuryNews.push(`${w.name} recovered from ${healed.join(", ")}.`);
-    return { ...w, injuries: active as any };
+    return { ...w, injuries: active };
   });
 
   let s = { ...afterAging, roster: rosterWithHealedInjuries };

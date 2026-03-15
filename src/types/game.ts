@@ -2,6 +2,9 @@
  * Stable Lords — Core Game Types
  * Ported from Duel repo + design bible specs
  */
+import type { PoolWarrior } from "@/engine/recruitment";
+import type { BoutResult } from "@/engine/boutProcessor";
+
 
 // ─── Fighting Styles ────────────────────────────────────────────────────────
 
@@ -342,10 +345,10 @@ export interface FightSummary {
   week: number;
   phase: "planning" | "resolution";
   pendingResolutionData?: {
-    gazette: any[];
+    gazette: string[];
     injuries: string[];
     deaths: string[];
-    bouts: any[];
+    bouts: BoutResult[];
     promotions: string[];
   };
   tournamentId?: string | null;
@@ -520,7 +523,7 @@ export interface GameState {
   restStates: RestState[];
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
-  recruitPool: any[]; // PoolWarrior[] from recruitment engine
+  recruitPool: PoolWarrior[]; // from recruitment engine
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
   insightTokens: InsightToken[]; // discovered weapon/rhythm insights

@@ -575,7 +575,7 @@ export function simulateFight(
   let tacticStreakA = 0;
   let tacticStreakD = 0;
   let by: FightOutcome["by"] = null;
-  let causeBucket: any = undefined;
+  let causeBucket: DeathCauseBucket | undefined = undefined;
   let fatalHitLocation: string | undefined = undefined;
   let fatalExchangeIndex: number | undefined = undefined;
 
