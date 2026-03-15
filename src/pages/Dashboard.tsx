@@ -1108,11 +1108,21 @@ function StableComparisonWidget() {
   const playerNames = useMemo(() => new Set(state.roster.map(w => w.name)), [state.roster]);
 
   const playerStats = useMemo(() => {
-    const active = state.roster.filter(w => w.status === "Active");
-    const wins = state.roster.reduce((s, w) => s + w.career.wins, 0);
-    const kills = state.roster.reduce((s, w) => s + w.career.kills, 0);
-    const avgFame = active.length > 0 ? Math.round(active.reduce((s, w) => s + w.fame, 0) / active.length) : 0;
-    return { name: state.player.stableName, warriors: active.length, wins, kills, avgFame, isPlayer: true };
+    // ⚡ Bolt: Combines multiple filter/reduce iterations into a single O(n) pass
+    let activeCount = 0;
+    let totalFame = 0;
+    let wins = 0;
+    let kills = 0;
+    for (const w of state.roster) {
+      wins += w.career.wins;
+      kills += w.career.kills;
+      if (w.status === "Active") {
+        activeCount++;
+        totalFame += w.fame ?? 0;
+      }
+    }
+    const avgFame = activeCount > 0 ? Math.round(totalFame / activeCount) : 0;
+    return { name: state.player.stableName, warriors: activeCount, wins, kills, avgFame, isPlayer: true };
   }, [state.roster, state.player.stableName]);
 
   // Build rival name sets and H2H records
@@ -1122,10 +1132,21 @@ function StableComparisonWidget() {
 
     const stats = rivals.map(r => {
       const rivalNameSet = new Set(r.roster.map(w => w.name));
-      const active = r.roster.filter(w => w.status === "Active");
-      const wins = r.roster.reduce((s, w) => s + w.career.wins, 0);
-      const kills = r.roster.reduce((s, w) => s + w.career.kills, 0);
-      const avgFame = active.length > 0 ? Math.round(active.reduce((s, w) => s + w.fame, 0) / active.length) : 0;
+
+      // ⚡ Bolt: Single O(n) pass to extract wins, kills, active count, and active fame
+      let activeCount = 0;
+      let totalFame = 0;
+      let wins = 0;
+      let kills = 0;
+      for (const w of r.roster) {
+        wins += w.career.wins;
+        kills += w.career.kills;
+        if (w.status === "Active") {
+          activeCount++;
+          totalFame += w.fame ?? 0;
+        }
+      }
+      const avgFame = activeCount > 0 ? Math.round(totalFame / activeCount) : 0;
 
       // Compute H2H from arena history
       const record = { wins: 0, losses: 0, kills: 0, deaths: 0 };
@@ -1150,7 +1171,7 @@ function StableComparisonWidget() {
       }
       h2h[r.owner.stableName] = record;
 
-      return { name: r.owner.stableName, warriors: active.length, wins, kills, avgFame, isPlayer: false };
+      return { name: r.owner.stableName, warriors: activeCount, wins, kills, avgFame, isPlayer: false };
     });
 
     return { rivalStats: stats, h2hRecords: h2h };
