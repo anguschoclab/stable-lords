@@ -26,6 +26,26 @@ const PERSONALITY_PLAN_MODS: Record<OwnerPersonality, Partial<FightPlan>> = {
 };
 
 /** Philosophy modifiers — layered on top of personality */
+function calculateRecentRecord(recentFights: import("@/types/game").FightSummary[], rosterNames: Set<string>) {
+  const wins = recentFights.filter(f =>
+    (rosterNames.has(f.a) && f.winner === "A") || (rosterNames.has(f.d) && f.winner === "D")
+  ).length;
+  const losses = recentFights.filter(f =>
+    (rosterNames.has(f.a) && f.winner === "D") || (rosterNames.has(f.d) && f.winner === "A")
+  ).length;
+  const kills = recentFights.filter(f =>
+    f.by === "Kill" && (
+      (rosterNames.has(f.a) && f.winner === "A") || (rosterNames.has(f.d) && f.winner === "D")
+    )
+  ).length;
+  const deaths = recentFights.filter(f =>
+    f.by === "Kill" && (
+      (rosterNames.has(f.a) && f.winner === "D") || (rosterNames.has(f.d) && f.winner === "A")
+    )
+  ).length;
+  return { wins, losses, kills, deaths };
+}
+
 const PHILOSOPHY_PLAN_MODS: Record<string, Partial<FightPlan>> = {
   "Brute Force":    { OE: 2, AL: -1, killDesire: 2 },
   "Speed Kills":    { OE: 1, AL: 3, killDesire: 1 },
@@ -619,22 +639,7 @@ export function generateOwnerNarratives(
     const personality = rival.owner.personality ?? "Pragmatic";
     const names = new Set(rival.roster.map(w => w.name));
 
-    const wins = recentFights.filter(f =>
-      (names.has(f.a) && f.winner === "A") || (names.has(f.d) && f.winner === "D")
-    ).length;
-    const losses = recentFights.filter(f =>
-      (names.has(f.a) && f.winner === "D") || (names.has(f.d) && f.winner === "A")
-    ).length;
-    const kills = recentFights.filter(f =>
-      f.by === "Kill" && (
-        (names.has(f.a) && f.winner === "A") || (names.has(f.d) && f.winner === "D")
-      )
-    ).length;
-    const deaths = recentFights.filter(f =>
-      f.by === "Kill" && (
-        (names.has(f.a) && f.winner === "D") || (names.has(f.d) && f.winner === "A")
-      )
-    ).length;
+    const { wins, losses } = calculateRecentRecord(recentFights, names);
 
     const totalFights = wins + losses;
     if (totalFights === 0) continue;
@@ -762,12 +767,7 @@ export function evolvePhilosophies(
     if (adaptation === "Traditionalist") return rival;
 
     const names = new Set(rival.roster.map(w => w.name));
-    const wins = recentFights.filter(f =>
-      (names.has(f.a) && f.winner === "A") || (names.has(f.d) && f.winner === "D")
-    ).length;
-    const losses = recentFights.filter(f =>
-      (names.has(f.a) && f.winner === "D") || (names.has(f.d) && f.winner === "A")
-    ).length;
+    const { wins, losses } = calculateRecentRecord(recentFights, names);
 
     const totalFights = wins + losses;
     if (totalFights < 4) return rival;
