@@ -1419,7 +1419,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-secondary/30 p-4 rounded-xl border border-border/50">
         <div className="flex-1">
