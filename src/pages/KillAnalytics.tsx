@@ -162,6 +162,203 @@ function KillTrendChart({ points }: { points: { week: number; cumulative: number
   );
 }
 
+
+/* ── Sub-Components ──────────────────────────────────────── */
+
+function HeaderStats({
+  totalKills,
+  totalFights,
+  killRate,
+  graveyardCount,
+}: {
+  totalKills: number;
+  totalFights: number;
+  killRate: number;
+  graveyardCount: number;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-xl border border-destructive/30 bg-gradient-to-br from-destructive/5 via-card to-card p-6 sm:p-8">
+      <div className="relative">
+        <div className="flex items-center gap-3 mb-2">
+          <Skull className="h-6 w-6 text-destructive" />
+          <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide">Kill Analytics</h1>
+        </div>
+        <p className="text-muted-foreground text-sm max-w-xl">
+          Every death is data. Analyze kill patterns, lethal styles, and the mechanics of mortality in the arena.
+        </p>
+        <div className="flex items-center gap-4 mt-4 flex-wrap">
+          <div className="text-center">
+            <div className="text-2xl font-display font-bold text-destructive">{totalKills}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Kills</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-display font-bold text-foreground">{totalFights}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Bouts</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-display font-bold text-arena-blood">{killRate}%</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Kill Rate</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-display font-bold text-muted-foreground">{graveyardCount}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">In Graveyard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HitLocationBreakdown({ locations }: { locations: LocationBreakdown[] }) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <Target className="h-4 w-4 text-arena-blood" /> Killing Blow Locations
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {locations.map(loc => (
+          <div key={loc.location} className="space-y-1">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className={`text-[10px] ${LOCATION_COLORS[loc.location] ?? ""}`}>
+                {loc.location}
+              </Badge>
+              <span className="text-xs font-mono text-muted-foreground">{loc.count} ({loc.pct}%)</span>
+            </div>
+            <Progress value={loc.pct} className="h-2 [&>div]:bg-destructive/60" />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function DeadliestWarriors({ killerLeaders }: { killerLeaders: { name: string; style: string; kills: number }[] }) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <Swords className="h-4 w-4 text-arena-blood" /> Deadliest Warriors
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {killerLeaders.map((k, i) => (
+          <div key={k.name} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-destructive font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
+              <div>
+                <span className="text-xs font-display text-foreground">{k.name}</span>
+                <div className="text-[9px] text-muted-foreground font-mono">
+                  {STYLE_DISPLAY_NAMES[k.style as keyof typeof STYLE_DISPLAY_NAMES] ?? k.style}
+                </div>
+              </div>
+            </div>
+            <Badge variant="outline" className="text-destructive border-destructive/30 text-[10px] font-mono">
+              {k.kills} kill{k.kills !== 1 ? "s" : ""}
+            </Badge>
+          </div>
+        ))}
+        {killerLeaders.length === 0 && <p className="text-xs text-muted-foreground italic py-4">No data.</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
+function StyleLethalityBreakdown({ styleStats }: { styleStats: StyleKillStats[] }) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-arena-blood" /> Style Lethality Breakdown
+        </CardTitle>
+        <p className="text-[10px] text-muted-foreground font-mono">Kills vs deaths by fighting style</p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {styleStats.reduce((acc, s) => {
+          if (s.kills > 0 || s.deaths > 0) {
+            const maxKD = Math.max(...styleStats.map(x => x.kills + x.deaths), 1);
+            const killWidth = (s.kills / maxKD) * 100;
+            const deathWidth = (s.deaths / maxKD) * 100;
+            acc.push(
+              <div key={s.style} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-display text-foreground">
+                    {STYLE_DISPLAY_NAMES[s.style as keyof typeof STYLE_DISPLAY_NAMES] ?? s.style}
+                  </span>
+                  <div className="flex items-center gap-2 text-[10px] font-mono">
+                    <span className="text-destructive">{s.kills}K</span>
+                    <span className="text-muted-foreground">{s.deaths}D</span>
+                    <span className="text-foreground font-semibold">KDR: {s.kdr}</span>
+                  </div>
+                </div>
+                <div className="flex gap-0.5 h-2.5">
+                  <div className="bg-destructive/70 rounded-l-full transition-all" style={{ width: `${killWidth}%` }} />
+                  <div className="bg-muted-foreground/30 rounded-r-full transition-all" style={{ width: `${deathWidth}%` }} />
+                </div>
+              </div>
+            );
+          }
+          return acc;
+        }, [] as React.ReactNode[])}
+      </CardContent>
+    </Card>
+  );
+}
+
+function RecentKillFeed({ recentKills }: { recentKills: KillRecord[] }) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <Activity className="h-4 w-4 text-destructive" /> Recent Kills
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {recentKills.map((k, i) => (
+          <div key={i} className="flex items-center gap-3 py-2 border-b border-border/20 last:border-0">
+            <span className="text-[10px] font-mono text-muted-foreground/50 w-10 shrink-0">Wk {k.week}</span>
+            <Skull className="h-3.5 w-3.5 text-destructive shrink-0" />
+            <div className="flex-1 min-w-0">
+              <span className="text-xs font-display text-foreground font-semibold">{k.killer}</span>
+              <span className="text-[10px] text-muted-foreground mx-1">slew</span>
+              <span className="text-xs font-display text-muted-foreground">{k.victim}</span>
+            </div>
+            <div className="text-[9px] text-muted-foreground font-mono shrink-0">
+              {STYLE_DISPLAY_NAMES[k.killerStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? k.killerStyle} vs {STYLE_DISPLAY_NAMES[k.victimStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? k.victimStyle}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function GraveyardByStyle({ graveyardByStyle }: { graveyardByStyle: [string, number][] }) {
+  if (graveyardByStyle.length === 0) return null;
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-display flex items-center gap-2">
+          <Users className="h-4 w-4 text-muted-foreground" /> Graveyard by Style
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {graveyardByStyle.map(([style, count]) => (
+          <div key={style} className="flex items-center justify-between py-1">
+            <span className="text-xs font-display text-foreground">
+              {STYLE_DISPLAY_NAMES[style as keyof typeof STYLE_DISPLAY_NAMES] ?? style}
+            </span>
+            <Badge variant="outline" className="text-[10px] font-mono">{count} fallen</Badge>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+
+
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function KillAnalytics() {
@@ -205,36 +402,12 @@ export default function KillAnalytics() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-xl border border-destructive/30 bg-gradient-to-br from-destructive/5 via-card to-card p-6 sm:p-8">
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <Skull className="h-6 w-6 text-destructive" />
-            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide">Kill Analytics</h1>
-          </div>
-          <p className="text-muted-foreground text-sm max-w-xl">
-            Every death is data. Analyze kill patterns, lethal styles, and the mechanics of mortality in the arena.
-          </p>
-          <div className="flex items-center gap-4 mt-4 flex-wrap">
-            <div className="text-center">
-              <div className="text-2xl font-display font-bold text-destructive">{totalKills}</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Kills</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-display font-bold text-foreground">{totalFights}</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Bouts</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-display font-bold text-arena-blood">{killRate}%</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Kill Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-display font-bold text-muted-foreground">{state.graveyard.length}</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">In Graveyard</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <HeaderStats
+        totalKills={totalKills}
+        totalFights={totalFights}
+        killRate={killRate}
+        graveyardCount={state.graveyard.length}
+      />
 
       {totalKills === 0 ? (
         <Card>
@@ -245,7 +418,6 @@ export default function KillAnalytics() {
         </Card>
       ) : (
         <>
-          {/* Kill Trend */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-display flex items-center gap-2">
@@ -258,140 +430,13 @@ export default function KillAnalytics() {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Hit Location Breakdown */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-display flex items-center gap-2">
-                  <Target className="h-4 w-4 text-arena-blood" /> Killing Blow Locations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {locations.map(loc => (
-                  <div key={loc.location} className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className={`text-[10px] ${LOCATION_COLORS[loc.location] ?? ""}`}>
-                        {loc.location}
-                      </Badge>
-                      <span className="text-xs font-mono text-muted-foreground">{loc.count} ({loc.pct}%)</span>
-                    </div>
-                    <Progress value={loc.pct} className="h-2 [&>div]:bg-destructive/60" />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Deadliest Killers */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-display flex items-center gap-2">
-                  <Swords className="h-4 w-4 text-arena-blood" /> Deadliest Warriors
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                {killerLeaders.map((k, i) => (
-                  <div key={k.name} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-destructive font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
-                      <div>
-                        <span className="text-xs font-display text-foreground">{k.name}</span>
-                        <div className="text-[9px] text-muted-foreground font-mono">
-                          {STYLE_DISPLAY_NAMES[k.style as keyof typeof STYLE_DISPLAY_NAMES] ?? k.style}
-                        </div>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-destructive border-destructive/30 text-[10px] font-mono">
-                      {k.kills} kill{k.kills !== 1 ? "s" : ""}
-                    </Badge>
-                  </div>
-                ))}
-                {killerLeaders.length === 0 && <p className="text-xs text-muted-foreground italic py-4">No data.</p>}
-              </CardContent>
-            </Card>
+            <HitLocationBreakdown locations={locations} />
+            <DeadliestWarriors killerLeaders={killerLeaders} />
           </div>
 
-          {/* Style Kill/Death Ratios */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-display flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-arena-blood" /> Style Lethality Breakdown
-              </CardTitle>
-              <p className="text-[10px] text-muted-foreground font-mono">Kills vs deaths by fighting style</p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {styleStats.reduce((acc, s) => {
-              if (s.kills > 0 || s.deaths > 0) {
-                const maxKD = Math.max(...styleStats.map(x => x.kills + x.deaths), 1);
-                const killWidth = (s.kills / maxKD) * 100;
-                const deathWidth = (s.deaths / maxKD) * 100;
-                acc.push(
-                  <div key={s.style} className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-display text-foreground">
-                        {STYLE_DISPLAY_NAMES[s.style as keyof typeof STYLE_DISPLAY_NAMES] ?? s.style}
-                      </span>
-                      <div className="flex items-center gap-2 text-[10px] font-mono">
-                        <span className="text-destructive">{s.kills}K</span>
-                        <span className="text-muted-foreground">{s.deaths}D</span>
-                        <span className="text-foreground font-semibold">KDR: {s.kdr}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-0.5 h-2.5">
-                      <div className="bg-destructive/70 rounded-l-full transition-all" style={{ width: `${killWidth}%` }} />
-                      <div className="bg-muted-foreground/30 rounded-r-full transition-all" style={{ width: `${deathWidth}%` }} />
-                    </div>
-                  </div>
-                );
-              }
-              return acc;
-            }, [] as React.ReactNode[])}
-            </CardContent>
-          </Card>
-
-          {/* Recent Kill Feed */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-display flex items-center gap-2">
-                <Activity className="h-4 w-4 text-destructive" /> Recent Kills
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {recentKills.map((k, i) => (
-                <div key={i} className="flex items-center gap-3 py-2 border-b border-border/20 last:border-0">
-                  <span className="text-[10px] font-mono text-muted-foreground/50 w-10 shrink-0">Wk {k.week}</span>
-                  <Skull className="h-3.5 w-3.5 text-destructive shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-display text-foreground font-semibold">{k.killer}</span>
-                    <span className="text-[10px] text-muted-foreground mx-1">slew</span>
-                    <span className="text-xs font-display text-muted-foreground">{k.victim}</span>
-                  </div>
-                  <div className="text-[9px] text-muted-foreground font-mono shrink-0">
-                    {STYLE_DISPLAY_NAMES[k.killerStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? k.killerStyle} vs {STYLE_DISPLAY_NAMES[k.victimStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? k.victimStyle}
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Graveyard by Style */}
-          {graveyardByStyle.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-display flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" /> Graveyard by Style
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {graveyardByStyle.map(([style, count]) => (
-                  <div key={style} className="flex items-center justify-between py-1">
-                    <span className="text-xs font-display text-foreground">
-                      {STYLE_DISPLAY_NAMES[style as keyof typeof STYLE_DISPLAY_NAMES] ?? style}
-                    </span>
-                    <Badge variant="outline" className="text-[10px] font-mono">{count} fallen</Badge>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
+          <StyleLethalityBreakdown styleStats={styleStats} />
+          <RecentKillFeed recentKills={recentKills} />
+          <GraveyardByStyle graveyardByStyle={graveyardByStyle} />
         </>
       )}
 
