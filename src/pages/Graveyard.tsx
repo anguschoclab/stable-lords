@@ -2,7 +2,7 @@
  * Stable Lords — Graveyard & Retired Warriors
  */
 import React from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import { Link } from "@tanstack/react-router";
 import { WarriorLink } from "@/components/EntityLink";
 
 export default function Graveyard() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   return (
     <div className="space-y-6">

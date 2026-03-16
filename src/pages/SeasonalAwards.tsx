@@ -3,7 +3,7 @@
  * Summarizes each season's best warriors, deadliest fighters, and biggest upsets.
  */
 import { useMemo, useState } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import type { Warrior, FightSummary, Season } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -310,7 +310,7 @@ function SeasonSection({ award }: { award: SeasonalAward }) {
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function SeasonalAwards() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   const allWarriors = useMemo(() => [
     ...state.roster,

@@ -3,7 +3,7 @@
  * burn warnings, and seasonal cap visualization.
  */
 import React, { useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import {
   ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, STYLE_DISPLAY_NAMES,
   type Warrior, type Attributes,
@@ -257,7 +257,7 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function TrainingPlanner() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const activeWarriors = state.roster.filter(w => w.status === "Active");
   const trainers = state.trainers ?? [];
 

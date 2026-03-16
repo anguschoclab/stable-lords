@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import { LoreArchive } from "@/lore/LoreArchive";
@@ -567,10 +567,186 @@ function RisingStars({ allFights, currentWeek }: { allFights: FightSummary[]; cu
   );
 }
 
-/* ── main page ───────────────────────────────────────────── */
+
+/* ── Weekly Issue ────────────────────────────────────────── */
+
+function WeeklyIssue({
+  issue,
+  state
+}: {
+  issue: { week: number; fights: FightSummary[]; fotwId: string | null; kills: number; kos: number; rollup: any };
+  state: any;
+}) {
+  const { week, fights, fotwId, kills, kos, rollup } = issue;
+  const fotw = fights.find((f) => f.id === fotwId);
+  const otherFights = fights.filter((f) => f.id !== fotwId);
+  const styleEntries = Object.entries(rollup as Record<string, { w: number; l: number; k: number; pct: number; fights: number }>).sort(
+    ([, a], [, b]) => b.fights - a.fights
+  );
+
+  return (
+    <article key={week} className="space-y-4">
+      <div className="flex items-end gap-3 border-b-2 border-accent/30 pb-2">
+        <h2 className="font-display text-xl text-foreground leading-none">
+          Week {week}
+        </h2>
+        <div className="flex gap-2 mb-0.5">
+          <Badge variant="outline" className="text-[10px] font-mono gap-1">
+            <Swords className="h-3 w-3" /> {fights.length} bout{fights.length !== 1 ? "s" : ""}
+          </Badge>
+          {kos > 0 && (
+            <Badge variant="outline" className="text-[10px] font-mono gap-1 text-arena-gold border-arena-gold/30">
+              <Flame className="h-3 w-3" /> {kos} KO{kos !== 1 ? "s" : ""}
+            </Badge>
+          )}
+          {kills > 0 && (
+            <Badge variant="outline" className="text-[10px] font-mono gap-1 text-arena-blood border-arena-blood/30">
+              <Skull className="h-3 w-3" /> {kills} kill{kills !== 1 ? "s" : ""}
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-3">
+          {fotw && <FightCard fight={fotw} isFOTW />}
+          {otherFights.map((f) => (
+            <FightCard key={f.id} fight={f} isFOTW={false} />
+          ))}
+          {fights.length === 0 && (
+            <p className="text-xs text-muted-foreground italic">No bouts this week.</p>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          {/* Weekly Power Rankings */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-display flex items-center gap-2">
+                <Crown className="h-4 w-4 text-arena-gold" />
+                Power Rankings
+              </CardTitle>
+              <p className="text-[10px] text-muted-foreground font-mono">Top 5 by fame · Week {week}</p>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {(() => {
+                // Accumulate fame up to this week
+                const fameMap = new Map<string, number>();
+                for (const af of state.arenaHistory.filter((f: any) => f.week <= week)) {
+                  fameMap.set(af.a, (fameMap.get(af.a) ?? 0) + (af.fameDeltaA ?? 0));
+                  fameMap.set(af.d, (fameMap.get(af.d) ?? 0) + (af.fameDeltaD ?? 0));
+                }
+                const ranked = [...fameMap.entries()]
+                  .map(([name, fame]) => ({ name, fame }))
+                  .sort((a, b) => b.fame - a.fame)
+                  .slice(0, 5);
+                if (ranked.length === 0) return <p className="text-xs text-muted-foreground italic">No data yet.</p>;
+                const medals = ["🥇", "🥈", "🥉"];
+                return ranked.map((r, i) => (
+                  <div key={r.name} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm leading-none w-5">{medals[i] ?? `${i + 1}.`}</span>
+                      <span className={`text-[11px] font-display truncate max-w-[100px] ${i === 0 ? "text-foreground font-bold" : "text-muted-foreground"}`}>{r.name}</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-arena-fame">{r.fame} fame</span>
+                  </div>
+                ));
+              })()}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-display flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-arena-fame" />
+                Style Trends
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {styleEntries.length > 0 ? (
+                <div className="space-y-0.5">
+                  {styleEntries.map(([style, data]) => (
+                    <StyleTrendRow key={style} style={style} {...data} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">No style data.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-display flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-arena-gold" />
+                Arena Chronicle
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-2">
+              {(() => {
+                const story = generateWeeklyGazette(fights, state.crowdMood as any, week, state.graveyard, state.arenaHistory);
+                return (
+                  <>
+                    <h3 className="text-xs font-display font-bold text-foreground">{story.headline}</h3>
+                    {story.tags.length > 0 && (
+                      <div className="flex gap-1 flex-wrap">
+                        {story.tags.map(t => (
+                          <Badge key={t} variant="outline" className="text-[9px] text-arena-gold border-arena-gold/30">{t}</Badge>
+                        ))}
+                      </div>
+                    )}
+                    {story.body.split("\n\n").map((p, i) => (
+                      <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">{p}</p>
+                    ))}
+                  </>
+                );
+              })()}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-display flex items-center gap-2">
+                <Trophy className="h-4 w-4 text-arena-gold" />
+                Headlines
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-2">
+              {fotw && (
+                <p className="text-xs text-foreground">
+                  <span className="font-semibold">{winnerName(fotw)}</span>
+                  {fotw.by === "Kill" ? " slays " : fotw.by === "KO" ? " knocks out " : " defeats "}
+                  <span className="font-semibold">{fotw.winner === "A" ? fotw.d : fotw.a}</span>{" "}
+                  in the bout of the week!
+                </p>
+              )}
+              {kills > 0 && (
+                <p className="text-xs text-arena-blood">
+                  {kills} warrior{kills !== 1 ? "s" : ""} fell to the sands this week. The crowd roars.
+                </p>
+              )}
+              {fights.length > 3 && (
+                <p className="text-xs text-muted-foreground italic">
+                  A busy week at the arena — {fights.length} bouts kept the fans entertained.
+                </p>
+              )}
+              {fights.length <= 3 && fights.length > 0 && (
+                <p className="text-xs text-muted-foreground italic">
+                  A quiet week. The sands thirst for more.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Separator className="mt-6" />
+    </article>
+  );
+}
+\n/* ── main page ───────────────────────────────────────────── */
 
 export default function Gazette() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const allFights = useMemo(() => ArenaHistory.all(), [state.week]);
@@ -658,174 +834,9 @@ export default function Gazette() {
       )}
 
       {/* Weekly Issues — paginated */}
-      {visibleIssues.map(({ week, fights, fotwId, kills, kos, rollup }) => {
-        const fotw = fights.find((f) => f.id === fotwId);
-        const otherFights = fights.filter((f) => f.id !== fotwId);
-        const styleEntries = Object.entries(rollup as Record<string, { w: number; l: number; k: number; pct: number; fights: number }>).sort(
-          ([, a], [, b]) => b.fights - a.fights
-        );
-
-        return (
-          <article key={week} className="space-y-4">
-            <div className="flex items-end gap-3 border-b-2 border-accent/30 pb-2">
-              <h2 className="font-display text-xl text-foreground leading-none">
-                Week {week}
-              </h2>
-              <div className="flex gap-2 mb-0.5">
-                <Badge variant="outline" className="text-[10px] font-mono gap-1">
-                  <Swords className="h-3 w-3" /> {fights.length} bout{fights.length !== 1 ? "s" : ""}
-                </Badge>
-                {kos > 0 && (
-                  <Badge variant="outline" className="text-[10px] font-mono gap-1 text-arena-gold border-arena-gold/30">
-                    <Flame className="h-3 w-3" /> {kos} KO{kos !== 1 ? "s" : ""}
-                  </Badge>
-                )}
-                {kills > 0 && (
-                  <Badge variant="outline" className="text-[10px] font-mono gap-1 text-arena-blood border-arena-blood/30">
-                    <Skull className="h-3 w-3" /> {kills} kill{kills !== 1 ? "s" : ""}
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 space-y-3">
-                {fotw && <FightCard fight={fotw} isFOTW />}
-                {otherFights.map((f) => (
-                  <FightCard key={f.id} fight={f} isFOTW={false} />
-                ))}
-                {fights.length === 0 && (
-                  <p className="text-xs text-muted-foreground italic">No bouts this week.</p>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                {/* Weekly Power Rankings */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-display flex items-center gap-2">
-                      <Crown className="h-4 w-4 text-arena-gold" />
-                      Power Rankings
-                    </CardTitle>
-                    <p className="text-[10px] text-muted-foreground font-mono">Top 5 by fame · Week {week}</p>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {(() => {
-                      // Accumulate fame up to this week
-                      const fameMap = new Map<string, number>();
-                      for (const af of state.arenaHistory.filter(f => f.week <= week)) {
-                        fameMap.set(af.a, (fameMap.get(af.a) ?? 0) + (af.fameDeltaA ?? 0));
-                        fameMap.set(af.d, (fameMap.get(af.d) ?? 0) + (af.fameDeltaD ?? 0));
-                      }
-                      const ranked = [...fameMap.entries()]
-                        .map(([name, fame]) => ({ name, fame }))
-                        .sort((a, b) => b.fame - a.fame)
-                        .slice(0, 5);
-                      if (ranked.length === 0) return <p className="text-xs text-muted-foreground italic">No data yet.</p>;
-                      const medals = ["🥇", "🥈", "🥉"];
-                      return ranked.map((r, i) => (
-                        <div key={r.name} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm leading-none w-5">{medals[i] ?? `${i + 1}.`}</span>
-                            <span className={`text-[11px] font-display truncate max-w-[100px] ${i === 0 ? "text-foreground font-bold" : "text-muted-foreground"}`}>{r.name}</span>
-                          </div>
-                          <span className="text-[10px] font-mono text-arena-fame">{r.fame} fame</span>
-                        </div>
-                      ));
-                    })()}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-display flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-arena-fame" />
-                      Style Trends
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {styleEntries.length > 0 ? (
-                      <div className="space-y-0.5">
-                        {styleEntries.map(([style, data]) => (
-                          <StyleTrendRow key={style} style={style} {...data} />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground italic">No style data.</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-display flex items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-arena-gold" />
-                      Arena Chronicle
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 space-y-2">
-                    {(() => {
-                      const story = generateWeeklyGazette(fights, state.crowdMood as any, week, state.graveyard, state.arenaHistory);
-                      return (
-                        <>
-                          <h3 className="text-xs font-display font-bold text-foreground">{story.headline}</h3>
-                          {story.tags.length > 0 && (
-                            <div className="flex gap-1 flex-wrap">
-                              {story.tags.map(t => (
-                                <Badge key={t} variant="outline" className="text-[9px] text-arena-gold border-arena-gold/30">{t}</Badge>
-                              ))}
-                            </div>
-                          )}
-                          {story.body.split("\n\n").map((p, i) => (
-                            <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">{p}</p>
-                          ))}
-                        </>
-                      );
-                    })()}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-display flex items-center gap-2">
-                      <Trophy className="h-4 w-4 text-arena-gold" />
-                      Headlines
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 space-y-2">
-                    {fotw && (
-                      <p className="text-xs text-foreground">
-                        <span className="font-semibold">{winnerName(fotw)}</span>
-                        {fotw.by === "Kill" ? " slays " : fotw.by === "KO" ? " knocks out " : " defeats "}
-                        <span className="font-semibold">{fotw.winner === "A" ? fotw.d : fotw.a}</span>{" "}
-                        in the bout of the week!
-                      </p>
-                    )}
-                    {kills > 0 && (
-                      <p className="text-xs text-arena-blood">
-                        {kills} warrior{kills !== 1 ? "s" : ""} fell to the sands this week. The crowd roars.
-                      </p>
-                    )}
-                    {fights.length > 3 && (
-                      <p className="text-xs text-muted-foreground italic">
-                        A busy week at the arena — {fights.length} bouts kept the fans entertained.
-                      </p>
-                    )}
-                    {fights.length <= 3 && fights.length > 0 && (
-                      <p className="text-xs text-muted-foreground italic">
-                        A quiet week. The sands thirst for more.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <Separator className="mt-6" />
-          </article>
-        );
-      })}
-
-      {/* Load More button */}
+            {visibleIssues.map((issue) => (
+        <WeeklyIssue key={issue.week} issue={issue} state={state} />
+      ))}\n\n      {/* Load More button */}
       {hasMore && (
         <div className="flex justify-center py-4">
           <button

@@ -4,7 +4,7 @@
  * Supports exact routes and pattern-matched dynamic routes.
  */
 import { useEffect } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { toast } from "sonner";
 import type { GameState, Warrior } from "@/types/game";
 

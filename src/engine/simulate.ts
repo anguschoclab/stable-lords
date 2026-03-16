@@ -34,6 +34,7 @@ import {
   pressingLine, generateWarriorIntro, battleOpener, getWeaponDisplayName,
   popularityLine, skillLearnLine, narrateInsightHint,
 } from "./narrativePBP";
+import { getSecureSeed } from "@/utils/random";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 /**
@@ -117,7 +118,7 @@ function pickText(rng: () => number, texts: string[]): string {
   return texts[Math.floor(rng() * texts.length)];
 }
 
-const HIT_LOCATIONS = ["head", "chest", "abdomen", "right arm", "left arm", "right leg", "left leg"] as const;
+
 type HitLocation = typeof HIT_LOCATIONS[number];
 
 /** Maps a grouped protect target to the granular hit locations it covers */
@@ -243,25 +244,15 @@ const GLOBAL_PAR_PENALTY = -2;
 const INITIATIVE_PRESS_BONUS = 1;
 
 // Phase detection thresholds
-const PHASE_OPENING_THRESHOLD = 0.25; // First 25% of exchanges
-const PHASE_MID_THRESHOLD = 0.65;      // Middle 40% of exchanges
 
 // Target & Protect mechanics
-const TARGET_HIT_CHANCE = 0.6;         // Chance to hit targeted location
-const TARGET_MISS_CHANCE = 0.4;        // Chance to hit elsewhere when targeting
-const PROTECT_DAMAGE_REDUCTION = 0.75; // Protected locations take 25% less damage
-const PROTECT_DAMAGE_PENALTY = 1.1;    // Unprotected locations take 10% more damage
 
 // OE/AL Modifiers
 const OE_ATT_SCALING = 0.7;            // Attack bonus per OE point above 5
 const OE_DEF_SCALING = 0.5;            // Defense penalty per OE point above 6
 const AL_INI_SCALING = 0.6;            // Initiative bonus per AL point above 5
-const ENDURANCE_OE_SCALING = 0.4;      // OE contribution to endurance cost
-const ENDURANCE_AL_SCALING = 0.2;      // AL contribution to endurance cost
 
 // Fatigue thresholds and penalties
-const FATIGUE_MODERATE_THRESHOLD = 0.5; // Endurance ratio for moderate fatigue
-const FATIGUE_HEAVY_THRESHOLD = 0.25;   // Endurance ratio for heavy fatigue
 const FATIGUE_COLLAPSE_THRESHOLD = 0.1; // Endurance ratio for near-collapse
 const FATIGUE_MODERATE_PENALTY = -2;    // Skill penalty at moderate fatigue
 const FATIGUE_HEAVY_PENALTY = -4;       // Skill penalty at heavy fatigue
@@ -349,15 +340,7 @@ function fatiguePenalty(endurance: number, maxEndurance: number): number {
 }
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
-function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {
-  const base = damageClass + DAMAGE_BASE_MIN;
-  const locMult = location === "head" ? DAMAGE_HEAD_MULT 
-    : location === "chest" ? DAMAGE_CHEST_MULT 
-    : location === "abdomen" ? DAMAGE_ABDOMEN_MULT 
-    : DAMAGE_LIMB_MULT;
-  const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
-  return Math.max(1, Math.round(base * locMult * variance));
-}
+
 
 // ─── Equipment Bonuses ────────────────────────────────────────────────────
 function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
@@ -469,6 +452,608 @@ export function defaultPlanForWarrior(w: Warrior): FightPlan {
  * @param logPrefix - Optional string used for debugging output prefixes.
  * @returns A comprehensive `FightOutcome` object containing the winner, detailed logs, statistics, and narrative events.
  */
+function createFighterState(
+  label: "A" | "D",
+  plan: FightPlan,
+  warrior: Warrior | undefined,
+  opponentPlan: FightPlan,
+  trainers: TrainerData[] | undefined
+): FighterState {
+  const attrs = warrior?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
+  const skills = warrior?.baseSkills ?? computeBaseSkills(attrs, plan.style);
+  const derived = warrior?.derivedStats ?? computeDerivedStats(attrs);
+
+  const equip = getEquipmentMods(warrior?.equipment ?? DEFAULT_LOADOUT, derived.encumbrance);
+  const trainerMods = trainers ? getTrainerMods(trainers, plan.style) : null;
+  const classicBonus = getClassicWeaponBonus(plan.style, (warrior?.equipment ?? DEFAULT_LOADOUT).weapon);
+  const favWeapon = warrior ? getFavoriteWeaponBonus(warrior) : 0;
+
+  const weaponReq = checkWeaponRequirements(
+    (warrior?.equipment ?? DEFAULT_LOADOUT).weapon,
+    { ST: attrs.ST, DF: attrs.DF, SP: attrs.SP }
+  );
+
+  const effSkills: BaseSkills = {
+    ATT: skills.ATT + equip.attMod + (trainerMods?.attMod ?? 0) + classicBonus + favWeapon + weaponReq.attPenalty,
+    PAR: skills.PAR + equip.parMod + (trainerMods?.parMod ?? 0),
+    DEF: skills.DEF + equip.defMod + (trainerMods?.defMod ?? 0),
+    INI: skills.INI + equip.iniMod + (trainerMods?.iniMod ?? 0),
+    RIP: skills.RIP,
+    DEC: skills.DEC + (trainerMods?.decMod ?? 0),
+  };
+
+  return {
+    label,
+    attributes: attrs,
+    style: plan.style,
+    skills: effSkills,
+    derived: { ...derived, damage: derived.damage + equip.dmgMod },
+    plan,
+    hp: derived.hp,
+    maxHp: derived.hp,
+    endurance: derived.endurance + (trainerMods?.endMod ?? 0) + equip.endMod,
+    maxEndurance: derived.endurance + (trainerMods?.endMod ?? 0) + equip.endMod,
+    hitsLanded: 0,
+    hitsTaken: 0,
+    ripostes: 0,
+    consecutiveHits: 0,
+    armHits: 0,
+    legHits: 0,
+  };
+}
+
+function initializeMatchData(
+  planA: FightPlan,
+  planD: FightPlan,
+  warriorA?: Warrior,
+  warriorD?: Warrior,
+  trainers?: TrainerData[]
+) {
+  // Matchup bonus
+  const matchupA = getMatchupBonus(planA.style, planD.style);
+  const matchupD = getMatchupBonus(planD.style, planA.style);
+
+  // Trainer mods for later healing reduction calculation
+  const trainerModsA = trainers ? getTrainerMods(trainers, planA.style) : null;
+  const trainerModsD = trainers ? getTrainerMods(trainers, planD.style) : null;
+
+  // Weapon requirement cache for endurance calculations
+  const attrsA = warriorA?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
+  const attrsD = warriorD?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
+  const weaponReqA = checkWeaponRequirements(
+    (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon,
+    { ST: attrsA.ST, DF: attrsA.DF, SP: attrsA.SP }
+  );
+  const weaponReqD = checkWeaponRequirements(
+    (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon,
+    { ST: attrsD.ST, DF: attrsD.DF, SP: attrsD.SP }
+  );
+  const nameA = warriorA?.name ?? "Attacker";
+  const nameD = warriorD?.name ?? "Defender";
+  const styleNameA = STYLE_DISPLAY_NAMES[planA.style] ?? planA.style;
+  const styleNameD = STYLE_DISPLAY_NAMES[planD.style] ?? planD.style;
+
+  const fA = createFighterState("A", planA, warriorA, planD, trainers);
+  const fD = createFighterState("D", planD, warriorD, planA, trainers);
+
+  return { matchupA, matchupD, trainerModsA, trainerModsD, weaponReqA, weaponReqD, nameA, nameD, styleNameA, styleNameD, fA, fD };
+}
+
+function resolvePhaseStrategy(f: FighterState, phase: Phase) {
+  const phaseKey = phase === "OPENING" ? "opening" : phase === "MID" ? "mid" : "late";
+  const effOE = f.plan.phases?.[phaseKey]?.OE ?? f.plan.OE;
+  const effAL = f.plan.phases?.[phaseKey]?.AL ?? f.plan.AL;
+  const effKD = f.plan.phases?.[phaseKey]?.killDesire ?? f.plan.killDesire ?? 5;
+  const tactics = resolveEffectiveTactics(f.plan, phaseKey);
+  const offMods = getOffensiveTacticMods(tactics.offTactic, f.style);
+  const defMods = getDefensiveTacticMods(tactics.defTactic, f.style);
+
+  return { effOE, effAL, effKD, tactics, offMods, defMods };
+}
+
+function appendIntroLines(
+  rng: () => number,
+  log: MinuteEvent[],
+  planA: FightPlan,
+  planD: FightPlan,
+  warriorA: Warrior | undefined,
+  warriorD: Warrior | undefined,
+  nameA: string,
+  nameD: string
+) {
+  appendIntroLines(rng, log, planA, planD, warriorA, warriorD, nameA, nameD);
+}
+
+function resolveInitiative(
+  rng: () => number, fA: FighterState, fD: FighterState, effAL_A: number, effAL_D: number,
+  matchupA: number, matchupD: number, fatA: number, fatD: number, defModsA: ReturnType<typeof getDefensiveTacticMods>, defModsD: ReturnType<typeof getDefensiveTacticMods>,
+  tempoA: number, tempoD: number, passiveA: ReturnType<typeof getStylePassive>, passiveD: ReturnType<typeof getStylePassive>, antiSynA: ReturnType<typeof getStyleAntiSynergy>, antiSynD: ReturnType<typeof getStyleAntiSynergy>,
+  tacticsA: ReturnType<typeof resolveEffectiveTactics>, tacticsD: ReturnType<typeof resolveEffectiveTactics>, offModsA: ReturnType<typeof getOffensiveTacticMods>, offModsD: ReturnType<typeof getOffensiveTacticMods>, effOE_A: number, effOE_D: number,
+  effKD_A: number, effKD_D: number, ex: number, min: number, log: MinuteEvent[], name: (f: FighterState) => string
+) {
+  const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits;
+  const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits;
+  const aGoesFirst = contestCheck(rng, iniA, iniD);
+  const iniPressBonus = INITIATIVE_PRESS_BONUS;
+
+  const attacker = aGoesFirst ? fA : fD;
+  const defender = aGoesFirst ? fD : fA;
+  const attMatchup = aGoesFirst ? matchupA : matchupD;
+  const defMatchup = aGoesFirst ? matchupD : matchupA;
+  const attFat = aGoesFirst ? fatA : fatD;
+  const defFat = aGoesFirst ? fatD : fatA;
+  const attOE = aGoesFirst ? effOE_A : effOE_D;
+  const defOE = aGoesFirst ? effOE_D : effOE_A;
+  const attAL = aGoesFirst ? effAL_A : effAL_D;
+  const defAL = aGoesFirst ? effAL_D : effAL_A;
+  const attKD = aGoesFirst ? effKD_A : effKD_D;
+  const attPassive = aGoesFirst ? passiveA : passiveD;
+  const defPassive = aGoesFirst ? passiveD : passiveA;
+  const attAntiSyn = aGoesFirst ? antiSynA : antiSynD;
+  const defAntiSyn = aGoesFirst ? antiSynD : antiSynA;
+
+  const attTactics = aGoesFirst ? tacticsA : tacticsD;
+  const defTactics = aGoesFirst ? tacticsD : tacticsA;
+  const attOffMods = aGoesFirst ? offModsA : offModsD;
+  const defOffMods = aGoesFirst ? offModsD : offModsA;
+  const attDefMods = aGoesFirst ? defModsA : defModsD;
+  const defDefMods = aGoesFirst ? defModsD : defModsA;
+
+  // Narrate initiative swings (canonical PBP style)
+  if (ex === 0 || (ex > 0 && rng() < 0.3)) {
+    if (aGoesFirst) {
+      log.push({ minute: min, text: narrateInitiative(rng, name(attacker), rng() < 0.3) });
+    }
+  }
+
+  return {
+    attacker, defender, attMatchup, defMatchup, attFat, defFat, attOE, defOE, attAL, defAL,
+    attKD, attPassive, defPassive, attAntiSyn, defAntiSyn, attTactics, defTactics,
+    attOffMods, defOffMods, attDefMods, defDefMods, aGoesFirst, iniPressBonus
+  };
+}
+
+function handleWhiffedAttack(
+  rng: () => number,
+  attacker: FighterState,
+  defender: FighterState,
+  defMatchup: number,
+  defFat: number,
+  defDefMods: ReturnType<typeof getDefensiveTacticMods>,
+  defPassive: ReturnType<typeof getStylePassive>,
+  defAntiSyn: ReturnType<typeof getStyleAntiSynergy>,
+  defTactics: ReturnType<typeof resolveEffectiveTactics>,
+  attOE: number,
+  attAL: number,
+  attOffMods: ReturnType<typeof getOffensiveTacticMods>,
+  min: number,
+  log: MinuteEvent[],
+  name: (f: FighterState) => string,
+  weaponOf: (f: FighterState) => string,
+  tags: string[]
+) {
+  // Attack whiffs — reset consecutive hits
+  attacker.consecutiveHits = 0;
+
+  if (rng() < 0.25) {
+    log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
+    log.push({ minute: min, text: narrateDodge(rng, name(defender)) });
+  }
+  // ── Endurance cost for attempt ──
+  attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, attAL) * 0.5)) + attOffMods.endCost;
+
+  // Defender may riposte on whiff — HARD check (off-tempo, attacker recovering)
+  const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
+  const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_WHIFF_PENALTY + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
+  if (ripCheck) {
+    const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
+    const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
+    const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
+    attacker.hp -= ripDmg;
+    attacker.hitsTaken++;
+    defender.hitsLanded++;
+    defender.ripostes++;
+    defender.consecutiveHits++;
+    attacker.consecutiveHits = 0;
+
+    // Canonical PBP: counterstrike + attack + hit
+    log.push({ minute: min, text: narrateCounterstrike(rng, name(defender)) });
+    log.push({ minute: min, text: narrateAttack(rng, name(defender), weaponOf(defender)) });
+    log.push({ minute: min, text: narrateHit(rng, name(attacker), ripLoc) });
+    const sevLine = damageSeverityLine(rng, ripDmg, attacker.maxHp);
+    if (sevLine) log.push({ minute: min, text: sevLine });
+
+    if (defender.ripostes >= 3 && !tags.includes("RiposteChain")) tags.push("RiposteChain");
+  }
+}
+
+function resolveDefenseAttempt(
+  rng: () => number,
+  attacker: FighterState,
+  defender: FighterState,
+  defMatchup: number,
+  defFat: number,
+  defDefMods: ReturnType<typeof getDefensiveTacticMods>,
+  defPassive: ReturnType<typeof getStylePassive>,
+  defAntiSyn: ReturnType<typeof getStyleAntiSynergy>,
+  defTactics: ReturnType<typeof resolveEffectiveTactics>,
+  attOffMods: ReturnType<typeof getOffensiveTacticMods>,
+  defOE: number,
+  tacticOveruseDef: number,
+  min: number,
+  log: MinuteEvent[],
+  name: (f: FighterState) => string,
+  weaponOf: (f: FighterState) => string,
+  tags: string[]
+): boolean {
+  // Attack lands — defender tries to stop it
+  // BALANCE v2: PAR and DEF are MUTUALLY EXCLUSIVE.
+  // - Dodge tactic → skip PAR, use DEF at full skill
+  // - Otherwise → PAR only; if PAR fails, the hit lands (no second chance)
+  // This eliminates the multiplicative double-defense that crushed offensive styles.
+
+  const defOEmod = oeDefMod(defOE);
+  const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
+  const bashBypass = attOffMods.parryBypass ?? 0;
+
+  const isDodging = defTactics.defTactic === "Dodge";
+
+  let defended = false;
+  let canRiposte = false;
+
+  if (isDodging) {
+    // ── 3b. DODGE PATH — full DEF skill, no parry attempt ──
+    const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus - tacticOveruseDef - defender.legHits);
+    if (defSuccess) {
+      defended = true;
+      attacker.consecutiveHits = 0;
+      if (rng() < 0.5) {
+        log.push({ minute: min, text: narrateDodge(rng, name(defender)) });
+      }
+      // Dodge doesn't enable riposte (you're out of position)
+    }
+  } else {
+    // ── 3a. PARRY PATH — PAR check; if it fails, the hit lands ──
+    const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef - defender.armHits);
+
+    if (parrySuccess) {
+      defended = true;
+      canRiposte = true;
+      attacker.consecutiveHits = 0;
+
+      if (rng() < 0.5) {
+        log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
+        log.push({ minute: min, text: narrateParry(rng, name(defender), weaponOf(defender)) });
+      }
+    }
+  }
+
+  if (defended && canRiposte) {
+    // Parry succeeds — defender may riposte (harder check than before)
+    const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_PARRY_PENALTY + defDefMods.ripBonus + defPassive.ripBonus);
+    if (ripAfterParry) {
+      const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
+      const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
+      const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
+      attacker.hp -= ripDmg;
+      attacker.hitsTaken++;
+      defender.hitsLanded++;
+      defender.ripostes++;
+      defender.consecutiveHits++;
+      // Canonical PBP: counterstrike after parry
+      log.push({ minute: min, text: narrateCounterstrike(rng, name(defender)) });
+      log.push({ minute: min, text: narrateAttack(rng, name(defender), weaponOf(defender)) });
+      log.push({ minute: min, text: narrateHit(rng, name(attacker), ripLoc) });
+      const sevLine2 = damageSeverityLine(rng, ripDmg, attacker.maxHp);
+      if (sevLine2) log.push({ minute: min, text: sevLine2 });
+    }
+  }
+
+  return defended;
+}
+
+function applyDamageAndCheckKill(
+  rng: () => number,
+  attacker: FighterState,
+  defender: FighterState,
+  attTactics: ReturnType<typeof resolveEffectiveTactics>,
+  attOffMods: ReturnType<typeof getOffensiveTacticMods>,
+  attPassive: ReturnType<typeof getStylePassive>,
+  min: number,
+  log: MinuteEvent[],
+  name: (f: FighterState) => string,
+  weaponOf: (f: FighterState) => string,
+  tags: string[],
+  prevHpRatioA: number,
+  prevHpRatioD: number,
+  phase: string,
+  attKD: number,
+  attMatchup: number,
+  attFat: number,
+  trainerModsA: ReturnType<typeof getTrainerMods> | null,
+  trainerModsD: ReturnType<typeof getTrainerMods> | null,
+  ex: number
+) {
+  // ── 5. DAMAGE APPLICATION — with passive DMG + crit ──
+  const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
+  let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
+
+  // Style-specific crit (e.g. Aimed Blow precision)
+  if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
+    rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
+    log.push({ minute: min, text: `💥 CRITICAL HIT! ${name(attacker)} finds a vital weakness!` });
+    if (!tags.includes("CriticalHit")) tags.push("CriticalHit");
+  }
+
+  const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
+  defender.hp -= damage;
+  defender.hitsTaken++;
+  attacker.hitsLanded++;
+  attacker.consecutiveHits++;
+  defender.consecutiveHits = 0;
+  if (hitLoc === "right arm" || hitLoc === "left arm") defender.armHits++;
+  if (hitLoc === "right leg" || hitLoc === "left leg") defender.legHits++;
+
+  // Canonical PBP narration: attack + hit + damage severity + state changes
+  log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
+  log.push({ minute: min, text: narrateHit(rng, name(defender), hitLoc) });
+
+  // Insight hint generation based on stat differences
+  if (damage > 0 && rng() < 0.2) {
+    let attribute = null;
+    if (attacker.attributes.ST - defender.attributes.ST > 5) attribute = "ST";
+    else if (defender.attributes.SP - attacker.attributes.SP > 5) attribute = "SP";
+    else if (defender.attributes.DF - attacker.attributes.DF > 5) attribute = "DF";
+    else if (defender.hp / defender.maxHp < 0.3) attribute = "WL";
+
+    if (attribute) {
+      const hint = narrateInsightHint(rng, attribute);
+      if (hint) {
+        log.push({ minute: min, text: `🔍 ${hint}` });
+        if (!tags.includes(`Insight_${attribute}`)) tags.push(`Insight_${attribute}`);
+      }
+    }
+  }
+
+  const sevLine3 = damageSeverityLine(rng, damage, defender.maxHp);
+  if (sevLine3) log.push({ minute: min, text: sevLine3 });
+
+  // State change narration (desperation, bleeding, etc.)
+  const defHpRatio = defender.hp / defender.maxHp;
+  const prevDefHpRatio = defender.label === "A" ? prevHpRatioA : prevHpRatioD;
+  const stateLine = stateChangeLine(rng, name(defender), defHpRatio, prevDefHpRatio);
+  if (stateLine) log.push({ minute: min, text: stateLine });
+
+  if (defender.label === "A") prevHpRatioA = defHpRatio;
+  else prevHpRatioD = defHpRatio;
+
+  // Crowd reactions
+  const crowd = crowdReaction(rng, name(defender), name(attacker), defHpRatio);
+  if (crowd) log.push({ minute: min, text: crowd });
+
+  // Taunts (rare)
+  const taunt = tauntLine(rng, name(attacker), true);
+  if (taunt) log.push({ minute: min, text: taunt });
+
+  // Consecutive hits pressing line
+  if (attacker.consecutiveHits >= 3 && rng() < 0.4) {
+    log.push({ minute: min, text: pressingLine(rng, name(attacker)) });
+  }
+
+  // Check for significant hit
+  if (damage >= 5) {
+    if (rng() < 0.5) tags.push("Flashy");
+  }
+
+  let ended = false;
+  let winner = null;
+  let by = null;
+  let causeBucket: any = undefined;
+  let fatalHitLocation = undefined;
+  let fatalExchangeIndex = undefined;
+
+  // ── 6. DECISIVENESS CHECK — Style-specific kill mechanics ──
+  const killMech = getKillMechanic(attacker.style, {
+    phase: phase as StylePhase,
+    hitsLanded: attacker.hitsLanded,
+    consecutiveHits: attacker.consecutiveHits,
+    targetedLocation: attTactics.target,
+    hitLocation: hitLoc,
+  });
+
+  const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
+  const killWindowEnd = defender.maxEndurance * KILL_WINDOW_ENDURANCE;
+
+  if (defender.hp <= killWindowHp && defender.endurance <= killWindowEnd) {
+    const kdMod = Math.floor((attKD) - 5) * 0.5;
+    const phaseMod = phase === "LATE" ? 3 : phase === "MID" ? 1 : 0;
+    const decSuccess = skillCheck(rng, attacker.skills.DEC, kdMod + phaseMod + attMatchup + attFat + attOffMods.decBonus + killMech.decBonus);
+
+    if (decSuccess) {
+      const killRoll = rng();
+      const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * TRAINER_HEALING_REDUCTION : (trainerModsD?.healMod ?? 0) * TRAINER_HEALING_REDUCTION;
+      const killThreshold = Math.max(KILL_THRESHOLD_MIN, KILL_THRESHOLD_BASE + attKD * KILL_DESIRE_SCALING + (phase === "LATE" ? KILL_PHASE_LATE_BONUS : 0) + killMech.killBonus - healingReduction);
+
+      if (killRoll < killThreshold) {
+        // KILL — style-specific narrative
+        defender.hp = 0;
+        winner = attacker.label;
+        by = "Kill";
+        causeBucket = "EXECUTION";
+        fatalHitLocation = hitLoc;
+        fatalExchangeIndex = ex;
+        tags.push("Kill");
+
+        // KILL — canonical PBP narration
+        const endLines = narrateBoutEnd(rng, "Kill", name(attacker), name(defender));
+        for (const l of endLines) log.push({ minute: min, text: l });
+        ended = true;
+      } else {
+        log.push({
+          minute: min,
+          text: `${name(attacker)} senses the kill window but ${name(defender)} desperately clings on!`,
+        });
+      }
+    }
+  }
+
+  // KO check
+  if (!ended && defender.hp <= 0) {
+    winner = attacker.label;
+    by = "KO";
+    causeBucket = "FATAL_DAMAGE";
+    fatalHitLocation = hitLoc;
+    fatalExchangeIndex = ex;
+    tags.push("KO");
+    const koLines = narrateBoutEnd(rng, "KO", name(attacker), name(defender));
+    for (const l of koLines) log.push({ minute: min, text: l });
+    ended = true;
+  }
+
+  return { ended, winner, by, causeBucket, fatalHitLocation, fatalExchangeIndex, prevHpRatioA, prevHpRatioD };
+}
+
+function applyEnduranceCostAndCheckExhaustion(
+  rng: () => number,
+  attacker: FighterState,
+  defender: FighterState,
+  fA: FighterState,
+  fD: FighterState,
+  attOE: number,
+  attAL: number,
+  defOE: number,
+  defAL: number,
+  weaponReqA: ReturnType<typeof checkWeaponRequirements>,
+  weaponReqD: ReturnType<typeof checkWeaponRequirements>,
+  winnerIn: string | null,
+  min: number,
+  log: MinuteEvent[],
+  name: (f: FighterState) => string,
+  nameA: string,
+  nameD: string,
+  ex: number
+) {
+  // ── 7. ENDURANCE & FATIGUE — with style-specific drain rates ──
+  const attEndMult = getEnduranceMult(attacker.style);
+  const defEndMult = getEnduranceMult(defender.style);
+  const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * DAMAGE_TAX_SCALING)) : 0;
+
+  const attWepEndMult = attacker.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
+  const defWepEndMult = defender.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
+
+  attacker.endurance -= Math.round(enduranceCost(attOE, attAL) * attEndMult * attWepEndMult);
+  defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * DEFENDER_ENDURANCE_DISCOUNT * defEndMult * defWepEndMult) + defDamageTax);
+
+  // Clamp endurance
+  fA.endurance = Math.max(0, fA.endurance);
+  fD.endurance = Math.max(0, fD.endurance);
+
+  let ended = false;
+  let winner = winnerIn;
+  let by = null;
+
+  // Exhaustion narration
+  if (fA.endurance <= 0 && fD.endurance <= 0 && !winner) {
+    winner = fA.hp >= fD.hp ? "A" : fD.hp > fA.hp ? "D" : null;
+    by = "Exhaustion";
+    if (winner) {
+      const exLines = narrateBoutEnd(rng, "Exhaustion", winner === "A" ? nameA : nameD, winner === "A" ? nameD : nameA);
+      for (const l of exLines) log.push({ minute: min, text: l });
+    } else {
+      log.push({ minute: min, text: `Both warriors collapse from exhaustion! The bout is declared a draw.` });
+    }
+    ended = true;
+    return { ended, winner, by };
+  }
+
+  if (attacker.endurance <= 0 && !winner) {
+    winner = defender.label;
+    by = "Stoppage";
+    const stLines = narrateBoutEnd(rng, "Stoppage", name(defender), name(attacker));
+    for (const l of stLines) log.push({ minute: min, text: l });
+    ended = true;
+    return { ended, winner, by };
+  }
+
+  if (defender.endurance <= 0 && !winner) {
+    winner = attacker.label;
+    by = "Stoppage";
+    const stLines = narrateBoutEnd(rng, "Stoppage", name(attacker), name(defender));
+    for (const l of stLines) log.push({ minute: min, text: l });
+    ended = true;
+    return { ended, winner, by };
+  }
+
+  // Fatigue narration (canonical PBP style)
+  if (ex > 0 && ex % 4 === 0) {
+    for (const f of [fA, fD]) {
+      const endRatio = f.endurance / f.maxEndurance;
+      const fLine = fatigueLine(rng, name(f), endRatio);
+      if (fLine) log.push({ minute: min, text: fLine });
+    }
+  }
+
+  // Trading blows filler (canonical: "The two warriors fiercely trade attacks and parrys.")
+  if (ex > 2 && rng() < 0.15) {
+    log.push({ minute: min, text: tradingBlowsLine(rng) });
+  }
+
+  return { ended, winner, by };
+}
+
+function determineFightResult(
+  winner: string | null,
+  by: string | null,
+  fA: FighterState,
+  fD: FighterState,
+  nameA: string,
+  nameD: string,
+  min: number,
+  log: MinuteEvent[],
+  tags: string[]
+) {
+  // If no winner after all exchanges — decision or draw
+  if (!winner) {
+    if (fA.hitsLanded > fD.hitsLanded + DECISION_HIT_MARGIN) {
+      winner = "A";
+      by = "Stoppage";
+      log.push({ minute: min, text: `Time! ${nameA} is awarded the decision on points.` });
+    } else if (fD.hitsLanded > fA.hitsLanded + DECISION_HIT_MARGIN) {
+      winner = "D";
+      by = "Stoppage";
+      log.push({ minute: min, text: `Time! ${nameD} is awarded the decision on points.` });
+    } else if (fA.hp > fD.hp) {
+      winner = "A";
+      by = "Stoppage";
+      log.push({ minute: min, text: `Time! ${nameA} wins a close decision.` });
+    } else if (fD.hp > fA.hp) {
+      winner = "D";
+      by = "Stoppage";
+      log.push({ minute: min, text: `Time! ${nameD} wins a close decision.` });
+    } else {
+      by = "Draw";
+      log.push({ minute: min, text: `Time! The Arenamaster declares a draw.` });
+    }
+  }
+
+  // Comeback detection
+  if (winner) {
+    const w = winner === "A" ? fA : fD;
+    const l = winner === "A" ? fD : fA;
+    if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) {
+      tags.push("Comeback");
+    }
+    if (w.hitsLanded >= 5) {
+      tags.push("Dominance");
+    }
+  }
+
+  // Deduplicate tags
+  const uniqueTags = [...new Set(tags)];
+
+  return { winner, by, uniqueTags };
+}
+
 export function simulateFight(
   planA: FightPlan,
   planD: FightPlan,
@@ -479,84 +1064,19 @@ export function simulateFight(
 ): FightOutcome {
   const rng = mulberry32(seed ?? (Date.now() ^ getSecureSeed()));
 
-  // Compute skills from warriors or generate defaults
-  const attrsA = warriorA?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
-  const attrsD = warriorD?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
-
-  const skillsA = warriorA?.baseSkills ?? computeBaseSkills(attrsA, planA.style);
-  const skillsD = warriorD?.baseSkills ?? computeBaseSkills(attrsD, planD.style);
-
-  const derivedA = warriorA?.derivedStats ?? computeDerivedStats(attrsA);
-  const derivedD = warriorD?.derivedStats ?? computeDerivedStats(attrsD);
-
-  const nameA = warriorA?.name ?? "Attacker";
-  const nameD = warriorD?.name ?? "Defender";
-  const styleNameA = STYLE_DISPLAY_NAMES[planA.style] ?? planA.style;
-  const styleNameD = STYLE_DISPLAY_NAMES[planD.style] ?? planD.style;
-
-  // Matchup bonus
-  const matchupA = getMatchupBonus(planA.style, planD.style);
-  const matchupD = getMatchupBonus(planD.style, planA.style);
-
-  // Equipment bonuses
-  const equipA = getEquipmentMods(warriorA?.equipment ?? DEFAULT_LOADOUT, derivedA.encumbrance);
-  const equipD = getEquipmentMods(warriorD?.equipment ?? DEFAULT_LOADOUT, derivedD.encumbrance);
-
-  // Trainer bonuses (shared stable trainers apply to both player warriors)
-  const trainerModsA = trainers ? getTrainerMods(trainers, planA.style) : null;
-  const trainerModsD = trainers ? getTrainerMods(trainers, planD.style) : null;
-
-  // Apply bonuses to effective skills
-  // Classic weapon bonus (compendium: each style has a canonical weapon)
-  const classicBonusA = getClassicWeaponBonus(planA.style, (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon);
-  const classicBonusD = getClassicWeaponBonus(planD.style, (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon);
-
-  // Favorite weapon/rhythm bonuses (only if warrior has discovered them)
-  const favWeaponA = warriorA ? getFavoriteWeaponBonus(warriorA) : 0;
-  const favWeaponD = warriorD ? getFavoriteWeaponBonus(warriorD) : 0;
-
-  // Weapon requirement penalties (STR/DFT/SPD minimums)
-  const weaponReqA = checkWeaponRequirements(
-    (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon,
-    { ST: attrsA.ST, DF: attrsA.DF, SP: attrsA.SP }
-  );
-  const weaponReqD = checkWeaponRequirements(
-    (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon,
-    { ST: attrsD.ST, DF: attrsD.DF, SP: attrsD.SP }
-  );
-
-  const effSkillsA: BaseSkills = {
-    ATT: skillsA.ATT + equipA.attMod + (trainerModsA?.attMod ?? 0) + classicBonusA + favWeaponA + weaponReqA.attPenalty,
-    PAR: skillsA.PAR + equipA.parMod + (trainerModsA?.parMod ?? 0),
-    DEF: skillsA.DEF + equipA.defMod + (trainerModsA?.defMod ?? 0),
-    INI: skillsA.INI + equipA.iniMod + (trainerModsA?.iniMod ?? 0),
-    RIP: skillsA.RIP,
-    DEC: skillsA.DEC + (trainerModsA?.decMod ?? 0),
-  };
-  const effSkillsD: BaseSkills = {
-    ATT: skillsD.ATT + equipD.attMod + (trainerModsD?.attMod ?? 0) + classicBonusD + favWeaponD + weaponReqD.attPenalty,
-    PAR: skillsD.PAR + equipD.parMod + (trainerModsD?.parMod ?? 0),
-    DEF: skillsD.DEF + equipD.defMod + (trainerModsD?.defMod ?? 0),
-    INI: skillsD.INI + equipD.iniMod + (trainerModsD?.iniMod ?? 0),
-    RIP: skillsD.RIP,
-    DEC: skillsD.DEC + (trainerModsD?.decMod ?? 0),
-  };
-
-  // Fighter state
-  const fA: FighterState = {
-    label: "A", attributes: attrsA, style: planA.style, skills: effSkillsA, derived: { ...derivedA, damage: derivedA.damage + equipA.dmgMod }, plan: planA,
-    hp: derivedA.hp, maxHp: derivedA.hp,
-    endurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
-    maxEndurance: derivedA.endurance + (trainerModsA?.endMod ?? 0) + equipA.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0, armHits: 0, legHits: 0,
-  };
-  const fD: FighterState = {
-    label: "D", attributes: attrsD, style: planD.style, skills: effSkillsD, derived: { ...derivedD, damage: derivedD.damage + equipD.dmgMod }, plan: planD,
-    hp: derivedD.hp, maxHp: derivedD.hp,
-    endurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
-    maxEndurance: derivedD.endurance + (trainerModsD?.endMod ?? 0) + equipD.endMod,
-    hitsLanded: 0, hitsTaken: 0, ripostes: 0, consecutiveHits: 0, armHits: 0, legHits: 0,
-  };
+  const matchData = initializeMatchData(planA, planD, warriorA, warriorD, trainers);
+  const matchupA = matchData.matchupA;
+  const matchupD = matchData.matchupD;
+  const trainerModsA = matchData.trainerModsA;
+  const trainerModsD = matchData.trainerModsD;
+  const weaponReqA = matchData.weaponReqA;
+  const weaponReqD = matchData.weaponReqD;
+  const nameA = matchData.nameA;
+  const nameD = matchData.nameD;
+  const styleNameA = matchData.styleNameA;
+  const styleNameD = matchData.styleNameD;
+  const fA = matchData.fA;
+  const fD = matchData.fD;
 
   const log: MinuteEvent[] = [];
   const tags: string[] = [];
@@ -570,7 +1090,7 @@ export function simulateFight(
   let tacticStreakA = 0;
   let tacticStreakD = 0;
   let by: FightOutcome["by"] = null;
-  let causeBucket: any = undefined;
+  let causeBucket: FightOutcome["post"]["causeBucket"] | undefined = undefined;
   let fatalHitLocation: string | undefined = undefined;
   let fatalExchangeIndex: number | undefined = undefined;
 
@@ -621,23 +1141,23 @@ export function simulateFight(
     const phase = getPhase(ex, MAX_EXCHANGES);
     const min = minute(ex);
 
-    // Phase-based OE/AL/KD resolution
-    const phaseKeyA = phase === "OPENING" ? "opening" : phase === "MID" ? "mid" : "late";
-    const phaseKeyD = phase === "OPENING" ? "opening" : phase === "MID" ? "mid" : "late";
-    const effOE_A = fA.plan.phases?.[phaseKeyA]?.OE ?? fA.plan.OE;
-    const effAL_A = fA.plan.phases?.[phaseKeyA]?.AL ?? fA.plan.AL;
-    const effKD_A = fA.plan.phases?.[phaseKeyA]?.killDesire ?? fA.plan.killDesire ?? 5;
-    const effOE_D = fD.plan.phases?.[phaseKeyD]?.OE ?? fD.plan.OE;
-    const effAL_D = fD.plan.phases?.[phaseKeyD]?.AL ?? fD.plan.AL;
-    const effKD_D = fD.plan.phases?.[phaseKeyD]?.killDesire ?? fD.plan.killDesire ?? 5;
+    // Phase and Tactic resolution
+    const phaseStrategyA = resolvePhaseStrategy(fA, phase);
+    const phaseStrategyD = resolvePhaseStrategy(fD, phase);
 
-    // Per-phase tactic & target resolution
-    const tacticsA = resolveEffectiveTactics(fA.plan, phaseKeyA);
-    const tacticsD = resolveEffectiveTactics(fD.plan, phaseKeyD);
-    const offModsA = getOffensiveTacticMods(tacticsA.offTactic, fA.style);
-    const defModsA = getDefensiveTacticMods(tacticsA.defTactic, fA.style);
-    const offModsD = getOffensiveTacticMods(tacticsD.offTactic, fD.style);
-    const defModsD = getDefensiveTacticMods(tacticsD.defTactic, fD.style);
+    const effOE_A = phaseStrategyA.effOE;
+    const effAL_A = phaseStrategyA.effAL;
+    const effKD_A = phaseStrategyA.effKD;
+    const tacticsA = phaseStrategyA.tactics;
+    const offModsA = phaseStrategyA.offMods;
+    const defModsA = phaseStrategyA.defMods;
+
+    const effOE_D = phaseStrategyD.effOE;
+    const effAL_D = phaseStrategyD.effAL;
+    const effKD_D = phaseStrategyD.effKD;
+    const tacticsD = phaseStrategyD.tactics;
+    const offModsD = phaseStrategyD.offMods;
+    const defModsD = phaseStrategyD.defMods;
 
     // Emit phase-change indicator event
     if (phase !== lastPhase) {
@@ -692,41 +1212,17 @@ export function simulateFight(
     }
 
     // ── 1. INITIATIVE CONTEST — with tempo & passive ──
-    const iniA = fA.skills.INI + alIniMod(effAL_A) + matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits;
-    const iniD = fD.skills.INI + alIniMod(effAL_D) + matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits;
-    const aGoesFirst = contestCheck(rng, iniA, iniD);
-    const iniPressBonus = INITIATIVE_PRESS_BONUS;
+    const initData = resolveInitiative(
+      rng, fA, fD, effAL_A, effAL_D, matchupA, matchupD, fatA, fatD, defModsA, defModsD,
+      tempoA, tempoD, passiveA, passiveD, antiSynA, antiSynD, tacticsA, tacticsD,
+      offModsA, offModsD, effOE_A, effOE_D, effKD_A, effKD_D, ex, min, log, name
+    );
 
-    const attacker = aGoesFirst ? fA : fD;
-    const defender = aGoesFirst ? fD : fA;
-    const attMatchup = aGoesFirst ? matchupA : matchupD;
-    const defMatchup = aGoesFirst ? matchupD : matchupA;
-    const attFat = aGoesFirst ? fatA : fatD;
-    const defFat = aGoesFirst ? fatD : fatA;
-    const attOE = aGoesFirst ? effOE_A : effOE_D;
-    const defOE = aGoesFirst ? effOE_D : effOE_A;
-    const attAL = aGoesFirst ? effAL_A : effAL_D;
-    const defAL = aGoesFirst ? effAL_D : effAL_A;
-    const attKD = aGoesFirst ? effKD_A : effKD_D;
-    const attPassive = aGoesFirst ? passiveA : passiveD;
-    const defPassive = aGoesFirst ? passiveD : passiveA;
-    const attAntiSyn = aGoesFirst ? antiSynA : antiSynD;
-    const defAntiSyn = aGoesFirst ? antiSynD : antiSynA;
-
-    // Resolve per-phase tactic mods for attacker/defender
-    const attTactics = aGoesFirst ? tacticsA : tacticsD;
-    const defTactics = aGoesFirst ? tacticsD : tacticsA;
-    const attOffMods = aGoesFirst ? offModsA : offModsD;
-    const defOffMods = aGoesFirst ? offModsD : offModsA;
-    const attDefMods = aGoesFirst ? defModsA : defModsD;
-    const defDefMods = aGoesFirst ? defModsD : defModsA;
-
-    // Narrate initiative swings (canonical PBP style)
-    if (ex === 0 || (ex > 0 && rng() < 0.3)) {
-      if (aGoesFirst) {
-        log.push({ minute: min, text: narrateInitiative(rng, name(attacker), rng() < 0.3) });
-      }
-    }
+    const {
+      attacker, defender, attMatchup, defMatchup, attFat, defFat, attOE, defOE, attAL, defAL,
+      attKD, attPassive, defPassive, attAntiSyn, defAntiSyn, attTactics, defTactics,
+      attOffMods, defOffMods, attDefMods, defDefMods, aGoesFirst, iniPressBonus
+    } = initData;
 
     // Minute markers with status assessment (canonical: "MINUTE 2. The warriors appear equal in skill.")
     if (min > lastMinuteMarker && min > 1) {
@@ -760,350 +1256,62 @@ export function simulateFight(
     const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
     const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + iniPressBonus + GLOBAL_ATT_BONUS - tacticOveruseAtt - attacker.armHits);
 
+    let hitLanded = false;
+
     if (!attackSuccess) {
-      // Attack whiffs — reset consecutive hits
-      attacker.consecutiveHits = 0;
-
-       if (rng() < 0.25) {
-        log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
-        log.push({ minute: min, text: narrateDodge(rng, name(defender)) });
-      }
-      // ── Endurance cost for attempt ──
-      attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, attAL) * 0.5)) + attOffMods.endCost;
-
-      // Defender may riposte on whiff — HARD check (off-tempo, attacker recovering)
-      const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
-      const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_WHIFF_PENALTY + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
-      if (ripCheck) {
-        const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-        const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
-        const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
-        attacker.hp -= ripDmg;
-        attacker.hitsTaken++;
-        defender.hitsLanded++;
-        defender.ripostes++;
-        defender.consecutiveHits++;
-        attacker.consecutiveHits = 0;
-
-        // Canonical PBP: counterstrike + attack + hit
-        log.push({ minute: min, text: narrateCounterstrike(rng, name(defender)) });
-        log.push({ minute: min, text: narrateAttack(rng, name(defender), weaponOf(defender)) });
-        log.push({ minute: min, text: narrateHit(rng, name(attacker), ripLoc) });
-        const sevLine = damageSeverityLine(rng, ripDmg, attacker.maxHp);
-        if (sevLine) log.push({ minute: min, text: sevLine });
-
-        if (defender.ripostes >= 3 && !tags.includes("RiposteChain")) tags.push("RiposteChain");
-      }
+      handleWhiffedAttack(rng, attacker, defender, defMatchup, defFat, defDefMods, defPassive, defAntiSyn, defTactics, attOE, attAL, attOffMods, min, log, name, weaponOf, tags);
     } else {
-      // Attack lands — defender tries to stop it
-      // BALANCE v2: PAR and DEF are MUTUALLY EXCLUSIVE.
-      // - Dodge tactic → skip PAR, use DEF at full skill
-      // - Otherwise → PAR only; if PAR fails, the hit lands (no second chance)
-      // This eliminates the multiplicative double-defense that crushed offensive styles.
+      hitLanded = !resolveDefenseAttempt(rng, attacker, defender, defMatchup, defFat, defDefMods, defPassive, defAntiSyn, defTactics, attOffMods, defOE, tacticOveruseDef, min, log, name, weaponOf, tags);
+    }
 
-      const defOEmod = oeDefMod(defOE);
-      const defAntiSynPar = Math.round((defAntiSyn.defMult - 1) * 3);
-      const bashBypass = attOffMods.parryBypass ?? 0;
+    if (hitLanded) {
+      const killResult = applyDamageAndCheckKill(
+        rng, attacker, defender, attTactics, attOffMods, attPassive, min, log, name, weaponOf, tags,
+        prevHpRatioA, prevHpRatioD, phase, attKD, attMatchup, attFat, trainerModsA, trainerModsD, ex
+      );
 
-      const isDodging = defTactics.defTactic === "Dodge";
+      prevHpRatioA = killResult.prevHpRatioA;
+      prevHpRatioD = killResult.prevHpRatioD;
 
-      let defended = false;
-      let canRiposte = false;
-
-      if (isDodging) {
-        // ── 3b. DODGE PATH — full DEF skill, no parry attempt ──
-        const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus - tacticOveruseDef - defender.legHits);
-        if (defSuccess) {
-          defended = true;
-          attacker.consecutiveHits = 0;
-          if (rng() < 0.5) {
-            log.push({ minute: min, text: narrateDodge(rng, name(defender)) });
-          }
-          // Dodge doesn't enable riposte (you're out of position)
-        }
-      } else {
-        // ── 3a. PARRY PATH — PAR check; if it fails, the hit lands ──
-        const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef - defender.armHits);
-
-        if (parrySuccess) {
-          defended = true;
-          canRiposte = true;
-          attacker.consecutiveHits = 0;
-
-          if (rng() < 0.5) {
-            log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
-            log.push({ minute: min, text: narrateParry(rng, name(defender), weaponOf(defender)) });
-          }
-        }
-      }
-
-      if (defended && canRiposte) {
-        // Parry succeeds — defender may riposte (harder check than before)
-        const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_PARRY_PENALTY + defDefMods.ripBonus + defPassive.ripBonus);
-        if (ripAfterParry) {
-          const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-          const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
-          const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
-          attacker.hp -= ripDmg;
-          attacker.hitsTaken++;
-          defender.hitsLanded++;
-          defender.ripostes++;
-          defender.consecutiveHits++;
-          // Canonical PBP: counterstrike after parry
-          log.push({ minute: min, text: narrateCounterstrike(rng, name(defender)) });
-          log.push({ minute: min, text: narrateAttack(rng, name(defender), weaponOf(defender)) });
-          log.push({ minute: min, text: narrateHit(rng, name(attacker), ripLoc) });
-          const sevLine2 = damageSeverityLine(rng, ripDmg, attacker.maxHp);
-          if (sevLine2) log.push({ minute: min, text: sevLine2 });
-        }
-      }
-
-      if (!defended) {
-          // ── 5. DAMAGE APPLICATION — with passive DMG + crit ──
-          const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
-          let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
-
-          // Style-specific crit (e.g. Aimed Blow precision)
-          if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
-            rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
-            log.push({ minute: min, text: `💥 CRITICAL HIT! ${name(attacker)} finds a vital weakness!` });
-            if (!tags.includes("CriticalHit")) tags.push("CriticalHit");
-          }
-
-          const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
-          defender.hp -= damage;
-          defender.hitsTaken++;
-          attacker.hitsLanded++;
-          attacker.consecutiveHits++;
-          defender.consecutiveHits = 0;
-          if (hitLoc === "right arm" || hitLoc === "left arm") defender.armHits++;
-          if (hitLoc === "right leg" || hitLoc === "left leg") defender.legHits++;
-
-          // Canonical PBP narration: attack + hit + damage severity + state changes
-          log.push({ minute: min, text: narrateAttack(rng, name(attacker), weaponOf(attacker)) });
-          log.push({ minute: min, text: narrateHit(rng, name(defender), hitLoc) });
-
-          // Insight hint generation based on stat differences
-          if (damage > 0 && rng() < 0.2) {
-            let attribute = null;
-            if (attacker.attributes.ST - defender.attributes.ST > 5) attribute = "ST";
-            else if (defender.attributes.SP - attacker.attributes.SP > 5) attribute = "SP";
-            else if (defender.attributes.DF - attacker.attributes.DF > 5) attribute = "DF";
-            else if (defender.hp / defender.maxHp < 0.3) attribute = "WL";
-
-            if (attribute) {
-              const hint = narrateInsightHint(rng, attribute);
-              if (hint) {
-                log.push({ minute: min, text: `🔍 ${hint}` });
-                if (!tags.includes(`Insight_${attribute}`)) tags.push(`Insight_${attribute}`);
-              }
-            }
-          }
-
-          const sevLine3 = damageSeverityLine(rng, damage, defender.maxHp);
-          if (sevLine3) log.push({ minute: min, text: sevLine3 });
-
-          // State change narration (desperation, bleeding, etc.)
-          const defHpRatio = defender.hp / defender.maxHp;
-          const prevDefHpRatio = defender.label === "A" ? prevHpRatioA : prevHpRatioD;
-          const stateLine = stateChangeLine(rng, name(defender), defHpRatio, prevDefHpRatio);
-          if (stateLine) log.push({ minute: min, text: stateLine });
-          if (defender.label === "A") prevHpRatioA = defHpRatio;
-          else prevHpRatioD = defHpRatio;
-
-          // Crowd reactions
-          const crowd = crowdReaction(rng, name(defender), name(attacker), defHpRatio);
-          if (crowd) log.push({ minute: min, text: crowd });
-
-          // Taunts (rare)
-          const taunt = tauntLine(rng, name(attacker), true);
-          if (taunt) log.push({ minute: min, text: taunt });
-
-          // Consecutive hits pressing line
-          if (attacker.consecutiveHits >= 3 && rng() < 0.4) {
-            log.push({ minute: min, text: pressingLine(rng, name(attacker)) });
-          }
-
-          // Check for significant hit
-          if (damage >= 5) {
-            if (rng() < 0.5) tags.push("Flashy");
-          }
-
-          // ── 6. DECISIVENESS CHECK — Style-specific kill mechanics ──
-          const killMech = getKillMechanic(attacker.style, {
-            phase: phase as StylePhase,
-            hitsLanded: attacker.hitsLanded,
-            consecutiveHits: attacker.consecutiveHits,
-            targetedLocation: attTactics.target,
-            hitLocation: hitLoc,
-          });
-
-          const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
-          const killWindowEnd = defender.maxEndurance * KILL_WINDOW_ENDURANCE;
-
-          if (defender.hp <= killWindowHp && defender.endurance <= killWindowEnd) {
-            const kdMod = Math.floor((attKD) - 5) * 0.5;
-            const phaseMod = phase === "LATE" ? 3 : phase === "MID" ? 1 : 0;
-            const decSuccess = skillCheck(rng, attacker.skills.DEC, kdMod + phaseMod + attMatchup + attFat + attOffMods.decBonus + killMech.decBonus);
-
-            if (decSuccess) {
-              const killRoll = rng();
-              const healingReduction = defender.label === "A" ? (trainerModsA?.healMod ?? 0) * TRAINER_HEALING_REDUCTION : (trainerModsD?.healMod ?? 0) * TRAINER_HEALING_REDUCTION;
-              const killThreshold = Math.max(KILL_THRESHOLD_MIN, KILL_THRESHOLD_BASE + attKD * KILL_DESIRE_SCALING + (phase === "LATE" ? KILL_PHASE_LATE_BONUS : 0) + killMech.killBonus - healingReduction);
-
-              if (killRoll < killThreshold) {
-                // KILL — style-specific narrative
-                defender.hp = 0;
-                winner = attacker.label as "A" | "D";
-                by = "Kill";
-                causeBucket = "EXECUTION";
-                fatalHitLocation = hitLoc;
-                fatalExchangeIndex = ex;
-                tags.push("Kill");
-
-                // KILL — canonical PBP narration
-                const endLines = narrateBoutEnd(rng, "Kill", name(attacker), name(defender));
-                for (const l of endLines) log.push({ minute: min, text: l });
-                break;
-              } else {
-                log.push({
-                  minute: min,
-                  text: `${name(attacker)} senses the kill window but ${name(defender)} desperately clings on!`,
-                });
-              }
-            }
-          }
-
-          // KO check
-          if (defender.hp <= 0) {
-            winner = attacker.label as "A" | "D";
-            by = "KO";
-            causeBucket = "FATAL_DAMAGE";
-            fatalHitLocation = hitLoc;
-            fatalExchangeIndex = ex;
-            tags.push("KO");
-            const koLines = narrateBoutEnd(rng, "KO", name(attacker), name(defender));
-            for (const l of koLines) log.push({ minute: min, text: l });
-            break;
-        }
+      if (killResult.ended) {
+        winner = killResult.winner as "A" | "D";
+        by = killResult.by as FightOutcome["by"];
+        causeBucket = killResult.causeBucket;
+        fatalHitLocation = killResult.fatalHitLocation;
+        fatalExchangeIndex = killResult.fatalExchangeIndex;
+        break;
       }
     }
 
-    // ── 7. ENDURANCE & FATIGUE — with style-specific drain rates ──
-    // BALANCE v5: Defender discount reduced from 0.85 to 0.92 (defense is still cheaper but not free).
-    // Damage tax increased: taking hits is exhausting regardless of style.
-    const attEndMult = getEnduranceMult(attacker.style);
-    const defEndMult = getEnduranceMult(defender.style);
-    const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * DAMAGE_TAX_SCALING)) : 0;
-    // Weapon requirement endurance penalty (×1.1 per failed req)
-    const attWepEndMult = attacker.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
-    const defWepEndMult = defender.label === "A" ? weaponReqA.endurancePenalty : weaponReqD.endurancePenalty;
-    attacker.endurance -= Math.round(enduranceCost(attOE, attAL) * attEndMult * attWepEndMult);
-    defender.endurance -= Math.max(1, Math.round(enduranceCost(defOE, defAL) * DEFENDER_ENDURANCE_DISCOUNT * defEndMult * defWepEndMult) + defDamageTax);
+    const endResult = applyEnduranceCostAndCheckExhaustion(
+      rng, attacker, defender, fA, fD, attOE, attAL, defOE, defAL, weaponReqA, weaponReqD,
+      winner, min, log, name, nameA, nameD, ex
+    );
 
-    // Clamp endurance
-    fA.endurance = Math.max(0, fA.endurance);
-    fD.endurance = Math.max(0, fD.endurance);
-
-    // Exhaustion narration
-    if (fA.endurance <= 0 && fD.endurance <= 0 && !winner) {
-      winner = fA.hp >= fD.hp ? "A" : fD.hp > fA.hp ? "D" : null;
-      by = "Exhaustion";
-      if (winner) {
-        const exLines = narrateBoutEnd(rng, "Exhaustion", winner === "A" ? nameA : nameD, winner === "A" ? nameD : nameA);
-        for (const l of exLines) log.push({ minute: min, text: l });
-      } else {
-        log.push({ minute: min, text: `Both warriors collapse from exhaustion! The bout is declared a draw.` });
-      }
+    if (endResult.ended) {
+      winner = endResult.winner as "A" | "D" | null;
+      by = endResult.by as FightOutcome["by"];
       break;
-    }
-
-    if (attacker.endurance <= 0 && !winner) {
-      winner = defender.label as "A" | "D";
-      by = "Stoppage";
-      const stLines = narrateBoutEnd(rng, "Stoppage", name(defender), name(attacker));
-      for (const l of stLines) log.push({ minute: min, text: l });
-      break;
-    }
-
-    if (defender.endurance <= 0 && !winner) {
-      winner = attacker.label as "A" | "D";
-      by = "Stoppage";
-      const stLines = narrateBoutEnd(rng, "Stoppage", name(attacker), name(defender));
-      for (const l of stLines) log.push({ minute: min, text: l });
-      break;
-    }
-
-    // Fatigue narration (canonical PBP style)
-    if (ex > 0 && ex % 4 === 0) {
-      for (const f of [fA, fD]) {
-        const endRatio = f.endurance / f.maxEndurance;
-        const fLine = fatigueLine(rng, name(f), endRatio);
-        if (fLine) log.push({ minute: min, text: fLine });
-      }
-    }
-
-    // Trading blows filler (canonical: "The two warriors fiercely trade attacks and parrys.")
-    if (ex > 2 && rng() < 0.15) {
-      log.push({ minute: min, text: tradingBlowsLine(rng) });
     }
   }
 
-  // If no winner after all exchanges — decision or draw
-  if (!winner) {
-    const min = minute(MAX_EXCHANGES);
-    if (fA.hitsLanded > fD.hitsLanded + DECISION_HIT_MARGIN) {
-      winner = "A";
-      by = "Stoppage";
-      log.push({ minute: min, text: `Time! ${nameA} is awarded the decision on points.` });
-    } else if (fD.hitsLanded > fA.hitsLanded + DECISION_HIT_MARGIN) {
-      winner = "D";
-      by = "Stoppage";
-      log.push({ minute: min, text: `Time! ${nameD} is awarded the decision on points.` });
-    } else if (fA.hp > fD.hp) {
-      winner = "A";
-      by = "Stoppage";
-      log.push({ minute: min, text: `Time! ${nameA} wins a close decision.` });
-    } else if (fD.hp > fA.hp) {
-      winner = "D";
-      by = "Stoppage";
-      log.push({ minute: min, text: `Time! ${nameD} wins a close decision.` });
-    } else {
-      by = "Draw";
-      log.push({ minute: min, text: `Time! The Arenamaster declares a draw.` });
-    }
-  }
-
-  // Comeback detection
-  if (winner) {
-    const w = winner === "A" ? fA : fD;
-    const l = winner === "A" ? fD : fA;
-    if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) {
-      tags.push("Comeback");
-    }
-    if (w.hitsLanded >= 5) {
-      tags.push("Dominance");
-    }
-  }
-
-  // Deduplicate tags
-  const uniqueTags = [...new Set(tags)];
+  const result = determineFightResult(winner, by, fA, fD, nameA, nameD, minute(MAX_EXCHANGES), log, tags);
 
   const finalMinute = log.length > 0 ? log[log.length - 1].minute : 1;
 
   return {
-    winner,
-    by,
+    winner: result.winner as "A" | "D" | null,
+    by: result.by as FightOutcome["by"],
     minutes: finalMinute,
     log,
     post: {
-      xpA: winner === "A" ? 2 : winner === null ? 1 : 1,
-      xpD: winner === "D" ? 2 : winner === null ? 1 : 1,
+      xpA: result.winner === "A" ? 2 : result.winner === null ? 1 : 1,
+      xpD: result.winner === "D" ? 2 : result.winner === null ? 1 : 1,
       hitsA: fA.hitsLanded,
       hitsD: fD.hitsLanded,
-      gotKillA: winner === "A" && by === "Kill",
-      gotKillD: winner === "D" && by === "Kill",
-      tags: uniqueTags,
+      gotKillA: result.winner === "A" && result.by === "Kill",
+      gotKillD: result.winner === "D" && result.by === "Kill",
+      tags: result.uniqueTags,
       causeBucket,
       fatalHitLocation,
       fatalExchangeIndex,

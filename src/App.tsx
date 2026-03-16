@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { router } from "@/router";
-import { GameProvider, useGame } from "@/state/GameContext";
+import { GameProvider } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import AppShell from "@/components/AppShell";
 import ResolutionReveal from "@/components/ResolutionReveal";
 import Dashboard from "@/pages/Dashboard";
@@ -27,7 +28,7 @@ import Orphanage from "@/pages/Orphanage";
 const queryClient = new QueryClient();
 
 function GameRoutes() {
-  const { state, atTitleScreen } = useGame();
+  const { state, atTitleScreen } = useGameStore();
 
   // No active game → show title / start screen
   if (atTitleScreen) {

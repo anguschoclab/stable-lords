@@ -3,7 +3,7 @@
  * Each section is a self-contained widget in a responsive grid.
  */
 import React, { useMemo, useState, useCallback } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, BASE_ROSTER_CAP, type Warrior } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
 import TagBadge from "@/components/TagBadge";
@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 // ─── Widget: Season & Calendar ─────────────────────────────────────────────
 
 function SeasonWidget() {
-  const { state, doAdvanceWeek } = useGame();
+  const { state, doAdvanceWeek } = useGameStore();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const moodDesc = MOOD_DESCRIPTIONS[state.crowdMood as keyof typeof MOOD_DESCRIPTIONS] ?? "";
 
@@ -149,7 +149,7 @@ function SeasonWidget() {
 // ─── Widget: Stable Overview ───────────────────────────────────────────────
 
 function StableWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const activeWarriors = state.roster.filter(w => w.status === "Active");
   // Sort warriors by fame or wins for the "Top 5" list
   const topWarriors = [...activeWarriors].sort((a, b) => b.fame - a.fame).slice(0, 5);
@@ -223,7 +223,7 @@ function StableWidget() {
 // ─── Widget: Warrior Rankings ──────────────────────────────────────────────
 
 function RankingsWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const navigate = useNavigate();
 
   const ranked = useMemo(
@@ -300,7 +300,7 @@ function RankingsWidget() {
 // ─── Widget: Finances ──────────────────────────────────────────────────────
 
 function FinancesWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
   const gold = state.gold ?? 0;
 
@@ -346,7 +346,7 @@ function FinancesWidget() {
 // ─── Widget: Meta Pulse ────────────────────────────────────────────────────
 
 function MetaPulseWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const metaDrift = useMemo(
     () => computeMetaDrift(state.arenaHistory),
     [state.arenaHistory]
@@ -394,7 +394,7 @@ function MetaPulseWidget() {
 // ─── Widget: Arena Gazette ─────────────────────────────────────────────────
 
 function GazetteWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const recentNews = state.newsletter.slice(-3).reverse();
 
   return (
@@ -440,7 +440,7 @@ function GazetteWidget() {
 // ─── Widget: Recent Bouts ──────────────────────────────────────────────────
 
 function RecentBoutsWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   // Get the last 5 bouts involving the player's stable
   const recentBouts = useMemo(() => {
@@ -516,7 +516,7 @@ function RecentBoutsWidget() {
 // ─── Widget: Training Status ───────────────────────────────────────────────
 
 function TrainingWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   // Map warrior IDs to warriors for display
   const trainingWarriors = useMemo(() => {
     const assignments = state.trainingAssignments ?? [];
@@ -606,7 +606,7 @@ function TrainingWidget() {
 // ─── Widget: Rival Stables ─────────────────────────────────────────────────
 
 function RivalsWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const rivals = state.rivals ?? [];
 
   // Find recent bouts involving rival warriors
@@ -728,7 +728,7 @@ interface DerivedRivalry {
 }
 
 function RivalryWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const rosterNames = useMemo(() => new Set(state.roster.map(w => w.name).concat(state.graveyard?.map(w => w.name) ?? [])), [state.roster, state.graveyard]);
 
   const rivalWarriorStable = useMemo(() => {
@@ -924,7 +924,7 @@ function RivalryWidget() {
 // ─── Widget: Crowd Mood Meter ──────────────────────────────────────────────
 
 function CrowdMoodWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const mood = state.crowdMood as CrowdMood;
   const moodHistory = state.moodHistory || [];
   const mods = useMemo(() => getMoodModifiers(mood), [mood]);
@@ -1103,7 +1103,7 @@ function CrowdMoodWidget() {
 // ─── Widget: Stable Comparison ─────────────────────────────────────────────
 
 function StableComparisonWidget() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   const playerNames = useMemo(() => new Set(state.roster.map(w => w.name)), [state.roster]);
 
@@ -1340,9 +1340,10 @@ function useDraggableWidgets() {
   const savedOrder = prefs.dashboardLayout ?? DEFAULT_ORDER;
   // Ensure all widgets are present (handles new widgets added after save)
   const validIds = new Set(DEFAULT_ORDER);
+  const savedOrderSet = new Set(savedOrder);
   const order = [
     ...savedOrder.filter(id => validIds.has(id)),
-    ...DEFAULT_ORDER.filter(id => !savedOrder.includes(id)),
+    ...DEFAULT_ORDER.filter(id => !savedOrderSet.has(id)),
   ];
 
   const [widgetOrder, setWidgetOrder] = useState(order);
@@ -1406,7 +1407,7 @@ function useDraggableWidgets() {
 // ─── Main Dashboard ────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const {
     widgetOrder, dragIdx, dragOverIdx, isEditing, setIsEditing,
     handleDragStart, handleDragOver, handleDrop, handleDragEnd, resetLayout,
@@ -1418,7 +1419,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-secondary/30 p-4 rounded-xl border border-border/50">
         <div className="flex-1">

@@ -23,6 +23,26 @@
 
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { getItemById, getItemByCode } from "@/data/equipment";
+import {
+  HIT_LOC_VARIANTS,
+  STYLE_PBP_DESC,
+  ARMOR_INTRO_VERBS,
+  WEAPON_INTRO_VERBS,
+  HELM_DESCS,
+  BATTLE_OPENERS,
+  PARRY_TEMPLATES,
+  PARRY_SHIELD_TEMPLATES,
+  DODGE_TEMPLATES,
+  COUNTERSTRIKE_TEMPLATES,
+  HIT_TEMPLATES,
+  PARRY_BREAK_TEMPLATES,
+  CROWD_REACTIONS_POSITIVE,
+  CROWD_REACTIONS_NEGATIVE,
+  CROWD_REACTIONS_ENCOURAGE,
+  INI_WIN_TEMPLATES,
+  INI_KEEP_TEMPLATES
+} from "./narrativeTemplates";
+
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -94,29 +114,9 @@ function szToHeight(sz: number): string {
   return inch > 0 ? `${ft}' ${inch}"` : `${ft}'`;
 }
 
-const ARMOR_INTRO_VERBS = [
-  "will wear a fine, well-oiled suit of",
-  "will wear",
-  "has been given a suit of",
-  "has chosen to wear finely crafted",
-  "is checking the straps of his",
-  "has drawn on a suit of",
-  "has put on a suit of",
-  "is clad in",
-];
 
-const WEAPON_INTRO_VERBS = [
-  "awaits with a %W in hand",
-  "is armed with a %W",
-  "has selected a %W",
-  "stands balancing a %W",
-  "walks out, swinging a %W",
-  "is swinging a %W",
-  "is drawing a %W from its sheath",
-  "tests the balance of a %W",
-  "grins down his %W at his foe",
-  "grins down his %W at her foe",
-];
+
+
 
 const HELM_DESCS: Record<string, string[]> = {
   "leather_cap": ["LEATHER CAP"],
@@ -174,17 +174,7 @@ export function generateWarriorIntro(rng: RNG, data: WarriorIntroData, sz?: numb
 
 // ─── Battle Openers ─────────────────────────────────────────────────────────
 
-const BATTLE_OPENERS = [
-  "The battle begins amid the crowd's approval.",
-  "Those in the stands shift their attention to the warriors.",
-  "The audience falls silent as the dueling begins.",
-  "The audience rises as the fighting begins.",
-  "The warriors advance on each other.",
-  "The time for the fight has come.",
-  "The signal is given for the duel to begin.",
-  "The battle begins",
-  "The crowd watches intently as the warriors square off.",
-];
+
 
 export function battleOpener(rng: RNG): string {
   return pick(rng, BATTLE_OPENERS);
@@ -298,20 +288,9 @@ export function narrateAttack(rng: RNG, attackerName: string, weaponId?: string)
 
 // ─── Parry/Block Narration ──────────────────────────────────────────────────
 
-const PARRY_TEMPLATES = [
-  "%D parrys with his %W.",
-  "%D's %W rings as he makes a brilliant and masterfull parry!",
-  "%D blocks the blow with his %W.",
-  "%D, with a look of calm on his face, blocks the blow with his %W!",
-  "%D deflects the attack with his %W.",
-  "%D's defense is secure as his %W easily parrys the attack!",
-];
 
-const PARRY_SHIELD_TEMPLATES = [
-  "%D parrys the attack using his %W.",
-  "%D's defense is secure as his %W easily parrys the attack!",
-  "%D blocks the blow with his %W.",
-];
+
+
 
 /**
  * Generates narrative text for a successful parry by the defender.
@@ -333,25 +312,7 @@ export function narrateParry(rng: RNG, defenderName: string, weaponId?: string):
 
 // ─── Dodge Narration ────────────────────────────────────────────────────────
 
-const DODGE_TEMPLATES = [
-  "%D ducks out of the way of the attack.",
-  "%D contorts his body inhumanly as he unbelievably dodges the blow!",
-  "%D twists impossibly away from the blow, amazing the spectators!",
-  "%D makes it look easy as he gracefully dodges the blow.",
-  "%D moves beyond his opponent's reach.",
-  "%D dodges right, out of harm's way.",
-  "%D dodges left out of harms way.",
-  "%D's body is a blur of motion as he leaps away from the attack!",
-  "%D curves snakelike away from the blow at the last instant!",
-  "%D shows off his superb training as he vaults over the attack!",
-  "%D drops to his knees, avoiding the attack then leaping back up!",
-  "%D turns, and falls back, out of his opponent's reach.",
-  "%D leans away from the attack.",
-  "%D pivots to the left out of harm's way.",
-  "%D nimbly eludes his opponent's attack!",
-  "%D narrowly escapes the force of the blow!",
-  "%D ducks under the blow and falls instantaneously into a roll to his feet!",
-];
+
 
 /**
  * Generates narrative text describing a successful dodge or evasion.
@@ -368,19 +329,7 @@ export function narrateDodge(rng: RNG, defenderName: string): string {
 
 // ─── Riposte / Counterstrike Narration ──────────────────────────────────────
 
-const COUNTERSTRIKE_TEMPLATES = [
-  "%D pivots around seeking the counterstrike!",
-  "%D steps back, and then rushes forward in a counterstrike!",
-  "%D ducks under his oncoming foe, seizing the counterstrike!",
-  "%D feints an attack, freezing his opponent's initiative!",
-  "%D leaps over his oncoming foe, seizing the counterstrike!",
-  "%D falls back, then leaps forward catching his foe off guard!",
-  "%D disengages his foe's weapon arm and tries to steal the initiative!",
-  "%D bats his foe's weapon aside leaving him open to attack!",
-  "%D ducks under the onrushing foe, looking for the counterstrike!",
-  "%D twists to the side, throwing his opponent off balance.",
-  "%D allows his foe to over-extend himself.",
-];
+
 
 export function narrateCounterstrike(rng: RNG, name: string): string {
   return pick(rng, COUNTERSTRIKE_TEMPLATES).replace(/%D/g, name);
@@ -388,20 +337,9 @@ export function narrateCounterstrike(rng: RNG, name: string): string {
 
 // ─── Hit Narration ──────────────────────────────────────────────────────────
 
-const HIT_TEMPLATES = [
-  "%D takes a hit to the %L!",
-  "%D is struck on the %L!",
-  "%D is wounded in the %L!",
-  "%D has been wounded on the %L!",
-  "%D is hit in the %L!",
-  "%D is struck in the %L!",
-];
 
-const PARRY_BREAK_TEMPLATES = [
-  "%A smashes through the parry with his %W!",
-  "%A slips his %W past the parry!",
-  "%A twists his %W around the parry!",
-];
+
+
 
 /**
  * Generates narrative text for a successful hit on a target location.
@@ -516,26 +454,11 @@ export function fatigueLine(rng: RNG, name: string, endRatio: number): string | 
 
 // ─── Crowd Reactions ────────────────────────────────────────────────────────
 
-const CROWD_REACTIONS_POSITIVE = [
-  "The audience screams its approval!",
-  "A cheer arises as the crowd comes to its feet!",
-  "Excitement spreads among the stands!",
-  "Lightning flashes a sign of approval!",
-  "The action spellbinds the arena audience!",
-];
 
-const CROWD_REACTIONS_NEGATIVE = [
-  "The crowd jeers '%N'.",
-  "There are scattered boo's for %N.",
-  "Furious cries of derision are rising from the crowd!",
-  "%N's fans fall silent.",
-  "From the stands a voice yells '%N, you stupid idiot!'",
-];
 
-const CROWD_REACTIONS_ENCOURAGE = [
-  "From the stands, a voice screams 'Come on %N, you can do it!'",
-  "From the stands a voice yells 'Come on %N!'",
-];
+
+
+
 
 /**
  * Generates a crowd reaction narrative line based on the severity of action.
@@ -559,19 +482,7 @@ export function crowdReaction(rng: RNG, loserName: string, winnerName: string, h
 
 // ─── Initiative Narration ───────────────────────────────────────────────────
 
-const INI_WIN_TEMPLATES = [
-  "%N rushes to his opponent's weak side!",
-  "%N leaps to his left!",
-  "%N leaps to his right!",
-  "%N leaps forward!",
-  "%N is moving constantly without pause!",
-  "%N is moving in circles around his opponent!",
-  "%N shifts continually back and forth!",
-  "%N looks for a better position.",
-  "%N shifts to his right.",
-  "%N carefully steps to his right.",
-  "%N sidesteps, trying to throw his opponent off balance.",
-];
+
 
 const INI_FEINT_TEMPLATES = [
   "%N feints an attack, freezing his opponent's initiative!",
@@ -619,11 +530,7 @@ const KILL_TEMPLATES = [
   "%D stumbles to the ground!!!\n%D is slain!",
 ];
 
-const KO_TEMPLATES = [
-  "%D collapses from accumulated damage!\n%A wins by knockout!",
-  "%D crumples to his knees!!!\n%D is incapable of further combat!\n%A is triumphant!",
-  "%D stumbles to the ground!!!\n%D is severely hurt!!\n%A is the victor of the match!",
-];
+
 
 const STOPPAGE_TEMPLATES = [
   "%D motions to the other LORD PROTECTORS that he cannot continue!\n%A is the victor of the match!",

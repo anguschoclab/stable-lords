@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Warrior } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +51,7 @@ function MatchupCard({ match, type }: { match: MatchupScore, type: "challenge" |
 }
 
 export default function SchedulingAssistant() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const [selectedWarriorId, setSelectedWarriorId] = useState<string | null>(null);
 
   const activeWarriors = useMemo(() => {

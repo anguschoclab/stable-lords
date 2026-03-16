@@ -3,7 +3,7 @@
  * Design Bible v3.0 §9.2: Reputation sliders, roster wall, trainer table.
  */
 import React, { useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, type Warrior } from "@/types/game";
 import { computeStableReputation } from "@/engine/stableReputation";
@@ -31,7 +31,7 @@ const REP_LABELS: { key: keyof ReturnType<typeof computeStableReputation>; label
 ];
 
 function ReputationSliders() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const rep = useMemo(() => computeStableReputation(state), [state]);
 
   return (
@@ -68,7 +68,7 @@ function ReputationSliders() {
 // ─── Roster Wall ──────────────────────────────────────────────────────────
 
 function RosterWall() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const navigate = useNavigate();
 
   const sortedRoster = useMemo(
@@ -170,7 +170,7 @@ function RosterWall() {
 // ─── Trainer Table ────────────────────────────────────────────────────────
 
 function TrainerTable() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const trainers = (state.trainers ?? []).filter(t => t.contractWeeksLeft > 0);
 
   return (
@@ -225,7 +225,7 @@ function TrainerTable() {
 // ─── Main Page ────────────────────────────────────────────────────────────
 
 export default function StableHall() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   return (
     <div className="space-y-6">

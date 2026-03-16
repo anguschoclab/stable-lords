@@ -3,7 +3,7 @@
  * and spotlight feed. Design Bible v3.0 §9.1
  */
 import React, { useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Warrior } from "@/types/game";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
@@ -23,7 +23,7 @@ import {
 // ─── Crowd Mood Meter ──────────────────────────────────────────────────────
 
 function CrowdMoodMeter() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const mood = state.crowdMood as CrowdMood;
   const mods = getMoodModifiers(mood);
   const desc = MOOD_DESCRIPTIONS[mood] ?? "";
@@ -85,7 +85,7 @@ function CrowdMoodMeter() {
 // ─── Arena Leaderboard ────────────────────────────────────────────────────
 
 function ArenaLeaderboard() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   const allWarriors = useMemo(() => {
     const warriors: { warrior: Warrior; stableName: string; isPlayer: boolean }[] = [];
@@ -192,7 +192,7 @@ function ArenaLeaderboard() {
 // ─── Spotlight Feed ───────────────────────────────────────────────────────
 
 function SpotlightFeed() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   const spotlights = useMemo(() => {
     const items: { text: string; icon: string; week: number; type: string }[] = [];
@@ -266,7 +266,7 @@ function SpotlightFeed() {
 // ─── Active Rivalries ─────────────────────────────────────────────────────
 
 function RivalryPanel() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const rivalries = (state.rivalries ?? []).filter(r => r.intensity > 0);
 
   if (rivalries.length === 0) return null;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,7 +12,7 @@ import { Newspaper, Skull, Activity, Swords, ChevronRight } from "lucide-react";
 type RevealStep = "gazette" | "injuries" | "bouts";
 
 export default function ResolutionReveal() {
-  const { state, doClearResolution } = useGame();
+  const { state, doClearResolution } = useGameStore();
   const [step, setStep] = useState<RevealStep>("gazette");
 
   if (state.phase !== "resolution" || !state.pendingResolutionData) return null;

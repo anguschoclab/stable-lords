@@ -69,7 +69,8 @@ export function processAging(state: GameState): GameState {
         retired.push({ ...w, status: "Retired", retiredWeek: state.week });
       }
     }
-    roster = roster.filter((w) => !toRetire.includes(w.id));
+    const toRetireSet = new Set(toRetire);
+    roster = roster.filter((w) => !toRetireSet.has(w.id));
   }
 
   const newsletter = ageEvents.length > 0

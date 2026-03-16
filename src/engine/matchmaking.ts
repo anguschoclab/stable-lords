@@ -59,15 +59,15 @@ function pairingScore(
   }
 
   // Style diversity bonus — +20 if this style matchup hasn't occurred in last 4 weeks
-  const recentStylePairs = recentHistory.reduce((acc, f) => {
+  const recentStylePairs = new Set(recentHistory.reduce((acc, f) => {
     if (f.week >= week - 4) {
       acc.push(`${f.styleA}|${f.styleD}`);
     }
     return acc;
-  }, [] as string[]);
+  }, [] as string[]));
   const thisPair = `${p.style}|${r.style}`;
   const reversePair = `${r.style}|${p.style}`;
-  if (!recentStylePairs.includes(thisPair) && !recentStylePairs.includes(reversePair)) {
+  if (!recentStylePairs.has(thisPair) && !recentStylePairs.has(reversePair)) {
     score += 20;
   }
 
@@ -80,10 +80,12 @@ function pairingScore(
 
   // Challenge / Avoid Assistant modifiers
   // Extremely heavy weights so they basically override other considerations if possible
-  if (playerChallenges.includes(r.id) || playerChallenges.includes(rivalStableId)) {
+  const playerChallengesSet = new Set(playerChallenges);
+  if (playerChallengesSet.has(r.id) || playerChallengesSet.has(rivalStableId)) {
     score += 500;
   }
-  if (playerAvoids.includes(r.id) || playerAvoids.includes(rivalStableId)) {
+  const playerAvoidsSet = new Set(playerAvoids);
+  if (playerAvoidsSet.has(r.id) || playerAvoidsSet.has(rivalStableId)) {
     score -= 500;
   }
 

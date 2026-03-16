@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { advanceWeek } from "@/state/gameStore";
 import { generateMatchCard } from "@/engine/matchmaking";
 import { isTooInjuredToFight, type Injury } from "@/engine/injuries";
@@ -19,7 +19,7 @@ import BoutViewer from "@/components/BoutViewer";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
 
 export default function RunRound() {
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
   const [results, setResults] = useState<BoutResult[]>([]);
   const [running, setRunning] = useState(false);
   const [autosimming, setAutosimming] = useState(false);

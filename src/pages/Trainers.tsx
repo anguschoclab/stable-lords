@@ -3,7 +3,7 @@
  * Hire, manage, fire trainers. Convert retired warriors to trainers.
  */
 import React, { useMemo, useCallback, useState } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import type { TrainerData } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import {
@@ -121,12 +121,12 @@ function TrainerCard({
 }
 
 export default function Trainers() {
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
   const currentTrainers = state.trainers ?? [];
   const hiringPool = state.hiringPool ?? [];
-  const canHire = currentTrainers.length < TRAINER_MAX_PER_STABLE;
+  const canHire = (currentTrainers || []).length < TRAINER_MAX_PER_STABLE;
 
   // Auto-populate hiring pool on first visit if empty
   React.useEffect(() => {
@@ -195,7 +195,7 @@ export default function Trainers() {
   const fireTrainer = useCallback(
     (trainerId: string) => {
 
-      const trainer = currentTrainers.find((t) => t.id === trainerId);
+      const trainer = (currentTrainers || []).find((t) => t.id === trainerId);
       setState({
         ...state,
         trainers: currentTrainers.filter((t) => t.id !== trainerId),

@@ -4,7 +4,7 @@
  */
 import React from "react";
 import { Link } from "@tanstack/react-router";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { cn } from "@/lib/utils";
 
 // ─── Warrior Link ──────────────────────────────────────────────────────────

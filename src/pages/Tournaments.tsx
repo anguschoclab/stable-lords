@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { killWarrior } from "@/state/gameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
@@ -34,7 +34,7 @@ const SEASON_ICONS: Record<string, string> = {
 };
 
 export default function Tournaments() {
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
   const [prepModeOpen, setPrepModeOpen] = useState(false);
 
   const currentTournament = useMemo(

@@ -3,7 +3,7 @@
  * Post-tournament recap: MVP, deadliest, biggest upsets per completed tournament.
  */
 import { useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import AwardCard from "@/components/awards/AwardCard";
 import UpsetsList from "@/components/awards/UpsetsList";
 import FightsList from "@/components/awards/FightsList";
@@ -214,7 +214,7 @@ function TournamentSection({ award }: { award: TournamentAward }) {
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function TournamentAwards() {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   const playerNames = useMemo(() => new Set([
     ...state.roster.map(w => w.name),

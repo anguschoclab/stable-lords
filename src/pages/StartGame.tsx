@@ -3,7 +3,7 @@
  * New Game → name stable → Orphanage | Continue | Load | Delete saves
  */
 import React, { useState, useCallback, useMemo, useRef } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { createFreshState } from "@/state/gameStore";
 import {
   listSaveSlots,
@@ -51,7 +51,7 @@ import { randomOwnerName, randomStableName } from "@/data/randomNames";
 type Screen = "title" | "newGame";
 
 export default function StartGame() {
-  const { loadGame } = useGame();
+  const { loadGame } = useGameStore();
   const [screen, setScreen] = useState<Screen>("title");
   const [slots, setSlots] = useState<SaveSlotMeta[]>(() => listSaveSlots());
   const [deleteTarget, setDeleteTarget] = useState<SaveSlotMeta | null>(null);

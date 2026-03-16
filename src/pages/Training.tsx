@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import {
   ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, STYLE_DISPLAY_NAMES,
   type Warrior, type TrainingAssignment, type Attributes,
@@ -169,7 +169,7 @@ function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onA
 }
 
 export default function Training() {
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
 
   const assignmentMap = useMemo(() => {
     const map = new Map<string, TrainingAssignment>();

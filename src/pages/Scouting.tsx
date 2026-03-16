@@ -2,7 +2,7 @@
  * Stable Lords — Scouting Page with Comparison Mode
  */
 import React, { useState, useCallback, useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/scouting";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import type { Warrior, ScoutReportData, RivalStableData, FightSummary } from "@/types/game";
@@ -486,7 +486,7 @@ function WarriorComparison({ rivals, playerRoster }: { rivals: RivalStableData[]
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function Scouting() {
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
   const [selectedRival, setSelectedRival] = useState<string | null>(null);
   const [selectedWarrior, setSelectedWarrior] = useState<string | null>(null);
 

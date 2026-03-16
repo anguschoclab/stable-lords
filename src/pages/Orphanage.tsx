@@ -4,7 +4,7 @@
  * (Stable naming now handled on Start Game page)
  */
 import React, { useState, useMemo, useCallback } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { makeWarrior } from "@/state/gameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
@@ -27,7 +27,7 @@ import { generateOrphanPool, type OrphanWarrior } from "@/data/orphanPool";
 const STEP_LABELS = ["Choose Warriors", "First Blood", "Your Story Begins"];
 
 export default function Orphanage() {
-  const { state, setState, returnToTitle } = useGame();
+  const { state, setState, returnToTitle } = useGameStore();
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [poolSeed, setPoolSeed] = useState(() => Date.now());

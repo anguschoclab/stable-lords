@@ -2,7 +2,7 @@
  * Equipment Optimizer Page — recommends gear by fighting style with encumbrance analysis.
  */
 import React, { useState, useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { generateRecommendations, getStyleEquipmentTips } from "@/engine/equipmentOptimizer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Shield, Swords, Star, AlertTriangle, Lightbulb, Shirt, HardHat, Zap } from "lucide-react";
 
 export default function EquipmentOptimizerPage() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const activeWarriors = state.roster.filter(w => w.status === "Active");
   const [selectedStyle, setSelectedStyle] = useState<FightingStyle>(
     activeWarriors[0]?.style ?? FightingStyle.StrikingAttack

@@ -278,6 +278,7 @@ export function aiDraftFromPool(
 
     const personality = rival.owner.personality ?? "Pragmatic";
     const prefs = PERSONALITY_STYLE_PREFS[personality] || [];
+    const prefsSet = new Set(prefs);
 
     // Score candidates
     let bestIdx = -1;
@@ -286,7 +287,7 @@ export function aiDraftFromPool(
       const w = remainingPool[i];
       let score = 0;
       // Style fit
-      if (prefs.includes(w.style)) score += 20;
+      if (prefsSet.has(w.style)) score += 20;
       // Quality
       score += TIER_STARS[w.tier] * 10;
       // Cost penalty (AI has implied budget)

@@ -24,6 +24,9 @@ const PERSONALITY_PLAN_MODS: Record<OwnerPersonality, Partial<FightPlan>> = {
   Pragmatic:   { OE: 0, AL: 0, killDesire: 0 },
   Tactician:   { OE: -1, AL: 1, killDesire: -2 },
 };
+import { processAIRosterManagement } from "./ownerRoster";
+import { generateOwnerNarratives } from "./ownerNarrative";
+import { evolvePhilosophies } from "./ownerPhilosophy";
 
 /** Philosophy modifiers — layered on top of personality */
 function calculateRecentRecord(recentFights: import("@/types/game").FightSummary[], rosterNames: Set<string>) {

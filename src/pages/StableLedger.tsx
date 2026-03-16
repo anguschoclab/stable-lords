@@ -3,7 +3,7 @@
  * Design Bible v1.6.0 §8: Overview, Tokens, Contracts, Chronicle, Hall of Warriors
  */
 import React, { useState, useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, type InsightToken, type TrainerData, type LedgerEntry } from "@/types/game";
 import { computeWeeklyBreakdown } from "@/engine/economy";
@@ -26,13 +26,18 @@ import {
 // ─── Tab: Overview ────────────────────────────────────────────────────────
 
 function OverviewTab() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
   const gold = state.gold ?? 0;
   const activeWarriors = state.roster.filter(w => w.status === "Active");
-  const totalWins = state.roster.reduce((s, w) => s + w.career.wins, 0);
-  const totalLosses = state.roster.reduce((s, w) => s + w.career.losses, 0);
-  const totalKills = state.roster.reduce((s, w) => s + w.career.kills, 0);
+  const { wins: totalWins, losses: totalLosses, kills: totalKills } = state.roster.reduce(
+    (acc, w) => ({
+      wins: acc.wins + w.career.wins,
+      losses: acc.losses + w.career.losses,
+      kills: acc.kills + w.career.kills,
+    }),
+    { wins: 0, losses: 0, kills: 0 }
+  );
 
   // Recent ledger entries
   const recentLedger = (state.ledger ?? []).slice(-10).reverse();
@@ -148,7 +153,7 @@ function OverviewTab() {
 // ─── Tab: Tokens ──────────────────────────────────────────────────────────
 
 function TokensTab() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const tokens = state.insightTokens ?? [];
   const weaponTokens = tokens.filter(t => t.type === "Weapon");
   const rhythmTokens = tokens.filter(t => t.type === "Rhythm");
@@ -265,7 +270,7 @@ function TokensTab() {
 // ─── Tab: Contracts ───────────────────────────────────────────────────────
 
 function ContractsTab() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const trainers = state.trainers ?? [];
   const activeTrainers = trainers.filter(t => t.contractWeeksLeft > 0);
   const expiredTrainers = trainers.filter(t => t.contractWeeksLeft <= 0);
@@ -355,7 +360,7 @@ function ContractsTab() {
 // ─── Tab: Chronicle ───────────────────────────────────────────────────────
 
 function ChronicleTab() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const news = useMemo(
     () => [...state.newsletter].reverse().slice(0, 20),
     [state.newsletter]
@@ -400,7 +405,7 @@ function ChronicleTab() {
 // ─── Tab: Hall of Warriors ────────────────────────────────────────────────
 
 function HallTab() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const graveyard = state.graveyard ?? [];
   const retired = state.retired ?? [];
 

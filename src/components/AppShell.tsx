@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper, Crown, Shield, BarChart3, Target, Award, BookOpen, Eye, Landmark, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { Badge } from "@/components/ui/badge";
 import { MOOD_ICONS } from "@/engine/crowdMood";
 import {
@@ -56,7 +56,7 @@ const navItems = [
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { state, doReset, returnToTitle, lastSavedAt } = useGame();
+  const { state, doReset, returnToTitle, lastSavedAt } = useGameStore();
   const { theme, setTheme } = useTheme();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);

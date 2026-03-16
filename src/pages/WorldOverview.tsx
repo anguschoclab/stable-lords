@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +52,7 @@ const TIER_COLORS: Record<string, string> = {
 };
 
 export default function WorldOverview() {
-  const { state } = useGame();
+  const { state } = useGameStore();
   const [stableSort, setStableSort] = useState<{ field: SortField; dir: SortDir }>({ field: "fame", dir: "desc" });
   const [warriorSort, setWarriorSort] = useState<{ field: WarriorSortField; dir: SortDir }>({ field: "fame", dir: "desc" });
 

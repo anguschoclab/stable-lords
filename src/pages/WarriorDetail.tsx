@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { obfuscateWarrior } from "@/lib/obfuscation";
-import { useGame } from "@/state/GameContext";
+import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightPlan, type FightSummary } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -264,7 +264,7 @@ function DiscoveryProgressBar({
 
 /** Favorites & Mastery Card — shows discovered/hinted weapon and rhythm preferences */
 function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () => void }) {
-  const { setState, state } = useGame();
+  const { setState, state } = useGameStore();
   const favDisplay = getFavoritesDisplay(warrior);
   const totalFights = displayWarrior.career.wins + displayWarrior.career.losses;
   const mastery = getMastery(totalFights);
@@ -597,7 +597,7 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
 export default function WarriorDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
 
   // Find warrior in roster, graveyard, retired, OR rival stables
   const warrior = useMemo(() => {
