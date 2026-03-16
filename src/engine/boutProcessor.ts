@@ -4,7 +4,7 @@
  * Extracts the duplicated ~300-line bout processing pipeline into a single
  * pure-function module. Both manual round simulation and autosim delegate here.
  */
-import type { GameState, FightSummary, Warrior } from "@/types/game";
+import type { GameState, FightSummary, Warrior, FightOutcome } from "@/types/game";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
 import { killWarrior } from "@/state/gameStore";
@@ -113,59 +113,288 @@ interface BoutContext {
   playerStableName: string;
 }
 
-/**
- * Resolve a single bout and return the updated state + result.
- * Handles: combat sim, record updates, death, injuries, XP, match history,
- * fight summary, side-effect singletons (StyleMeter, ArenaHistory, etc.).
- */
-function resolveBout(
+
+// ─── Extracted Helpers for Single Bout Processing ──────────────────────────
+
+
+function handleBoutDeath(
   state: GameState,
-  ctx: BoutContext
-): { state: GameState; result: BoutResult; death: boolean; playerDeath: boolean; injured: boolean; injuredNames: string[]; deathNames: string[] } {
-  const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, playerId } = ctx;
-
-  // Ensure both combatants are still active
-  const currentW = state.roster.find(w => w.id === warrior.id);
-  let currentO: Warrior | undefined;
-  if (rivalStableId) {
-    for (const r of state.rivals || []) {
-      currentO = r.roster.find(w => w.id === opponent.id);
-      if (currentO) break;
-    }
-  } else {
-    currentO = state.roster.find(w => w.id === opponent.id);
-  }
-
-  // Skip if either is unavailable
-  if (!currentW || currentW.status !== "Active" || !currentO) {
-    return {
-      state,
-      result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] }, isRivalry, rivalStable },
-      death: false, playerDeath: false, injured: false, injuredNames: [], deathNames: [],
-    };
-  }
-
-  const planA = currentW.plan ?? defaultPlanForWarrior(currentW);
-  const planD = currentO.plan ?? defaultPlanForWarrior(currentO);
-  const outcome = simulateFight(planA, planD, currentW, currentO, undefined, state.trainers);
-
-  const tags = outcome.post?.tags ?? [];
-  const rawFameA = fameFromTags(outcome.winner === "A" ? tags : []);
-  const rawFameD = fameFromTags(outcome.winner === "D" ? tags : []);
-  const rivalryMult = isRivalry ? 2 : 1;
-  const fameA = Math.round(rawFameA.fame * moodMods.fameMultiplier * rivalryMult);
-  const popA = Math.round(rawFameA.pop * moodMods.popMultiplier);
-  const fameD = Math.round(rawFameD.fame * moodMods.fameMultiplier);
-  const popD = Math.round(rawFameD.pop * moodMods.popMultiplier);
-
+  warrior: Warrior,
+  opponent: Warrior,
+  outcome: FightOutcome,
+  playerId: string,
+  rivalStableId?: string,
+  week?: number
+): { s: GameState; death: boolean; playerDeath: boolean; deathNames: string[] } {
   let s = { ...state };
   let death = false;
   let playerDeath = false;
-  let injured = false;
-  const injuredNames: string[] = [];
   const deathNames: string[] = [];
 
-  // ── Batch roster update: records, fame, flair ──
+  if (outcome.by === "Kill") {
+    death = true;
+    if (outcome.winner === "A") {
+      deathNames.push(opponent.name);
+      if (rivalStableId) {
+        s.rivals = (s.rivals || []).map(r => ({ ...r, roster: r.roster.filter(w => w.id !== opponent.id) }));
+        s.rivalries = detectRivalries(s.rivalries || [], playerId, rivalStableId, warrior.name, opponent.name, week || s.week);
+      } else {
+        s = killWarrior(s, opponent.id, warrior.name, "Killed in arena combat");
+      }
+    } else {
+      playerDeath = true;
+      deathNames.push(warrior.name);
+      s = killWarrior(s, warrior.id, opponent.name, "Killed in arena combat");
+      if (rivalStableId) {
+        s.rivalries = detectRivalries(s.rivalries || [], rivalStableId, playerId, opponent.name, warrior.name, week || s.week);
+      }
+    }
+  }
+
+  return { s, death, playerDeath, deathNames };
+}
+
+
+function handleBoutInjuries(
+  state: GameState,
+  warrior: Warrior,
+  opponent: Warrior,
+  outcome: FightOutcome,
+  rivalStableId?: string,
+  week?: number
+): { s: GameState; injured: boolean; injuredNames: string[] } {
+  const s = { ...state };
+  let injured = false;
+  const injuredNames: string[] = [];
+
+  // Rest states (KO)
+  if (outcome.by === "KO") {
+    const loserId = outcome.winner === "A" ? opponent.id : warrior.id;
+    s.restStates = addRestState(s.restStates || [], loserId, "KO", week || s.week);
+  }
+
+  // Injuries
+  const injA = rollForInjury(warrior, outcome, "A");
+  if (injA) {
+    injured = true;
+    injuredNames.push(warrior.name);
+    s.roster = s.roster.map(w => w.id === warrior.id ? { ...w, injuries: [...(w.injuries || []), injA as any] } : w);
+  }
+  if (!rivalStableId) {
+    const injD = rollForInjury(opponent, outcome, "D");
+    if (injD) {
+      injured = true;
+      injuredNames.push(opponent.name);
+      s.roster = s.roster.map(w => w.id === opponent.id ? { ...w, injuries: [...(w.injuries || []), injD as any] } : w);
+    }
+  }
+
+  return { s, injured, injuredNames };
+}
+
+function applyBoutXP(
+  state: GameState,
+  warrior: Warrior,
+  opponent: Warrior,
+  outcome: FightOutcome,
+  tags: string[],
+  rivalStableId?: string
+): GameState {
+  const s = { ...state };
+  const xpA = calculateXP(outcome, "A", tags);
+  s.roster = s.roster.map(w => w.id === warrior.id ? applyXP(w, xpA).warrior : w);
+  if (!rivalStableId) {
+    const xpD = calculateXP(outcome, "D", tags);
+    s.roster = s.roster.map(w => w.id === opponent.id ? applyXP(w, xpD).warrior : w);
+  }
+  return s;
+}
+
+
+function handleFavoritesDiscovery(
+  state: GameState,
+  warrior: Warrior,
+  opponent: Warrior,
+  rivalStableId?: string,
+  week?: number
+): GameState {
+  const s = { ...state };
+  const currentWeek = week || s.week;
+
+  const wA = s.roster.find(w => w.id === warrior.id);
+  if (wA) {
+    const disc = checkDiscovery(wA);
+    if (disc.updated) {
+      s.roster = s.roster.map(w => w.id === wA.id ? { ...w, favorites: wA.favorites } : w);
+      if (disc.hints.length > 0) {
+        s.newsletter = [...s.newsletter, { week: currentWeek, title: "Training Insight", items: disc.hints }];
+      }
+      if (disc.weaponRevealed && wA.favorites) {
+        const weaponItem = WEAPONS.find((wp) => wp.id === wA.favorites!.weaponId);
+        s.insightTokens = [...(s.insightTokens || []), {
+          id: `it_${wA.id}_weapon_${currentWeek}`,
+          type: "Weapon" as const,
+          warriorId: wA.id,
+          warriorName: wA.name,
+          detail: `Favorite weapon: ${weaponItem?.name ?? wA.favorites.weaponId} (+1 ATT)`,
+          discoveredWeek: currentWeek,
+        }];
+      }
+      if (disc.rhythmRevealed && wA.favorites) {
+        s.insightTokens = [...(s.insightTokens || []), {
+          id: `it_${wA.id}_rhythm_${currentWeek}`,
+          type: "Rhythm" as const,
+          warriorId: wA.id,
+          warriorName: wA.name,
+          detail: `Natural rhythm: OE ${wA.favorites.rhythm.oe} / AL ${wA.favorites.rhythm.al} (+1 INI)`,
+          discoveredWeek: currentWeek,
+        }];
+      }
+    }
+  }
+
+  if (!rivalStableId) {
+    const wD = s.roster.find(w => w.id === opponent.id);
+    if (wD) {
+      const disc = checkDiscovery(wD);
+      if (disc.updated) {
+        s.roster = s.roster.map(w => w.id === wD.id ? { ...w, favorites: wD.favorites } : w);
+        if (disc.hints.length > 0) {
+          s.newsletter = [...s.newsletter, { week: currentWeek, title: "Training Insight", items: disc.hints }];
+        }
+        if (disc.weaponRevealed && wD.favorites) {
+          const weaponItem = WEAPONS.find((wp) => wp.id === wD.favorites!.weaponId);
+          s.insightTokens = [...(s.insightTokens || []), {
+            id: `it_${wD.id}_weapon_${currentWeek}`,
+            type: "Weapon" as const,
+            warriorId: wD.id,
+            warriorName: wD.name,
+            detail: `Favorite weapon: ${weaponItem?.name ?? wD.favorites.weaponId} (+1 ATT)`,
+            discoveredWeek: currentWeek,
+          }];
+        }
+        if (disc.rhythmRevealed && wD.favorites) {
+          s.insightTokens = [...(s.insightTokens || []), {
+            id: `it_${wD.id}_rhythm_${currentWeek}`,
+            type: "Rhythm" as const,
+            warriorId: wD.id,
+            warriorName: wD.name,
+            detail: `Natural rhythm: OE ${wD.favorites.rhythm.oe} / AL ${wD.favorites.rhythm.al} (+1 INI)`,
+            discoveredWeek: currentWeek,
+          }];
+        }
+      }
+    }
+  }
+
+  return s;
+}
+
+
+function checkGiantKillerFlair(
+  state: GameState,
+  warrior: Warrior,
+  opponent: Warrior,
+  outcome: FightOutcome
+): GameState {
+  const s = { ...state };
+  if (outcome.winner) {
+    const winnerW = outcome.winner === "A" ? warrior : opponent;
+    const loserW = outcome.winner === "A" ? opponent : warrior;
+    if (loserW.fame >= winnerW.fame + 10 && loserW.fame >= winnerW.fame * 2) {
+      const upsetCount = s.arenaHistory.filter(af => {
+        if (af.fameA == null || af.fameD == null || !af.winner) return false;
+        const wName = af.winner === "A" ? af.a : af.d;
+        if (wName !== winnerW.name) return false;
+        const wFame = af.winner === "A" ? af.fameA : af.fameD;
+        const lFame = af.winner === "A" ? af.fameD : af.fameA;
+        return lFame >= wFame + 10 && lFame >= wFame * 2;
+      }).length;
+      if (upsetCount >= 3 && !winnerW.flair.includes("Giant Killer")) {
+        s.roster = s.roster.map(w => w.id === winnerW.id ? { ...w, flair: [...w.flair, "Giant Killer"] } : w);
+      }
+    }
+  }
+  return s;
+}
+
+function generateFightSummary(
+  warrior: Warrior,
+  opponent: Warrior,
+  outcome: FightOutcome,
+  tags: string[],
+  fameA: number,
+  popA: number,
+  fameD: number,
+  popD: number,
+  week: number
+): { summary: FightSummary; announcement: string | undefined } {
+  const fightSummary: FightSummary = {
+    id: `fight_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    week,
+    title: `${warrior.name} vs ${opponent.name}`,
+    a: warrior.name,
+    d: opponent.name,
+    winner: outcome.winner,
+    by: outcome.by,
+    styleA: warrior.style,
+    styleD: opponent.style,
+    flashyTags: tags,
+    fameDeltaA: fameA,
+    fameDeltaD: fameD,
+    fameA: warrior.fame,
+    fameD: opponent.fame,
+    popularityDeltaA: popA,
+    popularityDeltaD: popD,
+    transcript: outcome.log.map(e => e.text),
+    createdAt: new Date().toISOString(),
+  };
+
+  StyleRollups.addFight({ week, styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
+  ArenaHistory.append(fightSummary);
+  LoreArchive.signalFight(fightSummary);
+  NewsletterFeed.appendFightResult({ summary: fightSummary, transcript: outcome.log.map(e => e.text) });
+
+  let announcement: string | undefined;
+  const announceTone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") || tags.includes("Comeback") ? "hype" : "neutral");
+  const announcerBlurb = blurb({
+    tone: announceTone,
+    winner: outcome.winner === "A" ? warrior.name : outcome.winner === "D" ? opponent.name : undefined,
+    loser: outcome.winner === "A" ? opponent.name : outcome.winner === "D" ? warrior.name : undefined,
+    by: outcome.by ?? undefined,
+  });
+
+  if (outcome.by === "Kill") announcement = commentatorFor("Kill");
+  else if (outcome.by === "KO") announcement = commentatorFor("KO");
+  else if (tags.includes("Flashy")) announcement = commentatorFor("Flashy");
+  else if (tags.includes("Comeback")) announcement = commentatorFor("Upset");
+  else if (outcome.winner) {
+    const winnerName = outcome.winner === "A" ? warrior.name : opponent.name;
+    const loserName = outcome.winner === "A" ? opponent.name : warrior.name;
+    announcement = recapLine(winnerName, loserName, outcome.minutes);
+  }
+
+  if (announcerBlurb) {
+    fightSummary.transcript = [...fightSummary.transcript, `🎙️ ${announcerBlurb}`];
+  }
+
+  return { summary: fightSummary, announcement };
+}
+
+function applyBoutRecords(
+  state: GameState,
+  warrior: Warrior,
+  opponent: Warrior,
+  outcome: FightOutcome,
+  tags: string[],
+  fameA: number,
+  popA: number,
+  fameD: number,
+  popD: number,
+  rivalStableId?: string
+): GameState {
+  const s = { ...state };
+
   s.roster = s.roster.map(w => {
     if (w.id === warrior.id) {
       const won = outcome.winner === "A";
@@ -203,7 +432,6 @@ function resolveBout(
     return w;
   });
 
-  // ── Rival warrior records ──
   if (rivalStableId) {
     s.rivals = (s.rivals || []).map(r => ({
       ...r,
@@ -227,209 +455,92 @@ function resolveBout(
     }));
   }
 
-  // ── Death ──
-  if (outcome.by === "Kill") {
-    death = true;
-    if (outcome.winner === "A") {
-      deathNames.push(opponent.name);
-      if (rivalStableId) {
-        s.rivals = (s.rivals || []).map(r => ({ ...r, roster: r.roster.filter(w => w.id !== opponent.id) }));
-        s.rivalries = detectRivalries(s.rivalries || [], playerId, rivalStableId, warrior.name, opponent.name, week);
-      } else {
-        s = killWarrior(s, opponent.id, warrior.name, "Killed in arena combat");
-      }
-    } else {
-      playerDeath = true;
-      deathNames.push(warrior.name);
-      s = killWarrior(s, warrior.id, opponent.name, "Killed in arena combat");
-      if (rivalStableId) {
-        s.rivalries = detectRivalries(s.rivalries || [], rivalStableId, playerId, opponent.name, warrior.name, week);
-      }
+  return s;
+}
+
+/**
+ * Resolve a single bout and return the updated state + result.
+ * Handles: combat sim, record updates, death, injuries, XP, match history,
+ * fight summary, side-effect singletons (StyleMeter, ArenaHistory, etc.).
+ */
+
+function resolveBout(
+  state: GameState,
+  ctx: BoutContext
+): { state: GameState; result: BoutResult; death: boolean; playerDeath: boolean; injured: boolean; injuredNames: string[]; deathNames: string[] } {
+  const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, playerId } = ctx;
+
+  const currentW = state.roster.find(w => w.id === warrior.id);
+  let currentO: Warrior | undefined;
+  if (rivalStableId) {
+    for (const r of state.rivals || []) {
+      currentO = r.roster.find(w => w.id === opponent.id);
+      if (currentO) break;
     }
+  } else {
+    currentO = state.roster.find(w => w.id === opponent.id);
   }
 
-  // ── Rest states (KO) ──
-  if (outcome.by === "KO") {
-    const loserId = outcome.winner === "A" ? opponent.id : warrior.id;
-    s.restStates = addRestState(s.restStates || [], loserId, "KO", week);
+  if (!currentW || currentW.status !== "Active" || !currentO) {
+    return {
+      state,
+      result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] }, isRivalry, rivalStable },
+      death: false, playerDeath: false, injured: false, injuredNames: [], deathNames: [],
+    };
   }
 
-  // ── Injuries ──
-  const injA = rollForInjury(warrior, outcome, "A");
-  if (injA) {
-    injured = true;
-    injuredNames.push(warrior.name);
-    s.roster = s.roster.map(w => w.id === warrior.id ? { ...w, injuries: [...(w.injuries || []), injA as any] } : w);
-  }
-  if (!rivalStableId) {
-    const injD = rollForInjury(opponent, outcome, "D");
-    if (injD) {
-      injured = true;
-      injuredNames.push(opponent.name);
-      s.roster = s.roster.map(w => w.id === opponent.id ? { ...w, injuries: [...(w.injuries || []), injD as any] } : w);
-    }
-  }
+  const planA = currentW.plan ?? defaultPlanForWarrior(currentW);
+  const planD = currentO.plan ?? defaultPlanForWarrior(currentO);
+  const outcome = simulateFight(planA, planD, currentW, currentO, undefined, state.trainers);
 
-  // ── XP ──
-  const xpA = calculateXP(outcome, "A", tags);
-  s.roster = s.roster.map(w => w.id === warrior.id ? applyXP(w, xpA).warrior : w);
-  if (!rivalStableId) {
-    const xpD = calculateXP(outcome, "D", tags);
-    s.roster = s.roster.map(w => w.id === opponent.id ? applyXP(w, xpD).warrior : w);
-  }
+  const tags = outcome.post?.tags ?? [];
+  const rawFameA = fameFromTags(outcome.winner === "A" ? tags : []);
+  const rawFameD = fameFromTags(outcome.winner === "D" ? tags : []);
+  const rivalryMult = isRivalry ? 2 : 1;
+  const fameA = Math.round(rawFameA.fame * moodMods.fameMultiplier * rivalryMult);
+  const popA = Math.round(rawFameA.pop * moodMods.popMultiplier);
+  const fameD = Math.round(rawFameD.fame * moodMods.fameMultiplier);
+  const popD = Math.round(rawFameD.pop * moodMods.popMultiplier);
 
-  // ── Favorites Discovery ──
-  {
-    const wA = s.roster.find(w => w.id === warrior.id);
-    if (wA) {
-      const disc = checkDiscovery(wA);
-      if (disc.updated) {
-        // Persist mutated favorites back into roster
-        s.roster = s.roster.map(w => w.id === wA.id ? { ...w, favorites: wA.favorites } : w);
-        if (disc.hints.length > 0) {
-          s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: disc.hints }];
-        }
-        // Create InsightTokens for full reveals
-        if (disc.weaponRevealed && wA.favorites) {
-          const weaponItem = WEAPONS.find((wp) => wp.id === wA.favorites!.weaponId);
-          s.insightTokens = [...(s.insightTokens || []), {
-            id: `it_${wA.id}_weapon_${week}`,
-            type: "Weapon" as const,
-            warriorId: wA.id,
-            warriorName: wA.name,
-            detail: `Favorite weapon: ${weaponItem?.name ?? wA.favorites.weaponId} (+1 ATT)`,
-            discoveredWeek: week,
-          }];
-        }
-        if (disc.rhythmRevealed && wA.favorites) {
-          s.insightTokens = [...(s.insightTokens || []), {
-            id: `it_${wA.id}_rhythm_${week}`,
-            type: "Rhythm" as const,
-            warriorId: wA.id,
-            warriorName: wA.name,
-            detail: `Natural rhythm: OE ${wA.favorites.rhythm.oe} / AL ${wA.favorites.rhythm.al} (+1 INI)`,
-            discoveredWeek: week,
-          }];
-        }
-      }
-    }
-  }
-  if (!rivalStableId) {
-    const wD = s.roster.find(w => w.id === opponent.id);
-    if (wD) {
-      const disc = checkDiscovery(wD);
-      if (disc.updated) {
-        s.roster = s.roster.map(w => w.id === wD.id ? { ...w, favorites: wD.favorites } : w);
-        if (disc.hints.length > 0) {
-          s.newsletter = [...s.newsletter, { week, title: "Training Insight", items: disc.hints }];
-        }
-        if (disc.weaponRevealed && wD.favorites) {
-          const weaponItem = WEAPONS.find((wp) => wp.id === wD.favorites!.weaponId);
-          s.insightTokens = [...(s.insightTokens || []), {
-            id: `it_${wD.id}_weapon_${week}`,
-            type: "Weapon" as const,
-            warriorId: wD.id,
-            warriorName: wD.name,
-            detail: `Favorite weapon: ${weaponItem?.name ?? wD.favorites.weaponId} (+1 ATT)`,
-            discoveredWeek: week,
-          }];
-        }
-        if (disc.rhythmRevealed && wD.favorites) {
-          s.insightTokens = [...(s.insightTokens || []), {
-            id: `it_${wD.id}_rhythm_${week}`,
-            type: "Rhythm" as const,
-            warriorId: wD.id,
-            warriorName: wD.name,
-            detail: `Natural rhythm: OE ${wD.favorites.rhythm.oe} / AL ${wD.favorites.rhythm.al} (+1 INI)`,
-            discoveredWeek: week,
-          }];
-        }
-      }
-    }
-  }
+  let s = { ...state };
 
-  // ── Match history ──
+  // 1. Apply batch roster updates (records, fame, popularity, career, flair)
+  s = applyBoutRecords(s, warrior, opponent, outcome, tags, fameA, popA, fameD, popD, rivalStableId);
+
+  // 2. Handle death resolution
+  const deathRes = handleBoutDeath(s, warrior, opponent, outcome, playerId, rivalStableId, week);
+  s = deathRes.s;
+
+  // 3. Handle injuries & KOs
+  const injRes = handleBoutInjuries(s, warrior, opponent, outcome, rivalStableId, week);
+  s = injRes.s;
+
+  // 4. Apply XP
+  s = applyBoutXP(s, warrior, opponent, outcome, tags, rivalStableId);
+
+  // 5. Check and handle favorites discovery
+  s = handleFavoritesDiscovery(s, warrior, opponent, rivalStableId, week);
+
+  // 6. Match history
   if (rivalStableId) {
     s.matchHistory = addMatchRecord(s.matchHistory || [], warrior.id, opponent.id, rivalStableId, week);
   }
 
-  // ── Giant Killer flair ──
-  if (outcome.winner) {
-    const winnerW = outcome.winner === "A" ? warrior : opponent;
-    const loserW = outcome.winner === "A" ? opponent : warrior;
-    if (loserW.fame >= winnerW.fame + 10 && loserW.fame >= winnerW.fame * 2) {
-      const upsetCount = s.arenaHistory.filter(af => {
-        if (af.fameA == null || af.fameD == null || !af.winner) return false;
-        const wName = af.winner === "A" ? af.a : af.d;
-        if (wName !== winnerW.name) return false;
-        const wFame = af.winner === "A" ? af.fameA : af.fameD;
-        const lFame = af.winner === "A" ? af.fameD : af.fameA;
-        return lFame >= wFame + 10 && lFame >= wFame * 2;
-      }).length;
-      if (upsetCount >= 3 && !winnerW.flair.includes("Giant Killer")) {
-        s.roster = s.roster.map(w => w.id === winnerW.id ? { ...w, flair: [...w.flair, "Giant Killer"] } : w);
-      }
-    }
-  }
+  // 7. Giant Killer Flair
+  s = checkGiantKillerFlair(s, warrior, opponent, outcome);
 
-  // ── Fight summary ──
-  const fightSummary: FightSummary = {
-    id: `fight_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    week,
-    title: `${warrior.name} vs ${opponent.name}`,
-    a: warrior.name,
-    d: opponent.name,
-    winner: outcome.winner,
-    by: outcome.by,
-    styleA: warrior.style,
-    styleD: opponent.style,
-    flashyTags: tags,
-    fameDeltaA: fameA,
-    fameDeltaD: fameD,
-    fameA: warrior.fame,
-    fameD: opponent.fame,
-    popularityDeltaA: popA,
-    popularityDeltaD: popD,
-    transcript: outcome.log.map(e => e.text),
-    createdAt: new Date().toISOString(),
-  };
-  s.arenaHistory = [...s.arenaHistory, fightSummary];
-
-  // ── Side-effect singletons ──
-  StyleRollups.addFight({ week, styleA: warrior.style, styleD: opponent.style, winner: outcome.winner, by: outcome.by });
-  ArenaHistory.append(fightSummary);
-  LoreArchive.signalFight(fightSummary);
-  NewsletterFeed.appendFightResult({ summary: fightSummary, transcript: outcome.log.map(e => e.text) });
-
-  // ── Announcement (commentator + AnnouncerAI blurb) ──
-  let announcement: string | undefined;
-  const announceTone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") || tags.includes("Comeback") ? "hype" : "neutral");
-  const announcerBlurb = blurb({
-    tone: announceTone,
-    winner: outcome.winner === "A" ? warrior.name : outcome.winner === "D" ? opponent.name : undefined,
-    loser: outcome.winner === "A" ? opponent.name : outcome.winner === "D" ? warrior.name : undefined,
-    by: outcome.by ?? undefined,
-  });
-
-  if (outcome.by === "Kill") announcement = commentatorFor("Kill");
-  else if (outcome.by === "KO") announcement = commentatorFor("KO");
-  else if (tags.includes("Flashy")) announcement = commentatorFor("Flashy");
-  else if (tags.includes("Comeback")) announcement = commentatorFor("Upset");
-  else if (outcome.winner) {
-    const winnerName = outcome.winner === "A" ? warrior.name : opponent.name;
-    const loserName = outcome.winner === "A" ? opponent.name : warrior.name;
-    announcement = recapLine(winnerName, loserName, outcome.minutes);
-  }
-
-  // Append announcer flavour to the fight summary transcript
-  if (announcerBlurb) {
-    fightSummary.transcript = [...fightSummary.transcript, `🎙️ ${announcerBlurb}`];
-  }
+  // 8. Generate Summary and handle side-effects
+  const { summary, announcement } = generateFightSummary(warrior, opponent, outcome, tags, fameA, popA, fameD, popD, week);
+  s.arenaHistory = [...s.arenaHistory, summary];
 
   return {
     state: s,
     result: { a: warrior, d: opponent, outcome, announcement, isRivalry, rivalStable },
-    death, playerDeath, injured, injuredNames, deathNames,
+    death: deathRes.death,
+    playerDeath: deathRes.playerDeath,
+    injured: injRes.injured,
+    injuredNames: injRes.injuredNames,
+    deathNames: deathRes.deathNames,
   };
 }
 

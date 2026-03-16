@@ -34,6 +34,7 @@ import {
   pressingLine, generateWarriorIntro, battleOpener, getWeaponDisplayName,
   popularityLine, skillLearnLine, narrateInsightHint,
 } from "./narrativePBP";
+import { getSecureSeed } from "@/utils/random";
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────
 /**
