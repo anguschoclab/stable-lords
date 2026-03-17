@@ -7,18 +7,23 @@ const WARRIOR_NAMES = [
   // Brutal & powerful
   "KRAGOS", "GORLAK", "THUNDRAK", "BREKKA", "MORGUL", "SKARN", "GARVOK",
   "DRAXUS", "KORGAN", "BRUTAG", "IRONJAW", "GROTHAK", "WULFGAR", "BOLVERK",
+  "MACEWARD", "HACKER", "BONEBREAKER", "SKULLSMASHER", "GUTRENDER", "FLESHPOUNDER",
   // Agile & cunning
   "SILVANE", "VEXIA", "ASHARA", "THORNE", "DUSKBANE", "FERRIK", "VYREN",
   "KAELIS", "SYRAH", "NYX", "TALYN", "LYSARA", "MIRAEL", "ZEPHYRA",
+  "SLIVER", "RAZORDANCE", "QUICKSILVER", "GHOSTSTEP", "VENOMSPIT", "SHADOWDART",
   // Dark & mysterious
   "WRAITH", "MORKA", "SHADE", "OBERON", "VHAEL", "RAZIEL", "NOCTIS",
   "REVENANT", "MALAKAI", "SEREN", "GHAEL", "VELKOR", "EREBUS", "ORPHEUS",
+  "DEATHBRINGER", "GRAVEWALKER", "SOULRIPPER", "NIGHTTERROR", "DOOMBRINGER", "HELLSPAWN",
   // Arena legends
   "VICTUS", "MAXIMAR", "GLADIUS", "CENTURAX", "SPARTOK", "TYRANNUS",
   "AURELIAN", "PRIMUS", "DECIMUS", "SEVERAK", "CASSIAN", "VALORIAN",
+  "CHAMPION", "IMMORTAL", "UNBEATEN", "BLOODLORD", "IRONMASTER", "WARBRINGER",
   // Beast-like
   "FANGMAW", "CLAWREN", "STORMFANG", "BLOODHOWL", "ASHCLAW", "DIREWOLF",
   "SCORPIUS", "VIPERTOOTH", "RAVENMOOR", "HAWKSTEEL", "BEARJAW", "LYNXBLADE",
+  "MANTICORE", "GRIFFON", "DRAGONBLOOD", "WOLFHEART", "SERPENTSTRIKE", "TIGERCLAW",
 ];
 
 const OWNER_FIRST = [
@@ -28,6 +33,8 @@ const OWNER_FIRST = [
   "Sigmund", "Theron", "Ulric", "Valeria", "Wren", "Xander",
   "Ysolde", "Zephyr", "Alaric", "Brynna", "Corwin", "Dahlia",
   "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
+  "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
+  "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
 ];
 
 const OWNER_LAST = [
@@ -36,6 +43,8 @@ const OWNER_LAST = [
   "Thornwell", "Darkmore", "Brightforge", "Coldstone", "Wyrmwood",
   "Nighthollow", "Embervale", "Frostborn", "Greymane", "Silverbane",
   "Hawkridge", "Bonecrest", "Firebrand", "Shadowmere", "Bladewell",
+  "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
+  "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
 ];
 
 const STABLE_PREFIXES = [
@@ -43,6 +52,8 @@ const STABLE_PREFIXES = [
   "The Ashen", "The Golden", "The Black", "The Silver", "The Burning",
   "The Steel", "The Dark", "The Scarlet", "The Savage", "The Fallen",
   "The Pale", "The Raging", "The Obsidian", "The Thorned", "The Hollow",
+  "The Bone", "The Flesh", "The Skull", "The Death", "The Grave",
+  "The Doom", "The Hell", "The Vengeful", "The Wrathful", "The Cursed",
 ];
 
 const STABLE_SUFFIXES = [
@@ -50,6 +61,8 @@ const STABLE_SUFFIXES = [
   "Wardens", "Reapers", "Lions", "Hawks", "Pit",
   "Company", "Guard", "Horde", "Serpents", "Ravens",
   "Forge", "Phalanx", "Jackals", "Vipers", "Shields",
+  "Crushers", "Breakers", "Renders", "Slayers", "Executioners",
+  "Butchers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
 ];
 
 const STABLE_ALT = [
@@ -59,6 +72,10 @@ const STABLE_ALT = [
   "Circle of Steel", "The Pitborn", "Scions of the Arena",
   "The Deathless Company", "Lords of the Red Sand",
   "The Unbroken", "Warlords of Dusk", "The Chainbound",
+  "Masters of the Pit", "Champions of Blood", "The Gore Soaked",
+  "The Flesh Tearers", "The Skull Splitters", "The Bone Breakers",
+  "The Blood Drinkers", "The Soul Reapers", "The Death Dealers",
+  "The Hell Hounds", "The Doom Bringers", "The Grave Diggers",
 ];
 
 function pick<T>(arr: T[]): T {

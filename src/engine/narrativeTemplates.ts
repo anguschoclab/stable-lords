@@ -65,6 +65,9 @@ export const BATTLE_OPENERS = [
   "The signal is given for the duel to begin.",
   "The battle begins",
   "The crowd watches intently as the warriors square off.",
+  "A brutal cheer rises as the combatants face each other.",
+  "The scent of old blood fills the air as the bout commences.",
+  "Anticipation grips the arena as the duel gets underway.",
 ];
 
 export const PARRY_TEMPLATES = [
@@ -73,6 +76,8 @@ export const PARRY_TEMPLATES = [
   "knocks the incoming strike aside with his %W.",
   "blocks the attack effortlessly.",
   "sweeps the attack away using his %W.",
+  "catches the vicious swing on the flat of his %W.",
+  "turns the strike aside with a screech of steel against his %W.",
 ];
 
 export const PARRY_SHIELD_TEMPLATES = [
@@ -80,6 +85,8 @@ export const PARRY_SHIELD_TEMPLATES = [
   "blocks the strike with a raised SHIELD.",
   "interposes his SHIELD.",
   "angles his SHIELD to deflect the attack.",
+  "absorbs the impact entirely with his SHIELD.",
+  "raises his SHIELD just in time to catch the blow.",
 ];
 
 export const DODGE_TEMPLATES = [
@@ -89,12 +96,16 @@ export const DODGE_TEMPLATES = [
   "ducks beneath the blow.",
   "evades the attack smoothly.",
   "shifts aside, avoiding the strike.",
+  "twists his body, the strike missing by a hair's breadth.",
+  "slips beneath the attack with surprising agility.",
 ];
 
 export const COUNTERSTRIKE_TEMPLATES = [
   "%N twists inside the attack and launches a COUNTERSTRIKE!",
   "%N parries and IMMEDIATELY strikes back!",
   "A sudden opening—%N exploits it with a COUNTERSTRIKE!",
+  "Exploiting the overextension, %N delivers a rapid COUNTERSTRIKE!",
+  "%N bats the attack aside, leaving his foe open for a COUNTERSTRIKE!",
 ];
 
 export const HIT_TEMPLATES = [
@@ -103,29 +114,39 @@ export const HIT_TEMPLATES = [
   "strikes cleanly against",
   "finds its mark on",
   "slams into",
+  "crashes devastatingly into",
+  "bites deep into",
+  "leaves a brutal wound on",
 ];
 
 export const PARRY_BREAK_TEMPLATES = [
   "%A brings %W crashing through the parry!",
   "%A's force overwhelms the block!",
   "The block is SHATTERED by %A's %W!",
+  "%A's %W smashes through the desperate defense!",
+  "The raw power of %A's %W forces its way past the guard!",
 ];
 
 export const CROWD_REACTIONS_POSITIVE = [
   "The crowd ROARS in approval!",
   "Cheers erupt from the stands!",
   "The audience leaps to their feet!",
+  "A thunderous cheer sweeps the arena!",
+  "The crowd howls for more blood!",
 ];
 
 export const CROWD_REACTIONS_NEGATIVE = [
   "Boos and jeers echo from the arena walls.",
   "The crowd murmurs in disappointment.",
   "Derisive laughter from the high seats.",
+  "The audience groans at the clumsy display.",
+  "Insults rain down from the disappointed onlookers.",
 ];
 
 export const CROWD_REACTIONS_ENCOURAGE = [
   "Chants of encouragement begin to build.",
   "The crowd urges the warriors on.",
+  "Shouts of support ring out from the pit edge.",
 ];
 
 export const INI_WIN_TEMPLATES = [
@@ -133,74 +154,107 @@ export const INI_WIN_TEMPLATES = [
   "%N gains the upper hand.",
   "A sudden burst of speed puts %N on the offensive.",
   "%N presses the attack.",
+  "%N dictates the deadly tempo of the fight.",
+  "%N steals the momentum!",
 ];
 
 export const INI_KEEP_TEMPLATES = [
   "%N maintains the assault.",
   "%N continues to press the advantage.",
   "Relentless, %N strikes again.",
+  "%N refuses to yield the offensive.",
+  "Giving his foe no quarter, %N presses on.",
 ];
 
 export const EXECUTION_TEMPLATES = [
   "%A delivers a brutal execution stroke!",
   "%A shows no mercy, finishing the bout!",
   "The final blow is devastating.",
+  "Exploiting %D's exhaustion, %A delivers a fatal, devastating blow with his %W!",
+  "With %D's defenses utterly broken, %A executes a horrific attack with his %W!",
+  "%D collapses from blood loss as %A lands the final, lethal strike with his %W!",
+  "Taking advantage of %D's crippled legs, %A finishes him off with his %W!",
+  "%A drives his %W deep into %D's unguarded vitals, ending it instantly!",
+  "With a merciless, overwhelming strike from his %W, %A snuffs out %D's life!",
+  "%A expertly guides his %W into a lethal opening, ending %D!",
+  "%D's armor fails entirely against %A's masterful finish with his %W!",
 ];
 
 export const KO_TEMPLATES = [
   "%D collapses, unconscious.",
   "%D goes down hard and doesn't move.",
   "The strike knocks %D senseless.",
+  "%D's eyes roll back as he slumps to the blood-soaked sand.",
+  "Unable to bear the punishment, %D crumples into darkness.",
 ];
 
 export const SURRENDER_TEMPLATES = [
   "%D yields to %A.",
   "%D signals surrender.",
   "Unable to continue, %D throws down his weapon.",
+  "Bleeding and broken, %D begs for mercy from %A.",
+  "%D raises a trembling hand, conceding the bout to %A.",
 ];
 
 export const FATIGUE_COLLAPSE_TEMPLATES = [
   "%N collapses from sheer exhaustion.",
   "His endurance spent, %N falls to the sand.",
+  "Gasping for air, %N's legs give out completely.",
+  "%N drops to his knees, utterly drained of energy.",
 ];
 
 export const TAUNT_TEMPLATES = [
   '"Is that all you have?" sneers %N.',
   '%N laughs. "You fight like a child!"',
   '"Prepare to die," %N hisses.',
+  '"I will wear your entrails as a necklace!" %N roars.',
+  '"Your stablemaster will weep today!" %N mocks.',
+  '"You look tired. Let me end it," %N chuckles.',
 ];
 
 export const STALEMATE_TEMPLATES = [
   "The warriors circle cautiously.",
   "A moment's pause as both catch their breath.",
   "They trade feints, looking for an opening.",
+  "The pace slows as the fighters evaluate the carnage.",
+  "Footsteps crunch on the sand as the combatants reassess their strategies.",
 ];
 
 export const SLASH_ATTACK_TEMPLATES = [
   "slashes his %W at",
   "swings a wide arc at",
   "cuts fiercely at",
+  "carves a deadly path with his %W toward",
+  "whips his %W in a brutal horizontal slice at",
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
   "bashes heavily with his %W toward",
   "swings a crushing blow at",
   "hammers down on",
+  "brings his %W down with bone-shattering force upon",
+  "delivers a bludgeoning smash toward",
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [
   "thrusts his %W directly at",
   "lunges forward, aiming at",
   "stabs toward",
+  "drives his %W forward with lethal intent toward",
+  "pierces the distance, lunging his %W at",
 ];
 
 export const FIST_ATTACK_TEMPLATES = [
   "throws a savage punch at",
   "strikes out with an OPEN HAND at",
   "jabs quickly at",
+  "delivers a brutal haymaker toward",
+  "drives a crushing fist into",
 ];
 
 export const GENERIC_ATTACK_TEMPLATES = [
   "attacks with his %W targeting",
   "strikes out at",
+  "lashes out with his %W against",
+  "unleashes a vicious assault upon",
 ];
