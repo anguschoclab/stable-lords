@@ -32,3 +32,12 @@ This file generates play-by-play narrative text for bouts, but over half of the 
 - `narrativePBP.ts`: Keep only the functions that utilize these templates (`narrateAttack`, `battleOpener`, etc.), importing the templates from the new file.
 
 **Benefit:** Instantly cuts the file size in half and makes it much easier to read the actual logic without scrolling past hundreds of lines of string literals.
+
+## 4. UI Component Consolidation
+- [x] Extract  component to .
+- [x] Extract  component to .
+
+
+## 4. UI Component Consolidation
+- [x] Extract `WarriorNameTag` component to `src/components/ui/`.
+- [x] Extract `StatBadge` component to `src/components/ui/`.
