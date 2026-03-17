@@ -113,11 +113,19 @@ export function createFreshState(): GameState {
 /** Legacy alias — kept for existing imports */
 export const createDemoState = createFreshState;
 
+// Security: Prevent prototype pollution when deserializing localStorage state
+function sanitizeReviver(key: string, value: any) {
+  if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+    return undefined;
+  }
+  return value;
+}
+
 export function loadGameState(): GameState {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw, sanitizeReviver);
       if (parsed && parsed.meta) {
         // Migrate old saves
         if (!parsed.graveyard) parsed.graveyard = [];
