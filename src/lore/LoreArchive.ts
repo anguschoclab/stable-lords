@@ -7,6 +7,7 @@ const KEY_FIGHTS = "sl.lore.fights";
 const KEY_HALL = "sl.lore.hall";
 
 function loadArray<T>(key: string): T[] {
+  if (typeof localStorage === 'undefined') return [];
   try {
     return JSON.parse(localStorage.getItem(key) || "[]");
   } catch {
@@ -14,7 +15,9 @@ function loadArray<T>(key: string): T[] {
   }
 }
 function saveArray<T>(key: string, arr: T[]) {
-  localStorage.setItem(key, JSON.stringify(arr));
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
 }
 
 export const LoreArchive = {

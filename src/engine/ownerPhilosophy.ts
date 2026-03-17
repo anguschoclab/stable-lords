@@ -24,6 +24,17 @@ const PERSONALITY_PLAN_MODS: Record<OwnerPersonality, Partial<FightPlan>> = {
   Pragmatic:   { OE: 0, AL: 0, killDesire: 0 },
   Tactician:   { OE: -1, AL: 1, killDesire: -2 },
 };
+/** How stable philosophies can drift if they are underperforming */
+const PHILOSOPHY_DRIFT: Record<string, string[]> = {
+  "Aggressive": ["Reckless", "Balanced"],
+  "Reckless": ["Aggressive"],
+  "Defensive": ["Methodical", "Balanced"],
+  "Methodical": ["Defensive", "Tactical"],
+  "Tactical": ["Methodical", "Balanced"],
+  "Balanced": ["Aggressive", "Defensive", "Showman"],
+  "Showman": ["Aggressive", "Balanced"],
+};
+
 export function evolvePhilosophies(
   state: GameState,
   newSeason: Season
