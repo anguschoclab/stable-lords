@@ -3,6 +3,7 @@
  * Manages up to 5 save slots in localStorage.
  */
 import type { GameState } from "@/types/game";
+import { z } from "zod";
 
 const SLOTS_INDEX_KEY = "stablelords.slots";
 const SLOT_PREFIX = "stablelords.slot.";
@@ -206,31 +207,52 @@ export function exportActiveSlot(): void {
   if (slotId) exportSlot(slotId);
 }
 
+const BaseSaveSchema = z.object({
+  meta: z.object({
+    gameName: z.string().optional(),
+    version: z.string(),
+  }).passthrough(),
+  player: z.object({
+    stableName: z.string(),
+  }).passthrough(),
+}).passthrough();
+
+const ExportedSaveSchema = z.object({
+  _format: z.literal("stablelords-save-v1"),
+  state: BaseSaveSchema,
+}).passthrough();
+
+const AnySaveSchema = z.union([
+  ExportedSaveSchema,
+  BaseSaveSchema,
+]);
+
 /**
  * Validate and parse an imported JSON file.
  * Returns the GameState or throws with a user-friendly message.
  */
 export function parseImportedSave(json: string): GameState {
-  let parsed: Record<string, unknown>;
+  let parsed: unknown;
   try {
     parsed = JSON.parse(json);
   } catch {
     throw new Error("Invalid file — could not parse JSON.");
   }
 
-  // Support both wrapped format and raw GameState
-  let state: Record<string, unknown>;
-  if (parsed?._format === "stablelords-save-v1" && parsed.state) {
-    state = parsed.state;
-  } else if (parsed?.meta?.gameName) {
-    state = parsed;
-  } else {
-    throw new Error("Unrecognized save format. Expected a Stable Lords save file.");
+  let validated;
+  try {
+    validated = AnySaveSchema.parse(parsed);
+  } catch (err) {
+    console.error("Save validation failed:", err);
+    throw new Error("Save file is missing required fields (player/meta).");
   }
 
-  // Basic validation
-  if (!state.player?.stableName || !state.meta?.version) {
-    throw new Error("Save file is missing required fields (player/meta).");
+  // Support both wrapped format and raw GameState
+  let state: Record<string, unknown>;
+  if ("_format" in validated && validated._format === "stablelords-save-v1") {
+    state = validated.state as Record<string, unknown>;
+  } else {
+    state = validated as Record<string, unknown>;
   }
 
   // Apply migrations
