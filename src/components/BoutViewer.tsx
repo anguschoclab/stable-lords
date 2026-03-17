@@ -218,7 +218,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
         <>
           {/* Playback Controls */}
           <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-b border-border bg-secondary/30">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={reset} title="Reset">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={reset} title="Reset" aria-label="Reset playback">
               <RotateCcw className="h-3.5 w-3.5" />
             </Button>
             <Button
@@ -227,10 +227,11 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
               className="h-8 w-8"
               onClick={togglePlay}
               title={isPlaying ? "Pause" : "Play"}
+              aria-label={isPlaying ? "Pause playback" : "Play playback"}
             >
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={skipToEnd} title="Skip to end">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={skipToEnd} title="Skip to end" aria-label="Skip to end of playback">
               <SkipForward className="h-3.5 w-3.5" />
             </Button>
             <div className="h-4 w-px bg-border mx-1" />
@@ -238,6 +239,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
               onClick={() => setSpeed((s) => (s === 1 ? 2 : s === 2 ? 3 : 1) as 1 | 2 | 3)}
               className="text-[11px] font-mono text-muted-foreground hover:text-foreground px-2 py-1 rounded bg-secondary border border-border transition-colors"
               title="Playback speed"
+              aria-label="Toggle playback speed"
             >
               {speed}×
             </button>
