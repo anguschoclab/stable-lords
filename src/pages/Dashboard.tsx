@@ -6,7 +6,9 @@ import React, { useMemo, useState, useCallback } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, BASE_ROSTER_CAP, type Warrior } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
 import TagBadge from "@/components/TagBadge";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -266,18 +268,8 @@ function RankingsWidget() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-display font-semibold text-sm truncate">{w.name}</span>
-                    {w.champion && <Trophy className="h-3 w-3 text-arena-gold shrink-0" />}
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Badge variant="outline" className="text-[10px] font-mono h-4 px-1">
-                      {STYLE_ABBREV[w.style]}
-                    </Badge>
-                    <span className="text-[11px] text-muted-foreground">
-                      {w.career.wins}W-{w.career.losses}L
-                    </span>
-                  </div>
+                  <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                  <StatBadge styleName={w.style} career={w.career} />
                 </div>
 
                 {/* Stats */}
@@ -561,9 +553,7 @@ function TrainingWidget() {
                 <div key={warriorId} className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-display font-semibold truncate">
-                        <WarriorLink name={w.name} id={w.id}>{w.name}</WarriorLink>
-                      </span>
+                      <WarriorNameTag id={w.id} name={w.name} />
                       <Badge variant="outline" className="text-[10px] font-mono h-4 px-1">
                         {STYLE_ABBREV[w.style]}
                       </Badge>

@@ -6,6 +6,7 @@ import type { FightSummary } from "@/types/game";
 const KEY = "sl.arenaHistory";
 
 function load(): FightSummary[] {
+  if (typeof localStorage === 'undefined') return [];
   try {
     return JSON.parse(localStorage.getItem(KEY) || "[]");
   } catch {
@@ -14,7 +15,9 @@ function load(): FightSummary[] {
 }
 
 function save(arr: FightSummary[]) {
-  localStorage.setItem(KEY, JSON.stringify(arr));
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(KEY, JSON.stringify(arr));
+  }
 }
 
 export const ArenaHistory = {

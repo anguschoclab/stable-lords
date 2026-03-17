@@ -9,6 +9,8 @@ import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, type Warrior } from 
 import { computeStableReputation } from "@/engine/stableReputation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -115,20 +117,14 @@ function RosterWall() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-display font-bold text-sm truncate">{w.name}</span>
-                      {w.champion && <Crown className="h-3 w-3 text-arena-gold shrink-0" />}
-                      {injuryCount > 0 && <Heart className="h-3 w-3 text-destructive shrink-0" />}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Badge variant="outline" className="text-[10px] font-mono h-4 px-1">
-                        {STYLE_ABBREV[w.style]}
-                      </Badge>
-                      <span className="text-[10px] text-muted-foreground">
-                        {w.career.wins}W-{w.career.losses}L
-                        {w.career.kills > 0 && <span className="text-arena-blood ml-0.5">{w.career.kills}K</span>}
-                      </span>
-                    </div>
+                    <WarriorNameTag
+                      id={w.id}
+                      name={w.name}
+                      isChampion={w.champion}
+                      injuryCount={injuryCount}
+                      useCrown
+                    />
+                    <StatBadge styleName={w.style} career={w.career} />
 
                     {/* Attribute mini-bar */}
                     <div className="flex gap-1.5 mt-1.5">

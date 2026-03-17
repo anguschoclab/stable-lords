@@ -12,6 +12,7 @@ type RollingBucket = { W: number; L: number; K: number; fights: number };
 // ── Week-based rollups ────────────────────────────────────────────────────
 
 function loadWeek(week: number): Record<string, Bucket> {
+  if (typeof localStorage === 'undefined') return {};
   try {
     const raw = localStorage.getItem(`${KEY_WEEK}_${week}`);
     return raw ? JSON.parse(raw) : {};
@@ -21,7 +22,9 @@ function loadWeek(week: number): Record<string, Bucket> {
 }
 
 function saveWeek(week: number, m: Record<string, Bucket>) {
-  localStorage.setItem(`${KEY_WEEK}_${week}`, JSON.stringify(m));
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(`${KEY_WEEK}_${week}`, JSON.stringify(m));
+  }
 }
 
 function ensure(style: string, m: Record<string, Bucket>): Bucket {
@@ -32,6 +35,7 @@ function ensure(style: string, m: Record<string, Bucket>): Bucket {
 // ── Rolling window (last 10 fights per style) ─────────────────────────────
 
 function loadRolling(): Record<string, RollingBucket[]> {
+  if (typeof localStorage === 'undefined') return {};
   try {
     return JSON.parse(localStorage.getItem(KEY_ROLLING) || "{}");
   } catch {
@@ -39,10 +43,13 @@ function loadRolling(): Record<string, RollingBucket[]> {
   }
 }
 function saveRolling(m: Record<string, RollingBucket[]>) {
-  localStorage.setItem(KEY_ROLLING, JSON.stringify(m));
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(KEY_ROLLING, JSON.stringify(m));
+  }
 }
 
 function loadTour(): Record<string, Record<string, RollingBucket>> {
+  if (typeof localStorage === 'undefined') return {};
   try {
     return JSON.parse(localStorage.getItem(KEY_TOUR) || "{}");
   } catch {
@@ -50,7 +57,9 @@ function loadTour(): Record<string, Record<string, RollingBucket>> {
   }
 }
 function saveTour(m: Record<string, Record<string, RollingBucket>>) {
-  localStorage.setItem(KEY_TOUR, JSON.stringify(m));
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(KEY_TOUR, JSON.stringify(m));
+  }
 }
 
 // ── Public types ──────────────────────────────────────────────────────────

@@ -9,6 +9,8 @@ import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Warrior } from "@/types/game";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -150,8 +152,7 @@ function ArenaLeaderboard() {
                       {i + 1}
                     </TableCell>
                     <TableCell>
-                      <WarriorLink name={w.name} id={w.id} className="font-display font-semibold text-sm" />
-                      {w.champion && <Trophy className="h-3 w-3 text-arena-gold inline ml-1" />}
+                      <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
                     </TableCell>
                     <TableCell>
                       <span className={`text-xs ${entry.isPlayer ? "text-primary font-semibold" : "text-muted-foreground"}`}>
@@ -159,9 +160,7 @@ function ArenaLeaderboard() {
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="outline" className="text-[10px] font-mono">
-                        {STYLE_ABBREV[w.style]}
-                      </Badge>
+                      <StatBadge styleName={w.style} />
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">
                       <span className="text-arena-pop">{w.career.wins}</span>

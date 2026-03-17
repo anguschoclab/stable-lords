@@ -743,7 +743,8 @@ function WeeklyIssue({
     </article>
   );
 }
-\n/* ── main page ───────────────────────────────────────────── */
+
+/* ── main page ───────────────────────────────────────────── */
 
 export default function Gazette() {
   const { state } = useGameStore();
@@ -836,7 +837,7 @@ export default function Gazette() {
       {/* Weekly Issues — paginated */}
             {visibleIssues.map((issue) => (
         <WeeklyIssue key={issue.week} issue={issue} state={state} />
-      ))}\n\n      {/* Load More button */}
+      ))}      {/* Load More button */}
       {hasMore && (
         <div className="flex justify-center py-4">
           <button

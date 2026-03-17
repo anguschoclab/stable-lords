@@ -24,6 +24,13 @@ const PERSONALITY_PLAN_MODS: Record<OwnerPersonality, Partial<FightPlan>> = {
   Pragmatic:   { OE: 0, AL: 0, killDesire: 0 },
   Tactician:   { OE: -1, AL: 1, killDesire: -2 },
 };
+const META_RECRUIT_QUOTES: Record<MetaAdaptation, string> = {
+  MetaChaser: "\"If it wins, we buy it.\"",
+  Traditionalist: "\"We rely on what we know.\"",
+  Opportunist: "\"There is room in the market for a new face.\"",
+  Innovator: "\"They will never see this coming.\""
+};
+
 export function processAIRosterManagement(
   state: GameState
 ): { updatedRivals: RivalStableData[]; gazetteItems: string[] } {
