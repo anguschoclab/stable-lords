@@ -24,6 +24,11 @@ const WARRIOR_NAMES = [
   "FANGMAW", "CLAWREN", "STORMFANG", "BLOODHOWL", "ASHCLAW", "DIREWOLF",
   "SCORPIUS", "VIPERTOOTH", "RAVENMOOR", "HAWKSTEEL", "BEARJAW", "LYNXBLADE",
   "MANTICORE", "GRIFFON", "DRAGONBLOOD", "WOLFHEART", "SERPENTSTRIKE", "TIGERCLAW",
+  // Expanded
+  "GOREFANG", "DUSKREAPER", "BLOODSPILL", "ASHENWAKE", "GRIMSCAR", "NIGHTSLASH",
+  "OATHBREAKER", "CINDERSTRIKE", "TOMBSTONE", "SKULLSPLIT", "GUTSPILLER", "FLESHRENDER",
+  "BONECHILL", "DOOMBRASS", "SLAGHEART", "RUSTBLADE", "WARGUT", "IRONCLAW",
+  "GRAVEBORN", "DEATHWATCH", "VENOMFANG", "SOULSNARE", "BLOODCRAZED", "PITFIEND",
 ];
 
 const OWNER_FIRST = [
@@ -35,6 +40,7 @@ const OWNER_FIRST = [
   "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
   "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
   "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
+  "Vortigern", "Morwenna", "Titus", "Galba",
 ];
 
 const OWNER_LAST = [
@@ -45,6 +51,7 @@ const OWNER_LAST = [
   "Hawkridge", "Bonecrest", "Firebrand", "Shadowmere", "Bladewell",
   "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
   "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
+  "Graveward", "Grimbane", "Sorrowbring", "Cinderfall",
 ];
 
 const STABLE_PREFIXES = [
@@ -54,6 +61,8 @@ const STABLE_PREFIXES = [
   "The Pale", "The Raging", "The Obsidian", "The Thorned", "The Hollow",
   "The Bone", "The Flesh", "The Skull", "The Death", "The Grave",
   "The Doom", "The Hell", "The Vengeful", "The Wrathful", "The Cursed",
+  "The Grinding", "The Bleeding", "The Ruined", "The Shattered", "The Forsaken",
+  "The Merciless", "The Unforgiving", "The Putrid", "The Rotting", "The Blighted",
 ];
 
 const STABLE_SUFFIXES = [
@@ -63,6 +72,8 @@ const STABLE_SUFFIXES = [
   "Forge", "Phalanx", "Jackals", "Vipers", "Shields",
   "Crushers", "Breakers", "Renders", "Slayers", "Executioners",
   "Butchers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
+  "Manglers", "Gorehounds", "Scavengers", "Defilers", "Despoilers",
+  "Marauders", "Annihilators", "Obliterators", "Ravagers", "Plunderers",
 ];
 
 const STABLE_ALT = [
@@ -76,6 +87,10 @@ const STABLE_ALT = [
   "The Flesh Tearers", "The Skull Splitters", "The Bone Breakers",
   "The Blood Drinkers", "The Soul Reapers", "The Death Dealers",
   "The Hell Hounds", "The Doom Bringers", "The Grave Diggers",
+  "Cult of the Severed Head", "Brotherhood of the Black Sand",
+  "Choir of Screams", "The Iron Maiden's Embrace", "The Bloodied Knuckles",
+  "Harbingers of the Final Strike", "The Slaughterhouse Syndicate",
+  "Disciples of the Meat Grinder", "The Carrion Crows", "The Abattoir Artisans",
 ];
 
 function pick<T>(arr: T[]): T {

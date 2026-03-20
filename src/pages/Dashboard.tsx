@@ -554,9 +554,7 @@ function TrainingWidget() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <WarriorNameTag id={w.id} name={w.name} />
-                      <Badge variant="outline" className="text-[10px] font-mono h-4 px-1">
-                        {STYLE_ABBREV[w.style]}
-                      </Badge>
+                      <StatBadge styleName={w.style} />
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-[10px] text-muted-foreground">Training</span>

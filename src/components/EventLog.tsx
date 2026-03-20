@@ -57,16 +57,29 @@ const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }>
  * Names are matched longest-first to avoid partial matches.
  */
 function LinkifiedText({ text, names }: { text: string; names: string[] }) {
-  if (!names || names.length === 0) return <>{text}</>;
+  // ⚡ Bolt: Memoize the regular expression creation and string splitting.
+  // The EventLog renders many events, each containing LinkifiedText for the title and subtitle.
+  // Re-creating the regex and re-splitting the string on every render for every event is a significant performance bottleneck.
+  // This reduces unnecessary CPU cycles and garbage collection by caching the result unless the text or names list changes.
+  const { parts, nameSet, isLinkifiable } = useMemo(() => {
+    if (!names || names.length === 0) {
+      return { parts: [text], nameSet: new Set<string>(), isLinkifiable: false };
+    }
 
-  // Sort longest first to avoid partial matches
-  const sorted = [...names].sort((a, b) => b.length - a.length);
-  // Escape regex special chars in names
-  const escaped = sorted.map(n => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const pattern = new RegExp(`(${escaped.join("|")})`, "g");
+    // Sort longest first to avoid partial matches
+    const sorted = [...names].sort((a, b) => b.length - a.length);
+    // Escape regex special chars in names
+    const escaped = sorted.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const pattern = new RegExp(`(${escaped.join("|")})`, "g");
 
-  const parts = text.split(pattern);
-  const nameSet = new Set(names);
+    return {
+      parts: text.split(pattern),
+      nameSet: new Set(names),
+      isLinkifiable: true,
+    };
+  }, [text, names]);
+
+  if (!isLinkifiable) return <>{text}</>;
 
   return (
     <>

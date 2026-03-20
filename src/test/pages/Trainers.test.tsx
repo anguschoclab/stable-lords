@@ -17,18 +17,13 @@ import { renderWithGameState } from "../testUtils";
 import { createFreshState } from "@/state/gameStore";
 import type { GameState, TrainerData } from "@/types/game";
 import "../setup";
+import { useGameStore } from "@/state/useGameStore";
 
 // Mock the router components
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
 }));
 
-// Fix ResizeObserver not being defined in jsdom
-global.ResizeObserver = class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
 
 // Mock Radix UI Tabs to always render both contents for easy testing
 vi.mock("@/components/ui/tabs", () => {
@@ -73,7 +68,7 @@ describe("Trainers Component", () => {
     const staffElements = await screen.findAllByText("Master Splinter");
     expect(staffElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Fundamentals");
+    const focusBadge = screen.getByText("Fundamentals SPECIALIST", { exact: false });
     expect(focusBadge).toBeInTheDocument();
   });
 
@@ -83,7 +78,7 @@ describe("Trainers Component", () => {
     const poolElements = await screen.findAllByText("Coach Rocky");
     expect(poolElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Aggression");
+    const focusBadge = screen.getByText("Aggression SPECIALIST", { exact: false });
     expect(focusBadge).toBeInTheDocument();
   });
 

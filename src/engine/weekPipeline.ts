@@ -70,10 +70,16 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
 
   const promotionNews: string[] = [];
   const updatedRivals = (state.rivals || []).map(r => {
-    const totalWins = r.roster.reduce((sum, w) => sum + w.career.wins, 0);
-    const totalKills = r.roster.reduce((sum, w) => sum + w.career.kills, 0);
-    const totalFights = r.roster.reduce((sum, w) => sum + w.career.wins + w.career.losses, 0);
-    const activeCount = r.roster.filter(w => w.status === "Active").length;
+    const { totalWins, totalKills, totalFights, activeCount } = r.roster.reduce(
+      (acc, w) => {
+        acc.totalWins += w.career.wins;
+        acc.totalKills += w.career.kills;
+        acc.totalFights += w.career.wins + w.career.losses;
+        if (w.status === "Active") acc.activeCount++;
+        return acc;
+      },
+      { totalWins: 0, totalKills: 0, totalFights: 0, activeCount: 0 }
+    );
 
     let newTier = r.tier;
 

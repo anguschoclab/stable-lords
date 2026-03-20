@@ -154,6 +154,7 @@ export function migrateGameState(parsed: any): GameState {
   if (!parsed.moodHistory) parsed.moodHistory = [];
   if (!parsed.seasonalGrowth) parsed.seasonalGrowth = [];
   if (!parsed.settings) parsed.settings = { featureFlags: { tournaments: true, scouting: true } };
+  if (!parsed.phase) parsed.phase = "planning";
   if (parsed.settings && !parsed.settings.featureFlags?.scouting) {
     parsed.settings.featureFlags = { ...parsed.settings.featureFlags, scouting: true };
   }

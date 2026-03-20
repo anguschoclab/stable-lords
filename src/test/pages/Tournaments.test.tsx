@@ -14,14 +14,6 @@ vi.mock('@/state/useGameStore', () => ({
   useGameStore: vi.fn()
 }));
 
-// Mock ResizeObserver for Radix UI Tooltip
-beforeAll(() => {
-  global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-});
 
 describe('Tournaments Page', () => {
   const mockSetState = vi.fn();

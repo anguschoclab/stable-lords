@@ -48,6 +48,47 @@ export function generateBalanceReport(result: AutosimResult): string {
     .sort(([, driftA], [, driftB]) => driftB - driftA)
     .map(([style, drift]) => `${style.padEnd(20)} | Drift: ${drift > 0 ? '+' : ''}${drift}`);
 
+  // 4. Generate Oracle Observations & Suggested Tweaks
+  const anomalies: string[] = [];
+
+  // Lethality Observations
+  anomalies.push("### 1. Lethality");
+  if (killRate < 8) {
+    anomalies.push(`**Anomaly:** The Overall Kill Rate (${killRate.toFixed(2)}%) is below the target bounds (8% - 15%). Warriors are surviving too often.`);
+    anomalies.push("**Suggested Action:** \n- In `src/engine/simulate.ts`, consider increasing `KILL_THRESHOLD_BASE` (currently \`0.3\`) to \`0.4\` or \`0.5\` to widen the base kill window.\n- Alternatively, increase `KILL_DESIRE_SCALING` (currently \`0.04\`) to make high Kill Desire plans more lethal.");
+  } else if (killRate > 15) {
+    anomalies.push(`**Anomaly:** The Overall Kill Rate (${killRate.toFixed(2)}%) is above the target bounds (8% - 15%). The game is too lethal.`);
+    anomalies.push("**Suggested Action:** \n- In `src/engine/simulate.ts`, consider decreasing `KILL_THRESHOLD_BASE` (currently \`0.3\`) to reduce the base kill window.\n- Alternatively, decrease `KILL_DESIRE_SCALING` (currently \`0.04\`).");
+  } else {
+    anomalies.push(`**Status:** Kill Rate is within target bounds (8% - 15%).`);
+  }
+  anomalies.push("");
+
+  // Economy Observations
+  anomalies.push("### 2. Economy");
+  if (playerGold > 10000) {
+    anomalies.push(`**Anomaly:** The Player Stable Wealth exhibits hyper-inflation (${playerGold} gold). There is insufficient gold sink or running costs compared to income.`);
+    anomalies.push("**Suggested Action:** \n- In `src/engine/economy.ts`, increase `WARRIOR_UPKEEP` (currently \`20\`) to scale costs with roster size.\n- Alternatively, introduce new gold sinks (e.g., baseline stable maintenance fees, healing costs, or equipment degradation).");
+  } else if (playerGold < 1000) {
+    anomalies.push(`**Anomaly:** The Player Stable Wealth is very low (${playerGold} gold). The economy might be too punishing.`);
+    anomalies.push("**Suggested Action:** \n- Check income sources in `src/engine/economy.ts` (e.g. \`FIGHT_PURSE\` or \`WIN_BONUS\`).");
+  } else {
+    anomalies.push(`**Status:** Player Stable Wealth is relatively stable.`);
+  }
+  anomalies.push("");
+
+  // Meta-Drift Observations
+  anomalies.push("### 3. Meta-Drift");
+  const dominantStyles = Object.entries(meta).filter(([, drift]) => drift >= 5).map(([s]) => s);
+  const strugglingStyles = Object.entries(meta).filter(([, drift]) => drift <= -5).map(([s]) => s);
+
+  if (dominantStyles.length > 0 || strugglingStyles.length > 0) {
+    anomalies.push(`**Anomaly:** Meta is unbalanced. Dominant: ${dominantStyles.length > 0 ? dominantStyles.join(', ') : 'None'}. Struggling: ${strugglingStyles.length > 0 ? strugglingStyles.join(', ') : 'None'}.`);
+    anomalies.push(`**Suggested Action:**\n- Review the \`MATCHUP_MATRIX\` in \`src/engine/simulate.ts\` for the struggling and dominating styles.\n- Alternatively, adjust offensive/defensive multipliers for these styles.`);
+  } else {
+    anomalies.push(`**Status:** Meta drift is healthy. No severely dominant or struggling styles.`);
+  }
+
   // Format the Report
   return `
 # Stable Lords — Daily Balance Report
@@ -86,6 +127,12 @@ export function generateBalanceReport(result: AutosimResult): string {
 \`\`\`
 ${sortedMeta.join("\n")}
 \`\`\`
+
+---
+
+## 🔍 Oracle Observations & Suggested Tweaks
+
+${anomalies.join("\n")}
 
 ---
 *Report generated automatically by the Simulation Oracle.*

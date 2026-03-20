@@ -505,6 +505,7 @@ export interface GameState {
   gold: number;
   ledger: LedgerEntry[];
   week: number;
+  phase: "planning" | "resolution";
   season: Season;
   roster: Warrior[];
   graveyard: Warrior[];
