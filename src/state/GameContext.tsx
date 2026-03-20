@@ -17,6 +17,7 @@ import {
   saveToSlot,
   listSaveSlots,
 } from "./saveSlots";
+import { useGameStore } from "./useGameStore";
 
 interface GameContextValue {
   state: GameState;
@@ -47,6 +48,12 @@ const TITLE_SENTINEL = "__TITLE__";
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const initialize = useGameStore((state) => state.initialize);
+  const markSaved = useGameStore((state) => state.markSaved);
+  const setStateRaw = useGameStore((state) => state.setState);
+  const setActiveSlotId = useGameStore((state) => state.setActiveSlotId);
+  const state = useGameStore((state) => state.state);
+  const atTitleScreen = useGameStore((state) => state.atTitleScreen);
+  const lastSavedAt = useGameStore((state) => state.lastSavedAt);
   useEffect(() => {
     initialize();
   }, [initialize]);

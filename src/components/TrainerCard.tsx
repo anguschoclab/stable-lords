@@ -65,7 +65,7 @@ export default function TrainerCard({
               </div>
             </div>
             {owned && onFire && (
-              <Button variant="ghost" size="icon" onClick={onFire} title="Release trainer" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0">
+              <Button variant="ghost" size="icon" onClick={onFire} title="Release trainer" aria-label="Release trainer" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0">
                 <UserMinus className="h-4 w-4" />
               </Button>
             )}
