@@ -1,3 +1,4 @@
+import { generateFightNarrative } from "@/engine/gazetteNarrative";
 /**
  * Bout Processor — shared fight resolution logic for RunRound and Autosim.
  *
@@ -124,6 +125,8 @@ function handleBoutDeath(
   opponent: Warrior,
   outcome: FightOutcome,
   playerId: string,
+  boutId: string,
+  tags: string[],
   rivalStableId?: string,
   week?: number
 ): { s: GameState; death: boolean; playerDeath: boolean; deathNames: string[] } {
@@ -134,22 +137,69 @@ function handleBoutDeath(
 
   if (outcome.by === "Kill") {
     death = true;
-    if (outcome.winner === "A") {
-      deathNames.push(opponent.name);
+    const isPlayerVictim = outcome.winner !== "A";
+    const killer = isPlayerVictim ? opponent : warrior;
+    const victim = isPlayerVictim ? warrior : opponent;
+
+    deathNames.push(victim.name);
+
+    // Create death event
+    const summaryData = {
+      id: boutId,
+      week: week || s.week,
+      a: warrior.name,
+      d: opponent.name,
+      winner: outcome.winner,
+      by: outcome.by,
+      styleA: warrior.style,
+      styleD: opponent.style,
+      transcript: [],
+      title: `${warrior.name} vs ${opponent.name}`,
+      phase: "resolution" as const
+    };
+    const deathSummaryText = generateFightNarrative(summaryData as any, s.crowdMood);
+
+    const deathEvent = {
+      boutId,
+      killerId: killer.id,
+      deathSummary: deathSummaryText,
+      memorialTags: tags
+    };
+
+    // Stable reputation hit/boost (update fame directly on state)
+    if (isPlayerVictim) {
+      playerDeath = true;
+      s = killWarrior(s, warrior.id, opponent.name, "Killed in arena combat", deathEvent);
+      if (rivalStableId) {
+        s.rivalries = detectRivalries(s.rivalries || [], rivalStableId, playerId, opponent.name, warrior.name, week || s.week);
+      }
+      // Fame hit for having a warrior killed
+      s.fame = Math.max(0, (s.fame || 0) - 5);
+      if (s.player) s.player.fame = Math.max(0, (s.player.fame || 0) - 5);
+    } else {
       if (rivalStableId) {
         s.rivals = (s.rivals || []).map(r => ({ ...r, roster: r.roster.filter(w => w.id !== opponent.id) }));
         s.rivalries = detectRivalries(s.rivalries || [], playerId, rivalStableId, warrior.name, opponent.name, week || s.week);
       } else {
-        s = killWarrior(s, opponent.id, warrior.name, "Killed in arena combat");
+        s = killWarrior(s, opponent.id, warrior.name, "Killed in arena combat", deathEvent);
       }
-    } else {
-      playerDeath = true;
-      deathNames.push(warrior.name);
-      s = killWarrior(s, warrior.id, opponent.name, "Killed in arena combat");
-      if (rivalStableId) {
-        s.rivalries = detectRivalries(s.rivalries || [], rivalStableId, playerId, opponent.name, warrior.name, week || s.week);
-      }
+      // Fame boost for getting a kill
+      s.fame = Math.max(0, (s.fame || 0) + 5);
+      if (s.player) s.player.fame = Math.max(0, (s.player.fame || 0) + 5);
     }
+
+    // Append to ArenaHistory as DEATH event
+    const deathFightSummary: FightSummary = {
+        ...summaryData,
+        isDeathEvent: true,
+        deathEventData: deathEvent,
+        createdAt: new Date().toISOString()
+    };
+    s.arenaHistory = [...s.arenaHistory, deathFightSummary];
+    ArenaHistory.append(deathFightSummary);
+
+    // Add newsletter item
+    s.newsletter = [...s.newsletter, { week: week || s.week, title: "Arena Obituary", items: [deathSummaryText] }];
   }
 
   return { s, death, playerDeath, deathNames };
@@ -329,10 +379,11 @@ function generateFightSummary(
   popA: number,
   fameD: number,
   popD: number,
-  week: number
+  week: number,
+  boutId?: string
 ): { summary: FightSummary; announcement: string | undefined } {
   const fightSummary: FightSummary = {
-    id: crypto.randomUUID(),
+    id: boutId || crypto.randomUUID(),
     week,
     title: `${warrior.name} vs ${opponent.name}`,
     a: warrior.name,
@@ -470,6 +521,7 @@ function resolveBout(
   state: GameState,
   ctx: BoutContext
 ): { state: GameState; result: BoutResult; death: boolean; playerDeath: boolean; injured: boolean; injuredNames: string[]; deathNames: string[] } {
+  const boutId = crypto.randomUUID();
   const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, playerId, warriorMap } = ctx;
 
   const currentW = warriorMap.get(warrior.id);
@@ -502,7 +554,7 @@ function resolveBout(
   s = applyBoutRecords(s, warrior, opponent, outcome, tags, fameA, popA, fameD, popD, rivalStableId);
 
   // 2. Handle death resolution
-  const deathRes = handleBoutDeath(s, warrior, opponent, outcome, playerId, rivalStableId, week);
+  const deathRes = handleBoutDeath(s, warrior, opponent, outcome, playerId, boutId, tags, rivalStableId, week);
   s = deathRes.s;
 
   // 3. Handle injuries & KOs
@@ -524,7 +576,7 @@ function resolveBout(
   s = checkGiantKillerFlair(s, warrior, opponent, outcome);
 
   // 8. Generate Summary and handle side-effects
-  const { summary, announcement } = generateFightSummary(warrior, opponent, outcome, tags, fameA, popA, fameD, popD, week);
+  const { summary, announcement } = generateFightSummary(warrior, opponent, outcome, tags, fameA, popA, fameD, popD, week, boutId);
   s.arenaHistory = [...s.arenaHistory, summary];
 
   return {

@@ -1,3 +1,4 @@
+import { SortHeader } from "@/components/ui/sort-header";
 import { useState, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";

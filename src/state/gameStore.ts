@@ -349,10 +349,10 @@ export function advanceWeek(state: GameState): GameState {
     return f;
   });
 
-  const newNewsletter = s.newsletter.slice(-100);
-  const newLedger = s.ledger.slice(-500);
-  const newMatchHistory = s.matchHistory.slice(-500);
-  const newMoodHistory = s.moodHistory.slice(-50);
+  const newNewsletter = (s.newsletter || []).slice(-100);
+  const newLedger = (s.ledger || []).slice(-500);
+  const newMatchHistory = (s.matchHistory || []).slice(-500);
+  const newMoodHistory = (s.moodHistory || []).slice(-50);
 
   // Keep graveyard and retired lean if they grow too large
   const newGraveyard = s.graveyard.slice(-200);
@@ -429,7 +429,8 @@ export function killWarrior(
   state: GameState,
   warriorId: string,
   killedBy: string,
-  cause: string
+  cause: string,
+  deathEvent?: DeathEvent
 ): GameState {
   const warrior = state.roster.find((w) => w.id === warriorId);
   if (!warrior) return state;
@@ -439,6 +440,7 @@ export function killWarrior(
     deathWeek: state.week,
     deathCause: cause,
     killedBy,
+    deathEvent,
   };
   return {
     ...state,

@@ -237,6 +237,14 @@ export interface WarriorFavorites {
   };
 }
 
+
+export interface DeathEvent {
+  boutId: string;
+  killerId: string;
+  deathSummary: string;
+  memorialTags: string[];
+}
+
 export interface Warrior {
   id: string;
   name: string;
@@ -266,6 +274,7 @@ export interface Warrior {
   potentialRevealed?: Partial<Record<keyof Attributes, boolean>>;
   deathWeek?: number;
   deathCause?: string;
+  deathEvent?: DeathEvent;
   killedBy?: string;
   retiredWeek?: number;
   stableId?: string; // for AI rival warriors
@@ -368,6 +377,8 @@ export interface FightSummary {
   fameD?: number;
   transcript?: string[];
   createdAt: string;
+  isDeathEvent?: boolean;
+  deathEventData?: DeathEvent;
 }
 
 export interface HallEntry {

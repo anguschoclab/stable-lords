@@ -88,7 +88,7 @@ function styleName(style: string): string {
   return STYLE_DISPLAY_NAMES[style as keyof typeof STYLE_DISPLAY_NAMES] ?? style;
 }
 
-function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType): string {
+export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType): string {
   const tone = MOOD_TONE[mood];
   const adj = pick(tone.adjectives);
   const winner = fight.winner === "A" ? fight.a : fight.winner === "D" ? fight.d : null;
