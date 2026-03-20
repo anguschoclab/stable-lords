@@ -201,11 +201,28 @@ export function generateWeeklyGazette(
 
   // Detect rising stars — warriors whose total career is exactly 3 wins, 0 losses
   const risingStars: string[] = [];
-  if (allFights) {
+  if (allFights && fights.length > 0) {
+    const fightsByWarrior = new Map<string, FightSummary[]>();
+    for (const af of allFights) {
+      let aFights = fightsByWarrior.get(af.a);
+      if (!aFights) {
+        aFights = [];
+        fightsByWarrior.set(af.a, aFights);
+      }
+      aFights.push(af);
+
+      let dFights = fightsByWarrior.get(af.d);
+      if (!dFights) {
+        dFights = [];
+        fightsByWarrior.set(af.d, dFights);
+      }
+      dFights.push(af);
+    }
+
     for (const f of fights) {
       if (!f.winner) continue;
       const winnerName = f.winner === "A" ? f.a : f.d;
-      const allByWarrior = allFights.filter(af => af.a === winnerName || af.d === winnerName);
+      const allByWarrior = fightsByWarrior.get(winnerName) ?? [];
       if (allByWarrior.length !== 3) continue;
       const allWins = allByWarrior.every(af =>
         (af.a === winnerName && af.winner === "A") || (af.d === winnerName && af.winner === "D")
