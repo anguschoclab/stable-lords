@@ -33,7 +33,17 @@ export const LoreArchive = {
     const fights = LoreArchive.allFights();
     fights.push(f);
     while (fights.length > 500) fights.shift();
-    saveArray(KEY_FIGHTS, fights);
+
+    // Strip transcripts from older entries to save localstorage
+    const cleaned = fights.map((fight, i, arr) => {
+      if (arr.length - i > 20 && fight.transcript) {
+        const { transcript, ...rest } = fight;
+        return rest as FightSummary;
+      }
+      return fight;
+    });
+
+    saveArray(KEY_FIGHTS, cleaned);
   },
 
   markFightOfWeek(week: number, fightId: string) {

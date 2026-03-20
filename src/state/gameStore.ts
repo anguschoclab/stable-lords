@@ -158,11 +158,35 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.settings && !parsed.settings.featureFlags?.scouting) {
     parsed.settings.featureFlags = { ...parsed.settings.featureFlags, scouting: true };
   }
-  // Ensure all warriors have status
-  parsed.roster = (parsed.roster || []).map((w: Partial<Warrior>) => ({
+  // Ensure all warriors have status and favorites
+  const ensureWarriorDefaults = (w: Partial<Warrior>) => ({
     ...w,
     status: w.status || "Active",
-  }));
+    favorites: w.favorites || {
+      weaponId: "",
+      rhythm: { oe: 0, al: 0 },
+      discovered: { weapon: false, rhythm: false, weaponHints: 0, rhythmHints: 0 },
+    },
+  });
+
+  parsed.roster = (parsed.roster || []).map(ensureWarriorDefaults);
+  parsed.graveyard = (parsed.graveyard || []).map(ensureWarriorDefaults);
+  parsed.retired = (parsed.retired || []).map(ensureWarriorDefaults);
+
+  // Ensure owner defaults
+  if (parsed.player) {
+    parsed.player.metaAdaptation = parsed.player.metaAdaptation || "Opportunist";
+    parsed.player.favoredStyles = parsed.player.favoredStyles || [];
+  }
+  if (parsed.rivals) {
+    parsed.rivals.forEach((r: any) => {
+      if (r.owner) {
+        r.owner.metaAdaptation = r.owner.metaAdaptation || "Opportunist";
+        r.owner.favoredStyles = r.owner.favoredStyles || [];
+      }
+    });
+  }
+
   return parsed as GameState;
 }
 
@@ -316,22 +340,23 @@ export function advanceWeek(state: GameState): GameState {
   }
 
   // ── Step 14: Clock Advance ────────────────────────────────────────────
-  const hofFightIds = new Set((s.hallOfFame || []).map(h => h.fightId));
-  let newArenaHistory = s.arenaHistory;
-  if (newArenaHistory.length > 500) {
-    const preserved = newArenaHistory.filter(f => hofFightIds.has(f.id));
-    const recent = newArenaHistory.filter(f => !hofFightIds.has(f.id)).slice(-500);
-    // Sort logic preserves original insertion order (createdAt if available, fallback to week, or id)
-    newArenaHistory = [...preserved, ...recent].sort((a, b) => a.week - b.week || (a.createdAt || a.id).localeCompare(b.createdAt || b.id));
-  }
+  const newArenaHistory = s.arenaHistory.slice(-500).map((f, i, arr) => {
+    // Keep transcripts only for the last 20 fights to save memory
+    if (arr.length - i > 20 && f.transcript) {
+      const { transcript, ...rest } = f;
+      return rest as FightSummary;
+    }
+    return f;
+  });
 
-  const newNewsletter = (s.newsletter || []).slice(-100);
-  const newLedger = (s.ledger || []).slice(-500);
-  const newMatchHistory = (s.matchHistory || []).slice(-500);
-  const newMoodHistory = (s.moodHistory || []).slice(-50);
-  const newScoutReports = (s.scoutReports || []).slice(-100);
-  const newTournaments = (s.tournaments || []).slice(-20);
-  const newSeasonalGrowth = (s.seasonalGrowth || []).slice(-200);
+  const newNewsletter = s.newsletter.slice(-100);
+  const newLedger = s.ledger.slice(-500);
+  const newMatchHistory = s.matchHistory.slice(-500);
+  const newMoodHistory = s.moodHistory.slice(-50);
+
+  // Keep graveyard and retired lean if they grow too large
+  const newGraveyard = s.graveyard.slice(-200);
+  const newRetired = s.retired.slice(-200);
 
   return {
     ...s,
@@ -340,9 +365,8 @@ export function advanceWeek(state: GameState): GameState {
     ledger: newLedger,
     matchHistory: newMatchHistory,
     moodHistory: newMoodHistory,
-    scoutReports: newScoutReports,
-    tournaments: newTournaments,
-    seasonalGrowth: newSeasonalGrowth,
+    graveyard: newGraveyard,
+    retired: newRetired,
     week: newWeek,
     season: newSeason,
   };
@@ -352,13 +376,15 @@ export function appendFightToHistory(
   state: GameState,
   summary: FightSummary
 ): GameState {
-  let newHistory = [...state.arenaHistory, summary];
-  if (newHistory.length > 500) {
-    const hofFightIds = new Set((state.hallOfFame || []).map(h => h.fightId));
-    const preserved = newHistory.filter(f => hofFightIds.has(f.id));
-    const recent = newHistory.filter(f => !hofFightIds.has(f.id)).slice(-500);
-    newHistory = [...preserved, ...recent].sort((a, b) => a.week - b.week || (a.createdAt || a.id).localeCompare(b.createdAt || b.id));
-  }
+  const newHistory = [...state.arenaHistory, summary].slice(-500).map((f, i, arr) => {
+    // Keep transcripts only for the last 20 fights to save memory
+    if (arr.length - i > 20 && f.transcript) {
+      const { transcript, ...rest } = f;
+      return rest as FightSummary;
+    }
+    return f;
+  });
+
   return {
     ...state,
     arenaHistory: newHistory,

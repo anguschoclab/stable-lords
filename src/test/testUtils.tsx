@@ -31,7 +31,7 @@ export function renderWithGameState(ui: React.ReactElement, partialState: Partia
   };
 
   // Set the state in the store directly
-  useGameStore.setState({ state: mockState, atTitleScreen: false, ftueComplete: true } as any);
+  useGameStore.setState({ state: mockState, atTitleScreen: false });
 
   return render(
     <TooltipProvider>

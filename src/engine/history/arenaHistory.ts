@@ -29,7 +29,16 @@ export const ArenaHistory = {
     const arr = load();
     arr.push(summary);
     while (arr.length > 500) arr.shift();
-    save(arr);
+
+    const cleaned = arr.map((f, i, array) => {
+      if (array.length - i > 20 && f.transcript) {
+        const { transcript, ...rest } = f;
+        return rest as FightSummary;
+      }
+      return f;
+    });
+
+    save(cleaned);
   },
 
   query(opts: { week?: number; warriorName?: string } = {}): FightSummary[] {
