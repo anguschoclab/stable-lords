@@ -72,10 +72,16 @@ export function computeRivalReputation(
     : 0;
   const fame = Math.min(100, Math.round(avgFame * 3));
 
-  const totalKills = roster.reduce((s, w) => s + w.career.kills, 0);
-  const notoriety = Math.min(100, Math.round(totalKills * 4));
+  const { totalKills, cleanBouts } = roster.reduce(
+    (acc, w) => {
+      acc.totalKills += w.career.kills;
+      acc.cleanBouts += w.career.wins + w.career.losses - w.career.kills;
+      return acc;
+    },
+    { totalKills: 0, cleanBouts: 0 }
+  );
 
-  const cleanBouts = roster.reduce((s, w) => s + w.career.wins + w.career.losses, 0) - totalKills;
+  const notoriety = Math.min(100, Math.round(totalKills * 4));
   const honor = Math.min(100, Math.max(0, Math.round(50 + cleanBouts * 0.3 - totalKills * 3)));
 
   const uniqueStyles = new Set(active.map(w => w.style)).size;

@@ -743,7 +743,8 @@ function WeeklyIssue({
     </article>
   );
 }
-\n/* ── main page ───────────────────────────────────────────── */
+
+/* ── main page ───────────────────────────────────────────── */
 
 export default function Gazette() {
   const { state } = useGameStore();
