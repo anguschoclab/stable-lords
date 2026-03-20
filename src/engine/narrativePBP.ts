@@ -1,3 +1,4 @@
+import { KO_TEMPLATES } from "./narrativeTemplates";
 /**
  * Stable Lords — Canonical Duelmasters PBP (Play-By-Play) Narrative Engine
  *

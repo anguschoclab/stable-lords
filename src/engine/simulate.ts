@@ -94,6 +94,9 @@ function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): numb
   return MATCHUP_MATRIX[ai][di];
 }
 
+import { computeHitDamage, applyProtectMod, rollHitLocation } from "./combat/combatDamage";
+import { enduranceCost, fatiguePenalty } from "./combat/combatFatigue";
+
 // ─── Phase detection ──────────────────────────────────────────────────────
 type Phase = "OPENING" | "MID" | "LATE";
 /**
@@ -106,8 +109,8 @@ type Phase = "OPENING" | "MID" | "LATE";
  */
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const ratio = exchange / maxExchanges;
-  if (ratio < PHASE_OPENING_THRESHOLD) return "OPENING";
-  if (ratio < PHASE_MID_THRESHOLD) return "MID";
+  if (ratio < 0.25) return "OPENING";
+  if (ratio < 0.65) return "MID";
   return "LATE";
 }
 
@@ -118,48 +121,7 @@ function pickText(rng: () => number, texts: string[]): string {
 }
 
 
-type HitLocation = typeof HIT_LOCATIONS[number];
-
-/** Maps a grouped protect target to the granular hit locations it covers */
-/**
- * Expands a general protection target (e.g., "head", "body", "arms", "legs", "vital")
- * into a list of specific `HitLocation` strings it covers.
- *
- * @param protect - The generalized body part targeted for protection by the defender's tactic.
- * @returns An array of specific hit locations covered by the protection, or an empty array if none.
- */
-function protectCovers(protect?: string): string[] {
-  if (!protect || protect === "Any") return [];
-  const p = protect.toLowerCase();
-  if (p === "head") return ["head"];
-  if (p === "body") return ["chest", "abdomen"];
-  if (p === "arms") return ["right arm", "left arm"];
-  if (p === "legs") return ["right leg", "left leg"];
-  return [];
-}
-
-function rollHitLocation(rng: () => number, target?: string, protect?: string): HitLocation {
-  if (target && target !== "Any") {
-    const t = target.toLowerCase() as HitLocation;
-    if (HIT_LOCATIONS.includes(t)) {
-      const covered = protectCovers(protect);
-      const hitChance = covered.includes(t) ? TARGET_MISS_CHANCE : TARGET_HIT_CHANCE;
-      if (rng() < hitChance) return t;
-    }
-  }
-  return HIT_LOCATIONS[Math.floor(rng() * HIT_LOCATIONS.length)];
-}
-
-/** Protect reduces damage on covered locations but increases damage taken elsewhere */
-function applyProtectMod(damage: number, location: HitLocation, protect?: string): number {
-  if (!protect || protect === "Any") return damage;
-  const covered = protectCovers(protect);
-  if (covered.includes(location)) {
-    return Math.max(1, Math.round(damage * PROTECT_DAMAGE_REDUCTION));
-  } else {
-    return Math.round(damage * PROTECT_DAMAGE_PENALTY);
-  }
-}
+type HitLocation = string;
 
 // ─── Tactic Modifiers ─────────────────────────────────────────────────────
 function getOffensiveTacticMods(tactic: OffensiveTactic | undefined, style: FightingStyle) {
@@ -354,20 +316,6 @@ function oeAttMod(oe: number, style?: FightingStyle): number {
 }
 function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * OE_DEF_SCALING); }
 function alIniMod(al: number): number { return Math.floor((al - 5) * AL_INI_SCALING); }
-function enduranceCost(oe: number, al: number): number {
-  // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
-  // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
-  return Math.max(1, Math.round((oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING)));
-}
-
-// ─── Fatigue Penalties ────────────────────────────────────────────────────
-function fatiguePenalty(endurance: number, maxEndurance: number): number {
-  const ratio = endurance / maxEndurance;
-  if (ratio > FATIGUE_MODERATE_THRESHOLD) return 0;
-  if (ratio > FATIGUE_HEAVY_THRESHOLD) return FATIGUE_MODERATE_PENALTY;
-  if (ratio > FATIGUE_COLLAPSE_THRESHOLD) return FATIGUE_HEAVY_PENALTY;
-  return FATIGUE_COLLAPSE_PENALTY;
-}
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
 
