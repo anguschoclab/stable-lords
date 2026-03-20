@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Settings, Download, Upload, Trash2, ShieldAlert, FastForward, Activity } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportActiveSlot, loadSaveSlot, deleteSlot } from '@/state/saveSlots';
+import { exportActiveSlot, loadSaveSlot, deleteSlot, parseImportedSave } from '@/state/saveSlots';
 import { advanceWeek } from '@/state/gameStore';
 import { computeNextSeason } from '@/engine/weekPipeline';
 
@@ -36,16 +36,18 @@ export default function AdminTools() {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target?.result as string);
-        // Basic validation
-        if (data && data.state && data.slotId) {
-           setState(data.state);
-           toast.success('Save imported successfully');
-        } else {
-           toast.error('Invalid save file format');
-        }
+        const jsonString = event.target?.result as string;
+        const parsedData = parseImportedSave(jsonString) as any;
+
+        // Handle both raw GameState and wrapped { state: GameState, slotId?: string } formats
+        const newState = (parsedData.state && parsedData.player === undefined)
+          ? parsedData.state
+          : parsedData;
+
+        setState(newState);
+        toast.success('Save imported successfully');
       } catch (err) {
-        toast.error('Failed to parse save file');
+        toast.error(err instanceof Error ? err.message : 'Failed to parse save file');
       }
     };
     reader.readAsText(file);
