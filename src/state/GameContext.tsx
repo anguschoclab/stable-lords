@@ -48,7 +48,9 @@ const TITLE_SENTINEL = "__TITLE__";
 export function GameProvider({ children }: { children: ReactNode }) {
   const initialize = useGameStore((state) => state.initialize);
   useEffect(() => {
-    initialize();
+    if (initialize) {
+      initialize();
+    }
   }, [initialize]);
 
   const setState = useCallback((next: GameState) => {

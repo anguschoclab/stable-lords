@@ -17,6 +17,7 @@ import { renderWithGameState } from "../testUtils";
 import { createFreshState } from "@/state/gameStore";
 import type { GameState, TrainerData } from "@/types/game";
 import "../setup";
+import { useGameStore } from "@/state/useGameStore";
 
 // Mock the router components
 vi.mock("@tanstack/react-router", () => ({
@@ -73,7 +74,7 @@ describe("Trainers Component", () => {
     const staffElements = await screen.findAllByText("Master Splinter");
     expect(staffElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Fundamentals");
+    const focusBadge = screen.getByText("Fundamentals SPECIALIST", { exact: false });
     expect(focusBadge).toBeInTheDocument();
   });
 
@@ -83,7 +84,7 @@ describe("Trainers Component", () => {
     const poolElements = await screen.findAllByText("Coach Rocky");
     expect(poolElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Aggression");
+    const focusBadge = screen.getByText("Aggression SPECIALIST", { exact: false });
     expect(focusBadge).toBeInTheDocument();
   });
 

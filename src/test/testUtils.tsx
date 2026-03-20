@@ -31,13 +31,11 @@ export function renderWithGameState(ui: React.ReactElement, partialState: Partia
   };
 
   // Set the state in the store directly
-  useGameStore.setState({ state: mockState, atTitleScreen: false, ftueComplete: true });
+  useGameStore.setState({ state: mockState, atTitleScreen: false, ftueComplete: true } as any);
 
   return render(
     <TooltipProvider>
-      <GameProvider>
-        {ui}
-      </GameProvider>
+      {ui}
     </TooltipProvider>
   );
 }
