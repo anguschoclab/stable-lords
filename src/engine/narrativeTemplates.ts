@@ -178,6 +178,11 @@ export const EXECUTION_TEMPLATES = [
   "With a merciless, overwhelming strike from his %W, %A snuffs out %D's life!",
   "%A expertly guides his %W into a lethal opening, ending %D!",
   "%D's armor fails entirely against %A's masterful finish with his %W!",
+  "%A decapitates %D with a swift arc of his %W!",
+  "%A brings his %W down in a sickening, bone-crushing strike that shatters %D's skull!",
+  "Exploiting a moment of sloppy fatigue, %A severs %D's throat with a merciless strike from his %W!",
+  "%D stumbles, his endurance broken, and %A drives his %W into his unguarded chest, ending the fight permanently!",
+  "%A carves open %D's torso with a horrific, eviscerating slash of his %W!",
 ];
 
 export const KO_TEMPLATES = [
@@ -201,6 +206,8 @@ export const FATIGUE_COLLAPSE_TEMPLATES = [
   "His endurance spent, %N falls to the sand.",
   "Gasping for air, %N's legs give out completely.",
   "%N drops to his knees, utterly drained of energy.",
+  "His lungs burning, %N sags weakly to the blood-slicked arena floor.",
+  "With a ragged gasp, %N's overtaxed muscles finally surrender to the carnage.",
 ];
 
 export const TAUNT_TEMPLATES = [
@@ -226,6 +233,8 @@ export const SLASH_ATTACK_TEMPLATES = [
   "cuts fiercely at",
   "carves a deadly path with his %W toward",
   "whips his %W in a brutal horizontal slice at",
+  "attempts to sever flesh with a vicious slash of his %W toward",
+  "sweeps his %W in a lethal, tearing arc toward",
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
@@ -234,6 +243,8 @@ export const BASH_ATTACK_TEMPLATES = [
   "hammers down on",
   "brings his %W down with bone-shattering force upon",
   "delivers a bludgeoning smash toward",
+  "strikes to crush ribs and armor alike with his %W at",
+  "hurls the heavy weight of his %W in a devastating, blunt arc at",
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [

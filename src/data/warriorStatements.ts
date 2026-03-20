@@ -43,6 +43,7 @@ function pickStatement(entries: StatementEntry[], baseValue: number): string {
 
 // GOOD WIT: INITIATIVE (1st statement)
 const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
+  { minBase: 26, text: "Bends the chaos of the pit to his will, forcing foes to fight on his terms" },
   { minBase: 25, text: "A terrifying maestro of battle tempo, dictating every bloody exchange" },
   { minBase: 23, text: "Relentlessly forces his enemies into deadly, suffocating corners" },
   { minBase: 21, text: "Brilliant at keeping his foes off balance" },
@@ -55,6 +56,7 @@ const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
   { minBase: 0,  text: "Has learned how to keep his foe in trouble" },
 ];
 const GOOD_INI_LOW: StatementEntry[] = [ // base 8-12
+  { minBase: 26, text: "Commands the flow of carnage before his opponent can even raise their steel" },
   { minBase: 25, text: "Explodes into action, leaving ruined flesh in his wake" },
   { minBase: 23, text: "Moves with the cold purpose of an executioner" },
   { minBase: 21, text: "Never wastes a moment or is indecisive" },
@@ -94,6 +96,7 @@ const GOOD_RIP_LOW: StatementEntry[] = [ // base 10-12
 
 // GOOD WIT: ATTACK (3rd statement)
 const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
+  { minBase: 26, text: "Mutilates his targets with the cold, measured precision of an anatomist" },
   { minBase: 25, text: "Dismantles opponents with terrifying, surgical butchery" },
   { minBase: 23, text: "Strikes with the ruthless precision of a master torturer" },
   { minBase: 21, text: "Knows every weak and sensitive location to be struck on the human body" },
@@ -106,6 +109,7 @@ const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
   { minBase: 0,  text: "He lands blows on less protected areas" },
 ];
 const GOOD_ATT_LOW: StatementEntry[] = [ // base 7-9
+  { minBase: 26, text: "Transforms every meager opening into a harrowing bloodbath" },
   { minBase: 25, text: "Creates massacres out of seemingly simple feints" },
   { minBase: 23, text: "Brings a grim, creative malice to every offensive exchange" },
   { minBase: 21, text: "Is always thinking of feints and ploys to be used in attacks" },
@@ -234,6 +238,7 @@ const BAD_RIP_LOW: StatementEntry[] = [
 ];
 
 const BAD_ATT_HIGH: StatementEntry[] = [
+  { minBase: 16, text: "Swings with a desperate, thoughtless frenzy that invites a quick end" },
   { minBase: 15, text: "Throws chaotic, predictable haymakers that are easily punished" },
   { minBase: 12, text: "Relies entirely on savage, thoughtless swinging" },
   { minBase: 10, text: "His attacks are as blunt and stupid as a rock" },
@@ -253,6 +258,7 @@ const BAD_ATT_LOW: StatementEntry[] = [
 ];
 
 const BAD_PAR_HIGH: StatementEntry[] = [
+  { minBase: 16, text: "His clumsy blocks are little more than invitations for a severing blow" },
   { minBase: 15, text: "Often raises his guard too late to stop the bleeding" },
   { minBase: 12, text: "Relies on his armor to catch blows he fails to block" },
   { minBase: 10, text: "His parries are stiff, predictable, and easily broken" },
@@ -281,6 +287,7 @@ const BAD_DEF_HIGH: StatementEntry[] = [
   { minBase: 0, text: "He is constantly making mistakes" },
 ];
 const BAD_DEF_LOW: StatementEntry[] = [
+  { minBase: 16, text: "Lumbers mindlessly into the path of inevitable dismemberment" },
   { minBase: 15, text: "Presents a massive, unmoving target for butchery" },
   { minBase: 12, text: "Rarely attempts to dodge, inviting severe wounds" },
   { minBase: 10, text: "Simply walks into his opponent's deadliest strikes" },
@@ -291,6 +298,7 @@ const BAD_DEF_LOW: StatementEntry[] = [
 ];
 
 const BAD_END_HIGH: StatementEntry[] = [
+  { minBase: 26, text: "Burns through his stamina with the chaotic, gasping panic of a drowning man" },
   { minBase: 15, text: "Burns out in a flash of mindless, exhausting rage" },
   { minBase: 12, text: "Exhausts himself swinging wildly at the air" },
   { minBase: 10, text: "Pushes his body past the breaking point out of pure ignorance" },
@@ -300,6 +308,7 @@ const BAD_END_HIGH: StatementEntry[] = [
   { minBase: 0, text: "Often wastes his endurance thoughtlessly" },
 ];
 const BAD_END_LOW: StatementEntry[] = [
+  { minBase: 16, text: "Heaves for breath, a sloppy wreck waiting for the executioner's final stroke" },
   { minBase: 15, text: "Collapses from fatigue after throwing too many clumsy strikes" },
   { minBase: 12, text: "Gasps for air while completely ignoring the pace of the duel" },
   { minBase: 10, text: "Has no concept of pacing, ensuring an early collapse" },
