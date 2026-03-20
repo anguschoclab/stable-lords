@@ -4,6 +4,7 @@
  */
 import type { GameState } from "@/types/game";
 import { z } from "zod";
+import { migrateGameState } from "./gameStore";
 
 const SLOTS_INDEX_KEY = "stablelords.slots";
 const SLOT_PREFIX = "stablelords.slot.";
@@ -75,42 +76,7 @@ export function loadFromSlot(slotId: string): GameState | null {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed?.meta) {
-        // Migration
-        if (!parsed.graveyard) parsed.graveyard = [];
-        if (!parsed.retired) parsed.retired = [];
-        if (!parsed.crowdMood) parsed.crowdMood = "Calm";
-        if (!parsed.tournaments) parsed.tournaments = [];
-        if (!parsed.trainers) parsed.trainers = [];
-        if (!parsed.hiringPool) parsed.hiringPool = [];
-        if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
-        if (!parsed.coachDismissed) parsed.coachDismissed = [];
-        if (!parsed.rivals) parsed.rivals = [];
-        if (!parsed.scoutReports) parsed.scoutReports = [];
-        if (!parsed.trainingAssignments) parsed.trainingAssignments = [];
-        if (!parsed.restStates) parsed.restStates = [];
-        if (!parsed.rivalries) parsed.rivalries = [];
-        if (!parsed.matchHistory) parsed.matchHistory = [];
-        if (!parsed.playerChallenges) parsed.playerChallenges = [];
-        if (!parsed.playerAvoids) parsed.playerAvoids = [];
-        if (!parsed.recruitPool) parsed.recruitPool = [];
-        if (parsed.gold === undefined) parsed.gold = 500;
-        if (!parsed.ledger) parsed.ledger = [];
-        if (!parsed.settings) parsed.settings = { featureFlags: { tournaments: true, scouting: true } };
-        if (parsed.settings && !parsed.settings.featureFlags?.scouting) {
-          parsed.settings.featureFlags = { ...parsed.settings.featureFlags, scouting: true };
-        }
-        if (!parsed.seasonalGrowth) parsed.seasonalGrowth = [];
-        if (parsed.rosterBonus === undefined) parsed.rosterBonus = 0;
-        if (!parsed.moodHistory) parsed.moodHistory = [];
-        // Migrate old training assignments (add type field)
-        if (parsed.trainingAssignments) {
-          parsed.trainingAssignments = parsed.trainingAssignments.map((a: Partial<TrainingAssignment>) => ({
-            ...a,
-            type: a.type ?? "attribute",
-          }));
-        }
-        parsed.roster = (parsed.roster || []).map((w: Partial<Warrior>) => ({ ...w, status: w.status || "Active" }));
-        return parsed as GameState;
+        return migrateGameState(parsed);
       }
     }
   } catch { /* corrupt */ }
@@ -256,34 +222,7 @@ export function parseImportedSave(json: string): GameState {
   }
 
   // Apply migrations
-  if (!state.graveyard) state.graveyard = [];
-  if (!state.retired) state.retired = [];
-  if (!state.crowdMood) state.crowdMood = "Calm";
-  if (!state.tournaments) state.tournaments = [];
-  if (!state.trainers) state.trainers = [];
-  if (!state.hiringPool) state.hiringPool = [];
-  if (state.ftueComplete === undefined) state.ftueComplete = true;
-  if (!state.coachDismissed) state.coachDismissed = [];
-  if (!state.rivals) state.rivals = [];
-  if (!state.scoutReports) state.scoutReports = [];
-  if (!state.trainingAssignments) state.trainingAssignments = [];
-  if (state.gold === undefined) state.gold = 500;
-  if (!state.ledger) state.ledger = [];
-  if (!state.restStates) state.restStates = [];
-  if (!state.rivalries) state.rivalries = [];
-  if (!state.matchHistory) state.matchHistory = [];
-  if (!state.playerChallenges) state.playerChallenges = [];
-  if (!state.playerAvoids) state.playerAvoids = [];
-  if (!state.recruitPool) state.recruitPool = [];
-  if (!state.settings) state.settings = { featureFlags: { tournaments: true, scouting: true } };
-  if (state.settings && !state.settings.featureFlags?.scouting) {
-    state.settings.featureFlags = { ...state.settings.featureFlags, scouting: true };
-  }
-  if (state.rosterBonus === undefined) state.rosterBonus = 0;
-  if (!state.moodHistory) state.moodHistory = [];
-  state.roster = ((state.roster as Partial<Warrior>[]) || []).map((w: Partial<Warrior>) => ({ ...w, status: w.status || "Active" }));
-
-  return state as GameState;
+  return migrateGameState(state);
 }
 
 /**

@@ -40,6 +40,7 @@ const OWNER_FIRST = [
   "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
   "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
   "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
+  "Vortigern", "Morwenna", "Titus", "Galba",
 ];
 
 const OWNER_LAST = [
@@ -50,6 +51,7 @@ const OWNER_LAST = [
   "Hawkridge", "Bonecrest", "Firebrand", "Shadowmere", "Bladewell",
   "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
   "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
+  "Graveward", "Grimbane", "Sorrowbring", "Cinderfall",
 ];
 
 const STABLE_PREFIXES = [

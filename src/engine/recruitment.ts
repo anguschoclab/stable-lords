@@ -170,7 +170,7 @@ export function generateRecruit(
   const favorites = generateFavorites(style, rng);
 
   return {
-    id: `recruit_${Date.now()}_${Math.floor(rng() * 1e6)}`,
+    id: crypto.randomUUID(),
     name,
     style,
     attributes,
@@ -302,7 +302,7 @@ export function aiDraftFromPool(
 
       // Add to rival roster as a Warrior
       rival.roster.push({
-        id: `rival_recruit_${Date.now()}_${Math.floor(Math.random() * 1e6)}`,
+        id: crypto.randomUUID(),
         name: recruit.name,
         style: recruit.style,
         attributes: recruit.attributes,

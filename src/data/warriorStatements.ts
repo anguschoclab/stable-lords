@@ -43,6 +43,7 @@ function pickStatement(entries: StatementEntry[], baseValue: number): string {
 
 // GOOD WIT: INITIATIVE (1st statement)
 const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
+  { minBase: 26, text: "Bends the chaos of the pit to his will, forcing foes to fight on his terms" },
   { minBase: 25, text: "A terrifying maestro of battle tempo, dictating every bloody exchange" },
   { minBase: 23, text: "Relentlessly forces his enemies into deadly, suffocating corners" },
   { minBase: 21, text: "Brilliant at keeping his foes off balance" },
@@ -55,6 +56,7 @@ const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
   { minBase: 0,  text: "Has learned how to keep his foe in trouble" },
 ];
 const GOOD_INI_LOW: StatementEntry[] = [ // base 8-12
+  { minBase: 26, text: "Commands the flow of carnage before his opponent can even raise their steel" },
   { minBase: 25, text: "Explodes into action, leaving ruined flesh in his wake" },
   { minBase: 23, text: "Moves with the cold purpose of an executioner" },
   { minBase: 21, text: "Never wastes a moment or is indecisive" },
@@ -94,6 +96,7 @@ const GOOD_RIP_LOW: StatementEntry[] = [ // base 10-12
 
 // GOOD WIT: ATTACK (3rd statement)
 const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
+  { minBase: 26, text: "Mutilates his targets with the cold, measured precision of an anatomist" },
   { minBase: 25, text: "Dismantles opponents with terrifying, surgical butchery" },
   { minBase: 23, text: "Strikes with the ruthless precision of a master torturer" },
   { minBase: 21, text: "Knows every weak and sensitive location to be struck on the human body" },
@@ -106,6 +109,7 @@ const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
   { minBase: 0,  text: "He lands blows on less protected areas" },
 ];
 const GOOD_ATT_LOW: StatementEntry[] = [ // base 7-9
+  { minBase: 26, text: "Transforms every meager opening into a harrowing bloodbath" },
   { minBase: 25, text: "Creates massacres out of seemingly simple feints" },
   { minBase: 23, text: "Brings a grim, creative malice to every offensive exchange" },
   { minBase: 21, text: "Is always thinking of feints and ploys to be used in attacks" },

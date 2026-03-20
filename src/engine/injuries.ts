@@ -95,7 +95,7 @@ export function rollForInjury(
 
   return {
     ...template,
-    id: `inj_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+    id: crypto.randomUUID(),
     weeksRemaining: weeks,
   };
 }

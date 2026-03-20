@@ -254,6 +254,8 @@ export const SLASH_ATTACK_TEMPLATES = [
   "cuts fiercely at",
   "carves a deadly path with his %W toward",
   "whips his %W in a brutal horizontal slice at",
+  "attempts to sever flesh with a vicious slash of his %W toward",
+  "sweeps his %W in a lethal, tearing arc toward",
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
@@ -262,6 +264,8 @@ export const BASH_ATTACK_TEMPLATES = [
   "hammers down on",
   "brings his %W down with bone-shattering force upon",
   "delivers a bludgeoning smash toward",
+  "strikes to crush ribs and armor alike with his %W at",
+  "hurls the heavy weight of his %W in a devastating, blunt arc at",
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [

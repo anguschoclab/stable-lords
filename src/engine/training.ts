@@ -241,7 +241,7 @@ export function processTraining(state: GameState): GameState {
       const [minW, maxW] = template.weeksRange;
       const weeks = minW + Math.floor(Math.random() * (maxW - minW + 1));
       const injury: InjuryData = {
-        id: `tinj_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+        id: crypto.randomUUID(),
         name: template.name,
         description: template.description,
         severity: "Minor",
