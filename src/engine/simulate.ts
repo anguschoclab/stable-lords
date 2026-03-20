@@ -19,6 +19,7 @@ import {
   type TrainerData,
   type OffensiveTactic,
   type DefensiveTactic,
+  type DeathCauseBucket,
 } from "@/types/game";
 import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
 import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
@@ -876,7 +877,7 @@ function applyDamageAndCheckKill(
   let ended = false;
   let winner = null;
   let by = null;
-  let causeBucket: any = undefined;
+  let causeBucket: DeathCauseBucket | undefined = undefined;
   let fatalHitLocation = undefined;
   let fatalExchangeIndex = undefined;
 
