@@ -552,8 +552,8 @@ function TrainingWidget() {
               return (
                 <div key={warriorId} className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                    <div className="flex items-center gap-1.5">
+                      <WarriorNameTag id={w.id} name={w.name} />
                       <StatBadge styleName={w.style} />
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">

@@ -36,4 +36,4 @@ This file generates play-by-play narrative text for bouts, but over half of the 
 ## 4. UI Component Consolidation
 - [x] Extract `WarriorNameTag` component to `src/components/ui/`.
 - [x] Extract `StatBadge` component to `src/components/ui/`.
-- [x] Utilize `WarriorNameTag` and `StatBadge` throughout `src/pages/` to remove duplication.
+- [x] Refactor consolidated components and update the files that import them.

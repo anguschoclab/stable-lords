@@ -3,6 +3,8 @@ import { useGameStore } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Warrior } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Swords, Flame, Skull, Heart, Eye, Target, AlertTriangle, Shield } from "lucide-react";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
@@ -31,8 +33,11 @@ function MatchupCard({ match, type }: { match: MatchupScore, type: "challenge" |
         <span className="font-mono">Fame: {match.rivalWarrior.fame}</span>
       </div>
 
-      <div className="mt-1">
-        <StatBadge styleName={match.rivalWarrior.style as FightingStyle} career={match.rivalWarrior.career} />
+      <div className="flex items-center gap-2 mt-1">
+        <StatBadge styleName={match.rivalWarrior.style as FightingStyle} variant="secondary" />
+        <span className="text-[10px] text-muted-foreground truncate">
+            {STYLE_DISPLAY_NAMES[match.rivalWarrior.style as FightingStyle] || match.rivalWarrior.style}
+        </span>
       </div>
 
       {match.notes.length > 0 && (
@@ -122,8 +127,8 @@ export default function SchedulingAssistant() {
                             className={`w-full flex flex-col gap-1 p-3 text-left transition-colors hover:bg-secondary/40 ${selectedWarrior?.id === w.id ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}
                           >
                               <div className="flex justify-between items-center w-full">
-                                  <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
-                                  <span className="text-[11px] text-muted-foreground">Fame {w.fame}</span>
+                                  <WarriorNameTag id={w.id} name={w.name} />
+                                  <StatBadge styleName={w.style as FightingStyle} />
                               </div>
                               <div className="flex justify-between items-center text-[11px] text-muted-foreground w-full mt-1">
                                   <StatBadge styleName={w.style as FightingStyle} career={w.career} />
@@ -142,8 +147,8 @@ export default function SchedulingAssistant() {
                       <CardContent className="p-4 flex items-center justify-between">
                           <div>
                               <div className="flex items-center gap-2">
-                                  <h2 className="text-lg font-display font-bold text-primary">{selectedWarrior.name}</h2>
-                                  <Badge className="text-xs">{STYLE_DISPLAY_NAMES[selectedWarrior.style as FightingStyle] || selectedWarrior.style}</Badge>
+                              <h2 className="text-lg font-display font-bold text-primary"><WarriorNameTag id={selectedWarrior.id} name={selectedWarrior.name} /></h2>
+                              <StatBadge styleName={selectedWarrior.style as FightingStyle} showFullName variant="default" />
                               </div>
                               <p className="text-sm text-muted-foreground mt-1">Analyzing rival rosters for favorable and unfavorable stylistic matchups.</p>
                           </div>

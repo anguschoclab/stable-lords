@@ -9,6 +9,8 @@ import type { Warrior, ScoutReportData, RivalStableData, FightSummary } from "@/
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Button } from "@/components/ui/button";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { StatBadge } from "@/components/ui/StatBadge";
@@ -416,8 +418,8 @@ function WarriorComparison({ rivals, playerRoster }: { rivals: RivalStableData[]
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-display font-semibold truncate">{w.name}</span>
-                    <Badge variant="outline" className="text-[8px] ml-1">{STYLE_DISPLAY_NAMES[w.style]}</Badge>
+                    <WarriorNameTag id={w.id} name={w.name} />
+                    <StatBadge styleName={w.style} showFullName />
                   </div>
                   <div className="text-[9px] text-muted-foreground">{stable}</div>
                 </button>
@@ -628,8 +630,8 @@ export default function Scouting() {
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
-                            <StatBadge styleName={w.style} />
+                            <WarriorNameTag id={w.id} name={w.name} />
+                            <StatBadge styleName={w.style} showFullName />
                           </div>
                           {hasReport && (
                             <Badge variant="secondary" className="text-[10px] gap-1">
