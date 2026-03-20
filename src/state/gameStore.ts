@@ -9,6 +9,7 @@ import { processEconomy } from "@/engine/economy";
 import { processAging } from "@/engine/aging";
 import { tickInjuries } from "@/engine/injuries";
 import { clearExpiredRest, runAIvsAIBouts } from "@/engine/matchmaking";
+import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
 import { partialRefreshPool, aiDraftFromPool } from "@/engine/recruitment";
 import { processHallOfFame, processTierProgression, computeNextSeason } from "@/engine/weekPipeline";
 import { processOwnerGrudges } from "@/engine/ownerAI";

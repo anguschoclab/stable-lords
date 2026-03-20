@@ -354,10 +354,10 @@ export interface FightSummary {
   week: number;
   phase: "planning" | "resolution";
   pendingResolutionData?: {
-    gazette: any[];
+    gazette: NewsletterItem[];
     injuries: string[];
     deaths: string[];
-    bouts: any[];
+    bouts: BoutResult[];
     promotions: string[];
   };
   tournamentId?: string | null;
