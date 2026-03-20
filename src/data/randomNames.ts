@@ -24,6 +24,8 @@ const WARRIOR_NAMES = [
   "FANGMAW", "CLAWREN", "STORMFANG", "BLOODHOWL", "ASHCLAW", "DIREWOLF",
   "SCORPIUS", "VIPERTOOTH", "RAVENMOOR", "HAWKSTEEL", "BEARJAW", "LYNXBLADE",
   "MANTICORE", "GRIFFON", "DRAGONBLOOD", "WOLFHEART", "SERPENTSTRIKE", "TIGERCLAW",
+  // Thematic expansions
+  "DUSKCLEAVER", "BONEGRINDER", "SKULLSPLITTER", "GRIMFANG", "BLOODFIEND",
 ];
 
 const OWNER_FIRST = [
@@ -35,6 +37,7 @@ const OWNER_FIRST = [
   "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
   "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
   "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
+  "Vortigern", "Morwenna", "Titus", "Galba",
 ];
 
 const OWNER_LAST = [
@@ -45,6 +48,7 @@ const OWNER_LAST = [
   "Hawkridge", "Bonecrest", "Firebrand", "Shadowmere", "Bladewell",
   "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
   "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
+  "Graveward", "Grimbane", "Sorrowbring", "Cinderfall",
 ];
 
 const STABLE_PREFIXES = [
@@ -54,6 +58,7 @@ const STABLE_PREFIXES = [
   "The Pale", "The Raging", "The Obsidian", "The Thorned", "The Hollow",
   "The Bone", "The Flesh", "The Skull", "The Death", "The Grave",
   "The Doom", "The Hell", "The Vengeful", "The Wrathful", "The Cursed",
+  "The Ruined", "The Bleeding", "The Sanguine",
 ];
 
 const STABLE_SUFFIXES = [
@@ -63,6 +68,7 @@ const STABLE_SUFFIXES = [
   "Forge", "Phalanx", "Jackals", "Vipers", "Shields",
   "Crushers", "Breakers", "Renders", "Slayers", "Executioners",
   "Butchers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
+  "Defilers", "Despoilers", "Scourges",
 ];
 
 const STABLE_ALT = [
@@ -76,6 +82,7 @@ const STABLE_ALT = [
   "The Flesh Tearers", "The Skull Splitters", "The Bone Breakers",
   "The Blood Drinkers", "The Soul Reapers", "The Death Dealers",
   "The Hell Hounds", "The Doom Bringers", "The Grave Diggers",
+  "Choir of the Slaughtered", "The Abattoir Elite", "Vanguard of the Abyss",
 ];
 
 function pick<T>(arr: T[]): T {

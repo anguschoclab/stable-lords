@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Swords, Flame, Skull, Heart, Eye, Target, AlertTriangle, Shield } from "lucide-react";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge } from "@/components/ui/StatBadge";
 import { getRecommendedChallenges, getMatchupsToAvoid, type MatchupScore } from "@/engine/schedulingAssistant";
 import { isTooInjuredToFight } from "@/engine/injuries";
 
@@ -15,7 +17,7 @@ function MatchupCard({ match, type }: { match: MatchupScore, type: "challenge" |
     <div className={`p-3 rounded-lg border flex flex-col gap-2 ${isChallenge ? "border-arena-pop/30 bg-arena-pop/5" : "border-destructive/30 bg-destructive/5"}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <WarriorLink name={match.rivalWarrior.name} id={match.rivalWarrior.id} className="font-display font-semibold text-sm" />
+          <WarriorNameTag id={match.rivalWarrior.id} name={match.rivalWarrior.name} />
         </div>
         <div className="text-right">
             <Badge variant="outline" className={`text-[10px] h-4 px-1 shrink-0 ${isChallenge ? "text-arena-pop border-arena-pop/40" : "text-destructive border-destructive/40"}`}>
@@ -29,11 +31,8 @@ function MatchupCard({ match, type }: { match: MatchupScore, type: "challenge" |
         <span className="font-mono">Fame: {match.rivalWarrior.fame}</span>
       </div>
 
-      <div className="flex items-center gap-2 mt-1">
-        <Badge variant="secondary" className="text-[10px] font-mono h-4 px-1">{STYLE_ABBREV[match.rivalWarrior.style as FightingStyle] || match.rivalWarrior.style}</Badge>
-        <span className="text-[10px] text-muted-foreground truncate">
-            {STYLE_DISPLAY_NAMES[match.rivalWarrior.style as FightingStyle] || match.rivalWarrior.style}
-        </span>
+      <div className="mt-1">
+        <StatBadge styleName={match.rivalWarrior.style as FightingStyle} career={match.rivalWarrior.career} />
       </div>
 
       {match.notes.length > 0 && (
@@ -123,12 +122,11 @@ export default function SchedulingAssistant() {
                             className={`w-full flex flex-col gap-1 p-3 text-left transition-colors hover:bg-secondary/40 ${selectedWarrior?.id === w.id ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}
                           >
                               <div className="flex justify-between items-center w-full">
-                                  <span className="font-display font-semibold text-sm truncate">{w.name}</span>
-                                  <Badge variant="outline" className="text-[10px] font-mono h-4 px-1 shrink-0">{STYLE_ABBREV[w.style as FightingStyle] || w.style}</Badge>
+                                  <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                                  <span className="text-[11px] text-muted-foreground">Fame {w.fame}</span>
                               </div>
-                              <div className="flex justify-between text-[11px] text-muted-foreground w-full">
-                                  <span>Fame {w.fame}</span>
-                                  <span className="font-mono">{w.career.wins}W-{w.career.losses}L</span>
+                              <div className="flex justify-between items-center text-[11px] text-muted-foreground w-full mt-1">
+                                  <StatBadge styleName={w.style as FightingStyle} career={w.career} />
                               </div>
                           </button>
                       ))}

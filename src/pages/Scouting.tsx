@@ -10,6 +10,8 @@ import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/g
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge } from "@/components/ui/StatBadge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Eye, Shield, Coins, Users, Swords, ArrowLeftRight, Trophy, Skull, TrendingUp, UserRoundSearch } from "lucide-react";
@@ -625,11 +627,9 @@ export default function Scouting() {
                     >
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-display font-semibold text-sm">{w.name}</span>
-                            <Badge variant="outline" className="text-[10px] ml-2">
-                              {STYLE_DISPLAY_NAMES[w.style]}
-                            </Badge>
+                          <div className="flex items-center gap-2">
+                            <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                            <StatBadge styleName={w.style} />
                           </div>
                           {hasReport && (
                             <Badge variant="secondary" className="text-[10px] gap-1">
