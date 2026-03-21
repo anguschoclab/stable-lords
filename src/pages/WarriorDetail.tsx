@@ -350,7 +350,7 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
               <div className="text-sm text-muted-foreground/50">Not yet discovered</div>
             )}
           </div>
-          {!displayWarrior.favorites.discovered.weapon && (
+          {!warrior.favorites.discovered.weapon && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
