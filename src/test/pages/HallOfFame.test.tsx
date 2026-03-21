@@ -53,19 +53,15 @@ function createDummyWarrior(name: string, status: Warrior["status"], wins: numbe
     status,
     style: FightingStyle.AimedBlow,
     age: 20,
-    potential: "Average",
+    attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
     fame,
     popularity: 0,
-    career: { wins, losses, kills: 0, highestRank: 0 },
-    stats: {
-      attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
-      skills: { ATT: 10, PAR: 10, DEF: 10, INI: 10, RIP: 10, DEC: 10 },
-      derivedStats: { hp: 20, endurance: 20, damage: 10, encumbrance: 0 }
-    },
+    career: { wins, losses, kills: 0 },
     titles: [],
-    history: [],
-    condition: { hpCurrent: 20, enduranceCurrent: 20, injuries: [], fatigue: 0 }
-  };
+    injuries: [],
+    flair: [],
+    champion: false,
+  } as any;
 }
 
 describe("HallOfFame Component", () => {
