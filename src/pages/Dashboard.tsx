@@ -183,7 +183,7 @@ function StableWidget() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <Link to={`/warrior/${w.id}`} className="text-xs font-bold truncate hover:underline">{w.name}</Link>
+                        <Link to={`/warrior/${w.id}` as any} className="text-xs font-bold truncate hover:underline">{w.name}</Link>
                         <span className="text-[10px] font-mono whitespace-nowrap">
                            <span className="text-arena-pop">{w.career.wins}</span>-<span className="text-muted-foreground">{w.career.losses}</span>-<span className="text-destructive">{w.career.kills}</span>
                         </span>

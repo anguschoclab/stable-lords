@@ -352,7 +352,7 @@ export interface FightOutcome {
 export interface FightSummary {
   id: string;
   week: number;
-  phase: "planning" | "resolution";
+  phase?: "planning" | "resolution";
   pendingResolutionData?: {
     gazette: NewsletterItem[];
     injuries: string[];
@@ -516,6 +516,15 @@ export interface GameState {
     version: string;
     createdAt: string;
   };
+  /** Current game phase for resolution flow */
+  phase?: "planning" | "resolution";
+  pendingResolutionData?: {
+    gazette: any[];
+    injuries: string[];
+    deaths: string[];
+    bouts: any[];
+    promotions: string[];
+  };
   ftueComplete: boolean;
   ftueStep?: number;
   coachDismissed: string[];
@@ -545,8 +554,8 @@ export interface GameState {
   restStates: RestState[];
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
-  playerChallenges: string[]; // IDs of rival warriors or stables to prioritize
-  playerAvoids: string[]; // IDs of rival warriors or stables to avoid
+  playerChallenges?: string[];
+  playerAvoids?: string[];
   recruitPool: PoolWarrior[]; // from recruitment engine
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries

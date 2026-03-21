@@ -1,4 +1,4 @@
-import { Phase } from "@/types/game";
+type Phase = "opening" | "mid" | "late";
 
 export function mulberry32(seed: number) {
   return function() {

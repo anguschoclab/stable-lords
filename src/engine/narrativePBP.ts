@@ -25,11 +25,11 @@ import { KO_TEMPLATES } from "./narrativeTemplates";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { getItemById, getItemByCode } from "@/data/equipment";
 import {
-  HIT_LOC_VARIANTS,
-  STYLE_PBP_DESC,
+  HIT_LOC_VARIANTS as _HIT_LOC_VARIANTS,
+  STYLE_PBP_DESC as _STYLE_PBP_DESC,
   ARMOR_INTRO_VERBS,
   WEAPON_INTRO_VERBS,
-  HELM_DESCS,
+  HELM_DESCS as _HELM_DESCS,
   BATTLE_OPENERS,
   PARRY_TEMPLATES,
   PARRY_SHIELD_TEMPLATES,
@@ -530,8 +530,11 @@ const KILL_TEMPLATES = [
   "%D falls to the arena floor. The wound is mortal.\nSilence grips the crowd.",
   "%D stumbles to the ground!!!\n%D is slain!",
 ];
-
-
+const KO_TEMPLATES = [
+  "%D is knocked unconscious!\n%A stands victorious over their fallen foe.",
+  "%D collapses to the ground, out cold!\n%A raises a fist in triumph.",
+  "A devastating blow sends %D sprawling!\n%A wins by knockout!",
+];
 
 const STOPPAGE_TEMPLATES = [
   "%D motions to the other LORD PROTECTORS that he cannot continue!\n%A is the victor of the match!",

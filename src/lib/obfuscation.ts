@@ -1,15 +1,16 @@
 import { Warrior, InsightToken, FightingStyle, Attributes, FightPlan } from "@/types/game";
 
 // Obfuscated representation of a warrior for the UI
-export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attrs" | "defaultPlan"> {
+export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attributes" | "defaultPlan"> {
   style: FightingStyle | "UNKNOWN";
-  attrs: {
+  attributes: {
     ST: number | string;
-    AG: number | string;
-    EN: number | string;
-    WI: number | string;
     CN: number | string;
-    AP: number | string;
+    SZ: number | string;
+    WT: number | string;
+    WL: number | string;
+    SP: number | string;
+    DF: number | string;
   };
   defaultPlan?: FightPlan | undefined; // Hidden unless known
   isFullyRevealed: boolean;
@@ -40,10 +41,10 @@ export function obfuscateWarrior(
   // Helper to mask an attribute if unknown
   const getAttr = (key: keyof Attributes) => {
     if (knownAttrs.includes(key)) {
-      return warrior.attrs[key];
+      return warrior.attributes[key];
     }
     // Return a qualitative band instead of the exact number
-    const val = warrior.attrs[key];
+    const val = warrior.attributes[key];
     if (val >= 21) return "Monstrous";
     if (val >= 17) return "Exceptional";
     if (val >= 13) return "High";
@@ -55,13 +56,14 @@ export function obfuscateWarrior(
   return {
     ...warrior,
     style: knowsStyle ? warrior.style : "UNKNOWN" as any,
-    attrs: {
+    attributes: {
       ST: getAttr("ST"),
-      AG: getAttr("AG"),
-      EN: getAttr("EN"),
-      WI: getAttr("WI"),
       CN: getAttr("CN"),
-      AP: getAttr("AP"),
+      SZ: getAttr("SZ"),
+      WT: getAttr("WT"),
+      WL: getAttr("WL"),
+      SP: getAttr("SP"),
+      DF: getAttr("DF"),
     },
     // Hide the actual fight plan completely
     defaultPlan: undefined,

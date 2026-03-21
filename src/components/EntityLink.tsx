@@ -17,7 +17,7 @@ interface WarriorLinkProps {
 }
 
 export function WarriorLink({ name, id, className, children }: WarriorLinkProps) {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   const resolvedId = id ?? resolveWarriorId(name, state);
 
@@ -27,7 +27,7 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
 
   return (
     <Link
-      to={`/warrior/${resolvedId}`}
+      to={`/warrior/${resolvedId}` as any}
       className={cn(
         "hover:text-primary hover:underline underline-offset-2 transition-colors cursor-pointer",
         className
@@ -70,7 +70,7 @@ interface StableLinkProps {
 }
 
 export function StableLink({ name, className, children }: StableLinkProps) {
-  const { state } = useGame();
+  const { state } = useGameStore();
 
   // Resolve stable name to owner ID
   const stableId = (state.rivals ?? []).find(r => r.owner.stableName === name)?.owner.id;

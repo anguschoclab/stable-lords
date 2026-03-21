@@ -200,7 +200,7 @@ function matchRoute(pathname: string): RouteEntry | undefined {
  * Tips dismissed permanently via game state.
  */
 export function useCoachTip(pathname: string) {
-  const { state, setState } = useGame();
+  const { state, setState } = useGameStore();
 
   useEffect(() => {
     if (!state.ftueComplete) return;

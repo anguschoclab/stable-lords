@@ -47,19 +47,15 @@ function createDummyWarrior(name: string, status: Warrior["status"], wins: numbe
     status,
     style: FightingStyle.AimedBlow,
     age: 20,
-    potential: "Average",
+    attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
     fame,
     popularity: 0,
-    career: { wins, losses, kills: 0, highestRank: 0 },
-    stats: {
-      attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
-      skills: { ATT: 10, PAR: 10, DEF: 10, INI: 10, RIP: 10, DEC: 10 },
-      derivedStats: { hp: 20, endurance: 20, damage: 10, encumbrance: 0 }
-    },
+    career: { wins, losses, kills: 0 },
     titles: [],
-    history: [],
-    condition: { hpCurrent: 20, enduranceCurrent: 20, injuries: [], fatigue: 0 }
-  };
+    injuries: [],
+    flair: [],
+    champion: false,
+  } as any;
 }
 
 describe("HallOfFame Component", () => {
@@ -76,10 +72,10 @@ describe("HallOfFame Component", () => {
   };
 
   const fight1: FightSummary = {
-    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow
+    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
   const fight2: FightSummary = {
-    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow
+    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
 
   beforeEach(() => {
@@ -121,7 +117,7 @@ describe("HallOfFame Component", () => {
     expect(reaperCard).not.toBeNull();
 
     // Within the card, look for the 'Greatest Fight' section block
-    const greatestFightSection = within(reaperCard).getByText("Greatest Fight").closest("div")?.parentElement;
+    const greatestFightSection = within(reaperCard as HTMLElement).getByText("Greatest Fight").closest("div")?.parentElement;
     expect(greatestFightSection).not.toBeUndefined();
 
     // Search for the opponent's name within this section
@@ -129,7 +125,7 @@ describe("HallOfFame Component", () => {
     expect(opponent).toBeInTheDocument();
 
     // fight2 (Victim2) shouldn't be the top
-    expect(within(reaperCard).queryByText(/Victim2/)).not.toBeInTheDocument();
+    expect(within(reaperCard as HTMLElement).queryByText(/Victim2/)).not.toBeInTheDocument();
   });
 
 });

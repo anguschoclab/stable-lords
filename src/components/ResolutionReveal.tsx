@@ -12,12 +12,21 @@ import { Newspaper, Skull, Activity, Swords, ChevronRight } from "lucide-react";
 type RevealStep = "gazette" | "injuries" | "bouts";
 
 export default function ResolutionReveal() {
-  const { state, doClearResolution } = useGameStore();
+  const { state, setState } = useGameStore();
   const [step, setStep] = useState<RevealStep>("gazette");
 
-  if (state.phase !== "resolution" || !state.pendingResolutionData) return null;
+  const latestFight = state.arenaHistory?.[state.arenaHistory.length - 1];
+  if (!latestFight?.pendingResolutionData) return null;
 
-  const data = state.pendingResolutionData;
+  const data = latestFight.pendingResolutionData;
+
+  const doClearResolution = () => {
+    // Clear resolution data
+    const updated = { ...state, arenaHistory: state.arenaHistory.map((f, i) =>
+      i === state.arenaHistory.length - 1 ? { ...f, pendingResolutionData: undefined } : f
+    )};
+    setState(updated);
+  };
   const hasInjuriesOrDeaths = data.injuries.length > 0 || data.deaths.length > 0;
 
   const handleNext = () => {

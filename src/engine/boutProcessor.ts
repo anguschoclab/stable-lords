@@ -385,6 +385,7 @@ function generateFightSummary(
   const fightSummary: FightSummary = {
     id: boutId || crypto.randomUUID(),
     week,
+    phase: "resolution",
     title: `${warrior.name} vs ${opponent.name}`,
     a: warrior.name,
     d: opponent.name,

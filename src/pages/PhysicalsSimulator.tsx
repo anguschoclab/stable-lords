@@ -15,33 +15,31 @@ export default function PhysicalsSimulator() {
   const [statsA, setStatsA] = useState({ strength: 10, quickness: 10, vitality: 10 });
   const [statsB, setStatsB] = useState({ strength: 10, quickness: 10, vitality: 10 });
 
-  // Simulate 10 minutes of intense combat (10 exchanges, 2 actions per minute each)
   const simulation = useMemo(() => {
-    // Generate mock warriors for calculation
-    const wA = { id: 'A', name: 'Fighter A', style: styleA, attr: { ST: statsA.strength, SP: statsA.quickness, CN: statsA.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 }, career: { wins: 0, losses: 0, kills: 0 }, skills: { [styleA]: 20 }, fame: 10, tags: [], status: 'Active', popularAppeal: 10, birthWeek: 1, potential: 100, injuries: [], contractCost: 10 };
-    const wB = { id: 'B', name: 'Fighter B', style: styleB, attr: { ST: statsB.strength, SP: statsB.quickness, CN: statsB.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 }, career: { wins: 0, losses: 0, kills: 0 }, skills: { [styleB]: 20 }, fame: 10, tags: [], status: 'Active', popularAppeal: 10, birthWeek: 1, potential: 100, injuries: [], contractCost: 10 };
+    const attrA = { ST: statsA.strength, SP: statsA.quickness, CN: statsA.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 };
+    const attrB = { ST: statsB.strength, SP: statsB.quickness, CN: statsB.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 };
 
-    const calcA = computeWarriorStats(wA.attr, wA.style);
-    const calcB = computeWarriorStats(wB.attr, wB.style);
+    const resultA = computeWarriorStats(attrA, styleA);
+    const resultB = computeWarriorStats(attrB, styleB);
+
+    const calcA = resultA.derivedStats;
+    const calcB = resultB.derivedStats;
 
     let endA = calcA.endurance;
     let endB = calcB.endurance;
     let hpA = calcA.hp;
     let hpB = calcB.hp;
 
-    // Simulate generic exchanges
     let minutesPassed = 0;
     while (minutesPassed < 10 && endA > 0 && endB > 0 && hpA > 0 && hpB > 0) {
       minutesPassed++;
-      // A attacks B
-      const dmgA = Math.max(1, calcA.damage - Math.floor(calcB.damageTake / 2));
+      const dmgA = Math.max(1, calcA.damage);
       hpB -= dmgA;
-      endA -= 10; // attack cost
-      endB -= 5; // defend cost
+      endA -= 10;
+      endB -= 5;
 
-      // B attacks A
       if (hpB > 0) {
-        const dmgB = Math.max(1, calcB.damage - Math.floor(calcA.damageTake / 2));
+        const dmgB = Math.max(1, calcB.damage);
         hpA -= dmgB;
         endB -= 10;
         endA -= 5;
@@ -56,8 +54,8 @@ export default function PhysicalsSimulator() {
   }, [styleA, styleB, statsA, statsB]);
 
   const renderFighterConfig = (label: string, style: FightingStyle, setStyle: any, stats: any, setStats: any, colorClass: string) => (
-    <Card className={`border-${colorClass}/40`}>
-      <CardHeader className={`bg-${colorClass}/5 pb-4 border-b border-border`}>
+    <Card>
+      <CardHeader className="pb-4 border-b border-border">
         <CardTitle className="font-display text-lg flex items-center justify-between">
           {label}
           <Select value={style} onValueChange={(v) => setStyle(v as FightingStyle)}>
@@ -130,8 +128,8 @@ export default function PhysicalsSimulator() {
                   <div className="font-mono">{simulation.calcA.damage}</div>
                 </div>
                 <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Mitigation</div>
-                  <div className="font-mono">{simulation.calcA.damageTake}</div>
+                  <div className="text-muted-foreground text-xs">Encumbrance</div>
+                  <div className="font-mono">{simulation.calcA.encumbrance}</div>
                 </div>
               </div>
             </div>
@@ -164,8 +162,8 @@ export default function PhysicalsSimulator() {
                   <div className="font-mono">{simulation.calcB.damage}</div>
                 </div>
                 <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Mitigation</div>
-                  <div className="font-mono">{simulation.calcB.damageTake}</div>
+                  <div className="text-muted-foreground text-xs">Encumbrance</div>
+                  <div className="font-mono">{simulation.calcB.encumbrance}</div>
                 </div>
               </div>
             </div>

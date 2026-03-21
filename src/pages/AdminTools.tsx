@@ -1,31 +1,19 @@
 import React, { useState } from 'react';
-import { useGame } from '@/state/GameContext';
+import { useGameStore } from '@/state/useGameStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Settings, Download, Upload, Trash2, ShieldAlert, FastForward, Activity } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportActiveSlot, loadSaveSlot, deleteSlot, parseImportedSave } from '@/state/saveSlots';
+import { exportActiveSlot, deleteSlot } from '@/state/saveSlots';
 import { advanceWeek } from '@/state/gameStore';
 import { computeNextSeason } from '@/engine/weekPipeline';
 
 
 export default function AdminTools() {
-  const { state, setState, doReset } = useGame();
-  const [importData, setImportData] = useState('');
+  const { state, setState, doReset } = useGameStore();
 
   const handleExport = () => {
-    const slot = exportActiveSlot(state);
-    if (!slot) {
-      toast.error('Could not export save slot');
-      return;
-    }
-    const blob = new Blob([JSON.stringify(slot, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `stable_lords_save_${slot.slotId}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    exportActiveSlot();
     toast.success('Save exported successfully');
   };
 
@@ -36,16 +24,14 @@ export default function AdminTools() {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const jsonString = event.target?.result as string;
-        const parsedData = parseImportedSave(jsonString) as any;
-
-        // Handle both raw GameState and wrapped { state: GameState, slotId?: string } formats
-        const newState = (parsedData.state && parsedData.player === undefined)
-          ? parsedData.state
-          : parsedData;
-
-        setState(newState);
-        toast.success('Save imported successfully');
+        const data = JSON.parse(event.target?.result as string);
+        // Basic validation
+        if (data && data.state) {
+           setState(data.state);
+           toast.success('Save imported successfully');
+        } else {
+           toast.error('Invalid save file format');
+        }
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Failed to parse save file');
       }
@@ -65,7 +51,6 @@ export default function AdminTools() {
   };
 
   const skipSeason = () => {
-    // Basic skip, just bump the season. In a real scenario we'd run weekPipeline fully.
     let newState = { ...state };
     for(let i=0; i<13; i++) {
         newState = advanceWeek(newState);
@@ -92,7 +77,7 @@ export default function AdminTools() {
             <CardTitle className="text-lg flex items-center gap-2">
               <Download className="h-5 w-5" /> Save Management
             </CardTitle>
-            <CardDescription>Import or export your save data (Feature 27 & 38)</CardDescription>
+            <CardDescription>Import or export your save data</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button onClick={handleExport} className="w-full gap-2" variant="outline">
@@ -137,14 +122,13 @@ export default function AdminTools() {
             <CardTitle className="text-lg flex items-center gap-2">
               <Activity className="h-5 w-5" /> Telemetry & System State
             </CardTitle>
-            <CardDescription>Raw state dump for debugging (Feature 29)</CardDescription>
+            <CardDescription>Raw state dump for debugging</CardDescription>
           </CardHeader>
           <CardContent>
              <div className="bg-muted p-4 rounded-md overflow-x-auto max-h-[300px] text-xs font-mono">
                 {JSON.stringify({
                     week: state.week,
                     season: state.season,
-                    year: state.year,
                     rosterSize: state.roster.length,
                     gold: state.gold,
                     activeTournaments: state.tournaments.length,

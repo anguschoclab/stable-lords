@@ -24,7 +24,7 @@ const TIER_CONFIG: Record<string, { label: string; color: string; icon: React.El
 };
 
 export default function StableDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams({ strict: false }) as { id: string };
   const { state } = useGameStore();
 
   const rival = useMemo(

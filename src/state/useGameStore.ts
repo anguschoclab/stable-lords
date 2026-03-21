@@ -36,7 +36,7 @@ export interface GameStoreActions {
   doReset: () => void;
   returnToTitle: () => void;
   initialize: () => void;
-  loadGame: (slotId: string, state: GameState) => void;
+  loadGame: (slotId: string, gameState: GameState) => void;
 }
 
 const getInitialData = () => {
@@ -148,6 +148,16 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         draft.activeSlotId = null;
         draft.state = createFreshState();
         draft.atTitleScreen = true;
+      });
+    },
+
+    loadGame: (slotId: string, gameState: GameState) => {
+      localStorage.setItem("stablelords.activeSlot", slotId);
+      set((draft) => {
+        draft.state = gameState;
+        draft.activeSlotId = slotId;
+        draft.atTitleScreen = false;
+        draft.lastSavedAt = new Date().toISOString();
       });
     },
   }))

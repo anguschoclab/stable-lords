@@ -56,13 +56,13 @@ describe("HallOfFights Component", () => {
   let mockState: GameState;
 
   const fight1: FightSummary = {
-    id: "f1", week: 10, title: "Fighter A vs Fighter B", a: "Fighter A", d: "Fighter B", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow
+    id: "f1", week: 10, title: "Fighter A vs Fighter B", a: "Fighter A", d: "Fighter B", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
   const fight2: FightSummary = {
-    id: "f2", week: 10, title: "Fighter C vs Fighter D", a: "Fighter C", d: "Fighter D", winner: "D", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow
+    id: "f2", week: 10, title: "Fighter C vs Fighter D", a: "Fighter C", d: "Fighter D", winner: "D", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
   const fight3: FightSummary = {
-    id: "f3", week: 11, title: "Fighter E vs Fighter F", a: "Fighter E", d: "Fighter F", winner: "A", by: "Kill", styleA: FightingStyle.BashingAttack, styleD: FightingStyle.TotalParry
+    id: "f3", week: 11, title: "Fighter E vs Fighter F", a: "Fighter E", d: "Fighter F", winner: "A", by: "Kill", styleA: FightingStyle.BashingAttack, styleD: FightingStyle.TotalParry, createdAt: new Date().toISOString()
   };
 
   beforeEach(() => {

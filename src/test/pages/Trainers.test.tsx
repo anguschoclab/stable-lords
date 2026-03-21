@@ -44,6 +44,8 @@ describe("Trainers Component", () => {
     name: "Master Splinter",
     tier: "Master",
     focus: "Fundamentals",
+    fame: 10,
+    contractWeeksLeft: 8,
   };
 
   const poolTrainer: TrainerData = {
@@ -51,6 +53,8 @@ describe("Trainers Component", () => {
     name: "Coach Rocky",
     tier: "Seasoned",
     focus: "Aggression",
+    fame: 5,
+    contractWeeksLeft: 12,
   };
 
   beforeEach(() => {
@@ -90,7 +94,7 @@ describe("Trainers Component", () => {
     const trainerCard = staffElement.closest(".rounded-lg")!;
 
     // The fire button only has a title 'Release trainer'
-    const fireBtn = within(trainerCard).getByTitle(/release trainer/i);
+    const fireBtn = within(trainerCard as HTMLElement).getByTitle(/release trainer/i);
     fireEvent.click(fireBtn);
 
     // Test the state mutation implicitly by observing UI removal
@@ -105,11 +109,11 @@ describe("Trainers Component", () => {
     const poolRow = poolElement.closest(".relative")!;
 
     // Find and click the Hire button. Note: "Hire" is also the name of the tab trigger, so use within()
-    const hireBtn = within(poolRow).getByRole("button", { name: /hire/i });
+    const hireBtn = within(poolRow as HTMLElement).getByRole("button", { name: /hire/i });
     fireEvent.click(hireBtn);
 
     // Test that the Hire button within the pool row is gone (the trainer was removed from the pool)
-    expect(within(poolRow).queryByRole("button", { name: /hire/i })).not.toBeInTheDocument();
+    expect(within(poolRow as HTMLElement).queryByRole("button", { name: /hire/i })).not.toBeInTheDocument();
   });
 
 });

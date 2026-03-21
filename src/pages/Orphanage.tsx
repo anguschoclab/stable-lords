@@ -80,6 +80,7 @@ export default function Orphanage() {
     const summary: FightSummary = {
       id: `ftue_${Date.now()}`,
       week: 1,
+      phase: "resolution",
       title: `${wA.name} vs ${wB.name}`,
       a: wA.name,
       d: wB.name,
