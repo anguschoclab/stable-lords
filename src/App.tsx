@@ -23,7 +23,6 @@ import Scouting from "@/pages/Scouting";
 import StableDetail from "@/pages/StableDetail";
 import WorldOverview from "@/pages/WorldOverview";
 import StartGame from "@/pages/StartGame";
-import Orphanage from "@/pages/Orphanage";
 
 const queryClient = new QueryClient();
 
