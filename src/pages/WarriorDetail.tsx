@@ -595,7 +595,7 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
 }
 
 export default function WarriorDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams({ strict: false }) as { id: string };
   const navigate = useNavigate();
   const { state, setState } = useGameStore();
 
