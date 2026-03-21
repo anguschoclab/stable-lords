@@ -29,19 +29,18 @@ describe("ArenaHistory", () => {
     localStorageMock.clear();
   });
 
-  const mockFight: FightSummary = {
+  const mockFight = {
+    id: "f1",
     a: "Attacker",
     d: "Defender",
-    aStyle: 0,
-    dStyle: 1,
-    winner: "Attacker",
-    kill: false,
-    text: "Attacker defeated Defender",
+    styleA: "BASHING ATTACK",
+    styleD: "TOTAL PARRY",
+    winner: "A" as const,
+    by: "KO" as const,
+    title: "Attacker vs Defender",
     week: 1,
-    aDmg: 10,
-    dDmg: 5,
-    exchangeCount: 3,
-  };
+    createdAt: new Date().toISOString(),
+  } satisfies FightSummary;
 
   describe("load fallback and all()", () => {
     it("should return an empty array if localStorage is empty", () => {
@@ -73,7 +72,7 @@ describe("ArenaHistory", () => {
 
     it("should append a fight to an existing history", () => {
       ArenaHistory.append(mockFight);
-      const mockFight2 = { ...mockFight, winner: "Defender" };
+      const mockFight2 = { ...mockFight, winner: "D" as const };
       ArenaHistory.append(mockFight2);
       const history = ArenaHistory.all();
       expect(history.length).toBe(2);

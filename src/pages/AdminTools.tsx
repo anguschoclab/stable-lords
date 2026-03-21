@@ -123,7 +123,6 @@ export default function AdminTools() {
                 {JSON.stringify({
                     week: state.week,
                     season: state.season,
-                    year: state.year,
                     rosterSize: state.roster.length,
                     gold: state.gold,
                     activeTournaments: state.tournaments.length,

@@ -157,7 +157,7 @@ function TokensTab() {
   const tokens = state.insightTokens ?? [];
   const weaponTokens = tokens.filter(t => t.type === "Weapon");
   const rhythmTokens = tokens.filter(t => t.type === "Rhythm");
-  const statTokens = tokens.filter(t => t.type === "StatHint");
+  const statTokens = tokens.filter(t => t.type === "Attribute");
 
   return (
     <div className="space-y-4">

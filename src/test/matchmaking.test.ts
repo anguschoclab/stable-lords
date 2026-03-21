@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { generateMatchCard, addRestState, clearExpiredRest, runAIvsAIBouts } from '../engine/matchmaking';
-import type { GameState, Warrior, RivalStableData, RestState, Rivalry, MatchRecord, Stable } from '../types/game';
+import type { GameState, Warrior, RivalStableData, RestState, Rivalry, MatchRecord } from '../types/game';
 import type { Injury } from '../engine/injuries';
 
 // Import FightingStyle to use a valid one
@@ -37,21 +37,13 @@ function createRivalStable(id: string, name: string, warriors: Warrior[]): Rival
       id,
       name: `Owner ${id}`,
       stableName: name,
-      portrait: "url",
-      personality: "Pragmatic",
+      personality: "Pragmatic" as const,
       fame: 0,
-      funds: 100,
+      renown: 0,
+      titles: 0,
     },
     roster: warriors,
-    philosophy: "Balanced",
-    tier: 1,
-    facilities: {
-      trainingPits: 1,
-      apothecary: 1,
-      recruitmentNetwork: 1,
-    },
-    activityLogs: [],
-  };
+  } as RivalStableData;
 }
 
 // Base mock game state
@@ -192,7 +184,7 @@ describe("Eligibility Rules", () => {
       ]),
     ];
     state.trainingAssignments = [
-      { warriorId: "w2", trainerId: "t1", focus: "Strength" },
+      { warriorId: "w2", type: "attribute" as const, attribute: "ST" as const },
     ];
 
     const card = generateMatchCard(state);

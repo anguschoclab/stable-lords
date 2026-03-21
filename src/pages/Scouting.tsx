@@ -517,7 +517,7 @@ export default function Scouting() {
         return;
       }
 
-      const report = generateScoutReport(activeWarrior, quality, state.week);
+      const { report, newInsights } = generateScoutReport(activeWarrior, quality, state.week);
       const reportData: ScoutReportData = report;
 
       const newReports = [

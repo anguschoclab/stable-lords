@@ -10,6 +10,23 @@ import { ArrowUpDown, Crown, Skull, Swords, TrendingUp, Trophy } from "lucide-re
 import type { RivalStableData, Warrior } from "@/types/game";
 import { getStableTemplates } from "@/engine/rivals";
 
+type SortDir = "asc" | "desc";
+
+function SortHeader({ label, field, active, dir, onClick }: {
+  label: string;
+  field: string;
+  active: boolean;
+  dir: SortDir;
+  onClick: () => void;
+}) {
+  return (
+    <button onClick={onClick} className="flex items-center gap-1 hover:text-foreground transition-colors">
+      {label}
+      <ArrowUpDown className={`h-3 w-3 ${active ? "text-primary" : "text-muted-foreground/40"}`} />
+    </button>
+  );
+}
+
 type SortField = "rank" | "name" | "fame" | "wins" | "losses" | "kills" | "winRate" | "roster" | "tier";
 
 type WarriorSortField = "name" | "stable" | "fame" | "wins" | "losses" | "kills" | "winRate" | "style";
@@ -277,7 +294,7 @@ export default function WorldOverview() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link
-                                to={row.isPlayer ? "/" : `/stable/${row.id}`}
+                                to={row.isPlayer ? "/" : `/stable/${row.id}` as any}
                                 className="font-semibold hover:text-primary transition-colors"
                               >
                                 {row.name}
@@ -360,7 +377,7 @@ export default function WorldOverview() {
                       <TableCell className="font-mono text-muted-foreground text-xs">{i + 1}</TableCell>
                       <TableCell>
                         {row.isPlayer ? (
-                          <Link to={`/warrior/${row.id}`} className="font-semibold hover:text-primary transition-colors">
+                          <Link to={`/warrior/${row.id}` as any} className="font-semibold hover:text-primary transition-colors">
                             {row.name}
                           </Link>
                         ) : (
@@ -369,7 +386,7 @@ export default function WorldOverview() {
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Link
-                          to={row.isPlayer ? "/" : `/stable/${row.stableId}`}
+                          to={row.isPlayer ? "/" : `/stable/${row.stableId}` as any}
                           className="text-sm text-muted-foreground hover:text-primary transition-colors"
                         >
                           {row.stableName}
