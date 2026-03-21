@@ -377,7 +377,7 @@ export default function WorldOverview() {
                       <TableCell className="font-mono text-muted-foreground text-xs">{i + 1}</TableCell>
                       <TableCell>
                         {row.isPlayer ? (
-                          <Link to={`/warrior/${row.id}`} className="font-semibold hover:text-primary transition-colors">
+                          <Link to={`/warrior/${row.id}` as any} className="font-semibold hover:text-primary transition-colors">
                             {row.name}
                           </Link>
                         ) : (
