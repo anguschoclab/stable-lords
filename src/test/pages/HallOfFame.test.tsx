@@ -78,10 +78,10 @@ describe("HallOfFame Component", () => {
   };
 
   const fight1: FightSummary = {
-    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow
+    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
   const fight2: FightSummary = {
-    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow
+    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
 
   beforeEach(() => {
