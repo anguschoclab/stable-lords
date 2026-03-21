@@ -24,7 +24,9 @@ import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
 import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
 import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/engine/trainers";
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "./tacticSuitability";
-import { computeHitDamage } from "./combat/combatDamage";
+import { computeHitDamage, rollHitLocation, applyProtectMod, protectCovers, HIT_LOCATIONS, type HitLocation } from "./combat/combatDamage";
+import { enduranceCost, fatiguePenalty } from "./combat/combatFatigue";
+import { mulberry32, skillCheck, contestCheck, getPhase as getCombatPhase } from "./combat/combatMath";
 import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "./stylePassives";
 import { getFavoriteWeaponBonus, getFavoriteRhythmBonus } from "./favorites";
 import {
