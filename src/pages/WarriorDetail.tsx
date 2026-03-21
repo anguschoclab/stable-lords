@@ -771,7 +771,7 @@ export default function WarriorDetail() {
                 <AttrBar
                   key={key}
                   label={ATTRIBUTE_LABELS[key]}
-                  value={displayWarrior.attrs[key]}
+                  value={typeof displayWarrior.attributes[key] === 'number' ? displayWarrior.attributes[key] as number : 0}
                   potential={displayWarrior.potential?.[key]}
                 />
               ))}
