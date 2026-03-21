@@ -169,7 +169,8 @@ export function generateWeeklyGazette(
   graveyard: Warrior[],
   allFights?: FightSummary[]
 ): GazetteStory {
-  const tone = MOOD_TONE[mood];
+  const moodKey = mood && MOOD_TONE[mood] ? mood : "Calm";
+  const tone = MOOD_TONE[moodKey];
   const kills = fights.filter(f => f.by === "Kill");
   const knockouts = fights.filter(f => f.by === "KO");
   const tags: string[] = [];

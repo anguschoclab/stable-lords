@@ -126,6 +126,13 @@ export function sanitizeReviver(key: string, value: any) {
 
 export function migrateGameState(parsed: any): GameState {
   if (!parsed.graveyard) parsed.graveyard = [];
+  if (!parsed.arenaHistory) parsed.arenaHistory = [];
+  if (!parsed.newsletter) parsed.newsletter = [];
+  if (!parsed.gazettes) parsed.gazettes = [];
+  if (!parsed.hallOfFame) parsed.hallOfFame = [];
+  if (parsed.fame === undefined) parsed.fame = 0;
+  if (parsed.popularity === undefined) parsed.popularity = 0;
+  if (!parsed.moodHistory) parsed.moodHistory = [];
   if (!parsed.retired) parsed.retired = [];
   if (!parsed.crowdMood) parsed.crowdMood = "Calm";
   if (!parsed.tournaments) parsed.tournaments = [];
@@ -368,6 +375,13 @@ export function advanceWeek(state: GameState): GameState {
   const newGraveyard = s.graveyard.slice(-200);
   const newRetired = s.retired.slice(-200);
 
+  // Keep arrays bounded to prevent save bloat
+  const newTournaments = (s.tournaments || []).slice(-100);
+  const newScoutReports = (s.scoutReports || []).slice(-100);
+  const newHallOfFame = (s.hallOfFame || []).slice(-100);
+  const newRivalries = (s.rivalries || []).slice(-100);
+  const newOwnerGrudges = (s.ownerGrudges || []).slice(-100);
+
   return {
     ...s,
     arenaHistory: newArenaHistory,
@@ -377,6 +391,11 @@ export function advanceWeek(state: GameState): GameState {
     moodHistory: newMoodHistory,
     graveyard: newGraveyard,
     retired: newRetired,
+    tournaments: newTournaments,
+    scoutReports: newScoutReports,
+    hallOfFame: newHallOfFame,
+    rivalries: newRivalries,
+    ownerGrudges: newOwnerGrudges,
     week: newWeek,
     season: newSeason,
   };
