@@ -72,7 +72,7 @@ describe("ArenaHistory", () => {
 
     it("should append a fight to an existing history", () => {
       ArenaHistory.append(mockFight);
-      const mockFight2 = { ...mockFight, winner: "Defender" };
+      const mockFight2 = { ...mockFight, winner: "D" as const };
       ArenaHistory.append(mockFight2);
       const history = ArenaHistory.all();
       expect(history.length).toBe(2);

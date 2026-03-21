@@ -192,7 +192,7 @@ describe("Eligibility Rules", () => {
       ]),
     ];
     state.trainingAssignments = [
-      { warriorId: "w2", trainerId: "t1", focus: "Strength" },
+      { warriorId: "w2", type: "attribute" as const, attribute: "ST" as const },
     ];
 
     const card = generateMatchCard(state);
