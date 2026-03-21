@@ -3,6 +3,7 @@
  * Each function is a pure transform: GameState → GameState.
  */
 import type { GameState, Season, Warrior, RivalStableData } from "@/types/game";
+import type { PoolWarrior } from "./recruitment";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
@@ -97,10 +98,10 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
       promotionNews.push(`📉 ${r.owner.stableName} falls to Minor status.`);
     }
 
-    return newTier !== r.tier ? { ...r, tier: newTier as any } : r;
+    return newTier !== r.tier ? { ...r, tier: newTier as RivalStableData["tier"] } : r;
   });
 
-  const s = { ...state, rivals: updatedRivals, recruitPool: [] as any[] };
+  const s = { ...state, rivals: updatedRivals, recruitPool: [] as PoolWarrior[] };
   if (promotionNews.length > 0) {
     s.newsletter = [...s.newsletter, { week: newWeek, title: "Stable Rankings Update", items: promotionNews }];
   }
