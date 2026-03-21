@@ -52,6 +52,18 @@ const TIER_COLORS: Record<string, string> = {
   Minor: "bg-muted text-muted-foreground border-border",
 };
 
+
+function SortHeader({ label, field, active, direction, onClick }: { label: string, field: string, active: boolean, direction: string, onClick: () => void }) {
+  return (
+    <div className="flex items-center cursor-pointer select-none" onClick={onClick}>
+      {label}
+      {active && (
+        <span className="ml-1 text-xs">{direction === "asc" ? "▲" : "▼"}</span>
+      )}
+    </div>
+  );
+}
+
 export default function WorldOverview() {
   const { state } = useGameStore();
   const [stableSort, setStableSort] = useState<{ field: SortField; dir: SortDir }>({ field: "fame", dir: "desc" });

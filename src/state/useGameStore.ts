@@ -36,6 +36,7 @@ export interface GameStoreActions {
   doReset: () => void;
   returnToTitle: () => void;
   initialize: () => void;
+  loadGame: (slotId: string, state: GameState) => void;
 }
 
 const getInitialData = () => {
@@ -69,6 +70,16 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
           });
         }
       }
+    },
+
+    loadGame: (slotId: string, state: GameState) => {
+      saveToSlot(slotId, state);
+      set((draft) => {
+        draft.state = state;
+        draft.activeSlotId = slotId;
+        draft.atTitleScreen = false;
+        draft.lastSavedAt = new Date().toISOString();
+      });
     },
 
     setState: (next: GameState) => {

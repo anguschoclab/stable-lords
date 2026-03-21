@@ -283,23 +283,6 @@ const DAMAGE_LIMB_MULT = 0.8;          // Limb hit damage multiplier
 const DAMAGE_VARIANCE_MIN = 0.7;       // Minimum damage variance
 const DAMAGE_VARIANCE_MAX = 1.3;       // Maximum damage variance (MIN + 0.6)
 
-function computeHitDamageOld(rng: () => number, baseDamage: number, location: string): number {
-  let dmg = Math.max(DAMAGE_BASE_MIN, baseDamage);
-  const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
-  dmg *= variance;
-
-  switch (location) {
-    case "head": dmg *= DAMAGE_HEAD_MULT; break;
-    case "chest": dmg *= DAMAGE_CHEST_MULT; break;
-    case "abdomen": dmg *= DAMAGE_ABDOMEN_MULT; break;
-    case "left arm":
-    case "right arm":
-    case "left leg":
-    case "right leg":
-      dmg *= DAMAGE_LIMB_MULT; break;
-  }
-  return Math.max(1, Math.round(dmg));
-}
 
 // Equipment weight thresholds
 const HEAVY_WEAPON_THRESHOLD_1 = 5;    // First heavy weapon damage bonus (≥5 weight)
@@ -360,17 +343,6 @@ function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) *
 function alIniMod(al: number): number { return Math.floor((al - 5) * AL_INI_SCALING); }
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
-function computeHitDamageNew(rng: () => number, baseDamage: number, location: HitLocation): number {
-  let locationMult = 1.0;
-  if (location === "head") locationMult = DAMAGE_HEAD_MULT;
-  else if (location === "chest") locationMult = DAMAGE_CHEST_MULT;
-  else if (location === "abdomen") locationMult = DAMAGE_ABDOMEN_MULT;
-  else if (location === "left arm" || location === "right arm" || location === "left leg" || location === "right leg") locationMult = DAMAGE_LIMB_MULT;
-
-  const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
-  return Math.max(1, Math.round(baseDamage * locationMult * variance));
-}
-
 // ─── Equipment Bonuses ────────────────────────────────────────────────────
 function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
   const weapon = getItemById(loadout.weapon);

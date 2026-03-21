@@ -10,6 +10,8 @@ const localStorageMock = (function() {
 })();
 Object.defineProperty(global, 'localStorage', { value: localStorageMock, writable: true });
 
+
+
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, within, fireEvent, waitFor } from "@testing-library/react";
 import { HallOfFights } from "@/lore/HallOfFights";
