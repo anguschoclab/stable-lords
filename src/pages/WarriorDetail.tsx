@@ -134,9 +134,9 @@ function SkillBar({ label, value, max = 20 }: { label: string; value: number; ma
 }
 
 function WarriorStatementsPanel({ warrior }: { warrior: Warrior }) {
-  if (!displayWarrior.baseSkills) return null;
+  if (!warrior.baseSkills) return null;
   const statements = generateWarriorStatements(
-    displayWarrior.attributes.WT, displayWarrior.attributes.SP, displayWarrior.attributes.DF, displayWarrior.baseSkills
+    warrior.attributes.WT, warrior.attributes.SP, warrior.attributes.DF, warrior.baseSkills
   );
   const lines = [
     statements.initiative, statements.riposte, statements.attack,
