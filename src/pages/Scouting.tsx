@@ -12,8 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { StatBadge } from "@/components/ui/StatBadge";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Button } from "@/components/ui/button";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
-import { StatBadge } from "@/components/ui/StatBadge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Eye, Shield, Coins, Users, Swords, ArrowLeftRight, Trophy, Skull, TrendingUp, UserRoundSearch } from "lucide-react";
