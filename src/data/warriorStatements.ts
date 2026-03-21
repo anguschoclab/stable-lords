@@ -58,9 +58,13 @@ const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
 const GOOD_INI_LOW: StatementEntry[] = [ // base 8-12
   { minBase: 26, text: "Commands the flow of carnage before his opponent can even raise their steel" },
   { minBase: 25, text: "Explodes into action, leaving ruined flesh in his wake" },
+  { minBase: 24, text: "Seizes the bloody initiative with horrifying speed" },
   { minBase: 23, text: "Moves with the cold purpose of an executioner" },
+  { minBase: 22, text: "Forces a deadly tempo the moment steel is drawn" },
   { minBase: 21, text: "Never wastes a moment or is indecisive" },
+  { minBase: 20, text: "Is an absolute terror in setting the pace of carnage" },
   { minBase: 19, text: "Seizes the lethal opening before the crowd even breathes" },
+  { minBase: 18, text: "Never hesitates to press the advantage when blood is drawn" },
   { minBase: 17, text: "Seldom hesitates, moves instantly if given an opportunity" },
   { minBase: 16, text: "Steps firmly into the bloody rhythm of the arena" },
   { minBase: 15, text: "With a very aggressive and clever fighting style" },

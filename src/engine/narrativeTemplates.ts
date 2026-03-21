@@ -200,6 +200,13 @@ export const EXECUTION_TEMPLATES = [
   "Fatigue betrays %D, their weapon drooping just long enough for %A to strike the killing blow!",
   "The crowd erupts as %A brutally claims %D's life with a horrific arc of their %W!",
   "Utterly outmatched at the end, %D is violently put down by %A's %W!",
+  "With %D's weapon heavy from exhaustion, %A delivers a crushing, fatal blow with their %W!",
+  "%D drops their guard, too tired to block, and %A butchers them with a %W!",
+  "The relentless assault drains %D completely, leaving them open for %A's lethal %W strike!",
+  "Gasping for breath, %D watches helplessly as %A ends it all with a brutal %W swing!",
+  "%D's arms fail under the fatigue, and %A ruthlessly caves them in with a %W!",
+  "Exhaustion robs %D of their footing, ensuring a horrific death from %A's %W!",
+  "Bleeding and completely spent, %D takes the final, obliterating hit from %A's %W!",
 ];
 
 export const KO_TEMPLATES = [
@@ -229,6 +236,12 @@ export const FATIGUE_COLLAPSE_TEMPLATES = [
   "%N stumbles blindly, completely spent, before crashing face-first into the dirt.",
   "With a final, desperate gasp, %N succumbs to total bodily failure.",
   "Lungs burning and muscles screaming, %N can no longer stand.",
+  "%N's vision blurs as exhaustion claims them, sending them face-down in the gore.",
+  "Too tired to even bleed, %N collapses in a heap of useless armor.",
+  "Every ounce of fight drained, %N drops motionless onto the crimson sand.",
+  "Lungs burning and muscles failing, %N crumbles in utter defeat.",
+  "Unable to support their own weight, %N folds into unconsciousness.",
+  "%N staggers blindly before a total system failure sends them crashing to the floor.",
 ];
 
 export const TAUNT_TEMPLATES = [
