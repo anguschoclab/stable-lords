@@ -162,19 +162,7 @@ interface FighterState {
   legHits: number;
 }
 
-// ─── Skill Checks ─────────────────────────────────────────────────────────
-function skillCheck(rng: () => number, skill: number, modifier: number = 0): boolean {
-  // Roll under: skill + modifier > d20
-  const roll = Math.floor(rng() * 20) + 1;
-  return roll <= skill + modifier;
-}
-
-function contestCheck(rng: () => number, a: number, d: number, modA: number = 0, modD: number = 0): boolean {
-  // True if A wins. Higher effective skill + roll wins.
-  const rollA = Math.floor(rng() * 20) + 1 + a + modA;
-  const rollD = Math.floor(rng() * 20) + 1 + d + modD;
-  return rollA > rollD;
-}
+// skillCheck and contestCheck imported from combat/combatMath
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
 
