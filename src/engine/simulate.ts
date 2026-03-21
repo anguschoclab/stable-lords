@@ -92,70 +92,19 @@ function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): numb
 
 // ─── Phase detection ──────────────────────────────────────────────────────
 type Phase = "OPENING" | "MID" | "LATE";
-/**
- * Determines the current phase of the fight based on the exchange ratio.
- * Used to trigger phase-specific passive abilities and narrative events.
- *
- * @param exchange - The current exchange number.
- * @param maxExchanges - The maximum expected exchanges for the bout.
- * @returns The string literal representing the current phase ("OPENING", "MID", or "LATE").
- */
+// Phase detection uses getCombatPhase from combat/combatMath, mapped to uppercase
 function getPhase(exchange: number, maxExchanges: number): Phase {
-  const ratio = exchange / maxExchanges;
-  if (ratio < PHASE_OPENING_THRESHOLD) return "OPENING";
-  if (ratio < PHASE_MID_THRESHOLD) return "MID";
-  return "LATE";
+  const p = getCombatPhase(exchange, maxExchanges);
+  return p.toUpperCase() as Phase;
 }
 
-// ─── Legacy narrative helpers (replaced by narrativePBP.ts) ───────────────
-// Kept as fallback only
+// pickText kept as simple local helper
 function pickText(rng: () => number, texts: string[]): string {
   return texts[Math.floor(rng() * texts.length)];
 }
 
-
-type HitLocation = typeof HIT_LOCATIONS[number];
-
-/** Maps a grouped protect target to the granular hit locations it covers */
-/**
- * Expands a general protection target (e.g., "head", "body", "arms", "legs", "vital")
- * into a list of specific `HitLocation` strings it covers.
- *
- * @param protect - The generalized body part targeted for protection by the defender's tactic.
- * @returns An array of specific hit locations covered by the protection, or an empty array if none.
- */
-function protectCovers(protect?: string): string[] {
-  if (!protect || protect === "Any") return [];
-  const p = protect.toLowerCase();
-  if (p === "head") return ["head"];
-  if (p === "body") return ["chest", "abdomen"];
-  if (p === "arms") return ["right arm", "left arm"];
-  if (p === "legs") return ["right leg", "left leg"];
-  return [];
-}
-
-function rollHitLocation(rng: () => number, target?: string, protect?: string): HitLocation {
-  if (target && target !== "Any") {
-    const t = target.toLowerCase() as HitLocation;
-    if (HIT_LOCATIONS.includes(t)) {
-      const covered = protectCovers(protect);
-      const hitChance = covered.includes(t) ? TARGET_MISS_CHANCE : TARGET_HIT_CHANCE;
-      if (rng() < hitChance) return t;
-    }
-  }
-  return HIT_LOCATIONS[Math.floor(rng() * HIT_LOCATIONS.length)];
-}
-
-/** Protect reduces damage on covered locations but increases damage taken elsewhere */
-function applyProtectMod(damage: number, location: HitLocation, protect?: string): number {
-  if (!protect || protect === "Any") return damage;
-  const covered = protectCovers(protect);
-  if (covered.includes(location)) {
-    return Math.max(1, Math.round(damage * PROTECT_DAMAGE_REDUCTION));
-  } else {
-    return Math.round(damage * PROTECT_DAMAGE_PENALTY);
-  }
-}
+// HitLocation, HIT_LOCATIONS, protectCovers, rollHitLocation, applyProtectMod
+// all imported from combat/combatDamage
 
 // ─── Tactic Modifiers ─────────────────────────────────────────────────────
 function getOffensiveTacticMods(tactic: OffensiveTactic | undefined, style: FightingStyle) {
