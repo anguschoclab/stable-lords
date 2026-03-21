@@ -877,9 +877,9 @@ export default function WarriorDetail() {
       {activeTab === "equipment" && displayWarrior.derivedStats && (
         <EquipmentLoadoutUI
           loadout={currentLoadout}
-          style={displayWarrior.style}
-          carryCap={displayWarrior.derivedStats.encumbrance}
-          warriorAttrs={{ ST: displayWarrior.attributes.ST, DF: displayWarrior.attributes.DF, SP: displayWarrior.attributes.SP }}
+          style={warrior.style}
+          carryCap={warrior.derivedStats?.encumbrance ?? 0}
+          warriorAttrs={{ ST: warrior.attributes.ST, DF: warrior.attributes.DF, SP: warrior.attributes.SP }}
           onChange={handleEquipmentChange}
         />
       )}
