@@ -1,8 +1,38 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { loadGameState, saveGameState, createFreshState } from "@/state/gameStore";
 
 describe("gameStore - Security", () => {
+  let originalLocalStorage: Storage;
+
   beforeEach(() => {
+    // Save original localStorage
+    if (typeof globalThis.localStorage !== "undefined") {
+      originalLocalStorage = globalThis.localStorage;
+    }
+
+    // Mock localStorage
+    const store: Record<string, string> = {};
+    const mockLocalStorage = {
+      getItem: vi.fn((key: string) => store[key] || null),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = value;
+      }),
+      removeItem: vi.fn((key: string) => {
+        delete store[key];
+      }),
+      clear: vi.fn(() => {
+        Object.keys(store).forEach((key) => delete store[key]);
+      }),
+      length: 0,
+      key: vi.fn((index: number) => null),
+    } as Storage;
+
+    Object.defineProperty(globalThis, "localStorage", {
+      value: mockLocalStorage,
+      configurable: true,
+      writable: true,
+    });
+
     localStorage.clear();
   });
 

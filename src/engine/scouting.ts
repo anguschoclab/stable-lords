@@ -111,7 +111,7 @@ export function generateScoutReport(
 
   // Basic scouting reveals Style
   newInsights.push({
-    id: `is_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    id: crypto.randomUUID(),
     type: "Style",
     warriorId: warrior.id,
     warriorName: warrior.name,
@@ -124,7 +124,7 @@ export function generateScoutReport(
     const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - Math.random()).slice(0, quality === "Expert" ? 4 : 2);
     attrsToReveal.forEach(attr => {
       newInsights.push({
-        id: `ia_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        id: crypto.randomUUID(),
         type: "Attribute",
         warriorId: warrior.id,
         warriorName: warrior.name,
@@ -138,7 +138,7 @@ export function generateScoutReport(
   // Expert scouting reveals Tactics
   if (quality === "Expert" && warrior.plan) {
     newInsights.push({
-      id: `it_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      id: crypto.randomUUID(),
       type: "Tactic",
       warriorId: warrior.id,
       warriorName: warrior.name,
@@ -149,7 +149,7 @@ export function generateScoutReport(
 
   return {
     report: {
-      id: `scout_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+      id: crypto.randomUUID(),
       warriorName: warrior.name,
       style: warrior.style,
       quality,

@@ -72,6 +72,16 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
       }
     },
 
+    loadGame: (slotId: string, state: GameState) => {
+      saveToSlot(slotId, state);
+      set((draft) => {
+        draft.state = state;
+        draft.activeSlotId = slotId;
+        draft.atTitleScreen = false;
+        draft.lastSavedAt = new Date().toISOString();
+      });
+    },
+
     setState: (next: GameState) => {
       const { activeSlotId } = get();
       if (activeSlotId) {

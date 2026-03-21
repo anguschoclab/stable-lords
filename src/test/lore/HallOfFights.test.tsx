@@ -10,6 +10,8 @@ const localStorageMock = (function() {
 })();
 Object.defineProperty(global, 'localStorage', { value: localStorageMock, writable: true });
 
+
+
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, within, fireEvent, waitFor } from "@testing-library/react";
 import { HallOfFights } from "@/lore/HallOfFights";
@@ -39,12 +41,6 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
 }));
 
-// Fix ResizeObserver not being defined in jsdom
-global.ResizeObserver = class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
 
 // Mock Radix UI Tabs to always render both contents for easy testing
 vi.mock("@/components/ui/tabs", () => {

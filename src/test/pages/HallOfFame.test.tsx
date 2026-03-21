@@ -38,12 +38,6 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
 }));
 
-// Fix ResizeObserver not being defined in jsdom
-global.ResizeObserver = class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
 
 // Utility to create a dummy warrior
 function createDummyWarrior(name: string, status: Warrior["status"], wins: number, losses: number, fame: number): Warrior {

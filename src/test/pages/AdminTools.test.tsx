@@ -12,6 +12,12 @@ describe('AdminTools Page', () => {
   const mockSetState = vi.fn();
   const mockDoReset = vi.fn();
   const mockState = {
+  newsletter: [],
+  ledger: [],
+  matchHistory: [],
+  moodHistory: [],
+  graveyard: [],
+  retired: [],
     week: 1,
     season: 'Spring',
     year: 1,
@@ -70,6 +76,15 @@ describe('AdminTools Page', () => {
     // Test reset fires doReset
     fireEvent.click(resetBtn);
     expect(mockDoReset).toHaveBeenCalled();
+  });
+
+  it('provides button to skip FTUE', () => {
+    render(<AdminTools />);
+    const skipFtueBtn = screen.getByRole('button', { name: /Skip FTUE/i });
+    expect(skipFtueBtn).toBeDefined();
+
+    fireEvent.click(skipFtueBtn);
+    expect(mockSetState).toHaveBeenCalledWith(expect.objectContaining({ ftueComplete: true }));
   });
 
   it('renders a JSON state dump', () => {

@@ -104,6 +104,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               size="icon"
               className="md:hidden h-8 w-8 text-muted-foreground"
               onClick={toggleSidebar}
+              aria-label="Toggle sidebar"
             >
               {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
             </Button>
@@ -157,6 +158,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               size="icon"
               onClick={exportActiveSlot}
               title="Export Save"
+              aria-label="Export Save"
               className="h-8 w-8 text-muted-foreground hover:text-foreground hidden sm:inline-flex"
             >
               <Download className="h-3.5 w-3.5" />
@@ -166,6 +168,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               title="Toggle theme"
+              aria-label="Toggle theme"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
             >
               {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
@@ -175,6 +178,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               size="icon"
               onClick={returnToTitle}
               title="Return to Title Screen"
+              aria-label="Return to Title Screen"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -184,6 +188,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               size="icon"
               onClick={() => setResetOpen(true)}
               title="Delete Save"
+              aria-label="Delete Save"
               className="h-8 w-8 text-muted-foreground hover:text-destructive"
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -272,6 +277,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             className="h-8 w-8 m-1 text-muted-foreground hover:text-foreground"
             onClick={toggleSidebar}
             title={sidebarOpen ? "Hide event log" : "Show event log"}
+            aria-label={sidebarOpen ? "Hide event log" : "Show event log"}
           >
             {sidebarOpen ? <PanelLeftClose className="h-3.5 w-3.5" /> : <PanelLeft className="h-3.5 w-3.5" />}
           </Button>

@@ -1,3 +1,4 @@
+import { SortHeader } from "@/components/ui/sort-header";
 import { useState, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
@@ -67,6 +68,18 @@ const TIER_COLORS: Record<string, string> = {
   Established: "bg-blue-500/20 text-blue-300 border-blue-500/40",
   Minor: "bg-muted text-muted-foreground border-border",
 };
+
+
+function SortHeader({ label, field, active, direction, onClick }: { label: string, field: string, active: boolean, direction: string, onClick: () => void }) {
+  return (
+    <div className="flex items-center cursor-pointer select-none" onClick={onClick}>
+      {label}
+      {active && (
+        <span className="ml-1 text-xs">{direction === "asc" ? "▲" : "▼"}</span>
+      )}
+    </div>
+  );
+}
 
 export default function WorldOverview() {
   const { state } = useGameStore();

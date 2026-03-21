@@ -17,6 +17,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { WarriorLink } from "@/components/EntityLink";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge } from "@/components/ui/StatBadge";
 import {
   BookOpen, Coins, FileText, ScrollText, Skull, Shield,
   Trophy, Star, Swords, Heart, Zap, GraduationCap,
@@ -436,12 +438,10 @@ function HallTab() {
                 {retired.map(w => (
                   <TableRow key={w.id}>
                     <TableCell>
-                      <WarriorLink name={w.name} id={w.id} className="font-display font-semibold text-sm" />
+                      <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-[10px]">
-                        {STYLE_DISPLAY_NAMES[w.style]}
-                      </Badge>
+                      <StatBadge styleName={w.style} />
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">
                       {w.career.wins}W-{w.career.losses}L-{w.career.kills}K
@@ -482,13 +482,11 @@ function HallTab() {
               <TableBody>
                 {graveyard.map(w => (
                   <TableRow key={w.id}>
-                    <TableCell>
-                      <WarriorLink name={w.name} id={w.id} className="font-display font-semibold text-sm text-destructive/80" />
+                    <TableCell className="text-destructive/80">
+                      <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-[10px]">
-                        {STYLE_DISPLAY_NAMES[w.style]}
-                      </Badge>
+                      <StatBadge styleName={w.style} />
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">
                       {w.career.wins}W-{w.career.losses}L-{w.career.kills}K

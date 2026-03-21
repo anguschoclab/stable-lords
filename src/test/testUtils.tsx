@@ -35,9 +35,7 @@ export function renderWithGameState(ui: React.ReactElement, partialState: Partia
 
   return render(
     <TooltipProvider>
-      <GameProvider>
-        {ui}
-      </GameProvider>
+      {ui}
     </TooltipProvider>
   );
 }

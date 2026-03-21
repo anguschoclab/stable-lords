@@ -237,6 +237,14 @@ export interface WarriorFavorites {
   };
 }
 
+
+export interface DeathEvent {
+  boutId: string;
+  killerId: string;
+  deathSummary: string;
+  memorialTags: string[];
+}
+
 export interface Warrior {
   id: string;
   name: string;
@@ -266,6 +274,7 @@ export interface Warrior {
   potentialRevealed?: Partial<Record<keyof Attributes, boolean>>;
   deathWeek?: number;
   deathCause?: string;
+  deathEvent?: DeathEvent;
   killedBy?: string;
   retiredWeek?: number;
   stableId?: string; // for AI rival warriors
@@ -345,10 +354,10 @@ export interface FightSummary {
   week: number;
   phase?: "planning" | "resolution";
   pendingResolutionData?: {
-    gazette: any[];
+    gazette: NewsletterItem[];
     injuries: string[];
     deaths: string[];
-    bouts: any[];
+    bouts: BoutResult[];
     promotions: string[];
   };
   tournamentId?: string | null;
@@ -368,6 +377,8 @@ export interface FightSummary {
   fameD?: number;
   transcript?: string[];
   createdAt: string;
+  isDeathEvent?: boolean;
+  deathEventData?: DeathEvent;
 }
 
 export interface HallEntry {
@@ -490,6 +501,15 @@ export interface OwnerGrudge {
   lastEscalation: number;
 }
 
+
+export interface GazetteStory {
+  headline: string;
+  body: string;
+  mood: CrowdMoodType;
+  tags: string[];
+  week: number;
+}
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -514,12 +534,14 @@ export interface GameState {
   gold: number;
   ledger: LedgerEntry[];
   week: number;
+  phase: "planning" | "resolution";
   season: Season;
   roster: Warrior[];
   graveyard: Warrior[];
   retired: Warrior[];
   arenaHistory: FightSummary[];
   newsletter: NewsletterItem[];
+  gazettes: GazetteStory[];
   hallOfFame: HallEntry[];
   crowdMood: CrowdMoodType;
   tournaments: TournamentEntry[];

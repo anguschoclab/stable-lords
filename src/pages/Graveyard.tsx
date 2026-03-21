@@ -27,7 +27,7 @@ export default function Graveyard() {
       <Tabs defaultValue="graveyard">
         <TabsList>
           <TabsTrigger value="graveyard" className="gap-1.5">
-            <Skull className="h-3.5 w-3.5" /> Fallen ({state.graveyard.length})
+            <Skull className="h-3.5 w-3.5" /> Fallen ({state.graveyard.filter(w => w.stableId === state.player.id || !w.stableId).length})
           </TabsTrigger>
           <TabsTrigger value="retired" className="gap-1.5">
             <Armchair className="h-3.5 w-3.5" /> Retired ({state.retired.length})
@@ -35,9 +35,9 @@ export default function Graveyard() {
         </TabsList>
 
         <TabsContent value="graveyard" className="space-y-3 mt-4">
-          {state.graveyard.length === 0 ? (
+          {state.graveyard.filter(w => w.stableId === state.player.id || !w.stableId).length === 0 ? (
             <Card>
-              <CardContent className="p-8 text-center space-y-3">
+              <CardContent className="p-8 text-center space-y-3 bg-zinc-950/80 border-red-900/20">
                 <Skull className="h-10 w-10 mx-auto text-muted-foreground/50" />
                 <p className="text-muted-foreground text-sm">No warriors have fallen… yet. Send them into the arena to tempt fate.</p>
                 <Link to="/run-round">
@@ -48,24 +48,30 @@ export default function Graveyard() {
               </CardContent>
             </Card>
           ) : (
-            state.graveyard.map((w) => (
-              <Card key={w.id}>
-                <CardContent className="p-4">
+            state.graveyard.filter(w => w.stableId === state.player.id || !w.stableId).map((w) => (
+              <Card key={w.id} className="border-destructive/20 bg-background/50">
+                <CardContent className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <WarriorLink name={w.name} id={w.id} className="font-display font-semibold text-foreground" />
-                      <span className="text-sm text-muted-foreground ml-2">
-                        {STYLE_DISPLAY_NAMES[w.style]}
-                      </span>
+                    <div className="flex flex-col">
+                      <WarriorLink name={w.name} id={w.id} className="font-display font-semibold text-foreground text-lg" />
+                      <span className="text-sm text-muted-foreground">{STYLE_DISPLAY_NAMES[w.style]}</span>
                     </div>
-                    <Badge variant="destructive" className="text-xs">
+                    <Badge variant="outline" className="text-xs border-red-900/50 text-red-500 bg-red-950/30">
                       <Skull className="h-3 w-3 mr-1" /> Week {w.deathWeek}
                     </Badge>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-2">
-                    {w.career.wins}W-{w.career.losses}L-{w.career.kills}K
-                    {w.deathCause && <> · {w.deathCause}</>}
-                    {w.killedBy && <> · Slain by <WarriorLink name={w.killedBy} /></>}
+                  {w.deathEvent?.deathSummary ? (
+                    <p className="text-sm italic text-muted-foreground border-l-2 border-destructive/50 pl-3 py-1 my-2">
+                      "{w.deathEvent.deathSummary}"
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {w.deathCause && <>Cause of death: {w.deathCause}</>}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+                    <span>Record: {w.career.wins}W-{w.career.losses}L-{w.career.kills}K</span>
+                    {w.deathEvent?.killerId && <span>Slain by: <WarriorLink name={w.killedBy || w.deathEvent.killerId} /></span>}
                   </div>
                 </CardContent>
               </Card>

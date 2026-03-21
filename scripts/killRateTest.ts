@@ -1,6 +1,6 @@
-import { FightingStyle, type Warrior } from "../types/game";
-import { simulateFight, defaultPlanForWarrior } from "./simulate";
-import { computeWarriorStats } from "./skillCalc";
+import { FightingStyle, type Warrior } from "../src/types/game";
+import { simulateFight, defaultPlanForWarrior } from "../src/engine/simulate";
+import { computeWarriorStats } from "../src/engine/skillCalc";
 
 // Helper to generate a random number between min and max (inclusive)
 function randInt(min: number, max: number) {

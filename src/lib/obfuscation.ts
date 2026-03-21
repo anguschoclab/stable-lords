@@ -1,4 +1,4 @@
-import { Warrior, InsightToken, FightingStyle, Attributes } from "@/types/game";
+import { Warrior, InsightToken, FightingStyle, Attributes, FightPlan } from "@/types/game";
 
 // Obfuscated representation of a warrior for the UI
 export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attributes" | "defaultPlan"> {
@@ -12,7 +12,7 @@ export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attributes" 
     SP: number | string;
     DF: number | string;
   };
-  defaultPlan?: any; // Hidden unless known
+  defaultPlan?: FightPlan | undefined; // Hidden unless known
   isFullyRevealed: boolean;
 }
 

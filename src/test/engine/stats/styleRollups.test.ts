@@ -70,5 +70,57 @@ describe("StyleRollups", () => {
       const result = StyleRollups.getWeekRollup(4);
       expect(result).toEqual({ "Aggressive": { w: 1, l: 0, k: 0, pct: 1, fights: 1 } });
     });
+
+    it("returns an empty object when JSON has incorrect field types", () => {
+      const invalidJson = JSON.stringify({ "Aggressive": { w: "1", l: 0, k: 0, pct: 1, fights: 1 } });
+      (globalThis.localStorage.getItem as any).mockReturnValue(invalidJson);
+      const result = StyleRollups.getWeekRollup(5);
+      expect(result).toEqual({});
+    });
+
+    it("returns an empty object when JSON is missing required fields", () => {
+      const invalidJson = JSON.stringify({ "Aggressive": { w: 1, l: 0 } });
+      (globalThis.localStorage.getItem as any).mockReturnValue(invalidJson);
+      const result = StyleRollups.getWeekRollup(6);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("last10 (loadRolling)", () => {
+    it("returns empty array when localStorage is corrupted", () => {
+      (globalThis.localStorage.getItem as any).mockReturnValue(JSON.stringify({ "Aggressive": [{ W: "invalid" }] }));
+      const result = StyleRollups.last10();
+      expect(result).toEqual([]);
+    });
+
+    it("returns valid records when localStorage is correct", () => {
+      const validRolling = {
+        "Aggressive": [{ W: 1, L: 0, K: 0, fights: 1 }]
+      };
+      (globalThis.localStorage.getItem as any).mockReturnValue(JSON.stringify(validRolling));
+      const result = StyleRollups.last10();
+      expect(result.length).toBe(1);
+      expect(result[0].style).toBe("Aggressive");
+      expect(result[0].W).toBe(1);
+    });
+  });
+
+  describe("tournament (loadTour)", () => {
+    it("returns empty array when tournament data is corrupted", () => {
+      (globalThis.localStorage.getItem as any).mockReturnValue(JSON.stringify({ "tour1": { "Aggressive": { W: "invalid" } } }));
+      const result = StyleRollups.tournament("tour1");
+      expect(result).toEqual([]);
+    });
+
+    it("returns valid records when tournament data is correct", () => {
+      const validTour = {
+        "tour1": { "Aggressive": { W: 1, L: 0, K: 0, fights: 1 } }
+      };
+      (globalThis.localStorage.getItem as any).mockReturnValue(JSON.stringify(validTour));
+      const result = StyleRollups.tournament("tour1");
+      expect(result.length).toBe(1);
+      expect(result[0].style).toBe("Aggressive");
+      expect(result[0].W).toBe(1);
+    });
   });
 });

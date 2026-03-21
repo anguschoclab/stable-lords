@@ -8,22 +8,34 @@ const WARRIOR_NAMES = [
   "KRAGOS", "GORLAK", "THUNDRAK", "BREKKA", "MORGUL", "SKARN", "GARVOK",
   "DRAXUS", "KORGAN", "BRUTAG", "IRONJAW", "GROTHAK", "WULFGAR", "BOLVERK",
   "MACEWARD", "HACKER", "BONEBREAKER", "SKULLSMASHER", "GUTRENDER", "FLESHPOUNDER",
+  "MARROWCRUNCHER", "GOREFIST", "IRONHIDE", "THUNDERSTOMP", "BEASTJAW", "BLOODCHASER",
   // Agile & cunning
   "SILVANE", "VEXIA", "ASHARA", "THORNE", "DUSKBANE", "FERRIK", "VYREN",
   "KAELIS", "SYRAH", "NYX", "TALYN", "LYSARA", "MIRAEL", "ZEPHYRA",
   "SLIVER", "RAZORDANCE", "QUICKSILVER", "GHOSTSTEP", "VENOMSPIT", "SHADOWDART",
+  "SILENTBLADE", "NIGHTSHIV", "CROWSBEAK", "VIPERSWIFT", "BLADEDANCER", "SWIFTCURSE",
   // Dark & mysterious
   "WRAITH", "MORKA", "SHADE", "OBERON", "VHAEL", "RAZIEL", "NOCTIS",
   "REVENANT", "MALAKAI", "SEREN", "GHAEL", "VELKOR", "EREBUS", "ORPHEUS",
   "DEATHBRINGER", "GRAVEWALKER", "SOULRIPPER", "NIGHTTERROR", "DOOMBRINGER", "HELLSPAWN",
+  "BONEWEAVER", "SHADOWFIEND", "GRIMVISAGE", "HOLLOWEYE", "DUSKWALKER", "CARRIONBIRD",
   // Arena legends
   "VICTUS", "MAXIMAR", "GLADIUS", "CENTURAX", "SPARTOK", "TYRANNUS",
   "AURELIAN", "PRIMUS", "DECIMUS", "SEVERAK", "CASSIAN", "VALORIAN",
   "CHAMPION", "IMMORTAL", "UNBEATEN", "BLOODLORD", "IRONMASTER", "WARBRINGER",
+  "INVINCITUS", "DOMINUS", "SLAUGHTERKING", "ARENAMASTER", "GOLDENHELM", "THE UNDEFEATED",
   // Beast-like
   "FANGMAW", "CLAWREN", "STORMFANG", "BLOODHOWL", "ASHCLAW", "DIREWOLF",
   "SCORPIUS", "VIPERTOOTH", "RAVENMOOR", "HAWKSTEEL", "BEARJAW", "LYNXBLADE",
   "MANTICORE", "GRIFFON", "DRAGONBLOOD", "WOLFHEART", "SERPENTSTRIKE", "TIGERCLAW",
+  // Expanded
+  "GOREFANG", "DUSKREAPER", "BLOODSPILL", "ASHENWAKE", "GRIMSCAR", "NIGHTSLASH",
+  "OATHBREAKER", "CINDERSTRIKE", "TOMBSTONE", "SKULLSPLIT", "GUTSPILLER", "FLESHRENDER",
+  "BONECHILL", "DOOMBRASS", "SLAGHEART", "RUSTBLADE", "WARGUT", "IRONCLAW",
+  "GRAVEBORN", "DEATHWATCH", "VENOMFANG", "SOULSNARE", "BLOODCRAZED", "PITFIEND",
+  // New Additions
+  "BLOODSPITE", "IRONFANG", "GRAVEMAKER", "DOOMSCYTHE", "CARRION",
+  "SLAKEMAW", "MARROWSTEALER", "GORETIDE", "GRIMTIDE", "SKULLSMASHER", "BONECARVER",
 ];
 
 const OWNER_FIRST = [
@@ -35,6 +47,7 @@ const OWNER_FIRST = [
   "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
   "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
   "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
+  "Vortigern", "Morwenna", "Titus", "Galba",
 ];
 
 const OWNER_LAST = [
@@ -45,6 +58,7 @@ const OWNER_LAST = [
   "Hawkridge", "Bonecrest", "Firebrand", "Shadowmere", "Bladewell",
   "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
   "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
+  "Graveward", "Grimbane", "Sorrowbring", "Cinderfall",
 ];
 
 const STABLE_PREFIXES = [
@@ -54,6 +68,8 @@ const STABLE_PREFIXES = [
   "The Pale", "The Raging", "The Obsidian", "The Thorned", "The Hollow",
   "The Bone", "The Flesh", "The Skull", "The Death", "The Grave",
   "The Doom", "The Hell", "The Vengeful", "The Wrathful", "The Cursed",
+  "The Grinding", "The Bleeding", "The Ruined", "The Shattered", "The Forsaken",
+  "The Merciless", "The Unforgiving", "The Putrid", "The Rotting", "The Blighted",
 ];
 
 const STABLE_SUFFIXES = [
@@ -63,6 +79,8 @@ const STABLE_SUFFIXES = [
   "Forge", "Phalanx", "Jackals", "Vipers", "Shields",
   "Crushers", "Breakers", "Renders", "Slayers", "Executioners",
   "Butchers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
+  "Manglers", "Gorehounds", "Scavengers", "Defilers", "Despoilers",
+  "Marauders", "Annihilators", "Obliterators", "Ravagers", "Plunderers",
 ];
 
 const STABLE_ALT = [
@@ -76,6 +94,10 @@ const STABLE_ALT = [
   "The Flesh Tearers", "The Skull Splitters", "The Bone Breakers",
   "The Blood Drinkers", "The Soul Reapers", "The Death Dealers",
   "The Hell Hounds", "The Doom Bringers", "The Grave Diggers",
+  "Cult of the Severed Head", "Brotherhood of the Black Sand",
+  "Choir of Screams", "The Iron Maiden's Embrace", "The Bloodied Knuckles",
+  "Harbingers of the Final Strike", "The Slaughterhouse Syndicate",
+  "Disciples of the Meat Grinder", "The Carrion Crows", "The Abattoir Artisans",
 ];
 
 function pick<T>(arr: T[]): T {

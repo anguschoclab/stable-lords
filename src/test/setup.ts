@@ -22,3 +22,10 @@ const localStorageMock = (function() {
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock
 });
+
+// Mock ResizeObserver for JSDOM
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};

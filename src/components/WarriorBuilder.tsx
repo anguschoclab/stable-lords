@@ -152,6 +152,7 @@ export default function WarriorBuilder({
                     type="button"
                     onClick={() => setName(randomWarriorName())}
                     title="Random name"
+                    aria-label="Randomize warrior name"
                     className="shrink-0"
                   >
                     <Dices className="h-4 w-4" />

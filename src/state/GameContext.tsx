@@ -9,7 +9,9 @@ import { useGameStore } from "./useGameStore";
 export function GameProvider({ children }: { children: ReactNode }) {
   const initialize = useGameStore((s) => s.initialize);
   useEffect(() => {
-    initialize();
+    if (initialize) {
+      initialize();
+    }
   }, [initialize]);
 
   return <>{children}</>;

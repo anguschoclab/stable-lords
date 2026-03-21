@@ -12,7 +12,7 @@ export interface SortHeaderProps {
 
 export function SortHeader({ label, active, onClick }: SortHeaderProps) {
   return (
-    <button onClick={onClick} className="flex items-center gap-1 hover:text-foreground transition-colors">
+    <button onClick={onClick} aria-label={`Sort by ${label}`} className="flex items-center gap-1 hover:text-foreground transition-colors">
       {label}
       <ArrowUpDown className={`h-3 w-3 ${active ? "text-primary" : "text-muted-foreground/40"}`} />
     </button>

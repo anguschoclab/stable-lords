@@ -41,12 +41,12 @@ export function applyProtectMod(damage: number, location: HitLocation, protect?:
   const PROTECT_DAMAGE_REDUCTION = 0.75;
   const PROTECT_DAMAGE_PENALTY = 1.1;
 
-  if (!protect) return damage * PROTECT_DAMAGE_PENALTY;
+  if (!protect) return Math.floor(damage * PROTECT_DAMAGE_PENALTY);
   const covers = protectCovers(protect);
   if (covers.includes(location)) {
     return Math.floor(damage * PROTECT_DAMAGE_REDUCTION);
   }
-  return damage * PROTECT_DAMAGE_PENALTY;
+  return Math.floor(damage * PROTECT_DAMAGE_PENALTY);
 }
 
 export function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {

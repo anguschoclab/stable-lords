@@ -3,6 +3,7 @@
  * Each function is a pure transform: GameState → GameState.
  */
 import type { GameState, Season, Warrior, RivalStableData } from "@/types/game";
+import type { PoolWarrior } from "./recruitment";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
@@ -70,10 +71,16 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
 
   const promotionNews: string[] = [];
   const updatedRivals = (state.rivals || []).map(r => {
-    const totalWins = r.roster.reduce((sum, w) => sum + w.career.wins, 0);
-    const totalKills = r.roster.reduce((sum, w) => sum + w.career.kills, 0);
-    const totalFights = r.roster.reduce((sum, w) => sum + w.career.wins + w.career.losses, 0);
-    const activeCount = r.roster.filter(w => w.status === "Active").length;
+    const { totalWins, totalKills, totalFights, activeCount } = r.roster.reduce(
+      (acc, w) => {
+        acc.totalWins += w.career.wins;
+        acc.totalKills += w.career.kills;
+        acc.totalFights += w.career.wins + w.career.losses;
+        if (w.status === "Active") acc.activeCount++;
+        return acc;
+      },
+      { totalWins: 0, totalKills: 0, totalFights: 0, activeCount: 0 }
+    );
 
     let newTier = r.tier;
 
@@ -91,10 +98,10 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
       promotionNews.push(`📉 ${r.owner.stableName} falls to Minor status.`);
     }
 
-    return newTier !== r.tier ? { ...r, tier: newTier as any } : r;
+    return newTier !== r.tier ? { ...r, tier: newTier as RivalStableData["tier"] } : r;
   });
 
-  const s = { ...state, rivals: updatedRivals, recruitPool: [] as any[] };
+  const s = { ...state, rivals: updatedRivals, recruitPool: [] as PoolWarrior[] };
   if (promotionNews.length > 0) {
     s.newsletter = [...s.newsletter, { week: newWeek, title: "Stable Rankings Update", items: promotionNews }];
   }

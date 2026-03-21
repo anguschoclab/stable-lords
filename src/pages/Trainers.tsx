@@ -21,6 +21,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge } from "@/components/ui/StatBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -86,7 +88,7 @@ function TrainerCard({
               </div>
             </div>
             {owned && onFire && (
-              <Button variant="ghost" size="icon" onClick={onFire} title="Release trainer" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0">
+              <Button variant="ghost" size="icon" onClick={onFire} title="Release trainer" aria-label="Release trainer" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0">
                 <UserMinus className="h-4 w-4" />
               </Button>
             )}
@@ -334,9 +336,9 @@ export default function Trainers() {
                           className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border"
                         >
                           <div>
-                            <div className="font-display font-semibold text-sm">{w.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {STYLE_DISPLAY_NAMES[w.style]} · {w.career.wins}W-{w.career.losses}L
+                            <div className="flex items-center gap-2 mb-1">
+                              <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                              <StatBadge styleName={w.style} career={w.career} />
                             </div>
                             <div className="text-xs text-muted-foreground mt-0.5">
                               → {preview.tier} {preview.focus} Trainer

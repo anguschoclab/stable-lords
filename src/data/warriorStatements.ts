@@ -43,8 +43,11 @@ function pickStatement(entries: StatementEntry[], baseValue: number): string {
 
 // GOOD WIT: INITIATIVE (1st statement)
 const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
+  { minBase: 26, text: "Bends the chaos of the pit to his will, forcing foes to fight on his terms" },
   { minBase: 25, text: "A terrifying maestro of battle tempo, dictating every bloody exchange" },
+  { minBase: 24, text: "Summons a storm of steel that leaves no room to breathe" },
   { minBase: 23, text: "Relentlessly forces his enemies into deadly, suffocating corners" },
+  { minBase: 22, text: "A predator in the pit, suffocating their prey with relentless advances" },
   { minBase: 21, text: "Brilliant at keeping his foes off balance" },
   { minBase: 19, text: "Orchestrates the slaughter with predatory anticipation" },
   { minBase: 17, text: "Nothing short of a genius at keeping his foes at swords point" },
@@ -55,10 +58,15 @@ const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
   { minBase: 0,  text: "Has learned how to keep his foe in trouble" },
 ];
 const GOOD_INI_LOW: StatementEntry[] = [ // base 8-12
+  { minBase: 26, text: "Commands the flow of carnage before his opponent can even raise their steel" },
   { minBase: 25, text: "Explodes into action, leaving ruined flesh in his wake" },
+  { minBase: 24, text: "Seizes the bloody initiative with horrifying speed" },
   { minBase: 23, text: "Moves with the cold purpose of an executioner" },
+  { minBase: 22, text: "Forces a deadly tempo the moment steel is drawn" },
   { minBase: 21, text: "Never wastes a moment or is indecisive" },
+  { minBase: 20, text: "Is an absolute terror in setting the pace of carnage" },
   { minBase: 19, text: "Seizes the lethal opening before the crowd even breathes" },
+  { minBase: 18, text: "Never hesitates to press the advantage when blood is drawn" },
   { minBase: 17, text: "Seldom hesitates, moves instantly if given an opportunity" },
   { minBase: 16, text: "Steps firmly into the bloody rhythm of the arena" },
   { minBase: 15, text: "With a very aggressive and clever fighting style" },
@@ -94,8 +102,11 @@ const GOOD_RIP_LOW: StatementEntry[] = [ // base 10-12
 
 // GOOD WIT: ATTACK (3rd statement)
 const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
+  { minBase: 26, text: "Mutilates his targets with the cold, measured precision of an anatomist" },
   { minBase: 25, text: "Dismantles opponents with terrifying, surgical butchery" },
+  { minBase: 24, text: "Severs muscle and bone with the cold precision of an executioner" },
   { minBase: 23, text: "Strikes with the ruthless precision of a master torturer" },
+  { minBase: 22, text: "Paints the sands with masterful, agonizing strokes of the blade" },
   { minBase: 21, text: "Knows every weak and sensitive location to be struck on the human body" },
   { minBase: 19, text: "Targets vital organs with a chilling, practiced ease" },
   { minBase: 17, text: "Uses an unusual fighting style, deadly to slower, less active foes" },
@@ -106,6 +117,7 @@ const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
   { minBase: 0,  text: "He lands blows on less protected areas" },
 ];
 const GOOD_ATT_LOW: StatementEntry[] = [ // base 7-9
+  { minBase: 26, text: "Transforms every meager opening into a harrowing bloodbath" },
   { minBase: 25, text: "Creates massacres out of seemingly simple feints" },
   { minBase: 23, text: "Brings a grim, creative malice to every offensive exchange" },
   { minBase: 21, text: "Is always thinking of feints and ploys to be used in attacks" },
@@ -196,18 +208,22 @@ const GOOD_END_LOW: StatementEntry[] = [
 // ─── Bad Wit Statements (WT <= 7) ──────────────────────────────────────────
 
 const BAD_INI_HIGH: StatementEntry[] = [
+  { minBase: 17, text: "Freezes under pressure, surrendering all momentum to the slaughter" },
   { minBase: 15, text: "Plunges forward with blind, uncontrollable aggression" },
   { minBase: 12, text: "Charges into danger with no thought for the consequences" },
   { minBase: 10, text: "Relies entirely on brute force to seize control" },
+  { minBase: 8, text: "Let's the enemy dictate how and when he dies" },
   { minBase: 7, text: "He is unconcerned with controlling the fight" },
   { minBase: 5, text: "Responding to the actions of his foes rather than controlling the fight" },
   { minBase: 2, text: "Is easily manipulated into disastrously poor positioning" },
   { minBase: 0, text: "He needs time to think things through before he can act" },
 ];
 const BAD_INI_LOW: StatementEntry[] = [
+  { minBase: 17, text: "Wanders the arena without a plan, waiting to be gutted" },
   { minBase: 15, text: "Often stumbles blindly into his enemy's trap" },
   { minBase: 12, text: "Has the tactical foresight of a cornered beast" },
   { minBase: 10, text: "Surrenders the pace of the fight out of sheer ignorance" },
+  { minBase: 8, text: "Yields every lethal opportunity right back to the enemy" },
   { minBase: 7, text: "Rarely considers how to gain the initiative" },
   { minBase: 5, text: "He often needs time to think things through, losing the chance to act" },
   { minBase: 2, text: "Simply waits to be butchered" },
@@ -215,18 +231,22 @@ const BAD_INI_LOW: StatementEntry[] = [
 ];
 
 const BAD_RIP_HIGH: StatementEntry[] = [
+  { minBase: 17, text: "Responds to his opponent's missteps with complete paralysis" },
   { minBase: 15, text: "Swings wildly after a block, hitting nothing but air" },
   { minBase: 12, text: "His clumsy counterattacks leave him completely exposed" },
   { minBase: 10, text: "Lacks the cunning to punish a struggling foe" },
+  { minBase: 8, text: "Never realizes the opening is there until the moment has passed" },
   { minBase: 7, text: "The more subtle points of the riposte simply escape him" },
   { minBase: 5, text: "He often fails to make use of his foes mistakes" },
   { minBase: 2, text: "Repeatedly misses the chance for an easy kill" },
   { minBase: 0, text: "He makes a lot of mistakes" },
 ];
 const BAD_RIP_LOW: StatementEntry[] = [
+  { minBase: 17, text: "Stares dumbly at exposed throats without raising his blade" },
   { minBase: 15, text: "Never realizes when his opponent is vulnerable" },
   { minBase: 12, text: "Lets golden opportunities for slaughter slip away" },
   { minBase: 10, text: "Is completely blind to the rhythm of the duel" },
+  { minBase: 8, text: "Forgives his enemy's worst mistakes by doing absolutely nothing" },
   { minBase: 7, text: "He makes bad dueling decisions" },
   { minBase: 5, text: "He makes mistakes" },
   { minBase: 2, text: "Fails to grasp the concept of retaliation" },
@@ -234,18 +254,22 @@ const BAD_RIP_LOW: StatementEntry[] = [
 ];
 
 const BAD_ATT_HIGH: StatementEntry[] = [
+  { minBase: 17, text: "Wastes his lethal potential on the most obvious, blockable swings" },
   { minBase: 15, text: "Throws chaotic, predictable haymakers that are easily punished" },
   { minBase: 12, text: "Relies entirely on savage, thoughtless swinging" },
   { minBase: 10, text: "His attacks are as blunt and stupid as a rock" },
+  { minBase: 8, text: "Fails to grasp the concept of an exposed throat or unarmored limb" },
   { minBase: 7, text: "He makes bad dueling decisions" },
   { minBase: 5, text: "Makes feints that fool no one" },
   { minBase: 2, text: "Strikes harmlessly at heavily armored sections" },
   { minBase: 0, text: "He makes a lot of mistakes" },
 ];
 const BAD_ATT_LOW: StatementEntry[] = [
+  { minBase: 17, text: "Swings his steel with all the grace of a blind butcher" },
   { minBase: 15, text: "Hacks clumsily without any plan or precision" },
   { minBase: 12, text: "His strikes are desperately wild and mostly ineffective" },
   { minBase: 10, text: "Shows no creativity, just repeating the same dull attack" },
+  { minBase: 8, text: "Throws his weapon around hoping it hits flesh, but mostly catching shield" },
   { minBase: 7, text: "He makes costly mistakes" },
   { minBase: 5, text: "He makes incredibly stupid attacks" },
   { minBase: 2, text: "Practically hands his weapon to his enemy" },
@@ -253,18 +277,22 @@ const BAD_ATT_LOW: StatementEntry[] = [
 ];
 
 const BAD_PAR_HIGH: StatementEntry[] = [
+  { minBase: 17, text: "Leaves his vital organs entirely exposed while guarding empty space" },
   { minBase: 15, text: "Often raises his guard too late to stop the bleeding" },
   { minBase: 12, text: "Relies on his armor to catch blows he fails to block" },
   { minBase: 10, text: "His parries are stiff, predictable, and easily broken" },
+  { minBase: 8, text: "Gives up the center line constantly, begging for a sudden demise" },
   { minBase: 7, text: "Fails to parry in situations where he could do so" },
   { minBase: 5, text: "Is nearly always fooled by a feint" },
   { minBase: 2, text: "Takes fatal blows to the head while protecting his knees" },
   { minBase: 0, text: "Isn't bright enough to parry in most circumstances" },
 ];
 const BAD_PAR_LOW: StatementEntry[] = [
+  { minBase: 17, text: "Attempts to block heavy blows with flimsy wrist movements" },
   { minBase: 15, text: "Clumsily attempts blocks that usually miss the incoming steel" },
   { minBase: 12, text: "Treats his weapon as a club, forgetting it can deflect" },
   { minBase: 10, text: "Often flinches instead of raising a proper guard" },
+  { minBase: 8, text: "Barely moves his weapon until the blade is already cutting his flesh" },
   { minBase: 7, text: "Carelessly taking blows that he could avoid" },
   { minBase: 5, text: "Is often fooled by a feint" },
   { minBase: 2, text: "Is easily tricked into opening his own throat" },
@@ -272,18 +300,24 @@ const BAD_PAR_LOW: StatementEntry[] = [
 ];
 
 const BAD_DEF_HIGH: StatementEntry[] = [
+  { minBase: 17, text: "Lurches into the path of fatal thrusts like a blind man on a battlefield" },
   { minBase: 15, text: "Stumbles around the arena like a drunken brute" },
+  { minBase: 14, text: "Stands like a statue, eagerly awaiting the butcher's block" },
   { minBase: 12, text: "Prefers to absorb blows rather than step out of the way" },
+  { minBase: 11, text: "Lumbers blindly into strikes that a child could dodge" },
   { minBase: 10, text: "His footwork is dangerously uncoordinated and slow" },
+  { minBase: 8, text: "Turns his unarmored back to the enemy far too often" },
   { minBase: 7, text: "Carelessly takes blows that he could avoid" },
   { minBase: 5, text: "Is often fooled by a feint" },
   { minBase: 2, text: "Constantly trips over his own feet" },
   { minBase: 0, text: "He is constantly making mistakes" },
 ];
 const BAD_DEF_LOW: StatementEntry[] = [
+  { minBase: 17, text: "Makes no effort to move from the inevitable path of execution" },
   { minBase: 15, text: "Presents a massive, unmoving target for butchery" },
   { minBase: 12, text: "Rarely attempts to dodge, inviting severe wounds" },
   { minBase: 10, text: "Simply walks into his opponent's deadliest strikes" },
+  { minBase: 8, text: "Lacks any sense of spacing, letting foes press right up to his throat" },
   { minBase: 7, text: "Stands around making himself a target" },
   { minBase: 5, text: "He makes mistakes" },
   { minBase: 2, text: "Seems almost eager to be slaughtered" },
@@ -291,18 +325,23 @@ const BAD_DEF_LOW: StatementEntry[] = [
 ];
 
 const BAD_END_HIGH: StatementEntry[] = [
+  { minBase: 17, text: "Thrashes like a dying beast until his lungs bleed" },
   { minBase: 15, text: "Burns out in a flash of mindless, exhausting rage" },
   { minBase: 12, text: "Exhausts himself swinging wildly at the air" },
   { minBase: 10, text: "Pushes his body past the breaking point out of pure ignorance" },
+  { minBase: 8, text: "Completely ruins his own late-bout chances by flailing early" },
   { minBase: 7, text: "And he doesn't conserve his endurance" },
   { minBase: 5, text: "He doesn't think about resting as much as he should" },
   { minBase: 2, text: "Spends all his energy on useless, panicked movements" },
   { minBase: 0, text: "Often wastes his endurance thoughtlessly" },
 ];
 const BAD_END_LOW: StatementEntry[] = [
+  { minBase: 17, text: "A guaranteed casualty if the bout extends past the early exchanges" },
   { minBase: 15, text: "Collapses from fatigue after throwing too many clumsy strikes" },
+  { minBase: 14, text: "Heaves for air like a dying beast before the first drop of blood is spilled" },
   { minBase: 12, text: "Gasps for air while completely ignoring the pace of the duel" },
   { minBase: 10, text: "Has no concept of pacing, ensuring an early collapse" },
+  { minBase: 8, text: "Dooms himself to an exhausted, humiliating slaughter" },
   { minBase: 7, text: "He fails to husband strength when tired" },
   { minBase: 5, text: "Often wastes his endurance thoughtlessly" },
   { minBase: 2, text: "Will literally work himself to death for no reason" },

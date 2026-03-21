@@ -9,13 +9,79 @@ const KEY_TOUR = "sl.metrics.style.tournaments";
 type Bucket = { w: number; l: number; k: number; pct: number; fights: number };
 type RollingBucket = { W: number; L: number; K: number; fights: number };
 
+// ── Validation ────────────────────────────────────────────────────────────
+
+function isBucket(o: any): o is Bucket {
+  return (
+    o &&
+    typeof o.w === 'number' &&
+    typeof o.l === 'number' &&
+    typeof o.k === 'number' &&
+    typeof o.pct === 'number' &&
+    typeof o.fights === 'number'
+  );
+}
+
+function isRollingBucket(o: any): o is RollingBucket {
+  return (
+    o &&
+    typeof o.W === 'number' &&
+    typeof o.L === 'number' &&
+    typeof o.K === 'number' &&
+    typeof o.fights === 'number'
+  );
+}
+
+function validateWeekRecord(o: any): Record<string, Bucket> {
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return {};
+  const res: Record<string, Bucket> = {};
+  for (const key in o) {
+    if (isBucket(o[key])) res[key] = o[key];
+  }
+  return res;
+}
+
+function validateRollingRecord(o: any): Record<string, RollingBucket[]> {
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return {};
+  const res: Record<string, RollingBucket[]> = {};
+  for (const key in o) {
+    if (Array.isArray(o[key])) {
+      const arr = o[key].filter(isRollingBucket);
+      if (arr.length > 0) res[key] = arr;
+    }
+  }
+  return res;
+}
+
+function validateTourRecord(o: any): Record<string, Record<string, RollingBucket>> {
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return {};
+  const res: Record<string, Record<string, RollingBucket>> = {};
+  for (const tourId in o) {
+    const tourData = o[tourId];
+    if (tourData && typeof tourData === 'object' && !Array.isArray(tourData)) {
+      const validatedStyles: Record<string, RollingBucket> = {};
+      for (const style in tourData) {
+        if (isRollingBucket(tourData[style])) {
+          validatedStyles[style] = tourData[style];
+        }
+      }
+      if (Object.keys(validatedStyles).length > 0) {
+        res[tourId] = validatedStyles;
+      }
+    }
+  }
+  return res;
+}
+
 // ── Week-based rollups ────────────────────────────────────────────────────
 
 function loadWeek(week: number): Record<string, Bucket> {
   if (typeof localStorage === 'undefined') return {};
   try {
     const raw = localStorage.getItem(`${KEY_WEEK}_${week}`);
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return validateWeekRecord(parsed);
   } catch {
     return {};
   }
@@ -37,7 +103,10 @@ function ensure(style: string, m: Record<string, Bucket>): Bucket {
 function loadRolling(): Record<string, RollingBucket[]> {
   if (typeof localStorage === 'undefined') return {};
   try {
-    return JSON.parse(localStorage.getItem(KEY_ROLLING) || "{}");
+    const raw = localStorage.getItem(KEY_ROLLING);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return validateRollingRecord(parsed);
   } catch {
     return {};
   }
@@ -51,7 +120,10 @@ function saveRolling(m: Record<string, RollingBucket[]>) {
 function loadTour(): Record<string, Record<string, RollingBucket>> {
   if (typeof localStorage === 'undefined') return {};
   try {
-    return JSON.parse(localStorage.getItem(KEY_TOUR) || "{}");
+    const raw = localStorage.getItem(KEY_TOUR);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return validateTourRecord(parsed);
   } catch {
     return {};
   }

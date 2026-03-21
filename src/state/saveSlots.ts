@@ -4,7 +4,7 @@
  */
 import type { GameState } from "@/types/game";
 import { z } from "zod";
-import { migrateGameState } from "./gameStore";
+import { migrateGameState, sanitizeReviver } from "./gameStore";
 
 const SLOTS_INDEX_KEY = "stablelords.slots";
 const SLOT_PREFIX = "stablelords.slot.";
@@ -28,7 +28,7 @@ export interface SaveSlotMeta {
 export function listSaveSlots(): SaveSlotMeta[] {
   try {
     const raw = localStorage.getItem(SLOTS_INDEX_KEY);
-    if (raw) return JSON.parse(raw) as SaveSlotMeta[];
+    if (raw) return JSON.parse(raw, sanitizeReviver) as SaveSlotMeta[];
   } catch { /* corrupt */ }
   return [];
 }
@@ -74,7 +74,7 @@ export function loadFromSlot(slotId: string): GameState | null {
   try {
     const raw = localStorage.getItem(`${SLOT_PREFIX}${slotId}`);
     if (raw) {
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw, sanitizeReviver);
       if (parsed?.meta) {
         return migrateGameState(parsed);
       }
@@ -120,7 +120,7 @@ export function migrateLegacySave(): void {
   try {
     const raw = localStorage.getItem(LEGACY_KEY);
     if (!raw) return;
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw, sanitizeReviver);
     if (!parsed?.meta) return;
 
     const slotId = "slot_legacy";
@@ -200,7 +200,7 @@ const AnySaveSchema = z.union([
 export function parseImportedSave(json: string): GameState {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(json);
+    parsed = JSON.parse(json, sanitizeReviver);
   } catch {
     throw new Error("Invalid file — could not parse JSON.");
   }
@@ -261,7 +261,7 @@ export function loadOwners(): OwnerPersist[] {
   try {
     const raw = localStorage.getItem(OWNERS_KEY);
     if (!raw) return [];
-    const arr = JSON.parse(raw);
+    const arr = JSON.parse(raw, sanitizeReviver);
     return Array.isArray(arr) ? arr : [];
   } catch {
     return [];

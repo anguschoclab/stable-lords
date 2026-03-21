@@ -5,12 +5,6 @@ import PhysicalsSimulator from '../../pages/PhysicalsSimulator';
 // Mocking getBoundingClientRect for Radix UI select and slider
 // This is often needed in JSDOM when rendering complex UI components
 beforeAll(() => {
-  global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-
   Element.prototype.getBoundingClientRect = vi.fn(() => ({
     width: 0, height: 0, top: 0, left: 0, bottom: 0, right: 0,
     x: 0, y: 0, toJSON: () => {},

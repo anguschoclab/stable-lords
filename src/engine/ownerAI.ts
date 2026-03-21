@@ -480,7 +480,7 @@ function generateAIRecruit(rival: RivalStableData, week: number, meta?: StyleMet
   const name = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
 
   return {
-    id: `ai_recruit_${rival.owner.id}_${week}_${Math.floor(Math.random() * 1e6)}`,
+    id: crypto.randomUUID(),
     name,
     style,
     attributes: attrs,

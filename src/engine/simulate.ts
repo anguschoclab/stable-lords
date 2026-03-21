@@ -19,6 +19,7 @@ import {
   type TrainerData,
   type OffensiveTactic,
   type DefensiveTactic,
+  type DeathCauseBucket,
 } from "@/types/game";
 import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
 import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
@@ -95,6 +96,9 @@ function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): numb
   return MATCHUP_MATRIX[ai][di];
 }
 
+import { computeHitDamage, applyProtectMod, rollHitLocation } from "./combat/combatDamage";
+import { enduranceCost, fatiguePenalty } from "./combat/combatFatigue";
+
 // ─── Phase detection ──────────────────────────────────────────────────────
 type Phase = "OPENING" | "MID" | "LATE";
 /**
@@ -107,6 +111,8 @@ type Phase = "OPENING" | "MID" | "LATE";
  */
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const ratio = exchange / maxExchanges;
+  const PHASE_OPENING_THRESHOLD = 0.25;
+  const PHASE_MID_THRESHOLD = 0.65;
   if (ratio < PHASE_OPENING_THRESHOLD) return "OPENING";
   if (ratio < PHASE_MID_THRESHOLD) return "MID";
   return "LATE";
@@ -119,7 +125,8 @@ function pickText(rng: () => number, texts: string[]): string {
 }
 
 
-type HitLocation = typeof HIT_LOCATIONS[number];
+export const HIT_LOCATIONS = ["head", "chest", "abdomen", "left arm", "right arm", "left leg", "right leg"] as const;
+export type HitLocation = typeof HIT_LOCATIONS[number];
 
 /** Maps a grouped protect target to the granular hit locations it covers */
 /**
@@ -266,8 +273,12 @@ const FATIGUE_HEAVY_THRESHOLD = 0.25;
 const OE_ATT_SCALING = 0.7;            // Attack bonus per OE point above 5
 const OE_DEF_SCALING = 0.5;            // Defense penalty per OE point above 6
 const AL_INI_SCALING = 0.6;            // Initiative bonus per AL point above 5
+const ENDURANCE_OE_SCALING = 0.5;      // Endurance cost per OE point
+const ENDURANCE_AL_SCALING = 0.5;      // Endurance cost per AL point
 
 // Fatigue thresholds and penalties
+const FATIGUE_MODERATE_THRESHOLD = 0.6; // Endurance ratio for moderate fatigue
+const FATIGUE_HEAVY_THRESHOLD = 0.3;    // Endurance ratio for heavy fatigue
 const FATIGUE_COLLAPSE_THRESHOLD = 0.1; // Endurance ratio for near-collapse
 const FATIGUE_MODERATE_PENALTY = -2;    // Skill penalty at moderate fatigue
 const FATIGUE_HEAVY_PENALTY = -4;       // Skill penalty at heavy fatigue
@@ -281,6 +292,7 @@ const DAMAGE_ABDOMEN_MULT = 1.1;       // Abdomen hit damage multiplier
 const DAMAGE_LIMB_MULT = 0.8;          // Limb hit damage multiplier
 const DAMAGE_VARIANCE_MIN = 0.7;       // Minimum damage variance
 const DAMAGE_VARIANCE_MAX = 1.3;       // Maximum damage variance (MIN + 0.6)
+
 
 // Equipment weight thresholds
 const HEAVY_WEAPON_THRESHOLD_1 = 5;    // First heavy weapon damage bonus (≥5 weight)
@@ -339,24 +351,8 @@ function oeAttMod(oe: number, style?: FightingStyle): number {
 }
 function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * OE_DEF_SCALING); }
 function alIniMod(al: number): number { return Math.floor((al - 5) * AL_INI_SCALING); }
-function enduranceCost(oe: number, al: number): number {
-  // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
-  // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
-  return Math.max(1, Math.round((oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING)));
-}
-
-// ─── Fatigue Penalties ────────────────────────────────────────────────────
-function fatiguePenalty(endurance: number, maxEndurance: number): number {
-  const ratio = endurance / maxEndurance;
-  if (ratio > FATIGUE_MODERATE_THRESHOLD) return 0;
-  if (ratio > FATIGUE_HEAVY_THRESHOLD) return FATIGUE_MODERATE_PENALTY;
-  if (ratio > FATIGUE_COLLAPSE_THRESHOLD) return FATIGUE_HEAVY_PENALTY;
-  return FATIGUE_COLLAPSE_PENALTY;
-}
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
-
-
 // ─── Equipment Bonuses ────────────────────────────────────────────────────
 function getEquipmentMods(loadout: EquipmentLoadout, carryCap: number) {
   const weapon = getItemById(loadout.weapon);
@@ -863,7 +859,7 @@ function applyDamageAndCheckKill(
   let ended = false;
   let winner = null;
   let by = null;
-  let causeBucket: any = undefined;
+  let causeBucket: DeathCauseBucket | undefined = undefined;
   let fatalHitLocation = undefined;
   let fatalExchangeIndex = undefined;
 
@@ -1078,7 +1074,7 @@ export function simulateFight(
   trainers?: TrainerData[]
 ): FightOutcome {
   // getSecureSeed is undefined in Node environments without crypto
-  const secureSeed = typeof globalThis !== "undefined" && (globalThis as any).crypto ? (globalThis as any).crypto.getRandomValues(new Uint32Array(1))[0] : Math.floor(Math.random() * 0xFFFFFFFF);
+  const secureSeed = typeof globalThis !== "undefined" && globalThis.crypto ? globalThis.crypto.getRandomValues(new Uint32Array(1))[0] : Math.floor(Math.random() * 0xFFFFFFFF);
   const rng = mulberry32(seed ?? (Date.now() ^ secureSeed));
 
   const matchData = initializeMatchData(planA, planD, warriorA, warriorD, trainers);

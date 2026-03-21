@@ -371,7 +371,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
     philosophy: "Brute Force",
     preferredStyles: [FightingStyle.BashingAttack, FightingStyle.LungingAttack, FightingStyle.StrikingAttack],
     attrBias: { ST: 3, WL: 3, CN: 1 },
-    warriorNames: ["CONVICT", "CHAIN", "SHACKLE", "LOCKJAW", "GALLOWS", "FELON", "PAROLE", "CELL", "BARS", "BRAND", "EXILE", "OUTCAST"],
+    warriorNames: ["CONVICT", "CHAIN", "SHACKLE", "LOCKJAW", "GALLOWS", "FELON", "PAROLE", "CELL", "BARS", "BRAND", "EXILE", "OUTCAST", "NOOSE", "INMATE", "LIFER", "WARD", "GUILTY", "DUNGEON", "MANACLE", "TETHER", "CONDEMNED", "FUGITIVE", "VILLAIN", "RUFFIAN", "SCOUNDREL", "SINNER", "THIEF", "ROBBER", "BRUTE", "SMUGGLER"],
     fameRange: [0, 2],
     rosterRange: [6, 9],
     tier: "Minor",
