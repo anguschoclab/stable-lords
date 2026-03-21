@@ -400,7 +400,7 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
 function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHistory: FightSummary[] }) {
   const milestones = useMemo(() => {
     const events: { week: number; label: string; icon: React.ReactNode; color: string }[] = [];
-    const fights = arenaHistory.filter(f => f.a === displayWarrior.name || f.d === displayWarrior.name);
+    const fights = arenaHistory.filter(f => f.a === warrior.name || f.d === warrior.name);
     // Sort chronologically
     const sorted = [...fights].sort((a, b) => a.week - b.week);
 
