@@ -428,7 +428,7 @@ function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHist
     }
 
     // Championship
-    if (displayWarrior.champion) {
+    if (warrior.champion) {
       const champFight = sorted.find(f => f.tournamentId && (
         (f.a === displayWarrior.name && f.winner === "A") || (f.d === displayWarrior.name && f.winner === "D")
       ));
