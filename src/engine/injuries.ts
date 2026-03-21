@@ -52,6 +52,8 @@ const SEVERITY_WEEKS: Record<InjurySeverity, [number, number]> = {
   Minor: [1, 3],
   Moderate: [3, 6],
   Severe: [6, 12],
+  Critical: [12, 24],
+  Permanent: [999, 999],
 };
 
 /** Roll for a possible injury after a fight. Returns an Injury or null. */

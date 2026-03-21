@@ -386,7 +386,7 @@ export default function WorldOverview() {
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Link
-                          to={row.isPlayer ? "/" : `/stable/${row.stableId}`}
+                          to={row.isPlayer ? "/" : `/stable/${row.stableId}` as any}
                           className="text-sm text-muted-foreground hover:text-primary transition-colors"
                         >
                           {row.stableName}
