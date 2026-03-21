@@ -334,6 +334,7 @@ function generateFightSummary(
   const fightSummary: FightSummary = {
     id: `fight_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     week,
+    phase: "resolution",
     title: `${warrior.name} vs ${opponent.name}`,
     a: warrior.name,
     d: opponent.name,

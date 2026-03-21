@@ -411,6 +411,7 @@ export default function Tournaments() {
         const summary: FightSummary = {
           id: bout.fightId,
           week: state.week,
+          phase: "resolution",
           tournamentId: currentTournament.id,
           title: `${bout.a} vs ${bout.d}`,
           a: bout.a,

@@ -24,12 +24,7 @@ const PERSONALITY_PLAN_MODS: Record<OwnerPersonality, Partial<FightPlan>> = {
   Pragmatic:   { OE: 0, AL: 0, killDesire: 0 },
   Tactician:   { OE: -1, AL: 1, killDesire: -2 },
 };
-import { processAIRosterManagement as _processAIRosterManagement } from "./ownerRoster";
-import { generateOwnerNarratives as _generateOwnerNarratives } from "./ownerNarrative";
-import { evolvePhilosophies as _evolvePhilosophies } from "./ownerPhilosophy";
-export { _processAIRosterManagement as processAIRosterManagement };
-export { _generateOwnerNarratives as generateOwnerNarratives };
-export { _evolvePhilosophies as evolvePhilosophies };
+// Re-imports removed — these functions are defined in this file below.
 
 /** Philosophy modifiers — layered on top of personality */
 function calculateRecentRecord(recentFights: import("@/types/game").FightSummary[], rosterNames: Set<string>) {
