@@ -114,7 +114,7 @@ describe("Trainers Component", () => {
     const poolRow = poolElement.closest(".relative")!;
 
     // Find and click the Hire button. Note: "Hire" is also the name of the tab trigger, so use within()
-    const hireBtn = within(poolRow).getByRole("button", { name: /hire/i });
+    const hireBtn = within(poolRow as HTMLElement).getByRole("button", { name: /hire/i });
     fireEvent.click(hireBtn);
 
     // Test that the Hire button within the pool row is gone (the trainer was removed from the pool)
