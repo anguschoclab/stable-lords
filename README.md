@@ -1,5 +1,7 @@
 # Stable Lords
 
+> _Last verified commit test: 2026-03-21_
+
 **Stable Lords** is a tactical combat management game inspired by Duelmasters. Manage your stable of warriors, train fighting styles, and compete in the arena!
 
 ## Features
