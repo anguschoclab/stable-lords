@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { generateMatchCard, addRestState, clearExpiredRest, runAIvsAIBouts } from '../engine/matchmaking';
-import type { GameState, Warrior, RivalStableData, RestState, Rivalry, MatchRecord, Stable } from '../types/game';
+import type { GameState, Warrior, RivalStableData, RestState, Rivalry, MatchRecord } from '../types/game';
 import type { Injury } from '../engine/injuries';
 
 // Import FightingStyle to use a valid one
