@@ -43,8 +43,8 @@ export default function StableDetail() {
     );
   }
 
-  const activeRoster = rival.roster.filter(w => w.status === "Active");
-  const deadWarriors = rival.roster.filter(w => w.status === "Dead");
+  const activeRoster = rival.roster.filter(isActive);
+  const deadWarriors = rival.roster.filter(isDead);
   const { wins: totalWins, losses: totalLosses, kills: totalKills } = rival.roster.reduce(
     (acc, w) => ({
       wins: acc.wins + w.career.wins,
