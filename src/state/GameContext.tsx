@@ -141,4 +141,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export { useGame };
+export function useGame() {
+  const context = useContext(GameContext);
+  if (!context) {
+    throw new Error("useGame must be used within a GameProvider");
+  }
+  return context;
+}

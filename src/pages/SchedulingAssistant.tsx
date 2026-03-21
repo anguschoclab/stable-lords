@@ -7,8 +7,6 @@ import { StatBadge } from "@/components/ui/StatBadge";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Swords, Flame, Skull, Heart, Eye, Target, AlertTriangle, Shield } from "lucide-react";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
-import { StatBadge } from "@/components/ui/StatBadge";
 import { getRecommendedChallenges, getMatchupsToAvoid, type MatchupScore } from "@/engine/schedulingAssistant";
 import { isTooInjuredToFight } from "@/engine/injuries";
 
