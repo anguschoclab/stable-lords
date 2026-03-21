@@ -14,6 +14,7 @@ import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import { commentatorFor, recapLine, blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
 import { rollForInjury, isTooInjuredToFight, type Injury } from "@/engine/injuries";
+import { isFightReady } from "@/engine/warriorStatus";
 import { calculateXP, applyXP } from "@/engine/progression";
 import { checkDiscovery } from "@/engine/favorites";
 import { WEAPONS } from "@/data/equipment";
@@ -75,11 +76,7 @@ export function generatePairings(state: GameState): BoutPairing[] {
     }
   } else {
     // Fallback: internal matchmaking
-    const activeWarriors = state.roster.filter(w => {
-      if (w.status !== "Active") return false;
-      const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-      return !isTooInjuredToFight(injObjs);
-    });
+    const activeWarriors = state.roster.filter(w => isFightReady(w));
     const paired = new Set<string>();
     for (let i = 0; i < activeWarriors.length; i++) {
       if (paired.has(activeWarriors[i].id)) continue;

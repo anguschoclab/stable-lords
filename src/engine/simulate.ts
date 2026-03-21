@@ -24,7 +24,9 @@ import { computeBaseSkills, computeDerivedStats } from "./skillCalc";
 import { getItemById, type EquipmentLoadout, DEFAULT_LOADOUT, getLoadoutWeight, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
 import { getTrainingBonus, TRAINER_FOCUSES, type TrainerFocus } from "@/engine/trainers";
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "./tacticSuitability";
-import { computeHitDamage } from "./combat/combatDamage";
+import { computeHitDamage, rollHitLocation, applyProtectMod, protectCovers, HIT_LOCATIONS, type HitLocation } from "./combat/combatDamage";
+import { enduranceCost, fatiguePenalty } from "./combat/combatFatigue";
+import { mulberry32, skillCheck, contestCheck, getPhase as getCombatPhase } from "./combat/combatMath";
 import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "./stylePassives";
 import { getFavoriteWeaponBonus, getFavoriteRhythmBonus } from "./favorites";
 import {
@@ -44,14 +46,7 @@ import {
  * @param seed - The initial seed value.
  * @returns A function that generates a pseudo-random float between 0 (inclusive) and 1 (exclusive).
  */
-function mulberry32(seed: number) {
-  return () => {
-    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+// mulberry32 imported from combat/combatMath
 
 // ─── Style Matchup Matrix (from spec) ─────────────────────────────────────
 const STYLE_ORDER = [
@@ -97,70 +92,19 @@ function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): numb
 
 // ─── Phase detection ──────────────────────────────────────────────────────
 type Phase = "OPENING" | "MID" | "LATE";
-/**
- * Determines the current phase of the fight based on the exchange ratio.
- * Used to trigger phase-specific passive abilities and narrative events.
- *
- * @param exchange - The current exchange number.
- * @param maxExchanges - The maximum expected exchanges for the bout.
- * @returns The string literal representing the current phase ("OPENING", "MID", or "LATE").
- */
+// Phase detection uses getCombatPhase from combat/combatMath, mapped to uppercase
 function getPhase(exchange: number, maxExchanges: number): Phase {
-  const ratio = exchange / maxExchanges;
-  if (ratio < PHASE_OPENING_THRESHOLD) return "OPENING";
-  if (ratio < PHASE_MID_THRESHOLD) return "MID";
-  return "LATE";
+  const p = getCombatPhase(exchange, maxExchanges);
+  return p.toUpperCase() as Phase;
 }
 
-// ─── Legacy narrative helpers (replaced by narrativePBP.ts) ───────────────
-// Kept as fallback only
+// pickText kept as simple local helper
 function pickText(rng: () => number, texts: string[]): string {
   return texts[Math.floor(rng() * texts.length)];
 }
 
-
-type HitLocation = typeof HIT_LOCATIONS[number];
-
-/** Maps a grouped protect target to the granular hit locations it covers */
-/**
- * Expands a general protection target (e.g., "head", "body", "arms", "legs", "vital")
- * into a list of specific `HitLocation` strings it covers.
- *
- * @param protect - The generalized body part targeted for protection by the defender's tactic.
- * @returns An array of specific hit locations covered by the protection, or an empty array if none.
- */
-function protectCovers(protect?: string): string[] {
-  if (!protect || protect === "Any") return [];
-  const p = protect.toLowerCase();
-  if (p === "head") return ["head"];
-  if (p === "body") return ["chest", "abdomen"];
-  if (p === "arms") return ["right arm", "left arm"];
-  if (p === "legs") return ["right leg", "left leg"];
-  return [];
-}
-
-function rollHitLocation(rng: () => number, target?: string, protect?: string): HitLocation {
-  if (target && target !== "Any") {
-    const t = target.toLowerCase() as HitLocation;
-    if (HIT_LOCATIONS.includes(t)) {
-      const covered = protectCovers(protect);
-      const hitChance = covered.includes(t) ? TARGET_MISS_CHANCE : TARGET_HIT_CHANCE;
-      if (rng() < hitChance) return t;
-    }
-  }
-  return HIT_LOCATIONS[Math.floor(rng() * HIT_LOCATIONS.length)];
-}
-
-/** Protect reduces damage on covered locations but increases damage taken elsewhere */
-function applyProtectMod(damage: number, location: HitLocation, protect?: string): number {
-  if (!protect || protect === "Any") return damage;
-  const covered = protectCovers(protect);
-  if (covered.includes(location)) {
-    return Math.max(1, Math.round(damage * PROTECT_DAMAGE_REDUCTION));
-  } else {
-    return Math.round(damage * PROTECT_DAMAGE_PENALTY);
-  }
-}
+// HitLocation, HIT_LOCATIONS, protectCovers, rollHitLocation, applyProtectMod
+// all imported from combat/combatDamage
 
 // ─── Tactic Modifiers ─────────────────────────────────────────────────────
 function getOffensiveTacticMods(tactic: OffensiveTactic | undefined, style: FightingStyle) {
@@ -218,19 +162,7 @@ interface FighterState {
   legHits: number;
 }
 
-// ─── Skill Checks ─────────────────────────────────────────────────────────
-function skillCheck(rng: () => number, skill: number, modifier: number = 0): boolean {
-  // Roll under: skill + modifier > d20
-  const roll = Math.floor(rng() * 20) + 1;
-  return roll <= skill + modifier;
-}
-
-function contestCheck(rng: () => number, a: number, d: number, modA: number = 0, modD: number = 0): boolean {
-  // True if A wins. Higher effective skill + roll wins.
-  const rollA = Math.floor(rng() * 20) + 1 + a + modA;
-  const rollD = Math.floor(rng() * 20) + 1 + d + modD;
-  return rollA > rollD;
-}
+// skillCheck and contestCheck imported from combat/combatMath
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
 
@@ -243,44 +175,12 @@ const GLOBAL_PAR_PENALTY = -2;
 /** Initiative winner gets a pressing advantage to reward aggressive styles */
 const INITIATIVE_PRESS_BONUS = 1;
 
-// Phase detection thresholds
-const PHASE_OPENING_THRESHOLD = 0.25;
-const PHASE_MID_THRESHOLD = 0.65;
-
-// Target & Protect mechanics
-const HIT_LOCATIONS = ["head", "chest", "abdomen", "right arm", "left arm", "right leg", "left leg"] as const;
-const TARGET_HIT_CHANCE = 0.7;
-const TARGET_MISS_CHANCE = 0.3;
-const PROTECT_DAMAGE_REDUCTION = 0.5;
-const PROTECT_DAMAGE_PENALTY = 1.15;
-
-// Endurance scaling
-const ENDURANCE_OE_SCALING = 0.5;
-const ENDURANCE_AL_SCALING = 0.3;
-
-// Fatigue thresholds
-const FATIGUE_MODERATE_THRESHOLD = 0.5;
-const FATIGUE_HEAVY_THRESHOLD = 0.25;
+// Phase thresholds, HIT_LOCATIONS, target/protect constants now in combat/ modules
 
 // OE/AL Modifiers
-const OE_ATT_SCALING = 0.7;            // Attack bonus per OE point above 5
-const OE_DEF_SCALING = 0.5;            // Defense penalty per OE point above 6
-const AL_INI_SCALING = 0.6;            // Initiative bonus per AL point above 5
-
-// Fatigue thresholds and penalties
-const FATIGUE_COLLAPSE_THRESHOLD = 0.1; // Endurance ratio for near-collapse
-const FATIGUE_MODERATE_PENALTY = -2;    // Skill penalty at moderate fatigue
-const FATIGUE_HEAVY_PENALTY = -4;       // Skill penalty at heavy fatigue
-const FATIGUE_COLLAPSE_PENALTY = -7;    // Skill penalty at collapse
-
-// Damage calculations
-const DAMAGE_BASE_MIN = 1;             // Minimum damage class offset
-const DAMAGE_HEAD_MULT = 1.5;          // Head hit damage multiplier
-const DAMAGE_CHEST_MULT = 1.2;         // Chest hit damage multiplier
-const DAMAGE_ABDOMEN_MULT = 1.1;       // Abdomen hit damage multiplier
-const DAMAGE_LIMB_MULT = 0.8;          // Limb hit damage multiplier
-const DAMAGE_VARIANCE_MIN = 0.7;       // Minimum damage variance
-const DAMAGE_VARIANCE_MAX = 1.3;       // Maximum damage variance (MIN + 0.6)
+const OE_ATT_SCALING = 0.7;
+const OE_DEF_SCALING = 0.5;
+const AL_INI_SCALING = 0.6;
 
 // Equipment weight thresholds
 const HEAVY_WEAPON_THRESHOLD_1 = 5;    // First heavy weapon damage bonus (≥5 weight)
@@ -339,20 +239,7 @@ function oeAttMod(oe: number, style?: FightingStyle): number {
 }
 function oeDefMod(oe: number): number { return -Math.floor(Math.max(0, oe - 6) * OE_DEF_SCALING); }
 function alIniMod(al: number): number { return Math.floor((al - 5) * AL_INI_SCALING); }
-function enduranceCost(oe: number, al: number): number {
-  // BALANCE v6: Lower base cost (so low-OE styles are more efficient) but higher OE scaling
-  // OE 3 → cost ~2, OE 7 → cost ~4, OE 10 → cost ~6
-  return Math.max(1, Math.round((oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING)));
-}
-
-// ─── Fatigue Penalties ────────────────────────────────────────────────────
-function fatiguePenalty(endurance: number, maxEndurance: number): number {
-  const ratio = endurance / maxEndurance;
-  if (ratio > FATIGUE_MODERATE_THRESHOLD) return 0;
-  if (ratio > FATIGUE_HEAVY_THRESHOLD) return FATIGUE_MODERATE_PENALTY;
-  if (ratio > FATIGUE_COLLAPSE_THRESHOLD) return FATIGUE_HEAVY_PENALTY;
-  return FATIGUE_COLLAPSE_PENALTY;
-}
+// enduranceCost and fatiguePenalty imported from combat/combatFatigue
 
 // ─── Damage Calculation ──────────────────────────────────────────────────
 

@@ -2,7 +2,8 @@ import React, { useState, useMemo, useCallback } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { advanceWeek } from "@/state/gameStore";
 import { generateMatchCard } from "@/engine/matchmaking";
-import { isTooInjuredToFight, type Injury } from "@/engine/injuries";
+import { isFightReady } from "@/engine/warriorStatus";
+import { type Injury } from "@/engine/injuries";
 import { processWeekBouts, generatePairings, type BoutResult } from "@/engine/boutProcessor";
 import { runAutosim, type AutosimResult, type WeekSummary } from "@/engine/autosim";
 import type { Warrior } from "@/types/game";
@@ -26,11 +27,7 @@ export default function RunRound() {
   const [autosimProgress, setAutosimProgress] = useState<{ current: number; total: number; lastSummary?: WeekSummary } | null>(null);
   const [autosimResult, setAutosimResult] = useState<AutosimResult | null>(null);
 
-  const fightReady = state.roster.filter(w => {
-    if (w.status !== "Active") return false;
-    const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-    return !isTooInjuredToFight(injObjs);
-  });
+  const fightReady = state.roster.filter(isFightReady);
   const tooInjuredCount = state.roster.filter(w => w.status === "Active").length - fightReady.length;
   const inTrainingCount = (state.trainingAssignments || []).length;
 

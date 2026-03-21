@@ -6,6 +6,7 @@ import type { GameState } from "@/types/game";
 import { advanceWeek } from "@/state/gameStore";
 import { processWeekBouts, generatePairings, type WeekBoutSummary } from "@/engine/boutProcessor";
 import { isTooInjuredToFight, type Injury } from "@/engine/injuries";
+import { isFightReady } from "@/engine/warriorStatus";
 
 export type StopReason =
   | "death"
@@ -61,11 +62,7 @@ export async function runAutosim(
 
     // Check pairings exist
     const pairings = generatePairings(currentState);
-    const fightReady = currentState.roster.filter(w => {
-      if (w.status !== "Active") return false;
-      const injObjs = (w.injuries || []).filter((inj): inj is Injury => typeof inj !== "string");
-      return !isTooInjuredToFight(injObjs);
-    });
+    const fightReady = currentState.roster.filter(isFightReady);
     if (pairings.length === 0 && fightReady.length < 2) {
       return {
         finalState: currentState,
