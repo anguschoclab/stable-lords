@@ -836,7 +836,7 @@ export default function WarriorDetail() {
                       <div className="text-xs text-muted-foreground">Carry Cap</div>
                       <div className="text-lg font-bold">{displayWarrior.derivedStats.encumbrance}</div>
                       <div className="text-[10px] text-muted-foreground">
-                        {ENCUMBRANCE_LABELS[computeEncumbranceClass(displayWarrior.attributes.ST, displayWarrior.attributes.CN)]}
+                        {ENCUMBRANCE_LABELS[computeEncumbranceClass(warrior.attributes.ST, warrior.attributes.CN)]}
                       </div>
                     </div>
                   </div>
