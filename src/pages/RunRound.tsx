@@ -27,11 +27,7 @@ export default function RunRound() {
   const [autosimProgress, setAutosimProgress] = useState<{ current: number; total: number; lastSummary?: WeekSummary } | null>(null);
   const [autosimResult, setAutosimResult] = useState<AutosimResult | null>(null);
 
-  const fightReady = state.roster.filter(w => {
-    if (w.status !== "Active") return false;
-    const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-    return !isTooInjuredToFight(injObjs);
-  });
+  const fightReady = state.roster.filter(isFightReady);
   const tooInjuredCount = state.roster.filter(w => w.status === "Active").length - fightReady.length;
   const inTrainingCount = (state.trainingAssignments || []).length;
 

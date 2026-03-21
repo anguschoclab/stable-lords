@@ -75,11 +75,7 @@ export function generatePairings(state: GameState): BoutPairing[] {
     }
   } else {
     // Fallback: internal matchmaking
-    const activeWarriors = state.roster.filter(w => {
-      if (w.status !== "Active") return false;
-      const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-      return !isTooInjuredToFight(injObjs);
-    });
+    const activeWarriors = state.roster.filter(w => isFightReady(w));
     const paired = new Set<string>();
     for (let i = 0; i < activeWarriors.length; i++) {
       if (paired.has(activeWarriors[i].id)) continue;

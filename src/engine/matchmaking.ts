@@ -21,9 +21,7 @@ function disallowStablemates(aStableId: string, dStableId: string): boolean {
 // ─── Eligibility ──────────────────────────────────────────────────────────
 
 function isEligible(w: Warrior, week: number, restMap: Map<string, number>, trainingIds: Set<string>): boolean {
-  if (w.status !== "Active") return false;
-  const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
-  if (isTooInjuredToFight(injObjs)) return false;
+  if (!isFightReady(w)) return false;
   const restUntil = restMap.get(w.id);
   if (restUntil && restUntil > week) return false;
   if (trainingIds.has(w.id)) return false;
