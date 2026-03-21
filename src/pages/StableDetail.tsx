@@ -5,6 +5,7 @@ import React, { useMemo } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
+import { isActive, isDead } from "@/engine/warriorStatus";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
