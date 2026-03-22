@@ -55,10 +55,10 @@ export function generateBalanceReport(result: AutosimResult): string {
   anomalies.push("### 1. Lethality");
   if (killRate < 8) {
     anomalies.push(`**Anomaly:** The Overall Kill Rate (${killRate.toFixed(2)}%) is below the target bounds (8% - 15%). Warriors are surviving too often.`);
-    anomalies.push("**Suggested Action:** \n- In `src/engine/simulate.ts`, consider increasing `KILL_THRESHOLD_BASE` (currently \`0.3\`) to \`0.4\` or \`0.5\` to widen the base kill window.\n- Alternatively, increase `KILL_DESIRE_SCALING` (currently \`0.04\`) to make high Kill Desire plans more lethal.");
+    anomalies.push("**Suggested Action:** \n- In `src/engine/simulate.ts`, consider increasing `KILL_THRESHOLD_BASE` (currently `0.3`) to `0.4` or `0.5` to widen the base kill window.\n- Alternatively, increase `KILL_DESIRE_SCALING` (currently `0.04`) to make high Kill Desire plans more lethal.");
   } else if (killRate > 15) {
     anomalies.push(`**Anomaly:** The Overall Kill Rate (${killRate.toFixed(2)}%) is above the target bounds (8% - 15%). The game is too lethal.`);
-    anomalies.push("**Suggested Action:** \n- In `src/engine/simulate.ts`, consider decreasing `KILL_THRESHOLD_BASE` (currently \`0.3\`) to reduce the base kill window.\n- Alternatively, decrease `KILL_DESIRE_SCALING` (currently \`0.04\`).");
+    anomalies.push("**Suggested Action:** \n- In `src/engine/simulate.ts`, consider decreasing `KILL_THRESHOLD_BASE` (currently `0.3`) to reduce the base kill window.\n- Alternatively, decrease `KILL_DESIRE_SCALING` (currently `0.04`).");
   } else {
     anomalies.push(`**Status:** Kill Rate is within target bounds (8% - 15%).`);
   }
@@ -68,10 +68,10 @@ export function generateBalanceReport(result: AutosimResult): string {
   anomalies.push("### 2. Economy");
   if (playerGold > 10000) {
     anomalies.push(`**Anomaly:** The Player Stable Wealth exhibits hyper-inflation (${playerGold} gold). There is insufficient gold sink or running costs compared to income.`);
-    anomalies.push("**Suggested Action:** \n- In `src/engine/economy.ts`, increase `WARRIOR_UPKEEP` (currently \`20\`) to scale costs with roster size.\n- Alternatively, introduce new gold sinks (e.g., baseline stable maintenance fees, healing costs, or equipment degradation).");
+    anomalies.push("**Suggested Action:** \n- In `src/engine/economy.ts`, increase `WARRIOR_UPKEEP` (currently `20`) to scale costs with roster size.\n- Alternatively, introduce new gold sinks (e.g., baseline stable maintenance fees, healing costs, or equipment degradation).");
   } else if (playerGold < 1000) {
     anomalies.push(`**Anomaly:** The Player Stable Wealth is very low (${playerGold} gold). The economy might be too punishing.`);
-    anomalies.push("**Suggested Action:** \n- Check income sources in `src/engine/economy.ts` (e.g. \`FIGHT_PURSE\` or \`WIN_BONUS\`).");
+    anomalies.push("**Suggested Action:** \n- Check income sources in `src/engine/economy.ts` (e.g. `FIGHT_PURSE` or `WIN_BONUS`).");
   } else {
     anomalies.push(`**Status:** Player Stable Wealth is relatively stable.`);
   }

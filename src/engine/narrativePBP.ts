@@ -530,11 +530,6 @@ const KILL_TEMPLATES = [
   "%D falls to the arena floor. The wound is mortal.\nSilence grips the crowd.",
   "%D stumbles to the ground!!!\n%D is slain!",
 ];
-const KO_TEMPLATES = [
-  "%D is knocked unconscious!\n%A stands victorious over their fallen foe.",
-  "%D collapses to the ground, out cold!\n%A raises a fist in triumph.",
-  "A devastating blow sends %D sprawling!\n%A wins by knockout!",
-];
 
 const STOPPAGE_TEMPLATES = [
   "%D motions to the other LORD PROTECTORS that he cannot continue!\n%A is the victor of the match!",

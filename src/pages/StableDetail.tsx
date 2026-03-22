@@ -15,6 +15,8 @@ import {
   ArrowLeft, Quote, Scroll, Dumbbell, Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge } from "@/components/ui/StatBadge";
 
 const TIER_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   Legendary: { label: "Legendary", color: "text-arena-gold border-arena-gold/40 bg-arena-gold/10", icon: Crown },
@@ -173,13 +175,9 @@ export default function StableDetail() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <WarriorLink name={w.name} id={w.id} className="font-display font-bold text-sm">
-                          {w.name}
-                        </WarriorLink>
+                        <WarriorNameTag name={w.name} id={w.id} />
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-[10px] h-5">
-                            {STYLE_DISPLAY_NAMES[w.style]}
-                          </Badge>
+                          <StatBadge styleName={w.style} showFullName variant="secondary" />
                           {w.age && (
                             <span className="text-[10px] text-muted-foreground">Age {w.age}</span>
                           )}
@@ -195,16 +193,8 @@ export default function StableDetail() {
 
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1">
-                          <Swords className="h-3 w-3 text-primary" />
-                          <span className="text-arena-pop">{w.career.wins}W</span>
-                          <span className="text-destructive">{w.career.losses}L</span>
-                        </span>
-                        {w.career.kills > 0 && (
-                          <span className="flex items-center gap-0.5 text-arena-blood">
-                            <Skull className="h-3 w-3" /> {w.career.kills}
-                          </span>
-                        )}
+                        <Swords className="h-3 w-3 text-primary" />
+                        <StatBadge career={w.career} hideStyle />
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Progress value={wr} className="h-1.5 w-16" />

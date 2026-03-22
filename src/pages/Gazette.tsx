@@ -12,6 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Newspaper, Trophy, Swords, TrendingUp, Skull, Flame, Star, ChevronDown, BarChart3, Crown, Grid3X3, Zap, BookOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FightSummary } from "@/types/game";
+import { StatBadge } from "@/components/ui/StatBadge";
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -488,10 +489,7 @@ function BestByStyle({ allFights }: { allFights: FightSummary[] }) {
                       {w.name}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-                    <span>{w.wins}W-{w.losses}L</span>
-                    {w.kills > 0 && <span className="text-arena-blood">{w.kills}K</span>}
-                  </div>
+                  <StatBadge career={{ wins: w.wins, losses: w.losses, kills: w.kills, matches: w.wins + w.losses, survives: w.wins + w.losses, deaths: 0 }} hideStyle />
                 </div>
               ))}
             </div>
