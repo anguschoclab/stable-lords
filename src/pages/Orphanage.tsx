@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { StatBadge } from "@/components/ui/StatBadge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Swords, ArrowRight, ArrowLeft, Sparkles, Skull, Shield,
@@ -400,10 +401,10 @@ export default function Orphanage() {
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-display font-bold">{boutResult.a.name}</span>
-                  <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[boutResult.a.style]}</Badge>
+                  <StatBadge styleName={boutResult.a.style} showFullName />
                   <span className="text-muted-foreground text-sm">vs</span>
                   <span className="font-display font-bold">{boutResult.d.name}</span>
-                  <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[boutResult.d.style]}</Badge>
+                  <StatBadge styleName={boutResult.d.style} showFullName />
                 </div>
 
                 <div className="text-center py-4">

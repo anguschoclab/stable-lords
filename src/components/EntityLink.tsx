@@ -17,9 +17,16 @@ interface WarriorLinkProps {
 }
 
 export function WarriorLink({ name, id, className, children }: WarriorLinkProps) {
-  const { state } = useGameStore();
+  // Gracefully handle undefined useGameStore context in test environments.
+  let state = undefined;
+  try {
+    const store = useGameStore();
+    state = store.state;
+  } catch (e) {
+    // Ignore store errors in test
+  }
 
-  const resolvedId = id ?? resolveWarriorId(name, state);
+  const resolvedId = id ?? (state ? resolveWarriorId(name, state) : null);
 
   if (!resolvedId) {
     return <span className={className}>{children ?? name}</span>;

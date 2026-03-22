@@ -255,19 +255,10 @@ const PHASE_OPENING_THRESHOLD = 0.25;
 const PHASE_MID_THRESHOLD = 0.65;
 
 // Target & Protect mechanics
-const HIT_LOCATIONS = ["head", "chest", "abdomen", "right arm", "left arm", "right leg", "left leg"] as const;
 const TARGET_HIT_CHANCE = 0.7;
 const TARGET_MISS_CHANCE = 0.3;
 const PROTECT_DAMAGE_REDUCTION = 0.5;
 const PROTECT_DAMAGE_PENALTY = 1.15;
-
-// Endurance scaling
-const ENDURANCE_OE_SCALING = 0.5;
-const ENDURANCE_AL_SCALING = 0.3;
-
-// Fatigue thresholds
-const FATIGUE_MODERATE_THRESHOLD = 0.5;
-const FATIGUE_HEAVY_THRESHOLD = 0.25;
 
 // OE/AL Modifiers
 const OE_ATT_SCALING = 0.7;            // Attack bonus per OE point above 5

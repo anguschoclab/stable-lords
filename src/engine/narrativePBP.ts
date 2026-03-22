@@ -530,11 +530,6 @@ const KILL_TEMPLATES = [
   "%D falls to the arena floor. The wound is mortal.\nSilence grips the crowd.",
   "%D stumbles to the ground!!!\n%D is slain!",
 ];
-const KO_TEMPLATES = [
-  "%D is knocked unconscious!\n%A stands victorious over their fallen foe.",
-  "%D collapses to the ground, out cold!\n%A raises a fist in triumph.",
-  "A devastating blow sends %D sprawling!\n%A wins by knockout!",
-];
 
 const STOPPAGE_TEMPLATES = [
   "%D motions to the other LORD PROTECTORS that he cannot continue!\n%A is the victor of the match!",
@@ -542,11 +537,6 @@ const STOPPAGE_TEMPLATES = [
   "%D accepts his loss, jaw clenched to keep from admitting his pain!\n%A is the victor of the match!",
   "%D compliments his victorious foe on a good fight.\n%A has won the duel!",
   "%D surrenders, and offers his hand to his foe.\n%A is the victor of the match!",
-];
-
-const KO_TEMPLATES = [
-  "A crushing final blow sends %D crashing to the sand, unconscious!\n%A is declared the victor by knockout!",
-  "%D crumples under the assault and does not rise. %A takes the victory by KO!"
 ];
 
 const EXHAUSTION_TEMPLATES = [

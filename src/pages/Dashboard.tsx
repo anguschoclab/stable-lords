@@ -661,7 +661,7 @@ function RivalsWidget() {
                       {topWarrior && (
                         <>
                           <span>·</span>
-                          <span className="truncate">★ <WarriorLink name={topWarrior.name} id={topWarrior.id}>{topWarrior.name}</WarriorLink></span>
+                          <span className="truncate flex items-center gap-1">★ <WarriorNameTag name={topWarrior.name} id={topWarrior.id} /></span>
                         </>
                       )}
                     </div>
@@ -688,8 +688,8 @@ function RivalsWidget() {
                       >
                         {won ? "W" : f.winner ? "L" : "D"}
                       </Badge>
-                      <span className="text-[11px] truncate">
-                        <WarriorLink name={playerIsA ? f.a : f.d} /> vs <WarriorLink name={playerIsA ? f.d : f.a} />
+                      <span className="text-[11px] truncate flex items-center gap-1">
+                        <WarriorNameTag name={playerIsA ? f.a : f.d} /> vs <WarriorNameTag name={playerIsA ? f.d : f.a} />
                       </span>
                     </div>
                   );
