@@ -197,6 +197,29 @@ export function migrateGameState(parsed: any): GameState {
     });
   }
 
+
+  // Memory Leak Check: Truncate long-running arrays for older, bloated save files
+  if (parsed.arenaHistory) {
+    parsed.arenaHistory = parsed.arenaHistory.slice(-500).map((f: any, i: number, arr: any[]) => {
+      if (arr.length - i > 20 && f.transcript) {
+        const { transcript, ...rest } = f;
+        return rest;
+      }
+      return f;
+    });
+  }
+  if (parsed.newsletter) parsed.newsletter = parsed.newsletter.slice(-100);
+  if (parsed.ledger) parsed.ledger = parsed.ledger.slice(-500);
+  if (parsed.matchHistory) parsed.matchHistory = parsed.matchHistory.slice(-500);
+  if (parsed.moodHistory) parsed.moodHistory = parsed.moodHistory.slice(-50);
+  if (parsed.graveyard) parsed.graveyard = parsed.graveyard.slice(-200);
+  if (parsed.retired) parsed.retired = parsed.retired.slice(-200);
+  if (parsed.tournaments) parsed.tournaments = parsed.tournaments.slice(-100);
+  if (parsed.scoutReports) parsed.scoutReports = parsed.scoutReports.slice(-100);
+  if (parsed.hallOfFame) parsed.hallOfFame = parsed.hallOfFame.slice(-100);
+  if (parsed.rivalries) parsed.rivalries = parsed.rivalries.slice(-100);
+  if (parsed.ownerGrudges) parsed.ownerGrudges = parsed.ownerGrudges.slice(-100);
+  if (parsed.gazettes) parsed.gazettes = parsed.gazettes.slice(-50);
   return parsed as GameState;
 }
 

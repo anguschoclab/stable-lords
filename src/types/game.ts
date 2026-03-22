@@ -516,8 +516,6 @@ export interface GameState {
     version: string;
     createdAt: string;
   };
-  /** Current game phase for resolution flow */
-  phase?: "planning" | "resolution";
   pendingResolutionData?: {
     gazette: any[];
     injuries: string[];
@@ -554,8 +552,8 @@ export interface GameState {
   restStates: RestState[];
   rivalries: Rivalry[];
   matchHistory: MatchRecord[];
-  playerChallenges?: string[];
-  playerAvoids?: string[];
+  playerChallenges: string[];
+  playerAvoids: string[];
   recruitPool: PoolWarrior[]; // from recruitment engine
   rosterBonus: number; // extra roster slots from championships
   ownerGrudges: OwnerGrudge[]; // personality-driven owner rivalries
