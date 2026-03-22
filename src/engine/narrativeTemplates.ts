@@ -124,6 +124,12 @@ export const HIT_TEMPLATES = [
   "impacts with bone-jarring force against",
   "delivers a sickening crunch to",
   "punishes the exposed flesh of",
+  "bursts a blood vessel in",
+  "rips a gruesome tear across",
+  "splinters the armor guarding",
+  "sends a shockwave of pain through",
+  "cleaves viciously into",
+  "mangles the unprotected meat of",
 ];
 
 export const PARRY_BREAK_TEMPLATES = [
@@ -137,6 +143,10 @@ export const PARRY_BREAK_TEMPLATES = [
   "Sparks fly as %A drives %W straight through a crumbling parry!",
   "%A ignores the block entirely, bludgeoning past it with %W!",
   "With brutal momentum, %A breaks the guard using their %W!",
+  "%A's %W rips the blocking weapon clean out of position!",
+  "A terrifying impact from %A's %W shatters the defensive line!",
+  "%D's wrists nearly break as %A's %W crushes their parry attempt!",
+  "There is no stopping the momentum of %A's %W as it smashes aside the block!",
 ];
 
 export const CROWD_REACTIONS_POSITIVE = [
@@ -207,6 +217,13 @@ export const EXECUTION_TEMPLATES = [
   "%D's arms fail under the fatigue, and %A ruthlessly caves them in with a %W!",
   "Exhaustion robs %D of their footing, ensuring a horrific death from %A's %W!",
   "Bleeding and completely spent, %D takes the final, obliterating hit from %A's %W!",
+  "Utterly exhausted, %D can do nothing as %A violently crushes their skull with a %W!",
+  "With %D's defense completely abandoned due to fatigue, %A steps in and cleanly severs their life with a %W!",
+  "A horrifying crunch echoes as %A's %W bludgeons the helpless, gasping %D to death!",
+  "%A hooks their %W past %D's drooping guard, spilling their life onto the arena floor!",
+  "%D collapses, utterly spent, just in time for %A to deliver a merciless coup de grace with their %W!",
+  "The heavy, blunt impact of %A's %W shatters %D's ribcage, bringing a gruesome end to the bout!",
+  "With %D paralyzed by exhaustion, %A unleashes a savage, dismembering strike with their %W!"
 ];
 
 export const KO_TEMPLATES = [
@@ -242,6 +259,11 @@ export const FATIGUE_COLLAPSE_TEMPLATES = [
   "Lungs burning and muscles failing, %N crumbles in utter defeat.",
   "Unable to support their own weight, %N folds into unconsciousness.",
   "%N staggers blindly before a total system failure sends them crashing to the floor.",
+  "A pathetic wheeze escapes %N as their overtaxed heart forces them to the ground.",
+  "The overwhelming weight of battle finally breaks %N, dropping them like a stone.",
+  "%N throws up blood and bile before surrendering to complete muscular failure.",
+  "Legs turning to jelly, %N spirals downward into the dirt, utterly defeated by fatigue.",
+  "Weapons clatter as %N's grip fails, their body folding into a limp, exhausted pile.",
 ];
 
 export const TAUNT_TEMPLATES = [
@@ -269,6 +291,9 @@ export const SLASH_ATTACK_TEMPLATES = [
   "whips his %W in a brutal horizontal slice at",
   "attempts to sever flesh with a vicious slash of his %W toward",
   "sweeps his %W in a lethal, tearing arc toward",
+  "drags the razor edge of his %W across the air toward",
+  "lashes out with a dismembering swing of his %W at",
+  "attempts to open a gaping wound with his %W against",
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
@@ -279,6 +304,9 @@ export const BASH_ATTACK_TEMPLATES = [
   "delivers a bludgeoning smash toward",
   "strikes to crush ribs and armor alike with his %W at",
   "hurls the heavy weight of his %W in a devastating, blunt arc at",
+  "swings his %W like a wrecking ball targeting",
+  "attempts to pulverize bone with a violent heave of his %W at",
+  "drives his %W forward in a heavy, concussive strike toward",
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [

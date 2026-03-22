@@ -114,6 +114,8 @@ const GOOD_ATT_HIGH: StatementEntry[] = [ // base >= 10
   { minBase: 15, text: "Makes very clever attacks" },
   { minBase: 14, text: "Excels at crippling enemies before the final blow" },
   { minBase: 13, text: "Landing blows on vital areas" },
+  { minBase: 10, text: "Carves through defenses like they are mere parchment" },
+  { minBase: 5,  text: "His strikes consistently find the unarmored meat" },
   { minBase: 0,  text: "He lands blows on less protected areas" },
 ];
 const GOOD_ATT_LOW: StatementEntry[] = [ // base 7-9
@@ -166,6 +168,8 @@ const GOOD_DEF_HIGH: StatementEntry[] = [ // base >= 7
   { minBase: 15, text: "Is always thinking ahead" },
   { minBase: 14, text: "Leaves opponents swinging furiously at empty air" },
   { minBase: 13, text: "Is gifted at avoiding blows" },
+  { minBase: 10, text: "Weaves through the bloodiest of exchanges unscathed" },
+  { minBase: 5,  text: "Shows a preternatural calm when ducking under heavy blows" },
   { minBase: 0,  text: "Is gifted at avoiding a blow" },
 ];
 const GOOD_DEF_LOW: StatementEntry[] = [ // base 3-6
@@ -295,6 +299,8 @@ const BAD_PAR_LOW: StatementEntry[] = [
   { minBase: 8, text: "Barely moves his weapon until the blade is already cutting his flesh" },
   { minBase: 7, text: "Carelessly taking blows that he could avoid" },
   { minBase: 5, text: "Is often fooled by a feint" },
+  { minBase: 4, text: "Tries to catch the blade with his face" },
+  { minBase: 3, text: "Has the defensive instincts of a slaughtered pig" },
   { minBase: 2, text: "Is easily tricked into opening his own throat" },
   { minBase: 0, text: "He is usually fooled by a feint" },
 ];
@@ -344,6 +350,8 @@ const BAD_END_LOW: StatementEntry[] = [
   { minBase: 8, text: "Dooms himself to an exhausted, humiliating slaughter" },
   { minBase: 7, text: "He fails to husband strength when tired" },
   { minBase: 5, text: "Often wastes his endurance thoughtlessly" },
+  { minBase: 4, text: "Tires himself out swinging wildly at empty air" },
+  { minBase: 3, text: "Begs to be put out of his misery by sheer exhaustion" },
   { minBase: 2, text: "Will literally work himself to death for no reason" },
   { minBase: 0, text: "And he doesn't have the smarts to understand when he should rest" },
 ];

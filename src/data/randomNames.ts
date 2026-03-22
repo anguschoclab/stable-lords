@@ -36,6 +36,8 @@ const WARRIOR_NAMES = [
   // New Additions
   "BLOODSPITE", "IRONFANG", "GRAVEMAKER", "DOOMSCYTHE", "CARRION",
   "SLAKEMAW", "MARROWSTEALER", "GORETIDE", "GRIMTIDE", "SKULLSMASHER", "BONECARVER",
+  "MEATHOOK", "GORESPLITTER", "ROTJAW", "SPINECRACKER", "BLIGHTFIST", "MUCKRENDER",
+  "GRISTLE", "VILEBLOOD", "HATEFORGED", "HELLTOOTH"
 ];
 
 const OWNER_FIRST = [
@@ -47,7 +49,8 @@ const OWNER_FIRST = [
   "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
   "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
   "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
-  "Vortigern", "Morwenna", "Titus", "Galba",
+  "Vortigern", "Morwenna", "Titus", "Galba", "Vane", "Malagar", "Roderick",
+  "Gellart", "Thaddeus"
 ];
 
 const OWNER_LAST = [
@@ -58,7 +61,8 @@ const OWNER_LAST = [
   "Hawkridge", "Bonecrest", "Firebrand", "Shadowmere", "Bladewell",
   "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
   "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
-  "Graveward", "Grimbane", "Sorrowbring", "Cinderfall",
+  "Graveward", "Grimbane", "Sorrowbring", "Cinderfall", "Rotwood",
+  "Blightford", "Grimhollow", "Vileblood", "Slagmore"
 ];
 
 const STABLE_PREFIXES = [
@@ -70,6 +74,7 @@ const STABLE_PREFIXES = [
   "The Doom", "The Hell", "The Vengeful", "The Wrathful", "The Cursed",
   "The Grinding", "The Bleeding", "The Ruined", "The Shattered", "The Forsaken",
   "The Merciless", "The Unforgiving", "The Putrid", "The Rotting", "The Blighted",
+  "The Mangled", "The Slagged", "The Severed"
 ];
 
 const STABLE_SUFFIXES = [
@@ -81,6 +86,7 @@ const STABLE_SUFFIXES = [
   "Butchers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
   "Manglers", "Gorehounds", "Scavengers", "Defilers", "Despoilers",
   "Marauders", "Annihilators", "Obliterators", "Ravagers", "Plunderers",
+  "Carrion", "Screams", "Guts", "Bones"
 ];
 
 const STABLE_ALT = [
@@ -98,6 +104,8 @@ const STABLE_ALT = [
   "Choir of Screams", "The Iron Maiden's Embrace", "The Bloodied Knuckles",
   "Harbingers of the Final Strike", "The Slaughterhouse Syndicate",
   "Disciples of the Meat Grinder", "The Carrion Crows", "The Abattoir Artisans",
+  "The Rotting Chorus", "Choir of the Slaughtered", "The Slag Syndicate",
+  "Lords of the Meat Hook"
 ];
 
 function pick<T>(arr: T[]): T {
