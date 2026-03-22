@@ -146,14 +146,27 @@ function detectRivalryMatchup(
   weekFights: FightSummary[],
   allFights: FightSummary[]
 ): { a: string; b: string; count: number } | null {
-  const pairCounts = new Map<string, number>();
-  for (const f of allFights) {
-    const key = [f.a, f.d].sort().join("||");
-    pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
+  // Optimization: Only count pairs that fought this week
+  const candidatePairs = new Set<string>();
+  for (const f of weekFights) {
+    candidatePairs.add(f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`);
   }
+
+  const pairCounts = new Map<string, number>();
+  for (const key of candidatePairs) {
+    pairCounts.set(key, 0);
+  }
+
+  for (const f of allFights) {
+    const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
+    if (pairCounts.has(key)) {
+      pairCounts.set(key, pairCounts.get(key)! + 1);
+    }
+  }
+
   let best: { a: string; b: string; count: number } | null = null;
   for (const f of weekFights) {
-    const key = [f.a, f.d].sort().join("||");
+    const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
     const count = pairCounts.get(key) ?? 0;
     if (count >= 3 && (!best || count > best.count)) {
       best = { a: f.a, b: f.d, count };
@@ -198,32 +211,36 @@ export function generateWeeklyGazette(
   // Detect rising stars — warriors whose total career is exactly 3 wins, 0 losses
   const risingStars: string[] = [];
   if (allFights && fights.length > 0) {
-    const fightsByWarrior = new Map<string, FightSummary[]>();
-    for (const af of allFights) {
-      let aFights = fightsByWarrior.get(af.a);
-      if (!aFights) {
-        aFights = [];
-        fightsByWarrior.set(af.a, aFights);
+    const candidates = new Set<string>();
+    for (const f of fights) {
+      if (f.winner) {
+        candidates.add(f.winner === "A" ? f.a : f.d);
       }
-      aFights.push(af);
-
-      let dFights = fightsByWarrior.get(af.d);
-      if (!dFights) {
-        dFights = [];
-        fightsByWarrior.set(af.d, dFights);
-      }
-      dFights.push(af);
     }
 
-    for (const f of fights) {
-      if (!f.winner) continue;
-      const winnerName = f.winner === "A" ? f.a : f.d;
-      const allByWarrior = fightsByWarrior.get(winnerName) ?? [];
-      if (allByWarrior.length !== 3) continue;
-      const allWins = allByWarrior.every(af =>
-        (af.a === winnerName && af.winner === "A") || (af.d === winnerName && af.winner === "D")
-      );
-      if (allWins) risingStars.push(winnerName);
+    const stats = new Map<string, { total: number; wins: number }>();
+    for (const c of candidates) {
+      stats.set(c, { total: 0, wins: 0 });
+    }
+
+    for (const af of allFights) {
+      if (stats.has(af.a)) {
+        const s = stats.get(af.a)!;
+        s.total++;
+        if (af.winner === "A") s.wins++;
+      }
+      if (stats.has(af.d)) {
+        const s = stats.get(af.d)!;
+        s.total++;
+        if (af.winner === "D") s.wins++;
+      }
+    }
+
+    for (const c of candidates) {
+      const s = stats.get(c)!;
+      if (s.total === 3 && s.wins === 3) {
+        risingStars.push(c);
+      }
     }
   }
   if (risingStars.length > 0) tags.push("Rising Star");
