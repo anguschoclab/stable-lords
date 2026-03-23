@@ -59,18 +59,18 @@ export default function Tournaments() {
     if (active.length < 2) return;
 
     // Gather AI rival warriors for the bracket (up to 5 from rivals)
-    const rivalWarriors: { name: string; isAI: boolean }[] = [];
+    const rivalWarriors: { name: string; isAI: boolean; stableId: string }[] = [];
     for (const rival of (state.rivals ?? [])) {
       const eligibleRivals = rival.roster.filter((w) => w.status === "Active").slice(0, 2);
       for (const rw of eligibleRivals) {
-        rivalWarriors.push({ name: rw.name, isAI: true });
+        rivalWarriors.push({ name: rw.name, isAI: true, stableId: rival.owner.id });
       }
       if (rivalWarriors.length >= 5) break;
     }
 
     // Combine player + AI warriors
     const allEntrants = [
-      ...active.map((w) => ({ name: w.name, isAI: false })),
+      ...active.map((w) => ({ name: w.name, isAI: false, stableId: state.player.id })),
       ...rivalWarriors,
     ];
 
@@ -87,6 +87,8 @@ export default function Tournaments() {
           matchIndex: Math.floor(i / 2),
           a: shuffled[i].name,
           d: shuffled[i + 1].name,
+          stableA: shuffled[i].stableId,
+          stableD: shuffled[i + 1].stableId,
         });
       } else {
         // Odd entrant gets a bye
@@ -161,6 +163,11 @@ export default function Tournaments() {
       bout.winner = outcome.winner;
       bout.by = outcome.by;
       bout.fightId = `tf_${Date.now()}_${bout.matchIndex}`;
+      // Cross-reference stable IDs
+      const sIdA = bout.stableA;
+      const sIdD = bout.stableD;
+      const rvKey = sIdA && sIdD ? (sIdA < sIdD ? `${sIdA}|${sIdD}` : `${sIdD}|${sIdA}`) : null;
+      const isRivalry = !!rvKey && state.rivalries?.some(r => (r.stableIdA === sIdA && r.stableIdB === sIdD) || (r.stableIdB === sIdA && r.stableIdA === sIdD));
 
       const winnerName = outcome.winner === "A" ? bout.a : outcome.winner === "D" ? bout.d : null;
       if (winnerName) winners.push(winnerName);
@@ -186,6 +193,9 @@ export default function Tournaments() {
         by: outcome.by,
         styleA: wA.style,
         styleD: wD.style,
+        stableA: sIdA,
+        stableD: sIdD,
+        isRivalry,
         flashyTags: tags,
         transcript: outcome.log.map((e) => e.text),
         createdAt: new Date().toISOString(),
@@ -626,6 +636,7 @@ export default function Tournaments() {
                                   log={fightSummary.transcript!.map((text, idx) => ({ minute: idx + 1, text }))}
                                   winner={fightSummary.winner}
                                   by={fightSummary.by}
+                                  isRivalry={fightSummary.isRivalry}
                                 />
                               </div>
                             )}

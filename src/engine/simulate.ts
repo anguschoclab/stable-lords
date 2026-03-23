@@ -70,15 +70,26 @@ function createFighterState(
   const trainerMods = trainers ? getTrainerMods(trainers, plan.style) : null;
   const favWeapon = warrior ? getFavoriteWeaponBonus(warrior) : 0;
 
+  const getShieldBonus = (id: string) => {
+    if (id === "small_shield") return { def: 1, att: 0 };
+    if (id === "medium_shield") return { def: 2, att: 0 };
+    if (id === "large_shield") return { def: 3, att: -1 };
+    return { def: 0, att: 0 };
+  };
+  const wShield = getShieldBonus(equip.weapon);
+  const oShield = getShieldBonus(equip.shield);
+  const totalShieldDef = wShield.def + oShield.def;
+  const totalShieldAtt = wShield.att + oShield.att;
+
   const weaponReq = checkWeaponRequirements(
     equip.weapon,
     { ST: attrs.ST, DF: attrs.DF, SP: attrs.SP }
   );
 
   const effSkills: BaseSkills = {
-    ATT: skills.ATT + (trainerMods?.attMod ?? 0) + classicBonus + favWeapon + weaponReq.attPenalty,
-    PAR: skills.PAR + (trainerMods?.parMod ?? 0),
-    DEF: skills.DEF + (trainerMods?.defMod ?? 0),
+    ATT: skills.ATT + (trainerMods?.attMod ?? 0) + classicBonus + favWeapon + weaponReq.attPenalty + totalShieldAtt,
+    PAR: skills.PAR + (trainerMods?.parMod ?? 0) + totalShieldDef,
+    DEF: skills.DEF + (trainerMods?.defMod ?? 0) + totalShieldDef,
     INI: skills.INI + (trainerMods?.iniMod ?? 0),
     RIP: skills.RIP,
     DEC: skills.DEC + (trainerMods?.decMod ?? 0),

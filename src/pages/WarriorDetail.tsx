@@ -584,6 +584,7 @@ function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: strin
                   log={f.transcript!.map((text, i) => ({ minute: i + 1, text }))}
                   winner={f.winner}
                   by={f.by}
+                  isRivalry={f.isRivalry}
                 />
               </div>
             )}

@@ -67,26 +67,33 @@ export default function Graveyard() {
                     </div>
 
                     <div className="bg-neutral-900/40 rounded-lg p-3.5 mb-5 border border-neutral-800/50">
-                      <p className="text-sm text-neutral-300 italic font-serif leading-relaxed">
-                        "{w.deathEvent?.deathSummary || w.deathCause || 'Fell in combat.'}"
+                      <p className="text-sm text-neutral-300 italic font-serif leading-relaxed mb-2">
+                        "{w.deathEvent?.deathSummary || w.causeOfDeath || w.deathCause || 'Fell in combat.'}"
                       </p>
-                      <div className="mt-4 flex items-center justify-between text-xs text-neutral-500 font-medium">
+                      <div className="mt-4 flex flex-col gap-2 text-xs text-neutral-500 font-medium">
                         <span className="flex items-center gap-1.5">
                           <Crosshair className="w-3.5 h-3.5 text-red-900" />
-                          {w.deathEvent?.killerId ? (
-                            <>Killed by <WarriorLink name={w.killedBy || w.deathEvent.killerName || w.deathEvent.killerId} className="text-red-400/80" /></>
+                          {w.killedBy ? (
+                            <>Slew by <span className="text-red-400/80">{w.killedBy}</span></>
+                          ) : w.deathEvent?.killerId ? (
+                            <>Slew by <WarriorLink name={w.deathEvent.killerId} className="text-red-400/80" /></>
                           ) : (
                             <>Killed in the Arena</>
                           )}
                         </span>
-                        <span className="bg-neutral-900 px-2 py-1 rounded">Wk {w.deathWeek || w.deathEvent?.week} / Y{w.deathEvent?.year || state.currentYear}</span>
+                        <div className="flex items-center justify-between">
+                            <span className="bg-neutral-900 px-2 py-1 rounded">
+                                {w.dateOfDeath || `Week ${w.deathWeek || '?'}`}
+                            </span>
+                            <span className="text-[10px] opacity-60">{state.season}</span>
+                        </div>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 text-xs mb-5">
                       <div className="flex items-center gap-2.5 text-neutral-400 bg-neutral-900/30 p-2.5 rounded border border-neutral-800/30">
                         <Swords className="w-4 h-4 text-neutral-600" />
-                        <span className="font-medium">{w.career.wins}W-{w.career.losses}L-{w.career.kills}K</span>
+                        <span className="font-medium">{(w.career?.wins || 0)}W-{(w.career?.losses || 0)}L-{(w.career?.kills || 0)}K</span>
                       </div>
                       <div className="flex items-center gap-2.5 text-neutral-400 bg-neutral-900/30 p-2.5 rounded border border-neutral-800/30">
                         <Trophy className="w-4 h-4 text-amber-600/40" />
@@ -98,6 +105,11 @@ export default function Graveyard() {
                       {w.deathEvent?.memorialTags?.map((tag: string, i: number) => (
                         <span key={i} className="text-[10px] uppercase font-bold tracking-widest text-neutral-500 bg-neutral-900 px-2 py-1 rounded border border-neutral-800">
                           {tag}
+                        </span>
+                      ))}
+                      {w.flair?.map((f: string, i: number) => (
+                        <span key={`flair-${i}`} className="text-[10px] uppercase font-bold tracking-widest text-amber-500/60 bg-neutral-900 px-2 py-1 rounded border border-neutral-800">
+                          {f}
                         </span>
                       ))}
                     </div>

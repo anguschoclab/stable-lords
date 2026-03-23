@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import type { GameState, FightSummary } from "@/types/game";
+import type { GameState, FightSummary, Warrior } from "@/types/game";
 import {
   createFreshState,
   advanceWeek,
   appendFightToHistory,
   updateWarriorAfterFight,
+  initializeStable,
+  draftInitialRoster,
 } from "./gameStore";
 import {
   migrateLegacySave,
@@ -37,6 +39,8 @@ export interface GameStoreActions {
   returnToTitle: () => void;
   initialize: () => void;
   loadGame: (slotId: string, gameState: GameState) => void;
+  doInitializeStable: (name: string, stableName: string) => void;
+  doDraftInitialRoster: (warriors: Warrior[]) => void;
 }
 
 const getInitialData = () => {
@@ -148,6 +152,23 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         draft.activeSlotId = null;
         draft.state = createFreshState();
         draft.atTitleScreen = true;
+      });
+    },
+
+    doInitializeStable: (name: string, stableName: string) => {
+      set((draft) => {
+        const next = initializeStable(draft.state, name, stableName);
+        draft.state = next;
+        // Also save if in a slot
+        if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
+      });
+    },
+
+    doDraftInitialRoster: (warriors: Warrior[]) => {
+      set((draft) => {
+        const next = draftInitialRoster(draft.state, warriors);
+        draft.state = next;
+        if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
       });
     },
   }))

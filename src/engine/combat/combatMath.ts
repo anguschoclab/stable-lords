@@ -31,11 +31,10 @@ export function pickText(rng: () => number, texts: string[]): string {
 
 export function skillCheck(rng: () => number, skill: number, modifier: number = 0): boolean {
   const roll = Math.floor(rng() * 20) + 1;
-  if (roll === 1) return true;
-  if (roll === 20) return false;
-
   const target = Math.max(1, Math.min(19, Math.floor(skill) + modifier));
-  return roll <= target;
+  const success = roll === 1 || (roll !== 20 && roll <= target);
+  // console.log(`SKILL CHECK: roll ${roll} vs target ${target} -> ${success ? "SUCCESS" : "FAIL"}`);
+  return success;
 }
 
 export function contestCheck(

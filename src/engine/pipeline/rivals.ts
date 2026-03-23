@@ -4,7 +4,7 @@ import { aiDraftFromPool } from "@/engine/recruitment";
 import { processAIRosterManagement } from "@/engine/ownerRoster";
 
 export const applyRivalAI: (state: GameState) => GameState = (state) => {
-  let s = { ...state };
+  const s = { ...state };
 
   // AI Bouts
   if ((s.rivals || []).length > 0) {
@@ -28,7 +28,7 @@ export const applyRivalAI: (state: GameState) => GameState = (state) => {
 };
 
 export const applyRecruitment: (state: GameState) => GameState = (state) => {
-  let s = { ...state };
+  const s = { ...state };
   if ((s.rivals || []).length > 0 && (s.recruitPool || []).length > 0) {
     const draft = aiDraftFromPool(s.recruitPool, s.rivals, s.week);
     s.recruitPool = draft.updatedPool;

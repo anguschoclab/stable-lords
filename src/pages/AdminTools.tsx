@@ -46,7 +46,20 @@ export default function AdminTools() {
 
 
   const skipFTUE = () => {
-    setState({ ...state, ftueComplete: true, ftueStep: 99 });
+    setState({ 
+      ...state, 
+      ftueComplete: true, 
+      isFTUE: false,
+      player: {
+        id: state.player?.id || "admin-0",
+        name: state.player?.name || "Master Admin",
+        stableName: state.player?.stableName || "The Admin Lords",
+        fame: state.player?.fame || 0,
+        renown: state.player?.renown || 0,
+        titles: state.player?.titles || 0,
+        ...(state.player || {})
+      }
+    });
     toast.success('FTUE skipped. State unlocked.');
   };
 

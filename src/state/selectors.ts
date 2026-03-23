@@ -29,11 +29,17 @@ export interface StableStats {
 }
 
 export const selectStableStats = (state: GameState): StableStats => {
-  const { wins, losses, kills } = state.roster.reduce(
+  const allWarriors = [
+    ...state.roster,
+    ...(state.graveyard || []),
+    ...(state.retired || [])
+  ];
+  
+  const { wins, losses, kills } = allWarriors.reduce(
     (acc, w) => ({
-      wins: acc.wins + w.career.wins,
-      losses: acc.losses + w.career.losses,
-      kills: acc.kills + w.career.kills,
+      wins: acc.wins + (w.career?.wins || 0),
+      losses: acc.losses + (w.career?.losses || 0),
+      kills: acc.kills + (w.career?.kills || 0),
     }),
     { wins: 0, losses: 0, kills: 0 }
   );

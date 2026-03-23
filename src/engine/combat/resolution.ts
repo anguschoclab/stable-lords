@@ -13,23 +13,23 @@ import {
   type FightPlan,
 } from "@/types/game";
 import { skillCheck, contestCheck } from "./combatMath";
-import { computeHitDamage, rollHitLocation, applyProtectMod } from "./combatDamage";
+import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "./combatDamage";
 import { enduranceCost, fatiguePenalty } from "./combatFatigue";
 import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "../stylePassives";
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "../tacticSuitability";
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
-export const GLOBAL_ATT_BONUS = 8;
-export const GLOBAL_PAR_PENALTY = -6;
+export const GLOBAL_ATT_BONUS = -1;
+export const GLOBAL_PAR_PENALTY = 1;
 export const MAX_EXCHANGES = 15;
 export const EXCHANGES_PER_MINUTE = 3;
 export const DECISION_HIT_MARGIN = 2;
 export const INITIATIVE_PRESS_BONUS = 1;
 export const OE_ATT_SCALING = 0.7;
 export const OE_DEF_SCALING = 0.5;
-export const AL_INI_SCALING = 0.6;
-export const RIPOSTE_WHIFF_PENALTY = -5;
-export const RIPOSTE_PARRY_PENALTY = -4;
+export const AL_INI_SCALING = 0.3; // Reduced from 0.6
+export const RIPOSTE_WHIFF_PENALTY = 0; // Removed penalty
+export const RIPOSTE_PARRY_PENALTY = 0; // Removed penalty
 export const DEFENDER_ENDURANCE_DISCOUNT = 0.92;
 export const DAMAGE_TAX_SCALING = 0.7;
 export const KILL_WINDOW_ENDURANCE = 0.4;
@@ -60,7 +60,7 @@ const MATCHUP_MATRIX: number[][] = [
   [ 0, -1,  0,  0,  0,  0,  0,  0, +1,  0], // SL
   [ 0, -1, +1, +1, +1, +1,  0,  0, +1,  0], // ST
   [-1,  0, -1,  0,  0,  0, -1, -1,  0,  0], // TP
-  [ 0,  0, +1,  0, +1, +1,  0,  0,  0,  0], // WS
+  [ 0, +2, +1,  0, +1, +1,  0,  0,  0,  0], // WS
 ];
 
 export function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
@@ -178,6 +178,50 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const offModsD = getOffensiveTacticMods(tacticsD.offTactic, fD.style);
   const defModsD = getDefensiveTacticMods(tacticsD.defTactic, fD.style);
 
+  // 1.5 Apply Aggression Bias & Special Conditions
+  let biasAttA = 0, biasDefA = 0;
+  const aggBiasA = fA.plan.phases?.[phaseKey]?.aggressionBias ?? fA.plan.aggressionBias ?? 5;
+  if (aggBiasA > 5) {
+    biasAttA = (aggBiasA - 5) * 0.5;
+    biasDefA = -(aggBiasA - 5) * 0.5;
+  } else if (aggBiasA < 5) {
+    biasAttA = (aggBiasA - 5) * 0.5;
+    biasDefA = (5 - aggBiasA) * 0.5;
+  }
+
+  let biasAttD = 0, biasDefD = 0;
+  const aggBiasD = fD.plan.phases?.[phaseKey]?.aggressionBias ?? fD.plan.aggressionBias ?? 5;
+  if (aggBiasD > 5) {
+    biasAttD = (aggBiasD - 5) * 0.5;
+    biasDefD = -(aggBiasD - 5) * 0.5;
+  } else if (aggBiasD < 5) {
+    biasAttD = (aggBiasD - 5) * 0.5;
+    biasDefD = (5 - aggBiasD) * 0.5;
+  }
+
+  // Opening Move (First 3 exchanges)
+  let openOE_A = 0, openAL_A = 0, openOE_D = 0, openAL_D = 0;
+  if (exchange < 3) {
+    if (fA.plan.openingMove === "Aggressive") { openOE_A = 1; openAL_A = 1; }
+    else if (fA.plan.openingMove === "Safe") { openOE_A = -1; openAL_A = -1; }
+    
+    if (fD.plan.openingMove === "Aggressive") { openOE_D = 1; openAL_D = 1; }
+    else if (fD.plan.openingMove === "Safe") { openOE_D = -1; openAL_D = -1; }
+  }
+
+  // Fallback Condition
+  let fallOE_A = 0, fallAL_A = 0, fallOE_D = 0, fallAL_D = 0;
+  if (fA.plan.fallbackCondition === "Exhausted" && fA.endurance < fA.maxEndurance * 0.25) { fallOE_A = -2; fallAL_A = -2; }
+  else if (fA.plan.fallbackCondition === "Hurt" && fA.hp < fA.maxHp * 0.3) { fallOE_A = -2; fallAL_A = -2; }
+  
+  if (fD.plan.fallbackCondition === "Exhausted" && fD.endurance < fD.maxEndurance * 0.25) { fallOE_D = -2; fallAL_D = -2; }
+  else if (fD.plan.fallbackCondition === "Hurt" && fD.hp < fD.maxHp * 0.3) { fallOE_D = -2; fallAL_D = -2; }
+
+  const finalOE_A = Math.max(1, Math.min(10, effOE_A + openOE_A + fallOE_A));
+  const finalAL_A = Math.max(1, Math.min(10, effAL_A + openAL_A + fallAL_A));
+  const finalOE_D = Math.max(1, Math.min(10, effOE_D + openOE_D + fallOE_D));
+  const finalAL_D = Math.max(1, Math.min(10, effAL_D + openAL_D + fallAL_D));
+
   // 2. Initiative Contest
   const fatA = fatiguePenalty(fA.endurance, fA.maxEndurance);
   const fatD = fatiguePenalty(fD.endurance, fD.maxEndurance);
@@ -204,8 +248,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   if (passiveA.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "A", result: passiveA.narrative });
   if (passiveD.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "D", result: passiveD.narrative });
 
-  const iniA = fA.skills.INI + alIniMod(effAL_A) + ctx.matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits;
-  const iniD = fD.skills.INI + alIniMod(effAL_D) + ctx.matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits;
+  const iniA = fA.skills.INI + alIniMod(finalAL_A) + ctx.matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits;
+  const iniD = fD.skills.INI + alIniMod(finalAL_D) + ctx.matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits;
   
   const aGoesFirst = contestCheck(rng, iniA, iniD);
   const attacker = aGoesFirst ? fA : fD;
@@ -215,8 +259,10 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
 
   events.push({ type: "INITIATIVE", actor: attLabel, value: aGoesFirst ? iniA : iniD, result: true });
 
-  const attOE = aGoesFirst ? effOE_A : effOE_D;
-  const defOE = aGoesFirst ? effOE_D : effOE_A;
+  const attOE = aGoesFirst ? finalOE_A : finalOE_D;
+  const defOE = aGoesFirst ? finalOE_D : finalOE_A;
+  const attAL = aGoesFirst ? finalAL_A : finalAL_D;
+  const defAL = aGoesFirst ? finalAL_D : finalAL_A;
   const attMatchup = aGoesFirst ? ctx.matchupA : ctx.matchupD;
   const defMatchup = aGoesFirst ? ctx.matchupD : ctx.matchupA;
   const attFat = aGoesFirst ? fatA : fatD;
@@ -230,6 +276,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const attTactics = aGoesFirst ? tacticsA : tacticsD;
   const defTactics = aGoesFirst ? tacticsD : tacticsA;
   const attKD = aGoesFirst ? effKD_A : effKD_D;
+  const attAggBias = aGoesFirst ? biasAttA : biasAttD;
+  const defAggBias = aGoesFirst ? biasDefD : biasDefA;
 
   const tacticOveruseAtt = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakA) : Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakD);
   const tacticOveruseDef = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakD) : Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakA);
@@ -237,7 +285,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   // 3. Attack attempt
   const attOEmod = oeAttMod(attOE, attacker.style);
   const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
-  const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + INITIATIVE_PRESS_BONUS + GLOBAL_ATT_BONUS - tacticOveruseAtt - attacker.armHits);
+    const attackSuccess = skillCheck(rng, attacker.skills.ATT, attOEmod + attMatchup + attFat + attOffMods.attBonus + attPassive.attBonus + attAntiSynMod + INITIATIVE_PRESS_BONUS + GLOBAL_ATT_BONUS + attAggBias - tacticOveruseAtt - attacker.armHits);
 
   if (!attackSuccess) {
     events.push({ type: "ATTACK", actor: attLabel, result: "WHIFF" });
@@ -273,14 +321,14 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     let canRiposte = false;
 
     if (isDodging) {
-      const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus - tacticOveruseDef - defender.legHits);
+      const defSuccess = skillCheck(rng, defender.skills.DEF, defOEmod + defMatchup + defFat + defDefMods.defBonus + defPassive.defBonus + defAggBias - tacticOveruseDef - defender.legHits);
       if (defSuccess) {
         defended = true;
         events.push({ type: "DEFENSE", actor: defLabel, result: "DODGE" });
         attacker.consecutiveHits = 0;
       }
     } else {
-      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass - tacticOveruseDef - defender.armHits);
+      const parrySuccess = skillCheck(rng, defender.skills.PAR, defOEmod + defMatchup + defFat + defDefMods.parBonus + defPassive.parBonus + defAntiSynPar - attOffMods.defPenalty + GLOBAL_PAR_PENALTY - bashBypass + defAggBias - tacticOveruseDef - defender.armHits);
       if (parrySuccess) {
         defended = true;
         canRiposte = true;
@@ -317,7 +365,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
         events.push({ type: "INSIGHT", actor: attLabel, metadata: { attribute: attr } });
       }
 
-      // Kill Check
+      // Kill Check refactored to use combatDamage.ts logic
       const killMech = getKillMechanic(attacker.style, {
         phase: stylePhase, hitsLanded: attacker.hitsLanded,
         consecutiveHits: attacker.consecutiveHits, targetedLocation: attTactics.target,
@@ -325,20 +373,20 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
       });
 
       const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
-      const killWindowEnd = defender.maxEndurance * KILL_WINDOW_ENDURANCE;
+      if (defender.hp <= killWindowHp) {
+        const phaseLevel = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
+        const killThreshold = calculateKillWindow(
+            defender.hp / defender.maxHp,
+            defender.endurance / defender.maxEndurance,
+            hitLoc,
+            attKD + killMech.killBonus,
+            phaseLevel
+        );
 
-      if (defender.hp <= killWindowHp && defender.endurance <= killWindowEnd) {
-        const kdMod = Math.floor(attKD - 5) * 0.5;
-        const phaseMod = phase === "LATE" ? 3 : phase === "MID" ? 1 : 0;
-        const decSuccess = skillCheck(rng, attacker.skills.DEC, kdMod + phaseMod + attMatchup + attFat + attOffMods.decBonus + killMech.decBonus);
-
-        if (decSuccess) {
-          const healingReduction = defender.label === "A" ? (ctx.trainerModsA?.healMod ?? 0) * TRAINER_HEALING_REDUCTION : (ctx.trainerModsD?.healMod ?? 0) * TRAINER_HEALING_REDUCTION;
-          const killThreshold = Math.max(KILL_THRESHOLD_MIN, KILL_THRESHOLD_BASE + attKD * KILL_DESIRE_SCALING + (phase === "LATE" ? KILL_PHASE_LATE_BONUS : 0) + killMech.killBonus - healingReduction);
-          if (rng() < killThreshold) {
-            defender.hp = 0;
-            events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", location: hitLoc } });
-          }
+        const decSuccess = skillCheck(rng, attacker.skills.DEC, Math.floor(attKD - 5) * 0.5 + phaseLevel + attOffMods.decBonus + killMech.decBonus);
+        if (decSuccess && rng() < killThreshold) {
+          defender.hp = 0;
+          events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", location: hitLoc } });
         }
       }
 
@@ -369,13 +417,12 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   // 5. Endurance updates
   const attEndurMult = getEnduranceMult(attacker.style);
   const defEndurMult = getEnduranceMult(defender.style);
-  const defDamageTax = defender.hitsTaken > 0 ? Math.min(3, Math.floor(defender.hitsTaken * DAMAGE_TAX_SCALING)) : 0;
   const attWepEndMult = attLabel === "A" ? ctx.weaponReqA.endurancePenalty : ctx.weaponReqD.endurancePenalty;
   const defWepEndMult = defLabel === "A" ? ctx.weaponReqA.endurancePenalty : ctx.weaponReqD.endurancePenalty;
 
-  const attCost = Math.round(enduranceCost(attOE, aGoesFirst ? effAL_A : effAL_D) * attEndurMult * attWepEndMult);
-  const defCost = Math.max(1, Math.round(enduranceCost(defOE, aGoesFirst ? effAL_D : effAL_A) * DEFENDER_ENDURANCE_DISCOUNT * defEndurMult * defWepEndMult) + defDamageTax);
-
+  const attCost = Math.round(enduranceCost(attOE, attAL) * attEndurMult * attWepEndMult);
+  const defCost = Math.max(1, Math.round(enduranceCost(defOE, defAL) * DEFENDER_ENDURANCE_DISCOUNT * defEndurMult * defWepEndMult));
+  
   attacker.endurance -= attCost;
   defender.endurance -= defCost;
   

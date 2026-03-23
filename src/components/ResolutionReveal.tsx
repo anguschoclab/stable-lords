@@ -183,6 +183,7 @@ export default function ResolutionReveal() {
                             winner={r.outcome.winner}
                             by={r.outcome.by}
                             announcement={r.announcement}
+                            isRivalry={r.isRivalry}
                           />
                           <Separator className="my-4" />
                         </div>

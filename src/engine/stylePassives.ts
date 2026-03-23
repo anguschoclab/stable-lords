@@ -26,15 +26,15 @@ interface TempoProfile {
 // - LU endurance mult 1.08 → 1.02 (lungers burn energy but not THIS much)
 const STYLE_TEMPO: Record<FightingStyle, TempoProfile> = {
   [FightingStyle.AimedBlow]:       { opening: -1, mid:  0, late:  1, enduranceMult: 0.94 },  // AB: reduced late tempo from +2 to +1
-  [FightingStyle.BashingAttack]:   { opening:  2, mid:  1, late:  0, enduranceMult: 0.98 },  // BA: stronger opening, efficient stamina
-  [FightingStyle.LungingAttack]:   { opening:  3, mid:  0, late: -2, enduranceMult: 1.02 },  // LU: explosive opener
+  [FightingStyle.BashingAttack]:   { opening:  1, mid:  1, late:  0, enduranceMult: 0.98 },  
+  [FightingStyle.LungingAttack]:   { opening:  1, mid:  0, late: -1, enduranceMult: 1.02 },  
   [FightingStyle.ParryLunge]:      { opening:  0, mid:  1, late:  0, enduranceMult: 1.00 },
-  [FightingStyle.ParryRiposte]:    { opening: -2, mid:  0, late:  0, enduranceMult: 1.04 },  // PR: slow starter, slightly tiring
+  [FightingStyle.ParryRiposte]:    { opening:  0, mid:  1, late:  0, enduranceMult: 1.04 },  
   [FightingStyle.ParryStrike]:     { opening:  0, mid:  0, late:  0, enduranceMult: 0.96 },
-  [FightingStyle.SlashingAttack]:  { opening:  2, mid:  1, late:  0, enduranceMult: 0.96 },  // SL: slight nerf from 0.94
-  [FightingStyle.StrikingAttack]:  { opening:  1, mid:  1, late:  0, enduranceMult: 0.96 },  // ST: consistent, efficient
-  [FightingStyle.TotalParry]:      { opening: -2, mid:  0, late:  1, enduranceMult: 0.96 },  // TP: nerfed endurance from 0.88
-  [FightingStyle.WallOfSteel]:     { opening:  0, mid:  0, late:  1, enduranceMult: 0.92 },
+  [FightingStyle.SlashingAttack]:  { opening:  1, mid:  1, late:  0, enduranceMult: 0.96 },  
+  [FightingStyle.StrikingAttack]:  { opening:  1, mid:  0, late:  0, enduranceMult: 0.96 },  
+  [FightingStyle.TotalParry]:      { opening: -1, mid:  1, late:  1, enduranceMult: 0.96 },  
+  [FightingStyle.WallOfSteel]:     { opening:  1, mid:  1, late:  1, enduranceMult: 0.92 },
 };
 
 export type Phase = "OPENING" | "MID" | "LATE";
@@ -247,7 +247,8 @@ export function getStylePassive(
         ...EMPTY_PASSIVE,
         mastery: m.tier,
         attBonus: -2,
-        parBonus: 1 + m.bonus,  // Restored +1 base parry to bring TP from 34.8% to ~36%
+        parBonus: 2 + m.bonus,  // Buffed from 1
+        iniBonus: 1, // Added small ini bonus to help not lose every turn
         defBonus: 0,
         ripBonus: 0,
         narrative: context.phase === "LATE" && context.endRatio > 0.5
@@ -263,8 +264,9 @@ export function getStylePassive(
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        defBonus: scale(wallBonus),
-        parBonus: 0,  // Removed — WS identity is constant motion, not parry
+        defBonus: scale(wallBonus) + 1, // Significant buff to base defense
+        parBonus: 1,  // Restored a baseline parry
+        iniBonus: scale(1) + 1, // Added ini bonus to help break the "Initiative Trap"
         narrative: wallBonus >= 1
           ? `${m.tier !== "Novice" ? `[${m.tier}] ` : ""}the constant blade motion becomes an impenetrable wall!`
           : undefined,

@@ -253,15 +253,25 @@ function PhaseSliders({
   const phaseTarget = phase?.target ?? basePlan.target ?? "Any";
 
   const update = (field: keyof PhaseStrategy, val: any) => {
-    onChange({ OE: oe, AL: al, killDesire: kd, offensiveTactic: phase?.offensiveTactic, defensiveTactic: phase?.defensiveTactic, target: phase?.target, [field]: val });
+    onChange({ 
+      OE: oe, 
+      AL: al, 
+      killDesire: kd, 
+      aggressionBias: phase?.aggressionBias ?? basePlan.aggressionBias ?? 5,
+      offensiveTactic: phase?.offensiveTactic, 
+      defensiveTactic: phase?.defensiveTactic, 
+      target: phase?.target, 
+      [field]: val 
+    });
   };
 
   return (
     <div className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-4">
         <SliderField label="OE" value={oe} onChange={v => update("OE", v)} icon={<Swords className="h-3 w-3 text-arena-gold" />} color="text-arena-gold" />
         <SliderField label="AL" value={al} onChange={v => update("AL", v)} icon={<Flame className="h-3 w-3 text-arena-fame" />} color="text-arena-fame" />
         <SliderField label="KD" value={kd} onChange={v => update("killDesire", v)} icon={<Crosshair className="h-3 w-3 text-destructive" />} color="text-destructive" />
+        <SliderField label="Aggression" value={phase?.aggressionBias ?? basePlan.aggressionBias ?? 5} onChange={v => update("aggressionBias", v)} icon={<Zap className="h-3 w-3 text-indigo-400" />} color="text-indigo-400" />
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="space-y-1">
@@ -473,10 +483,11 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
         </div>
 
         {!phaseMode ? (
-          <div className="grid gap-5 sm:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-4">
             <SliderField label="Offensive Effort" value={plan.OE} onChange={v => updateField("OE", v)} icon={<Swords className="h-3.5 w-3.5 text-arena-gold" />} color="text-arena-gold" />
             <SliderField label="Activity Level" value={plan.AL} onChange={v => updateField("AL", v)} icon={<Flame className="h-3.5 w-3.5 text-arena-fame" />} color="text-arena-fame" />
             <SliderField label="Kill Desire" value={plan.killDesire ?? 5} onChange={v => updateField("killDesire", v)} icon={<Crosshair className="h-3.5 w-3.5 text-destructive" />} color="text-destructive" />
+            <SliderField label="Aggression Bias" value={plan.aggressionBias ?? 5} onChange={v => updateField("aggressionBias", v)} icon={<Zap className="h-3.5 w-3.5 text-indigo-400" />} color="text-indigo-400" />
           </div>
         ) : (
           <Tabs defaultValue="opening" className="w-full">
@@ -501,6 +512,33 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
             ))}
           </Tabs>
         )}
+
+        {/* Opening Move & Fallback Condition */}
+        <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+                <Label className="text-sm flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 text-indigo-400" /> Opening Move</Label>
+                <Select value={plan.openingMove ?? "Measured"} onValueChange={v => updateField("openingMove", v as any)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Safe">Safe (Defensive Posture)</SelectItem>
+                        <SelectItem value="Measured">Measured (Wait and See)</SelectItem>
+                        <SelectItem value="Aggressive">Aggressive (Blitz Start)</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-1.5">
+                <Label className="text-sm flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 text-amber-500" /> Fallback Condition</Label>
+                <Select value={plan.fallbackCondition ?? "None"} onValueChange={v => updateField("fallbackCondition", v as any)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="None">None (Hold the line)</SelectItem>
+                        <SelectItem value="Exhausted">Exhausted (Low Stamina)</SelectItem>
+                        <SelectItem value="Hurt">Hurt (Low Health)</SelectItem>
+                    </SelectContent>
+                </Select>
+                <p className="text-[10px] text-muted-foreground">Drops OE/AL by 2 when condition met.</p>
+            </div>
+        </div>
 
         {/* Stamina Projection */}
         <StaminaCurve points={staminaPoints} />

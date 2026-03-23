@@ -196,13 +196,13 @@ describe("combatDamage engine", () => {
 
       const rngMin = vi.fn().mockReturnValue(0);
       const resMin = computeHitDamage(rngMin, baseClass, "right arm");
-      // 12 * 1.0 * 0.85 = 10.2 -> 10
-      expect(resMin).toBe(10);
+      // 12 * 1.0 * 0.70 = 8.4 -> 8
+      expect(resMin).toBe(8);
 
       const rngMax = vi.fn().mockReturnValue(0.9999);
       const resMax = computeHitDamage(rngMax, baseClass, "right arm");
-      // 12 * 1.0 * 1.15 = 13.8 -> 14
-      expect(resMax).toBe(14);
+      // 12 * 1.0 * 1.30 = 15.6 -> 16
+      expect(resMax).toBe(16);
     });
 
     it("minimum damage is 1", () => {

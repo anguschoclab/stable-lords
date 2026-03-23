@@ -158,6 +158,7 @@ export interface PhaseStrategy {
   offensiveTactic?: OffensiveTactic;
   defensiveTactic?: DefensiveTactic;
   target?: AttackTarget;
+  aggressionBias?: number; // 0-10
 }
 
 export interface FightPlan {
@@ -165,6 +166,9 @@ export interface FightPlan {
   OE: number;      // Offensive Effort 1-10 (default / fallback)
   AL: number;      // Activity Level 1-10
   killDesire?: number; // Kill Desire 1-10
+  aggressionBias?: number; // 0-10, affects risk/reward balance
+  openingMove?: "Safe" | "Aggressive" | "Measured";
+  fallbackCondition?: "Exhausted" | "Hurt" | "None";
   target?: AttackTarget;
   protect?: ProtectTarget;  // Prioritize defense of a body location
   offensiveTactic?: OffensiveTactic;
@@ -280,6 +284,10 @@ export interface Warrior {
   stableId?: string; // for AI rival warriors
   /** Hidden favorite weapon & rhythm — discovered through bouts */
   favorites?: WarriorFavorites;
+  // Permadeath updates
+  isDead?: boolean;
+  dateOfDeath?: string;
+  causeOfDeath?: string;
 }
 
 // ─── Owner / Stable ─────────────────────────────────────────────────────────
@@ -389,6 +397,8 @@ export interface FightSummary {
   title: string;
   a: string;
   d: string;
+  stableA?: string;
+  stableD?: string;
   winner: "A" | "D" | null;
   by: FightOutcomeBy;
   styleA: string;
@@ -404,6 +414,7 @@ export interface FightSummary {
   createdAt: string;
   isDeathEvent?: boolean;
   deathEventData?: DeathEvent;
+  isRivalry?: boolean;
 }
 
 export interface HallEntry {
@@ -440,6 +451,8 @@ export interface TournamentBout {
   matchIndex: number;
   a: string; // warrior name
   d: string;
+  stableA?: string;
+  stableD?: string;
   winner?: "A" | "D" | null;
   by?: FightOutcomeBy;
   fightId?: string;
@@ -590,6 +603,7 @@ export interface GameState {
       scouting: boolean;
     };
   };
+  isFTUE: boolean;
 }
 
 /** Trainer as stored in game state (mirrors modules/trainers Trainer shape) */

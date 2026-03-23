@@ -133,12 +133,13 @@ export function narrateEvents(
         }
         break;
 
-      case "INSIGHT":
+      case "INSIGHT": {
         // Logic for which attribute to hint at could be passed in metadata
         // For now, mirroring the 20% chance from simulate.ts if we want to keep it simple
         const hint = narrateInsightHint(rng, event.metadata?.attribute || "ST");
         if (hint) log.push({ minute, text: `🔍 ${hint}` });
         break;
+      }
 
       case "BOUT_END":
         // This will be handled at the very end of simulateFight usually, 

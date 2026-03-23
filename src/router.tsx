@@ -67,9 +67,11 @@ const styleGuideRoute = new Route({ getParentRoute: () => rootRoute, path: "/sty
 const arenaHubRoute = new Route({ getParentRoute: () => rootRoute, path: "/arena-hub", component: ArenaHub });
 const stableLedgerRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-ledger", component: StableLedger });
 const stableHallRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-hall", component: StableHall });
+const welcomeRoute = new Route({ getParentRoute: () => rootRoute, path: "/welcome", component: () => import("@/pages/Orphanage").then(m => m.default) });
 
 // Create the route tree
 const routeTree = rootRoute.addChildren([
+  welcomeRoute,
   indexRoute,
   runRoundRoute,
   tournamentsRoute,

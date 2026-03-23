@@ -15,6 +15,7 @@ interface BoutViewerProps {
   winner: "A" | "D" | null;
   by: FightOutcomeBy;
   announcement?: string;
+  isRivalry?: boolean;
 }
 
 // Classify log lines for visual treatment
@@ -72,7 +73,7 @@ function getOutcomeStyles(by: FightOutcomeBy) {
   }
 }
 
-export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, by, announcement }: BoutViewerProps) {
+export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, by, announcement, isRivalry }: BoutViewerProps) {
   const [visibleCount, setVisibleCount] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState<1 | 2 | 3>(1);
@@ -169,11 +170,16 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
             </div>
 
             {/* Center VS */}
-            <div className="flex flex-col items-center gap-1 shrink-0 px-2">
-              <div className="w-10 h-10 rounded-full border-2 border-border bg-secondary flex items-center justify-center">
-                <Swords className="h-4 w-4 text-arena-gold" />
-              </div>
-              {isComplete && by && (
+              <div className="flex flex-col items-center gap-1 shrink-0 px-2">
+                <div className="w-10 h-10 rounded-full border-2 border-border bg-secondary flex items-center justify-center">
+                  <Swords className="h-4 w-4 text-arena-gold" />
+                </div>
+                {isRivalry && (
+                  <Badge variant="destructive" className="text-[8px] px-1 py-0 uppercase font-black tracking-tighter animate-pulse shadow-sm shadow-destructive/20 mt-1">
+                    GRUDGE MATCH
+                  </Badge>
+                )}
+                {isComplete && by && (
                 <Badge
                   variant="outline"
                   className={cn("text-[10px] animate-scale-in", outcomeStyle.text)}

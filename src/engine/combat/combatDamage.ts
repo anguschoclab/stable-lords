@@ -20,8 +20,8 @@ const DAMAGE_HEAD_MULT = 1.5;
 const DAMAGE_CHEST_MULT = 1.2;
 const DAMAGE_ABDOMEN_MULT = 1.1;
 const DAMAGE_LIMB_MULT = 1.0;
-const DAMAGE_VARIANCE_MIN = 0.85;
-const DAMAGE_VARIANCE_MAX = 1.15;
+const DAMAGE_VARIANCE_MIN = 0.70;
+const DAMAGE_VARIANCE_MAX = 1.30;
 
 export function protectCovers(protect?: string): string[] {
   if (!protect || protect === "Any" || protect === "none_armor" || protect === "none_helm") return [];
@@ -83,4 +83,40 @@ export function computeHitDamage(rng: () => number, damageClass: number, locatio
   // Wait, Math.floor(13.8) is 13.
   // Test expected 14 for 13.8. So it's Math.round!
   return Math.max(1, Math.round(base * locMult * variance));
+}
+
+/**
+ * Calculates the probability of a lethal hit (Kill Window).
+ * Tie fatal conversion rates to fatigue and vital locations (Head/Torso/Abdomen).
+ */
+export function calculateKillWindow(
+  hpRatio: number,
+  enduranceRatio: number,
+  location: HitLocation,
+  killDesire: number,
+  phaseLevel: number // 0 for Opening, 1 for Mid, 2 for Late
+): number {
+  // Base threshold (lethal hits are rare but possible)
+  let threshold = 0.02;
+
+  // HP factor: higher chance if HP is low (below 30%)
+  if (hpRatio < 0.3) threshold += 0.12;
+  else if (hpRatio < 0.5) threshold += 0.05;
+
+  // Endurance (Fatigue) factor: higher chance if target is exhausted (below 30%)
+  if (enduranceRatio < 0.3) threshold += 0.10;
+  else if (enduranceRatio < 0.5) threshold += 0.04;
+
+  // Location factor: Vital spots are deadlier
+  if (location === "head") threshold += 0.08;
+  if (location === "chest" || location === "abdomen") threshold += 0.04;
+
+  // Kill Desire: Attacker's aggression
+  threshold += (killDesire - 5) * 0.01;
+
+  // Phase escalation: fights get more dangerous as time passes
+  threshold += phaseLevel * 0.05;
+
+  // Cap at 35% for organic hits
+  return Math.max(0, Math.min(0.35, threshold));
 }

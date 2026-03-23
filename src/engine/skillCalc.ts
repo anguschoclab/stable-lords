@@ -31,16 +31,17 @@ const STYLE_SEEDS: Record<FightingStyle, [number, number, number, number, number
   // PR RIP seed reduced (riposte identity via passives, not raw skill).
   // WS ATT/DEF boosted (zone-control identity needs baseline offense).
   // TP DEF reduced (endurance identity, not dodge-walling).
-  [FightingStyle.AimedBlow]:       [ 5,  2,  2,  3,  2,  4],  // 18 — precision via crit
-  [FightingStyle.BashingAttack]:   [ 8,  1,  2,  4,  1,  3],  // 19 — highest ATT, raw power
-  [FightingStyle.LungingAttack]:   [ 8,  1,  2,  5,  1,  3],  // 20 — fast, aggressive
-  [FightingStyle.ParryLunge]:      [ 5,  3,  2,  3,  2,  3],  // 18 — balanced hybrid
-  [FightingStyle.ParryRiposte]:    [ 3,  2,  2,  2,  1,  2],  // 12 — INI 3→2, slowest counter style
-  [FightingStyle.ParryStrike]:     [ 5,  3,  3,  3,  2,  3],  // 19 — efficient counter
-  [FightingStyle.SlashingAttack]:  [ 8,  1,  2,  4,  1,  3],  // 19 — offensive, multi-hit
-  [FightingStyle.StrikingAttack]:  [ 8,  2,  2,  4,  1,  3],  // 20 — reliable power
-  [FightingStyle.TotalParry]:      [ 2,  3,  2,  2,  2,  2],  // 13 — DEF 3→2, identity is endurance
-  [FightingStyle.WallOfSteel]:     [ 4,  2,  4,  3,  2,  3],  // 18 — ATT 3→4, DEF 3→4, zone control
+  //                                          ATT PAR DEF INI RIP DEC
+  [FightingStyle.AimedBlow]:       [ 5,  6,  6,  4,  4,  6],  
+  [FightingStyle.BashingAttack]:   [ 6,  5,  5,  4,  3,  4],  
+  [FightingStyle.LungingAttack]:   [ 6,  5,  5,  5,  3,  4],  
+  [FightingStyle.ParryLunge]:      [ 5,  7,  6,  4,  5,  4],  
+  [FightingStyle.ParryRiposte]:    [ 4,  8,  7,  4,  7,  4],  
+  [FightingStyle.ParryStrike]:     [ 5,  8,  8,  4,  6,  4],  
+  [FightingStyle.SlashingAttack]:  [ 6,  5,  5,  5,  3,  4],  
+  [FightingStyle.StrikingAttack]:  [ 6,  6,  6,  5,  3,  4],  
+  [FightingStyle.TotalParry]:      [ 3,  10, 8,  4,  4,  4],  
+  [FightingStyle.WallOfSteel]:     [ 5,  8,  9,  5,  4,  4],  
 };
 
 // ─── Attribute → Skill Breakpoint Contributions ──────────────────────────

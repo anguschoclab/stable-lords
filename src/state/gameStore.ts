@@ -59,6 +59,7 @@ export function createFreshState(): GameState {
     },
     ftueComplete: false,
     ftueStep: 0,
+    isFTUE: true,
     coachDismissed: [],
     player: {
       id: "owner_1",
@@ -151,6 +152,7 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.gold === undefined) parsed.gold = 500;
   if (!parsed.ledger) parsed.ledger = [];
   if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
+  if (parsed.isFTUE === undefined) parsed.isFTUE = !parsed.ftueComplete;
   if (!parsed.coachDismissed) parsed.coachDismissed = [];
   if (!parsed.rivals) parsed.rivals = [];
   if (!parsed.scoutReports) parsed.scoutReports = [];
@@ -404,5 +406,34 @@ export function clearResolutionPhase(state: GameState): GameState {
     ...state,
     phase: "planning",
     pendingResolutionData: undefined,
+  };
+}
+
+/**
+ * Initialize the player's stable name and starting gold.
+ * Used at the very start of the FTUE.
+ */
+export function initializeStable(state: GameState, name: string, stableName: string): GameState {
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      name,
+      stableName,
+    },
+    gold: 500, // Starting gold
+  };
+}
+
+/**
+ * Draft the initial roster from the orphanage.
+ * Moves selected warriors to the roster and completes the FTUE.
+ */
+export function draftInitialRoster(state: GameState, warriors: Warrior[]): GameState {
+  return {
+    ...state,
+    roster: warriors,
+    isFTUE: false,
+    ftueComplete: true,
   };
 }

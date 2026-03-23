@@ -489,7 +489,7 @@ function BestByStyle({ allFights }: { allFights: FightSummary[] }) {
                       {w.name}
                     </span>
                   </div>
-                  <StatBadge career={{ wins: w.wins, losses: w.losses, kills: w.kills, matches: w.wins + w.losses, survives: w.wins + w.losses, deaths: 0 }} hideStyle />
+                  <StatBadge styleName={style as any} career={{ wins: w.wins, losses: w.losses, kills: w.kills }} />
                 </div>
               ))}
             </div>
@@ -567,28 +567,52 @@ function RisingStars({ allFights, currentWeek }: { allFights: FightSummary[]; cu
 }
 
 
-/* ── Weekly Issue ────────────────────────────────────────── */
+import { Calendar } from "lucide-react";
 
 function WeeklyIssue({ issue, state }: { issue: GazetteStory; state: any }) {
+  const paragraphs = (issue.body || "").split("\n\n").filter(p => p.trim().length > 0);
+  
   return (
-    <article key={issue.week} className="space-y-4">
-      <div className="flex items-end gap-3 border-b-2 border-accent/30 pb-2">
-        <h2 className="font-display text-xl text-foreground leading-none">
-          Week {issue.week}
+    <article key={issue.week} className="space-y-6 relative overflow-hidden bg-card/50 p-6 md:p-10 rounded-none border border-border shadow-sm font-serif">
+      {/* Decorative corners or borders could be added for more "paper" feel */}
+      
+      <div className="flex flex-col gap-4 border-b-2 border-foreground/20 pb-6">
+        <div className="flex items-center justify-between text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground border-b border-foreground/10 pb-2">
+          <span>Vol. {Math.floor(issue.week / 4) + 1} · No. {issue.week}</span>
+          <span>{state.season} · Week {issue.week}</span>
+          <span>Arena District Edition</span>
+        </div>
+        
+        <h2 className="text-4xl md:text-5xl lg:text-6xl text-foreground font-black tracking-tighter leading-[0.9] uppercase text-center md:text-left py-2">
+          {issue.headline}
         </h2>
-        <div className="flex gap-2 mb-0.5">
+
+        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start">
+          <Badge variant="destructive" className="bg-arena-blood text-white text-[10px] uppercase font-bold px-2 py-0 border-none rounded-none">
+            LATEST
+          </Badge>
           {issue.tags.map(tag => (
-            <Badge key={tag} variant="outline" className="text-[10px] font-mono gap-1">
-              {tag}
-            </Badge>
+            <span key={tag} className="text-[10px] font-mono font-bold tracking-tighter text-muted-foreground px-2 border-l border-foreground/20 first:border-l-0">
+              #{tag.toUpperCase()}
+            </span>
           ))}
         </div>
       </div>
 
-      <div className="space-y-6">
-        <h3 className="font-display text-2xl text-primary">{issue.headline}</h3>
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-          <MarkdownReader content={issue.body} />
+      <div className="columns-1 md:columns-2 lg:columns-3 gap-10 [column-rule:1px_solid_hsl(var(--border))]">
+        {paragraphs.map((p, i) => (
+          <p key={i} className={`text-[15px] leading-relaxed text-foreground/80 mb-6 text-justify ${i === 0 ? "first-letter:text-6xl first-letter:font-black first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-letter:text-primary first-letter:mt-1" : ""}`}>
+            {p}
+          </p>
+        ))}
+      </div>
+      
+      <div className="flex items-center justify-between border-t-2 border-foreground/20 pt-4 mt-4 opacity-70">
+        <span className="text-[9px] font-mono uppercase tracking-[0.3em] font-bold">The Truth remains when the blood dries</span>
+        <div className="flex items-center gap-4">
+            <span className="text-[9px] font-mono uppercase tracking-widest font-bold">Price: 2 Copper</span>
+            <Separator orientation="vertical" className="h-3 bg-foreground/20" />
+            <span className="text-[9px] font-mono uppercase tracking-widest font-bold">Est. 412 AE</span>
         </div>
       </div>
     </article>

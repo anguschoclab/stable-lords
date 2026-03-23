@@ -1,4 +1,4 @@
-import { generateFightNarrative } from "@/engine/gazetteNarrative";
+import { generateFightNarrative, generateWeeklyGazette } from "@/engine/gazetteNarrative";
 /**
  * Bout Processor — shared fight resolution logic for RunRound and Autosim.
  *
@@ -23,7 +23,7 @@ import {
   generateMatchCard,
   addRestState,
   addMatchRecord,
-  detectRivalries,
+  updateRivalriesFromBouts,
 } from "@/engine/matchmaking";
 
 // ─── Types ────────────────────────────────────────────────────────────────
@@ -168,15 +168,7 @@ function handleBoutDeath(
       playerDeath = true;
       s = killWarrior(s, warrior.id, opponent.name, "Killed in arena combat", deathEvent);
       if (rivalStableId) {
-        s.rivalries = detectRivalries(s.rivalries || [], rivalStableId, playerId, opponent.name, warrior.name, week || s.week);
-      }
-      // Fame hit for having a warrior killed
-      s.fame = Math.max(0, (s.fame || 0) - 5);
-      if (s.player) s.player.fame = Math.max(0, (s.player.fame || 0) - 5);
-    } else {
-      if (rivalStableId) {
         s.rivals = (s.rivals || []).map(r => ({ ...r, roster: r.roster.filter(w => w.id !== opponent.id) }));
-        s.rivalries = detectRivalries(s.rivalries || [], playerId, rivalStableId, warrior.name, opponent.name, week || s.week);
       } else {
         s = killWarrior(s, opponent.id, warrior.name, "Killed in arena combat", deathEvent);
       }
@@ -377,7 +369,10 @@ function generateFightSummary(
   fameD: number,
   popD: number,
   week: number,
-  boutId?: string
+  stableA?: string,
+  stableD?: string,
+  boutId?: string,
+  isRivalry?: boolean
 ): { summary: FightSummary; announcement: string | undefined } {
   const fightSummary: FightSummary = {
     id: boutId || crypto.randomUUID(),
@@ -386,6 +381,8 @@ function generateFightSummary(
     title: `${warrior.name} vs ${opponent.name}`,
     a: warrior.name,
     d: opponent.name,
+    stableA,
+    stableD,
     winner: outcome.winner,
     by: outcome.by,
     styleA: warrior.style,
@@ -398,6 +395,7 @@ function generateFightSummary(
     popularityDeltaA: popA,
     popularityDeltaD: popD,
     transcript: outcome.log.map(e => e.text),
+    isRivalry,
     createdAt: new Date().toISOString(),
   };
 
@@ -574,7 +572,7 @@ function resolveBout(
   s = checkGiantKillerFlair(s, warrior, opponent, outcome);
 
   // 8. Generate Summary and handle side-effects
-  const { summary, announcement } = generateFightSummary(warrior, opponent, outcome, tags, fameA, popA, fameD, popD, week, boutId);
+  const { summary, announcement } = generateFightSummary(warrior, opponent, outcome, tags, fameA, popA, fameD, popD, week, playerId, rivalStableId, boutId, isRivalry);
   s.arenaHistory = [...s.arenaHistory, summary];
 
   return {
@@ -727,12 +725,13 @@ export function processWeekBouts(state: GameState): ProcessedWeek {
 
   NewsletterFeed.closeWeekToIssue(state.week);
 
-  // ── Rivalry escalation detection ──
-  const newRivalries = s.rivalries || [];
-  summary.hadRivalryEscalation = newRivalries.some((r, i) => {
-    const old = prevRivalries[i] ?? 0;
-    return r.intensity > old && r.intensity >= 4;
-  });
+  // ── Gazette generation ──
+  const weekSummaries = s.arenaHistory.filter(f => f.week === state.week);
+  const gazette = generateWeeklyGazette(weekSummaries, s.crowdMood, s.week, s.graveyard, s.arenaHistory);
+  s.gazettes = [...(s.gazettes || []), gazette];
+
+  // ── Rivalry update ──
+  s.rivalries = updateRivalriesFromBouts(s.rivalries || [], weekSummaries, s.week);
 
   return { state: s, results, summary };
 }

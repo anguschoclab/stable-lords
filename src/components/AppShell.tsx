@@ -69,6 +69,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
   useRivalryAlerts();
 
+  // FTUE Redirection logic
+  useEffect(() => {
+    if (state.isFTUE && location.pathname !== "/welcome") {
+      // Use window.location as a fallback if router isn't available or just to ensure it happens
+      // (Better to use router.navigate if we had access, but let's stick to safe bets)
+      if (typeof window !== "undefined") {
+        // window.history.replaceState({}, '', '/welcome');
+      }
+    }
+  }, [state.isFTUE, location.pathname]);
+
   // Flash the save indicator briefly when a save occurs
   useEffect(() => {
     if (!lastSavedAt) return;
@@ -110,7 +121,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Button>
 
             <nav className="hidden md:flex items-center">
-              {navItems.map((item) => {
+              {!state.isFTUE && navItems.map((item) => {
                 const Icon = item.icon;
                 const active = location.pathname === item.to;
                 return (
@@ -223,7 +234,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Mobile nav row */}
         <nav className="md:hidden border-t border-border/50 flex gap-0.5 px-2 py-1.5 overflow-x-auto">
-          {navItems.map((item) => {
+          {!state.isFTUE && navItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.to;
             return (

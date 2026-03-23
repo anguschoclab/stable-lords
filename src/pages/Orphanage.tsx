@@ -1,12 +1,11 @@
 /**
  * Stable Lords — Orphanage FTUE Flow
  * Dynamic warrior selection → Tutorial bout → Summary
- * (Stable naming now handled on Start Game page)
  */
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { makeWarrior } from "@/state/gameStore";
-import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
+import { simulateFight, defaultPlanForWarrior } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
 import { generateRecruitPool } from "@/engine/recruitment";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightSummary } from "@/types/game";
@@ -17,19 +16,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { StatBadge } from "@/components/ui/StatBadge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Swords, ArrowRight, ArrowLeft, Sparkles, Skull, Shield,
   CheckCircle2, Trophy, Zap, RefreshCw, User, MapPin, Brain,
 } from "lucide-react";
-import { generateOrphanPool, type OrphanWarrior } from "@/data/orphanPool";
+import { generateOrphanPool } from "@/data/orphanPool";
 
-const STEP_LABELS = ["Choose Warriors", "First Blood", "Your Story Begins"];
+const STEP_LABELS = ["Establish Identity", "Choose Warriors", "First Blood", "Your Story Begins"];
 
 export default function Orphanage() {
-  const { state, setState, returnToTitle } = useGameStore();
-  const [step, setStep] = useState(0);
+  const { state, doInitializeStable, doDraftInitialRoster, setState, returnToTitle } = useGameStore();
+  
+  const initialStep = !state.player.stableName ? 0 : 1;
+  const [step, setStep] = useState(initialStep);
+  const [stableInput, setStableInput] = useState(state.player.stableName || "");
+  const [ownerInput, setOwnerInput] = useState(state.player.name || "");
+  
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [poolSeed, setPoolSeed] = useState(() => Date.now());
   const [boutResult, setBoutResult] = useState<{
@@ -38,10 +41,9 @@ export default function Orphanage() {
     summary: FightSummary;
   } | null>(null);
 
-  // Dynamic orphan pool — regenerates on seed change
+  // Dynamic orphan pool
   const orphanPool = useMemo(() => generateOrphanPool(8, poolSeed), [poolSeed]);
 
-  // Names come from state (set on start page)
   const stableName = state.player.stableName;
   const ownerName = state.player.name;
 
@@ -49,8 +51,6 @@ export default function Orphanage() {
     setPoolSeed(Date.now());
     setSelected(new Set());
   }, []);
-
-  // ── Step 0: Choose Warriors ──────────────────────────────────────────────
 
   const toggleWarrior = useCallback((id: string) => {
     setSelected((prev) => {
@@ -65,8 +65,6 @@ export default function Orphanage() {
     () => orphanPool.filter((w) => selected.has(w.id)),
     [selected, orphanPool]
   );
-
-  // ── Step 1: Tutorial Bout ────────────────────────────────────────────────
 
   const runTutorialBout = useCallback(() => {
     if (selectedWarriors.length < 2) return;
@@ -98,8 +96,6 @@ export default function Orphanage() {
 
     setBoutResult({ a: wA, d: wB, outcome, summary });
   }, [selectedWarriors]);
-
-  // ── Step 2: Finalize & Enter Game ────────────────────────────────────────
 
   const finishFTUE = useCallback(() => {
     let seed = Date.now();
@@ -145,9 +141,10 @@ export default function Orphanage() {
         deathWeek: 1,
         deathCause: "Killed in first arena bout",
         killedBy: boutResult?.outcome.winner === "A" ? boutResult.a.name : boutResult?.d.name,
+        isDead: true,
+        dateOfDeath: `Week 1, ${state.season}`,
       }));
 
-    // Generate the large world: 23 AI stables
     const generatedRivals = generateRivalStables(23, Date.now());
     const rivals = generatedRivals.map((r) => ({
       owner: r.owner,
@@ -158,55 +155,22 @@ export default function Orphanage() {
       tier: r.template.tier,
     }));
 
-    // Collect all used names for recruit pool generation
     const usedNames = new Set<string>();
-    for (const w of aliveWarriors) usedNames.add(w.name);
-    for (const w of deadWarriors) usedNames.add(w.name);
-    for (const r of generatedRivals) {
-      for (const w of r.roster) usedNames.add(w.name);
-    }
+    aliveWarriors.forEach(w => usedNames.add(w.name));
+    deadWarriors.forEach(w => usedNames.add(w.name));
+    rivals.forEach(r => r.roster.forEach(w => usedNames.add(w.name)));
 
-    // Generate 100 recruit pool warriors
     const recruitPool = generateRecruitPool(100, 1, usedNames, Date.now() + 1);
-
-    // Count world stats for gazette
-    const totalWarriors = generatedRivals.reduce((sum, r) => sum + r.roster.length, 0);
-    const totalTrainers = generatedRivals.reduce((sum, r) => sum + r.trainers.length, 0);
 
     const newState = {
       ...state,
+      isFTUE: false,
       ftueComplete: true,
-      ftueStep: undefined,
-      fame: 1,
-      popularity: 1,
       roster: aliveWarriors,
       graveyard: [...state.graveyard, ...deadWarriors],
-      arenaHistory: boutResult ? [boutResult.summary] : [],
       rivals,
       recruitPool,
-      scoutReports: [],
-      newsletter: [
-        {
-          week: 1,
-          title: "Arena Gazette — Grand Opening",
-          items: [
-            `🏟️ ${stableName} enters the arena under ${ownerName}'s command!`,
-            `⚔️ ${rivals.length} rival stables with ${totalWarriors} warriors compete for glory!`,
-            `🏋️ ${totalTrainers} trainers stand ready across all stables.`,
-            `📋 ${recruitPool.length} orphans await in the recruitment pool.`,
-            ...(boutResult
-              ? [
-                  `First bout: ${boutResult.a.name} vs ${boutResult.d.name} — ${
-                    boutResult.outcome.winner
-                      ? `${boutResult.outcome.winner === "A" ? boutResult.a.name : boutResult.d.name} wins by ${boutResult.outcome.by}`
-                      : "Draw"
-                  }${boutResult.outcome.by === "Kill" ? " ☠️" : ""}`,
-                ]
-              : []),
-            `${aliveWarriors.length} warriors stand ready. The arena awaits.`,
-          ],
-        },
-      ],
+      arenaHistory: boutResult ? [boutResult.summary] : [],
     };
 
     if (boutResult) {
@@ -214,14 +178,11 @@ export default function Orphanage() {
     }
 
     setState(newState);
-  }, [state, setState, selectedWarriors, boutResult, ownerName, stableName]);
-
-  // ── Render ───────────────────────────────────────────────────────────────
+  }, [state, setState, selectedWarriors, boutResult]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-2xl space-y-6">
-        {/* Progress */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span className="font-display font-semibold text-foreground">{STEP_LABELS[step]}</span>
@@ -230,300 +191,104 @@ export default function Orphanage() {
           <Progress value={((step + 1) / STEP_LABELS.length) * 100} className="h-2" />
         </div>
 
-        {/* Step 0: Choose Warriors */}
+        {/* Step 0: Identity */}
         {step === 0 && (
+          <Card className="border-primary/30">
+            <CardHeader><CardTitle className="font-display text-xl">Establish Your Identity</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Your Name</label>
+                <input type="text" value={ownerInput} onChange={(e) => setOwnerInput(e.target.value)}
+                  className="w-full bg-secondary border border-border rounded px-3 py-2 text-sm" placeholder="e.g. Master Thorne" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Stable Name</label>
+                <input type="text" value={stableInput} onChange={(e) => setStableInput(e.target.value)}
+                  className="w-full bg-secondary border border-border rounded px-3 py-2 text-sm" placeholder="e.g. The Iron Sentinels" />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={returnToTitle} className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
+                <Button disabled={!ownerInput.trim() || !stableInput.trim()} onClick={() => { doInitializeStable(ownerInput.trim(), stableInput.trim()); setStep(1); }} className="flex-1 gap-2">
+                  Continue <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step 1: Choose Warriors */}
+        {step === 1 && (
           <div className="space-y-4">
             <Card className="border-primary/30">
-              <CardHeader className="pb-2">
-                <CardTitle className="font-display text-xl flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-primary" />
-                  The Orphanage
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm mb-1">
-                  Welcome, <span className="text-foreground font-semibold">{ownerName}</span> of <span className="text-foreground font-semibold">{stableName}</span>.
-                </p>
-                <p className="text-muted-foreground text-sm mb-4">
-                  These orphans have been forged by hardship — each with a unique past and fighting instinct.
-                  Choose <span className="text-foreground font-semibold">3 warriors</span> to form your starting stable.
-                </p>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground text-sm mb-4">Choose 3 warriors to form your starting stable.</p>
                 <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="font-mono">
-                    {selected.size}/3 selected
-                  </Badge>
-                  <Button variant="ghost" size="sm" onClick={rerollPool} className="gap-1.5 text-xs text-muted-foreground">
-                    <RefreshCw className="h-3 w-3" /> New batch
-                  </Button>
+                  <Badge variant="outline" className="font-mono">{selected.size}/3 selected</Badge>
+                  <Button variant="ghost" size="sm" onClick={rerollPool} className="gap-1.5 text-xs text-muted-foreground"><RefreshCw className="h-3 w-3" /> New batch</Button>
                 </div>
               </CardContent>
             </Card>
-
             <div className="grid gap-3">
               {orphanPool.map((pw) => {
                 const isSelected = selected.has(pw.id);
                 const stats = computeWarriorStats(pw.attrs, pw.style);
-                const archetype = pw.style === FightingStyle.BashingAttack || pw.style === FightingStyle.StrikingAttack
-                  ? "Power" : pw.style === FightingStyle.LungingAttack || pw.style === FightingStyle.SlashingAttack
-                  ? "Speed" : pw.style === FightingStyle.TotalParry || pw.style === FightingStyle.WallOfSteel
-                  ? "Endurance" : "Finesse";
-
                 return (
-                  <Card
-                    key={pw.id}
-                    className={`cursor-pointer transition-all ${
-                      isSelected
-                        ? "border-primary ring-1 ring-primary/50 bg-primary/5"
-                        : selected.size >= 3
-                        ? "opacity-50"
-                        : "hover:border-primary/30"
-                    }`}
-                    onClick={() => toggleWarrior(pw.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          {/* Name row */}
-                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                            {isSelected && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
-                            <span className="font-display font-bold text-foreground text-lg leading-tight">{pw.name}</span>
-                            <Badge variant="secondary" className="text-[10px]">
-                              {STYLE_DISPLAY_NAMES[pw.style]}
-                            </Badge>
-                            <Badge variant="outline" className="text-[10px] gap-1">
-                              {archetype}
-                            </Badge>
-                            <Badge variant="secondary" className="text-[10px] gap-1 opacity-80">
-                              Potential: ???
-                            </Badge>
-                          </div>
-
-                          {/* Metadata row */}
-                          <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2 flex-wrap">
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" /> Age {pw.age}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Brain className="h-3 w-3" /> {pw.trait}
-                            </span>
-                          </div>
-
-                          {/* Lore */}
-                          <p className="text-xs text-muted-foreground italic mb-2 leading-relaxed">{pw.lore}</p>
-
-                          {/* Origin */}
-                          <div className="flex items-start gap-1.5 text-[10px] text-muted-foreground/70 mb-2">
-                            <MapPin className="h-3 w-3 shrink-0 mt-0.5" />
-                            <span>{pw.origin}</span>
-                          </div>
-
-                          {/* Attributes */}
-                          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                            {ATTRIBUTE_KEYS.map((k) => (
-                              <TooltipProvider key={k} delayDuration={200}>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <span className="cursor-default">
-                                      <span className="font-mono text-foreground/70">{k}</span>{" "}
-                                      <span className={
-                                        pw.attrs[k] >= 15 ? "text-primary font-bold" :
-                                        pw.attrs[k] >= 12 ? "text-primary/80 font-semibold" :
-                                        pw.attrs[k] <= 6 ? "text-destructive" :
-                                        pw.attrs[k] <= 8 ? "text-destructive/70" : ""
-                                      }>
-                                        {pw.attrs[k]}
-                                      </span>
-                                    </span>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top" className="text-xs">
-                                    {ATTRIBUTE_LABELS[k]}: {pw.attrs[k]}
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            ))}
-                          </div>
+                  <Card key={pw.id} onClick={() => toggleWarrior(pw.id)} className={`cursor-pointer ${isSelected ? "border-primary bg-primary/5" : "hover:border-primary/30"}`}>
+                    <CardContent className="p-4 flex flex-row justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-display font-bold">{pw.name}</span>
+                          <Badge variant="secondary" className="text-[10px]">{STYLE_DISPLAY_NAMES[pw.style]}</Badge>
                         </div>
-
-                        {/* Right stats column */}
-                        <div className="text-right text-xs space-y-1.5 ml-2 shrink-0 pt-1">
-                          <div className="rounded bg-secondary/60 px-2 py-1 border border-border/50">
-                            <div className="text-[10px] text-muted-foreground">HP</div>
-                            <div className="font-mono font-bold text-sm">{stats.derivedStats.hp}</div>
-                          </div>
-                          <div className="rounded bg-secondary/60 px-2 py-1 border border-border/50">
-                            <div className="text-[10px] text-muted-foreground">DMG</div>
-                            <div className="font-mono font-bold text-sm">{DAMAGE_LABELS[stats.derivedStats.damage]}</div>
-                          </div>
-                          <div className="rounded bg-secondary/60 px-2 py-1 border border-border/50">
-                            <div className="text-[10px] text-muted-foreground">END</div>
-                            <div className="font-mono font-bold text-sm">{stats.derivedStats.endurance}</div>
-                          </div>
-                        </div>
+                        <p className="text-[11px] text-muted-foreground italic">{pw.lore}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] font-mono">HP: {stats.derivedStats.hp}</div>
+                        <div className="text-[10px] font-mono">END: {stats.derivedStats.endurance}</div>
                       </div>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
-
             <div className="flex gap-3">
-              <Button variant="outline" onClick={returnToTitle} className="gap-2">
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-              <Button
-                onClick={() => { setStep(1); runTutorialBout(); }}
-                disabled={selected.size < 3}
-                className="flex-1 gap-2"
-                size="lg"
-              >
-                <Swords className="h-4 w-4" />
-                To the Arena — First Blood
-              </Button>
+              <Button variant="outline" onClick={() => setStep(0)} className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
+              <Button onClick={() => { setStep(2); runTutorialBout(); }} disabled={selected.size < 3} className="flex-1 gap-2" size="lg">To the Arena <ArrowRight className="h-4 w-4" /></Button>
             </div>
           </div>
         )}
 
-        {/* Step 1: Tutorial Bout */}
-        {step === 1 && boutResult && (
+        {/* Step 2: First Blood */}
+        {step === 2 && boutResult && (
           <div className="space-y-4">
-            <Card className="border-primary/30">
-              <CardHeader className="pb-2">
-                <CardTitle className="font-display text-xl flex items-center gap-2">
-                  <Swords className="h-5 w-5 text-primary" />
-                  First Blood
-                </CardTitle>
-              </CardHeader>
+            <Card className="border-primary/30"><CardHeader><CardTitle className="font-display text-xl">First Blood</CardTitle></CardHeader>
               <CardContent>
-                <p className="text-muted-foreground text-sm mb-4">
-                  The crowd roars as your first two warriors step into the arena. This is what it's all about.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-5 space-y-4">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-display font-bold">{boutResult.a.name}</span>
-                  <StatBadge styleName={boutResult.a.style} showFullName />
-                  <span className="text-muted-foreground text-sm">vs</span>
-                  <span className="font-display font-bold">{boutResult.d.name}</span>
-                  <StatBadge styleName={boutResult.d.style} showFullName />
-                </div>
-
-                <div className="text-center py-4">
-                  <Badge
-                    className={`text-base px-4 py-1.5 ${
-                      boutResult.outcome.by === "Kill"
-                        ? "bg-destructive text-destructive-foreground"
-                        : "bg-primary text-primary-foreground"
-                    }`}
-                  >
-                    {boutResult.outcome.by === "Kill" && <Skull className="h-4 w-4 mr-1.5" />}
-                    {boutResult.outcome.winner
-                      ? `${boutResult.outcome.winner === "A" ? boutResult.a.name : boutResult.d.name} wins by ${boutResult.outcome.by}!`
-                      : "Draw!"}
-                  </Badge>
-                  {boutResult.outcome.by === "Kill" && (
-                    <p className="text-sm text-destructive mt-2">
-                      {boutResult.outcome.winner === "A" ? boutResult.d.name : boutResult.a.name} has fallen. The arena claims its first blood.
-                    </p>
-                  )}
-                </div>
-
-                {(boutResult.outcome.post?.tags ?? []).length > 0 && (
-                  <div className="flex gap-2 justify-center">
-                    {(boutResult.outcome.post?.tags ?? []).map((t) => (
-                      <Badge key={t} variant="secondary" className="text-xs gap-1">
-                        <Sparkles className="h-3 w-3" /> {t}
-                      </Badge>
-                    ))}
+                <div className="text-center py-4 space-y-4">
+                  <div className="flex justify-center gap-4 items-center">
+                    <span className="font-display font-bold">{boutResult.a.name}</span>
+                    <span className="text-muted-foreground">vs</span>
+                    <span className="font-display font-bold">{boutResult.d.name}</span>
                   </div>
-                )}
-
-                <div className="space-y-1 text-sm text-muted-foreground border-l-2 border-primary/20 pl-3 max-h-[200px] overflow-y-auto">
-                  {boutResult.outcome.log.map((e, j) => (
-                    <p key={j}>
-                      <span className="text-xs text-muted-foreground/60 mr-2">Min {e.minute}</span>
-                      {e.text}
-                    </p>
-                  ))}
+                  <Badge className={boutResult.outcome.by === "Kill" ? "bg-destructive" : "bg-primary"}>
+                    {boutResult.outcome.winner ? `${boutResult.outcome.winner === "A" ? boutResult.a.name : boutResult.d.name} wins by ${boutResult.outcome.by}` : "Draw"}
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
-
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setStep(0)} className="gap-2">
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-              <Button
-                onClick={() => setStep(2)}
-                className="flex-1 gap-2"
-                size="lg"
-              >
-                Continue <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Button variant="outline" onClick={() => setStep(1)}><ArrowLeft className="h-4 w-4" /> Back</Button>
+              <Button onClick={() => setStep(3)} className="flex-1">Continue <ArrowRight className="h-4 w-4" /></Button>
             </div>
           </div>
         )}
 
-        {/* Step 2: Summary & Enter Game */}
-        {step === 2 && (
+        {/* Step 3: Finalize */}
+        {step === 3 && (
           <Card className="border-primary/30">
-            <CardHeader>
-              <CardTitle className="font-display text-2xl flex items-center gap-3">
-                <Trophy className="h-6 w-6 text-primary" />
-                Your Story Begins
-              </CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="font-display text-2xl">Your Story Begins</CardTitle></CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-muted-foreground leading-relaxed">
-                <span className="text-foreground font-semibold">{stableName}</span> is registered.
-                The crowd knows your name. The Gazette has printed your first headline.
-                Now — forge legends.
-              </p>
-
-              <div className="space-y-3">
-                <div className="rounded-lg bg-secondary p-4 border border-border">
-                  <div className="text-xs text-muted-foreground mb-1">Stable Master</div>
-                  <div className="font-display font-semibold">{ownerName}</div>
-                </div>
-                <div className="rounded-lg bg-secondary p-4 border border-border">
-                  <div className="text-xs text-muted-foreground mb-1">Starting Roster</div>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {selectedWarriors.map((pw) => {
-                      const isDead = boutResult?.outcome.by === "Kill" &&
-                        ((boutResult.outcome.winner === "A" && pw.name === boutResult.d.name) ||
-                         (boutResult.outcome.winner === "D" && pw.name === boutResult.a.name));
-                      return (
-                        <Badge key={pw.id} variant={isDead ? "destructive" : "outline"} className="gap-1.5">
-                          {isDead && <Skull className="h-3 w-3" />}
-                          {pw.name}
-                          <span className="text-muted-foreground text-[10px]">
-                            {STYLE_DISPLAY_NAMES[pw.style]} · Age {pw.age}
-                          </span>
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                </div>
-                {boutResult && (
-                  <div className="rounded-lg bg-secondary p-4 border border-border">
-                    <div className="text-xs text-muted-foreground mb-1">First Bout Result</div>
-                    <div className="text-sm">
-                      {boutResult.outcome.winner
-                        ? `${boutResult.outcome.winner === "A" ? boutResult.a.name : boutResult.d.name} defeated ${
-                            boutResult.outcome.winner === "A" ? boutResult.d.name : boutResult.a.name
-                          } by ${boutResult.outcome.by}`
-                        : "Draw"}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <Button onClick={finishFTUE} className="w-full gap-2" size="lg">
-                <Zap className="h-4 w-4" />
-                Enter the Arena Hub
-              </Button>
+              <p className="text-muted-foreground">Stable registered. Warriors chosen. The arena awaits.</p>
+              <Button onClick={finishFTUE} className="w-full" size="lg"><Zap className="h-4 w-4 mr-2" /> Enter Arena Hub</Button>
             </CardContent>
           </Card>
         )}

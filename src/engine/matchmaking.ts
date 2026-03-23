@@ -364,35 +364,70 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
   return { results, updatedRivals, gazetteItems };
 }
 
+import { calculateRivalryScore } from "./rivals";
+
 // ─── Rivalry Detection ────────────────────────────────────────────────────
 
-export function detectRivalries(
+export function updateRivalriesFromBouts(
   existingRivalries: Rivalry[],
-  killerStableId: string,
-  victimStableId: string,
-  killerName: string,
-  victimName: string,
+  weekFights: FightSummary[],
   week: number
 ): Rivalry[] {
   const rivalries = [...existingRivalries];
-  const existing = rivalries.find(r =>
-    (r.stableIdA === killerStableId && r.stableIdB === victimStableId) ||
-    (r.stableIdB === killerStableId && r.stableIdA === victimStableId)
-  );
-
-  if (existing) {
-    existing.intensity = Math.min(5, existing.intensity + 2);
-    existing.reason = `${killerName} killed ${victimName} in Week ${week}`;
-  } else {
-    rivalries.push({
-      stableIdA: killerStableId,
-      stableIdB: victimStableId,
-      intensity: 3,
-      reason: `${killerName} killed ${victimName} in Week ${week}`,
-      startWeek: week,
-    });
+  
+  // Group fights by stable pairs
+  const pairs = new Map<string, { a: string; b: string; bouts: number; deaths: number; upsets: number; lastReason: string }>();
+  
+  for (const f of weekFights) {
+    if (!f.stableA || !f.stableD) continue; // Skip if it's not a stable-based fight
+    const key = f.stableA < f.stableD ? `${f.stableA}|${f.stableD}` : `${f.stableD}|${f.stableA}`;
+    const entry = pairs.get(key) ?? { a: f.stableA, b: f.stableD, bouts: 0, deaths: 0, upsets: 0, lastReason: "" };
+    
+    entry.bouts++;
+    if (f.by === "Kill") {
+        entry.deaths++;
+        entry.lastReason = `${f.winner === "A" ? f.a : f.d} killed ${f.winner === "A" ? f.d : f.a} in Week ${week}`;
+    }
+    
+    // Upset detection: fame gap > 20 and lower fame wins
+    if (f.winner && f.fameA !== undefined && f.fameD !== undefined) {
+        const winnerFame = f.winner === "A" ? f.fameA : f.fameD;
+        const loserFame = f.winner === "A" ? f.fameD : f.fameA;
+        if (loserFame > winnerFame + 20) {
+            entry.upsets++;
+            if (!entry.lastReason || f.by !== "Kill") {
+                entry.lastReason = `${f.winner === "A" ? f.a : f.d} upset ${f.winner === "A" ? f.d : f.a} in Week ${week}`;
+            }
+        }
+    }
+    
+    pairs.set(key, entry);
   }
-
+  
+  for (const [key, data] of pairs.entries()) {
+    const existing = rivalries.find(r =>
+      (r.stableIdA === data.a && r.stableIdB === data.b) ||
+      (r.stableIdB === data.a && r.stableIdA === data.b)
+    );
+    
+    const intensityDelta = calculateRivalryScore(data.bouts, data.deaths, data.upsets);
+    
+    if (existing) {
+      existing.intensity = Math.max(existing.intensity, Math.min(5, existing.intensity + Math.floor(intensityDelta / 2)));
+      if (data.deaths > 0 || data.upsets > 0) {
+          existing.reason = data.lastReason || existing.reason;
+      }
+    } else if (intensityDelta >= 2 || data.bouts >= 3) {
+      rivalries.push({
+        stableIdA: data.a,
+        stableIdB: data.b,
+        intensity: Math.min(5, intensityDelta),
+        reason: data.lastReason || `Frequent clashes in the arena`,
+        startWeek: week
+      });
+    }
+  }
+  
   return rivalries;
 }
 

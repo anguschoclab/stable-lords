@@ -670,3 +670,23 @@ export function pickRivalOpponent(
   if (eligible.length === 0) return null;
   return eligible[Math.floor(Math.random() * eligible.length)];
 }
+/**
+ * Calculate rivalry intensity adjustment based on match outcomes.
+ * Base (bouts fought) + Death (+5) + Upset (+3).
+ * Returns capped 1-5 intensity.
+ */
+export function calculateRivalryScore(
+  boutsFought: number,
+  deathsCount: number,
+  upsetsCount: number
+): number {
+  let score = 0;
+  // Bouts fought adds small but steady intensity
+  score += Math.floor(boutsFought / 3);
+  // Blood feuds are immediate and intense
+  score += deathsCount * 5;
+  // Embarrassment of losses to clear underdogs
+  score += upsetsCount * 3;
+  
+  return Math.max(1, Math.min(5, score));
+}

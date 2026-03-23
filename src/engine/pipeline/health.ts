@@ -12,7 +12,7 @@ export const applyHealthUpdates: (state: GameState) => GameState = (state) => {
     return { ...w, injuries: active };
   });
 
-  let s = { 
+  const s = { 
     ...state, 
     roster: rosterWithHealedInjuries,
     restStates: clearExpiredRest(state.restStates || [], state.week)
