@@ -380,7 +380,7 @@ export default function RunRound() {
                         <Badge key={id} variant="outline" className="gap-1.5 text-xs">
                           <Crosshair className="h-3 w-3 text-arena-pop" />
                           {entity ? (entity.isStable ? `[Stable] ${entity.name}` : entity.name) : id}
-                          <button onClick={() => removeChallenge(id)} className="text-muted-foreground hover:text-destructive ml-1">
+                          <button onClick={() => removeChallenge(id)} className="text-muted-foreground hover:text-destructive ml-1" aria-label="Remove challenge">
                             <Trash2 className="h-3 w-3" />
                           </button>
                         </Badge>
@@ -415,7 +415,7 @@ export default function RunRound() {
                         <Badge key={id} variant="outline" className="gap-1.5 text-xs">
                           <Ban className="h-3 w-3 text-destructive" />
                           {entity ? (entity.isStable ? `[Stable] ${entity.name}` : entity.name) : id}
-                          <button onClick={() => removeAvoid(id)} className="text-muted-foreground hover:text-destructive ml-1">
+                          <button onClick={() => removeAvoid(id)} className="text-muted-foreground hover:text-destructive ml-1" aria-label="Remove avoid target">
                             <Trash2 className="h-3 w-3" />
                           </button>
                         </Badge>

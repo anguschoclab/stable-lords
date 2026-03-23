@@ -13,20 +13,7 @@ import { getStableTemplates } from "@/engine/rivals";
 
 type SortDir = "asc" | "desc";
 
-function SortHeader({ label, field, active, dir, onClick }: {
-  label: string;
-  field: string;
-  active: boolean;
-  dir: SortDir;
-  onClick: () => void;
-}) {
-  return (
-    <button onClick={onClick} className="flex items-center gap-1 hover:text-foreground transition-colors">
-      {label}
-      <ArrowUpDown className={`h-3 w-3 ${active ? "text-primary" : "text-muted-foreground/40"}`} />
-    </button>
-  );
-}
+
 
 type SortField = "rank" | "name" | "fame" | "wins" | "losses" | "kills" | "winRate" | "roster" | "tier";
 
@@ -263,26 +250,26 @@ export default function WorldOverview() {
                   <TableRow>
                     <TableHead className="w-10">#</TableHead>
                     <TableHead>
-                      <SortHeader label="Stable" field="name" active={stableSort.field === "name"} dir={stableSort.dir} onClick={() => toggleStableSort("name")} />
+                      <SortHeader label="Stable" active={stableSort.field === "name"} dir={stableSort.dir} onClick={() => toggleStableSort("name")} />
                     </TableHead>
                     <TableHead className="hidden md:table-cell">Tier</TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="Fame" field="fame" active={stableSort.field === "fame"} dir={stableSort.dir} onClick={() => toggleStableSort("fame")} />
+                      <SortHeader label="Fame" active={stableSort.field === "fame"} dir={stableSort.dir} onClick={() => toggleStableSort("fame")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="W" field="wins" active={stableSort.field === "wins"} dir={stableSort.dir} onClick={() => toggleStableSort("wins")} />
+                      <SortHeader label="W" active={stableSort.field === "wins"} dir={stableSort.dir} onClick={() => toggleStableSort("wins")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="L" field="losses" active={stableSort.field === "losses"} dir={stableSort.dir} onClick={() => toggleStableSort("losses")} />
+                      <SortHeader label="L" active={stableSort.field === "losses"} dir={stableSort.dir} onClick={() => toggleStableSort("losses")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="Win%" field="winRate" active={stableSort.field === "winRate"} dir={stableSort.dir} onClick={() => toggleStableSort("winRate")} />
+                      <SortHeader label="Win%" active={stableSort.field === "winRate"} dir={stableSort.dir} onClick={() => toggleStableSort("winRate")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="Kills" field="kills" active={stableSort.field === "kills"} dir={stableSort.dir} onClick={() => toggleStableSort("kills")} />
+                      <SortHeader label="Kills" active={stableSort.field === "kills"} dir={stableSort.dir} onClick={() => toggleStableSort("kills")} />
                     </TableHead>
                     <TableHead className="text-right hidden sm:table-cell">
-                      <SortHeader label="Roster" field="roster" active={stableSort.field === "roster"} dir={stableSort.dir} onClick={() => toggleStableSort("roster")} />
+                      <SortHeader label="Roster" active={stableSort.field === "roster"} dir={stableSort.dir} onClick={() => toggleStableSort("roster")} />
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -347,28 +334,28 @@ export default function WorldOverview() {
                   <TableRow>
                     <TableHead className="w-10">#</TableHead>
                     <TableHead>
-                      <SortHeader label="Warrior" field="name" active={warriorSort.field === "name"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("name")} />
+                      <SortHeader label="Warrior" active={warriorSort.field === "name"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("name")} />
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
-                      <SortHeader label="Stable" field="stable" active={warriorSort.field === "stable"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("stable")} />
+                      <SortHeader label="Stable" active={warriorSort.field === "stable"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("stable")} />
                     </TableHead>
                     <TableHead className="hidden lg:table-cell">
-                      <SortHeader label="Style" field="style" active={warriorSort.field === "style"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("style")} />
+                      <SortHeader label="Style" active={warriorSort.field === "style"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("style")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="Fame" field="fame" active={warriorSort.field === "fame"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("fame")} />
+                      <SortHeader label="Fame" active={warriorSort.field === "fame"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("fame")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="W" field="wins" active={warriorSort.field === "wins"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("wins")} />
+                      <SortHeader label="W" active={warriorSort.field === "wins"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("wins")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="L" field="losses" active={warriorSort.field === "losses"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("losses")} />
+                      <SortHeader label="L" active={warriorSort.field === "losses"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("losses")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="Win%" field="winRate" active={warriorSort.field === "winRate"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("winRate")} />
+                      <SortHeader label="Win%" active={warriorSort.field === "winRate"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("winRate")} />
                     </TableHead>
                     <TableHead className="text-right">
-                      <SortHeader label="Kills" field="kills" active={warriorSort.field === "kills"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("kills")} />
+                      <SortHeader label="Kills" active={warriorSort.field === "kills"} dir={warriorSort.dir} onClick={() => toggleWarriorSort("kills")} />
                     </TableHead>
                   </TableRow>
                 </TableHeader>

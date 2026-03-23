@@ -1,70 +1,43 @@
-# Stable Lords — Daily Balance Report
-**Simulated Weeks:** 100
-**Stop Reason:** max_weeks
-**Stop Detail:** Completed 100 weeks.
+# Daily Balance & Meta Report
+Generated after simulating 100 weeks.
 
----
+## 1. Economy Metrics
+- **Initial Gold:** 1444
+- **Final Gold:** 101922
+- **Average Gold (over time):** 40101.88
+- *Observation:* Potential hyper-inflation detected. Consider adding more gold sinks.
 
-## ⚔️ Lethality & Combat
-*Cross-reference with Stable_Lords_Kill_Death_and_Permadeath_Spec_v0.2.md*
-- **Total Bouts:** 232
-- **Total Deaths:** 7
-- **Overall Kill Rate:** 3.02% *(Target: 8% - 15% normal)*
-- **Total Injuries:** 88
-- **Injury Rate:** 37.93%
+## 2. Lethality & Injuries
+- **Total Bouts:** 828
+- **Total Deaths:** 149 (Kill Rate: 18.00%)
+- **Total Injuries:** 144 (Injury Rate: 17.39%)
+- *Observation:* Check against the `Stable_Lords_Kill_Death_and_Permadeath_Spec_v0.2.md`. Are these rates within expected bounds?
 
----
+## 3. Meta-Drift (AI Adaptation & Style Dominance)
+Current Meta Drift Window Analysis:
+- **AIMED BLOW**: -1 drift
+- **BASHING ATTACK**: -4 drift
+- **LUNGING ATTACK**: +5 drift
+- **PARRY-LUNGE**: -5 drift
+- **PARRY-RIPOSTE**: -8 drift
+- **PARRY-STRIKE**: -6 drift
+- **SLASHING ATTACK**: -3 drift
+- **STRIKING ATTACK**: +4 drift
+- **TOTAL PARRY**: -3 drift
+- **WALL OF STEEL**: +3 drift
 
-## 💰 Economy & Ecosystem
-- **Player Stable Wealth (Gold):** 34634
-- **Total Rival Stables:** 5
-- **Average Rival Roster Size:** 9.6
+### Style Win Rates (Overall)
+- **LUNGING ATTACK**: 188 wins / 239 fights (78.66%)
+- **STRIKING ATTACK**: 149 wins / 226 fights (65.93%)
+- **WALL OF STEEL**: 121 wins / 201 fights (60.20%)
+- **AIMED BLOW**: 87 wins / 175 fights (49.71%)
+- **SLASHING ATTACK**: 40 wins / 89 fights (44.94%)
+- **TOTAL PARRY**: 81 wins / 190 fights (42.63%)
+- **BASHING ATTACK**: 56 wins / 137 fights (40.88%)
+- **PARRY-LUNGE**: 42 wins / 120 fights (35.00%)
+- **PARRY-STRIKE**: 24 wins / 103 fights (23.30%)
+- **PARRY-RIPOSTE**: 40 wins / 176 fights (22.73%)
 
-**Stable Tier Distribution:**
-- Legendary: 0
-- Major: 0
-- Established: 0
-- Minor: 5
-
----
-
-## 📈 Meta-Drift (Win Rate Shifting)
-*Positive drift indicates the style is dominating the meta. Negative indicates struggling.*
-
-```
-STRIKING ATTACK      | Drift: +6
-TOTAL PARRY          | Drift: +5
-WALL OF STEEL        | Drift: +2
-LUNGING ATTACK       | Drift: 0
-AIMED BLOW           | Drift: -1
-BASHING ATTACK       | Drift: -7
-PARRY-LUNGE          | Drift: -10
-PARRY-RIPOSTE        | Drift: -10
-PARRY-STRIKE         | Drift: -10
-SLASHING ATTACK      | Drift: -10
-```
-
----
-
-## 🔍 Oracle Observations & Suggested Tweaks
-
-### 1. Lethality
-**Anomaly:** The Overall Kill Rate (3.02%) is below the target bounds (8% - 15%). Warriors are surviving too often.
-**Suggested Action:** 
-- In `src/engine/simulate.ts`, consider increasing `KILL_THRESHOLD_BASE` (currently `0.3`) to `0.4` or `0.5` to widen the base kill window.
-- Alternatively, increase `KILL_DESIRE_SCALING` (currently `0.04`) to make high Kill Desire plans more lethal.
-
-### 2. Economy
-**Anomaly:** The Player Stable Wealth exhibits hyper-inflation (34634 gold). There is insufficient gold sink or running costs compared to income.
-**Suggested Action:** 
-- In `src/engine/economy.ts`, increase `WARRIOR_UPKEEP` (currently `20`) to scale costs with roster size.
-- Alternatively, introduce new gold sinks (e.g., baseline stable maintenance fees, healing costs, or equipment degradation).
-
-### 3. Meta-Drift
-**Anomaly:** Meta is unbalanced. Dominant: STRIKING ATTACK, TOTAL PARRY. Struggling: BASHING ATTACK, PARRY-LUNGE, PARRY-RIPOSTE, PARRY-STRIKE, SLASHING ATTACK.
-**Suggested Action:**
-- Review the `MATCHUP_MATRIX` in `src/engine/simulate.ts` for the struggling and dominating styles.
-- Alternatively, adjust offensive/defensive multipliers for these styles.
-
----
-*Report generated automatically by the Simulation Oracle.*
+## 4. Anomalies & Suggestions
+- *Mathematical Anomalies:* Styles with >60% win rate: LUNGING ATTACK, STRIKING ATTACK, WALL OF STEEL. Styles with <40% win rate: PARRY-LUNGE, PARRY-STRIKE, PARRY-RIPOSTE.
+- *Suggested Tweaks:* Lethality (18.00%) seems reasonable. Economy is inflating. Adjust `economy.ts` or add maintenance costs.

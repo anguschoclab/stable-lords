@@ -37,3 +37,6 @@ This file generates play-by-play narrative text for bouts, but over half of the 
 - [x] Extract `WarriorNameTag` component to `src/components/ui/`.
 - [x] Extract `StatBadge` component to `src/components/ui/`.
 - [x] Refactor consolidated components and update the files that import them.
+
+- [x] Cleaned up linting warnings in `Trainers.tsx` and duplicated component declarations in `WorldOverview.tsx` as part of a safe tech-debt pass.
+- [x] Removed duplicated `loadGame` action from `useGameStore.ts` that caused build warnings.

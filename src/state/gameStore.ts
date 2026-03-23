@@ -220,6 +220,11 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.rivalries) parsed.rivalries = parsed.rivalries.slice(-100);
   if (parsed.ownerGrudges) parsed.ownerGrudges = parsed.ownerGrudges.slice(-100);
   if (parsed.gazettes) parsed.gazettes = parsed.gazettes.slice(-50);
+  if (parsed.seasonalGrowth) parsed.seasonalGrowth = parsed.seasonalGrowth.slice(-500);
+  if (parsed.insightTokens) parsed.insightTokens = parsed.insightTokens.slice(-500);
+  if (parsed.playerChallenges) parsed.playerChallenges = parsed.playerChallenges.slice(-100);
+  if (parsed.playerAvoids) parsed.playerAvoids = parsed.playerAvoids.slice(-100);
+  if (parsed.trainingAssignments) parsed.trainingAssignments = parsed.trainingAssignments.slice(-200);
   return parsed as GameState;
 }
 
@@ -404,6 +409,11 @@ export function advanceWeek(state: GameState): GameState {
   const newHallOfFame = (s.hallOfFame || []).slice(-100);
   const newRivalries = (s.rivalries || []).slice(-100);
   const newOwnerGrudges = (s.ownerGrudges || []).slice(-100);
+  const newSeasonalGrowth = (s.seasonalGrowth || []).slice(-500);
+  const newInsightTokens = (s.insightTokens || []).slice(-500);
+  const newPlayerChallenges = (s.playerChallenges || []).slice(-100);
+  const newPlayerAvoids = (s.playerAvoids || []).slice(-100);
+  const newTrainingAssignments = (s.trainingAssignments || []).slice(-200);
 
   return {
     ...s,
@@ -419,6 +429,11 @@ export function advanceWeek(state: GameState): GameState {
     hallOfFame: newHallOfFame,
     rivalries: newRivalries,
     ownerGrudges: newOwnerGrudges,
+    seasonalGrowth: newSeasonalGrowth,
+    insightTokens: newInsightTokens,
+    playerChallenges: newPlayerChallenges,
+    playerAvoids: newPlayerAvoids,
+    trainingAssignments: newTrainingAssignments,
     week: newWeek,
     season: newSeason,
   };
