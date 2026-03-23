@@ -8,6 +8,7 @@
 import type {
   GameState, Warrior, RivalStableData, FightPlan, Owner,
   OwnerPersonality, Season, NewsletterItem, MetaAdaptation,
+  Attributes,
 } from "@/types/game";
 import { FightingStyle } from "@/types/game";
 import { defaultPlanForWarrior } from "./simulate";
@@ -244,7 +245,7 @@ function getPhilosophyStyles(philosophy: string): FightingStyle[] {
 }
 
 function generateRecruitAttrs(philosophy: string): { ST: number; CN: number; SZ: number; WT: number; WL: number; SP: number; DF: number } {
-  const biasMap: Record<string, Partial<Record<string, number>>> = {
+  const biasMap: Record<string, Partial<Record<keyof Attributes, number>>> = {
     "Brute Force": { ST: 3, CN: 2, SZ: 2 },
     "Speed Kills": { SP: 3, DF: 2, WL: 1 },
     "Iron Defense": { CN: 3, WL: 3, SZ: 1 },
@@ -261,7 +262,7 @@ function generateRecruitAttrs(philosophy: string): { ST: number; CN: number; SZ:
 
   const weighted: (keyof typeof attrs)[] = [];
   for (const k of keys) {
-    const w = ((bias as any)[k] ?? 1);
+    const w = (bias[k] ?? 1);
     for (let i = 0; i < w; i++) weighted.push(k);
   }
 
