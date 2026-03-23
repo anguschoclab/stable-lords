@@ -1,23 +1,19 @@
 /**
  * Stable Lords — Game State Store (localStorage-backed)
  */
-import { FightingStyle, type GameState, type Warrior, type FightSummary, type Season } from "@/types/game";
+import { FightingStyle, type GameState, type Warrior, type FightSummary, type Season, type DeathEvent } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { generateFavorites } from "@/engine/favorites";
-import { processTraining } from "@/engine/training";
-import { processEconomy } from "@/engine/economy";
-import { processAging } from "@/engine/aging";
-import { tickInjuries } from "@/engine/injuries";
-import { clearExpiredRest, runAIvsAIBouts } from "@/engine/matchmaking";
-import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
-import { partialRefreshPool, aiDraftFromPool } from "@/engine/recruitment";
-import { processHallOfFame, processTierProgression, computeNextSeason } from "@/engine/weekPipeline";
-import { processOwnerGrudges } from "@/engine/ownerAI";
-import { processAIRosterManagement } from "@/engine/ownerRoster";
-import { generateOwnerNarratives } from "@/engine/ownerNarrative";
-import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
-
-import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
+import { pipe } from "@/engine/pipeline";
+import { applyTraining } from "@/engine/pipeline/training";
+import { applyEconomy } from "@/engine/pipeline/economy";
+import { applyAging } from "@/engine/pipeline/aging";
+import { applyHealthUpdates } from "@/engine/pipeline/health";
+import { applyRivalAI, applyRecruitment } from "@/engine/pipeline/rivals";
+import { applyRecruitPoolRefresh } from "@/engine/pipeline/recruitment";
+import { applySeasonalUpdates } from "@/engine/pipeline/seasonal";
+import { applyNarrative } from "@/engine/pipeline/narrative";
+import { truncateState } from "@/engine/storage/truncation";
 const SAVE_KEY = "stablelords.save.v2";
 
 function generateId(): string {
@@ -293,156 +289,19 @@ export function resetGameState(): GameState {
  * @returns New game state after all pipeline steps
  */
 export function advanceWeek(state: GameState): GameState {
-  // ── Step 1: Training ──────────────────────────────────────────────────
-  const afterTraining = processTraining(state);
-
-  // ── Step 2: Economy ───────────────────────────────────────────────────
-  const afterEconomy = processEconomy(afterTraining);
-
-  // ── Step 3: Aging ─────────────────────────────────────────────────────
-  const afterAging = processAging(afterEconomy);
-
-  // ── Step 4: Injuries ──────────────────────────────────────────────────
-  const injuryNews: string[] = [];
-  const rosterWithHealedInjuries = afterAging.roster.map((w) => {
-    const injuryObjects = (w.injuries || []).filter((i): i is import("@/types/game").InjuryData => typeof i !== "string");
-    if (injuryObjects.length === 0) return w;
-    const { active, healed } = tickInjuries(injuryObjects);
-    if (healed.length > 0) injuryNews.push(`${w.name} recovered from ${healed.join(", ")}.`);
-    return { ...w, injuries: active };
-  });
-
-  let s = { ...afterAging, roster: rosterWithHealedInjuries };
-  if (injuryNews.length > 0) {
-    s.newsletter = [...s.newsletter, { week: s.week, title: "Medical Report", items: injuryNews }];
-  }
-
-  // ── Step 5: Rest States ───────────────────────────────────────────────
-  s.restStates = clearExpiredRest(s.restStates || [], s.week);
-
-  // ── Step 6: AI Bouts ──────────────────────────────────────────────────
-  if ((s.rivals || []).length > 0) {
-    const { updatedRivals, gazetteItems } = runAIvsAIBouts(s);
-    s.rivals = updatedRivals;
-    if (gazetteItems.length > 0) {
-      s.newsletter = [...s.newsletter, { week: s.week, title: "Rival Arena Report", items: gazetteItems }];
-    }
-  }
-
-  // ── Step 7: Recruitment ───────────────────────────────────────────────
-  const usedNames = new Set<string>();
-  for (const w of s.roster) usedNames.add(w.name);
-  for (const w of s.graveyard) usedNames.add(w.name);
-  for (const r of s.rivals || []) for (const w of r.roster) usedNames.add(w.name);
-  s.recruitPool = partialRefreshPool(s.recruitPool || [], s.week, usedNames);
-
-  if ((s.rivals || []).length > 0 && (s.recruitPool || []).length > 0) {
-    const draft = aiDraftFromPool(s.recruitPool, s.rivals, s.week);
-    s.recruitPool = draft.updatedPool;
-    s.rivals = draft.updatedRivals;
-    if (draft.gazetteItems.length > 0) {
-      s.newsletter = [...s.newsletter, { week: s.week, title: "Draft Report", items: draft.gazetteItems }];
-    }
-  }
-
-  // ── Step 8: Hall of Fame (every 52 weeks) ─────────────────────────────
-  const newWeek = s.week + 1;
-  const newSeason = computeNextSeason(newWeek);
-
-  s = processHallOfFame(s, newWeek);
-
-  // ── Step 9: Tier Progression (on season change) ───────────────────────
-  s = processTierProgression(s, newSeason, newWeek);
-
-  // ── Step 10: AI Roster Management ─────────────────────────────────────
-  if ((s.rivals || []).length > 0) {
-    const rosterMgmt = processAIRosterManagement(s);
-    s.rivals = rosterMgmt.updatedRivals;
-    if (rosterMgmt.gazetteItems.length > 0) {
-      s.newsletter = [...s.newsletter, { week: s.week, title: "Stable Management", items: rosterMgmt.gazetteItems }];
-    }
-  }
-
-  // ── Step 11: Owner Grudges (personality-driven rivalries) ─────────────
-  const grudgeResult = processOwnerGrudges(s, s.ownerGrudges || []);
-  s.ownerGrudges = grudgeResult.grudges;
-  if (grudgeResult.gazetteItems.length > 0) {
-    s.newsletter = [...s.newsletter, { week: s.week, title: "Owner Feuds", items: grudgeResult.gazetteItems }];
-  }
-
-  // ── Step 12: Owner Narratives (on season change) ──────────────────────
-  const narratives = generateOwnerNarratives(s, newSeason);
-  if (narratives.length > 0) {
-    s.newsletter = [...s.newsletter, { week: s.week, title: `${state.season} Season Review`, items: narratives }];
-  }
-
-  // ── Step 13: Philosophy Evolution (on season change) ──────────────────
-  const philResult = evolvePhilosophies(s, newSeason);
-  s.rivals = philResult.updatedRivals;
-  if (philResult.gazetteItems.length > 0) {
-    s.newsletter = [...s.newsletter, { week: s.week, title: "Strategy Shifts", items: philResult.gazetteItems }];
-  }
-
-
-  // Generate Weekly Gazette Issue
-  const weekFights = s.arenaHistory.filter(f => f.week === s.week);
-  const story = generateWeeklyGazette(weekFights, s.crowdMood, s.week, s.graveyard, s.arenaHistory);
-  s.gazettes = [...(s.gazettes || []), { ...story, week: s.week }];
-  s.gazettes = s.gazettes.slice(-50); // Keep last 50 issues
-
-  // ── Step 14: Clock Advance ────────────────────────────────────────────
-  const newArenaHistory = s.arenaHistory.slice(-500).map((f, i, arr) => {
-    // Keep transcripts only for the last 20 fights to save memory
-    if (arr.length - i > 20 && f.transcript) {
-      const { transcript, ...rest } = f;
-      return rest as FightSummary;
-    }
-    return f;
-  });
-
-  const newNewsletter = (s.newsletter || []).slice(-100);
-  const newLedger = (s.ledger || []).slice(-500);
-  const newMatchHistory = (s.matchHistory || []).slice(-500);
-  const newMoodHistory = (s.moodHistory || []).slice(-50);
-
-  // Keep graveyard and retired lean if they grow too large
-  const newGraveyard = s.graveyard.slice(-200);
-  const newRetired = s.retired.slice(-200);
-
-  // Keep arrays bounded to prevent save bloat
-  const newTournaments = (s.tournaments || []).slice(-100);
-  const newScoutReports = (s.scoutReports || []).slice(-100);
-  const newHallOfFame = (s.hallOfFame || []).slice(-100);
-  const newRivalries = (s.rivalries || []).slice(-100);
-  const newOwnerGrudges = (s.ownerGrudges || []).slice(-100);
-  const newSeasonalGrowth = (s.seasonalGrowth || []).slice(-500);
-  const newInsightTokens = (s.insightTokens || []).slice(-500);
-  const newPlayerChallenges = (s.playerChallenges || []).slice(-100);
-  const newPlayerAvoids = (s.playerAvoids || []).slice(-100);
-  const newTrainingAssignments = (s.trainingAssignments || []).slice(-200);
-
-  return {
-    ...s,
-    arenaHistory: newArenaHistory,
-    newsletter: newNewsletter,
-    ledger: newLedger,
-    matchHistory: newMatchHistory,
-    moodHistory: newMoodHistory,
-    graveyard: newGraveyard,
-    retired: newRetired,
-    tournaments: newTournaments,
-    scoutReports: newScoutReports,
-    hallOfFame: newHallOfFame,
-    rivalries: newRivalries,
-    ownerGrudges: newOwnerGrudges,
-    seasonalGrowth: newSeasonalGrowth,
-    insightTokens: newInsightTokens,
-    playerChallenges: newPlayerChallenges,
-    playerAvoids: newPlayerAvoids,
-    trainingAssignments: newTrainingAssignments,
-    week: newWeek,
-    season: newSeason,
-  };
+  return pipe(
+    state,
+    applyTraining,
+    applyEconomy,
+    applyAging,
+    applyHealthUpdates,
+    applyRivalAI,
+    applyRecruitPoolRefresh,
+    applyRecruitment,
+    applySeasonalUpdates,
+    applyNarrative,
+    truncateState
+  );
 }
 
 export function appendFightToHistory(

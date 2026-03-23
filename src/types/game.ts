@@ -316,6 +316,29 @@ export type DeathCauseBucket =
 
 export type FightOutcomeBy = "Kill" | "KO" | "Exhaustion" | "Stoppage" | "Draw" | null;
 
+export type CombatEventType = 
+  | "INITIATIVE"
+  | "ATTACK"
+  | "DEFENSE"
+  | "HIT"
+  | "CONTEST"
+  | "ENDURANCE"
+  | "FATIGUE"
+  | "STATE_CHANGE"
+  | "BOUT_END"
+  | "PASSIVE"
+  | "INSIGHT";
+
+export interface CombatEvent {
+  type: CombatEventType;
+  actor: "A" | "D";
+  target?: "A" | "D";
+  value?: number;
+  location?: string;
+  result?: string | boolean;
+  metadata?: Record<string, any>;
+}
+
 export interface MinuteEvent {
   minute: number;
   text: string;
@@ -327,6 +350,8 @@ export interface MinuteEvent {
   defTacticD?: string;
   protectA?: string;
   protectD?: string;
+  /** Raw combat events for narration and analytics */
+  events?: CombatEvent[];
 }
 
 export interface FightOutcome {
