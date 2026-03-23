@@ -156,4 +156,62 @@ describe("crowdMood system", () => {
       expect(computeCrowdMood(fights)).toBe("Calm");
     });
   });
+
+    describe("crowd mood state transitions over time", () => {
+      it("transitions from Calm to Theatrical to Festive to Bloodthirsty as fights progress", () => {
+        const history: FightSummary[] = [];
+
+        // Start empty
+        expect(computeCrowdMood(history)).toBe("Calm");
+
+        // 1. Add 3 flashy fights -> Theatrical (needs >=3 flashy)
+        history.push(createMockFight({ flashyTags: ["Flashy"], by: "KO" }));
+        history.push(createMockFight({ flashyTags: ["Flashy"], by: "KO" }));
+        history.push(createMockFight({ flashyTags: ["Flashy"], by: "KO" }));
+        expect(computeCrowdMood(history)).toBe("Theatrical");
+
+        // 2. Add 2 more non-flashy, non-kill fights -> Festive (length >= 4, kills == 0)
+        // Now length is 5.
+        history.push(createMockFight({ by: "KO" }));
+        history.push(createMockFight({ by: "KO" }));
+        // The last 5 has 3 flashy, 0 kills. Wait, flashy >= 3 triggers Theatrical!
+        // Bloodthirsty > Solemn > Theatrical > Festive > Calm.
+        // So with 3 flashy, it's still Theatrical.
+        expect(computeCrowdMood(history)).toBe("Theatrical");
+
+        // Let's push out the flashy fights to make it Festive
+        // We need 4 total fights with 0 kills, and flashy < 3
+        history.push(createMockFight({ by: "KO" })); // 6th fight. Last 5: flashy=2
+        history.push(createMockFight({ by: "KO" })); // 7th fight. Last 5: flashy=1
+        // Now last 5 fights: 0 kills, 1 flashy, length=5 -> Festive
+        expect(computeCrowdMood(history)).toBe("Festive");
+
+        // 3. Add 2 kills -> Bloodthirsty
+        history.push(createMockFight({ by: "Kill" })); // 8th fight. Last 5: 1 kill
+        // Still has 1 kill, not 0. So not Festive. flashy < 3, kills < 2, draws < 2 -> Calm
+        expect(computeCrowdMood(history)).toBe("Calm");
+
+        history.push(createMockFight({ by: "Kill" })); // 9th fight. Last 5: 2 kills
+        expect(computeCrowdMood(history)).toBe("Bloodthirsty");
+
+        // 4. Add draws to become Solemn. We need 1 kill and 2 draws in the last 5.
+        // Current last 5: [KO, KO, KO, Kill, Kill] (kills = 2)
+        // Push 1 draw: [KO, KO, Kill, Kill, Draw] (kills = 2 -> Bloodthirsty)
+        history.push(createMockFight({ winner: null, by: "Draw" }));
+        expect(computeCrowdMood(history)).toBe("Bloodthirsty");
+
+        // Push another draw: [KO, Kill, Kill, Draw, Draw] (kills = 2 -> Bloodthirsty)
+        history.push(createMockFight({ winner: null, by: "Draw" }));
+        expect(computeCrowdMood(history)).toBe("Bloodthirsty");
+
+        // Push something to drop a kill: [Kill, Kill, Draw, Draw, KO] (kills = 2 -> Bloodthirsty)
+        history.push(createMockFight({ by: "KO" }));
+        expect(computeCrowdMood(history)).toBe("Bloodthirsty");
+
+        // Drop the second kill: [Kill, Draw, Draw, KO, KO] (kills = 1, draws = 2 -> Solemn)
+        history.push(createMockFight({ by: "KO" }));
+        expect(computeCrowdMood(history)).toBe("Solemn");
+      });
+    });
+
 });
