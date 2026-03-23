@@ -140,11 +140,17 @@ export function migrateGameState(parsed: any): GameState {
   if (!parsed.hiringPool) parsed.hiringPool = [];
   if (!parsed.trainingAssignments) parsed.trainingAssignments = [];
   // Migrate old training assignments (add type field) if needed
-  if (parsed.trainingAssignments) {
-    parsed.trainingAssignments = parsed.trainingAssignments.map((a: any) => ({
-      ...a,
-      type: a.type ?? "attribute",
-    }));
+  if (Array.isArray(parsed.trainingAssignments)) {
+    parsed.trainingAssignments = parsed.trainingAssignments.map((a: unknown) => {
+      if (typeof a === 'object' && a !== null) {
+        const obj = a as Record<string, unknown>;
+        return {
+          ...obj,
+          type: obj.type ?? "attribute",
+        };
+      }
+      return a;
+    });
   }
   if (parsed.gold === undefined) parsed.gold = 500;
   if (!parsed.ledger) parsed.ledger = [];
