@@ -16,16 +16,14 @@ export default function ResolutionReveal() {
   const [step, setStep] = useState<RevealStep>("gazette");
 
   const latestFight = state.arenaHistory?.[state.arenaHistory.length - 1];
+  const data = latestFight?.pendingResolutionData;
 
   const deadWarriors = React.useMemo(() => {
-    const deaths = latestFight?.pendingResolutionData?.deaths || [];
-    return deaths.map((name: string) => state.graveyard.find(w => w.name === name)).filter(Boolean);
-  }, [latestFight?.pendingResolutionData?.deaths, state.graveyard]);
+    if (!data) return [];
+    return data.deaths.map((name: string) => state.graveyard.find(w => w.name === name)).filter(Boolean);
+  }, [data, state.graveyard]);
 
-
-  if (!latestFight?.pendingResolutionData) return null;
-
-  const data = latestFight.pendingResolutionData;
+  if (!data) return null;
 
   const doClearResolution = () => {
     // Clear resolution data
@@ -47,7 +45,6 @@ export default function ResolutionReveal() {
       doClearResolution();
     }
   };
-
 
 
   return (
