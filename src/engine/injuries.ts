@@ -7,28 +7,9 @@
  * - Recovery time in weeks
  * - Severity level
  */
-import type { Warrior, FightOutcome } from "@/types/game";
+import type { Warrior, FightOutcome, InjuryData, InjurySeverity } from "@/types/game";
 
-export type InjurySeverity = "Minor" | "Moderate" | "Severe" | "Critical" | "Permanent";
-
-export interface Injury {
-  id: string;
-  name: string;
-  description: string;
-  severity: InjurySeverity;
-  weeksRemaining: number;
-  penalties: {
-    ST?: number;
-    CN?: number;
-    SP?: number;
-    DF?: number;
-    ATT?: number;
-    PAR?: number;
-    DEF?: number;
-  };
-}
-
-const INJURY_TABLE: Omit<Injury, "id" | "weeksRemaining">[] = [
+const INJURY_TABLE: Omit<InjuryData, "id" | "weeksRemaining">[] = [
   // Minor (1-3 weeks)
   { name: "Bruised Ribs", description: "Painful but manageable.", severity: "Minor", penalties: { CN: -1 } },
   { name: "Sprained Wrist", description: "Weapon control slightly impaired.", severity: "Minor", penalties: { ATT: -1, DF: -1 } },
@@ -61,7 +42,7 @@ export function rollForInjury(
   warrior: Warrior,
   outcome: FightOutcome,
   side: "A" | "D"
-): Injury | null {
+): InjuryData | null {
   const wasHit = side === "A" ? (outcome.post?.hitsD ?? 0) : (outcome.post?.hitsA ?? 0);
   const lost = outcome.winner !== side && outcome.winner !== null;
   const wasKilled = (side === "A" && outcome.post?.gotKillD) || (side === "D" && outcome.post?.gotKillA);
@@ -103,9 +84,9 @@ export function rollForInjury(
 }
 
 /** Tick all injuries down by 1 week, remove healed ones. Returns updated injuries array and healed names. */
-export function tickInjuries(injuries: Injury[]): { active: Injury[]; healed: string[] } {
+export function tickInjuries(injuries: InjuryData[]): { active: InjuryData[]; healed: string[] } {
   const healed: string[] = [];
-  const active: Injury[] = [];
+  const active: InjuryData[] = [];
 
   for (const inj of injuries) {
     const remaining = inj.weeksRemaining - 1;
@@ -120,7 +101,7 @@ export function tickInjuries(injuries: Injury[]): { active: Injury[]; healed: st
 }
 
 /** Get total stat penalties from active injuries */
-export function getInjuryPenalties(injuries: Injury[]): Record<string, number> {
+export function getInjuryPenalties(injuries: InjuryData[]): Record<string, number> {
   const totals: Record<string, number> = {};
   for (const inj of injuries) {
     for (const [stat, penalty] of Object.entries(inj.penalties)) {
@@ -131,6 +112,6 @@ export function getInjuryPenalties(injuries: Injury[]): Record<string, number> {
 }
 
 /** Check if a warrior is too injured to fight */
-export function isTooInjuredToFight(injuries: Injury[]): boolean {
+export function isTooInjuredToFight(injuries: InjuryData[]): boolean {
   return injuries.some((i) => i.severity === "Severe" && i.weeksRemaining > 2);
 }

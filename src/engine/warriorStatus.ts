@@ -4,7 +4,8 @@
  * Import these instead of checking `.status === "Dead"` manually.
  */
 import type { Warrior, WarriorStatus } from "@/types/game";
-import { isTooInjuredToFight, type Injury } from "@/engine/injuries";
+import { isTooInjuredToFight } from "@/engine/injuries";
+import type { InjuryData } from "@/types/game";
 
 /** Whether a warrior is dead (killed in combat) */
 export function isDead(w: Pick<Warrior, "status">): boolean {
@@ -24,6 +25,6 @@ export function isActive(w: Pick<Warrior, "status">): boolean {
 /** Whether a warrior is active AND healthy enough to fight this week */
 export function isFightReady(w: Warrior): boolean {
   if (!isActive(w)) return false;
-  const injObjs = (w.injuries || []).filter((i): i is Injury => typeof i !== "string");
+  const injObjs = (w.injuries || []).filter((i): i is InjuryData => typeof i !== "string");
   return !isTooInjuredToFight(injObjs);
 }

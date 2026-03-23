@@ -3,7 +3,7 @@ import { useGameStore } from "@/state/useGameStore";
 import { advanceWeek } from "@/state/gameStore";
 import { generateMatchCard } from "@/engine/matchmaking";
 import { isFightReady } from "@/engine/warriorStatus";
-import { type Injury } from "@/engine/injuries";
+import type { InjuryData } from "@/types/game";
 import { processWeekBouts, generatePairings, type BoutResult } from "@/engine/boutProcessor";
 import { runAutosim, type AutosimResult, type WeekSummary } from "@/engine/autosim";
 import type { Warrior } from "@/types/game";

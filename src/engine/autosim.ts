@@ -5,7 +5,7 @@
 import type { GameState } from "@/types/game";
 import { advanceWeek } from "@/state/gameStore";
 import { processWeekBouts, generatePairings, type WeekBoutSummary } from "@/engine/boutProcessor";
-import { isTooInjuredToFight, type Injury } from "@/engine/injuries";
+import { isTooInjuredToFight } from "@/engine/injuries";
 import { isFightReady } from "@/engine/warriorStatus";
 
 export type StopReason =

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { generateMatchCard, addRestState, clearExpiredRest, runAIvsAIBouts } from '../engine/matchmaking';
 import type { GameState, Warrior, RivalStableData, RestState, Rivalry, MatchRecord } from '../types/game';
-import type { Injury } from '../engine/injuries';
+import type { InjuryData } from '../../src/types/game';
 
 // Import FightingStyle to use a valid one
 import { FightingStyle } from '../types/game';
@@ -108,13 +108,13 @@ describe("Eligibility Rules", () => {
     const state = createMockGameState();
     // In injuries.ts: isTooInjuredToFight returns true if severity === "Severe" AND weeksRemaining > 2
     state.roster = [
-      createWarrior("w1", { status: "Active", injuries: [{ severity: "Severe", weeksRemaining: 3 } as Injury] }), // too injured
-      createWarrior("w2", { status: "Active", injuries: [{ severity: "Severe", weeksRemaining: 1 } as Injury] }),    // eligible
+      createWarrior("w1", { status: "Active", injuries: [{ severity: "Severe", weeksRemaining: 3 } as InjuryData] }), // too injured
+      createWarrior("w2", { status: "Active", injuries: [{ severity: "Severe", weeksRemaining: 1 } as InjuryData] }),    // eligible
     ];
     state.rivals = [
       createRivalStable("r1", "Rival 1", [
         createWarrior("r_w1", { status: "Active" }),
-        createWarrior("r_w2", { status: "Active", injuries: [{ severity: "Severe", weeksRemaining: 3 } as Injury] }), // rival too injured
+        createWarrior("r_w2", { status: "Active", injuries: [{ severity: "Severe", weeksRemaining: 3 } as InjuryData] }), // rival too injured
       ]),
     ];
 
