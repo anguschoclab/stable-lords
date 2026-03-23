@@ -151,15 +151,7 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
       });
     },
 
-    loadGame: (slotId: string, gameState: GameState) => {
-      localStorage.setItem("stablelords.activeSlot", slotId);
-      set((draft) => {
-        draft.state = gameState;
-        draft.activeSlotId = slotId;
-        draft.atTitleScreen = false;
-        draft.lastSavedAt = new Date().toISOString();
-      });
-    },
+
   }))
 );
 
