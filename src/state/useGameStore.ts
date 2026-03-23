@@ -150,8 +150,6 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         draft.atTitleScreen = true;
       });
     },
-
-
   }))
 );
 

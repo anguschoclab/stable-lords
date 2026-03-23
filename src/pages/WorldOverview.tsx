@@ -56,9 +56,6 @@ const TIER_COLORS: Record<string, string> = {
   Minor: "bg-muted text-muted-foreground border-border",
 };
 
-
-
-
 export default function WorldOverview() {
   const { state } = useGameStore();
   const [stableSort, setStableSort] = useState<{ field: SortField; dir: SortDir }>({ field: "fame", dir: "desc" });
