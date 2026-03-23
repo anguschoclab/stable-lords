@@ -69,7 +69,8 @@ describe("Scheduling Assistant Engine", () => {
         const tp = mockWarrior("tp1", FightingStyle.TotalParry);
         const ab = mockWarrior("ab1", FightingStyle.AimedBlow);
 
-        const score = scoreMatchup(tp, ab);
+        const state = { player: { id: 'p' }, rivalries: [] } as any;
+        const score = scoreMatchup(tp, ab, state);
         // TP vs AB is +2 advantage for TP. 2 * 25 = 50. Base 100. Total = 150.
         expect(score).toBe(150);
     });
@@ -78,7 +79,8 @@ describe("Scheduling Assistant Engine", () => {
         const ab = mockWarrior("ab1", FightingStyle.AimedBlow);
         const pr = mockWarrior("pr1", FightingStyle.ParryRiposte);
 
-        const score = scoreMatchup(ab, pr);
+        const state = { player: { id: 'p' }, rivalries: [] } as any;
+        const score = scoreMatchup(ab, pr, state);
         // AB vs PR = -2 advantage. -2 * 25 = -50. Base 100. Total = 50.
         expect(score).toBe(50);
     });
@@ -106,8 +108,9 @@ describe("Scheduling Assistant Engine", () => {
         const r1 = mockWarrior("r1", FightingStyle.TotalParry, 10); // Diff 0. Penalty 0. Base 100
         const r2 = mockWarrior("r2", FightingStyle.TotalParry, 50); // Diff -40. +10 bump. But abs(diff) = 40. 40 - 20 = 20 penalty. Total penalty = -10. Score = 90
 
-        const score1 = scoreMatchup(p1, r1);
-        const score2 = scoreMatchup(p1, r2);
+        const state = { player: { id: 'p' }, rivalries: [] } as any;
+        const score1 = scoreMatchup(p1, r1, state);
+        const score2 = scoreMatchup(p1, r2, state);
 
         expect(score1).toBeGreaterThan(score2);
     });

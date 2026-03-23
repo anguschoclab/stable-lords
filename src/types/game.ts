@@ -168,7 +168,7 @@ export interface FightPlan {
   killDesire?: number; // Kill Desire 1-10
   aggressionBias?: number; // 0-10, affects risk/reward balance
   openingMove?: "Safe" | "Aggressive" | "Measured";
-  fallbackCondition?: "Exhausted" | "Hurt" | "None";
+  fallbackCondition?: "FLEE" | "TURTLE" | "BERZERK" | "None";
   target?: AttackTarget;
   protect?: ProtectTarget;  // Prioritize defense of a body location
   offensiveTactic?: OffensiveTactic;

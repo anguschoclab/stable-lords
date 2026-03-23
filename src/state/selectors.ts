@@ -8,16 +8,16 @@ import { isActive, isDead, isRetired, isFightReady } from "@/engine/warriorStatu
 // ─── Roster Selectors ───────────────────────────────────────────────────
 
 export const selectActiveWarriors = (state: GameState): Warrior[] =>
-  state.roster.filter(isActive);
+  state.roster.filter(w => isActive(w) && !w.isDead && w.status !== 'Dead');
 
 export const selectDeadWarriors = (state: GameState): Warrior[] =>
-  state.graveyard ?? state.roster.filter(isDead);
+  state.graveyard ?? state.roster.filter(w => isDead(w) || w.isDead || w.status === 'Dead');
 
 export const selectRetiredWarriors = (state: GameState): Warrior[] =>
   state.retired ?? state.roster.filter(isRetired);
 
 export const selectFightReadyWarriors = (state: GameState): Warrior[] =>
-  state.roster.filter(isFightReady);
+  state.roster.filter(w => isFightReady(w) && !w.isDead && w.status !== 'Dead');
 
 // ─── Aggregate Stats ────────────────────────────────────────────────────
 

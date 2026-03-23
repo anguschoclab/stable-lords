@@ -211,11 +211,13 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
 
   // Fallback Condition
   let fallOE_A = 0, fallAL_A = 0, fallOE_D = 0, fallAL_D = 0;
-  if (fA.plan.fallbackCondition === "Exhausted" && fA.endurance < fA.maxEndurance * 0.25) { fallOE_A = -2; fallAL_A = -2; }
-  else if (fA.plan.fallbackCondition === "Hurt" && fA.hp < fA.maxHp * 0.3) { fallOE_A = -2; fallAL_A = -2; }
-  
-  if (fD.plan.fallbackCondition === "Exhausted" && fD.endurance < fD.maxEndurance * 0.25) { fallOE_D = -2; fallAL_D = -2; }
-  else if (fD.plan.fallbackCondition === "Hurt" && fD.hp < fD.maxHp * 0.3) { fallOE_D = -2; fallAL_D = -2; }
+  if (fA.plan.fallbackCondition === "FLEE" && fA.hp < fA.maxHp * 0.3) { fallOE_A = -3; fallAL_A = -3; }
+  else if (fA.plan.fallbackCondition === "TURTLE" && fA.endurance < fA.maxEndurance * 0.3) { fallOE_A = -4; fallAL_A = 2; }
+  else if (fA.plan.fallbackCondition === "BERZERK" && fA.hp < fA.maxHp * 0.3) { fallOE_A = 4; fallAL_A = -2; }
+
+  if (fD.plan.fallbackCondition === "FLEE" && fD.hp < fD.maxHp * 0.3) { fallOE_D = -3; fallAL_D = -3; }
+  else if (fD.plan.fallbackCondition === "TURTLE" && fD.endurance < fD.maxEndurance * 0.3) { fallOE_D = -4; fallAL_D = 2; }
+  else if (fD.plan.fallbackCondition === "BERZERK" && fD.hp < fD.maxHp * 0.3) { fallOE_D = 4; fallAL_D = -2; }
 
   const finalOE_A = Math.max(1, Math.min(10, effOE_A + openOE_A + fallOE_A));
   const finalAL_A = Math.max(1, Math.min(10, effAL_A + openAL_A + fallAL_A));
@@ -386,12 +388,12 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
         const decSuccess = skillCheck(rng, attacker.skills.DEC, Math.floor(attKD - 5) * 0.5 + phaseLevel + attOffMods.decBonus + killMech.decBonus);
         if (decSuccess && rng() < killThreshold) {
           defender.hp = 0;
-          events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", location: hitLoc } });
+          events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", causeBucket: "EXECUTION", location: hitLoc } });
         }
       }
 
       if (defender.hp <= 0 && (events.length === 0 || events[events.length - 1].result !== "Kill")) {
-        events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { cause: "FATAL_DAMAGE", location: hitLoc } });
+        events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { cause: "FATAL_DAMAGE", causeBucket: "FATAL_DAMAGE", location: hitLoc } });
       }
     } else if (canRiposte) {
       // Parry succeeded — check riposte

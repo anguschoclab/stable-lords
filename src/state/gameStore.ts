@@ -375,6 +375,9 @@ export function killWarrior(
     deathCause: cause,
     killedBy,
     deathEvent,
+    isDead: true,
+    dateOfDeath: `Week ${state.week}, ${state.season}`,
+    causeOfDeath: cause,
   };
   return {
     ...state,

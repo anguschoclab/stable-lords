@@ -600,11 +600,7 @@ function WeeklyIssue({ issue, state }: { issue: GazetteStory; state: any }) {
       </div>
 
       <div className="columns-1 md:columns-2 lg:columns-3 gap-10 [column-rule:1px_solid_hsl(var(--border))]">
-        {paragraphs.map((p, i) => (
-          <p key={i} className={`text-[15px] leading-relaxed text-foreground/80 mb-6 text-justify ${i === 0 ? "first-letter:text-6xl first-letter:font-black first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8] first-letter:text-primary first-letter:mt-1" : ""}`}>
-            {p}
-          </p>
-        ))}
+        <MarkdownReader content={issue.body} />
       </div>
       
       <div className="flex items-center justify-between border-t-2 border-foreground/20 pt-4 mt-4 opacity-70">

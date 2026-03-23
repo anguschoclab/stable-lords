@@ -532,8 +532,9 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="None">None (Hold the line)</SelectItem>
-                        <SelectItem value="Exhausted">Exhausted (Low Stamina)</SelectItem>
-                        <SelectItem value="Hurt">Hurt (Low Health)</SelectItem>
+                        <SelectItem value="FLEE">Flee (Low Health: Max Defense)</SelectItem>
+                        <SelectItem value="TURTLE">Turtle (Low Stamina: Recover)</SelectItem>
+                        <SelectItem value="BERZERK">Berzerk (Low Health: All out attack)</SelectItem>
                     </SelectContent>
                 </Select>
                 <p className="text-[10px] text-muted-foreground">Drops OE/AL by 2 when condition met.</p>
@@ -565,7 +566,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
             </Select>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 relative">
             <Label className="text-sm flex items-center gap-1.5"><Swords className="h-3.5 w-3.5" /> Off. Tactic</Label>
             <Select value={plan.offensiveTactic ?? "none"} onValueChange={v => updateField("offensiveTactic", v as OffensiveTactic)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -583,9 +584,10 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
               </SelectContent>
             </Select>
             <PenaltyBadge penalty={offPenalty} />
+            {offPenalty < 0 && <Badge variant="destructive" className="animate-pulse absolute -top-2 -right-2 text-[10px] px-1 py-0 shadow-sm">⚠️ Mismatch</Badge>}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 relative">
             <Label className="text-sm flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Def. Tactic</Label>
             <Select value={plan.defensiveTactic ?? "none"} onValueChange={v => updateField("defensiveTactic", v as DefensiveTactic)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -603,6 +605,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
               </SelectContent>
             </Select>
             <PenaltyBadge penalty={defPenalty} />
+            {defPenalty < 0 && <Badge variant="destructive" className="animate-pulse absolute -top-2 -right-2 text-[10px] px-1 py-0 shadow-sm">⚠️ Mismatch</Badge>}
           </div>
         </div>
 

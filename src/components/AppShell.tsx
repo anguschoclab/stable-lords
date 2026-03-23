@@ -71,11 +71,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // FTUE Redirection logic
   useEffect(() => {
-    if (state.isFTUE && location.pathname !== "/welcome") {
-      // Use window.location as a fallback if router isn't available or just to ensure it happens
-      // (Better to use router.navigate if we had access, but let's stick to safe bets)
+    if (state.isFTUE && location.pathname !== "/welcome" && location.pathname !== "/") {
       if (typeof window !== "undefined") {
-        // window.history.replaceState({}, '', '/welcome');
+        window.location.href = "/";
       }
     }
   }, [state.isFTUE, location.pathname]);

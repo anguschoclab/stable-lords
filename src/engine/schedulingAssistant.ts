@@ -44,7 +44,7 @@ export interface MatchupScore {
   notes: string[];
 }
 
-export function scoreMatchup(playerWarrior: Warrior, rivalWarrior: Warrior): number {
+export function scoreMatchup(playerWarrior: Warrior, rivalWarrior: Warrior, state: GameState): number {
   const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[rivalWarrior.style] ?? 0;
   const fameDiff = playerWarrior.fame - rivalWarrior.fame;
 
@@ -63,6 +63,22 @@ export function scoreMatchup(playerWarrior: Warrior, rivalWarrior: Warrior): num
   const pWinRate = playerWarrior.career.wins / (Math.max(1, playerWarrior.career.wins + playerWarrior.career.losses));
   const rWinRate = rivalWarrior.career.wins / (Math.max(1, rivalWarrior.career.wins + rivalWarrior.career.losses));
   score += (pWinRate - rWinRate) * 20;
+
+
+  // Rivalry multiplier for grudge matches
+  const rivalries = state.rivalries || [];
+  const playerStableId = playerWarrior.stableId || state.player?.id;
+  const rivalStableId = rivalWarrior.stableId;
+
+  if (playerStableId && rivalStableId) {
+      const rivalry = rivalries.find(r =>
+          (r.stableIdA === playerStableId && r.stableIdB === rivalStableId) ||
+          (r.stableIdB === playerStableId && r.stableIdA === rivalStableId)
+      );
+      if (rivalry) {
+          score += rivalry.intensity * 50; // Grudge match!
+      }
+  }
 
   return score;
 }
@@ -101,7 +117,7 @@ export function getRecommendedChallenges(state: GameState, playerWarrior: Warrio
             playerWarriorId: playerWarrior.id,
             rivalWarrior: r.warrior,
             rivalStableName: r.stable.owner.stableName,
-            score: scoreMatchup(playerWarrior, r.warrior),
+            score: scoreMatchup(playerWarrior, r.warrior, state),
             styleAdvantage,
             fameDiff,
             notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff)
@@ -119,7 +135,7 @@ export function getMatchupsToAvoid(state: GameState, playerWarrior: Warrior, lim
             playerWarriorId: playerWarrior.id,
             rivalWarrior: r.warrior,
             rivalStableName: r.stable.owner.stableName,
-            score: scoreMatchup(playerWarrior, r.warrior),
+            score: scoreMatchup(playerWarrior, r.warrior, state),
             styleAdvantage,
             fameDiff,
             notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff)
