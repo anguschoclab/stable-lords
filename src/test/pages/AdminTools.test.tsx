@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AdminTools from '../../pages/AdminTools';
-import { useGame } from '../../state/GameContext';
+import { useGameStore } from '@/state/useGameStore';
 
 // Mock the context hook
-vi.mock('@/state/GameContext', () => ({
-  useGame: vi.fn()
+vi.mock('@/state/useGameStore', () => ({
+  useGameStore: vi.fn()
 }));
 
 describe('AdminTools Page', () => {
@@ -34,7 +34,7 @@ describe('AdminTools Page', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useGame as any).mockReturnValue({
+    (useGameStore as any).mockReturnValue({
       state: mockState,
       setState: mockSetState,
       doReset: mockDoReset

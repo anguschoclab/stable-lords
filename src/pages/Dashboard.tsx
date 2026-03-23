@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { WarriorLink, StableLink } from "@/components/EntityLink";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
+import { selectActiveWarriors } from "@/state/selectors";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
@@ -152,7 +153,8 @@ function SeasonWidget() {
 
 function StableWidget() {
   const { state } = useGameStore();
-  const activeWarriors = state.roster.filter(w => w.status === "Active");
+  // ⚡ Bolt: Use memoized selector to prevent unnecessary array allocation on render
+  const activeWarriors = selectActiveWarriors(state);
   // Sort warriors by fame or wins for the "Top 5" list
   const topWarriors = [...activeWarriors].sort((a, b) => b.fame - a.fame).slice(0, 5);
 
@@ -229,11 +231,10 @@ function RankingsWidget() {
   const navigate = useNavigate();
 
   const ranked = useMemo(
-    () => [...state.roster]
-      .filter(w => w.status === "Active")
+    () => [...selectActiveWarriors(state)]
       .sort((a, b) => b.fame - a.fame)
       .slice(0, 5),
-    [state.roster]
+    [state]
   );
 
   return (
@@ -243,7 +244,7 @@ function RankingsWidget() {
           <Trophy className="h-4 w-4 text-arena-gold" /> Warrior Rankings
         </CardTitle>
         <Badge variant="outline" className="text-[10px] text-muted-foreground">
-          {state.roster.filter(w => w.status === "Active").length} active
+          {selectActiveWarriors(state).length} active
         </Badge>
       </CardHeader>
       <CardContent className="p-0">
