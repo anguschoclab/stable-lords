@@ -29,20 +29,29 @@ export interface StableStats {
 }
 
 export const selectStableStats = (state: GameState): StableStats => {
-  const allWarriors = [
-    ...state.roster,
-    ...(state.graveyard || []),
-    ...(state.retired || [])
-  ];
+  let wins = 0;
+  let losses = 0;
+  let kills = 0;
+
+  const tally = (w: Warrior) => {
+    if (w.career) {
+      wins += w.career.wins || 0;
+      losses += w.career.losses || 0;
+      kills += w.career.kills || 0;
+    }
+  };
+
+  // ⚡ Bolt: Avoids creating a new array from spreading three arrays
+  // and eliminates the O(N) object allocations per iteration.
+  const { roster, graveyard, retired } = state;
+  for (let i = 0; i < roster.length; i++) tally(roster[i]);
+  if (graveyard) {
+    for (let i = 0; i < graveyard.length; i++) tally(graveyard[i]);
+  }
+  if (retired) {
+    for (let i = 0; i < retired.length; i++) tally(retired[i]);
+  }
   
-  const { wins, losses, kills } = allWarriors.reduce(
-    (acc, w) => ({
-      wins: acc.wins + (w.career?.wins || 0),
-      losses: acc.losses + (w.career?.losses || 0),
-      kills: acc.kills + (w.career?.kills || 0),
-    }),
-    { wins: 0, losses: 0, kills: 0 }
-  );
   const total = wins + losses;
   return {
     totalWins: wins,

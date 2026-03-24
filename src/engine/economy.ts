@@ -31,12 +31,17 @@ export interface WeeklyBreakdown {
 /** Compute a projected breakdown for the current state (before advancing). */
 export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
   const week = state.week;
-  const fightsThisWeek = state.arenaHistory.filter((f) => f.week === week);
   const playerWarriorNames = new Set(state.roster.map((w) => w.name));
 
   let fightCount = 0;
   let winCount = 0;
-  for (const f of fightsThisWeek) {
+
+  // ⚡ Bolt: Fast backward search in O(1) instead of an O(N) filter.
+  // We can break early because `arenaHistory` is guaranteed chronological.
+  for (let i = state.arenaHistory.length - 1; i >= 0; i--) {
+    const f = state.arenaHistory[i];
+    if (f.week !== week) break;
+
     const aIsPlayer = playerWarriorNames.has(f.a);
     const dIsPlayer = playerWarriorNames.has(f.d);
     if (aIsPlayer) { fightCount++; if (f.winner === "A") winCount++; }
@@ -54,8 +59,12 @@ export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
   const trainingCount = (state.trainingAssignments ?? []).length;
   if (trainingCount > 0) expenses.push({ label: `Training fees (${trainingCount})`, amount: trainingCount * TRAINING_COST });
 
-  const totalIncome = income.reduce((s, i) => s + i.amount, 0);
-  const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+  // ⚡ Bolt: Optimized calculation over constant size small arrays.
+  let totalIncome = 0;
+  for (let i = 0; i < income.length; i++) totalIncome += income[i].amount;
+
+  let totalExpenses = 0;
+  for (let i = 0; i < expenses.length; i++) totalExpenses += expenses[i].amount;
 
   return { income, expenses, totalIncome, totalExpenses, net: totalIncome - totalExpenses };
 }

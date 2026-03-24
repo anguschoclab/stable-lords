@@ -1,8 +1,3 @@
-
-## 2025-05-15 - [Combine sequential array iterations]
-**Learning:** Found multiple instances where arrays are iterated sequentially multiple times via `.filter().reduce()` or multiple `.reduce()` calls on the same array (e.g., calculating total wins, total kills, and average fame for an active roster). This causes O(5n) iteration loops for large arrays when O(n) is achievable.
-**Action:** Combine sequential `.filter()` and `.reduce()` iterations into a single `.reduce()` pass to improve execution efficiency, especially inside React render loops and `useMemo` hooks.
-
-## 2024-03-22 - Optimize O(N) allocations in Gazette Narrative
-**Learning:** O(N) operations executed each week for simulation history that grows rapidly (e.g., iterating through `allFights` repeatedly to find `Rising Stars` and `Rivalries` and building `Map` structures grouped by *all* warriors ever in history) becomes a major CPU and GC bottleneck.
-**Action:** Always filter using the current week's events to form a candidate `Set` first. Only evaluate candidate warriors and pairs against the `allFights` history array.
+## 2025-03-01 - Optimizing Zustand Selectors and Engine Loops
+**Learning:** Returning a brand new object in every iteration of a `.reduce` inside a Zustand selector (like `selectStableStats`) causes N object allocations per run and immense GC pressure. Spreading large arrays (`[...roster, ...graveyard, ...retired]`) before reducing further amplifies O(N) allocation overhead. Furthermore, `.filter` over `arenaHistory` (which is strictly chronological) can be optimized away entirely by using a backward `for` loop that breaks early once the target condition (e.g. `f.week !== currentWeek`) fails.
+**Action:** When computing aggregates over state arrays in selectors or engine pipelines, prefer standard `for` loops or mutating a local accumulator variable over spreading and functional `reduce` that return new objects. For chronological history arrays like `arenaHistory`, always use a fast backward loop to achieve O(1) time instead of an O(N) full-array scan with `.filter()`. Ensure mock test data remains strictly chronological to prevent test failures when early breaking is introduced.
