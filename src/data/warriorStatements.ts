@@ -43,19 +43,24 @@ function pickStatement(entries: StatementEntry[], baseValue: number): string {
 
 // GOOD WIT: INITIATIVE (1st statement)
 const GOOD_INI_HIGH: StatementEntry[] = [ // base >= 13
+  { minBase: 28, text: "Drowns his opponent in a relentless tide of crushing aggression" },
+  { minBase: 27, text: "Forces a suffocating, lethal rhythm onto the blood-soaked sands" },
   { minBase: 26, text: "Bends the chaos of the pit to his will, forcing foes to fight on his terms" },
   { minBase: 25, text: "A terrifying maestro of battle tempo, dictating every bloody exchange" },
   { minBase: 24, text: "Summons a storm of steel that leaves no room to breathe" },
   { minBase: 23, text: "Relentlessly forces his enemies into deadly, suffocating corners" },
   { minBase: 22, text: "A predator in the pit, suffocating their prey with relentless advances" },
   { minBase: 21, text: "Brilliant at keeping his foes off balance" },
+  { minBase: 20, text: "Seizes the momentum with bone-breaking certainty" },
   { minBase: 19, text: "Orchestrates the slaughter with predatory anticipation" },
+  { minBase: 18, text: "Dictates a savage pace that leaves foes gasping for survival" },
   { minBase: 17, text: "Nothing short of a genius at keeping his foes at swords point" },
   { minBase: 16, text: "Pushes the pace of combat with vicious, unyielding pressure" },
   { minBase: 15, text: "Nothing short of a genius at keeping his foes off balance and in trouble" },
   { minBase: 14, text: "Smothers enemy momentum before it can even spark" },
   { minBase: 13, text: "Has learned very well how to keep his foe in trouble" },
-  { minBase: 0,  text: "Has learned how to keep his foe in trouble" },
+  { minBase: 12, text: "Pushes forward with the grim certainty of an executioner" },
+  { minBase: 0, text: "Has learned how to keep his foe in trouble" },
 ];
 const GOOD_INI_LOW: StatementEntry[] = [ // base 8-12
   { minBase: 26, text: "Commands the flow of carnage before his opponent can even raise their steel" },
@@ -72,21 +77,31 @@ const GOOD_INI_LOW: StatementEntry[] = [ // base 8-12
   { minBase: 15, text: "With a very aggressive and clever fighting style" },
   { minBase: 14, text: "A brutal opportunist who never lingers on the defensive" },
   { minBase: 13, text: "Has learned to be a decisive and quick fighter" },
-  { minBase: 0,  text: "Has learned how to be decisive and quick" },
+  { minBase: 12, text: "Rushes the gap with vicious, undeniable intent" },
+  { minBase: 11, text: "Claims the center of the pit like a ravenous beast" },
+  { minBase: 10, text: "Presses the attack with cold, calculating brutality" },
+  { minBase: 9, text: "Steals the breath from his foe before the first strike lands" },
+  { minBase: 8, text: "Advances with an unnatural, predatory swiftness" },
+  { minBase: 0, text: "Has learned how to be decisive and quick" },
 ];
 
 // GOOD WIT: RIPOSTE (2nd statement)
 const GOOD_RIP_HIGH: StatementEntry[] = [ // base >= 13
+  { minBase: 26, text: "Turns every desperate block into a sudden, gruesome counter-stroke" },
   { minBase: 25, text: "Punishes every misstep with swift, crippling retribution" },
+  { minBase: 24, text: "Punishes overextension with dismembering precision" },
   { minBase: 23, text: "Turns the opponent's momentum into their own gruesome demise" },
   { minBase: 21, text: "Is always alert for any clue to a foe's weakness" },
+  { minBase: 20, text: "A master of the deadly art of answering steel with slaughter" },
   { minBase: 19, text: "Weaves through attacks to deliver punishing counter-strokes" },
+  { minBase: 18, text: "Catches the blade and returns it covered in gore" },
   { minBase: 17, text: "Is a very crafty fighter" },
   { minBase: 16, text: "Lures the enemy into fatal overextensions" },
   { minBase: 15, text: "Makes the most of his enemy's mistakes" },
   { minBase: 14, text: "Calculates the perfect moment to reverse the slaughter" },
   { minBase: 13, text: "Makes good dueling decisions" },
-  { minBase: 0,  text: "Makes good dueling decisions" },
+  { minBase: 12, text: "Leaves foes crippled the moment they dare to strike" },
+  { minBase: 0, text: "Makes good dueling decisions" },
 ];
 const GOOD_RIP_LOW: StatementEntry[] = [ // base 10-12
   { minBase: 23, text: "Twists an enemy's assault into a sudden, bloody end" },
@@ -97,7 +112,10 @@ const GOOD_RIP_LOW: StatementEntry[] = [ // base 10-12
   { minBase: 15, text: "Does a lot of little things well" },
   { minBase: 14, text: "Reads the flow of blood and steel expertly" },
   { minBase: 13, text: "Cleverly controls his foes' actions" },
-  { minBase: 0,  text: "Cleverly controls his foe's actions" },
+  { minBase: 12, text: "Meets an attack with a brutal, spiteful reprisal" },
+  { minBase: 11, text: "Twists past the strike to deliver a sickening riposte" },
+  { minBase: 10, text: "Retaliates with the swiftness of a striking viper" },
+  { minBase: 0, text: "Cleverly controls his foe's actions" },
 ];
 
 // GOOD WIT: ATTACK (3rd statement)
