@@ -148,6 +148,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
           {/* Toggle */}
           <button
             onClick={() => setExpanded(!expanded)}
+            aria-label={expanded ? 'Collapse bout details' : 'Expand bout details'}
             className="absolute top-0 right-0 p-1 text-muted-foreground hover:text-foreground transition-colors"
           >
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
