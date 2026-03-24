@@ -972,3 +972,14 @@ To turn the existing build into the required navigable shell (always playable):
    - 10 owners
    - at least 1 Gazette issue and 10 Chronicle entries
 4. Every placeholder route must show meaningful demo content and a “Coming soon” section.
+
+### 4.7 Lethality Risk Indicator (RunRound)
+**Purpose:**
+Add documentation for the new "Lethality Risk" indicator shown to players during bout preparation in `RunRound.tsx`.
+
+**Code Paths Covered:**
+- `src/pages/RunRound.tsx (getLethalityHint)`
+- `src/engine/combat/combatDamage.ts (calculateKillWindow)`
+
+**Key Knowledge Gaps Addressed:**
+Clarifies how the UI signals danger to the player based on hidden engine fatigue and hit location modifiers without breaking the narrative boundary.
