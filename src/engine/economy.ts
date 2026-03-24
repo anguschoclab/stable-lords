@@ -13,12 +13,12 @@
  */
 import type { GameState, LedgerEntry } from "@/types/game";
 
-const FIGHT_PURSE = 50;
+const FIGHT_PURSE = 60; // Increased purse to incentivize active bouts
 const WIN_BONUS = 30;
 const FAME_MULTIPLIER = 2;
-const WARRIOR_UPKEEP = 20;
+const WARRIOR_UPKEEP = 25; // Increased upkeep burn rate to prevent infinite stalling
 const TRAINER_SALARY = 35;
-const TRAINING_COST = 15;
+const TRAINING_COST = 20; // Increased training cost to make early-game recruits more of a risk
 
 export interface WeeklyBreakdown {
   income: { label: string; amount: number }[];

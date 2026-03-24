@@ -103,9 +103,9 @@ describe("computeStableReputation", () => {
     // totalKills = 2
     // graveyardKills = 3
     // killBouts = 2
-    // notorietyRaw = (2 + 3) * 2 + 2 * 1 = 10 + 2 = 12
-    // notoriety = 12 * 2 = 24
-    expect(rep.notoriety).toBe(24);
+    // notorietyRaw = (2 * 2) + (3 * 3) + (2 * 2) = 4 + 9 + 4 = 17
+    // notoriety = 17 * 2 = 34
+    expect(rep.notoriety).toBe(34);
   });
 
   it("calculates honor correctly", () => {

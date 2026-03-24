@@ -229,6 +229,7 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.playerChallenges) parsed.playerChallenges = parsed.playerChallenges.slice(-100);
   if (parsed.playerAvoids) parsed.playerAvoids = parsed.playerAvoids.slice(-100);
   if (parsed.trainingAssignments) parsed.trainingAssignments = parsed.trainingAssignments.slice(-200);
+  if (parsed.coachDismissed) parsed.coachDismissed = parsed.coachDismissed.slice(-100);
   return parsed as GameState;
 }
 

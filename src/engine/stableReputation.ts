@@ -35,7 +35,8 @@ export function computeStableReputation(state: GameState): StableReputation {
   const totalKills = roster.reduce((s, w) => s + w.career.kills, 0);
   const graveyardKills = state.graveyard.reduce((s, w) => s + w.career.kills, 0);
   const killBouts = state.arenaHistory.filter(f => f.by === "Kill").length;
-  const notorietyRaw = (totalKills + graveyardKills) * 2 + killBouts * 1;
+  // Make recent kills and historical lethality impact reputation more quickly
+  const notorietyRaw = (totalKills * 2) + (graveyardKills * 3) + (killBouts * 2);
   const notoriety = Math.min(100, Math.round(notorietyRaw * 2));
 
   // ── Honor ──

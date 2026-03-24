@@ -97,19 +97,19 @@ export function calculateKillWindow(
   phaseLevel: number // 0 for Opening, 1 for Mid, 2 for Late
 ): number {
   // Base threshold (lethal hits are rare but possible)
-  let threshold = 0.02;
+  let threshold = 0.03; // Increased base threshold from 0.02
 
   // HP factor: higher chance if HP is low (below 30%)
   if (hpRatio < 0.3) threshold += 0.12;
   else if (hpRatio < 0.5) threshold += 0.05;
 
   // Endurance (Fatigue) factor: higher chance if target is exhausted (below 30%)
-  if (enduranceRatio < 0.3) threshold += 0.10;
-  else if (enduranceRatio < 0.5) threshold += 0.04;
+  if (enduranceRatio < 0.3) threshold += 0.12; // Increased from +0.10
+  else if (enduranceRatio < 0.5) threshold += 0.06; // Increased from +0.04
 
   // Location factor: Vital spots are deadlier
-  if (location === "head") threshold += 0.08;
-  if (location === "chest" || location === "abdomen") threshold += 0.04;
+  if (location === "head") threshold += 0.10; // Increased from +0.08
+  if (location === "chest" || location === "abdomen") threshold += 0.06; // Increased from +0.04
 
   // Kill Desire: Attacker's aggression
   threshold += (killDesire - 5) * 0.01;
@@ -117,6 +117,6 @@ export function calculateKillWindow(
   // Phase escalation: fights get more dangerous as time passes
   threshold += phaseLevel * 0.05;
 
-  // Cap at 35% for organic hits
-  return Math.max(0, Math.min(0.35, threshold));
+  // Cap at 45% for organic hits to allow high-risk scenarios (fatigued, vital hits) to truly threaten permadeath
+  return Math.max(0, Math.min(0.45, threshold));
 }
