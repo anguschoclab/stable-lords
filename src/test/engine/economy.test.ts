@@ -85,23 +85,9 @@ describe("Economy Engine", () => {
       state.roster = [w1]; // Need the warrior in the roster so the engine knows it's a player warrior
 
       // Setup income: 2 fights, 1 win
+      // ⚡ Bolt: Make sure they are chronological (f3 then f1 then f2)
+      // because computeWeeklyBreakdown breaks early if f.week !== week.
       state.arenaHistory = [
-        {
-          id: "f1", week: 5, season: "Spring",
-          a: "Alice", d: "Enemy 1",
-          aStable: "Player", dStable: "Rival 1",
-          winner: "A", // Player won
-          loser: "D",
-          aInjuries: [], dInjuries: [], type: "Standard"
-        },
-        {
-          id: "f2", week: 5, season: "Spring",
-          a: "Enemy 2", d: "Alice",
-          aStable: "Rival 2", dStable: "Player",
-          winner: "A", // Player lost
-          loser: "D",
-          aInjuries: [], dInjuries: [], type: "Standard"
-        },
         {
           // Previous week fight, shouldn't count
           id: "f3", week: 4, season: "Spring",
@@ -110,7 +96,23 @@ describe("Economy Engine", () => {
           winner: "A",
           loser: "D",
           aInjuries: [], dInjuries: [], type: "Standard"
-        }
+        } as any,
+        {
+          id: "f1", week: 5, season: "Spring",
+          a: "Alice", d: "Enemy 1",
+          aStable: "Player", dStable: "Rival 1",
+          winner: "A", // Player won
+          loser: "D",
+          aInjuries: [], dInjuries: [], type: "Standard"
+        } as any,
+        {
+          id: "f2", week: 5, season: "Spring",
+          a: "Enemy 2", d: "Alice",
+          aStable: "Rival 2", dStable: "Player",
+          winner: "A", // Player lost
+          loser: "D",
+          aInjuries: [], dInjuries: [], type: "Standard"
+        } as any
       ];
 
       const breakdown = computeWeeklyBreakdown(state);
