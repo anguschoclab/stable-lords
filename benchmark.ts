@@ -238,17 +238,17 @@ Current Meta Drift Window Analysis:
     report += `\n`;
   }
 
-  report += `- *Suggested Tweaks:* `;
-  if (parseFloat(killRate) > 20) {
-    report += `Lethality is high (${killRate}%). Consider reducing \`KILL_THRESHOLD_BASE\` in \`simulate.ts\`. `;
-  } else if (parseFloat(killRate) < 5) {
-    report += `Lethality is low (${killRate}%). Consider increasing \`KILL_THRESHOLD_BASE\` in \`simulate.ts\`. `;
+      report += `- *Suggested Tweaks:* `;
+  if (parseFloat(killRate) > 15) {
+    report += `Lethality is high (${killRate}% vs expected 8-15%). Consider reducing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\`. `;
+  } else if (parseFloat(killRate) < 8) {
+    report += `Lethality is low (${killRate}% vs expected 8-15%). Consider increasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\`. `;
   } else {
-    report += `Lethality (${killRate}%) seems reasonable. `;
+    report += `Lethality (${killRate}%) is within the target 8-15% bound. `;
   }
 
   if (finalWealth > initialWealth * 2) {
-    report += `Economy is inflating. Adjust \`economy.ts\` or add maintenance costs.`;
+    report += `Economy is inflating. Consider reducing \`FIGHT_PURSE\` or \`WIN_BONUS\` in \`src/engine/economy.ts\`, or adding more gold sinks.`;
   }
 
   report += `\n`;
