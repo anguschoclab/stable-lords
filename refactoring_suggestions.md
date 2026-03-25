@@ -44,3 +44,4 @@ This file generates play-by-play narrative text for bouts, but over half of the 
 - [x] Extracted `StatBadge` optional props `hideStyle` to fix typing in `StableDetail.tsx`.
 - [x] Refactored `Orphanage.tsx` to use the consolidated `StatBadge` instead of inline `<Badge>` components.
 - [x] Refactored `Recruit.tsx` to use the consolidated `StatBadge` instead of inline `<Badge>` components.
+- [x] Refactored `RunRound.tsx` to use the consolidated `StatBadge` and `WarriorNameTag` components.

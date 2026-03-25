@@ -11,13 +11,15 @@ import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart, ChevronDown, Crosshair, Ban, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
-import { WarriorLink, StableLink } from "@/components/EntityLink";
+import { StableLink } from "@/components/EntityLink";
 
 function getLethalityHint(wA: Warrior, wB: Warrior, crowdMood: string): { label: string; color: string } {
   let score = 0;
@@ -459,8 +461,8 @@ export default function RunRound() {
               {matchCard.map((mp, i) => (
                 <div key={i} className="flex items-center justify-between py-3 text-sm">
                   <div className="flex items-center gap-2 flex-1">
-                    <WarriorLink name={mp.playerWarrior.name} id={mp.playerWarrior.id} className="font-semibold" />
-                    <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[mp.playerWarrior.style]}</Badge>
+                    <WarriorNameTag name={mp.playerWarrior.name} id={mp.playerWarrior.id} />
+                    <StatBadge styleName={mp.playerWarrior.style} showFullName />
                     <span className="text-muted-foreground text-xs hidden sm:inline">Fame {mp.playerWarrior.fame}</span>
                   </div>
                   <div className="flex items-center gap-1.5 flex-col px-2">
@@ -472,8 +474,8 @@ export default function RunRound() {
                   </div>
                   <div className="flex items-center gap-2 flex-1 justify-end">
                     <span className="text-muted-foreground text-xs">Fame {mp.rivalWarrior.fame}</span>
-                    <Badge variant="outline" className="text-xs">{STYLE_DISPLAY_NAMES[mp.rivalWarrior.style]}</Badge>
-                    <WarriorLink name={mp.rivalWarrior.name} id={mp.rivalWarrior.id} className="font-semibold" />
+                    <StatBadge styleName={mp.rivalWarrior.style} showFullName />
+                    <WarriorNameTag name={mp.rivalWarrior.name} id={mp.rivalWarrior.id} />
                     <StableLink name={mp.rivalStable.owner.stableName} className="text-xs text-muted-foreground">
                       ({mp.rivalStable.owner.stableName})
                     </StableLink>

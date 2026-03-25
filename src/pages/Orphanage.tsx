@@ -15,6 +15,7 @@ import { LoreArchive } from "@/lore/LoreArchive";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -238,7 +239,7 @@ export default function Orphanage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-display font-bold">{pw.name}</span>
-                          <Badge variant="secondary" className="text-[10px]">{STYLE_DISPLAY_NAMES[pw.style]}</Badge>
+                          <StatBadge styleName={pw.style} variant="secondary" showFullName />
                         </div>
                         <p className="text-[11px] text-muted-foreground italic">{pw.lore}</p>
                       </div>

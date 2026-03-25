@@ -19,6 +19,7 @@ import WarriorBuilder from "@/components/WarriorBuilder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatBadge } from "@/components/ui/StatBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -69,7 +70,6 @@ function RecruitCard({
   warrior: PoolWarrior; canAfford: boolean; rosterFull: boolean; onRecruit: (w: PoolWarrior) => void;
   isScouted: boolean; onScout: (w: PoolWarrior) => void; canAffordScout: boolean;
 }) {
-  const styleName = STYLE_DISPLAY_NAMES[warrior.style] ?? warrior.style;
   const grade = potentialGrade(potentialRating(warrior.potential));
 
   return (
@@ -80,7 +80,7 @@ function RecruitCard({
           <TierBadge tier={warrior.tier} />
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline" className="text-[10px]">{styleName}</Badge>
+          <StatBadge styleName={warrior.style} showFullName />
           <span>Age {warrior.age}</span>
           {isScouted && (
             <Badge className={`text-[10px] ml-auto ${grade === 'S' || grade === 'A' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
