@@ -19,39 +19,78 @@ export interface StableReputation {
  * Adaptability = style diversity + meta drift participation
  */
 export function computeStableReputation(state: GameState): StableReputation {
-  const roster = state.roster.filter(w => w.status === "Active");
+  let totalKills = 0;
+  let graveyardKills = 0;
+  const uniqueStyles = new Set<string>();
+  const activeWarriors: Warrior[] = [];
+
+  // ⚡ Bolt: Single pass over roster to collect active warriors, total kills, and unique styles
+  for (let i = 0; i < state.roster.length; i++) {
+    const w = state.roster[i];
+    if (w.status === "Active") {
+      activeWarriors.push(w);
+      uniqueStyles.add(w.style);
+      totalKills += w.career?.kills || 0;
+    }
+  }
+
+  // ⚡ Bolt: Single pass over graveyard to collect kills
+  for (let i = 0; i < state.graveyard.length; i++) {
+    graveyardKills += state.graveyard[i].career?.kills || 0;
+  }
+
+  let killBouts = 0;
+  let cleanBouts = 0;
+
+  // ⚡ Bolt: Single pass over arena history to collect bout stats
+  for (let i = 0; i < state.arenaHistory.length; i++) {
+    const f = state.arenaHistory[i];
+    if (f.by === "Kill") {
+      killBouts++;
+    } else if (f.winner !== null) {
+      cleanBouts++;
+    }
+  }
+
+  let gazetteMentions = 0;
+  const stableName = state.player.stableName;
+
+  // ⚡ Bolt: Single pass over newsletter for mentions
+  if (state.newsletter) {
+    for (let i = 0; i < state.newsletter.length; i++) {
+      const items = state.newsletter[i].items;
+      for (let j = 0; j < items.length; j++) {
+        if (items[j].includes(stableName)) {
+          gazetteMentions++;
+          break; // Count once per newsletter
+        }
+      }
+    }
+  }
 
   // ── Fame ──
-  const topFame = [...roster].sort((a, b) => b.fame - a.fame).slice(0, 5);
-  const avgFame = topFame.length > 0
-    ? topFame.reduce((s, w) => s + w.fame, 0) / topFame.length
-    : 0;
-  const gazetteMentions = state.newsletter.filter(n =>
-    n.items.some(item => item.includes(state.player.stableName))
-  ).length;
+  const topFame = activeWarriors.sort((a, b) => b.fame - a.fame).slice(0, 5);
+  let topFameSum = 0;
+  for (let i = 0; i < topFame.length; i++) {
+    topFameSum += topFame[i].fame;
+  }
+  const avgFame = topFame.length > 0 ? topFameSum / topFame.length : 0;
   const fame = Math.min(100, Math.round(avgFame * 3 + gazetteMentions * 0.5 + (state.fame ?? 0)));
 
   // ── Notoriety ──
-  const totalKills = roster.reduce((s, w) => s + w.career.kills, 0);
-  const graveyardKills = state.graveyard.reduce((s, w) => s + w.career.kills, 0);
-  const killBouts = state.arenaHistory.filter(f => f.by === "Kill").length;
   // Make recent kills and historical lethality impact reputation more quickly
   const notorietyRaw = (totalKills * 2) + (graveyardKills * 3) + (killBouts * 2);
   const notoriety = Math.min(100, Math.round(notorietyRaw * 2));
 
   // ── Honor ──
   // Base 50, reduced by kills, boosted by clean bouts
-  const cleanBouts = state.arenaHistory.filter(f =>
-    f.by !== "Kill" && f.winner !== null
-  ).length;
   const honorRaw = 50 + cleanBouts * 0.5 - totalKills * 3;
   const honor = Math.min(100, Math.max(0, Math.round(honorRaw)));
 
   // ── Adaptability ──
   // Style diversity among roster + training activity
-  const uniqueStyles = new Set(roster.map(w => w.style)).size;
   const trainingCount = (state.trainingAssignments ?? []).length;
-  const adaptRaw = uniqueStyles * 8 + trainingCount * 3 + (state.trainers?.length ?? 0) * 2;
+  const adaptRaw = uniqueStyles.size * 8 + trainingCount * 3 + (state.trainers?.length ?? 0) * 2;
   const adaptability = Math.min(100, Math.round(adaptRaw));
 
   return { fame, notoriety, honor, adaptability };
@@ -65,28 +104,36 @@ export function computeRivalReputation(
   arenaHistory: FightSummary[],
   stableName: string
 ): StableReputation {
-  const active = roster.filter(w => w.status === "Active");
+  let totalKills = 0;
+  let cleanBouts = 0;
+  const uniqueStyles = new Set<string>();
+  const activeWarriors: Warrior[] = [];
 
-  const topFame = [...active].sort((a, b) => b.fame - a.fame).slice(0, 5);
-  const avgFame = topFame.length > 0
-    ? topFame.reduce((s, w) => s + w.fame, 0) / topFame.length
-    : 0;
+  // ⚡ Bolt: Single pass over roster to compute stats instead of multiple filters and reduce
+  for (let i = 0; i < roster.length; i++) {
+    const w = roster[i];
+    if (w.status === "Active") {
+      activeWarriors.push(w);
+      uniqueStyles.add(w.style);
+    }
+
+    // Total kills and clean bouts uses full roster, not just active
+    totalKills += w.career?.kills || 0;
+    cleanBouts += (w.career?.wins || 0) + (w.career?.losses || 0) - (w.career?.kills || 0);
+  }
+
+  const topFame = activeWarriors.sort((a, b) => b.fame - a.fame).slice(0, 5);
+  let topFameSum = 0;
+  for (let i = 0; i < topFame.length; i++) {
+    topFameSum += topFame[i].fame;
+  }
+  const avgFame = topFame.length > 0 ? topFameSum / topFame.length : 0;
   const fame = Math.min(100, Math.round(avgFame * 3));
-
-  const { totalKills, cleanBouts } = roster.reduce(
-    (acc, w) => {
-      acc.totalKills += w.career.kills;
-      acc.cleanBouts += w.career.wins + w.career.losses - w.career.kills;
-      return acc;
-    },
-    { totalKills: 0, cleanBouts: 0 }
-  );
 
   const notoriety = Math.min(100, Math.round(totalKills * 4));
   const honor = Math.min(100, Math.max(0, Math.round(50 + cleanBouts * 0.3 - totalKills * 3)));
 
-  const uniqueStyles = new Set(active.map(w => w.style)).size;
-  const adaptability = Math.min(100, Math.round(uniqueStyles * 10));
+  const adaptability = Math.min(100, Math.round(uniqueStyles.size * 10));
 
   return { fame, notoriety, honor, adaptability };
 }
