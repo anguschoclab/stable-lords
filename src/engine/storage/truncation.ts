@@ -37,5 +37,8 @@ export function truncateState(state: GameState): GameState {
     trainingAssignments: (state.trainingAssignments || []).slice(-200),
     gazettes: (state.gazettes || []).slice(-50),
     coachDismissed: (state.coachDismissed || []).slice(-100),
+    restStates: (state.restStates || []).slice(-500),
+    hiringPool: (state.hiringPool || []).slice(-20),
+    recruitPool: (state.recruitPool || []).slice(-50),
   };
 }

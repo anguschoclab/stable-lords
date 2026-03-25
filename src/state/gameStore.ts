@@ -165,8 +165,9 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.rosterBonus === undefined) parsed.rosterBonus = 0;
   if (!parsed.ownerGrudges) parsed.ownerGrudges = [];
   if (!parsed.insightTokens) parsed.insightTokens = [];
-  if (!parsed.moodHistory) parsed.moodHistory = [];
   if (!parsed.seasonalGrowth) parsed.seasonalGrowth = [];
+  if (parsed.week === undefined) parsed.week = 1;
+  if (!parsed.season) parsed.season = "Spring";
   if (!parsed.settings) parsed.settings = { featureFlags: { tournaments: true, scouting: true } };
   if (!parsed.phase) parsed.phase = "planning";
   if (parsed.settings && !parsed.settings.featureFlags?.scouting) {
@@ -230,6 +231,9 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.playerAvoids) parsed.playerAvoids = parsed.playerAvoids.slice(-100);
   if (parsed.trainingAssignments) parsed.trainingAssignments = parsed.trainingAssignments.slice(-200);
   if (parsed.coachDismissed) parsed.coachDismissed = parsed.coachDismissed.slice(-100);
+  if (parsed.restStates) parsed.restStates = parsed.restStates.slice(-500);
+  if (parsed.hiringPool) parsed.hiringPool = parsed.hiringPool.slice(-20);
+  if (parsed.recruitPool) parsed.recruitPool = parsed.recruitPool.slice(-50);
   return parsed as GameState;
 }
 
