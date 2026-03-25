@@ -3,29 +3,29 @@ import { enduranceCost, fatiguePenalty } from "@/engine/combat/combatFatigue";
 
 describe("combatFatigue engine", () => {
   describe("fatiguePenalty", () => {
-    it("returns 0 penalty when endurance is high (> 55%)", () => {
+    it("returns 0 penalty when endurance is high (> 60%)", () => {
       expect(fatiguePenalty(100, 100)).toBe(0); // 100%
-      expect(fatiguePenalty(56, 100)).toBe(0);  // 56%
+      expect(fatiguePenalty(61, 100)).toBe(0);  // 61%
     });
 
-    it("returns -2 moderate penalty when endurance is <= 55% and > 30%", () => {
-      expect(fatiguePenalty(55, 100)).toBe(-2); // 55%
-      expect(fatiguePenalty(31, 100)).toBe(-2); // 31%
+    it("returns -2 moderate penalty when endurance is <= 60% and > 35%", () => {
+      expect(fatiguePenalty(60, 100)).toBe(-2); // 60%
+      expect(fatiguePenalty(36, 100)).toBe(-2); // 36%
     });
 
-    it("returns -5 heavy penalty when endurance is <= 30%", () => {
-      expect(fatiguePenalty(30, 100)).toBe(-5); // 30%
-      expect(fatiguePenalty(0, 100)).toBe(-5);  // 0%
+    it("returns -6 heavy penalty when endurance is <= 35%", () => {
+      expect(fatiguePenalty(35, 100)).toBe(-6); // 35%
+      expect(fatiguePenalty(0, 100)).toBe(-6);  // 0%
     });
 
     it("handles zero or negative maxEndurance gracefully (div by zero prevention)", () => {
       // ratio = endurance / Math.max(1, maxEndurance)
-      // endurance 0, max 0 => 0 / 1 => 0 => -5 heavy penalty
-      expect(fatiguePenalty(0, 0)).toBe(-5);
+      // endurance 0, max 0 => 0 / 1 => 0 => -6 heavy penalty
+      expect(fatiguePenalty(0, 0)).toBe(-6);
       // endurance 1, max 0 => 1 / 1 => 1 => 0 penalty
       expect(fatiguePenalty(1, 0)).toBe(0);
-      // endurance 0, max -10 => 0 / 1 => 0 => -5 heavy penalty
-      expect(fatiguePenalty(0, -10)).toBe(-5);
+      // endurance 0, max -10 => 0 / 1 => 0 => -6 heavy penalty
+      expect(fatiguePenalty(0, -10)).toBe(-6);
     });
   });
 
