@@ -48,7 +48,11 @@ const WARRIOR_NAMES = [
   "DEATHSTROKE", "GRAVESPAWN", "HELLFORGED", "SLAGMOUTH", "FLESHCRAWL",
   "MUDDRINKER", "SPINELESS", "GUTWRENCH", "MEATGRINDER", "SLUICEBLOOD",
   "VENOMSPAWN", "ROTWEAVER",
-  // Procedural Chronicle Additions v2
+  // Procedural Chronicle Additions v3
+  "GOREWAKE", "GRIMBONE", "ASHENMAW", "BLOODCRAWL", "IRONJAW",
+  "SLAGBORN", "GRAVESTONE", "FLESHCHOP", "MUCKSWINE", "BONEGRIND",
+  "DEATHMACE", "SHADOWFANG", "SCARRING", "HELLSPIT", "PLAGUEJAW",
+  "GUTWOUND", "SLUICEBORN", "VENOMCLAW", "ROTBREATH", "SKULLCLEAVER"
 ];
 
 const OWNER_FIRST = [
@@ -64,7 +68,9 @@ const OWNER_FIRST = [
   "Gellart", "Thaddeus",
   // Procedural Chronicle Additions
   "Vesper", "Silas", "Caius", "Mordecai", "Darius", "Oric", "Bran",
-  "Kael", "Lorcan", "Thalric", "Vergil", "Rurik", "Ignis", "Kian"
+  "Kael", "Lorcan", "Thalric", "Vergil", "Rurik", "Ignis", "Kian",
+  // Procedural Chronicle Additions v3
+  "Morven", "Corvus", "Gareth", "Bram", "Torvald", "Ulfric", "Jorah"
 ];
 
 const OWNER_LAST = [
@@ -79,7 +85,9 @@ const OWNER_LAST = [
   "Blightford", "Grimhollow", "Vileblood", "Slagmore",
   // Procedural Chronicle Additions
   "Gravewarden", "Bloodspiller", "Nightshade", "Ironfoot", "Crow",
-  "Deathweaver", "Ashfall", "Hollow", "Vane", "Blackwood", "Bitterstone"
+  "Deathweaver", "Ashfall", "Hollow", "Vane", "Blackwood", "Bitterstone",
+  // Procedural Chronicle Additions v3
+  "Gorehound", "Ironblood", "Gravewalker", "Grimscar", "Bloodthorn", "Skullbreaker"
 ];
 
 const STABLE_PREFIXES = [
@@ -94,7 +102,9 @@ const STABLE_PREFIXES = [
   "The Mangled", "The Slagged", "The Severed",
   // Procedural Chronicle Additions
   "The Decayed", "The Ruinous", "The Pestilent", "The Gilded", "The Rusty",
-  "The Mangled", "The Searing", "The Weeping", "The Drowned", "The Frozen"
+  "The Mangled", "The Searing", "The Weeping", "The Drowned", "The Frozen",
+  // Procedural Chronicle Additions v3
+  "The Butcher's", "The Bloodsoaked", "The Slaughtered", "The Severed", "The Putrefied"
 ];
 
 const STABLE_SUFFIXES = [
@@ -109,7 +119,9 @@ const STABLE_SUFFIXES = [
   "Carrion", "Screams", "Guts", "Bones",
   // Procedural Chronicle Additions
   "Swarm", "Fiends", "Wights", "Ghosts", "Terrors",
-  "Ghouls", "Beasts", "Monsters", "Demons", "Devils"
+  "Ghouls", "Beasts", "Monsters", "Demons", "Devils",
+  // Procedural Chronicle Additions v3
+  "Manglers", "Flayers", "Mutilators", "Eviscerators", "Decapitators"
 ];
 
 const STABLE_ALT = [
@@ -132,7 +144,10 @@ const STABLE_ALT = [
   // Procedural Chronicle Additions
   "The Flesh Markets", "Guild of the Severed", "Sons of the Pit",
   "Daughters of Ash", "The Bone Syndicate", "Bloodied Sands Collective",
-  "The Iron Carousel", "Cult of the Red Stain", "The Slaughter Cult"
+  "The Iron Carousel", "Cult of the Red Stain", "The Slaughter Cult",
+  // Procedural Chronicle Additions v3
+  "The Flesh Hook Combine", "Guild of the Bleeding Hand", "The Bone Collectors Syndicate",
+  "The Ashen Brotherhood", "The Gilded Abattoir"
 ];
 
 function pick<T>(arr: T[]): T {
