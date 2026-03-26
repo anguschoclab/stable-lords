@@ -1,3 +1,5 @@
+import { getRecentFightsForWarrior } from "@/engine/core/historyUtils";
+import { getRecentFights } from "@/engine/core/historyUtils";
 /**
  * Owner AI — Personality-driven decision-making, roster management,
  * owner rivalries, narrative events, and philosophy evolution.
@@ -274,7 +276,7 @@ export function processOwnerGrudges(
   const rivals = state.rivals || [];
 
   // Check for personality clashes between stables that have recently fought
-  const recentFights = state.arenaHistory.filter(f => f.week >= state.week - 13);
+  const recentFights = getRecentFights(state.arenaHistory, state.week - 13);
 
   for (let i = 0; i < rivals.length; i++) {
     for (let j = i + 1; j < rivals.length; j++) {
@@ -439,7 +441,7 @@ export function processAIRosterManagement(
 
       // If they hate the player, they consider the player's dominant style as the "meta" to counter
       if (rivalry && rivalry.intensity >= 3 && adaptation !== "Traditionalist") {
-        const playerMeta = computeMetaDrift(state.arenaHistory.filter(f => f.a === state.player.id || f.d === state.player.id), 10);
+        const playerMeta = computeMetaDrift(getRecentFightsForWarrior(state.arenaHistory, state.player.id, 10), 10);
         if (Object.keys(playerMeta).length > 0) customMeta = playerMeta;
       }
 
@@ -633,7 +635,7 @@ export function generateOwnerNarratives(
   if (newSeason === state.season) return [];
 
   const gazetteItems: string[] = [];
-  const recentFights = state.arenaHistory.filter(f => f.week >= state.week - 13);
+  const recentFights = getRecentFights(state.arenaHistory, state.week - 13);
   const rivals = state.rivals || [];
 
   for (const rival of rivals) {
@@ -758,7 +760,7 @@ export function evolvePhilosophies(
   if (newSeason === state.season) return { updatedRivals: state.rivals || [], gazetteItems: [] };
 
   const gazetteItems: string[] = [];
-  const recentFights = state.arenaHistory.filter(f => f.week >= state.week - 13);
+  const recentFights = getRecentFights(state.arenaHistory, state.week - 13);
   const meta = computeMetaDrift(state.arenaHistory, 20);
 
   const updatedRivals = (state.rivals || []).map(rival => {

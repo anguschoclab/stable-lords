@@ -1,3 +1,4 @@
+import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { generateFightNarrative, generateWeeklyGazette } from "@/engine/gazetteNarrative";
 /**
  * Bout Processor — shared fight resolution logic for RunRound and Autosim.
@@ -726,7 +727,7 @@ export function processWeekBouts(state: GameState): ProcessedWeek {
   NewsletterFeed.closeWeekToIssue(state.week);
 
   // ── Gazette generation ──
-  const weekSummaries = s.arenaHistory.filter(f => f.week === state.week);
+  const weekSummaries = getFightsForWeek(s.arenaHistory, state.week);
   const gazette = generateWeeklyGazette(weekSummaries, s.crowdMood, s.week, s.graveyard, s.arenaHistory);
   s.gazettes = [...(s.gazettes || []), gazette];
 
