@@ -7,7 +7,7 @@ import { type GameState, type FightSummary } from "@/types/game";
  * - Bounds various history arrays.
  */
 export function truncateState(state: GameState): GameState {
-  const arenaHistory = state.arenaHistory.slice(-500).map((f, i, arr) => {
+  const arenaHistory = (state.arenaHistory || []).slice(-500).map((f, i, arr) => {
     // Keep transcripts only for the last 20 fights to save memory
     if (arr.length - i > 20 && f.transcript) {
       const { transcript, ...rest } = f;
@@ -23,8 +23,8 @@ export function truncateState(state: GameState): GameState {
     ledger: (state.ledger || []).slice(-500),
     matchHistory: (state.matchHistory || []).slice(-500),
     moodHistory: (state.moodHistory || []).slice(-50),
-    graveyard: state.graveyard.slice(-200),
-    retired: state.retired.slice(-200),
+    graveyard: (state.graveyard || []).slice(-200),
+    retired: (state.retired || []).slice(-200),
     tournaments: (state.tournaments || []).slice(-100),
     scoutReports: (state.scoutReports || []).slice(-100),
     hallOfFame: (state.hallOfFame || []).slice(-100),
