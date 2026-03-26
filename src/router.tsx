@@ -40,65 +40,80 @@ const rootRoute = new RootRoute({
 });
 
 // Create child routes
-const indexRoute = new Route({ getParentRoute: () => rootRoute, path: "/", component: Dashboard });
+const indexRoute = new Route({ getParentRoute: () => rootRoute, path: "/", component: ArenaHub });
 const runRoundRoute = new Route({ getParentRoute: () => rootRoute, path: "/run-round", component: RunRound });
-const tournamentsRoute = new Route({ getParentRoute: () => rootRoute, path: "/tournaments", component: Tournaments });
-const recruitRoute = new Route({ getParentRoute: () => rootRoute, path: "/recruit", component: Recruit });
-const trainingRoute = new Route({ getParentRoute: () => rootRoute, path: "/training", component: Training });
-const scoutingRoute = new Route({ getParentRoute: () => rootRoute, path: "/scouting", component: Scouting });
-const stableDetailRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable/$id", component: StableDetail });
-const worldRoute = new Route({ getParentRoute: () => rootRoute, path: "/world", component: WorldOverview });
-const graveyardRoute = new Route({ getParentRoute: () => rootRoute, path: "/graveyard", component: Graveyard });
-const trainersRoute = new Route({ getParentRoute: () => rootRoute, path: "/trainers", component: Trainers });
-const helpRoute = new Route({ getParentRoute: () => rootRoute, path: "/help", component: Help });
 const warriorDetailRoute = new Route({ getParentRoute: () => rootRoute, path: "/warrior/$id", component: WarriorDetail });
-const hallOfFightsRoute = new Route({ getParentRoute: () => rootRoute, path: "/hall-of-fights", component: HallOfFights });
-const gazetteRoute = new Route({ getParentRoute: () => rootRoute, path: "/gazette", component: Gazette });
-const designBibleRoute = new Route({ getParentRoute: () => rootRoute, path: "/design-bible", component: DesignBible });
-const physicalsSimulatorRoute = new Route({ getParentRoute: () => rootRoute, path: "/physicals-simulator", component: PhysicalsSimulator });
-const adminToolsRoute = new Route({ getParentRoute: () => rootRoute, path: "/admin-tools", component: AdminTools });
-const hallOfFameRoute = new Route({ getParentRoute: () => rootRoute, path: "/hall-of-fame", component: HallOfFame });
-const killAnalyticsRoute = new Route({ getParentRoute: () => rootRoute, path: "/kill-analytics", component: KillAnalytics });
-const equipmentOptimizerRoute = new Route({ getParentRoute: () => rootRoute, path: "/equipment-optimizer", component: EquipmentOptimizerPage });
-const trainingPlannerRoute = new Route({ getParentRoute: () => rootRoute, path: "/training-planner", component: TrainingPlanner });
-const seasonalAwardsRoute = new Route({ getParentRoute: () => rootRoute, path: "/seasonal-awards", component: SeasonalAwards });
-const tournamentAwardsRoute = new Route({ getParentRoute: () => rootRoute, path: "/tournament-awards", component: TournamentAwards });
-const styleGuideRoute = new Route({ getParentRoute: () => rootRoute, path: "/style-guide", component: StyleGuide });
-const arenaHubRoute = new Route({ getParentRoute: () => rootRoute, path: "/arena-hub", component: ArenaHub });
-const stableLedgerRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-ledger", component: StableLedger });
-const stableHallRoute = new Route({ getParentRoute: () => rootRoute, path: "/stable-hall", component: StableHall });
 const welcomeRoute = new Route({ getParentRoute: () => rootRoute, path: "/welcome", component: () => import("@/pages/Orphanage").then(m => m.default) });
+
+// Pillar 2: Stable Management
+const stablePillar = new Route({ getParentRoute: () => rootRoute, path: "/stable" });
+const stableIndexRoute = new Route({ getParentRoute: () => stablePillar, path: "/", component: StableHall });
+const stableDetailRoute = new Route({ getParentRoute: () => stablePillar, path: "/$id", component: StableDetail });
+const stableTrainingRoute = new Route({ getParentRoute: () => stablePillar, path: "/training", component: Training });
+const stableRecruitRoute = new Route({ getParentRoute: () => stablePillar, path: "/recruit", component: Recruit });
+const stableGearRoute = new Route({ getParentRoute: () => stablePillar, path: "/equipment", component: EquipmentOptimizerPage });
+const stablePlannerRoute = new Route({ getParentRoute: () => stablePillar, path: "/planner", component: TrainingPlanner });
+const stableTrainersRoute = new Route({ getParentRoute: () => stablePillar, path: "/trainers", component: Trainers });
+const stableFinanceRoute = new Route({ getParentRoute: () => stablePillar, path: "/finance", component: StableLedger });
+
+// Pillar 3: World
+const worldPillar = new Route({ getParentRoute: () => rootRoute, path: "/world" });
+const worldIndexRoute = new Route({ getParentRoute: () => worldPillar, path: "/", component: WorldOverview });
+const worldTournamentsRoute = new Route({ getParentRoute: () => worldPillar, path: "/tournaments", component: Tournaments });
+const worldScoutingRoute = new Route({ getParentRoute: () => worldPillar, path: "/scouting", component: Scouting });
+const worldGazetteRoute = new Route({ getParentRoute: () => worldPillar, path: "/gazette", component: Gazette });
+const worldHistoryRoute = new Route({ getParentRoute: () => worldPillar, path: "/history", component: HallOfFights });
+
+// Pillar 4: Legacy
+const legacyPillar = new Route({ getParentRoute: () => rootRoute, path: "/legacy" });
+const legacyIndexRoute = new Route({ getParentRoute: () => legacyPillar, path: "/", component: Graveyard });
+const legacyHoFRoute = new Route({ getParentRoute: () => legacyPillar, path: "/hall-of-fame", component: HallOfFame });
+const legacyAnalyticsRoute = new Route({ getParentRoute: () => legacyPillar, path: "/analytics", component: KillAnalytics });
+const legacyAwardsRoute = new Route({ getParentRoute: () => legacyPillar, path: "/awards", component: SeasonalAwards });
+const legacyTourneyAwardsRoute = new Route({ getParentRoute: () => legacyPillar, path: "/tournament-awards", component: TournamentAwards });
+
+// Development / Help Tools
+const helpRoute = new Route({ getParentRoute: () => rootRoute, path: "/help", component: Help });
+const designBibleRoute = new Route({ getParentRoute: () => rootRoute, path: "/design-bible", component: DesignBible });
+const physSimRoute = new Route({ getParentRoute: () => rootRoute, path: "/physicals-simulator", component: PhysicalsSimulator });
+const adminToolsRoute = new Route({ getParentRoute: () => rootRoute, path: "/admin-tools", component: AdminTools });
+const styleGuideRoute = new Route({ getParentRoute: () => rootRoute, path: "/style-guide", component: StyleGuide });
 
 // Create the route tree
 const routeTree = rootRoute.addChildren([
   welcomeRoute,
   indexRoute,
   runRoundRoute,
-  tournamentsRoute,
-  recruitRoute,
-  trainingRoute,
-  scoutingRoute,
-  stableDetailRoute,
-  worldRoute,
-  graveyardRoute,
-  trainersRoute,
-  helpRoute,
   warriorDetailRoute,
-  hallOfFightsRoute,
-  gazetteRoute,
+  stablePillar.addChildren([
+    stableIndexRoute,
+    stableDetailRoute,
+    stableTrainingRoute,
+    stableRecruitRoute,
+    stableGearRoute,
+    stablePlannerRoute,
+    stableTrainersRoute,
+    stableFinanceRoute,
+  ]),
+  worldPillar.addChildren([
+    worldIndexRoute,
+    worldTournamentsRoute,
+    worldScoutingRoute,
+    worldGazetteRoute,
+    worldHistoryRoute,
+  ]),
+  legacyPillar.addChildren([
+    legacyIndexRoute,
+    legacyHoFRoute,
+    legacyAnalyticsRoute,
+    legacyAwardsRoute,
+    legacyTourneyAwardsRoute,
+  ]),
+  helpRoute,
   designBibleRoute,
-  physicalsSimulatorRoute,
+  physSimRoute,
   adminToolsRoute,
-  hallOfFameRoute,
-  killAnalyticsRoute,
-  equipmentOptimizerRoute,
-  trainingPlannerRoute,
-  seasonalAwardsRoute,
-  tournamentAwardsRoute,
   styleGuideRoute,
-  arenaHubRoute,
-  stableLedgerRoute,
-  stableHallRoute,
 ]);
 
 // Create the router

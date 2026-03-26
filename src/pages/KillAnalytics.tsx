@@ -1,7 +1,3 @@
-/**
- * Kill Analytics — Death Visualizer
- * Death cause chains, hit location breakdowns, aggregate kill trends.
- */
 import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
@@ -11,7 +7,17 @@ import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Skull, Target, TrendingUp, Swords, BarChart3, Activity, Users } from "lucide-react";
+import { 
+  Skull, Target, TrendingUp, Swords, BarChart3, 
+  Activity, Users, Info, ChevronRight, PieChart
+} from "lucide-react";
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer, BarChart, Bar, 
+  Cell, Legend, PieChart as RePieChart, Pie
+} from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 /* ── Aggregate Types ─────────────────────────────────────── */
 
@@ -103,261 +109,22 @@ function computeStyleKillStats(fights: FightSummary[]): StyleKillStats[] {
     .sort((a, b) => b.kills - a.kills);
 }
 
-function computeKillTrend(kills: KillRecord[], maxWeek: number): { week: number; cumulative: number }[] {
+function computeKillTrend(kills: KillRecord[], maxWeek: number): { week: string; count: number }[] {
   const byWeek = new Map<number, number>();
   for (const k of kills) byWeek.set(k.week, (byWeek.get(k.week) ?? 0) + 1);
 
-  const points: { week: number; cumulative: number }[] = [];
+  const points: { week: string; count: number }[] = [];
   let cum = 0;
   for (let w = 1; w <= maxWeek; w++) {
     cum += byWeek.get(w) ?? 0;
-    points.push({ week: w, cumulative: cum });
+    points.push({ week: `W${w}`, count: cum });
   }
   return points;
 }
 
-/* ── Location Badge ──────────────────────────────────────── */
+/* ── Layout Theme ────────────────────────────────────────── */
 
-const LOCATION_COLORS: Record<string, string> = {
-  Head: "bg-destructive/20 text-destructive border-destructive/30",
-  Chest: "bg-primary/20 text-primary border-primary/30",
-  Abdomen: "bg-accent/20 text-accent border-accent/30",
-  Arms: "bg-arena-pop/20 text-arena-pop border-arena-pop/30",
-  Legs: "bg-arena-fame/20 text-arena-fame border-arena-fame/30",
-};
-
-/* ── Trend Sparkline ─────────────────────────────────────── */
-
-function KillTrendChart({ points }: { points: { week: number; cumulative: number }[] }) {
-  if (points.length < 2) return null;
-  const w = 320, h = 80, pad = { l: 30, r: 8, t: 8, b: 20 };
-  const cw = w - pad.l - pad.r;
-  const ch = h - pad.t - pad.b;
-  const max = Math.max(...points.map(p => p.cumulative), 1);
-
-  const pathD = points.map((p, i) => {
-    const x = pad.l + (i / (points.length - 1)) * cw;
-    const y = pad.t + ch - (p.cumulative / max) * ch;
-    return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
-  }).join(" ");
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ maxHeight: 80 }}>
-      {[0, 0.25, 0.5, 0.75, 1].map(pct => {
-        const y = pad.t + ch - pct * ch;
-        return <line key={pct} x1={pad.l} y1={y} x2={w - pad.r} y2={y} stroke="hsl(var(--border))" strokeWidth="0.3" />;
-      })}
-      <path d={pathD} fill="none" stroke="hsl(var(--destructive))" strokeWidth="2" />
-      {[points[0], points[points.length - 1]].map((p, i) => {
-        if (!p) return null;
-        const x = pad.l + ((points.indexOf(p)) / (points.length - 1)) * cw;
-        const y = pad.t + ch - (p.cumulative / max) * ch;
-        return <circle key={i} cx={x} cy={y} r="3" fill="hsl(var(--destructive))" />;
-      })}
-      <text x={pad.l - 4} y={pad.t + 8} textAnchor="end" className="fill-muted-foreground" style={{ fontSize: 8 }}>{max}</text>
-      <text x={pad.l - 4} y={h - pad.b + 2} textAnchor="end" className="fill-muted-foreground" style={{ fontSize: 8 }}>0</text>
-      <text x={pad.l} y={h - 2} textAnchor="start" className="fill-muted-foreground" style={{ fontSize: 8 }}>Wk 1</text>
-      <text x={w - pad.r} y={h - 2} textAnchor="end" className="fill-muted-foreground" style={{ fontSize: 8 }}>Wk {points[points.length - 1].week}</text>
-    </svg>
-  );
-}
-
-
-/* ── Sub-Components ──────────────────────────────────────── */
-
-function HeaderStats({
-  totalKills,
-  totalFights,
-  killRate,
-  graveyardCount,
-}: {
-  totalKills: number;
-  totalFights: number;
-  killRate: number;
-  graveyardCount: number;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-xl border border-destructive/30 bg-gradient-to-br from-destructive/5 via-card to-card p-6 sm:p-8">
-      <div className="relative">
-        <div className="flex items-center gap-3 mb-2">
-          <Skull className="h-6 w-6 text-destructive" />
-          <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide">Kill Analytics</h1>
-        </div>
-        <p className="text-muted-foreground text-sm max-w-xl">
-          Every death is data. Analyze kill patterns, lethal styles, and the mechanics of mortality in the arena.
-        </p>
-        <div className="flex items-center gap-4 mt-4 flex-wrap">
-          <div className="text-center">
-            <div className="text-2xl font-display font-bold text-destructive">{totalKills}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Kills</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-display font-bold text-foreground">{totalFights}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Bouts</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-display font-bold text-arena-blood">{killRate}%</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Kill Rate</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-display font-bold text-muted-foreground">{graveyardCount}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">In Graveyard</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HitLocationBreakdown({ locations }: { locations: LocationBreakdown[] }) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <Target className="h-4 w-4 text-arena-blood" /> Killing Blow Locations
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {locations.map(loc => (
-          <div key={loc.location} className="space-y-1">
-            <div className="flex items-center justify-between">
-              <Badge variant="outline" className={`text-[10px] ${LOCATION_COLORS[loc.location] ?? ""}`}>
-                {loc.location}
-              </Badge>
-              <span className="text-xs font-mono text-muted-foreground">{loc.count} ({loc.pct}%)</span>
-            </div>
-            <Progress value={loc.pct} className="h-2 [&>div]:bg-destructive/60" />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function DeadliestWarriors({ killerLeaders }: { killerLeaders: { name: string; style: string; kills: number }[] }) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <Swords className="h-4 w-4 text-arena-blood" /> Deadliest Warriors
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0">
-        {killerLeaders.map((k, i) => (
-          <div key={k.name} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
-            <div className="flex items-center gap-2">
-              <span className={`text-[10px] font-mono w-4 ${i === 0 ? "text-destructive font-bold" : "text-muted-foreground"}`}>{i + 1}</span>
-              <div>
-                <span className="text-xs font-display text-foreground">{k.name}</span>
-                <div className="text-[9px] text-muted-foreground font-mono">
-                  {STYLE_DISPLAY_NAMES[k.style as keyof typeof STYLE_DISPLAY_NAMES] ?? k.style}
-                </div>
-              </div>
-            </div>
-            <Badge variant="outline" className="text-destructive border-destructive/30 text-[10px] font-mono">
-              {k.kills} kill{k.kills !== 1 ? "s" : ""}
-            </Badge>
-          </div>
-        ))}
-        {killerLeaders.length === 0 && <p className="text-xs text-muted-foreground italic py-4">No data.</p>}
-      </CardContent>
-    </Card>
-  );
-}
-
-function StyleLethalityBreakdown({ styleStats }: { styleStats: StyleKillStats[] }) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-arena-blood" /> Style Lethality Breakdown
-        </CardTitle>
-        <p className="text-[10px] text-muted-foreground font-mono">Kills vs deaths by fighting style</p>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {styleStats.reduce((acc, s) => {
-          if (s.kills > 0 || s.deaths > 0) {
-            const maxKD = Math.max(...styleStats.map(x => x.kills + x.deaths), 1);
-            const killWidth = (s.kills / maxKD) * 100;
-            const deathWidth = (s.deaths / maxKD) * 100;
-            acc.push(
-              <div key={s.style} className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-display text-foreground">
-                    {STYLE_DISPLAY_NAMES[s.style as keyof typeof STYLE_DISPLAY_NAMES] ?? s.style}
-                  </span>
-                  <div className="flex items-center gap-2 text-[10px] font-mono">
-                    <span className="text-destructive">{s.kills}K</span>
-                    <span className="text-muted-foreground">{s.deaths}D</span>
-                    <span className="text-foreground font-semibold">KDR: {s.kdr}</span>
-                  </div>
-                </div>
-                <div className="flex gap-0.5 h-2.5">
-                  <div className="bg-destructive/70 rounded-l-full transition-all" style={{ width: `${killWidth}%` }} />
-                  <div className="bg-muted-foreground/30 rounded-r-full transition-all" style={{ width: `${deathWidth}%` }} />
-                </div>
-              </div>
-            );
-          }
-          return acc;
-        }, [] as React.ReactNode[])}
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecentKillFeed({ recentKills }: { recentKills: KillRecord[] }) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <Activity className="h-4 w-4 text-destructive" /> Recent Kills
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {recentKills.map((k, i) => (
-          <div key={i} className="flex items-center gap-3 py-2 border-b border-border/20 last:border-0">
-            <span className="text-[10px] font-mono text-muted-foreground/50 w-10 shrink-0">Wk {k.week}</span>
-            <Skull className="h-3.5 w-3.5 text-destructive shrink-0" />
-            <div className="flex-1 min-w-0">
-              <span className="text-xs font-display text-foreground font-semibold">{k.killer}</span>
-              <span className="text-[10px] text-muted-foreground mx-1">slew</span>
-              <span className="text-xs font-display text-muted-foreground">{k.victim}</span>
-            </div>
-            <div className="text-[9px] text-muted-foreground font-mono shrink-0">
-              {STYLE_DISPLAY_NAMES[k.killerStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? k.killerStyle} vs {STYLE_DISPLAY_NAMES[k.victimStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? k.victimStyle}
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function GraveyardByStyle({ graveyardByStyle }: { graveyardByStyle: [string, number][] }) {
-  if (graveyardByStyle.length === 0) return null;
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <Users className="h-4 w-4 text-muted-foreground" /> Graveyard by Style
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {graveyardByStyle.map(([style, count]) => (
-          <div key={style} className="flex items-center justify-between py-1">
-            <span className="text-xs font-display text-foreground">
-              {STYLE_DISPLAY_NAMES[style as keyof typeof STYLE_DISPLAY_NAMES] ?? style}
-            </span>
-            <Badge variant="outline" className="text-[10px] font-mono">{count} fallen</Badge>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-
+const COLORS = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
 
 /* ── Main Page ───────────────────────────────────────────── */
 
@@ -385,103 +152,229 @@ export default function KillAnalytics() {
       e.kills++;
       m.set(k.killer, e);
     }
-    return [...m.values()].sort((a, b) => b.kills - a.kills).slice(0, 8);
+    return [...m.values()].sort((a, b) => b.kills - a.kills).slice(0, 10);
   }, [kills]);
 
-  // Death chains (recent kills with context)
-  const recentKills = useMemo(() => kills.slice().reverse().slice(0, 10), [kills]);
+  const recentKills = useMemo(() => kills.slice().reverse().slice(0, 8), [kills]);
 
-  // Graveyard data
-  const graveyardByStyle = useMemo(() => {
-    const m: Record<string, number> = {};
-    for (const w of state.graveyard) {
-      m[w.style] = (m[w.style] ?? 0) + 1;
+  const chartConfig = {
+    count: {
+      label: "Total Kills",
+      color: "hsl(var(--destructive))",
+    },
+    kills: {
+      label: "Kills",
+      color: "hsl(var(--destructive))",
+    },
+    deaths: {
+      label: "Deaths",
+      color: "hsl(var(--muted-foreground))",
     }
-    return Object.entries(m).sort(([, a], [, b]) => b - a);
-  }, [state.graveyard]);
+  };
 
   return (
-    <div className="space-y-6">
-      <HeaderStats
-        totalKills={totalKills}
-        totalFights={totalFights}
-        killRate={killRate}
-        graveyardCount={state.graveyard.length}
-      />
+    <div className="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      {/* Header Stat Strip */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-4">
+        <div>
+          <h1 className="text-3xl font-display font-black tracking-tighter uppercase flex items-center gap-3">
+             <Skull className="h-8 w-8 text-destructive" /> Mortality Analytics
+          </h1>
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest pl-11">
+             Post-Mortem Engine v1.4 · {totalKills} Recorded Exterminations
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+           <div className="text-right">
+              <div className="text-[10px] text-muted-foreground font-bold uppercase">Lethal Ratio</div>
+              <div className="text-lg font-display font-bold text-destructive">{killRate}%</div>
+           </div>
+           <div className="text-right ml-4">
+              <div className="text-[10px] text-muted-foreground font-bold uppercase">In Ground</div>
+              <div className="text-lg font-display font-bold text-muted-foreground">{state.graveyard.length}</div>
+           </div>
+        </div>
+      </div>
 
       {totalKills === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <Skull className="h-10 w-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm">No kills recorded yet. Run rounds to generate combat data.</p>
+        <Card className="border-dashed">
+          <CardContent className="py-24 text-center text-muted-foreground">
+            <Skull className="h-16 w-16 mx-auto mb-4 opacity-10 animate-pulse" />
+            <p className="text-sm font-bold uppercase tracking-widest">No fatalities logged in current history</p>
           </CardContent>
         </Card>
       ) : (
-        <>
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Trend Chart (2 columns) */}
+          <Card className="lg:col-span-2 shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-display flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-destructive" /> Cumulative Kill Trend
+              <CardTitle className="text-sm font-display font-black flex items-center gap-2 uppercase tracking-tighter">
+                <TrendingUp className="h-4 w-4 text-destructive" /> Cumulative Mortality Trend
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <KillTrendChart points={trend} />
+            <CardContent className="pt-4 h-[300px]">
+              <ChartContainer config={chartConfig}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={trend}>
+                    <defs>
+                      <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted)/0.2)" />
+                    <XAxis 
+                       dataKey="week" 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{fontSize: 10, fontWeight: 700}}
+                       tickMargin={10}
+                    />
+                    <YAxis 
+                       axisLine={false} 
+                       tickLine={false} 
+                       tick={{fontSize: 10, fontWeight: 700}}
+                       tickMargin={10}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Area 
+                      type="monotone" 
+                      dataKey="count" 
+                      stroke="hsl(var(--destructive))" 
+                      strokeWidth={3}
+                      fillOpacity={1} 
+                      fill="url(#colorCount)" 
+                      animationDuration={1500}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <HitLocationBreakdown locations={locations} />
-            <DeadliestWarriors killerLeaders={killerLeaders} />
-          </div>
+          {/* Hit Locations Pie (1 column) */}
+          <Card className="shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-display font-black flex items-center gap-2 uppercase tracking-tighter">
+                <Target className="h-4 w-4 text-primary" /> Lethal Strike Zones
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4 h-[300px] flex flex-col justify-center">
+              <div className="h-[180px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RePieChart>
+                    <Pie
+                      data={locations}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey="count"
+                      nameKey="location"
+                      animationBegin={500}
+                    >
+                      {locations.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                {locations.slice(0, 4).map((loc, i) => (
+                   <div key={loc.location} className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{backgroundColor: COLORS[i]}} />
+                      <span className="text-[10px] font-bold uppercase text-muted-foreground">{loc.location}</span>
+                      <span className="text-[10px] font-mono font-black ml-auto">{loc.pct}%</span>
+                   </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          <StyleLethalityBreakdown styleStats={styleStats} />
-          <RecentKillFeed recentKills={recentKills} />
-          <GraveyardByStyle graveyardByStyle={graveyardByStyle} />
-        </>
-      )}
+          {/* Style Lethality Bar (3 columns) */}
+          <Card className="lg:col-span-3 shadow-sm">
+             <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-display font-black flex items-center gap-2 uppercase tracking-tighter">
+                  <BarChart3 className="h-4 w-4 text-arena-blood" /> Style lethality Comparison
+                </CardTitle>
+             </CardHeader>
+             <CardContent className="pt-6 h-[250px]">
+                <ChartContainer config={chartConfig}>
+                   <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={styleStats.slice(0, 8)}>
+                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted)/0.2)" />
+                         <XAxis 
+                            dataKey="style" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{fontSize: 9, fontWeight: 700}}
+                            tickFormatter={(v) => (STYLE_DISPLAY_NAMES[v as keyof typeof STYLE_DISPLAY_NAMES] || v).slice(0, 8)}
+                         />
+                         <YAxis hide />
+                         <ChartTooltip content={<ChartTooltipContent />} />
+                         <Bar dataKey="kills" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                         <Bar dataKey="deaths" fill="hsl(var(--muted-foreground))" opacity={0.3} radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                   </ResponsiveContainer>
+                </ChartContainer>
+             </CardContent>
+          </Card>
 
-      {/* Rolling Win Rates by Style (StyleRecord) */}
-      <RollingStyleStats />
-    </div>
-  );
-}
+          {/* Leaders & Feed */}
+          <Card className="lg:col-span-1 border-l-4 border-l-destructive/50">
+             <CardHeader className="pb-2 border-b border-border/50 bg-destructive/5">
+                <CardTitle className="text-xs font-display font-black uppercase tracking-widest flex items-center gap-2">
+                   <Swords className="h-3 w-3 text-destructive" /> Reaper Leaderboard
+                </CardTitle>
+             </CardHeader>
+             <CardContent className="p-0">
+                {killerLeaders.map((k, i) => (
+                   <div key={k.name} className="flex items-center justify-between p-3 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center gap-2">
+                         <span className="text-[10px] font-mono font-black text-muted-foreground/40">{String(i+1).padStart(2, '0')}</span>
+                         <div>
+                            <div className="text-[11px] font-black uppercase leading-none mb-1">{k.name}</div>
+                            <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{STYLE_DISPLAY_NAMES[k.style as keyof typeof STYLE_DISPLAY_NAMES] || k.style}</div>
+                         </div>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-mono font-black text-destructive border-destructive/20">{k.kills} KILLS</Badge>
+                   </div>
+                ))}
+             </CardContent>
+          </Card>
 
-/** Rolling 10-fight style performance using StyleRecord */
-function RollingStyleStats() {
-  const rollingStats: StyleRecord[] = useMemo(() => StyleRollups.last10(), []);
-
-  if (rollingStats.length === 0) return null;
-
-  return (
-    <Card className="mt-6">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-primary" /> Rolling Style Performance (Last 10)
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {rollingStats
-            .sort((a, b) => (b.W / (b.fights || 1)) - (a.W / (a.fights || 1)))
-            .map((rec) => {
-              const winRate = rec.fights > 0 ? Math.round((rec.W / rec.fights) * 100) : 0;
-              return (
-                <div key={rec.style} className="flex items-center gap-3">
-                  <span className="text-xs font-display w-20 truncate">
-                    {STYLE_DISPLAY_NAMES[rec.style as keyof typeof STYLE_DISPLAY_NAMES] ?? rec.style}
-                  </span>
-                  <div className="flex-1">
-                    <Progress value={winRate} className="h-2" />
-                  </div>
-                  <span className="text-[10px] font-mono w-12 text-right">{winRate}%</span>
-                  <span className="text-[10px] text-muted-foreground w-16">
-                    {rec.W}W-{rec.L}L{rec.K > 0 ? `-${rec.K}K` : ""}
-                  </span>
+          <Card className="lg:col-span-2">
+             <CardHeader className="pb-2 border-b border-border/50">
+                <CardTitle className="text-xs font-display font-black uppercase tracking-widest flex items-center gap-2">
+                   <Activity className="h-3 w-3 text-muted-foreground" /> Sequential Lethality Feed
+                </CardTitle>
+             </CardHeader>
+             <CardContent className="p-0">
+                <div className="divide-y divide-border/20">
+                   {recentKills.map((k, i) => (
+                      <div key={i} className="flex items-center gap-4 p-3 hover:bg-muted/30 transition-colors group">
+                         <div className="text-[10px] font-mono text-muted-foreground/40 w-12 shrink-0">Wk {k.week}</div>
+                         <div className="flex-1 flex items-center gap-2 min-w-0">
+                            <span className="text-xs font-black truncate">{k.killer}</span>
+                            <ChevronRight className="h-3 w-3 text-destructive animate-pulse" />
+                            <span className="text-xs font-medium text-muted-foreground truncate">{k.victim}</span>
+                         </div>
+                         <div className="flex flex-col items-end shrink-0">
+                            <div className="text-[9px] font-bold uppercase tracking-tighter">{STYLE_DISPLAY_NAMES[k.killerStyle as keyof typeof STYLE_DISPLAY_NAMES] || k.killerStyle}</div>
+                            <div className="text-[8px] text-muted-foreground uppercase opacity-0 group-hover:opacity-100 transition-opacity">Execution by Skill</div>
+                         </div>
+                      </div>
+                   ))}
                 </div>
-              );
-            })}
+             </CardContent>
+          </Card>
+
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

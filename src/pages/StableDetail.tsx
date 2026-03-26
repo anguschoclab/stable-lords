@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { StatBadge } from "@/components/ui/StatBadge";
+import { FormSparkline } from "@/components/charts/FormSparkline";
+import { ConditionBattery } from "@/components/ui/ConditionBattery";
 
 const TIER_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   Legendary: { label: "Legendary", color: "text-arena-gold border-arena-gold/40 bg-arena-gold/10", icon: Crown },
@@ -192,14 +194,14 @@ export default function StableDetail() {
 
                     <Separator className="my-2" />
 
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-3">
-                        <Swords className="h-3 w-3 text-primary" />
-                        <StatBadge career={w.career} hideStyle />
+                    <div className="flex items-center justify-between text-xs py-1">
+                      <div className="flex items-center gap-2">
+                        <ConditionBattery value={100 - (w.fatigue ?? 0)} showText />
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Condition</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Progress value={wr} className="h-1.5 w-16" />
-                        <span className="text-muted-foreground w-8 text-right">{wr}%</span>
+                        <span className="text-[9px] text-muted-foreground uppercase font-bold translate-y-[1px]">Form</span>
+                        <FormSparkline warriorId={w.id} />
                       </div>
                     </div>
 

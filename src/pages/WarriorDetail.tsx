@@ -26,6 +26,10 @@ import { ENCUMBRANCE_LABELS, type EncumbranceClass } from "@/data/terrabloodChar
 import { getFavoritesDisplay, applyInsightToken } from "@/engine/favorites";
 import { getMastery } from "@/engine/stylePassives";
 import { Lightbulb, Eye } from "lucide-react";
+import { WarriorRadarChart } from "@/components/charts/WarriorRadarChart";
+import { FormSparkline } from "@/components/charts/FormSparkline";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 const TABS: SubNavTab[] = [
   { id: "overview", label: "Overview", icon: <User className="h-3.5 w-3.5" /> },
@@ -763,31 +767,31 @@ export default function WarriorDetail() {
         <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           {/* Attributes */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="font-display text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(20,255,100,0.8)]" /> Attributes
+            <CardHeader className="pb-3 border-b border-border/50">
+              <CardTitle className="font-display font-black text-sm uppercase tracking-widest flex items-center gap-2">
+                <Shield className="h-4 w-4 text-primary" /> Physical Polygon
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {ATTRIBUTE_KEYS.map((key) => (
-                <AttrBar
-                  key={key}
-                  label={ATTRIBUTE_LABELS[key]}
-                  value={typeof displayWarrior.attributes[key] === 'number' ? displayWarrior.attributes[key] as number : 0}
-                  potential={displayWarrior.potential?.[key]}
-                />
-              ))}
-              <div className="pt-2 text-xs text-muted-foreground">
-                Total: {ATTRIBUTE_KEYS.reduce((sum, k) => sum + (typeof displayWarrior.attributes[k] === 'number' ? displayWarrior.attributes[k] as number : 0), 0)} / 70
-              </div>
-              {/* Narrative growth assessment */}
-              <div className="pt-2 border-t border-border mt-2">
-                <div className="flex items-start gap-2 text-xs">
-                  <TrendingUp className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
-                  <p className="text-muted-foreground italic leading-relaxed">
-                    {overallGrowthNarrative(warrior)}
-                  </p>
-                </div>
+            <CardContent className="pt-6">
+              <WarriorRadarChart warrior={warrior} />
+              
+              <div className="mt-8 space-y-4">
+                 <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Form (Last 5)</span>
+                    <FormSparkline warriorId={warrior.id} />
+                 </div>
+                 
+                 <Separator className="opacity-40" />
+                 
+                 {/* Narrative growth assessment */}
+                 <div className="pt-2">
+                   <div className="flex items-start gap-2 text-xs">
+                     <TrendingUp className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                     <p className="text-muted-foreground italic leading-relaxed">
+                       {overallGrowthNarrative(warrior)}
+                     </p>
+                   </div>
+                 </div>
               </div>
             </CardContent>
           </Card>

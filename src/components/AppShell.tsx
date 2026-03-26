@@ -24,44 +24,55 @@ import EventLog from "@/components/EventLog";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useRivalryAlerts } from "@/hooks/useRivalryAlerts";
 
-const navItems = [
-  { to: "/", label: "Hub", icon: LayoutDashboard },
-  { to: "/arena-hub", label: "Arena", icon: Eye },
-  { to: "/stable-hall", label: "Stable Hall", icon: Landmark },
-  { to: "/stable-ledger", label: "Ledger", icon: BookOpen },
-  { to: "/run-round", label: "Run Round", icon: Zap },
-  { to: "/recruit", label: "Recruit", icon: UserPlus },
-  { to: "/training", label: "Training", icon: Dumbbell },
-  { to: "/scouting", label: "Scouting", icon: Search },
-  { to: "/trainers", label: "Trainers", icon: GraduationCap },
-  { to: "/tournaments", label: "Tournaments", icon: Trophy },
-  { to: "/world", label: "World", icon: Globe },
-  { to: "/owners", label: "Owners", icon: Users },
-  { to: "/archives/styles", label: "Styles", icon: BookOpen },
-  { to: "/hall-of-fights", label: "Chronicle", icon: ScrollText },
-  { to: "/gazette", label: "Gazette", icon: Newspaper },
-  { to: "/kill-analytics", label: "Kill Stats", icon: Target },
-  { to: "/equipment-optimizer", label: "Gear", icon: Shield },
-  { to: "/training-planner", label: "Planner", icon: BarChart3 },
-  { to: "/seasonal-awards", label: "Awards", icon: Award },
-  { to: "/tournament-awards", label: "Tourney Awards", icon: Trophy },
-  { to: "/hall-of-fame", label: "Hall of Fame", icon: Crown },
-  { to: "/graveyard", label: "Hall of Warriors", icon: Skull },
-  { to: "/style-guide", label: "Style Guide", icon: BookOpen },
-  { to: "/design-bible", label: "Design Bible", icon: BookOpen },
-  { to: "/physicals-simulator", label: "Physicals", icon: Zap },
-  { to: "/admin-tools", label: "Admin Tools", icon: Settings },
-  { to: "/help", label: "Help", icon: HelpCircle },
+const pillars = [
+  { id: "hub", label: "Hub", to: "/", icon: LayoutDashboard },
+  { id: "stable", label: "Stable", to: "/stable", icon: Shield },
+  { id: "world", label: "World", to: "/world", icon: Globe },
+  { id: "legacy", label: "Legacy", to: "/legacy", icon: Skull },
 ];
+
+const subNavItems: Record<string, { to: string; label: string; icon: any }[]> = {
+  hub: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/run-round", label: "Run Round", icon: Zap },
+  ],
+  stable: [
+    { to: "/stable", label: "Roster", icon: Users },
+    { to: "/stable/training", label: "Training", icon: Dumbbell },
+    { to: "/stable/recruit", label: "Recruit", icon: UserPlus },
+    { to: "/stable/equipment", label: "Gear", icon: Shield },
+    { to: "/stable/planner", label: "Planner", icon: BarChart3 },
+    { to: "/stable/trainers", label: "Trainers", icon: GraduationCap },
+    { to: "/stable/finance", label: "Finance", icon: BookOpen },
+  ],
+  world: [
+    { to: "/world", label: "Overview", icon: Globe },
+    { to: "/world/tournaments", label: "Tournaments", icon: Trophy },
+    { to: "/world/scouting", label: "Scouting", icon: Search },
+    { to: "/world/gazette", label: "Gazette", icon: Newspaper },
+    { to: "/world/history", label: "Chronicle", icon: ScrollText },
+  ],
+  legacy: [
+    { to: "/legacy", label: "Graveyard", icon: Skull },
+    { to: "/legacy/hall-of-fame", label: "Hall of Fame", icon: Crown },
+    { to: "/legacy/analytics", label: "Kill Stats", icon: Target },
+    { to: "/legacy/awards", label: "Awards", icon: Award },
+  ],
+};
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { state, doReset, returnToTitle, lastSavedAt } = useGameStore();
+  const { state, doReset, returnToTitle, lastSavedAt, doAdvanceWeek } = useGameStore();
   const { theme, setTheme } = useTheme();
   const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [saveFlash, setSaveFlash] = useState(false);
+
+  // Determine active pillar based on path
+  const activePillar = pillars.find(p =>
+    p.to === "/" ? location.pathname === "/" || location.pathname === "/run-round" : location.pathname.startsWith(p.to)
+  )?.id || "hub";
 
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
 
@@ -69,14 +80,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
   useRivalryAlerts();
 
-  // FTUE Redirection logic
+  // FTUE / Orphanage Redirection logic
   useEffect(() => {
-    if (state.isFTUE && location.pathname !== "/welcome" && location.pathname !== "/") {
+    const isOrphan = state.roster.filter(w => w.status === "Active").length < 3;
+    if (isOrphan && location.pathname !== "/welcome") {
       if (typeof window !== "undefined") {
-        window.location.href = "/";
+        // Use a soft redirect if possible, but window.location works for forcing state
+        window.location.href = "/welcome";
       }
     }
-  }, [state.isFTUE, location.pathname]);
+  }, [state.roster, location.pathname]);
 
   // Flash the save indicator briefly when a save occurs
   useEffect(() => {
@@ -118,24 +131,23 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
             </Button>
 
-            <nav className="hidden md:flex items-center">
-              {!state.isFTUE && navItems.map((item) => {
-                const Icon = item.icon;
-                const active = location.pathname === item.to;
+            <nav className="hidden md:flex items-center gap-1">
+              {!state.isFTUE && pillars.map((pillar) => {
+                const Icon = pillar.icon;
+                const active = activePillar === pillar.id;
                 return (
                   <Link
-                    key={item.to}
-                    to={item.to}
-                    aria-current={active ? "page" : undefined}
+                    key={pillar.id}
+                    to={pillar.to}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors",
+                      "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold transition-all",
                       active
-                        ? "bg-secondary text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-sm scale-105"
                         : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
                     )}
                   >
-                    <Icon className="h-3.5 w-3.5" />
-                    {item.label}
+                    <Icon className="h-4 w-4" />
+                    {pillar.label}
                   </Link>
                 );
               })}
@@ -231,20 +243,44 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
+        {/* ─── Sticky Sub-Nav ─── */}
+        {!state.isFTUE && subNavItems[activePillar] && (
+          <div className="border-t border-border/40 bg-muted/30 px-4 py-1 flex items-center gap-4 overflow-x-auto no-scrollbar">
+            {subNavItems[activePillar].map((item) => {
+              const active = location.pathname === item.to;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
+                    active
+                      ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  )}
+                >
+                  <Icon className="h-3 w-3" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
         {/* Mobile nav row */}
         <nav className="md:hidden border-t border-border/50 flex gap-0.5 px-2 py-1.5 overflow-x-auto">
-          {!state.isFTUE && navItems.map((item) => {
+          {!state.isFTUE && pillars.map((item) => {
             const Icon = item.icon;
-            const active = location.pathname === item.to;
+            const active = activePillar === item.id;
             return (
               <Link
-                key={item.to}
+                key={item.id}
                 to={item.to}
-                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium whitespace-nowrap transition-colors",
+                  "flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-colors",
                   active
-                    ? "bg-secondary text-foreground"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-secondary/40"
                 )}
               >
@@ -303,11 +339,51 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-border py-3 flex-shrink-0">
-        <div className="px-4 sm:px-6 text-xs text-muted-foreground">
-          Stable Lords v2.0 — Local save only
+      <footer className="border-t border-border py-3 flex-shrink-0 bg-muted/20">
+        <div className="px-4 sm:px-6 flex items-center justify-between">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+            Stable Lords v2.0 // SIMULATION_ACTIVE
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">
+              PROMPT_ENGINE: READY
+            </span>
+          </div>
         </div>
       </footer>
+
+      {/* ─── Persistent Continue Button ─── */}
+      {!state.isFTUE && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            size="lg"
+            className={cn(
+               "h-14 px-8 rounded-full shadow-2xl font-display font-black text-lg tracking-tighter uppercase transition-all hover:scale-105 active:scale-95 group",
+               state.phase === "planning" ? "bg-arena-gold text-black hover:bg-arena-gold/90" : "bg-primary text-primary-foreground"
+            )}
+            onClick={() => {
+              if (state.phase === "planning") {
+                doAdvanceWeek();
+              } else {
+                // Resolution phase navigation
+                window.location.href = "/run-round";
+              }
+            }}
+          >
+            {state.phase === "planning" ? (
+              <>
+                Advance Week
+                <Zap className="ml-2 h-5 w-5 fill-current group-hover:animate-pulse" />
+              </>
+            ) : (
+              <>
+                Go to Bouts
+                <Swords className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
