@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "@tanstack/react-router";
 import { obfuscateWarrior } from "@/lib/obfuscation";
 import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior, type FightPlan, type FightSummary } from "@/types/game";
+import { getAllFightsForWarrior } from "@/engine/core/historyUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -400,7 +401,7 @@ function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () =
 function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHistory: FightSummary[] }) {
   const milestones = useMemo(() => {
     const events: { week: number; label: string; icon: React.ReactNode; color: string }[] = [];
-    const fights = arenaHistory.filter(f => f.a === warrior.name || f.d === warrior.name);
+    const fights = getAllFightsForWarrior(arenaHistory, warrior.name);
     // Sort chronologically
     const sorted = [...fights].sort((a, b) => a.week - b.week);
 
@@ -487,7 +488,7 @@ function CareerTimeline({ warrior, arenaHistory }: { warrior: Warrior; arenaHist
 
 function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName: string; arenaHistory: FightSummary[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const fights = arenaHistory.filter((f) => f.a === warriorName || f.d === warriorName);
+  const fights = getAllFightsForWarrior(arenaHistory, warriorName);
 
   // Compute head-to-head records per opponent
   const h2h = useMemo(() => {

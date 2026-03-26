@@ -1,3 +1,4 @@
+import { getRecentFights } from "@/engine/core/historyUtils";
 /**
  * Owner AI — Personality-driven decision-making, roster management,
  * owner rivalries, narrative events, and philosophy evolution.
@@ -42,7 +43,7 @@ export function evolvePhilosophies(
   if (newSeason === state.season) return { updatedRivals: state.rivals || [], gazetteItems: [] };
 
   const gazetteItems: string[] = [];
-  const recentFights = state.arenaHistory.filter(f => f.week >= state.week - 13);
+  const recentFights = getRecentFights(state.arenaHistory, state.week - 13);
   const meta = computeMetaDrift(state.arenaHistory, 20);
 
   const updatedRivals = (state.rivals || []).map(rival => {

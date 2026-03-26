@@ -8,6 +8,7 @@ import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import type { TournamentEntry, TournamentBout, FightSummary } from "@/types/game";
 import { STYLE_DISPLAY_NAMES, BASE_ROSTER_CAP } from "@/types/game";
+import { getFightsForTournament } from "@/engine/core/historyUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -319,7 +320,7 @@ export default function Tournaments() {
       }
 
       // Mark fight of tournament & close newsletter
-      const tourneyFights = updatedState.arenaHistory.filter(f => f.tournamentId === currentTournament.id);
+      const tourneyFights = getFightsForTournament(updatedState.arenaHistory, currentTournament.id);
       if (tourneyFights.length > 0) {
         const best = tourneyFights.reduce((a, b) => {
           const sa = (b.flashyTags?.length ?? 0) + (b.by === "Kill" ? 3 : b.by === "KO" ? 2 : 0);

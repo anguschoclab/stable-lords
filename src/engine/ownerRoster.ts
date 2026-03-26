@@ -1,3 +1,4 @@
+import { getRecentFightsForWarrior } from "@/engine/core/historyUtils";
 /**
  * Owner AI — Personality-driven decision-making, roster management,
  * owner rivalries, narrative events, and philosophy evolution.
@@ -112,7 +113,7 @@ export function processAIRosterManagement(
 
       // If they hate the player, they consider the player's dominant style as the "meta" to counter
       if (rivalry && rivalry.intensity >= 3 && adaptation !== "Traditionalist") {
-        const playerMeta = computeMetaDrift(state.arenaHistory.filter(f => f.a === state.player.id || f.d === state.player.id), 10);
+        const playerMeta = computeMetaDrift(getRecentFightsForWarrior(state.arenaHistory, state.player.id, 10), 10);
         if (Object.keys(playerMeta).length > 0) customMeta = playerMeta;
       }
 
