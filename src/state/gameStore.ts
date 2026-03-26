@@ -1,3 +1,4 @@
+import { archiveWeekLogs } from '@/engine/weekPipeline';
 /**
  * Stable Lords — Game State Store (localStorage-backed)
  */
@@ -296,7 +297,8 @@ export function resetGameState(): GameState {
  * │  Step 7: Recruitment     — Refresh orphan pool, AI drafting   │
  * │  Step 8: Hall of Fame    — Yearly induction (every 52 weeks)  │
  * │  Step 9: Tier Progression— Promote/demote rival stables       │
- * │  Step 10: Clock Advance  — Increment week counter & season    │
+ * │  Step 10: OPFS Archival  — Save & strip PBP logs              │
+ * │  Step 11: Clock Advance  — Increment week counter & season    │
  * │                                                               │
  * │  Each step receives the output of the previous step.          │
  * │  No step mutates the original state reference.                │
@@ -317,6 +319,7 @@ export function advanceWeek(state: GameState): GameState {
     applyRecruitment,
     applySeasonalUpdates,
     applyNarrative,
+    archiveWeekLogs,
     truncateState
   );
 }

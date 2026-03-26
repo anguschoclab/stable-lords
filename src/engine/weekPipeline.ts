@@ -3,6 +3,7 @@
  * Each function is a pure transform: GameState → GameState.
  */
 import type { GameState, Season, Warrior, RivalStableData } from "@/types/game";
+import { OPFSArchiveService } from "./storage/opfsArchive";
 import type { PoolWarrior } from "./recruitment";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
@@ -115,4 +116,40 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
 export function computeNextSeason(newWeek: number): Season {
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   return SEASONS[seasonIdx];
+}
+
+
+/**
+ * OPFS Archival Step — Extracts PBP logs and fires background writes.
+ * Strips the massive PBP arrays from state to prevent UI freezing and memory bloat.
+ */
+export function archiveWeekLogs(state: GameState): GameState {
+  const opfs = new OPFSArchiveService();
+  if (!opfs.isSupported()) return state;
+
+  let stateModified = false;
+  const newArenaHistory = state.arenaHistory.map(summary => {
+    // If it has a transcript, archive it and strip it
+    if (summary.transcript && summary.transcript.length > 0) {
+      stateModified = true;
+      // Fire and forget archival (async, no await)
+      opfs.archiveBoutLog(state.season, summary.id, summary.transcript).catch(err => {
+        console.error(`Failed to background archive bout ${summary.id}:`, err);
+      });
+
+      // Strip transcript from state
+      return {
+        ...summary,
+        transcript: undefined
+      };
+    }
+    return summary;
+  });
+
+  if (!stateModified) return state;
+
+  return {
+    ...state,
+    arenaHistory: newArenaHistory
+  };
 }

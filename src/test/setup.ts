@@ -29,3 +29,17 @@ global.ResizeObserver = class ResizeObserver {
   unobserve() {}
   disconnect() {}
 };
+
+// Mock OPFS FileSystem interfaces for Vitest
+Object.defineProperty(global.navigator, 'storage', {
+  value: {
+    getDirectory: async () => ({
+      kind: 'directory',
+      name: 'root',
+      getDirectoryHandle: async () => ({}),
+      getFileHandle: async () => ({}),
+      values: async function* () {}
+    })
+  },
+  configurable: true
+});
