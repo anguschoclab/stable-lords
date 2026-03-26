@@ -126,6 +126,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.to}
                     to={item.to}
+                    aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors",
                       active
@@ -239,6 +240,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.to}
                 to={item.to}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium whitespace-nowrap transition-colors",
                   active
