@@ -4,9 +4,8 @@
  * creates inherent defensive bias that requires seed compression to fully fix.
  *
  * Run with: npx vitest run src/test/balance.test.ts
- * Review the matrix output to identify problem matchups.
  */
-import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import { describe, it, expect } from "vitest";
 import { FightingStyle, type Warrior } from "@/types/game";
 import { simulateFight, defaultPlanForWarrior } from "@/engine/simulate";
 import { computeWarriorStats } from "@/engine/skillCalc";
@@ -41,19 +40,6 @@ const FIGHTS_PER_MATCHUP = 100; // 100 per matchup × 100 matchups = 10k fights 
 
 
 describe("Style Balance", () => {
-  let logSpy: any;
-  let warnSpy: any;
-
-  beforeAll(() => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-  });
-
-  afterAll(() => {
-    logSpy.mockRestore();
-    warnSpy.mockRestore();
-  });
-
   // Accumulate wins per style across all matchups
   const styleWins: Record<string, number> = {};
   const styleFights: Record<string, number> = {};
@@ -98,55 +84,27 @@ describe("Style Balance", () => {
   }
 
   it("should have no style with >65% overall win rate", () => {
-    const report: string[] = ["=== STYLE WIN RATES (vs field) ==="];
     const problems: string[] = [];
 
     for (const s of ALL_STYLES) {
       const rate = styleFights[s] > 0 ? styleWins[s] / styleFights[s] : 0;
-      const pct = (rate * 100).toFixed(1);
-      report.push(`  ${s.padEnd(20)} ${pct}% (${styleWins[s]}/${styleFights[s]})`);
-      if (rate > 0.65) problems.push(`${s}: ${pct}%`);
-    }
-
-    console.log(report.join("\n"));
-
-    // Print worst matchups
-    const matchupReport: string[] = ["\n=== MATCHUP MATRIX (A win% vs D) ==="];
-    const header = "".padEnd(20) + ALL_STYLES.map(s => s.substring(0, 6).padStart(7)).join("");
-    matchupReport.push(header);
-    for (const a of ALL_STYLES) {
-      let row = a.padEnd(20);
-      for (const d of ALL_STYLES) {
-        if (a === d) {
-          row += "   -  ";
-          continue;
-        }
-        const total = FIGHTS_PER_MATCHUP;
-        const wins = matchupWins[a][d];
-        const pct = ((wins / total) * 100).toFixed(0);
-        row += `${pct.padStart(5)}% `;
+      if (rate > 0.65) {
+        problems.push(`${s}: ${(rate * 100).toFixed(1)}% (${styleWins[s]}/${styleFights[s]})`);
       }
-      matchupReport.push(row);
     }
-    console.log(matchupReport.join("\n"));
 
-    if (problems.length > 0) {
-      // Don't hard-fail yet — report what needs tuning
-      console.warn(`\n⚠️  STYLES OVER 65%: ${problems.join(", ")}`);
-    }
-    expect(problems.length).toBeLessThanOrEqual(5); // Adjusted tolerance might happen
+    expect(problems.length, `Styles over 65%: ${problems.join(", ")}`).toBeLessThanOrEqual(5);
   });
 
   it("should have no style with <35% overall win rate (too weak)", () => {
     const problems: string[] = [];
     for (const s of ALL_STYLES) {
       const rate = styleFights[s] > 0 ? styleWins[s] / styleFights[s] : 0;
-      if (rate < 0.35) problems.push(`${s}: ${(rate * 100).toFixed(1)}%`);
+      if (rate < 0.35) {
+        problems.push(`${s}: ${(rate * 100).toFixed(1)}% (${styleWins[s]}/${styleFights[s]})`);
+      }
     }
-    if (problems.length > 0) {
-      console.warn(`\n⚠️  STYLES UNDER 35%: ${problems.join(", ")}`);
-    }
-    expect(problems.length).toBeLessThanOrEqual(10); // Adjusted tolerance might happen
+    expect(problems.length, `Styles under 35%: ${problems.join(", ")}`).toBeLessThanOrEqual(10);
   });
 
   it("should have no single matchup worse than 80/20", () => {
@@ -161,9 +119,6 @@ describe("Style Balance", () => {
         }
       }
     }
-    if (problems.length > 0) {
-      console.warn(`\n⚠️  MATCHUPS OVER 80%: ${problems.join(", ")}`);
-    }
-    expect(problems.length).toBeLessThanOrEqual(50); // Adjusted tolerance to reflect canonical math swinginess
+    expect(problems.length, `Matchups over 80%: ${problems.join(", ")}`).toBeLessThanOrEqual(50);
   });
 });

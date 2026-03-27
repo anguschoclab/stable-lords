@@ -235,5 +235,50 @@ describe('OPFS Archival System', () => {
       await expect(service.archiveBoutLog(1, 'b-123', [])).resolves.toBeUndefined();
       errorSpy.mockRestore();
     });
+
+    it('Test 5.2: archiveBoutLog throws ArchiveConflictError on NoModificationAllowedError', async () => {
+      const seasonHandle = { getDirectoryHandle: vi.fn() } as any;
+      const boutsHandle = { getFileHandle: vi.fn() } as any;
+
+      const fileHandle = {
+        createWritable: vi.fn().mockResolvedValue({
+          write: vi.fn().mockRejectedValue(new DOMException('No Modification Allowed', 'NoModificationAllowedError')),
+          close: vi.fn()
+        })
+      };
+
+      rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
+      seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
+      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+
+      const service = new OPFSArchiveService();
+
+      await expect(service.archiveBoutLog(1, 'b-123', [])).rejects.toThrow(ArchiveConflictError);
+    });
+
+    it('Test 5.3: archiveBoutLog fails gracefully on unknown generic errors', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const seasonHandle = { getDirectoryHandle: vi.fn() } as any;
+      const boutsHandle = { getFileHandle: vi.fn() } as any;
+
+      const fileHandle = {
+        createWritable: vi.fn().mockResolvedValue({
+          write: vi.fn().mockRejectedValue(new Error('Generic fallback error')),
+          close: vi.fn()
+        })
+      };
+
+      rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
+      seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
+      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+
+      const service = new OPFSArchiveService();
+
+      // Ensure it fails gracefully (resolves to undefined) instead of throwing
+      await expect(service.archiveBoutLog(1, 'b-123', [])).resolves.toBeUndefined();
+
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
   });
 });

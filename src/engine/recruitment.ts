@@ -270,7 +270,7 @@ export function aiDraftFromPool(
 
   const updatedRivals = rivals.map(r => ({ ...r, roster: [...r.roster] }));
   const gazetteItems: string[] = [];
-  let remainingPool = [...pool];
+  const remainingPool = [...pool];
 
   // Major Draft (Every 4 weeks)
   const isMajorDraftWeek = week % 4 === 0;
