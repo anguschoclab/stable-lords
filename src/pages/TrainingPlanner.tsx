@@ -77,6 +77,106 @@ function computeTrainability(warrior: Warrior, trainers: any[]): number {
   return trainable > 0 ? Math.round((totalChance / trainable) * 100) : 0;
 }
 
+/* ── Burn Warnings Component ──────────────────────────────── */
+
+function BurnWarnings({ burns }: { burns: BurnWarning[] }) {
+  const visibleBurns = burns.filter(b => b.severity !== "low");
+  if (visibleBurns.length === 0) return null;
+
+  return (
+    <div className="mt-3 pt-2 border-t border-border/50 space-y-1">
+      {visibleBurns.map((b, i) => (
+        <div key={i} className={`flex items-center gap-2 text-[10px] ${
+          b.severity === "high" ? "text-destructive" : "text-amber-500"
+        }`}>
+          <AlertTriangle className="h-3 w-3 shrink-0" />
+          <span className="font-medium">{ATTRIBUTE_LABELS[b.attribute]}:</span>
+          <span>{b.reason}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Attribute Row Component ─────────────────────────────── */
+
+function AttributeRow({ attr }: { attr: {
+  key: keyof Attributes;
+  val: number;
+  pot?: number;
+  chance: number;
+  seasonGain: number;
+  capped: boolean;
+  seasonCapped: boolean;
+  drFactor: number;
+} }) {
+  const chancePct = Math.round(attr.chance * 100);
+  const isRecommended = !attr.capped && !attr.seasonCapped && attr.chance >= 0.4;
+
+  return (
+    <div className={`flex items-center gap-2 py-1 px-2 rounded ${attr.capped ? "opacity-40" : ""}`}>
+      <span className="text-xs w-16 font-medium flex items-center gap-1">
+        {attr.key === "SZ" && <Lock className="h-2.5 w-2.5" />}
+        {ATTRIBUTE_LABELS[attr.key]}
+      </span>
+
+      {/* Current / Potential bar */}
+      <div className="flex-1 relative">
+        <div className="h-3 bg-muted rounded-full overflow-hidden relative">
+          {/* Potential ceiling indicator */}
+          {attr.pot !== undefined && (
+            <div
+              className="absolute top-0 h-full border-r-2 border-arena-gold/50"
+              style={{ left: `${(attr.pot / 25) * 100}%` }}
+            />
+          )}
+          {/* Current value */}
+          <div
+            className={`h-full rounded-full transition-all ${
+              attr.capped ? "bg-muted-foreground/30" :
+              attr.drFactor < 0.5 ? "bg-amber-500/70" :
+              "bg-primary"
+            }`}
+            style={{ width: `${(attr.val / 25) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <span className="text-xs font-mono w-5 text-right">{attr.val}</span>
+      {attr.pot !== undefined && (
+        <span className="text-[9px] font-mono text-arena-gold w-5 text-right">/{attr.pot}</span>
+      )}
+
+      {/* Gain chance */}
+      {!attr.capped ? (
+        <span className={`text-[10px] font-mono w-10 text-right ${
+          chancePct >= 50 ? "text-arena-pop" :
+          chancePct >= 30 ? "text-foreground" :
+          "text-destructive"
+        }`}>
+          {chancePct}%
+        </span>
+      ) : (
+        <span className="text-[9px] text-muted-foreground w-10 text-right">MAX</span>
+      )}
+
+      {/* Season progress */}
+      <div className="w-10 flex gap-0.5">
+        {[0, 1, 2].map(i => (
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full ${
+              i < attr.seasonGain ? "bg-primary" : "bg-muted"
+            }`}
+          />
+        ))}
+      </div>
+
+      {isRecommended && <Target className="h-3 w-3 text-arena-pop shrink-0" />}
+    </div>
+  );
+}
+
 /* ── Warrior Planner Card ────────────────────────────────── */
 
 function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
@@ -162,93 +262,11 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
         </div>
       </CardHeader>
       <CardContent className="space-y-1.5 pt-2">
-        {ranked.map(attr => {
-          const chancePct = Math.round(attr.chance * 100);
-          const isRecommended = !attr.capped && !attr.seasonCapped && attr.chance >= 0.4;
+        {ranked.map(attr => (
+          <AttributeRow key={attr.key} attr={attr} />
+        ))}
 
-          return (
-            <div key={attr.key} className={`flex items-center gap-2 py-1 px-2 rounded ${attr.capped ? "opacity-40" : ""}`}>
-              <span className="text-xs w-16 font-medium flex items-center gap-1">
-                {attr.key === "SZ" && <Lock className="h-2.5 w-2.5" />}
-                {ATTRIBUTE_LABELS[attr.key]}
-              </span>
-
-              {/* Current / Potential bar */}
-              <div className="flex-1 relative">
-                <div className="h-3 bg-muted rounded-full overflow-hidden relative">
-                  {/* Potential ceiling indicator */}
-                  {attr.pot !== undefined && (
-                    <div
-                      className="absolute top-0 h-full border-r-2 border-arena-gold/50"
-                      style={{ left: `${(attr.pot / 25) * 100}%` }}
-                    />
-                  )}
-                  {/* Current value */}
-                  <div
-                    className={`h-full rounded-full transition-all ${
-                      attr.capped ? "bg-muted-foreground/30" :
-                      attr.drFactor < 0.5 ? "bg-amber-500/70" :
-                      "bg-primary"
-                    }`}
-                    style={{ width: `${(attr.val / 25) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              <span className="text-xs font-mono w-5 text-right">{attr.val}</span>
-              {attr.pot !== undefined && (
-                <span className="text-[9px] font-mono text-arena-gold w-5 text-right">/{attr.pot}</span>
-              )}
-
-              {/* Gain chance */}
-              {!attr.capped ? (
-                <span className={`text-[10px] font-mono w-10 text-right ${
-                  chancePct >= 50 ? "text-arena-pop" :
-                  chancePct >= 30 ? "text-foreground" :
-                  "text-destructive"
-                }`}>
-                  {chancePct}%
-                </span>
-              ) : (
-                <span className="text-[9px] text-muted-foreground w-10 text-right">MAX</span>
-              )}
-
-              {/* Season progress */}
-              <div className="w-10 flex gap-0.5">
-                {[0, 1, 2].map(i => (
-                  <div
-                    key={i}
-                    className={`h-1.5 flex-1 rounded-full ${
-                      i < attr.seasonGain ? "bg-primary" : "bg-muted"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {isRecommended && <Target className="h-3 w-3 text-arena-pop shrink-0" />}
-            </div>
-          );
-        })}
-
-        {/* Burn Warnings */}
-        {burns.filter(b => b.severity !== "low").length > 0 && (
-          <div className="mt-3 pt-2 border-t border-border/50 space-y-1">
-            {burns.reduce((acc, b, i) => {
-              if (b.severity !== "low") {
-                acc.push(
-                  <div key={i} className={`flex items-center gap-2 text-[10px] ${
-                    b.severity === "high" ? "text-destructive" : "text-amber-500"
-                  }`}>
-                    <AlertTriangle className="h-3 w-3 shrink-0" />
-                    <span className="font-medium">{ATTRIBUTE_LABELS[b.attribute]}:</span>
-                    <span>{b.reason}</span>
-                  </div>
-                );
-              }
-              return acc;
-            }, [] as React.ReactNode[])}
-          </div>
-        )}
+        <BurnWarnings burns={burns} />
       </CardContent>
     </Card>
   );
