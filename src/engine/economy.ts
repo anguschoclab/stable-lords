@@ -13,10 +13,11 @@
  */
 import type { GameState, LedgerEntry } from "@/types/game";
 
-const FIGHT_PURSE = 75; // Increased from 60 to 75 to reward active stable management
+const FIGHT_PURSE = 85; // Increased from 75 to 85 to reward risking warriors in fights
 const WIN_BONUS = 30;
 const FAME_MULTIPLIER = 2;
-const WARRIOR_UPKEEP = 30; // Increased from 25 to 30 to penalize large idle rosters
+const WARRIOR_UPKEEP = 35; // Increased from 30 to 35 to penalize large idle rosters and make cheap recruits viable
+const TRAINER_SALARY = 35;
 const TRAINING_COST = 20; // Increased training cost to make early-game recruits more of a risk
 import { TRAINER_WEEKLY_SALARY } from "./trainers";
 

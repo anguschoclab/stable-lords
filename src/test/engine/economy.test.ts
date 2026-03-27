@@ -60,18 +60,18 @@ describe("Economy Engine", () => {
       const breakdown = computeWeeklyBreakdown(state);
 
       // Expenses:
-      // Warriors: 2 * 30 = 60
+      // Warriors: 2 * 35 = 70
       // Trainers: 1 * 35 = 35
       // Training: 1 * 20 = 20
-      // Total expenses: 115
-      expect(breakdown.totalExpenses).toBe(115);
+      // Total expenses: 125
+      expect(breakdown.totalExpenses).toBe(125);
 
       const expenseLabels = breakdown.expenses.map(e => e.label);
       expect(expenseLabels).toContain("Warrior upkeep (2)");
       expect(expenseLabels).toContain("Trainer salaries (1)");
       expect(expenseLabels).toContain("Training fees (1)");
 
-      expect(breakdown.expenses.find(e => e.label.includes("Warrior upkeep"))?.amount).toBe(60);
+      expect(breakdown.expenses.find(e => e.label.includes("Warrior upkeep"))?.amount).toBe(70);
       expect(breakdown.expenses.find(e => e.label.includes("Trainer salaries"))?.amount).toBe(35);
       expect(breakdown.expenses.find(e => e.label.includes("Training fees"))?.amount).toBe(20);
     });
@@ -118,18 +118,18 @@ describe("Economy Engine", () => {
       const breakdown = computeWeeklyBreakdown(state);
 
       // Income:
-      // Fights: 2 * 75 = 150
+      // Fights: 2 * 85 = 170
       // Wins: 1 * 30 = 30
       // Fame: 10 * 2 = 20
-      // Total income: 200
-      expect(breakdown.totalIncome).toBe(200);
+      // Total income: 220
+      expect(breakdown.totalIncome).toBe(220);
 
       const incomeLabels = breakdown.income.map(i => i.label);
       expect(incomeLabels).toContain("Fight purses (2)");
       expect(incomeLabels).toContain("Win bonuses (1)");
       expect(incomeLabels).toContain("Fame dividends");
 
-      expect(breakdown.income.find(i => i.label.includes("Fight purses"))?.amount).toBe(150);
+      expect(breakdown.income.find(i => i.label.includes("Fight purses"))?.amount).toBe(170);
       expect(breakdown.income.find(i => i.label.includes("Win bonuses"))?.amount).toBe(30);
       expect(breakdown.income.find(i => i.label.includes("Fame dividends"))?.amount).toBe(20);
     });
@@ -155,10 +155,10 @@ describe("Economy Engine", () => {
 
       const breakdown = computeWeeklyBreakdown(state);
 
-      // Income: 10 (fame) + 75 (fight) = 85
-      // Expenses: 30 (upkeep) = 30
-      // Net = 55
-      expect(breakdown.net).toBe(55);
+      // Income: 10 (fame) + 85 (fight) = 95
+      // Expenses: 35 (upkeep) = 35
+      // Net = 60
+      expect(breakdown.net).toBe(60);
     });
   });
 
@@ -188,12 +188,12 @@ describe("Economy Engine", () => {
 
       const newState = processEconomy(state);
 
-      // Income: 10 (fame) + 75 (fight) + 30 (win) = 115
-      // Expenses: 30 (upkeep) = 30
-      // Net = 85
-      // Expected new gold = 100 + 85 = 185
+      // Income: 10 (fame) + 85 (fight) + 30 (win) = 125
+      // Expenses: 35 (upkeep) = 35
+      // Net = 90
+      // Expected new gold = 100 + 90 = 190
 
-      expect(newState.gold).toBe(185);
+      expect(newState.gold).toBe(190);
 
       // Verify immutability
       expect(newState).not.toBe(state);
@@ -208,7 +208,7 @@ describe("Economy Engine", () => {
 
       const fightPurseEntry = newLedgerEntries.find(e => e.label.includes("Fight purses"));
       expect(fightPurseEntry).toBeDefined();
-      expect(fightPurseEntry?.amount).toBe(75);
+      expect(fightPurseEntry?.amount).toBe(85);
       expect(fightPurseEntry?.category).toBe("fight");
       expect(fightPurseEntry?.week).toBe(3);
 
@@ -226,7 +226,7 @@ describe("Economy Engine", () => {
 
       const upkeepEntry = newLedgerEntries.find(e => e.label.includes("Warrior upkeep"));
       expect(upkeepEntry).toBeDefined();
-      expect(upkeepEntry?.amount).toBe(-30); // Expenses are recorded as negative amounts
+      expect(upkeepEntry?.amount).toBe(-35); // Expenses are recorded as negative amounts
       expect(upkeepEntry?.category).toBe("upkeep");
       expect(upkeepEntry?.week).toBe(3);
     });
