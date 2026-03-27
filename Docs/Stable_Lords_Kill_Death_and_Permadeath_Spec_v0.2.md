@@ -274,6 +274,10 @@ Hit location should not usually override the core kill-window structure. Instead
 | **Arms** | **Low direct / Medium indirect** | Defensive breakdown | PAR loss, weapon control degradation, riposte loss, exposed follow-up states | **Medium** | Usually should not kill alone; makes later kill windows easier to open |
 | **Legs** | **Low direct / Medium indirect** | Tempo breakdown / collapse setup | INI loss, movement/positioning loss, rising endurance cost, fall/collapse risk | **Medium** | Strong setup zone for attrition and late-bout finishing |
 
+**Implementation Note (v1.6+):** The exact engine implementation in `calculateKillWindow` applies the following explicit modifiers to the base kill threshold (0.08) when a hit lands in these vital zones:
+- **Head:** `+0.15`
+- **Chest / Abdomen:** `+0.22` (tuned high to ensure heavy armor encumbrance trade-offs are a statistical necessity)
+
 ### 9.3 Suggested location weighting model
 Use hit location to apply a **location profile** rather than a raw death roll.
 Each location contributes to some combination of:
