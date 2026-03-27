@@ -5,9 +5,11 @@
 import type { GameState } from "@/types/game";
 import { z } from "zod";
 import { migrateGameState, sanitizeReviver } from "./gameStore";
+import { OPFSArchiveService } from "@/engine/storage/opfsArchive";
+
+const archiveService = new OPFSArchiveService();
 
 const SLOTS_INDEX_KEY = "stablelords.slots";
-const SLOT_PREFIX = "stablelords.slot.";
 const ACTIVE_SLOT_KEY = "stablelords.activeSlot";
 export const MAX_SAVE_SLOTS = 5;
 
@@ -55,7 +57,7 @@ function metaFromState(slotId: string, state: GameState, existingCreatedAt?: str
 
 /** Save game state to a specific slot */
 export function saveToSlot(slotId: string, state: GameState): void {
-  localStorage.setItem(`${SLOT_PREFIX}${slotId}`, JSON.stringify(state));
+  archiveService.archiveHotState(slotId, state).catch(console.error);
   const slots = listSaveSlots();
   const existingIdx = slots.findIndex((s) => s.slotId === slotId);
   const existing = existingIdx >= 0 ? slots[existingIdx] : undefined;
@@ -70,22 +72,21 @@ export function saveToSlot(slotId: string, state: GameState): void {
 }
 
 /** Load game state from a specific slot */
-export function loadFromSlot(slotId: string): GameState | null {
+export async function loadFromSlot(slotId: string): Promise<GameState | null> {
   try {
-    const raw = localStorage.getItem(`${SLOT_PREFIX}${slotId}`);
-    if (raw) {
-      const parsed = JSON.parse(raw, sanitizeReviver);
-      if (parsed?.meta) {
-        return migrateGameState(parsed);
-      }
+    const parsed = await archiveService.retrieveHotState(slotId);
+    if (parsed && parsed.meta) {
+      return migrateGameState(parsed);
     }
-  } catch { /* corrupt */ }
+  } catch (err) {
+    console.error("Error loading slot", err);
+  }
   return null;
 }
 
 /** Delete a save slot */
 export function deleteSlot(slotId: string): void {
-  localStorage.removeItem(`${SLOT_PREFIX}${slotId}`);
+  // replaced with archiveService
   const slots = listSaveSlots().filter((s) => s.slotId !== slotId);
   persistSlotIndex(slots);
   // Clear active if it was this slot
@@ -124,12 +125,13 @@ export function migrateLegacySave(): void {
     if (!parsed?.meta) return;
 
     const slotId = "slot_legacy";
-    localStorage.setItem(`${SLOT_PREFIX}${slotId}`, raw);
+
 
     // Migration fields
     if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
     if (!parsed.coachDismissed) parsed.coachDismissed = [];
 
+    archiveService.archiveHotState(slotId, parsed).catch(console.error);
     const meta = metaFromState(slotId, parsed as GameState);
     persistSlotIndex([meta]);
     setActiveSlot(slotId);
@@ -148,8 +150,8 @@ export interface ExportedSave {
 }
 
 /** Export a slot's game state as a downloadable JSON file */
-export function exportSlot(slotId: string): void {
-  const state = loadFromSlot(slotId);
+export async function exportSlot(slotId: string): Promise<void> {
+  const state = await loadFromSlot(slotId);
   if (!state) return;
   const payload: ExportedSave = {
     _format: "stablelords-save-v1",
@@ -170,7 +172,7 @@ export function exportSlot(slotId: string): void {
 /** Export current active slot */
 export function exportActiveSlot(): void {
   const slotId = getActiveSlot();
-  if (slotId) exportSlot(slotId);
+  if (slotId) exportSlot(slotId).catch(console.error);
 }
 
 const BaseSaveSchema = z.object({

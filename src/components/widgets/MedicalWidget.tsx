@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
+import { selectActiveWarriors } from "@/state/selectors";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -11,9 +12,9 @@ export function MedicalWidget() {
   const { state } = useGameStore();
 
   const atRisk = useMemo(() => {
-    return state.roster.filter(w => {
+    return selectActiveWarriors(state).filter(w => {
       const fatigue = (w as any).fatigue ?? 0;
-      return w.status === "Active" && (fatigue > 70 || w.injuries.length > 0);
+      return (fatigue > 70 || w.injuries.length > 0);
     }).sort((a, b) => {
       const bFatigue = (b as any).fatigue ?? 0;
       const aFatigue = (a as any).fatigue ?? 0;

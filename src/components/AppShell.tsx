@@ -13,6 +13,7 @@ import {
 import { audioManager } from "@/lib/AudioManager";
 import { Button } from "@/components/ui/button";
 import { useGameStore } from "@/state/useGameStore";
+import { selectActiveWarriors } from "@/state/selectors";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MOOD_ICONS } from "@/engine/crowdMood";
@@ -111,7 +112,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useRivalryAlerts();
 
   useEffect(() => {
-    const isOrphan = state.roster.filter(w => w.status === "Active").length < 3;
+    const isOrphan = selectActiveWarriors(state).length < 3;
     if (isOrphan && location.pathname !== "/welcome") {
       if (typeof window !== "undefined") {
         window.location.href = "/welcome";

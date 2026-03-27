@@ -45,36 +45,28 @@ export interface GameStoreActions {
   doUpdateEquipment: (warriorId: string, equipment: { weapon: string; armor: string; shield: string; helm: string }) => void;
 }
 
-const getInitialData = () => {
-  const slotId = getActiveSlot();
-  if (slotId) {
-    const loaded = loadFromSlot(slotId);
-    if (loaded) return { state: loaded, activeSlotId: slotId };
-  }
-  return { state: createFreshState(), activeSlotId: null };
-};
-
-const initialData = getInitialData();
+const initialData = { state: createFreshState(), activeSlotId: null as string | null };
 
 export const useGameStore = create<GameStoreState & GameStoreActions>()(
   immer((set, get) => ({
     state: initialData.state,
     activeSlotId: initialData.activeSlotId,
-    atTitleScreen: !initialData.activeSlotId || !listSaveSlots().some((s) => s.slotId === initialData.activeSlotId),
+    atTitleScreen: true,
     lastSavedAt: null,
 
     initialize: () => {
       migrateLegacySave();
       const slotId = getActiveSlot();
       if (slotId) {
-        const loaded = loadFromSlot(slotId);
-        if (loaded) {
-          set((draft) => {
-            draft.state = loaded;
-            draft.activeSlotId = slotId;
-            draft.atTitleScreen = !listSaveSlots().some((s) => s.slotId === slotId);
-          });
-        }
+        loadFromSlot(slotId).then((loaded) => {
+          if (loaded) {
+            set((draft) => {
+              draft.state = loaded;
+              draft.activeSlotId = slotId;
+              draft.atTitleScreen = !listSaveSlots().some((s) => s.slotId === slotId);
+            });
+          }
+        });
       }
     },
 

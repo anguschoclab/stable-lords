@@ -9,6 +9,10 @@ export interface ArchiveService {
   archiveGazette: (season: number, week: number, markdown: string) => Promise<void>;
   retrieveGazette: (season: number, week: number) => Promise<string | null>;
 
+  // Hot State Save/Load (JSON)
+  archiveHotState: (slotId: string, stateData: any) => Promise<void>;
+  retrieveHotState: (slotId: string) => Promise<any | null>;
+
   // Utility
   getArchivedBoutIdsForSeason: (season: number) => Promise<string[]>;
 }
@@ -36,6 +40,57 @@ export class OPFSArchiveService implements ArchiveService {
       return await seasonHandle.getDirectoryHandle(type, { create: true });
     } catch (error) {
       console.error('Failed to get directory handle:', error);
+      return null;
+    }
+  }
+
+  private async getHotStateDirectory(): Promise<FileSystemDirectoryHandle | null> {
+    if (!this.isSupported()) return null;
+    try {
+      const rootHandle = await navigator.storage.getDirectory();
+      return await rootHandle.getDirectoryHandle('hot_state', { create: true });
+    } catch (error) {
+      console.error('Failed to get hot_state directory handle:', error);
+      return null;
+    }
+  }
+
+  async archiveHotState(slotId: string, stateData: any): Promise<void> {
+    try {
+      const dirHandle = await this.getHotStateDirectory();
+      if (!dirHandle) return;
+      const fileName = `${slotId}.json`;
+      const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(stateData));
+      await writable.close();
+    } catch (error: any) {
+      if (error.name === 'QuotaExceededError') {
+         console.error('OPFS Quota Exceeded during hot state archival', error);
+         typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+         return;
+      }
+      console.error('Error archiving hot state:', error);
+    }
+  }
+
+  async retrieveHotState(slotId: string): Promise<any | null> {
+    try {
+      const dirHandle = await this.getHotStateDirectory();
+      if (!dirHandle) return null;
+      const fileName = `${slotId}.json`;
+      const fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
+      const file = await fileHandle.getFile();
+      if (typeof file.text === 'function') {
+         const text = await file.text();
+         return JSON.parse(text);
+      }
+      return null;
+    } catch (error: any) {
+      if (error.name === 'NotFoundError') {
+        return null;
+      }
+      console.error('Error retrieving hot state:', error);
       return null;
     }
   }

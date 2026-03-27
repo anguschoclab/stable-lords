@@ -528,7 +528,6 @@ export interface MatchRecord {
   opponentStableId: string;
 }
 
-export const BASE_ROSTER_CAP = 10;
 
 /** Owner-to-owner grudge (personality-driven rivalry) */
 export interface OwnerGrudge {
