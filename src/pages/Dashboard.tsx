@@ -717,7 +717,7 @@ interface DerivedRivalry {
   playerLosses: number;
 }
 
-function RivalryWidget() {
+function useRivalriesLogic() {
   const { state } = useGameStore();
   const rosterNames = useMemo(() => new Set(state.roster.map(w => w.name).concat(state.graveyard?.map(w => w.name) ?? [])), [state.roster, state.graveyard]);
 
@@ -803,6 +803,12 @@ function RivalryWidget() {
     return [...winCounts.values()].sort((a, b) => b.wins - a.wins || b.kills - a.kills)[0] ?? null;
 
   }, [state.arenaHistory, rosterNames, rivalWarriorStable]);
+
+  return { rosterNames, rivalries, mostWanted };
+}
+
+function RivalryWidget() {
+  const { rosterNames, rivalries, mostWanted } = useRivalriesLogic();
 
   const intensityColor = (n: number) =>
     n >= 4 ? "text-destructive" : n >= 2 ? "text-arena-gold" : "text-muted-foreground";
