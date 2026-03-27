@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { router } from "@/router";
-import { GameProvider } from "@/state/GameContext";
 import { useGameStore } from "@/state/useGameStore";
 import AppShell from "@/components/AppShell";
 import ResolutionReveal from "@/components/ResolutionReveal";
@@ -38,9 +37,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <GameProvider>
-        <GameRoutes />
-      </GameProvider>
+      <GameRoutes />
     </TooltipProvider>
   </QueryClientProvider>
 );

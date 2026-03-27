@@ -14,7 +14,6 @@ const localStorageMock = (function() {
 Object.defineProperty(global, 'localStorage', { value: localStorageMock, writable: true });
 
 // Now import the state modules
-import { GameProvider } from "@/state/GameContext";
 import { useGameStore } from "@/state/useGameStore";
 import { createFreshState } from "@/state/gameStore";
 import { TooltipProvider } from "@/components/ui/tooltip";
