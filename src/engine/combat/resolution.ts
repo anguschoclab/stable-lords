@@ -153,6 +153,125 @@ export function resolveEffectiveTactics(plan: FightPlan, phaseKey: "opening" | "
   };
 }
 
+export function calculateFinalOEAL(effOE: number, effAL: number, f: FighterState, exchange: number): [number, number] {
+  let openOE = 0, openAL = 0;
+  if (exchange < 3) {
+    if (f.plan.openingMove === "Aggressive") { openOE = 1; openAL = 1; }
+    else if (f.plan.openingMove === "Safe") { openOE = -1; openAL = -1; }
+  }
+
+  let fallOE = 0, fallAL = 0;
+  if (f.plan.fallbackCondition === "FLEE" && f.hp < f.maxHp * 0.3) { fallOE = -3; fallAL = -3; }
+  else if (f.plan.fallbackCondition === "TURTLE" && f.endurance < f.maxEndurance * 0.3) { fallOE = -4; fallAL = 2; }
+  else if (f.plan.fallbackCondition === "BERZERK" && f.hp < f.maxHp * 0.3) { fallOE = 4; fallAL = -2; }
+
+  const finalOE = Math.max(1, Math.min(10, effOE + openOE + fallOE));
+  const finalAL = Math.max(1, Math.min(10, effAL + openAL + fallAL));
+  return [finalOE, finalAL];
+}
+
+export function executeRiposte(
+  events: CombatEvent[],
+  rng: () => number,
+  attacker: FighterState,
+  defender: FighterState,
+  defTactics: ReturnType<typeof resolveEffectiveTactics>,
+  defPassive: ReturnType<typeof getStylePassive>,
+  attLabel: "A" | "D",
+  defLabel: "A" | "D"
+) {
+  const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
+  const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
+  const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
+
+  events.push({ type: "DEFENSE", actor: defLabel, result: "RIPOSTE" });
+  events.push({ type: "HIT", actor: defLabel, target: attLabel, location: ripLoc, value: ripDmg });
+
+  attacker.hp -= ripDmg;
+  attacker.hitsTaken++;
+  defender.hitsLanded++;
+  defender.ripostes++;
+  defender.consecutiveHits++;
+  attacker.consecutiveHits = 0;
+}
+
+export function executeHit(
+  events: CombatEvent[],
+  rng: () => number,
+  attacker: FighterState,
+  defender: FighterState,
+  attTactics: ReturnType<typeof resolveEffectiveTactics>,
+  attOffMods: ReturnType<typeof getOffensiveTacticMods>,
+  attPassive: ReturnType<typeof getStylePassive>,
+  attLabel: "A" | "D",
+  defLabel: "A" | "D",
+  stylePhase: StylePhase,
+  phase: string,
+  attKD: number
+) {
+  const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
+  let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
+
+  if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
+    rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
+    events.push({ type: "HIT", actor: attLabel, target: defLabel, location: hitLoc, value: rawDamage, metadata: { crit: true } });
+  } else {
+    events.push({ type: "HIT", actor: attLabel, target: defLabel, location: hitLoc, value: rawDamage });
+  }
+
+  const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
+  defender.hp -= damage;
+  defender.hitsTaken++;
+  attacker.hitsLanded++;
+  attacker.consecutiveHits++;
+  defender.consecutiveHits = 0;
+  if (hitLoc === "right arm" || hitLoc === "left arm") defender.armHits++;
+  if (hitLoc === "right leg" || hitLoc === "left leg") defender.legHits++;
+
+  if (damage > 0 && rng() < 0.2) {
+    const attrs = ["ST", "SP", "DF", "WL"];
+    const attr = attrs[Math.floor(rng() * attrs.length)];
+    events.push({ type: "INSIGHT", actor: attLabel, metadata: { attribute: attr } });
+  }
+
+  const killMech = getKillMechanic(attacker.style, {
+    phase: stylePhase, hitsLanded: attacker.hitsLanded,
+    consecutiveHits: attacker.consecutiveHits, targetedLocation: attTactics.target,
+    hitLocation: hitLoc,
+  });
+
+  const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
+  if (defender.hp <= killWindowHp) {
+    const phaseLevel = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
+    const killThreshold = calculateKillWindow(
+        defender.hp / defender.maxHp,
+        defender.endurance / defender.maxEndurance,
+        hitLoc,
+        attKD + killMech.killBonus,
+        phaseLevel
+    );
+
+    const decSuccess = skillCheck(rng, attacker.skills.DEC, Math.floor(attKD - 5) * 0.5 + phaseLevel + attOffMods.decBonus + killMech.decBonus);
+    if (decSuccess && rng() < killThreshold) {
+      defender.hp = 0;
+      events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", causeBucket: "EXECUTION", location: hitLoc } });
+    }
+  }
+
+  if (defender.hp <= 0 && (events.length === 0 || events[events.length - 1].result !== "Kill")) {
+    events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { cause: "FATAL_DAMAGE", causeBucket: "FATAL_DAMAGE", location: hitLoc } });
+  }
+}
+
+export function applyAggressionBias(aggressionBias: number): [number, number] {
+  if (aggressionBias > 5) {
+    return [(aggressionBias - 5) * 0.5, -(aggressionBias - 5) * 0.5];
+  } else if (aggressionBias < 5) {
+    return [(aggressionBias - 5) * 0.5, (5 - aggressionBias) * 0.5];
+  }
+  return [0, 0];
+}
+
 // ─── Core Resolution Logic ────────────────────────────────────────────────
 
 export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: FighterState): CombatEvent[] {
@@ -179,50 +298,14 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const defModsD = getDefensiveTacticMods(tacticsD.defTactic, fD.style);
 
   // 1.5 Apply Aggression Bias & Special Conditions
-  let biasAttA = 0, biasDefA = 0;
   const aggBiasA = fA.plan.phases?.[phaseKey]?.aggressionBias ?? fA.plan.aggressionBias ?? 5;
-  if (aggBiasA > 5) {
-    biasAttA = (aggBiasA - 5) * 0.5;
-    biasDefA = -(aggBiasA - 5) * 0.5;
-  } else if (aggBiasA < 5) {
-    biasAttA = (aggBiasA - 5) * 0.5;
-    biasDefA = (5 - aggBiasA) * 0.5;
-  }
+  const [biasAttA, biasDefA] = applyAggressionBias(aggBiasA);
 
-  let biasAttD = 0, biasDefD = 0;
   const aggBiasD = fD.plan.phases?.[phaseKey]?.aggressionBias ?? fD.plan.aggressionBias ?? 5;
-  if (aggBiasD > 5) {
-    biasAttD = (aggBiasD - 5) * 0.5;
-    biasDefD = -(aggBiasD - 5) * 0.5;
-  } else if (aggBiasD < 5) {
-    biasAttD = (aggBiasD - 5) * 0.5;
-    biasDefD = (5 - aggBiasD) * 0.5;
-  }
+  const [biasAttD, biasDefD] = applyAggressionBias(aggBiasD);
 
-  // Opening Move (First 3 exchanges)
-  let openOE_A = 0, openAL_A = 0, openOE_D = 0, openAL_D = 0;
-  if (exchange < 3) {
-    if (fA.plan.openingMove === "Aggressive") { openOE_A = 1; openAL_A = 1; }
-    else if (fA.plan.openingMove === "Safe") { openOE_A = -1; openAL_A = -1; }
-    
-    if (fD.plan.openingMove === "Aggressive") { openOE_D = 1; openAL_D = 1; }
-    else if (fD.plan.openingMove === "Safe") { openOE_D = -1; openAL_D = -1; }
-  }
-
-  // Fallback Condition
-  let fallOE_A = 0, fallAL_A = 0, fallOE_D = 0, fallAL_D = 0;
-  if (fA.plan.fallbackCondition === "FLEE" && fA.hp < fA.maxHp * 0.3) { fallOE_A = -3; fallAL_A = -3; }
-  else if (fA.plan.fallbackCondition === "TURTLE" && fA.endurance < fA.maxEndurance * 0.3) { fallOE_A = -4; fallAL_A = 2; }
-  else if (fA.plan.fallbackCondition === "BERZERK" && fA.hp < fA.maxHp * 0.3) { fallOE_A = 4; fallAL_A = -2; }
-
-  if (fD.plan.fallbackCondition === "FLEE" && fD.hp < fD.maxHp * 0.3) { fallOE_D = -3; fallAL_D = -3; }
-  else if (fD.plan.fallbackCondition === "TURTLE" && fD.endurance < fD.maxEndurance * 0.3) { fallOE_D = -4; fallAL_D = 2; }
-  else if (fD.plan.fallbackCondition === "BERZERK" && fD.hp < fD.maxHp * 0.3) { fallOE_D = 4; fallAL_D = -2; }
-
-  const finalOE_A = Math.max(1, Math.min(10, effOE_A + openOE_A + fallOE_A));
-  const finalAL_A = Math.max(1, Math.min(10, effAL_A + openAL_A + fallAL_A));
-  const finalOE_D = Math.max(1, Math.min(10, effOE_D + openOE_D + fallOE_D));
-  const finalAL_D = Math.max(1, Math.min(10, effAL_D + openAL_D + fallAL_D));
+  const [finalOE_A, finalAL_A] = calculateFinalOEAL(effOE_A, effAL_A, fA, exchange);
+  const [finalOE_D, finalAL_D] = calculateFinalOEAL(effOE_D, effAL_D, fD, exchange);
 
   // 2. Initiative Contest
   const fatA = fatiguePenalty(fA.endurance, fA.maxEndurance);
@@ -298,19 +381,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
     const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_WHIFF_PENALTY + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
     if (ripCheck) {
-      const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-      const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
-      const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
-      
-      events.push({ type: "DEFENSE", actor: defLabel, result: "RIPOSTE" });
-      events.push({ type: "HIT", actor: defLabel, target: attLabel, location: ripLoc, value: ripDmg });
-      
-      attacker.hp -= ripDmg;
-      attacker.hitsTaken++;
-      defender.hitsLanded++;
-      defender.ripostes++;
-      defender.consecutiveHits++;
-      attacker.consecutiveHits = 0;
+      executeRiposte(events, rng, attacker, defender, defTactics, defPassive, attLabel, defLabel);
     }
   } else {
     // Attack lands — defender tries to stop it
@@ -341,77 +412,15 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
 
     if (!defended) {
       // 4. Hit Lands
-      const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
-      let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
-
-      if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
-        rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
-        events.push({ type: "HIT", actor: attLabel, target: defLabel, location: hitLoc, value: rawDamage, metadata: { crit: true } });
-      } else {
-        events.push({ type: "HIT", actor: attLabel, target: defLabel, location: hitLoc, value: rawDamage });
-      }
-
-      const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
-      defender.hp -= damage;
-      defender.hitsTaken++;
-      attacker.hitsLanded++;
-      attacker.consecutiveHits++;
-      defender.consecutiveHits = 0;
-      if (hitLoc === "right arm" || hitLoc === "left arm") defender.armHits++;
-      if (hitLoc === "right leg" || hitLoc === "left leg") defender.legHits++;
-
-      // Insight hint (logic moved to narrator but we can emit event for analytics)
-      if (damage > 0 && rng() < 0.2) {
-        const attrs = ["ST", "SP", "DF", "WL"];
-        const attr = attrs[Math.floor(rng() * attrs.length)];
-        events.push({ type: "INSIGHT", actor: attLabel, metadata: { attribute: attr } });
-      }
-
-      // Kill Check refactored to use combatDamage.ts logic
-      const killMech = getKillMechanic(attacker.style, {
-        phase: stylePhase, hitsLanded: attacker.hitsLanded,
-        consecutiveHits: attacker.consecutiveHits, targetedLocation: attTactics.target,
-        hitLocation: hitLoc,
-      });
-
-      const killWindowHp = defender.maxHp * killMech.killWindowHpMult;
-      if (defender.hp <= killWindowHp) {
-        const phaseLevel = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
-        const killThreshold = calculateKillWindow(
-            defender.hp / defender.maxHp,
-            defender.endurance / defender.maxEndurance,
-            hitLoc,
-            attKD + killMech.killBonus,
-            phaseLevel
-        );
-
-        const decSuccess = skillCheck(rng, attacker.skills.DEC, Math.floor(attKD - 5) * 0.5 + phaseLevel + attOffMods.decBonus + killMech.decBonus);
-        if (decSuccess && rng() < killThreshold) {
-          defender.hp = 0;
-          events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", causeBucket: "EXECUTION", location: hitLoc } });
-        }
-      }
-
-      if (defender.hp <= 0 && (events.length === 0 || events[events.length - 1].result !== "Kill")) {
-        events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { cause: "FATAL_DAMAGE", causeBucket: "FATAL_DAMAGE", location: hitLoc } });
-      }
+      executeHit(
+        events, rng, attacker, defender, attTactics, attOffMods, attPassive,
+        attLabel, defLabel, stylePhase, phase, attKD
+      );
     } else if (canRiposte) {
       // Parry succeeded — check riposte
       const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_PARRY_PENALTY + defDefMods.ripBonus + defPassive.ripBonus);
       if (ripAfterParry) {
-        const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-        const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
-        const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
-        
-        events.push({ type: "DEFENSE", actor: defLabel, result: "RIPOSTE" });
-        events.push({ type: "HIT", actor: defLabel, target: attLabel, location: ripLoc, value: ripDmg });
-        
-        attacker.hp -= ripDmg;
-        attacker.hitsTaken++;
-        defender.hitsLanded++;
-        defender.ripostes++;
-        defender.consecutiveHits++;
-        attacker.consecutiveHits = 0;
+        executeRiposte(events, rng, attacker, defender, defTactics, defPassive, attLabel, defLabel);
       }
     }
   }
