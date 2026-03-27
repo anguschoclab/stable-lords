@@ -1,0 +1,96 @@
+import { describe, it, expect } from 'vitest';
+import { getRecentFightsForWarrior } from '@/engine/core/historyUtils';
+import type { FightSummary } from '@/types/game';
+
+describe('getRecentFightsForWarrior', () => {
+  const createMockFight = (overrides: Partial<FightSummary>): FightSummary => ({
+    id: 'mock-id',
+    a: 'Attacker',
+    d: 'Defender',
+    winner: 'Attacker',
+    loser: 'Defender',
+    weaponA: 'Sword',
+    weaponD: 'Shield',
+    week: 1,
+    injuryA: null,
+    injuryD: null,
+    ...overrides,
+  });
+
+  it('returns empty array when history is empty', () => {
+    const history: FightSummary[] = [];
+    const result = getRecentFightsForWarrior(history, 'Hero');
+    expect(result).toEqual([]);
+  });
+
+  it('returns empty array when warrior is not in history', () => {
+    const history: FightSummary[] = [
+      createMockFight({ a: 'Alpha', d: 'Beta' }),
+      createMockFight({ a: 'Gamma', d: 'Delta' }),
+    ];
+    const result = getRecentFightsForWarrior(history, 'Hero');
+    expect(result).toEqual([]);
+  });
+
+  it('finds fights where warrior is attacker', () => {
+    const history: FightSummary[] = [
+      createMockFight({ a: 'Hero', d: 'Beta', week: 1 }),
+      createMockFight({ a: 'Gamma', d: 'Delta', week: 2 }),
+      createMockFight({ a: 'Hero', d: 'Epsilon', week: 3 }),
+    ];
+    const result = getRecentFightsForWarrior(history, 'Hero');
+    expect(result).toHaveLength(2);
+    expect(result.map(f => f.week)).toEqual([1, 3]); // Expect chronological order
+  });
+
+  it('finds fights where warrior is defender', () => {
+    const history: FightSummary[] = [
+      createMockFight({ a: 'Alpha', d: 'Hero', week: 1 }),
+      createMockFight({ a: 'Gamma', d: 'Delta', week: 2 }),
+      createMockFight({ a: 'Epsilon', d: 'Hero', week: 3 }),
+    ];
+    const result = getRecentFightsForWarrior(history, 'Hero');
+    expect(result).toHaveLength(2);
+    expect(result.map(f => f.week)).toEqual([1, 3]);
+  });
+
+  it('finds fights where warrior is both attacker and defender across different fights', () => {
+    const history: FightSummary[] = [
+      createMockFight({ a: 'Hero', d: 'Alpha', week: 1 }),
+      createMockFight({ a: 'Beta', d: 'Hero', week: 2 }),
+      createMockFight({ a: 'Gamma', d: 'Delta', week: 3 }),
+    ];
+    const result = getRecentFightsForWarrior(history, 'Hero');
+    expect(result).toHaveLength(2);
+    expect(result.map(f => f.week)).toEqual([1, 2]);
+  });
+
+  it('limits the results and returns the most recent fights chronologically', () => {
+    const history: FightSummary[] = [
+      createMockFight({ a: 'Hero', d: 'A', week: 1 }),
+      createMockFight({ a: 'Hero', d: 'B', week: 2 }),
+      createMockFight({ a: 'Hero', d: 'C', week: 3 }),
+      createMockFight({ a: 'Hero', d: 'D', week: 4 }),
+      createMockFight({ a: 'Hero', d: 'E', week: 5 }),
+    ];
+
+    // Default limit is 10, passing an explicit limit of 3
+    const result = getRecentFightsForWarrior(history, 'Hero', 3);
+
+    expect(result).toHaveLength(3);
+    // Should get weeks 3, 4, 5, returned in chronological order
+    expect(result.map(f => f.week)).toEqual([3, 4, 5]);
+  });
+
+  it('uses the default limit of 10', () => {
+    const history: FightSummary[] = Array.from({ length: 15 }).map((_, i) =>
+      createMockFight({ a: 'Hero', d: `Opponent${i}`, week: i + 1 })
+    );
+
+    const result = getRecentFightsForWarrior(history, 'Hero');
+
+    expect(result).toHaveLength(10);
+    // Should get the last 10 weeks (weeks 6 through 15) in chronological order
+    expect(result.map(f => f.week)).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+  });
+});

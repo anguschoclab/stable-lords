@@ -137,6 +137,149 @@ interface TrainingResult {
   message: string;
 }
 
+
+// ─── Refactored Helper Functions ──────────────────────────────────────────
+
+function processRecovery(warrior: Warrior, healingBonus: number): { updatedInjuries: InjuryData[], message: string } {
+  const activeInjuries = warrior.injuries.filter(
+    i => typeof i !== "string" && i.weeksRemaining > 0
+  ) as InjuryData[];
+
+  if (activeInjuries.length === 0) {
+    return { updatedInjuries: warrior.injuries, message: `${warrior.name} rested but has no injuries to heal.` };
+  }
+
+  // Heal 1 + healingBonus weeks of recovery per actual week
+  const healAmount = 1 + healingBonus;
+  const updatedInjuries = warrior.injuries.map(i => {
+    if (typeof i === "string") return i;
+    return { ...i, weeksRemaining: Math.max(0, i.weeksRemaining - healAmount) };
+  }).filter(i => typeof i === "string" || i.weeksRemaining > 0);
+
+  return {
+    updatedInjuries,
+    message: `${warrior.name} underwent active recovery (${healAmount} weeks of healing).`,
+  };
+}
+
+function processAttributeTraining(
+  warrior: Warrior,
+  attr: keyof Attributes,
+  state: GameState,
+  seasonalGrowth: SeasonalGrowth[]
+): { updatedWarrior: Warrior | null, updatedSeasonalGrowth: SeasonalGrowth[] | null, result: TrainingResult, hardCapped?: boolean } {
+  // SZ cannot be trained
+  if (attr === "SZ") {
+    return { updatedWarrior: null, updatedSeasonalGrowth: null, result: { type: "blocked", warriorId: warrior.id, message: `${warrior.name} cannot train Size — it is fixed at creation.` } };
+  }
+
+  const currentVal = warrior.attributes[attr];
+  const potentialVal = warrior.potential?.[attr];
+  const total = ATTRIBUTE_KEYS.reduce((sum, k) => sum + warrior.attributes[k], 0);
+
+  // Hard caps
+  if (currentVal >= ATTRIBUTE_MAX || total >= TOTAL_CAP) return { updatedWarrior: null, updatedSeasonalGrowth: null, result: { type: "blocked", warriorId: warrior.id, message: "" }, hardCapped: true };
+  if (!canGrow(currentVal, potentialVal)) return { updatedWarrior: null, updatedSeasonalGrowth: null, result: { type: "blocked", warriorId: warrior.id, message: "" }, hardCapped: true };
+
+  // Seasonal growth cap
+  const seasonGains = getSeasonalGains(seasonalGrowth, warrior.id, state.season);
+  if ((seasonGains[attr] ?? 0) >= SEASONAL_CAP_PER_ATTR) {
+    return {
+      updatedWarrior: null,
+      updatedSeasonalGrowth: null,
+      result: {
+        type: "blocked",
+        warriorId: warrior.id,
+        message: `${warrior.name} has reached the seasonal cap for ${attr} (${SEASONAL_CAP_PER_ATTR} gains this season).`,
+      }
+    };
+  }
+
+  // Compute gain chance with all modifiers
+  const gainChance = computeGainChance(warrior, attr, state.trainers ?? []);
+
+  // Roll for gain
+  if (Math.random() < gainChance) {
+    const newAttrs = { ...warrior.attributes, [attr]: currentVal + 1 };
+    const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, warrior.style);
+
+    const newRevealed = { ...(warrior.potentialRevealed || {}) };
+    let newlyRevealed = false;
+
+    const nearCeiling = potentialVal !== undefined && (currentVal + 1) >= potentialVal;
+    if (nearCeiling && !newRevealed[attr]) {
+      newRevealed[attr] = true;
+      newlyRevealed = true;
+    }
+
+    const ceilingNote = nearCeiling ? " (reached potential ceiling)" : "";
+
+    const updatedWarrior = { ...warrior, attributes: newAttrs, baseSkills, derivedStats, potentialRevealed: newRevealed };
+    const updatedSeasonalGrowth = updateSeasonalGains(seasonalGrowth, warrior.id, state.season, attr);
+
+    return {
+      updatedWarrior,
+      updatedSeasonalGrowth,
+      result: {
+        type: "gain",
+        warriorId: warrior.id,
+        message: `${warrior.name} improved ${attr} to ${currentVal + 1} through training.${ceilingNote}${newlyRevealed ? ` Their true potential in ${attr} is now fully revealed!` : ""}`,
+      }
+    };
+  } else {
+    // Failed to gain, but might still reveal potential from hard work!
+    const isRevealed = warrior.potentialRevealed?.[attr];
+    if (!isRevealed && Math.random() < 0.20) {
+      const newRevealed = { ...(warrior.potentialRevealed || {}), [attr]: true };
+      return {
+        updatedWarrior: { ...warrior, potentialRevealed: newRevealed },
+        updatedSeasonalGrowth: null,
+        result: {
+          type: "gain",
+          warriorId: warrior.id,
+          message: `${warrior.name} didn't improve their ${attr} this week, but their true potential in it was revealed from their efforts!`,
+        }
+      };
+    }
+  }
+
+  return { updatedWarrior: null, updatedSeasonalGrowth: null, result: { type: "blocked", warriorId: warrior.id, message: "" } };
+}
+
+function rollForTrainingInjury(warrior: Warrior, healingBonus: number): { injury: InjuryData | null, result: TrainingResult | null } {
+  const age = warrior.age ?? 18;
+  const agePenalty = age > 30 ? (age - 30) * 0.005 : 0;
+  const healReduce = healingBonus * 0.01;
+  const injuryChance = Math.max(INJURY_CHANCE_MIN, Math.min(INJURY_CHANCE_MAX,
+    BASE_TRAINING_INJURY_CHANCE + agePenalty - healReduce
+  ));
+
+  if (Math.random() < injuryChance) {
+    const template = TRAINING_INJURIES[Math.floor(Math.random() * TRAINING_INJURIES.length)];
+    const [minW, maxW] = template.weeksRange;
+    const weeks = minW + Math.floor(Math.random() * (maxW - minW + 1));
+    const injury: InjuryData = {
+      id: crypto.randomUUID(),
+      name: template.name,
+      description: template.description,
+      severity: "Minor",
+      weeksRemaining: Math.max(1, weeks - healingBonus),
+      penalties: template.penalties,
+    };
+
+    return {
+      injury,
+      result: {
+        type: "injury",
+        warriorId: warrior.id,
+        message: `${warrior.name} suffered a ${template.name} during training! (${injury.weeksRemaining} week recovery)`,
+      }
+    };
+  }
+
+  return { injury: null, result: null };
+}
+
 /** Process all training assignments at week-end. Returns updated state with cleared assignments. */
 export function processTraining(state: GameState): GameState {
   if (!state.trainingAssignments || state.trainingAssignments.length === 0) return state;
@@ -149,32 +292,13 @@ export function processTraining(state: GameState): GameState {
   for (const assignment of state.trainingAssignments) {
     const wIdx = roster.findIndex(w => w.id === assignment.warriorId);
     if (wIdx === -1) continue;
-    const warrior = roster[wIdx];
+    let warrior = roster[wIdx];
 
     // ── Recovery Mode ──
     if (assignment.type === "recovery") {
-      const activeInjuries = warrior.injuries.filter(
-        i => typeof i !== "string" && i.weeksRemaining > 0
-      ) as InjuryData[];
-
-      if (activeInjuries.length === 0) {
-        results.push({ type: "recovery", warriorId: warrior.id, message: `${warrior.name} rested but has no injuries to heal.` });
-        continue;
-      }
-
-      // Heal 1 + healingBonus weeks of recovery per actual week
-      const healAmount = 1 + healingBonus;
-      const updatedInjuries = warrior.injuries.map(i => {
-        if (typeof i === "string") return i;
-        return { ...i, weeksRemaining: Math.max(0, i.weeksRemaining - healAmount) };
-      }).filter(i => typeof i === "string" || i.weeksRemaining > 0);
-
-      roster = roster.map((w, i) => i === wIdx ? { ...w, injuries: updatedInjuries } : w);
-      results.push({
-        type: "recovery",
-        warriorId: warrior.id,
-        message: `${warrior.name} underwent active recovery (${healAmount} weeks of healing).`,
-      });
+      const { updatedInjuries, message } = processRecovery(warrior, healingBonus);
+      roster[wIdx] = { ...warrior, injuries: updatedInjuries };
+      results.push({ type: "recovery", warriorId: warrior.id, message });
       continue;
     }
 
@@ -182,105 +306,33 @@ export function processTraining(state: GameState): GameState {
     const attr = assignment.attribute;
     if (!attr) continue;
 
-    // SZ cannot be trained
-    if (attr === "SZ") {
-      results.push({ type: "blocked", warriorId: warrior.id, message: `${warrior.name} cannot train Size — it is fixed at creation.` });
-      continue;
+    const { updatedWarrior, updatedSeasonalGrowth, result, hardCapped } = processAttributeTraining(warrior, attr, state, seasonalGrowth);
+
+    if (result.message !== "") {
+      results.push(result);
     }
 
-    const currentVal = warrior.attributes[attr];
-    const potentialVal = warrior.potential?.[attr];
-    const total = ATTRIBUTE_KEYS.reduce((sum, k) => sum + warrior.attributes[k], 0);
-
-    // Hard caps
-    if (currentVal >= ATTRIBUTE_MAX || total >= TOTAL_CAP) continue;
-    if (!canGrow(currentVal, potentialVal)) continue;
-
-    // Seasonal growth cap
-    const seasonGains = getSeasonalGains(seasonalGrowth, warrior.id, state.season);
-    if ((seasonGains[attr] ?? 0) >= SEASONAL_CAP_PER_ATTR) {
-      results.push({
-        type: "blocked",
-        warriorId: warrior.id,
-        message: `${warrior.name} has reached the seasonal cap for ${attr} (${SEASONAL_CAP_PER_ATTR} gains this season).`,
-      });
-      continue;
+    if (updatedWarrior) {
+      warrior = updatedWarrior;
+      roster[wIdx] = warrior;
     }
 
-    // Compute gain chance with all modifiers
-    const gainChance = computeGainChance(warrior, attr, state.trainers ?? []);
+    if (updatedSeasonalGrowth) {
+      seasonalGrowth = updatedSeasonalGrowth;
+    }
 
-    // Roll for gain
-    if (Math.random() < gainChance) {
-      const newAttrs = { ...warrior.attributes, [attr]: currentVal + 1 };
-      const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, warrior.style);
-      
-      const newRevealed = { ...(warrior.potentialRevealed || {}) };
-      let newlyRevealed = false;
-      
-      const nearCeiling = potentialVal !== undefined && (currentVal + 1) >= potentialVal;
-      if (nearCeiling && !newRevealed[attr]) {
-        newRevealed[attr] = true;
-        newlyRevealed = true;
-      }
-
-      const ceilingNote = nearCeiling ? " (reached potential ceiling)" : "";
-      
-      roster = roster.map((w, i) =>
-        i === wIdx ? { ...w, attributes: newAttrs, baseSkills, derivedStats, potentialRevealed: newRevealed } : w
-      );
-      seasonalGrowth = updateSeasonalGains(seasonalGrowth, warrior.id, state.season, attr);
-
-      results.push({
-        type: "gain",
-        warriorId: warrior.id,
-        message: `${warrior.name} improved ${attr} to ${currentVal + 1} through training.${ceilingNote}${newlyRevealed ? ` Their true potential in ${attr} is now fully revealed!` : ""}`,
-      });
-    } else {
-      // Failed to gain, but might still reveal potential from hard work!
-      const isRevealed = warrior.potentialRevealed?.[attr];
-      if (!isRevealed && Math.random() < 0.20) {
-        const newRevealed = { ...(warrior.potentialRevealed || {}), [attr]: true };
-        roster = roster.map((w, i) =>
-          i === wIdx ? { ...w, potentialRevealed: newRevealed } : w
-        );
-        results.push({
-          type: "gain",
-          warriorId: warrior.id,
-          message: `${warrior.name} didn't improve their ${attr} this week, but their true potential in it was revealed from their efforts!`,
-        });
-      }
+    // If hard capped or seasonally capped (blocked with a message), or SZ training, we skip injury rolls.
+    // In original code, SZ training returns early (continue), hard caps return early (continue),
+    // seasonal cap returns early (continue).
+    if (hardCapped || (result.type === "blocked" && result.message !== "")) {
+      continue;
     }
 
     // ── Training Injury Roll ──
-    const age = warrior.age ?? 18;
-    const agePenalty = age > 30 ? (age - 30) * 0.005 : 0;
-    const healReduce = healingBonus * 0.01;
-    const injuryChance = Math.max(INJURY_CHANCE_MIN, Math.min(INJURY_CHANCE_MAX,
-      BASE_TRAINING_INJURY_CHANCE + agePenalty - healReduce
-    ));
-
-    if (Math.random() < injuryChance) {
-      const template = TRAINING_INJURIES[Math.floor(Math.random() * TRAINING_INJURIES.length)];
-      const [minW, maxW] = template.weeksRange;
-      const weeks = minW + Math.floor(Math.random() * (maxW - minW + 1));
-      const injury: InjuryData = {
-        id: crypto.randomUUID(),
-        name: template.name,
-        description: template.description,
-        severity: "Minor",
-        weeksRemaining: Math.max(1, weeks - healingBonus),
-        penalties: template.penalties,
-      };
-
-      roster = roster.map((w, i) =>
-        i === wIdx ? { ...w, injuries: [...w.injuries, injury] } : w
-      );
-      results.push({
-        type: "injury",
-        warriorId: warrior.id,
-        message: `${warrior.name} suffered a ${template.name} during training! (${injury.weeksRemaining} week recovery)`,
-      });
+    const { injury, result: injuryResult } = rollForTrainingInjury(warrior, healingBonus);
+    if (injury && injuryResult) {
+      roster[wIdx] = { ...warrior, injuries: [...warrior.injuries, injury] };
+      results.push(injuryResult);
     }
   }
 

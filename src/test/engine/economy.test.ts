@@ -48,6 +48,7 @@ describe("Economy Engine", () => {
       state.roster = [w1, w2];
 
       state.trainers = [{
+        contractWeeksLeft: 5, tier: "Apprentice",
         id: "t1", name: "Trainer Dan", specialty: "ST", effectTier: "Apprentice",
         salary: 35, // Not used by the engine which hardcodes TRAINER_SALARY to 35, but providing for completeness
         isAssigned: true, age: 40, portrait: 1, flavor: "Tough"

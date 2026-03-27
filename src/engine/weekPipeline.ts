@@ -133,7 +133,7 @@ export function processRivalActions(state: GameState, newWeek: number): GameStat
     return result.rival;
   });
 
-  let newState = {
+  const newState = {
     ...state,
     rivals: finalRivals,
     recruitPool: updatedPool,

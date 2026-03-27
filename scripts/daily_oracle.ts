@@ -46,7 +46,7 @@ function generateWarriorSim(id: string, style: FightingStyle) {
 async function generateDailyOracleReport() {
   console.log("Starting daily Oracle simulation (100 weeks)...");
 
-  let state = createFreshState();
+  const state = createFreshState();
   const WEEKS_TO_SIM = 100;
 
   // Seed the roster so we actually have fights

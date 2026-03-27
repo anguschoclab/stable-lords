@@ -67,7 +67,7 @@ export class OPFSArchiveService implements ArchiveService {
     } catch (error: any) {
       if (error.name === 'QuotaExceededError') {
          console.error('OPFS Quota Exceeded during hot state archival', error);
-         typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
          return;
       }
       console.error('Error archiving hot state:', error);
@@ -127,7 +127,7 @@ export class OPFSArchiveService implements ArchiveService {
       if (error.name === 'QuotaExceededError') {
         console.error('OPFS Quota Exceeded during bout log archival', error);
         // Dispatch to Zustand to show Toast
-        typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
         return;
       }
       if (error.name === 'NoModificationAllowedError') {
@@ -178,7 +178,7 @@ export class OPFSArchiveService implements ArchiveService {
       if (error.name === 'QuotaExceededError') {
          console.error('OPFS Quota Exceeded during gazette archival', error);
          // Dispatch to Zustand to show Toast
-         typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
          return;
       }
       console.error('Error archiving gazette:', error);
@@ -213,7 +213,7 @@ export class OPFSArchiveService implements ArchiveService {
        if (!dirHandle) return [];
 
        const boutIds: string[] = [];
-       // @ts-ignore - async iterator type issue
+       // @ts-expect-error - async iterator type issue
        for await (const entry of dirHandle.values()) {
          if (entry.kind === 'file' && entry.name.endsWith('.json')) {
            boutIds.push(entry.name.replace('.json', ''));

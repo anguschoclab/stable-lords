@@ -19,12 +19,11 @@ describe("generateRivalStables", () => {
     }
 
     // We expect to see all 4 types represented in a pool of 20 stables
-    expect(adaptations.size).toBe(4);
-    expect(adaptations.has("MetaChaser")).toBe(true);
-    expect(adaptations.has("Traditionalist")).toBe(true);
-    expect(adaptations.has("Opportunist")).toBe(true);
-    expect(adaptations.has("Innovator")).toBe(true);
-
-    console.log("MetaAdaptation counts:", counts);
+    const msg = `MetaAdaptation counts: ${JSON.stringify(counts)}`;
+    expect(adaptations.size, msg).toBe(4);
+    expect(adaptations.has("MetaChaser"), msg).toBe(true);
+    expect(adaptations.has("Traditionalist"), msg).toBe(true);
+    expect(adaptations.has("Opportunist"), msg).toBe(true);
+    expect(adaptations.has("Innovator"), msg).toBe(true);
   });
 });

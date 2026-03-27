@@ -192,17 +192,21 @@ export interface AIBoutResult {
   kill: boolean;
 }
 
-export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; updatedRivals: RivalStableData[]; gazetteItems: string[] } {
+export interface AIPoolWarrior {
+  warrior: Warrior;
+  stableIdx: number;
+  stableId: string;
+  stableName: string;
+}
+
+export function collectEligibleAIWarriors(state: GameState, rivals: RivalStableData[]): AIPoolWarrior[] {
   const restStates = state.restStates || [];
   const restMap = new Map<string, number>();
   for (const r of restStates) {
-      restMap.set(r.warriorId, Math.max(r.restUntilWeek, restMap.get(r.warriorId) ?? 0));
+    restMap.set(r.warriorId, Math.max(r.restUntilWeek, restMap.get(r.warriorId) ?? 0));
   }
   const trainingIds = new Set<string>();
-
-  // Collect eligible rival warriors with stable info
-  const pool: { warrior: Warrior; stableIdx: number; stableId: string; stableName: string }[] = [];
-  const rivals = [...(state.rivals || [])];
+  const pool: AIPoolWarrior[] = [];
   
   for (let si = 0; si < rivals.length; si++) {
     for (const w of rivals[si].roster) {
@@ -211,15 +215,17 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
       }
     }
   }
+  return pool;
+}
 
+export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[]): { a: AIPoolWarrior; d: AIPoolWarrior }[] {
   const maxBouts = Math.min(Math.floor(pool.length / 2), 4);
   const paired = new Set<string>();
-  const boutPairs: { a: typeof pool[0]; d: typeof pool[0] }[] = [];
+  const boutPairs: { a: AIPoolWarrior; d: AIPoolWarrior }[] = [];
 
-  // Pair warriors from DIFFERENT stables, using pickRivalOpponent as fallback
   for (const a of pool) {
     if (paired.has(a.warrior.id) || boutPairs.length >= maxBouts) break;
-    // Try direct scan first for speed
+
     let found = false;
     for (const d of pool) {
       if (paired.has(d.warrior.id) || disallowStablemates(a.stableId, d.stableId)) continue;
@@ -229,7 +235,7 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
       found = true;
       break;
     }
-    // Fallback: use pickRivalOpponent for broader cross-stable search
+
     if (!found && rivals.length > 0) {
       const pick = pickRivalOpponent(rivals, paired);
       if (pick && !disallowStablemates(a.stableId, pick.rival.owner.id)) {
@@ -242,83 +248,88 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
       }
     }
   }
+  return boutPairs;
+}
+
+export function updateAIWarriorRecord(
+  updatedRivals: RivalStableData[],
+  stableIdx: number,
+  wId: string,
+  won: boolean,
+  killed: boolean
+) {
+  const roster = updatedRivals[stableIdx].roster;
+  const idx = roster.findIndex(w => w.id === wId);
+  if (idx >= 0) {
+    roster[idx] = {
+      ...roster[idx],
+      career: {
+        wins: roster[idx].career.wins + (won ? 1 : 0),
+        losses: roster[idx].career.losses + (won ? 0 : 1),
+        kills: roster[idx].career.kills + (killed ? 1 : 0),
+      },
+      fame: Math.max(0, roster[idx].fame + (won ? (killed ? 3 : 1) : 0)),
+    };
+    if (won) {
+      updatedRivals[stableIdx].owner = {
+        ...updatedRivals[stableIdx].owner,
+        fame: (updatedRivals[stableIdx].owner.fame ?? 0) + (killed ? 3 : 1),
+      };
+    }
+  }
+}
+
+export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; updatedRivals: RivalStableData[]; gazetteItems: string[] } {
+  const rivals = [...(state.rivals || [])];
+  const pool = collectEligibleAIWarriors(state, rivals);
+  const boutPairs = pairAIWarriors(pool, rivals);
 
   const results: AIBoutResult[] = [];
   const gazetteItems: string[] = [];
-  // Deep clone rivals for mutation
   const updatedRivals = rivals.map(r => ({
     ...r,
     roster: r.roster.map(w => ({ ...w, career: { ...w.career } })),
   }));
 
-  // Compute current meta for plan adjustments
   const meta = computeMetaDrift(state.arenaHistory, 20);
 
-  // Check for existing rivalries between AI stables
   const rivalries = state.rivalries || [];
   const rivalryMap = new Map<string, boolean>();
   for (const rv of rivalries) {
-      const key = rv.stableIdA < rv.stableIdB ? `${rv.stableIdA}|${rv.stableIdB}` : `${rv.stableIdB}|${rv.stableIdA}`;
-      rivalryMap.set(key, true);
+    const key = rv.stableIdA < rv.stableIdB ? `${rv.stableIdA}|${rv.stableIdB}` : `${rv.stableIdB}|${rv.stableIdA}`;
+    rivalryMap.set(key, true);
   }
 
   for (const { a, d } of boutPairs) {
-    // Use personality-driven plans for AI warriors with meta awareness
     const stableA = rivals.find((_, idx) => idx === a.stableIdx);
     const stableD = rivals.find((_, idx) => idx === d.stableIdx);
+
     const persA = stableA?.owner?.personality ?? "Pragmatic";
     const philA = stableA?.philosophy ?? "Balanced";
     const adaptA = stableA?.owner?.metaAdaptation ?? "Opportunist";
+
     const persD = stableD?.owner?.personality ?? "Pragmatic";
     const philD = stableD?.philosophy ?? "Balanced";
     const adaptD = stableD?.owner?.metaAdaptation ?? "Opportunist";
 
     const planA = a.warrior.plan ?? aiPlanForWarrior(a.warrior, persA, philA, { meta, adaptation: adaptA }, d.warrior.style);
     const planD = d.warrior.plan ?? aiPlanForWarrior(d.warrior, persD, philD, { meta, adaptation: adaptD }, a.warrior.style);
-    const outcome = simulateFight(planA, planD, a.warrior, d.warrior);
 
+    const outcome = simulateFight(planA, planD, a.warrior, d.warrior);
     const isKill = outcome.by === "Kill";
     const winnerSide = outcome.winner;
+    const isRivalryBout = rivalryMap.has(a.stableId < d.stableId ? `${a.stableId}|${d.stableId}` : `${d.stableId}|${a.stableId}`);
 
-    // Check if this is a rivalry bout between AI stables
-    const key = a.stableId < d.stableId ? `${a.stableId}|${d.stableId}` : `${d.stableId}|${a.stableId}`;
-    const isRivalryBout = rivalryMap.has(key);
+    updateAIWarriorRecord(updatedRivals, a.stableIdx, a.warrior.id, winnerSide === "A", isKill && winnerSide === "A");
+    updateAIWarriorRecord(updatedRivals, d.stableIdx, d.warrior.id, winnerSide === "D", isKill && winnerSide === "D");
 
-    // Update records in updatedRivals
-    const updateWarriorRecord = (stableIdx: number, wId: string, won: boolean, killed: boolean) => {
-      const roster = updatedRivals[stableIdx].roster;
-      const idx = roster.findIndex(w => w.id === wId);
-      if (idx >= 0) {
-        roster[idx] = {
-          ...roster[idx],
-          career: {
-            wins: roster[idx].career.wins + (won ? 1 : 0),
-            losses: roster[idx].career.losses + (won ? 0 : 1),
-            kills: roster[idx].career.kills + (killed ? 1 : 0),
-          },
-          fame: Math.max(0, roster[idx].fame + (won ? (killed ? 3 : 1) : 0)),
-        };
-        // Accumulate stable-level fame on the owner
-        if (won) {
-          updatedRivals[stableIdx].owner = {
-            ...updatedRivals[stableIdx].owner,
-            fame: (updatedRivals[stableIdx].owner.fame ?? 0) + (killed ? 3 : 1),
-          };
-        }
-      }
-    };
-
-    updateWarriorRecord(a.stableIdx, a.warrior.id, winnerSide === "A", isKill && winnerSide === "A");
-    updateWarriorRecord(d.stableIdx, d.warrior.id, winnerSide === "D", isKill && winnerSide === "D");
-
-    // Handle AI death
     if (isKill) {
       const deadStableIdx = winnerSide === "A" ? d.stableIdx : a.stableIdx;
       const deadId = winnerSide === "A" ? d.warrior.id : a.warrior.id;
       updatedRivals[deadStableIdx].roster = updatedRivals[deadStableIdx].roster.filter(w => w.id !== deadId);
     }
 
-    const result: AIBoutResult = {
+    results.push({
       stableA: a.stableName,
       stableB: d.stableName,
       warriorA: a.warrior.name,
@@ -326,20 +337,17 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
       winner: winnerSide,
       by: outcome.by,
       kill: isKill,
-    };
-    results.push(result);
+    });
 
-    // Rivalry special coverage for AI vs AI bouts
     if (isRivalryBout) {
-      const rivalryCoverageTemplates = [
+      const templates = [
         `🔥 RIVALRY REPORT: The feud between ${a.stableName} and ${d.stableName} rages on — ${a.warrior.name} faced ${d.warrior.name} in a grudge match!`,
         `⚔️ VENDETTA IN THE PITS: ${a.stableName} vs ${d.stableName} — ${a.warrior.name} and ${d.warrior.name} settled scores in the arena!`,
         `🏟️ BAD BLOOD: ${a.stableName} and ${d.stableName} clashed again as ${a.warrior.name} took on ${d.warrior.name}!`,
       ];
-      gazetteItems.push(rivalryCoverageTemplates[Math.floor(Math.random() * rivalryCoverageTemplates.length)]);
+      gazetteItems.push(templates[Math.floor(Math.random() * templates.length)]);
     }
 
-    // Generate gazette entry for notable outcomes
     if (isKill) {
       const killer = winnerSide === "A" ? a.warrior.name : d.warrior.name;
       const killerStable = winnerSide === "A" ? a.stableName : d.stableName;

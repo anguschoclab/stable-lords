@@ -39,6 +39,16 @@ describe("combatMath engine", () => {
   });
 
   describe("getPhase", () => {
+    it("returns 'opening' when maxExchanges is 0 or negative", () => {
+      expect(getPhase(5, 0)).toBe("opening");
+      expect(getPhase(5, -5)).toBe("opening");
+    });
+    it("returns 'opening' when exchange is negative", () => {
+      expect(getPhase(-2, 10)).toBe("opening");
+    });
+    it("returns 'late' when exchange is greater than maxExchanges", () => {
+      expect(getPhase(15, 10)).toBe("late");
+    });
     it("returns 'opening' when ratio is exactly the threshold (0.25)", () => {
       expect(getPhase(2.5, 10)).toBe("opening");
     });

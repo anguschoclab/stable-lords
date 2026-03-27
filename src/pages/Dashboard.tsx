@@ -7,6 +7,8 @@ import { useGameStore } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Warrior } from "@/types/game";
 import { BASE_ROSTER_CAP } from "@/data/constants";
 import { Badge } from "@/components/ui/badge";
+import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
+
 import { StatBadge } from "@/components/ui/StatBadge";
 import TagBadge from "@/components/TagBadge";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
@@ -26,6 +28,8 @@ import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
 import { cn } from "@/lib/utils";
+import { CrowdMoodWidget } from "@/components/widgets/CrowdMoodWidget";
+
 
 // ─── Widget: Season & Calendar ─────────────────────────────────────────────
 
@@ -911,186 +915,139 @@ function RivalryWidget() {
   );
 }
 
-// ─── Widget: Crowd Mood Meter ──────────────────────────────────────────────
 
-function CrowdMoodWidget() {
-  const { state } = useGameStore();
-  const mood = state.crowdMood as CrowdMood;
-  const moodHistory = state.moodHistory || [];
-  const mods = useMemo(() => getMoodModifiers(mood), [mood]);
-  const icon = MOOD_ICONS[mood] ?? "😐";
-  const desc = MOOD_DESCRIPTIONS[mood] ?? "";
+// ─── Widget: Stable Comparison ─────────────────────────────────────────────
 
-  // Radial gauge: map mood to an angle (0-180 arc)
-  const MOOD_ANGLE: Record<CrowdMood, number> = {
-    Solemn: 20,
-    Calm: 55,
-    Theatrical: 90,
-    Festive: 130,
-    Bloodthirsty: 165,
-  };
-  const angle = MOOD_ANGLE[mood] ?? 90;
+type StableComparisonStats = {
+  name: string;
+  warriors: number;
+  wins: number;
+  kills: number;
+  avgFame: number;
+  isPlayer: boolean;
+};
 
-  // Format modifier as percentage label
-  const fmtMod = (v: number) => {
-    const pct = Math.round((v - 1) * 100);
-    if (pct === 0) return "—";
-    return `${pct > 0 ? "+" : ""}${pct}%`;
-  };
-  const fmtKill = (v: number) => {
-    const pct = Math.round(v * 100);
-    if (pct === 0) return "—";
-    return `${pct > 0 ? "+" : ""}${pct}%`;
-  };
+type HeadToHeadRecord = {
+  wins: number;
+  losses: number;
+  kills: number;
+  deaths: number;
+};
 
-  const modColor = (v: number) =>
-    v > 1 ? "text-arena-pop" : v < 1 ? "text-destructive" : "text-muted-foreground";
-  const killColor = (v: number) =>
-    v > 0 ? "text-destructive" : v < 0 ? "text-arena-pop" : "text-muted-foreground";
+// Helper: Extracts key stats for a single stable in O(n)
+function calculateStableStats(roster: readonly Warrior[], stableName: string, isPlayer: boolean): StableComparisonStats {
+  let activeCount = 0;
+  let totalFame = 0;
+  let wins = 0;
+  let kills = 0;
+  for (const w of roster) {
+    wins += w.career.wins;
+    kills += w.career.kills;
+    if (w.status === "Active") {
+      activeCount++;
+      totalFame += w.fame ?? 0;
+    }
+  }
+  const avgFame = activeCount > 0 ? Math.round(totalFame / activeCount) : 0;
+  return { name: stableName, warriors: activeCount, wins, kills, avgFame, isPlayer };
+}
+
+// Subcomponent: List of all stables (player + rivals)
+function StableComparisonList({ allStables }: { allStables: StableComparisonStats[] }) {
+  const maxWins = Math.max(...allStables.map(s => s.wins), 1);
+  const maxFame = Math.max(...allStables.map(s => s.avgFame), 1);
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="font-display text-base flex items-center gap-2">
-          <Heart className="h-4 w-4 text-destructive" /> Crowd Mood
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {/* Radial gauge */}
-        <div className="flex justify-center">
-          <div className="relative w-40 h-24">
-            {/* Arc background */}
-            <svg viewBox="0 0 160 90" className="w-full h-full">
-              {/* Track */}
-              <path
-                d="M 15 80 A 65 65 0 0 1 145 80"
-                fill="none"
-                stroke="hsl(var(--muted))"
-                strokeWidth="10"
-                strokeLinecap="round"
-              />
-              {/* Gradient colored arc segments */}
-              <defs>
-                <linearGradient id="moodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" />
-                  <stop offset="40%" stopColor="hsl(var(--accent))" />
-                  <stop offset="70%" stopColor="hsl(var(--arena-gold, 45 93% 47%))" />
-                  <stop offset="100%" stopColor="hsl(var(--destructive))" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M 15 80 A 65 65 0 0 1 145 80"
-                fill="none"
-                stroke="url(#moodGrad)"
-                strokeWidth="10"
-                strokeLinecap="round"
-                opacity="0.3"
-              />
-              {/* Needle */}
-              <line
-                x1="80"
-                y1="80"
-                x2={80 + 50 * Math.cos(Math.PI - (angle * Math.PI) / 180)}
-                y2={80 - 50 * Math.sin(Math.PI - (angle * Math.PI) / 180)}
-                stroke="hsl(var(--foreground))"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                className="transition-all duration-700"
-              />
-              {/* Center dot */}
-              <circle cx="80" cy="80" r="4" fill="hsl(var(--foreground))" />
-            </svg>
-            {/* Labels at ends */}
-            <span className="absolute bottom-0 left-0 text-[9px] text-muted-foreground">🕯️</span>
-            <span className="absolute bottom-0 right-0 text-[9px] text-muted-foreground">🩸</span>
+    <div className="space-y-3">
+      {/* Header row */}
+      <div className="grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-b border-border pb-1.5">
+        <span>Stable</span>
+        <span className="text-center">Size</span>
+        <span className="text-center">Victories</span>
+        <span className="text-center">Kills</span>
+        <span className="text-center">Avg Fame</span>
+      </div>
+      {allStables.map((s, i) => (
+        <div
+          key={i}
+          className={`grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 items-center py-1.5 rounded-md px-1.5 ${
+            s.isPlayer ? "bg-primary/5 border border-primary/20" : "hover:bg-secondary/40"
+          }`}
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            {s.isPlayer && <Shield className="h-3 w-3 text-primary shrink-0" />}
+            <span className={`text-sm truncate ${s.isPlayer ? "font-semibold" : ""}`}>{s.name}</span>
+          </div>
+          <div className="text-center text-sm font-mono">{s.warriors}</div>
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+              <div className="h-full bg-arena-pop rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
+            </div>
+            <span className="text-xs font-mono w-6 text-right">{s.wins}</span>
+          </div>
+          <div className="text-center text-sm font-mono text-destructive">{s.kills}</div>
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+              <div className="h-full bg-arena-fame rounded-full transition-all" style={{ width: `${(s.avgFame / maxFame) * 100}%` }} />
+            </div>
+            <span className="text-xs font-mono w-6 text-right">{s.avgFame}</span>
           </div>
         </div>
-
-        {/* Current mood */}
-        <div className="text-center">
-          <div className="text-2xl">{icon}</div>
-          <div className="font-display font-bold text-sm">{mood}</div>
-          <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{desc}</p>
-        </div>
-
-        {/* Modifier breakdown */}
-        <div className="grid grid-cols-3 gap-1.5 text-center">
-          <div className="rounded-md bg-secondary/60 p-1.5 border border-border/50">
-            <div className={`text-sm font-mono font-bold ${modColor(mods.fameMultiplier)}`}>
-              {fmtMod(mods.fameMultiplier)}
-            </div>
-            <div className="text-[9px] text-muted-foreground uppercase">Fame</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-1.5 border border-border/50">
-            <div className={`text-sm font-mono font-bold ${modColor(mods.popMultiplier)}`}>
-              {fmtMod(mods.popMultiplier)}
-            </div>
-            <div className="text-[9px] text-muted-foreground uppercase">Pop</div>
-          </div>
-          <div className="rounded-md bg-secondary/60 p-1.5 border border-border/50">
-            <div className={`text-sm font-mono font-bold ${killColor(mods.killChanceBonus)}`}>
-              {fmtKill(mods.killChanceBonus)}
-            </div>
-            <div className="text-[9px] text-muted-foreground uppercase">Kill %</div>
-          </div>
-        </div>
-
-        {/* Mood History Sparkline */}
-        {moodHistory.length >= 2 && (() => {
-          const MOOD_Y: Record<string, number> = { Solemn: 4, Calm: 3, Theatrical: 2, Festive: 1, Bloodthirsty: 0 };
-          const MOOD_COLOR: Record<string, string> = {
-            Solemn: "hsl(var(--primary))",
-            Calm: "hsl(var(--muted-foreground))",
-            Theatrical: "hsl(var(--accent-foreground))",
-            Festive: "hsl(var(--arena-pop, 142 71% 45%))",
-            Bloodthirsty: "hsl(var(--destructive))",
-          };
-          const last10 = moodHistory.slice(-10);
-          const w = 200, h = 40, px = 8, py = 4;
-          const stepX = (w - px * 2) / Math.max(last10.length - 1, 1);
-          const stepY = (h - py * 2) / 4;
-          const pts = last10.map((entry, i) => ({
-            x: px + i * stepX,
-            y: py + (MOOD_Y[entry.mood] ?? 2) * stepY,
-            mood: entry.mood as CrowdMood,
-            week: entry.week,
-          }));
-          const polyline = pts.map(p => `${p.x},${p.y}`).join(" ");
-
-          return (
-            <div className="mt-1">
-              <div className="text-[9px] text-muted-foreground uppercase mb-1">Mood History</div>
-              <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-10">
-                {/* Grid lines */}
-                {[0,1,2,3,4].map(i => (
-                  <line key={i} x1={px} x2={w-px} y1={py + i*stepY} y2={py + i*stepY}
-                    stroke="hsl(var(--border))" strokeWidth="0.5" strokeDasharray="2,2" opacity="0.4" />
-                ))}
-                {/* Line */}
-                <polyline points={polyline} fill="none" stroke="hsl(var(--foreground))" strokeWidth="1.5"
-                  strokeLinejoin="round" strokeLinecap="round" opacity="0.6" />
-                {/* Dots */}
-                {pts.map((p, i) => (
-                  <circle key={i} cx={p.x} cy={p.y} r="3"
-                    fill={MOOD_COLOR[p.mood] ?? "hsl(var(--foreground))"}
-                    stroke="hsl(var(--background))" strokeWidth="1">
-                    <title>Week {p.week}: {p.mood}</title>
-                  </circle>
-                ))}
-              </svg>
-              {/* Y-axis labels */}
-              <div className="flex justify-between text-[8px] text-muted-foreground -mt-0.5 px-1">
-                <span>🩸</span><span>🎉</span><span>🎭</span><span>😐</span><span>🕯️</span>
-              </div>
-            </div>
-          );
-        })()}
-      </CardContent>
-    </Card>
+      ))}
+    </div>
   );
 }
 
-// ─── Widget: Stable Comparison ─────────────────────────────────────────────
+// Subcomponent: Head-to-Head breakdown
+function HeadToHeadBreakdown({ rivalStats, h2hRecords }: { rivalStats: StableComparisonStats[], h2hRecords: Record<string, HeadToHeadRecord> }) {
+  if (!rivalStats.some(r => {
+    const rec = h2hRecords[r.name];
+    return rec && (rec.wins + rec.losses) > 0;
+  })) return null;
+
+  return (
+    <div className="space-y-2 pt-2 border-t border-border">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+        <Swords className="h-3 w-3" /> Head-to-Head
+      </div>
+      {rivalStats.map(r => {
+        const rec = h2hRecords[r.name];
+        if (!rec || (rec.wins + rec.losses) === 0) return null;
+        const total = rec.wins + rec.losses;
+        const winPct = Math.round((rec.wins / total) * 100);
+
+        return (
+          <div key={r.name} className="flex items-center gap-3">
+            <span className="text-xs text-foreground/80 w-28 truncate" title={r.name}>vs {r.name}</span>
+            <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden flex">
+              <div
+                className="h-full bg-arena-pop transition-all"
+                style={{ width: `${winPct}%` }}
+                title={`${rec.wins} wins`}
+              />
+              <div
+                className="h-full bg-destructive/70 transition-all"
+                style={{ width: `${100 - winPct}%` }}
+                title={`${rec.losses} losses`}
+              />
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-xs font-mono font-semibold text-arena-pop">{rec.wins}W</span>
+              <span className="text-[10px] text-muted-foreground">-</span>
+              <span className="text-xs font-mono font-semibold text-destructive">{rec.losses}L</span>
+              {(rec.kills > 0 || rec.deaths > 0) && (
+                <span className="text-[10px] font-mono text-muted-foreground ml-1">
+                  {rec.kills > 0 && <span className="text-arena-gold">☠{rec.kills}</span>}
+                  {rec.deaths > 0 && <span className="text-destructive ml-0.5">💀{rec.deaths}</span>}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function StableComparisonWidget() {
   const { state } = useGameStore();
@@ -1098,48 +1055,18 @@ function StableComparisonWidget() {
   const playerNames = useMemo(() => new Set(state.roster.map(w => w.name)), [state.roster]);
 
   const playerStats = useMemo(() => {
-    // ⚡ Bolt: Combines multiple filter/reduce iterations into a single O(n) pass
-    let activeCount = 0;
-    let totalFame = 0;
-    let wins = 0;
-    let kills = 0;
-    for (const w of state.roster) {
-      wins += w.career.wins;
-      kills += w.career.kills;
-      if (w.status === "Active") {
-        activeCount++;
-        totalFame += w.fame ?? 0;
-      }
-    }
-    const avgFame = activeCount > 0 ? Math.round(totalFame / activeCount) : 0;
-    return { name: state.player.stableName, warriors: activeCount, wins, kills, avgFame, isPlayer: true };
+    return calculateStableStats(state.roster, state.player.stableName, true);
   }, [state.roster, state.player.stableName]);
 
-  // Build rival name sets and H2H records
   const { rivalStats, h2hRecords } = useMemo(() => {
     const rivals = (state.rivals ?? []).slice(0, 3);
-    const h2h: Record<string, { wins: number; losses: number; kills: number; deaths: number }> = {};
+    const h2h: Record<string, HeadToHeadRecord> = {};
 
     const stats = rivals.map(r => {
       const rivalNameSet = new Set(r.roster.map(w => w.name));
+      const rStats = calculateStableStats(r.roster, r.owner.stableName, false);
 
-      // ⚡ Bolt: Single O(n) pass to extract wins, kills, active count, and active fame
-      let activeCount = 0;
-      let totalFame = 0;
-      let wins = 0;
-      let kills = 0;
-      for (const w of r.roster) {
-        wins += w.career.wins;
-        kills += w.career.kills;
-        if (w.status === "Active") {
-          activeCount++;
-          totalFame += w.fame ?? 0;
-        }
-      }
-      const avgFame = activeCount > 0 ? Math.round(totalFame / activeCount) : 0;
-
-      // Compute H2H from arena history
-      const record = { wins: 0, losses: 0, kills: 0, deaths: 0 };
+      const record: HeadToHeadRecord = { wins: 0, losses: 0, kills: 0, deaths: 0 };
       for (const f of state.arenaHistory) {
         const aIsPlayer = playerNames.has(f.a);
         const dIsPlayer = playerNames.has(f.d);
@@ -1160,14 +1087,14 @@ function StableComparisonWidget() {
         }
       }
       h2h[r.owner.stableName] = record;
-
-      return { name: r.owner.stableName, warriors: activeCount, wins, kills, avgFame, isPlayer: false };
+      return rStats;
     });
 
     return { rivalStats: stats, h2hRecords: h2h };
   }, [state.rivals, state.arenaHistory, playerNames]);
 
   const allStables = [playerStats, ...rivalStats];
+
   if (rivalStats.length === 0) {
     return (
       <Card className="md:col-span-2">
@@ -1183,9 +1110,6 @@ function StableComparisonWidget() {
     );
   }
 
-  const maxWins = Math.max(...allStables.map(s => s.wins), 1);
-  const maxFame = Math.max(...allStables.map(s => s.avgFame), 1);
-
   return (
     <Card className="md:col-span-2">
       <CardHeader className="pb-2">
@@ -1194,90 +1118,8 @@ function StableComparisonWidget() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-3">
-          {/* Header row */}
-          <div className="grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-b border-border pb-1.5">
-            <span>Stable</span>
-            <span className="text-center">Size</span>
-            <span className="text-center">Victories</span>
-            <span className="text-center">Kills</span>
-            <span className="text-center">Avg Fame</span>
-          </div>
-          {allStables.map((s, i) => (
-            <div
-              key={i}
-              className={`grid grid-cols-[1fr_60px_80px_50px_70px] gap-2 items-center py-1.5 rounded-md px-1.5 ${
-                s.isPlayer ? "bg-primary/5 border border-primary/20" : "hover:bg-secondary/40"
-              }`}
-            >
-              <div className="flex items-center gap-1.5 min-w-0">
-                {s.isPlayer && <Shield className="h-3 w-3 text-primary shrink-0" />}
-                <span className={`text-sm truncate ${s.isPlayer ? "font-semibold" : ""}`}>{s.name}</span>
-              </div>
-              <div className="text-center text-sm font-mono">{s.warriors}</div>
-              <div className="flex items-center gap-1.5">
-                <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-arena-pop rounded-full transition-all" style={{ width: `${(s.wins / maxWins) * 100}%` }} />
-                </div>
-                <span className="text-xs font-mono w-6 text-right">{s.wins}</span>
-              </div>
-              <div className="text-center text-sm font-mono text-destructive">{s.kills}</div>
-              <div className="flex items-center gap-1.5">
-                <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-arena-fame rounded-full transition-all" style={{ width: `${(s.avgFame / maxFame) * 100}%` }} />
-                </div>
-                <span className="text-xs font-mono w-6 text-right">{s.avgFame}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* H2H Breakdown */}
-        {rivalStats.some(r => {
-          const rec = h2hRecords[r.name];
-          return rec && (rec.wins + rec.losses) > 0;
-        }) && (
-          <div className="space-y-2 pt-2 border-t border-border">
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
-              <Swords className="h-3 w-3" /> Head-to-Head
-            </div>
-            {rivalStats.map(r => {
-              const rec = h2hRecords[r.name];
-              if (!rec || (rec.wins + rec.losses) === 0) return null;
-              const total = rec.wins + rec.losses;
-              const winPct = Math.round((rec.wins / total) * 100);
-
-              return (
-                <div key={r.name} className="flex items-center gap-3">
-                  <span className="text-xs text-foreground/80 w-28 truncate" title={r.name}>vs {r.name}</span>
-                  <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden flex">
-                    <div
-                      className="h-full bg-arena-pop transition-all"
-                      style={{ width: `${winPct}%` }}
-                      title={`${rec.wins} wins`}
-                    />
-                    <div
-                      className="h-full bg-destructive/70 transition-all"
-                      style={{ width: `${100 - winPct}%` }}
-                      title={`${rec.losses} losses`}
-                    />
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-xs font-mono font-semibold text-arena-pop">{rec.wins}W</span>
-                    <span className="text-[10px] text-muted-foreground">-</span>
-                    <span className="text-xs font-mono font-semibold text-destructive">{rec.losses}L</span>
-                    {(rec.kills > 0 || rec.deaths > 0) && (
-                      <span className="text-[10px] font-mono text-muted-foreground ml-1">
-                        {rec.kills > 0 && <span className="text-arena-gold">☠{rec.kills}</span>}
-                        {rec.deaths > 0 && <span className="text-destructive ml-0.5">💀{rec.deaths}</span>}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <StableComparisonList allStables={allStables} />
+        <HeadToHeadBreakdown rivalStats={rivalStats} h2hRecords={h2hRecords} />
       </CardContent>
     </Card>
   );

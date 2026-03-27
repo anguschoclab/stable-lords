@@ -18,6 +18,7 @@ export function mulberry32(seed: number) {
 }
 
 export function getPhase(exchange: number, maxExchanges: number): Phase {
+  if (maxExchanges <= 0) return "opening";
   const ratio = exchange / maxExchanges;
   if (ratio <= PHASE_OPENING_THRESHOLD) return "opening";
   if (ratio <= PHASE_MID_THRESHOLD) return "mid";
