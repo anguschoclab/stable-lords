@@ -201,6 +201,7 @@ export const INI_KEEP_TEMPLATES = [
 
 export const EXECUTION_TEMPLATES = [
 
+
   "%A delivers a brutal execution stroke!",
   "%A shows no mercy, finishing the bout!",
   "The final blow is devastating.",
@@ -261,7 +262,18 @@ export const EXECUTION_TEMPLATES = [
   "%A capitalizes on %D's faltering stance, delivering a bone-shattering finish with their %W!",
   "A spray of crimson paints the sand as %A obliterates %D with a final, massive swing of their %W!",
   "%D gasps their final breath before %A's %W ends their suffering entirely!",
-  "Exploiting %D's shattered defense, %A carves out a grisly death with their %W!"
+  "Exploiting %D's shattered defense, %A carves out a grisly death with their %W!",
+  // Procedural Chronicle Additions v4
+  "%A brings their %W down in a grisly arc, completely destroying %D's life!",
+  "With %D helpless on the bloody sand, %A delivers a ruthless, life-ending blow with a %W!",
+  "%D screams in agony as %A's %W brutally snuffs out their existence!",
+  "Exploiting a fatal misstep, %A uses their %W to sheer through %D's faltering defense, securing a gruesome kill!",
+  "The life drains from %D as %A mercilessly executes them with a devastating swing of a %W!",
+  "A deafening silence falls as %A violently ends the bout by driving their %W straight into %D's vitals!",
+  "%A shatters what remains of %D's armor, carving out a bloody finish with their %W!",
+  "Utterly exhausted, %D can only watch as %A's %W brings their gruesome end!",
+  "%D collapses to their knees just as %A unleashes a merciless, fatal strike with a %W!",
+  "A horrifying crunch echoes through the arena as %A crushes %D's life entirely with a brutal %W!"
 ];
 
 export const KO_TEMPLATES = [
@@ -281,6 +293,7 @@ export const SURRENDER_TEMPLATES = [
 ];
 
 export const FATIGUE_COLLAPSE_TEMPLATES = [
+
 
   "%N collapses from sheer exhaustion.",
   "His endurance spent, %N falls to the sand.",
@@ -314,6 +327,12 @@ export const FATIGUE_COLLAPSE_TEMPLATES = [
   "Utterly spent, %N's knees buckle, bringing them helplessly to the sand.",
   "The weight of the slaughter finally drags %N into total bodily failure.",
   "Choking on dust and their own blood, %N collapses from severe fatigue.",
+  // Procedural Chronicle Additions v4
+  "%N staggers blindly, totally consumed by the unbearable weight of sheer fatigue.",
+  "Choking on dust and exhaustion, %N drops to the bloodstained sand.",
+  "Their lungs screaming for air, %N crumbles in a heap of useless armor.",
+  "Unable to lift their weapon an inch further, %N spirals into total exhaustion.",
+  "The brutal slaughter finally breaks %N, dragging them down into complete unconsciousness."
 ];
 
 export const TAUNT_TEMPLATES = [
@@ -335,6 +354,7 @@ export const STALEMATE_TEMPLATES = [
 
 export const SLASH_ATTACK_TEMPLATES = [
 
+
   "slashes his %W at",
   "swings a wide arc at",
   "cuts fiercely at",
@@ -355,9 +375,16 @@ export const SLASH_ATTACK_TEMPLATES = [
   "attempts to slice %D completely in twain with a brutal sweep of his %W,",
   "lashes out with his %W in a fast, tearing arc hoping to maim",
   "swings a vicious, flesh-parting slash of his %W straight toward",
+  // Procedural Chronicle Additions v4
+  "swings a wide, dismembering arc of their %W attempting to sever the limbs of",
+  "lashes out with their %W in a vicious attempt to open the throat of",
+  "draws the razor edge of their %W across the air, hoping to slice open",
+  "attempts to shear right through the unarmored flesh of",
+  "whips their %W in a brutal, flesh-parting slash aimed straight at"
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
+
 
   "bashes heavily with his %W toward",
   "swings a crushing blow at",
@@ -379,9 +406,16 @@ export const BASH_ATTACK_TEMPLATES = [
   "attempts to shatter the armor and bone beneath with a heavy strike of his %W at",
   "swings his %W with concussive, crushing fury toward",
   "hurls the full, blunt force of his %W attempting to flatten",
+  // Procedural Chronicle Additions v4
+  "brings down the heavy bulk of their %W aiming to shatter the skull of",
+  "swings a concussive, bone-crushing blow with their %W toward",
+  "hurls the immense weight of their %W to pulverize the ribcage of",
+  "attempts to break every bone in the body of",
+  "delivers a bludgeoning, heavy strike of their %W aiming to completely flatten"
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [
+
 
   "thrusts his %W directly at",
   "lunges forward, aiming at",
@@ -398,6 +432,12 @@ export const THRUST_ATTACK_TEMPLATES = [
   "aims a deadly, pinpoint thrust of his %W to skewer",
   "lunges violently, attempting to bore his %W through the vitals of",
   "stabs forward with his %W, seeking a fatal puncture on",
+  // Procedural Chronicle Additions v4
+  "drives their %W forward, aiming a deadly puncture at the heart of",
+  "lunges violently, seeking to bore their %W through the exposed vitals of",
+  "stabs with lethal intent, hoping to impale",
+  "pierces the distance with a pinpoint thrust of their %W toward",
+  "drives their %W deep, seeking the vulnerable, unarmored gaps of"
 ];
 
 export const FIST_ATTACK_TEMPLATES = [

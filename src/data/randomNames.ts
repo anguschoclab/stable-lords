@@ -4,6 +4,7 @@
  */
 
 const WARRIOR_NAMES = [
+
   // Brutal & powerful
   "KRAGOS", "GORLAK", "THUNDRAK", "BREKKA", "MORGUL", "SKARN", "GARVOK",
   "DRAXUS", "KORGAN", "BRUTAG", "IRONJAW", "GROTHAK", "WULFGAR", "BOLVERK",
@@ -52,25 +53,32 @@ const WARRIOR_NAMES = [
   "GOREWAKE", "GRIMBONE", "ASHENMAW", "BLOODCRAWL", "IRONJAW",
   "SLAGBORN", "GRAVESTONE", "FLESHCHOP", "MUCKSWINE", "BONEGRIND",
   "DEATHMACE", "SHADOWFANG", "SCARRING", "HELLSPIT", "PLAGUEJAW",
-  "GUTWOUND", "SLUICEBORN", "VENOMCLAW", "ROTBREATH", "SKULLCLEAVER"
+  "GUTWOUND", "SLUICEBORN", "VENOMCLAW", "ROTBREATH", "SKULLCLEAVER",
+  // Procedural Chronicle Additions v4
+  "ASHRENDER", "GOREFANG", "DUSKWEAVER", "SKULLSPLITTER", "BLOODCRAZE",
+  "DEATHBRING", "GRAVETIDE", "HELLSPAWN", "SLAGHEART", "FLESHRIPPER",
+  "MUDSTOMPER", "SPINEBREAKER", "GUTSPILL", "MEATHAMMER", "SLUICEGORE",
+  "VENOMSTRIKE", "ROTBRINGER", "GRIMVISAGE", "BONECHOPPER", "IRONHIDE"
 ];
 
 const OWNER_FIRST = [
-  "Aldric", "Balthazar", "Cassian", "Draven", "Edric", "Fenwick",
-  "Gareth", "Hadrian", "Isolde", "Jareth", "Kestrel", "Lucian",
-  "Magnus", "Nyx", "Orion", "Percival", "Quillan", "Raeburn",
-  "Sigmund", "Theron", "Ulric", "Valeria", "Wren", "Xander",
-  "Ysolde", "Zephyr", "Alaric", "Brynna", "Corwin", "Dahlia",
-  "Elowen", "Florian", "Gwendal", "Helena", "Ingrid", "Josian",
-  "Tiberius", "Vespasian", "Lucretia", "Octavian", "Domitian", "Agrippa",
-  "Severus", "Aurelia", "Flavius", "Pompey", "Crassus", "Sulla",
-  "Vortigern", "Morwenna", "Titus", "Galba", "Vane", "Malagar", "Roderick",
-  "Gellart", "Thaddeus",
-  // Procedural Chronicle Additions
-  "Vesper", "Silas", "Caius", "Mordecai", "Darius", "Oric", "Bran",
-  "Kael", "Lorcan", "Thalric", "Vergil", "Rurik", "Ignis", "Kian",
-  // Procedural Chronicle Additions v3
-  "Morven", "Corvus", "Gareth", "Bram", "Torvald", "Ulfric", "Jorah"
+  "Aldric", "Balthazar", "Cassian", "Draven", "Edric",
+  "Fenwick", "Gareth", "Hadrian", "Isolde", "Jareth",
+  "Kestrel", "Lucian", "Magnus", "Nyx", "Orion",
+  "Percival", "Quillan", "Raeburn", "Sigmund", "Theron",
+  "Ulric", "Valeria", "Wren", "Xander", "Ysolde",
+  "Zephyr", "Alaric", "Brynna", "Corwin", "Dahlia",
+  "Elowen", "Florian", "Gwendal", "Helena", "Ingrid",
+  "Josian", "Tiberius", "Vespasian", "Lucretia", "Octavian",
+  "Domitian", "Agrippa", "Severus", "Aurelia", "Flavius",
+  "Pompey", "Crassus", "Sulla", "Vortigern", "Morwenna",
+  "Titus", "Galba", "Vane", "Malagar", "Roderick",
+  "Gellart", "Thaddeus", "Vesper", "Silas", "Caius",
+  "Mordecai", "Darius", "Oric", "Bran", "Kael",
+  "Lorcan", "Thalric", "Vergil", "Rurik", "Ignis",
+  "Kian", "Morven", "Corvus", "Bram", "Torvald",
+  "Ulfric", "Jorah", "Malakor", "Vael", "Thane",
+  "Kaelar"
 ];
 
 const OWNER_LAST = [
@@ -82,15 +90,15 @@ const OWNER_LAST = [
   "Bloodworth", "Deathridge", "Gorehound", "Skullcrusher", "Marrowbone",
   "Ironclad", "Steelborn", "Bronzebeard", "Coppervein", "Silverleaf",
   "Graveward", "Grimbane", "Sorrowbring", "Cinderfall", "Rotwood",
-  "Blightford", "Grimhollow", "Vileblood", "Slagmore",
-  // Procedural Chronicle Additions
-  "Gravewarden", "Bloodspiller", "Nightshade", "Ironfoot", "Crow",
-  "Deathweaver", "Ashfall", "Hollow", "Vane", "Blackwood", "Bitterstone",
-  // Procedural Chronicle Additions v3
-  "Gorehound", "Ironblood", "Gravewalker", "Grimscar", "Bloodthorn", "Skullbreaker"
+  "Blightford", "Grimhollow", "Vileblood", "Slagmore", "Gravewarden",
+  "Bloodspiller", "Nightshade", "Ironfoot", "Crow", "Deathweaver",
+  "Ashfall", "Hollow", "Vane", "Blackwood", "Bitterstone",
+  "Ironblood", "Gravewalker", "Grimscar", "Bloodthorn", "Skullbreaker",
+  "Goreblood", "Ironjaw"
 ];
 
 const STABLE_PREFIXES = [
+
   "The Iron", "The Blood", "The Shadow", "The Storm", "The Crimson",
   "The Ashen", "The Golden", "The Black", "The Silver", "The Burning",
   "The Steel", "The Dark", "The Scarlet", "The Savage", "The Fallen",
@@ -104,10 +112,13 @@ const STABLE_PREFIXES = [
   "The Decayed", "The Ruinous", "The Pestilent", "The Gilded", "The Rusty",
   "The Mangled", "The Searing", "The Weeping", "The Drowned", "The Frozen",
   // Procedural Chronicle Additions v3
-  "The Butcher's", "The Bloodsoaked", "The Slaughtered", "The Severed", "The Putrefied"
+  "The Butcher's", "The Bloodsoaked", "The Slaughtered", "The Severed", "The Putrefied",
+  // Procedural Chronicle Additions v4
+  "The Cursed", "The Bloodstained", "The Ashen", "The Shattered", "The Ironbound"
 ];
 
 const STABLE_SUFFIXES = [
+
   "Wolves", "Fang", "Legion", "Blades", "Talons",
   "Wardens", "Reapers", "Lions", "Hawks", "Pit",
   "Company", "Guard", "Horde", "Serpents", "Ravens",
@@ -121,10 +132,13 @@ const STABLE_SUFFIXES = [
   "Swarm", "Fiends", "Wights", "Ghosts", "Terrors",
   "Ghouls", "Beasts", "Monsters", "Demons", "Devils",
   // Procedural Chronicle Additions v3
-  "Manglers", "Flayers", "Mutilators", "Eviscerators", "Decapitators"
+  "Manglers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
+  // Procedural Chronicle Additions v4
+  "Legion", "Reapers", "Vanguards", "Butchers", "Desolators"
 ];
 
 const STABLE_ALT = [
+
   "House of Blades", "The Colosseum Elite", "Arena Immortals",
   "Order of the Crimson Sand", "The Bone Collectors",
   "Gladiators of the Ashen Gate", "The Sanguine Brotherhood",
@@ -147,7 +161,10 @@ const STABLE_ALT = [
   "The Iron Carousel", "Cult of the Red Stain", "The Slaughter Cult",
   // Procedural Chronicle Additions v3
   "The Flesh Hook Combine", "Guild of the Bleeding Hand", "The Bone Collectors Syndicate",
-  "The Ashen Brotherhood", "The Gilded Abattoir"
+  "The Ashen Brotherhood", "The Gilded Abattoir",
+  // Procedural Chronicle Additions v4
+  "Brotherhood of Ash", "The Iron Syndicate", "Cult of the Flayed",
+  "Lords of the Pit", "The Crimson Circle"
 ];
 
 function pick<T>(arr: T[]): T {
