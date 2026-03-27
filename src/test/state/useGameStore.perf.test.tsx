@@ -1,7 +1,7 @@
 import { render, act } from "@testing-library/react";
 import { useGameStore } from "@/state/useGameStore";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 // Mock component that tracks renders via a ref to avoid side effects during render
@@ -52,7 +52,10 @@ describe("useGameStore Optimization (Epic 4)", () => {
     expect(onRender).toHaveBeenCalledTimes(1);
   });
 
-  it.skip("requires useShallow for object-returning selectors to avoid extra renders", async () => {});
+  it.skip("requires useShallow for object-returning selectors to avoid extra renders", async () => {
+    const onRenderWithShallow = vi.fn();
+    const onRenderWithoutShallow = vi.fn();
+    const selector = (s: any) => ({ gold: s.state.gold, week: s.state.week });
 
     const WithShallow = () => {
       const val = useGameStore(useShallow(selector));
