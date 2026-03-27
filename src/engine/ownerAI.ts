@@ -30,22 +30,30 @@ const PERSONALITY_PLAN_MODS: Record<OwnerPersonality, Partial<FightPlan>> = {
 
 /** Philosophy modifiers — layered on top of personality */
 function calculateRecentRecord(recentFights: import("@/types/game").FightSummary[], rosterNames: Set<string>) {
-  const wins = recentFights.filter(f =>
-    (rosterNames.has(f.a) && f.winner === "A") || (rosterNames.has(f.d) && f.winner === "D")
-  ).length;
-  const losses = recentFights.filter(f =>
-    (rosterNames.has(f.a) && f.winner === "D") || (rosterNames.has(f.d) && f.winner === "A")
-  ).length;
-  const kills = recentFights.filter(f =>
-    f.by === "Kill" && (
-      (rosterNames.has(f.a) && f.winner === "A") || (rosterNames.has(f.d) && f.winner === "D")
-    )
-  ).length;
-  const deaths = recentFights.filter(f =>
-    f.by === "Kill" && (
-      (rosterNames.has(f.a) && f.winner === "D") || (rosterNames.has(f.d) && f.winner === "A")
-    )
-  ).length;
+  let wins = 0;
+  let losses = 0;
+  let kills = 0;
+  let deaths = 0;
+
+  for (let i = 0; i < recentFights.length; i++) {
+    const f = recentFights[i];
+    const isA = rosterNames.has(f.a);
+    const isD = rosterNames.has(f.d);
+
+    if (isA || isD) {
+      const isWin = (isA && f.winner === "A") || (isD && f.winner === "D");
+      const isLoss = (isA && f.winner === "D") || (isD && f.winner === "A");
+
+      if (isWin) wins++;
+      if (isLoss) losses++;
+
+      if (f.by === "Kill") {
+        if (isWin) kills++;
+        if (isLoss) deaths++;
+      }
+    }
+  }
+
   return { wins, losses, kills, deaths };
 }
 
@@ -294,14 +302,26 @@ export function processOwnerGrudges(
       const aNamesSet = new Set(rA.roster.map(w => w.name));
       const bNamesSet = new Set(rB.roster.map(w => w.name));
 
-      const crossFights = recentFights.filter(f =>
-        (aNamesSet.has(f.a) && bNamesSet.has(f.d)) ||
-        (bNamesSet.has(f.a) && aNamesSet.has(f.d))
-      );
+      let hasCrossFight = false;
+      let hasKill = false;
 
-      if (crossFights.length === 0) continue;
+      for (let k = 0; k < recentFights.length; k++) {
+        const f = recentFights[k];
+        const isCrossFight =
+          (aNamesSet.has(f.a) && bNamesSet.has(f.d)) ||
+          (bNamesSet.has(f.a) && aNamesSet.has(f.d));
 
-      const hasKill = crossFights.some(f => f.by === "Kill");
+        if (isCrossFight) {
+          hasCrossFight = true;
+          if (f.by === "Kill") {
+            hasKill = true;
+            break; // We found what we need (a kill), no need to check further
+          }
+        }
+      }
+
+      if (!hasCrossFight) continue;
+
       const existing = grudges.find(g =>
         (g.ownerIdA === rA.owner.id && g.ownerIdB === rB.owner.id) ||
         (g.ownerIdB === rA.owner.id && g.ownerIdA === rB.owner.id)

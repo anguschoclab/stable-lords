@@ -39,22 +39,29 @@ export function generateOwnerNarratives(
     const personality = rival.owner.personality ?? "Pragmatic";
     const names = new Set(rival.roster.map(w => w.name));
 
-    const wins = recentFights.filter(f =>
-      (names.has(f.a) && f.winner === "A") || (names.has(f.d) && f.winner === "D")
-    ).length;
-    const losses = recentFights.filter(f =>
-      (names.has(f.a) && f.winner === "D") || (names.has(f.d) && f.winner === "A")
-    ).length;
-    const kills = recentFights.filter(f =>
-      f.by === "Kill" && (
-        (names.has(f.a) && f.winner === "A") || (names.has(f.d) && f.winner === "D")
-      )
-    ).length;
-    const deaths = recentFights.filter(f =>
-      f.by === "Kill" && (
-        (names.has(f.a) && f.winner === "D") || (names.has(f.d) && f.winner === "A")
-      )
-    ).length;
+    let wins = 0;
+    let losses = 0;
+    let kills = 0;
+    let deaths = 0;
+
+    for (let j = 0; j < recentFights.length; j++) {
+      const f = recentFights[j];
+      const isA = names.has(f.a);
+      const isD = names.has(f.d);
+
+      if (isA || isD) {
+        const isWin = (isA && f.winner === "A") || (isD && f.winner === "D");
+        const isLoss = (isA && f.winner === "D") || (isD && f.winner === "A");
+
+        if (isWin) wins++;
+        if (isLoss) losses++;
+
+        if (f.by === "Kill") {
+          if (isWin) kills++;
+          if (isLoss) deaths++;
+        }
+      }
+    }
 
     const totalFights = wins + losses;
     if (totalFights === 0) continue;
