@@ -13,6 +13,8 @@ import { Newspaper, Trophy, Swords, TrendingUp, Skull, Flame, Star, ChevronDown,
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FightSummary } from "@/types/game";
 import { StatBadge } from "@/components/ui/StatBadge";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -160,39 +162,40 @@ function AllTimeMetaChart({ allFights }: { allFights: FightSummary[] }) {
   const maxFights = Math.max(...meta.map((m) => m.fights), 1);
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-arena-fame" />
-          All-Time Style Meta
+    <Card className="bg-glass-card border-border/40 overflow-hidden">
+      <CardHeader className="pb-4 border-b border-border/10 bg-secondary/5">
+        <CardTitle className="text-base font-display font-black uppercase tracking-tight flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-primary" />
+          Tactical Style Analysis
         </CardTitle>
-        <p className="text-[10px] text-muted-foreground font-mono">
-          Cumulative across {allFights.length} recorded bouts
+        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] opacity-60">
+          DATASET: {allFights.length} REGISTERED BOUTS · GLOBAL AGGREGATE
         </p>
       </CardHeader>
-      <CardContent className="pt-0 space-y-2">
+      <CardContent className="pt-6 space-y-4">
         {meta.map((s) => {
           const winPct = (s.pct * 100).toFixed(0);
           const usageWidth = (s.fights / maxFights) * 100;
           return (
-            <div key={s.style} className="space-y-1">
+            <div key={s.style} className="space-y-2 group">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-display text-foreground">{s.style}</span>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
-                  <span>{s.fights} bout{s.fights !== 1 ? "s" : ""}</span>
-                  <span className="text-primary font-semibold">{winPct}% W</span>
-                  {s.k > 0 && <span className="text-arena-blood">{s.k}K</span>}
+                <span className="text-xs font-display font-black uppercase text-foreground group-hover:text-primary transition-colors">{s.style}</span>
+                <div className="flex items-center gap-4 text-[10px] font-mono font-bold text-muted-foreground/60">
+                  <span className="bg-secondary/40 px-2 py-0.5 rounded">{s.fights} BOUTS</span>
+                  <span className="text-primary font-black uppercase tracking-widest">{winPct}% WIN_RATE</span>
+                  {s.k > 0 && <span className="text-destructive font-black uppercase tracking-widest">{s.k} KILLS</span>}
                 </div>
               </div>
-              {/* Stacked bar: wins vs losses */}
-              <div className="h-3 bg-muted rounded-full overflow-hidden flex" style={{ width: `${usageWidth}%`, minWidth: "2rem" }}>
-                <div
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${s.pct * 100}%` }}
+              <div className="h-2 bg-secondary/10 rounded-full overflow-hidden flex shadow-inner" style={{ width: `${usageWidth}%`, minWidth: "4rem" }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${s.pct * 100}%` }}
+                  className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]"
                 />
-                <div
-                  className="h-full bg-destructive/40 transition-all"
-                  style={{ width: `${(1 - s.pct) * 100}%` }}
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(1 - s.pct) * 100}%` }}
+                  className="h-full bg-destructive/20 border-l border-destructive/20"
                 />
               </div>
             </div>
@@ -570,48 +573,55 @@ function RisingStars({ allFights, currentWeek }: { allFights: FightSummary[]; cu
 import { Calendar } from "lucide-react";
 
 function WeeklyIssue({ issue, state }: { issue: GazetteStory; state: any }) {
-  const paragraphs = (issue.body || "").split("\n\n").filter(p => p.trim().length > 0);
-  
   return (
-    <article key={issue.week} className="space-y-6 relative overflow-hidden bg-card/50 p-6 md:p-10 rounded-none border border-border shadow-sm font-serif">
-      {/* Decorative corners or borders could be added for more "paper" feel */}
+    <motion.article 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      key={issue.week} 
+      className="space-y-8 relative overflow-hidden bg-[#faf9f6]/95 dark:bg-[#1a1918] p-8 md:p-14 rounded-sm border-2 border-double border-foreground/10 shadow-2xl font-serif text-foreground/90 selection:bg-primary/20"
+    >
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/10 via-primary to-primary/10 opacity-30" />
       
-      <div className="flex flex-col gap-4 border-b-2 border-foreground/20 pb-6">
-        <div className="flex items-center justify-between text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground border-b border-foreground/10 pb-2">
-          <span>Vol. {Math.floor(issue.week / 4) + 1} · No. {issue.week}</span>
-          <span>{state.season} · Week {issue.week}</span>
-          <span>Arena District Edition</span>
+      <div className="flex flex-col gap-6 border-b-2 border-foreground/30 pb-8">
+        <div className="flex items-center justify-between text-[9px] font-black tracking-[0.3em] uppercase text-muted-foreground/60 border-b border-foreground/10 pb-3">
+          <span className="flex items-center gap-2"><Newspaper className="h-3 w-3" /> VOL. {Math.floor(issue.week / 4) + 1} · NO. {issue.week}</span>
+          <span className="text-foreground/40">{state.season} · WEEK {issue.week}</span>
+          <span>ARENA DISTRICT CORE EDITION</span>
         </div>
         
-        <h2 className="text-4xl md:text-5xl lg:text-6xl text-foreground font-black tracking-tighter leading-[0.9] uppercase text-center md:text-left py-2">
+        <h2 className="text-4xl md:text-6xl lg:text-7xl text-foreground font-black tracking-tighter leading-[0.85] uppercase text-center md:text-left py-2 hover:text-primary transition-colors cursor-default">
           {issue.headline}
         </h2>
 
-        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start">
-          <Badge variant="destructive" className="bg-arena-blood text-white text-[10px] uppercase font-bold px-2 py-0 border-none rounded-none">
-            LATEST
+        <div className="flex flex-wrap gap-3 items-center justify-center md:justify-start">
+          <Badge className="bg-destructive text-destructive-foreground text-[9px] font-black tracking-[0.2em] uppercase px-3 py-1 rounded-none">
+            EXTRA_EDITION
           </Badge>
+          <Separator orientation="vertical" className="h-4 bg-foreground/20" />
           {issue.tags.map(tag => (
-            <span key={tag} className="text-[10px] font-mono font-bold tracking-tighter text-muted-foreground px-2 border-l border-foreground/20 first:border-l-0">
-              #{tag.toUpperCase()}
+            <span key={tag} className="text-[10px] font-mono font-black tracking-widest text-muted-foreground uppercase opacity-80">
+              #{tag}
             </span>
           ))}
         </div>
       </div>
 
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-10 [column-rule:1px_solid_hsl(var(--border))]">
-        <MarkdownReader content={issue.body} />
-      </div>
-      
-      <div className="flex items-center justify-between border-t-2 border-foreground/20 pt-4 mt-4 opacity-70">
-        <span className="text-[9px] font-mono uppercase tracking-[0.3em] font-bold">The Truth remains when the blood dries</span>
-        <div className="flex items-center gap-4">
-            <span className="text-[9px] font-mono uppercase tracking-widest font-bold">Price: 2 Copper</span>
-            <Separator orientation="vertical" className="h-3 bg-foreground/20" />
-            <span className="text-[9px] font-mono uppercase tracking-widest font-bold">Est. 412 AE</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 text-[15px] leading-[1.6] text-justify font-medium">
+        <div className="gazette-content first-letter:text-6xl first-letter:font-black first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:text-primary first-letter:leading-none">
+           <MarkdownReader content={issue.body} />
         </div>
       </div>
-    </article>
+      
+      <div className="flex flex-col md:flex-row items-center justify-between border-t-2 border-foreground/30 pt-6 mt-8 opacity-60">
+        <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 md:mb-0">THE TRUTH REMAINS WHEN THE BLOOD DRIES</span>
+        <div className="flex items-center gap-6">
+            <span className="text-[10px] font-black uppercase tracking-widest">PRICE: 2 COPPER</span>
+            <Separator orientation="vertical" className="h-4 bg-foreground/40" />
+            <span className="text-[10px] font-black uppercase tracking-widest font-mono">EST. 412 AE</span>
+        </div>
+      </div>
+    </motion.article>
   );
 }
 

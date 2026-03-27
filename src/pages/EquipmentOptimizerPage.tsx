@@ -85,70 +85,111 @@ export default function EquipmentOptimizerPage() {
 
       {/* Recommendations */}
       <div className="grid gap-4 sm:grid-cols-2">
-        {recs.map((rec, i) => (
-          <Card key={i} className={i === 0 ? "border-primary/30 glow-primary" : ""}>
-            <CardHeader className="pb-2">
-              <CardTitle className="font-display text-base flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-primary" />
-                  {rec.label}
-                </span>
-                <Badge variant={rec.synergy >= 80 ? "default" : "outline"} className="text-[10px] font-mono">
-                  {rec.synergy}% synergy
-                </Badge>
-              </CardTitle>
-              <p className="text-[11px] text-muted-foreground">{rec.description}</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Gear Slots */}
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <Swords className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium flex-1">{rec.breakdown.weapon.item.name}</span>
-                  {rec.breakdown.weapon.preferred && <Star className="h-3 w-3 text-arena-gold fill-arena-gold" />}
-                  <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.weapon.item.weight} enc</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Shirt className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium flex-1">{rec.breakdown.armor.item.name}</span>
-                  <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.armor.item.weight} enc</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Shield className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className={`text-xs font-medium flex-1 ${rec.breakdown.shield.blocked ? "text-muted-foreground line-through" : ""}`}>
-                    {rec.breakdown.shield.item.name}
-                  </span>
-                  {rec.breakdown.shield.blocked && <span className="text-[9px] text-destructive">2H</span>}
-                  <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.shield.item.weight} enc</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <HardHat className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium flex-1">{rec.breakdown.helm.item.name}</span>
-                  <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.helm.item.weight} enc</Badge>
-                </div>
-              </div>
+        {recs.map((rec, i) => {
+          const matchingWarriors = activeWarriors.filter(w => w.style === selectedStyle);
+          const [targetWarriorId, setTargetWarriorId] = useState<string>(matchingWarriors[0]?.id ?? "");
+          const { doUpdateEquipment } = useGameStore();
 
-              {/* Encumbrance */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Total Encumbrance</span>
-                  <span className={`font-mono font-semibold ${rec.totalWeight > carryCap ? "text-destructive" : ""}`}>
-                    {rec.totalWeight} / {carryCap}
+          const handleApply = () => {
+            if (!targetWarriorId) return;
+            doUpdateEquipment(targetWarriorId, rec.loadout);
+            import("sonner").then(({ toast }) => {
+               const w = matchingWarriors.find(mw => mw.id === targetWarriorId);
+               toast.success(`Applied ${rec.label} to ${w?.name}`);
+            });
+          };
+
+          return (
+            <Card key={i} className={i === 0 ? "border-primary/30 glow-primary" : ""}>
+              <CardHeader className="pb-2">
+                <CardTitle className="font-display text-base flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-primary" />
+                    {rec.label}
                   </span>
+                  <Badge variant={rec.synergy >= 80 ? "default" : "outline"} className="text-[10px] font-mono">
+                    {rec.synergy}% synergy
+                  </Badge>
+                </CardTitle>
+                <p className="text-[11px] text-muted-foreground">{rec.description}</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Gear Slots */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <Swords className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs font-medium flex-1">{rec.breakdown.weapon.item.name}</span>
+                    {rec.breakdown.weapon.preferred && <Star className="h-3 w-3 text-arena-gold fill-arena-gold" />}
+                    <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.weapon.item.weight} enc</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shirt className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs font-medium flex-1">{rec.breakdown.armor.item.name}</span>
+                    <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.armor.item.weight} enc</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className={`text-xs font-medium flex-1 ${rec.breakdown.shield.blocked ? "text-muted-foreground line-through" : ""}`}>
+                      {rec.breakdown.shield.item.name}
+                    </span>
+                    {rec.breakdown.shield.blocked && <span className="text-[9px] text-destructive">2H</span>}
+                    <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.shield.item.weight} enc</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <HardHat className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs font-medium flex-1">{rec.breakdown.helm.item.name}</span>
+                    <Badge variant="outline" className="text-[9px] font-mono">{rec.breakdown.helm.item.weight} enc</Badge>
+                  </div>
                 </div>
-                <Progress
-                  value={Math.min(100, (rec.totalWeight / carryCap) * 100)}
-                  className={`h-2 ${rec.totalWeight > carryCap ? "[&>div]:bg-destructive" : ""}`}
-                />
-                {rec.totalWeight > carryCap && (
-                  <div className="flex items-center gap-1 text-[10px] text-destructive">
-                    <AlertTriangle className="h-3 w-3" /> Over-encumbered
+
+                {/* Encumbrance */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Total Encumbrance</span>
+                    <span className={`font-mono font-semibold ${rec.totalWeight > carryCap ? "text-destructive" : ""}`}>
+                      {rec.totalWeight} / {carryCap}
+                    </span>
+                  </div>
+                  <Progress
+                    value={Math.min(100, (rec.totalWeight / carryCap) * 100)}
+                    className={`h-2 ${rec.totalWeight > carryCap ? "[&>div]:bg-destructive" : ""}`}
+                  />
+                  {rec.totalWeight > carryCap && (
+                    <div className="flex items-center gap-1 text-[10px] text-destructive">
+                      <AlertTriangle className="h-3 w-3" /> Over-encumbered
+                    </div>
+                  )}
+                </div>
+
+                {/* Apply Actions */}
+                {matchingWarriors.length > 0 && (
+                  <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Select value={targetWarriorId} onValueChange={setTargetWarriorId}>
+                        <SelectTrigger className="h-8 text-xs flex-1">
+                          <SelectValue placeholder="Target warrior..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {matchingWarriors.map(w => (
+                            <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        size="sm" 
+                        className="h-8 px-3 text-[10px]" 
+                        onClick={handleApply}
+                        disabled={!targetWarriorId}
+                      >
+                        Apply Loadout
+                      </Button>
+                    </div>
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

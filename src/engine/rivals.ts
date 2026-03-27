@@ -414,7 +414,7 @@ const STABLE_TEMPLATES: StableTemplate[] = [
 
 // ─── RNG ──────────────────────────────────────────────────────────────────
 
-function seededRng(seed: number) {
+export function seededRng(seed: number) {
   return () => {
     seed = (seed * 1103515245 + 12345) & 0x7fffffff;
     return seed / 0x7fffffff;
@@ -482,7 +482,7 @@ const PHILOSOPHY_TO_FOCUS: Record<string, ("Aggression" | "Defense" | "Endurance
   "Specialist": ["Aggression", "Defense", "Mind"],
 };
 
-function generateStableTrainers(
+export function generateStableTrainers(
   rng: () => number,
   stableId: string,
   philosophy: string,
@@ -689,4 +689,65 @@ export function calculateRivalryScore(
   score += upsetsCount * 3;
   
   return Math.max(1, Math.min(5, score));
+}
+
+/**
+ * Weekly update for a rival stable: training, trainer aging, and management.
+ */
+export function processRivalStableWeekly(
+  rival: RivalStableData,
+  rng: () => number,
+  week: number
+): { rival: RivalStableData; gazetteItems: string[] } {
+  const gazetteItems: string[] = [];
+  
+  // 1) Update trainers
+  let updatedTrainers = (rival.trainers || []).map(t => ({
+    ...t,
+    contractWeeksLeft: (t.contractWeeksLeft ?? 52) - 1
+  }));
+  
+  // Replace expired trainers
+  const active = updatedTrainers.filter(t => t.contractWeeksLeft > 0);
+  if (active.length < (rival.trainers || []).length) {
+    const expiredCount = (rival.trainers || []).length - active.length;
+    const template = STABLE_TEMPLATES.find(t => t.stableName === rival.owner.stableName);
+    const fresh = generateStableTrainers(
+      rng, 
+      rival.owner.id, 
+      template?.philosophy ?? "Balanced",
+      expiredCount, 
+      new Set(), 
+      rival.tier
+    );
+    updatedTrainers = [...active, ...fresh];
+  }
+
+  // 2) Warrior Training (Simulated)
+  // AI warriors gain attributes slowly based on their potential.
+  const updatedRoster = rival.roster.map(w => {
+    if (w.status !== "Active") return w;
+    
+    // Base 2% chance + 2% per trainer
+    const baseChance = 0.02 + (active.length * 0.02);
+    if (rng() < baseChance) {
+      const keys = (Object.keys(w.attributes) as (keyof typeof w.attributes)[]).filter(k => k !== "SZ");
+      const chosen = keys[Math.floor(rng() * keys.length)];
+      
+      const val = w.attributes[chosen];
+      const pot = w.potential?.[chosen] ?? 20;
+      
+      if (val < pot && val < 25) {
+        const newAttrs = { ...w.attributes, [chosen]: val + 1 };
+        const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, w.style);
+        return { ...w, attributes: newAttrs, baseSkills, derivedStats };
+      }
+    }
+    return w;
+  });
+
+  return { 
+    rival: { ...rival, trainers: updatedTrainers as any, roster: updatedRoster }, 
+    gazetteItems 
+  };
 }

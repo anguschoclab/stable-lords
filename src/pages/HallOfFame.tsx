@@ -9,8 +9,10 @@ import type { Warrior, FightSummary, NewsletterItem } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Crown, Skull, Star, Shield, Flame } from "lucide-react";
+import { Crown, Skull, Star, Shield, Flame, Swords, Trophy, Activity } from "lucide-react";
 import { InducteeCard } from "./HallOfFame/InducteeCard";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ── Main Page ───────────────────────────────────────────── */
 
@@ -84,24 +86,31 @@ export default function HallOfFame() {
   return (
     <div className="space-y-8">
       {/* Masthead */}
-      <div className="text-center space-y-2 py-4">
-        <div className="flex items-center justify-center gap-3">
-          <Separator className="w-16" />
-          <Crown className="h-6 w-6 text-arena-gold" />
-          <Separator className="w-16" />
+      <div className="text-center space-y-4 py-8 relative overflow-hidden bg-glass-card rounded-3xl border border-border/40">
+        <div className="absolute inset-0 bg-gradient-to-b from-arena-gold/5 to-transparent pointer-events-none" />
+        <div className="flex items-center justify-center gap-4 relative z-10">
+          <Separator className="w-16 bg-arena-gold/20" />
+          <div className="p-3 rounded-full bg-arena-gold/10 border border-arena-gold/20 shadow-[0_0_20px_rgba(var(--arena-gold-rgb),0.2)]">
+            <Crown className="h-8 w-8 text-arena-gold" />
+          </div>
+          <Separator className="w-16 bg-arena-gold/20" />
         </div>
-        <h1 className="font-display text-3xl sm:text-4xl tracking-wide text-foreground">
-          Hall of Fame
-        </h1>
-        <p className="text-sm text-muted-foreground font-mono tracking-widest uppercase">
-          Legends of the Arena
-        </p>
-        <div className="flex items-center justify-center gap-2">
-          <Separator className="w-24" />
-          <span className="text-[10px] text-muted-foreground font-mono">
-            Year {currentYear + 1} · Week {state.week}
-          </span>
-          <Separator className="w-24" />
+        <div className="relative z-10">
+          <h1 className="font-display text-4xl sm:text-6xl font-black tracking-tighter text-foreground uppercase">
+            Hall of Fame
+          </h1>
+          <p className="text-[10px] text-muted-foreground font-black tracking-[0.4em] uppercase opacity-60 mt-2">
+            LEGENDS_OF_THE_ARENA · ETERNAL_CHRONICLE
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-3 relative z-10">
+          <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-arena-gold/20 bg-arena-gold/5 text-arena-gold">
+            YEAR {currentYear + 1}
+          </Badge>
+          <Separator orientation="vertical" className="h-4 bg-border/20" />
+          <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-primary/20 bg-primary/5 text-primary">
+            WEEK {state.week}
+          </Badge>
         </div>
       </div>
 

@@ -33,13 +33,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { GraduationCap, UserPlus, UserMinus, RefreshCw, Armchair, Sparkles, Clock, Coins, Trophy } from "lucide-react";
+import { GraduationCap, UserPlus, UserMinus, RefreshCw, Armchair, Sparkles, Clock, Coins, Trophy, Zap, Target } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const TIER_COLORS: Record<string, string> = {
-  Novice: "text-muted-foreground",
-  Seasoned: "text-arena-pop",
-  Master: "text-arena-gold",
+const TIER_ACCENTS: Record<string, string> = {
+  Novice: "border-border/40 text-muted-foreground",
+  Seasoned: "border-blue-500/40 text-blue-400 bg-blue-500/10",
+  Master: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_15px_-5px_rgba(255,215,0,0.3)]",
 };
 
 function TrainerCard({
@@ -52,67 +53,80 @@ function TrainerCard({
   owned: boolean;
 }) {
   const icon = FOCUS_ICONS[trainer.focus as TrainerFocus] ?? "📋";
-  const tierColor = TIER_COLORS[trainer.tier] ?? "";
+  const tierAccent = TIER_ACCENTS[trainer.tier] ?? "";
   const desc = FOCUS_DESCRIPTIONS[trainer.focus as TrainerFocus] ?? "";
   const bonus = TIER_BONUS[trainer.tier as TrainerTier] ?? 1;
 
   return (
-    <Card className="border-border/40 bg-background shadow-sm hover:border-primary/50 transition-colors">
-      <CardContent className="p-0 flex items-stretch">
-        <div className="w-1.5 bg-primary/40 shrink-0" />
-        <div className="p-4 flex-1">
+    <Card className={cn(
+      "bg-glass-card border overflow-hidden transition-all duration-300 group",
+      tierAccent
+    )}>
+      <CardContent className="p-0 flex items-stretch min-h-[120px]">
+        <div className={cn("w-1.5 shrink-0", trainer.tier === "Master" ? "bg-arena-gold" : "bg-primary/40")} />
+        <div className="p-5 flex-1">
           <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded bg-secondary/80 border border-border flex items-center justify-center shrink-0 shadow-sm text-2xl">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 rounded-xl bg-background/40 border border-border/20 flex items-center justify-center shrink-0 shadow-inner text-2xl group-hover:scale-110 transition-transform">
                 {icon}
               </div>
               <div>
-                <div className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                <div className="font-display text-xl font-black uppercase tracking-tight text-foreground flex items-center gap-2">
                   {trainer.name}
+                  {trainer.tier === "Master" && <Badge className="bg-arena-gold text-black text-[9px] font-black h-4 px-1">ELITE</Badge>}
                 </div>
-                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                  <Badge variant="outline" className={`text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 bg-secondary/50 ${tierColor}`}>
-                    {trainer.tier} TIER
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-0.5", tierAccent)}>
+                    {trainer.tier} GRADE
                   </Badge>
-                  <span className="text-border">|</span>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{trainer.focus} SPECIALIST</span>
+                  <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest flex items-center gap-1">
+                     <Target className="h-3 w-3" /> {trainer.focus} SPECIALIST
+                  </span>
                   {trainer.retiredFromWarrior && (
-                    <>
-                      <span className="text-border">|</span>
-                      <Badge variant="outline" className="text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 text-arena-fame border-arena-fame/30 bg-arena-fame/10">
-                        <Armchair className="h-2 w-2 mr-1" /> EX-{trainer.retiredFromWarrior.toUpperCase()}
-                      </Badge>
-                    </>
+                    <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 text-arena-fame border-arena-fame/30 bg-arena-fame/5">
+                      <GraduationCap className="h-2.5 w-2.5 mr-1" /> EX-{trainer.retiredFromWarrior.toUpperCase()}
+                    </Badge>
                   )}
                 </div>
               </div>
             </div>
             {owned && onFire && (
-              <Button variant="ghost" size="icon" onClick={onFire} title="Release trainer" aria-label="Release trainer" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0">
+              <Button variant="ghost" size="icon" onClick={onFire} className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0 h-8 w-8">
                 <UserMinus className="h-4 w-4" />
               </Button>
             )}
           </div>
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-             <div className="bg-secondary/5 px-3 py-2 rounded border border-border/20 text-xs text-muted-foreground">
-                <span className="text-[9px] uppercase tracking-wider font-bold block mb-1">Focus & Bonus</span>
-                <span className="flex items-center gap-1.5 font-medium text-foreground">
-                  <Sparkles className="h-3 w-3 text-primary" /> +{bonus} to {trainer.focus} gains
-                </span>
-                {trainer.styleBonusStyle && (
-                  <span className="flex items-center gap-1.5 font-medium text-arena-gold mt-1">
-                     <Trophy className="h-3 w-3" /> +1 for {STYLE_DISPLAY_NAMES[trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? trainer.styleBonusStyle}
+          
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="bg-background/20 px-4 py-2.5 rounded-xl border border-border/20 flex items-center justify-between">
+                <div>
+                  <span className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground block">STAFF PERFORMANCE</span>
+                  <span className="flex items-center gap-1.5 font-bold text-sm text-primary">
+                    <Sparkles className="h-3.5 w-3.5" /> +{bonus} TO {trainer.focus.toUpperCase()}
                   </span>
+                </div>
+                {trainer.styleBonusStyle && (
+                  <div className="text-right">
+                    <span className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground block">STYLE MASTERY</span>
+                    <span className="flex items-center gap-1.5 font-bold text-xs text-arena-gold">
+                       <Trophy className="h-3 w-3" /> {STYLE_DISPLAY_NAMES[trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? trainer.styleBonusStyle}
+                    </span>
+                  </div>
                 )}
              </div>
-             <div className="flex flex-col justify-center">
+             
+             <div className="flex items-center h-full">
                  {owned ? (
-                     <div className="bg-secondary/5 px-3 py-2 rounded border border-border/20 text-xs flex items-center justify-between">
-                         <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">Contract Remaining</span>
-                         <span className="font-mono font-bold flex items-center gap-1"><Clock className="h-3 w-3" /> {trainer.contractWeeksLeft} WEEKS</span>
+                     <div className="w-full bg-secondary/10 px-4 py-2 rounded-lg border border-border/10 flex items-center justify-between">
+                         <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">CONTRACT DURATION</span>
+                         <span className="font-mono font-bold text-xs flex items-center gap-1.5">
+                           <Clock className="h-3.5 w-3.5 text-arena-fame" /> {trainer.contractWeeksLeft} WEEKS
+                         </span>
                      </div>
                  ) : (
-                     <p className="text-[11px] text-muted-foreground italic leading-tight">{desc}</p>
+                     <p className="text-[11px] text-muted-foreground italic leading-snug pl-3 border-l-2 border-primary/20">
+                       {desc}
+                     </p>
                  )}
              </div>
           </div>
@@ -288,22 +302,28 @@ export default function Trainers() {
 
           {/* Training Bonuses Summary */}
           {currentTrainers.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="font-display text-lg">Active Bonuses</CardTitle>
+            <Card className="bg-glass border-neon-gold border-2 overflow-hidden">
+              <CardHeader className="pb-3 border-b border-arena-gold/20 bg-arena-gold/5">
+                <CardTitle className="font-display font-black uppercase text-xs tracking-widest text-arena-gold flex items-center gap-2">
+                   <Zap className="h-4 w-4" /> Aggregated Training Multipliers
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-3">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {TRAINER_FOCUSES.map((focus) => {
                     const total = currentTrainers
                       .filter((t) => t.focus === focus && t.contractWeeksLeft > 0)
                       .reduce((sum, t) => sum + (TIER_BONUS[t.tier as TrainerTier] ?? 1), 0);
                     if (total === 0) return null;
                     return (
-                      <div key={focus} className="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-2 border border-border">
-                        <span>{FOCUS_ICONS[focus]}</span>
-                        <span className="text-sm font-semibold">+{total}</span>
-                        <span className="text-xs text-muted-foreground">{focus}</span>
+                      <div key={focus} className="group relative overflow-hidden flex flex-col items-center gap-2 rounded-2xl bg-background/40 p-4 border border-border/40 hover:border-primary/50 transition-all">
+                        <div className="text-3xl filter saturate-50 group-hover:saturate-100 transition-all">
+                          {FOCUS_ICONS[focus]}
+                        </div>
+                        <div className="text-center">
+                          <span className="text-2xl font-display font-black text-primary block">+{total}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">{focus}</span>
+                        </div>
                       </div>
                     );
                   })}

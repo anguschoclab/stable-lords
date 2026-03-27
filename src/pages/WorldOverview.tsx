@@ -7,13 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowUpDown, Crown, Skull, Swords, TrendingUp, Trophy } from "lucide-react";
-import type { RivalStableData, Warrior } from "@/types/game";
+import { ArrowUpDown, Crown, Skull, Swords, TrendingUp, Trophy, Activity, Brain, Shield, Zap, Eye, Target, Quote } from "lucide-react";
+import type { RivalStableData, Warrior, FightingStyle } from "@/types/game";
 import { getStableTemplates } from "@/engine/rivals";
+import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
+import { STYLE_DISPLAY_NAMES } from "@/types/game";
+import { cn } from "@/lib/utils";
 
 type SortDir = "asc" | "desc";
-
-
 
 type SortField = "rank" | "name" | "fame" | "wins" | "losses" | "kills" | "winRate" | "roster" | "tier";
 
@@ -49,11 +50,12 @@ interface WarriorRow {
   isPlayer: boolean;
 }
 
-const TIER_COLORS: Record<string, string> = {
-  Legendary: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-  Major: "bg-purple-500/20 text-purple-300 border-purple-500/40",
-  Established: "bg-blue-500/20 text-blue-300 border-blue-500/40",
-  Minor: "bg-muted text-muted-foreground border-border",
+const TIER_ACCENTS: Record<string, string> = {
+  Legendary: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_15px_-5px_hsl(var(--arena-gold)/0.4)]",
+  Major: "border-purple-500/50 text-purple-400 bg-purple-500/10",
+  Established: "border-blue-500/40 text-blue-400 bg-blue-500/10",
+  Minor: "border-border/40 text-muted-foreground bg-secondary/20",
+  Player: "border-primary text-primary bg-primary/10 shadow-[0_0_15px_-5px_hsl(var(--primary)/0.4)]",
 };
 
 export default function WorldOverview() {
@@ -176,9 +178,6 @@ export default function WorldOverview() {
     }));
   };
 
-
-
-  // Summary stats
   const totalWarriors = stableRows.reduce((s, r) => s + r.roster, 0);
   const totalKills = stableRows.reduce((s, r) => s + r.kills, 0);
   const topStable = stableRows[0];
@@ -192,53 +191,37 @@ export default function WorldOverview() {
         </p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Trophy className="h-5 w-5 text-amber-400" />
-            <div>
-              <p className="text-xs text-muted-foreground">Stables</p>
-              <p className="text-xl font-bold font-mono">{stableRows.length}</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { icon: Trophy, label: "STABLES", value: stableRows.length, color: "text-arena-gold" },
+          { icon: Swords, label: "ACTIVE WARRIORS", value: totalWarriors, color: "text-primary" },
+          { icon: Skull, label: "TOTAL KILLS", value: totalKills, color: "text-destructive" },
+          { icon: Crown, label: "TOP STABLE", value: topStable?.name ?? "—", color: "text-arena-gold", smallValue: true },
+        ].map((item, idx) => (
+          <Card key={idx} className="bg-glass-card border-border/40 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+               <item.icon className={cn("h-12 w-12", item.color)} />
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Swords className="h-5 w-5 text-primary" />
-            <div>
-              <p className="text-xs text-muted-foreground">Active Warriors</p>
-              <p className="text-xl font-bold font-mono">{totalWarriors}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Skull className="h-5 w-5 text-destructive" />
-            <div>
-              <p className="text-xs text-muted-foreground">Total Kills</p>
-              <p className="text-xl font-bold font-mono">{totalKills}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Crown className="h-5 w-5 text-amber-400" />
-            <div>
-              <p className="text-xs text-muted-foreground">Top Stable</p>
-              <p className="text-sm font-semibold truncate">{topStable?.name ?? "—"}</p>
-            </div>
-          </CardContent>
-        </Card>
+            <CardContent className="p-4 flex flex-col justify-center min-h-[80px]">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{item.label}</span>
+              <p className={cn(
+                "font-display font-black truncate",
+                item.smallValue ? "text-sm" : "text-2xl"
+              )}>
+                {item.value}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Tabs defaultValue="stables">
         <TabsList>
           <TabsTrigger value="stables">Stable Rankings</TabsTrigger>
           <TabsTrigger value="warriors">Warrior Leaderboard</TabsTrigger>
+          <TabsTrigger value="intel">Intelligence</TabsTrigger>
         </TabsList>
 
-        {/* ── Stable League Table ── */}
         <TabsContent value="stables">
           <Card>
             <CardHeader className="pb-2">
@@ -275,42 +258,42 @@ export default function WorldOverview() {
                 </TableHeader>
                 <TableBody>
                   {stableRows.map((row, i) => (
-                    <TableRow key={row.id} className={row.isPlayer ? "bg-primary/5" : ""}>
-                      <TableCell className="font-mono text-muted-foreground text-xs">{i + 1}</TableCell>
+                    <TableRow key={row.id} className={cn(row.isPlayer ? "bg-primary/5" : "hover:bg-secondary/20")}>
+                      <TableCell className="font-mono text-muted-foreground text-[10px] font-black">{i + 1}</TableCell>
                       <TableCell>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link
                                 to={row.isPlayer ? "/" : `/stable/${row.id}` as any}
-                                className="font-semibold hover:text-primary transition-colors"
+                                className={cn("font-display font-black uppercase text-xs tracking-tight transition-colors", row.isPlayer ? "text-primary" : "text-foreground hover:text-primary")}
                               >
                                 {row.name}
-                                {row.isPlayer && <span className="ml-1.5 text-[10px] text-primary">(You)</span>}
+                                {row.isPlayer && <span className="ml-1.5 text-[9px] font-bold opacity-50">(STAFF)</span>}
                               </Link>
                             </TooltipTrigger>
                             {row.motto && (
-                              <TooltipContent side="right" className="text-xs italic max-w-48">
+                              <TooltipContent side="right" className="text-[10px] italic max-w-48 bg-glass-card font-bold border-primary/20">
                                 "{row.motto}"
                               </TooltipContent>
                             )}
                           </Tooltip>
                         </TooltipProvider>
-                        <p className="text-[11px] text-muted-foreground">{row.ownerName}</p>
+                        <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60">{row.ownerName}</p>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        <Badge variant="outline" className={`text-[10px] ${TIER_COLORS[row.tier] || TIER_COLORS.Minor}`}>
+                        <Badge variant="outline" className={cn("text-[8px] font-black uppercase tracking-widest px-2 py-0", TIER_ACCENTS[row.tier] || TIER_ACCENTS.Minor)}>
                           {row.tier}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-mono">{row.fame}</TableCell>
-                      <TableCell className="text-right font-mono text-green-400">{row.wins}</TableCell>
-                      <TableCell className="text-right font-mono text-red-400">{row.losses}</TableCell>
-                      <TableCell className="text-right font-mono">
+                      <TableCell className="text-right font-mono font-bold text-xs">{row.fame}</TableCell>
+                      <TableCell className="text-right font-mono font-bold text-xs text-primary">{row.wins}</TableCell>
+                      <TableCell className="text-right font-mono font-bold text-xs text-muted-foreground/40">{row.losses}</TableCell>
+                      <TableCell className="text-right font-mono font-bold text-xs">
                         {row.winRate > 0 ? `${row.winRate}%` : "—"}
                       </TableCell>
-                      <TableCell className="text-right font-mono text-destructive">{row.kills}</TableCell>
-                      <TableCell className="text-right font-mono hidden sm:table-cell">{row.roster}</TableCell>
+                      <TableCell className="text-right font-mono font-bold text-xs text-destructive">{row.kills}</TableCell>
+                      <TableCell className="text-right font-mono font-bold text-xs hidden sm:table-cell">{row.roster}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -319,7 +302,6 @@ export default function WorldOverview() {
           </Card>
         </TabsContent>
 
-        {/* ── Warrior Leaderboard ── */}
         <TabsContent value="warriors">
           <Card>
             <CardHeader className="pb-2">
@@ -392,13 +374,77 @@ export default function WorldOverview() {
                   ))}
                 </TableBody>
               </Table>
-              {warriorRows.length > 50 && (
-                <p className="text-xs text-muted-foreground text-center py-3">
-                  Showing top 50 of {warriorRows.length} warriors
-                </p>
-              )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="intel" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+              <MetaDriftWidget />
+            </div>
+            <div className="lg:col-span-2 space-y-4">
+              <Card>
+                <CardHeader className="pb-2 border-b">
+                  <CardTitle className="text-base font-display flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-primary" /> Rival Intelligence
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 px-0">
+                  <div className="space-y-0 text-left">
+                    {state.rivals?.map((rival) => (
+                      <div key={rival.owner.id} className="px-5 py-4 border-b border-border/20 last:border-0 hover:bg-primary/5 transition-all group">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-4 text-left">
+                             <div className="w-10 h-10 rounded-lg bg-secondary/40 border border-border/20 flex items-center justify-center font-display font-black text-xs text-muted-foreground group-hover:text-primary transition-colors">
+                                {rival.owner.stableName.charAt(0)}
+                             </div>
+                             <div>
+                                <h4 className="font-display font-black uppercase text-sm tracking-tight text-foreground group-hover:text-primary transition-colors">{rival.owner.stableName}</h4>
+                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-60">OWNER: {rival.owner.name} · {rival.owner.personality || "Neutral"}</p>
+                             </div>
+                          </div>
+                          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-[0.2em] py-0.5 border-primary/20 bg-primary/5 text-primary">
+                            {rival.owner.metaAdaptation || "STABLE"} INTEL
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pl-14 text-left">
+                          <div className="relative">
+                             <Quote className="h-4 w-4 text-primary/10 absolute -top-2 -left-3" />
+                             <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">RIVAL PHILOSOPHY</span>
+                             <p className="text-[11px] leading-relaxed italic border-l-2 border-primary/20 pl-3">"{rival.philosophy || "Focusing on core martial excellence."}"</p>
+                          </div>
+                          <div className="space-y-2">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block">FAVORED DOCTRINES</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {rival.owner.favoredStyles && (rival.owner.favoredStyles as FightingStyle[]).length > 0 ? (
+                                (rival.owner.favoredStyles as FightingStyle[]).map((s) => (
+                                  <Badge key={s} variant="outline" className="text-[9px] font-bold py-0.5 px-2 bg-background/40 border-border/40">
+                                    {STYLE_DISPLAY_NAMES[s]}
+                                  </Badge>
+                                ))
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground italic">Adaptive style focus</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-4 flex items-start gap-3">
+                  <Zap className="h-4 w-4 text-primary mt-0.5" />
+                  <div className="text-xs text-muted-foreground leading-relaxed">
+                    <span className="font-bold text-foreground">Scouting Perspective:</span> Rival owners move with the meta at different speeds. **Innovators** will pivot their training programs weeks before a style becomes dominant, while **Traditionalists** may stubbornly stick to declining styles. Use this intel to predict who will be "meta-ready" in future tournaments.
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

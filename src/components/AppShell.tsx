@@ -2,10 +2,18 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import { Swords, LayoutDashboard, Zap, Trophy, HelpCircle, RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, LogOut, PanelLeftClose, PanelLeft, Save, Download, Dumbbell, Sun, Moon, Search, Globe, Newspaper, Crown, Shield, BarChart3, Target, Award, BookOpen, Eye, Landmark, Settings, Users } from "lucide-react";
+import { 
+  Swords, LayoutDashboard, Zap, Trophy, HelpCircle, 
+  RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, 
+  LogOut, PanelLeftClose, PanelLeft, Save, Download, 
+  Dumbbell, Sun, Moon, Search, Globe, Newspaper, 
+  Crown, Shield, BarChart3, Target, Award, BookOpen, 
+  Eye, Landmark, Settings, Users, Activity
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGameStore } from "@/state/useGameStore";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { MOOD_ICONS } from "@/engine/crowdMood";
 import {
   AlertDialog,
@@ -17,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useCoachTip } from "@/hooks/useCoachTip";
 import { getActiveSlot, deleteSlot, exportActiveSlot } from "@/state/saveSlots";
@@ -24,41 +33,46 @@ import EventLog from "@/components/EventLog";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useRivalryAlerts } from "@/hooks/useRivalryAlerts";
 
-const pillars = [
-  { id: "hub", label: "Hub", to: "/", icon: LayoutDashboard },
-  { id: "stable", label: "Stable", to: "/stable", icon: Shield },
-  { id: "world", label: "World", to: "/world", icon: Globe },
-  { id: "legacy", label: "Legacy", to: "/legacy", icon: Skull },
+const NAV_SECTIONS = [
+  {
+    id: "hub",
+    label: "Management",
+    items: [
+      { to: "/", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/run-round", label: "Arena Combat", icon: Swords },
+    ]
+  },
+  {
+    id: "stable",
+    label: "My Stable",
+    items: [
+      { to: "/stable", label: "Roster", icon: Users },
+      { to: "/stable/training", label: "Training", icon: Dumbbell },
+      { to: "/stable/recruit", label: "Recruitment", icon: UserPlus },
+      { to: "/stable/equipment", label: "Armory", icon: Shield },
+      { to: "/stable/planner", label: "Tactics", icon: BarChart3 },
+    ]
+  },
+  {
+    id: "world",
+    label: "The World",
+    items: [
+      { to: "/world", label: "Power Rankings", icon: Globe },
+      { to: "/world/tournaments", label: "Tournaments", icon: Trophy },
+      { to: "/world/scouting", label: "Scouting", icon: Search },
+      { to: "/world/gazette", label: "Daily Gazette", icon: Newspaper },
+    ]
+  },
+  {
+    id: "legacy",
+    label: "Archive",
+    items: [
+      { to: "/legacy", label: "Graveyard", icon: Skull },
+      { to: "/legacy/hall-of-fame", label: "Hall of Fame", icon: Crown },
+      { to: "/legacy/analytics", label: "Kill Stats", icon: Target },
+    ]
+  }
 ];
-
-const subNavItems: Record<string, { to: string; label: string; icon: any }[]> = {
-  hub: [
-    { to: "/", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/run-round", label: "Run Round", icon: Zap },
-  ],
-  stable: [
-    { to: "/stable", label: "Roster", icon: Users },
-    { to: "/stable/training", label: "Training", icon: Dumbbell },
-    { to: "/stable/recruit", label: "Recruit", icon: UserPlus },
-    { to: "/stable/equipment", label: "Gear", icon: Shield },
-    { to: "/stable/planner", label: "Planner", icon: BarChart3 },
-    { to: "/stable/trainers", label: "Trainers", icon: GraduationCap },
-    { to: "/stable/finance", label: "Finance", icon: BookOpen },
-  ],
-  world: [
-    { to: "/world", label: "Overview", icon: Globe },
-    { to: "/world/tournaments", label: "Tournaments", icon: Trophy },
-    { to: "/world/scouting", label: "Scouting", icon: Search },
-    { to: "/world/gazette", label: "Gazette", icon: Newspaper },
-    { to: "/world/history", label: "Chronicle", icon: ScrollText },
-  ],
-  legacy: [
-    { to: "/legacy", label: "Graveyard", icon: Skull },
-    { to: "/legacy/hall-of-fame", label: "Hall of Fame", icon: Crown },
-    { to: "/legacy/analytics", label: "Kill Stats", icon: Target },
-    { to: "/legacy/awards", label: "Awards", icon: Award },
-  ],
-};
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -69,29 +83,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [saveFlash, setSaveFlash] = useState(false);
 
-  // Determine active pillar based on path
-  const activePillar = pillars.find(p =>
-    p.to === "/" ? location.pathname === "/" || location.pathname === "/run-round" : location.pathname.startsWith(p.to)
-  )?.id || "hub";
-
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
 
   useCoachTip(location.pathname);
   useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
   useRivalryAlerts();
 
-  // FTUE / Orphanage Redirection logic
   useEffect(() => {
     const isOrphan = state.roster.filter(w => w.status === "Active").length < 3;
     if (isOrphan && location.pathname !== "/welcome") {
       if (typeof window !== "undefined") {
-        // Use a soft redirect if possible, but window.location works for forcing state
         window.location.href = "/welcome";
       }
     }
   }, [state.roster, location.pathname]);
 
-  // Flash the save indicator briefly when a save occurs
   useEffect(() => {
     if (!lastSavedAt) return;
     setSaveFlash(true);
@@ -106,284 +112,283 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     } catch { return ""; }
   };
 
+  const activePath = location.pathname;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* ─── Top Nav Bar ─── */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-12 items-center justify-between px-4">
-          {/* Left: Logo + Nav */}
-          <div className="flex items-center gap-1">
-            <Link to="/" className="flex items-center gap-2 mr-4">
-              <Swords className="h-5 w-5 text-arena-gold" />
-              <span className="font-display font-bold text-base tracking-wide hidden sm:inline">
-                Stable Lords
+    <div className="min-h-screen bg-background flex flex-col overflow-hidden text-foreground">
+      {/* ─── Global Status Header ─── */}
+      <header className="h-14 border-b border-border/60 bg-glass backdrop-blur-md z-50 flex items-center justify-between px-6 sticky top-0 flex-shrink-0">
+        <div className="flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-3 group">
+            <motion.div 
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20"
+            >
+              <Swords className="h-5 w-5 text-background" />
+            </motion.div>
+            <div className="flex flex-col">
+              <span className="font-display font-black text-sm tracking-tight leading-none uppercase group-hover:text-primary transition-colors">
+                {state.player.stableName}
               </span>
-            </Link>
+              <span className="text-[10px] text-muted-foreground font-bold tracking-widest leading-none mt-1 uppercase">
+                Est. Year {new Date(state.meta.createdAt).getFullYear()}
+              </span>
+            </div>
+          </Link>
 
-            {/* Toggle sidebar on mobile */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden h-8 w-8 text-muted-foreground"
-              onClick={toggleSidebar}
-              aria-label="Toggle sidebar"
-            >
-              {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
-            </Button>
+          <Separator orientation="vertical" className="h-6 bg-border/40" />
 
-            <nav className="hidden md:flex items-center gap-1">
-              {!state.isFTUE && pillars.map((pillar) => {
-                const Icon = pillar.icon;
-                const active = activePillar === pillar.id;
-                return (
-                  <Link
-                    key={pillar.id}
-                    to={pillar.to}
-                    className={cn(
-                      "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold transition-all",
-                      active
-                        ? "bg-primary text-primary-foreground shadow-sm scale-105"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {pillar.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* Right: Status + Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Auto-save indicator */}
-            {lastSavedAt && (
-              <div
-                className={cn(
-                  "hidden sm:flex items-center gap-1 text-[10px] font-mono transition-colors duration-500",
-                  saveFlash ? "text-arena-pop" : "text-muted-foreground/50"
-                )}
-                title={`Last saved: ${new Date(lastSavedAt).toLocaleString()}`}
+          <div className="hidden lg:flex items-center gap-6">
+            <div className="flex flex-col">
+              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">Chronicle</span>
+              <span className="text-xs font-mono font-bold">W{state.week} · {state.season}</span>
+            </div>
+            <div className="flex flex-col px-3 border-l border-border/20">
+              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">Treasury</span>
+              <motion.span 
+                key={state.gold}
+                initial={{ scale: 1.2, color: "#facc15" }}
+                animate={{ scale: 1, color: "var(--arena-gold)" }}
+                className="text-xs font-mono font-bold"
               >
-                <Save className={cn("h-3 w-3 transition-transform duration-300", saveFlash && "scale-110")} />
-                <span>{formatSaveTime(lastSavedAt)}</span>
+                ${state.gold}
+              </motion.span>
+            </div>
+            <div className="flex flex-col px-3 border-l border-border/20">
+              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">Mood</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs">{moodIcon}</span>
+                <span className="text-[10px] font-bold uppercase text-accent tracking-tighter">{state.crowdMood}</span>
               </div>
-            )}
-            <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 hidden sm:flex">
-              {moodIcon} Wk {state.week} · {state.season}
-            </Badge>
-            <Badge variant="outline" className="text-[11px] font-mono text-muted-foreground gap-1 sm:hidden">
-              {moodIcon} W{state.week}
-            </Badge>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={exportActiveSlot}
-              title="Export Save"
-              aria-label="Export Save"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hidden sm:inline-flex"
-            >
-              <Download className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              title="Toggle theme"
-              aria-label="Toggle theme"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            >
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {lastSavedAt && (
+             <div className={cn(
+               "flex items-center gap-1.5 text-[10px] font-bold font-mono px-2 py-1 rounded bg-secondary/40 transition-colors",
+               saveFlash ? "text-primary bg-primary/10 border border-primary/20" : "text-muted-foreground/60"
+             )}>
+               <Save className="h-3 w-3" />
+               <span>{formatSaveTime(lastSavedAt)}</span>
+             </div>
+          )}
+          
+          <Separator orientation="vertical" className="h-6 bg-border/40 hidden sm:block" />
+
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
               {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={returnToTitle}
-              title="Return to Title Screen"
-              aria-label="Return to Title Screen"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setResetOpen(true)}
-              title="Delete Save"
-              aria-label="Delete Save"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive"
-            >
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setResetOpen(true)}>
               <RotateCcw className="h-3.5 w-3.5" />
             </Button>
-
-            <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="font-display">Delete This Save?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete "{state.player.stableName}" and all its warriors, fight history, and tournament progress. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      const slotId = getActiveSlot();
-                      if (slotId) deleteSlot(slotId);
-                      doReset();
-                      setResetOpen(false);
-                    }}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Delete Save
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={returnToTitle}>
+              <LogOut className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </div>
-
-        {/* ─── Sticky Sub-Nav ─── */}
-        {!state.isFTUE && subNavItems[activePillar] && (
-          <div className="border-t border-border/40 bg-muted/30 px-4 py-1 flex items-center gap-4 overflow-x-auto no-scrollbar">
-            {subNavItems[activePillar].map((item) => {
-              const active = location.pathname === item.to;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
-                    active
-                      ? "bg-background text-foreground shadow-sm ring-1 ring-border"
-                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                  )}
-                >
-                  <Icon className="h-3 w-3" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Mobile nav row */}
-        <nav className="md:hidden border-t border-border/50 flex gap-0.5 px-2 py-1.5 overflow-x-auto">
-          {!state.isFTUE && pillars.map((item) => {
-            const Icon = item.icon;
-            const active = activePillar === item.id;
-            return (
-              <Link
-                key={item.id}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-colors",
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-secondary/40"
-                )}
-              >
-                <Icon className="h-3 w-3" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
       </header>
 
-      {/* ─── Body: Sidebar + Main ─── */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Event Log Sidebar */}
-        {/* Mobile overlay sidebar */}
-        {sidebarOpen && (
-          <div
-            className="md:hidden fixed inset-0 z-30 bg-black/40"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-        <aside
-          className={cn(
-            "border-r border-border bg-background flex-shrink-0 transition-all duration-200 overflow-hidden z-40",
-            "md:relative md:z-auto",
-            sidebarOpen
-              ? "fixed inset-y-0 left-0 w-72 md:static md:w-64 lg:w-72"
-              : "w-0"
-          )}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* ─── Persistent Left Sidebar ─── */}
+        <motion.aside 
+          initial={false}
+          animate={{ 
+            width: sidebarOpen ? 256 : (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 80 : 0),
+            marginLeft: sidebarOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 0 : -256)
+          }}
+          className="border-r border-border/60 bg-secondary/10 flex flex-col z-40 relative overflow-hidden h-full"
         >
-          <div className="h-full md:h-[calc(100vh-3rem)] md:sticky md:top-12">
-            <EventLog />
+          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8 no-scrollbar">
+            {NAV_SECTIONS.map((section) => (
+              <div key={section.id} className="space-y-2">
+                <h3 className={cn(
+                  "text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-3 mb-3",
+                  !sidebarOpen && "lg:text-center lg:px-0"
+                )}>
+                  {sidebarOpen ? section.label : section.label[0]}
+                </h3>
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const active = activePath === item.to || (item.to !== "/" && activePath.startsWith(item.to));
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                      >
+                        <motion.div
+                          whileHover={{ x: 4, backgroundColor: active ? "var(--primary)" : "rgba(255,255,255,0.05)" }}
+                          whileTap={{ scale: 0.98 }}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all group relative",
+                            active 
+                              ? "bg-primary text-background shadow-lg shadow-primary/20" 
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          <Icon className={cn("h-4 w-4 shrink-0 transition-transform group-hover:scale-110", active && "text-background")} />
+                          <AnimatePresence>
+                            {sidebarOpen && (
+                              <motion.span 
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                className="whitespace-nowrap uppercase tracking-wider"
+                              >
+                                {item.label}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                          {active && !sidebarOpen && (
+                            <div className="absolute right-0 top-1 bottom-1 w-1 bg-background rounded-l-full" />
+                          )}
+                          {!sidebarOpen && (
+                            <div className="lg:absolute lg:left-full lg:ml-4 lg:px-2 lg:py-1 lg:bg-popover lg:text-popover-foreground lg:text-[10px] lg:rounded lg:opacity-0 lg:group-hover:opacity-100 lg:transition-opacity lg:z-50 lg:pointer-events-none lg:shadow-xl lg:border lg:border-border lg:font-black lg:uppercase lg:tracking-widest whitespace-nowrap">
+                              {item.label}
+                            </div>
+                          )}
+                        </motion.div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
-        </aside>
 
-        {/* Sidebar toggle (desktop) */}
-        <div className="hidden md:flex flex-col">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 m-1 text-muted-foreground hover:text-foreground"
-            onClick={toggleSidebar}
-            title={sidebarOpen ? "Hide event log" : "Show event log"}
-            aria-label={sidebarOpen ? "Hide event log" : "Show event log"}
-          >
-            {sidebarOpen ? <PanelLeftClose className="h-3.5 w-3.5" /> : <PanelLeft className="h-3.5 w-3.5" />}
-          </Button>
+          <div className="p-4 border-t border-border/40">
+             <Button 
+               variant="ghost" 
+               className="w-full justify-start gap-3 h-10 hover:bg-secondary/40 px-3"
+               onClick={toggleSidebar}
+             >
+               <PanelLeft className={cn("h-4 w-4 transition-transform", !sidebarOpen && "rotate-180")} />
+               <span className={cn("text-xs font-bold whitespace-nowrap", !sidebarOpen && "lg:hidden font-display uppercase tracking-widest text-[9px]")}>Collapse</span>
+             </Button>
+          </div>
+        </motion.aside>
+
+        {/* ─── Main Content Canvas ─── */}
+        <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden relative">
+          <main className="flex-1 overflow-y-auto no-scrollbar relative">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+
+            <div className="max-w-7xl mx-auto px-6 py-8 min-h-full">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </main>
+
+          <footer className="h-10 border-t border-border/40 bg-background/50 backdrop-blur-sm px-6 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 flex-shrink-0">
+            <div className="flex items-center gap-4">
+              <span>SYSTEM_STABLE_V2.0</span>
+              <Separator orientation="vertical" className="h-3 bg-border/20" />
+              <span>S{state.season.toUpperCase()[0]}W{state.week}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5 animate-pulse">
+                <Activity className="h-3 w-3" /> HEARTBEAT_OK
+              </span>
+            </div>
+          </footer>
         </div>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-            {children}
-          </div>
-        </main>
+        {/* Global Event Log Sidebar */}
+        <aside className={cn(
+          "hidden xl:block border-l border-border/60 bg-secondary/5 transition-all duration-300 overflow-hidden",
+          sidebarOpen ? "w-80 opacity-100" : "w-0 opacity-0 pointer-events-none"
+        )}>
+           <div className="h-full px-4 py-6 min-w-[20rem]">
+              <div className="flex items-center gap-2 mb-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <ScrollText className="h-3.5 w-3.5" /> Event Chronicle
+              </div>
+              <div className="h-[calc(100%-2.5rem)]">
+                 <EventLog />
+              </div>
+           </div>
+        </aside>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-3 flex-shrink-0 bg-muted/20">
-        <div className="px-4 sm:px-6 flex items-center justify-between">
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
-            Stable Lords v2.0 // SIMULATION_ACTIVE
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-[10px] text-muted-foreground hidden sm:inline">
-              PROMPT_ENGINE: READY
-            </span>
-          </div>
-        </div>
-      </footer>
-
-      {/* ─── Persistent Continue Button ─── */}
       {!state.isFTUE && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
-            size="lg"
-            className={cn(
-               "h-14 px-8 rounded-full shadow-2xl font-display font-black text-lg tracking-tighter uppercase transition-all hover:scale-105 active:scale-95 group",
-               state.phase === "planning" ? "bg-arena-gold text-black hover:bg-arena-gold/90" : "bg-primary text-primary-foreground"
-            )}
-            onClick={() => {
-              if (state.phase === "planning") {
-                doAdvanceWeek();
-              } else {
-                // Resolution phase navigation
-                window.location.href = "/run-round";
-              }
-            }}
+        <div className="fixed bottom-8 right-8 z-[60]">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            {state.phase === "planning" ? (
-              <>
-                Advance Week
-                <Zap className="ml-2 h-5 w-5 fill-current group-hover:animate-pulse" />
-              </>
-            ) : (
-              <>
-                Go to Bouts
-                <Swords className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-              </>
-            )}
-          </Button>
+            <Button
+              size="lg"
+              className={cn(
+                 "h-16 px-10 rounded-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] font-display font-black text-xl tracking-tighter uppercase transition-all active:shadow-inner border-2 group relative overflow-hidden",
+                 state.phase === "planning" 
+                   ? "bg-arena-gold text-black border-arena-gold/50 hover:bg-arena-gold/90 shadow-arena-gold/20" 
+                   : "bg-primary text-background border-primary/50 hover:bg-primary/90 shadow-primary/20"
+              )}
+              onClick={() => {
+                if (state.phase === "planning") {
+                  doAdvanceWeek();
+                } else {
+                  window.location.href = "/run-round";
+                }
+              }}
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {state.phase === "planning" ? (
+                <>
+                  Advance Cycle
+                  <Zap className="ml-3 h-5 w-5 fill-current transition-transform group-hover:scale-125 group-hover:rotate-12" />
+                </>
+              ) : (
+                <>
+                  Resolve Bouts
+                  <Swords className="ml-3 h-5 w-5 transition-transform group-hover:scale-125 group-hover:-rotate-12" />
+                </>
+              )}
+            </Button>
+          </motion.div>
         </div>
       )}
+
+      <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+          <AlertDialogContent className="bg-glass-card border-neon">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="font-display text-2xl tracking-tighter uppercase">Terminate Operation?</AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground">
+                This will permanently delete the stable <span className="text-foreground font-bold font-display">"{state.player.stableName}"</span> and all associated chronicle data. This erasure is non-recoverable.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Retain Mission</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  const slotId = getActiveSlot();
+                  if (slotId) deleteSlot(slotId);
+                  doReset();
+                  setResetOpen(false);
+                }}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-bold uppercase tracking-widest text-[10px]"
+              >
+                Confirm Termination
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </motion.div>
+      </AlertDialog>
     </div>
   );
 }

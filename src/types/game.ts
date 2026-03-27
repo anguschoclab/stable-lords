@@ -483,6 +483,7 @@ export interface LedgerEntry {
 export interface RivalStableData {
   owner: Owner;
   roster: Warrior[];
+  trainers?: TrainerData[];
   /** Stable identity metadata */
   motto?: string;
   origin?: string;

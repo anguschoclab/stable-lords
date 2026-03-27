@@ -163,6 +163,7 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.gold === undefined) parsed.gold = 500;
   if (!parsed.ledger) parsed.ledger = [];
   if (parsed.ftueComplete === undefined) parsed.ftueComplete = true;
+  if (parsed.ftueStep === undefined) parsed.ftueStep = 0;
   if (parsed.isFTUE === undefined) parsed.isFTUE = !parsed.ftueComplete;
   if (!parsed.coachDismissed) parsed.coachDismissed = [];
   if (!parsed.rivals) parsed.rivals = [];
@@ -200,7 +201,18 @@ export function migrateGameState(parsed: any): GameState {
   parsed.retired = (parsed.retired || []).map(ensureWarriorDefaults);
 
   // Ensure owner defaults
-  if (parsed.player) {
+  if (!parsed.player) {
+    parsed.player = {
+      id: "owner_1",
+      name: "You",
+      stableName: "My Stable",
+      fame: 0,
+      renown: 0,
+      titles: 0,
+      metaAdaptation: "Opportunist",
+      favoredStyles: [],
+    };
+  } else {
     parsed.player.metaAdaptation = parsed.player.metaAdaptation || "Opportunist";
     parsed.player.favoredStyles = parsed.player.favoredStyles || [];
   }
@@ -245,6 +257,8 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.restStates) parsed.restStates = parsed.restStates.slice(-500);
   if (parsed.hiringPool) parsed.hiringPool = parsed.hiringPool.slice(-20);
   if (parsed.recruitPool) parsed.recruitPool = parsed.recruitPool.slice(-50);
+  if (parsed.trainers) parsed.trainers = parsed.trainers.slice(-50);
+  if (parsed.rivals) parsed.rivals = parsed.rivals.slice(-50);
   return parsed as GameState;
 }
 
@@ -456,5 +470,24 @@ export function draftInitialRoster(state: GameState, warriors: Warrior[]): GameS
     roster: warriors,
     isFTUE: false,
     ftueComplete: true,
+  };
+}
+
+/** Update a warrior's equipment loadout */
+export function updateWarriorEquipment(
+  state: GameState,
+  warriorId: string,
+  equipment: {
+    weapon: string;
+    armor: string;
+    shield: string;
+    helm: string;
+  }
+): GameState {
+  return {
+    ...state,
+    roster: state.roster.map((w) =>
+      w.id === warriorId ? { ...w, equipment } : w
+    ),
   };
 }

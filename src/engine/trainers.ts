@@ -31,6 +31,12 @@ export const TIER_COST: Record<TrainerTier, number> = {
   Master: 200,
 };
 
+export const TRAINER_WEEKLY_SALARY: Record<TrainerTier, number> = {
+  Novice: 10,
+  Seasoned: 25,
+  Master: 75,
+};
+
 export const TIER_BONUS: Record<TrainerTier, number> = {
   Novice: 1,
   Seasoned: 2,

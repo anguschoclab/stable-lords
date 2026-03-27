@@ -13,6 +13,8 @@ import { StatBadge } from "@/components/ui/StatBadge";
 import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Eye, Shield, Coins, Users, Swords, ArrowLeftRight, Trophy, Skull, TrendingUp, UserRoundSearch } from "lucide-react";
 import { toast } from "sonner";
@@ -59,22 +61,30 @@ function ComparisonBar({ label, valA, valB, maxVal, colorA, colorB }: {
   const bWins = valB > valA;
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-[11px]">
-        <span className={`font-mono ${aWins ? "text-foreground font-bold" : "text-muted-foreground"}`}>{valA}</span>
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</span>
-        <span className={`font-mono ${bWins ? "text-foreground font-bold" : "text-muted-foreground"}`}>{valB}</span>
+    <div className="space-y-1 group/bar">
+      <div className="flex items-center justify-between text-[10px] font-black tracking-widest uppercase">
+        <span className={cn("font-mono transition-colors", aWins ? colorA.replace("bg-", "text-") + " drop-shadow-sm" : "text-muted-foreground/40")}>{valA}</span>
+        <span className="text-muted-foreground/60 transition-colors group-hover/bar:text-foreground">{label}</span>
+        <span className={cn("font-mono transition-colors", bWins ? colorB.replace("bg-", "text-") + " drop-shadow-sm" : "text-muted-foreground/40")}>{valB}</span>
       </div>
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-1.5 items-center">
         <div className="flex-1 flex justify-end">
-          <div className="h-2 bg-muted rounded-full overflow-hidden w-full flex justify-end">
-            <div className={`h-full rounded-full ${colorA} transition-all`} style={{ width: `${pctA}%` }} />
+          <div className="h-1.5 bg-secondary/30 rounded-full overflow-hidden w-full flex justify-end">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${pctA}%` }}
+              className={cn("h-full rounded-full transition-all", colorA, aWins && "shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]")} 
+            />
           </div>
         </div>
-        <div className="w-1" />
+        <div className="w-1 h-1 rounded-full bg-border/40" />
         <div className="flex-1">
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className={`h-full rounded-full ${colorB} transition-all`} style={{ width: `${pctB}%` }} />
+          <div className="h-1.5 bg-secondary/30 rounded-full overflow-hidden">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${pctB}%` }}
+              className={cn("h-full rounded-full transition-all", colorB, bWins && "shadow-[0_0_8px_rgba(var(--accent-rgb),0.5)]")} 
+            />
           </div>
         </div>
       </div>
@@ -115,23 +125,24 @@ function StableComparison({ rivals }: { rivals: RivalStableData[] }) {
     <div className="space-y-6">
       {/* Selector row */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Stable A</label>
-          <div className="space-y-1.5">
+        <div className="space-y-3">
+          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">TACTICAL_ASSET_A</label>
+          <div className="grid grid-cols-1 gap-1.5">
             {rivals.map((r) => (
               <button
                 key={r.owner.id}
                 onClick={() => setIdA(r.owner.id === idA ? null : r.owner.id)}
                 disabled={r.owner.id === idB}
-                className={`w-full text-left px-3 py-2 rounded-lg border text-sm font-display transition-all ${
+                className={cn(
+                  "w-full text-left px-4 py-2.5 rounded-xl border font-display font-black uppercase text-[10px] tracking-tight transition-all",
                   idA === r.owner.id
-                    ? "border-primary bg-primary/10 text-foreground"
+                    ? "border-primary bg-primary/10 text-primary shadow-[0_0_15px_-5px_rgba(var(--primary-rgb),0.3)]"
                     : r.owner.id === idB
-                    ? "border-border/30 text-muted-foreground/30 cursor-not-allowed"
-                    : "border-border hover:border-primary/40 text-muted-foreground hover:text-foreground"
-                }`}
+                    ? "border-border/10 text-muted-foreground/20 cursor-not-allowed grayscale"
+                    : "border-border/30 bg-glass-card hover:border-primary/40 text-muted-foreground hover:text-foreground"
+                )}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Shield className="h-3.5 w-3.5" />
                   {r.owner.stableName}
                 </div>
@@ -139,23 +150,24 @@ function StableComparison({ rivals }: { rivals: RivalStableData[] }) {
             ))}
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Stable B</label>
-          <div className="space-y-1.5">
+        <div className="space-y-3">
+          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">TACTICAL_ASSET_B</label>
+          <div className="grid grid-cols-1 gap-1.5">
             {rivals.map((r) => (
               <button
                 key={r.owner.id}
                 onClick={() => setIdB(r.owner.id === idB ? null : r.owner.id)}
                 disabled={r.owner.id === idA}
-                className={`w-full text-left px-3 py-2 rounded-lg border text-sm font-display transition-all ${
+                className={cn(
+                  "w-full text-left px-4 py-2.5 rounded-xl border font-display font-black uppercase text-[10px] tracking-tight transition-all",
                   idB === r.owner.id
-                    ? "border-accent bg-accent/10 text-foreground"
+                    ? "border-accent bg-accent/10 text-accent shadow-[0_0_15px_-5px_rgba(var(--accent-rgb),0.3)]"
                     : r.owner.id === idA
-                    ? "border-border/30 text-muted-foreground/30 cursor-not-allowed"
-                    : "border-border hover:border-accent/40 text-muted-foreground hover:text-foreground"
-                }`}
+                    ? "border-border/10 text-muted-foreground/20 cursor-not-allowed grayscale"
+                    : "border-border/30 bg-glass-card hover:border-accent/40 text-muted-foreground hover:text-foreground"
+                )}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Shield className="h-3.5 w-3.5" />
                   {r.owner.stableName}
                 </div>
@@ -169,15 +181,19 @@ function StableComparison({ rivals }: { rivals: RivalStableData[] }) {
       {statsA && statsB && rivalA && rivalB && (
         <div className="space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="text-center flex-1">
-              <h3 className="font-display text-sm font-bold text-foreground">{rivalA.owner.stableName}</h3>
-              <Badge variant="outline" className="text-[9px] mt-1">{rivalA.tier}</Badge>
+          <div className="flex items-center justify-between bg-glass-card rounded-2xl p-6 border border-border/40 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+            <div className="text-center flex-1 relative z-10">
+              <h3 className="font-display font-black uppercase text-xl tracking-tighter text-foreground decoration-primary decoration-4 underline-offset-8 transition-all">{rivalA.owner.stableName}</h3>
+              <Badge variant="outline" className="text-[9px] font-black tracking-widest uppercase mt-3 border-primary/20 bg-primary/5 text-primary">{rivalA.tier}</Badge>
             </div>
-            <ArrowLeftRight className="h-5 w-5 text-muted-foreground mx-4 flex-shrink-0" />
-            <div className="text-center flex-1">
-              <h3 className="font-display text-sm font-bold text-foreground">{rivalB.owner.stableName}</h3>
-              <Badge variant="outline" className="text-[9px] mt-1">{rivalB.tier}</Badge>
+            <div className="flex flex-col items-center justify-center mx-6 relative z-10">
+               <ArrowLeftRight className="h-6 w-6 text-muted-foreground/40 mb-1" />
+               <span className="text-[8px] font-black text-muted-foreground/30 tracking-widest uppercase">VS</span>
+            </div>
+            <div className="text-center flex-1 relative z-10">
+              <h3 className="font-display font-black uppercase text-xl tracking-tighter text-foreground decoration-accent decoration-4 underline-offset-8 transition-all">{rivalB.owner.stableName}</h3>
+              <Badge variant="outline" className="text-[9px] font-black tracking-widest uppercase mt-3 border-accent/20 bg-accent/5 text-accent">{rivalB.tier}</Badge>
             </div>
           </div>
 

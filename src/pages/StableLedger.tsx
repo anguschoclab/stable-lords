@@ -7,7 +7,7 @@ import { useGameStore } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES, type InsightToken, type TrainerData, type LedgerEntry } from "@/types/game";
 import { computeWeeklyBreakdown } from "@/engine/economy";
-import { TIER_COST as TRAINER_TIER_COST } from "@/engine/trainers";
+import { TIER_COST as TRAINER_TIER_COST, TRAINER_WEEKLY_SALARY } from "@/engine/trainers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -288,7 +288,7 @@ function ContractsTab() {
         <CardContent className="p-0">
           {activeTrainers.length === 0 ? (
             <p className="p-4 text-xs text-muted-foreground">
-              No active trainer contracts. <Link to="/trainers" className="text-primary hover:underline">Hire trainers</Link>
+              No active trainer contracts. <Link to="/stable/trainers" className="text-primary hover:underline">Hire trainers</Link>
             </p>
           ) : (
             <Table>
@@ -327,7 +327,7 @@ function ContractsTab() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-mono text-xs text-muted-foreground">
-                        35g
+                        {TRAINER_WEEKLY_SALARY[t.tier] ?? 35}g
                       </TableCell>
                     </TableRow>
                   );
@@ -344,7 +344,7 @@ function ContractsTab() {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Weekly trainer expense</span>
             <span className="font-mono font-bold text-destructive">
-              -{activeTrainers.length * 35}g
+              -{activeTrainers.reduce((sum, t) => sum + (TRAINER_WEEKLY_SALARY[t.tier] ?? 35), 0)}g
             </span>
           </div>
           <div className="flex items-center justify-between text-sm mt-1">

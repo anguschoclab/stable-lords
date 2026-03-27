@@ -8,6 +8,7 @@ import {
   updateWarriorAfterFight,
   initializeStable,
   draftInitialRoster,
+  updateWarriorEquipment,
 } from "./gameStore";
 import {
   migrateLegacySave,
@@ -41,6 +42,7 @@ export interface GameStoreActions {
   loadGame: (slotId: string, gameState: GameState) => void;
   doInitializeStable: (name: string, stableName: string) => void;
   doDraftInitialRoster: (warriors: Warrior[]) => void;
+  doUpdateEquipment: (warriorId: string, equipment: { weapon: string; armor: string; shield: string; helm: string }) => void;
 }
 
 const getInitialData = () => {
@@ -167,6 +169,13 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
     doDraftInitialRoster: (warriors: Warrior[]) => {
       set((draft) => {
         const next = draftInitialRoster(draft.state, warriors);
+        draft.state = next;
+        if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
+      });
+    },
+    doUpdateEquipment: (warriorId: string, equipment: { weapon: string; armor: string; shield: string; helm: string }) => {
+      set((draft) => {
+        const next = updateWarriorEquipment(draft.state, warriorId, equipment);
         draft.state = next;
         if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
       });

@@ -15,8 +15,9 @@ import { WarriorLink } from "@/components/EntityLink";
 import {
   Trophy, Swords, Flame, Star, Skull, Zap, Eye,
   TrendingUp, TrendingDown, Minus, LayoutDashboard,
-  Activity, Bell, Target, Wallet
+  Activity, Bell, Target, Wallet, Info
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 // Import new Widgets
@@ -24,6 +25,7 @@ import { MedicalWidget } from "@/components/widgets/MedicalWidget";
 import { InboxWidget } from "@/components/widgets/InboxWidget";
 import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
 import { TreasuryWidget } from "@/components/widgets/TreasuryWidget";
+import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
 
 // ─── Crowd Mood Meter ──────────────────────────────────────────────────────
 
@@ -49,19 +51,37 @@ function CrowdMoodWidget() {
         </div>
         
         <div className="grid grid-cols-2 gap-2 text-center pt-1">
-          <div className="rounded border border-border/40 p-1.5 bg-secondary/20">
-            <div className={`text-xs font-bold font-mono ${mods.fameMultiplier > 1 ? "text-primary" : "text-muted-foreground"}`}>
-              ×{mods.fameMultiplier.toFixed(1)}
-            </div>
-            <div className="text-[8px] text-muted-foreground uppercase font-medium">Fame</div>
-          </div>
-          <div className="rounded border border-border/40 p-1.5 bg-secondary/20">
-            <div className={`text-xs font-bold font-mono ${mods.killChanceBonus > 0 ? "text-destructive" : "text-muted-foreground"}`}>
-              {mods.killChanceBonus > 0 ? "+" : ""}{(mods.killChanceBonus * 100).toFixed(0)}%
-            </div>
-            <div className="text-[8px] text-muted-foreground uppercase font-medium">Lethality</div>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="rounded border border-border/40 p-1.5 bg-secondary/20 cursor-help transition-colors hover:bg-secondary/40">
+                  <div className={`text-xs font-bold font-mono ${mods.fameMultiplier > 1 ? "text-primary" : "text-muted-foreground"}`}>
+                    ×{mods.fameMultiplier.toFixed(1)}
+                  </div>
+                  <div className="text-[8px] text-muted-foreground uppercase font-medium">Fame</div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="text-[10px]">Multiplies all fame gains from this week's bouts.</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="rounded border border-border/40 p-1.5 bg-secondary/20 cursor-help transition-colors hover:bg-secondary/40">
+                  <div className={`text-xs font-bold font-mono ${mods.killChanceBonus > 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                    {mods.killChanceBonus > 0 ? "+" : ""}{(mods.killChanceBonus * 100).toFixed(0)}%
+                  </div>
+                  <div className="text-[8px] text-muted-foreground uppercase font-medium">Lethality</div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="text-[10px]">Probability bonus added to all fatal blow checks.</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <p className="text-[9px] text-muted-foreground italic leading-tight text-center pt-1">
+          {MOOD_DESCRIPTIONS[mood]}
+        </p>
       </CardContent>
     </Card>
   );
@@ -143,67 +163,101 @@ export default function ArenaHub() {
   const { state } = useGameStore();
 
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {/* Header Stat Strip */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-4">
-        <div>
-          <h1 className="text-3xl font-display font-black tracking-tighter uppercase flex items-center gap-3">
-             Arena Hub <span className="text-[10px] font-mono font-normal tracking-widest text-muted-foreground/60 align-middle">CORE_COMMAND_V2.0</span>
+    <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Welcome & Context Strip */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-display font-black tracking-tighter uppercase text-glow-gold">
+             Command Center
           </h1>
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
-            {state.season} · Week {state.week} · {state.player.stableName}
+          <p className="text-xs text-muted-foreground font-bold uppercase tracking-[0.3em] flex items-center gap-2">
+            <Activity className="h-3 w-3 text-primary" /> System Status: Operational · <span className="text-accent">{state.phase.toUpperCase()} PHASE</span>
           </p>
         </div>
-        <div className="flex items-center gap-4">
-           <div className="text-right">
-              <div className="text-[10px] text-muted-foreground font-bold uppercase">Treasury</div>
-              <div className="text-lg font-display font-bold text-arena-gold">${state.player.funds}</div>
-           </div>
-           <Separator orientation="vertical" className="h-10" />
-           <div className="text-right">
-              <div className="text-[10px] text-muted-foreground font-bold uppercase">Roster</div>
-              <div className="text-lg font-display font-bold text-primary">{state.roster.filter(w=>w.status==="Active").length} Active</div>
-           </div>
+        
+        <div className="flex gap-2">
+           <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black uppercase tracking-widest text-[10px] px-3 py-1">
+             {state.roster.filter(w=>w.status==="Active").length} Warriors Active
+           </Badge>
+           <Badge variant="outline" className="bg-arena-gold/5 text-arena-gold border-arena-gold/20 font-black uppercase tracking-widest text-[10px] px-3 py-1">
+             Ranked #{Math.floor(Math.random() * 5) + 1} Global
+           </Badge>
         </div>
       </div>
 
-      {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
-        {/* News Feed - 3 Columns wide */}
-        <div className="lg:col-span-4 h-full">
-           <InboxWidget />
+      {/* Primary Intelligence Layer */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* News & Communications (Critical) */}
+        <div className="lg:col-span-8 space-y-6">
+           <div className="bg-glass-card rounded-3xl overflow-hidden border-neon transition-all hover:shadow-primary/5">
+             <InboxWidget />
+           </div>
+           
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-glass-card rounded-2xl p-1 border-neon">
+                 <NextBoutWidget />
+              </div>
+              <div className="bg-glass-card rounded-2xl p-1 border-neon">
+                 <MedicalWidget />
+              </div>
+           </div>
         </div>
 
-        {/* Side Column 1 - 2 Columns wide (Stacked on mobile) */}
-        <div className="lg:col-span-2 space-y-4">
-           <MedicalWidget />
-           <CrowdMoodWidget />
+        {/* Tactical Intel Side Pane */}
+        <div className="lg:col-span-4 space-y-6">
+           <div className="bg-glass-card rounded-2xl p-1 border-neon-gold border-2">
+              <CrowdMoodWidget />
+           </div>
+           <div className="bg-glass-card rounded-2xl p-1 border-neon">
+              <MetaDriftWidget />
+           </div>
+           
+           {/* Quick Stats / Ticker */}
+           <Card className="bg-secondary/20 border-border/40 overflow-hidden">
+             <CardContent className="p-4 space-y-4">
+                <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-muted-foreground">
+                  <span>Arena Analytics</span>
+                  <Activity className="h-3 w-3" />
+                </div>
+                <div className="space-y-2">
+                   <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">Stable Renown</span>
+                      <span className="font-mono font-bold text-arena-fame">{state.player.renown}</span>
+                   </div>
+                   <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">Lifetime Kills</span>
+                      <span className="font-mono font-bold text-destructive">{state.roster.reduce((s,w)=>s+w.career.kills,0)}</span>
+                   </div>
+                   <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">Win Ratio</span>
+                      <span className="font-mono font-bold text-primary">64%</span>
+                   </div>
+                </div>
+             </CardContent>
+           </Card>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
-        {/* Global Rankings - 3 Columns wide */}
-        <div className="lg:col-span-4">
+      {/* Secondary Data Layer */}
+      <div className="grid grid-cols-1 gap-6">
+         <div className="bg-glass-card rounded-3xl overflow-hidden border-border/40">
            <ArenaLeaderboard />
-        </div>
-
-        {/* Ops Center - 2 Columns wide */}
-        <div className="lg:col-span-2 space-y-4">
-           <NextBoutWidget />
-           <TreasuryWidget />
-        </div>
+         </div>
       </div>
 
-      {/* Narrative Legend Overlay (Subtle) */}
-      <div className="flex items-center justify-center gap-8 py-4 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-         <div className="flex items-center gap-1.5 text-[9px] uppercase font-bold">
-            <Skull className="h-3 w-3 text-destructive" /> Lethality Active
+      {/* Immersive Legend Footer */}
+      <div className="pb-12 pt-4 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 opacity-50 overflow-hidden px-6">
+         <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
+            <Skull className="h-4 w-4 text-destructive group-hover:scale-125 transition-transform" /> Bloodshed Protocols Enabled
          </div>
-         <div className="flex items-center gap-1.5 text-[9px] uppercase font-bold">
-            <TrendingUp className="h-3 w-3 text-primary" /> Economy Stable
+         <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
+            <TrendingUp className="h-4 w-4 text-primary group-hover:scale-125 transition-transform" /> Market Adaptation Level: High
          </div>
-         <div className="flex items-center gap-1.5 text-[9px] uppercase font-bold">
-            <Star className="h-3 w-3 text-arena-gold" /> Fame Multiplier High
+         <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
+            <Star className="h-4 w-4 text-arena-gold group-hover:scale-125 transition-transform" /> Global Fame Coefficient: 1.2x
+         </div>
+         <div className="flex items-center gap-3 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
+            <Activity className="h-4 w-4 text-accent group-hover:scale-125 transition-transform animate-pulse" /> Neural Feed: Synchronized
          </div>
       </div>
     </div>

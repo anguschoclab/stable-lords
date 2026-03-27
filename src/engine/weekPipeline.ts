@@ -5,6 +5,8 @@
 import type { GameState, Season, Warrior, RivalStableData } from "@/types/game";
 import { OPFSArchiveService } from "./storage/opfsArchive";
 import type { PoolWarrior } from "./recruitment";
+import { aiDraftFromPool } from "./recruitment";
+import { processRivalStableWeekly, seededRng } from "./rivals";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
@@ -111,11 +113,52 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
 }
 
 /**
+ * Rival AI Actions — recruitment, training, and trainer management.
+ */
+export function processRivalActions(state: GameState, newWeek: number): GameState {
+  const rng = seededRng(newWeek * 7919 + 13);
+  let updatedRivals = [...(state.rivals || [])];
+  const globalGazetteItems: string[] = [];
+
+  // 1) AI Recruitment (Every 4 weeks)
+  const draft = aiDraftFromPool(state.recruitPool, updatedRivals, newWeek);
+  updatedRivals = draft.updatedRivals;
+  const updatedPool = draft.updatedPool;
+  globalGazetteItems.push(...draft.gazetteItems);
+
+  // 2) Training & Management for each stable
+  const finalRivals = updatedRivals.map(r => {
+    const result = processRivalStableWeekly(r, rng, newWeek);
+    // filter out items already in globalGazetteItems if they somehow overlap
+    return result.rival;
+  });
+
+  let newState = {
+    ...state,
+    rivals: finalRivals,
+    recruitPool: updatedPool,
+  };
+
+  if (globalGazetteItems.length > 0) {
+    newState.newsletter = [
+      ...newState.newsletter,
+      { week: newWeek, title: "Intelligence Report", items: globalGazetteItems }
+    ];
+  }
+
+  return newState;
+}
+
+/**
  * Compute the next season for a given week number.
  */
 export function computeNextSeason(newWeek: number): Season {
   const seasonIdx = Math.floor((newWeek - 1) / 13) % 4;
   return SEASONS[seasonIdx];
+}
+
+export function seasonToNumber(season: Season): number {
+  return SEASONS.indexOf(season);
 }
 
 
@@ -132,8 +175,9 @@ export function archiveWeekLogs(state: GameState): GameState {
     // If it has a transcript, archive it and strip it
     if (summary.transcript && summary.transcript.length > 0) {
       stateModified = true;
+      const seasonNum = seasonToNumber(state.season);
       // Fire and forget archival (async, no await)
-      opfs.archiveBoutLog(state.season, summary.id, summary.transcript).catch(err => {
+      opfs.archiveBoutLog(seasonNum, summary.id, summary.transcript).catch(err => {
         console.error(`Failed to background archive bout ${summary.id}:`, err);
       });
 

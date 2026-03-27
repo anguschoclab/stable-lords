@@ -20,7 +20,8 @@ import { toast } from "sonner";
 import BoutViewer from "@/components/BoutViewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Quote } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const SEASON_NAMES: Record<string, string> = {
   Spring: "Spring Classic",
@@ -545,7 +546,7 @@ export default function Tournaments() {
           </Dialog>
 
         ) : !currentTournament && state.roster.filter((w) => w.status === "Active").length < 2 ? (
-          <Link to="/recruit">
+          <Link to="/stable/recruit">
             <Button variant="outline" className="gap-2">
               <UserPlus className="h-4 w-4" /> Recruit Warriors
             </Button>
@@ -566,88 +567,150 @@ export default function Tournaments() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Bracket visualization */}
-            {(() => {
-              const rounds = new Map<number, TournamentBout[]>();
-              currentTournament.bracket.forEach((b) => {
-                const arr = rounds.get(b.round) || [];
-                arr.push(b);
-                rounds.set(b.round, arr);
-              });
-              return Array.from(rounds.entries())
-                .sort(([a], [b]) => a - b)
-                .map(([round, bouts]) => (
-                  <div key={round}>
-                    <div className="text-xs text-muted-foreground font-semibold mb-2">
-                      Round {round}
-                    </div>
-                    <div className="space-y-2">
-                      {bouts.map((bout, i) => {
-                        const boutKey = `${round}_${i}`;
+            {/* Bracket visualization - High Density Visual Tree */}
+            <div className="relative overflow-x-auto pb-8 pt-4 no-scrollbar">
+              <div className="flex gap-16 min-w-max px-4">
+                {(() => {
+                  const roundsMap = new Map<number, TournamentBout[]>();
+                  currentTournament.bracket.forEach((b) => {
+                    const arr = roundsMap.get(b.round) || [];
+                    arr.push(b);
+                    roundsMap.set(b.round, arr);
+                  });
+                  
+                  const sortedRounds = Array.from(roundsMap.entries()).sort(([a], [b]) => a - b);
+                  const totalRounds = sortedRounds.length;
+
+                  return sortedRounds.map(([round, bouts], rIdx) => (
+                    <div key={round} className="flex flex-col justify-around gap-8 relative py-4">
+                      {/* Round Header */}
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">
+                          {round === totalRounds && totalRounds > 1 ? "Championship" : `Round ${round}`}
+                        </span>
+                      </div>
+
+                      {bouts.map((bout, bIdx) => {
+                        const boutKey = `${round}_${bIdx}`;
                         const isExpanded = expandedBout === boutKey;
                         const fightSummary = bout.fightId
                           ? state.arenaHistory.find((f) => f.id === bout.fightId)
                           : null;
                         const hasTranscript = fightSummary?.transcript && fightSummary.transcript.length > 0;
+                        
+                        const isAChosen = bout.winner === "A";
+                        const isDChosen = bout.winner === "D";
+                        const isPending = bout.winner === undefined;
 
                         return (
-                          <div key={i}>
-                            <button
-                              className={`w-full flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 py-2.5 px-3 rounded-lg border transition-colors text-left ${
-                                isExpanded ? "border-primary/40 bg-primary/5" : "border-border bg-secondary/50 hover:bg-secondary/80"
-                              }`}
-                              onClick={() => hasTranscript && setExpandedBout(isExpanded ? null : boutKey)}
-                            >
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <Swords className="h-4 w-4 text-arena-gold shrink-0" />
-                                <span className={`font-medium text-sm transition-all ${bout.winner === "A" ? "text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)] scale-105" : bout.winner === "D" ? "text-muted-foreground opacity-50" : "text-foreground"}`}>
-                                  {bout.a}
-                                </span>
-                                <span className="text-muted-foreground text-xs">vs</span>
-                                <span className={`font-medium text-sm transition-all ${bout.winner === "D" ? "text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)] scale-105" : bout.winner === "A" ? "text-muted-foreground opacity-50" : "text-foreground"}`}>
-                                  {bout.d}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {bout.winner !== undefined ? (
-                                  <Badge
-                                    variant="outline"
-                                    className={bout.by === "Kill" ? "text-destructive" : ""}
-                                  >
-                                    {bout.by === "Kill" && <Skull className="h-3 w-3 mr-1" />}
-                                    {bout.winner === "A" ? bout.a : bout.winner === "D" ? bout.d : "Draw"}
-                                    {bout.by && bout.by !== "Draw" ? ` (${bout.by})` : ""}
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="secondary" className="text-xs">Pending</Badge>
-                                )}
-                                {hasTranscript && (
-                                  isExpanded ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-primary" />
-                                )}
-                              </div>
-                            </button>
+                          <div key={bIdx} className="relative group">
+                            {/* SVG Connection to previous round (if not round 1) */}
+                            {rIdx > 0 && (
+                                <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-16 h-12 pointer-events-none stroke-border/20 fill-none overflow-visible">
+                                   <path d="M 0 0 L 32 0 L 32 24 L 64 24" className="stroke-2" />
+                                   {/* Note: This is a simplified path, real tree logic requires match indexing */}
+                                </svg>
+                            )}
 
+                            <div className={cn(
+                              "w-64 rounded-xl border transition-all duration-300 relative z-10",
+                              isPending ? "bg-background/20 border-border/40" : "bg-secondary/10 border-primary/30 shadow-[0_0_15px_-5px_rgba(0,0,0,0.5)]",
+                              isExpanded && "ring-2 ring-primary/50 border-primary shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)]"
+                            )}>
+                              {/* Match ID / Status Bar */}
+                              <div className="px-3 py-1 border-b border-border/20 flex items-center justify-between bg-secondary/20">
+                                <span className="text-[8px] font-black text-muted-foreground/60 tracking-widest uppercase">MATCH {bIdx + 1}</span>
+                                {isPending ? (
+                                    <Badge className="h-3 px-1.5 text-[7px] bg-blue-500/20 text-blue-400 border-none">PENDING</Badge>
+                                ) : (
+                                    <Badge className="h-3 px-1.5 text-[7px] bg-primary/20 text-primary border-none">RESOLVED</Badge>
+                                )}
+                              </div>
+
+                              <div className="p-3 space-y-1">
+                                {/* Competitor A */}
+                                <div className={cn(
+                                  "flex items-center justify-between p-2 rounded-lg transition-colors",
+                                  isAChosen ? "bg-primary/10 text-primary font-bold shadow-inner" : isDChosen ? "opacity-30 grayscale" : "bg-background/40"
+                                )}>
+                                  <div className="flex items-center gap-2 truncate">
+                                    <div className={cn("w-1 h-4 rounded-full", isAChosen ? "bg-primary" : "bg-muted-foreground/20")} />
+                                    <span className="text-xs truncate">{bout.a}</span>
+                                  </div>
+                                  {isAChosen && <Trophy className="h-3 w-3 animate-bounce shadow-glow text-arena-gold" />}
+                                </div>
+
+                                {/* vs Divider */}
+                                <div className="flex justify-center -my-2 relative z-10">
+                                  <div className="bg-secondary px-2 rounded-full border border-border/20 text-[8px] font-black text-muted-foreground">VS</div>
+                                </div>
+
+                                {/* Competitor D */}
+                                <div className={cn(
+                                  "flex items-center justify-between p-2 rounded-lg transition-colors",
+                                  isDChosen ? "bg-primary/10 text-primary font-bold shadow-inner" : isAChosen ? "opacity-30 grayscale" : "bg-background/40"
+                                )}>
+                                  <div className="flex items-center gap-2 truncate">
+                                    <div className={cn("w-1 h-4 rounded-full", isDChosen ? "bg-primary" : "bg-muted-foreground/20")} />
+                                    <span className="text-xs truncate">{bout.d}</span>
+                                  </div>
+                                  {isDChosen && <Trophy className="h-3 w-3 animate-bounce shadow-glow text-arena-gold" />}
+                                </div>
+                              </div>
+
+                              {/* Action Bar */}
+                              {hasTranscript && (
+                                <button
+                                  onClick={() => setExpandedBout(isExpanded ? null : boutKey)}
+                                  className="w-full py-1.5 px-3 border-t border-border/10 flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-colors group"
+                                >
+                                  <span className="text-[9px] font-black uppercase text-muted-foreground group-hover:text-primary">Engagement Log</span>
+                                  {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3 text-primary animate-pulse" />}
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Details Overlay */}
                             {isExpanded && hasTranscript && fightSummary && (
-                              <div className="mt-2 animate-fade-in">
-                                <BoutViewer
-                                  nameA={fightSummary.a}
-                                  nameD={fightSummary.d}
-                                  styleA={fightSummary.styleA}
-                                  styleD={fightSummary.styleD}
-                                  log={fightSummary.transcript!.map((text, idx) => ({ minute: idx + 1, text }))}
-                                  winner={fightSummary.winner}
-                                  by={fightSummary.by}
-                                  isRivalry={fightSummary.isRivalry}
-                                />
+                              <div className="absolute top-0 left-full ml-4 z-50 w-[400px] animate-in fade-in slide-in-from-left-4 duration-300">
+                                <Card className="bg-glass-card border-primary/50 shadow-2xl overflow-hidden">
+                                  <CardHeader className="p-4 border-b border-border/20 bg-secondary/40">
+                                    <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center justify-between">
+                                      <span>Bout Archive: {bout.a} vs {bout.d}</span>
+                                      <Badge variant="outline" className="text-[10px]">{fightSummary.by}</Badge>
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <div className="p-4 max-h-[500px] overflow-y-auto thin-scrollbar bg-background/60">
+                                    <BoutViewer
+                                      nameA={fightSummary.a}
+                                      nameD={fightSummary.d}
+                                      styleA={fightSummary.styleA}
+                                      styleD={fightSummary.styleD}
+                                      log={fightSummary.transcript!.map((text, idx) => ({ minute: idx + 1, text }))}
+                                      winner={fightSummary.winner}
+                                      by={fightSummary.by}
+                                      isRivalry={fightSummary.isRivalry}
+                                    />
+                                  </div>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="w-full rounded-none border-t border-border/20"
+                                    onClick={() => setExpandedBout(null)}
+                                  >
+                                    Close Archive
+                                  </Button>
+                                </Card>
                               </div>
                             )}
                           </div>
                         );
                       })}
                     </div>
-                  </div>
-                ));
-            })()}
+                  ));
+                })()}
+              </div>
+            </div>
 
             {currentTournament.bracket.some((b) => b.winner === undefined) && (
               <div className="flex gap-2">

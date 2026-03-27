@@ -159,9 +159,43 @@ export default function AdminTools() {
             </CardTitle>
             <CardDescription>Bypass safety checks</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Button onClick={skipFTUE} className="w-full gap-2" variant="destructive">
               Skip FTUE (Unlock All)
+            </Button>
+            <Button 
+              onClick={() => {
+                setState({ ...state, gold: (state.gold || 0) + 5000 });
+                toast.success('Added 5000 gold');
+              }} 
+              className="w-full gap-2" 
+              variant="outline"
+            >
+              Add 5000 Gold
+            </Button>
+            <Button 
+              onClick={() => {
+                const newRoster = state.roster.map(w => ({ ...w, fame: 100, popularity: 100 }));
+                setState({ ...state, roster: newRoster });
+                toast.success('Maxed roster fame/popularity');
+              }} 
+              className="w-full gap-2" 
+              variant="outline"
+            >
+              Max Roster Fame
+            </Button>
+            <Button 
+              onClick={() => {
+                import("@/engine/rivals").then(({ generateRivalStables }) => {
+                  const newRivals = generateRivalStables(23, Date.now());
+                  setState({ ...state, rivals: newRivals });
+                  toast.success('Regenerated all 23 rivals');
+                });
+              }} 
+              className="w-full gap-2" 
+              variant="outline"
+            >
+              Regenerate Rivals
             </Button>
           </CardContent>
         </Card>

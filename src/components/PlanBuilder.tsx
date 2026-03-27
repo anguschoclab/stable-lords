@@ -24,13 +24,14 @@ import {
   Crosshair, Swords, Shield, Flame, AlertTriangle, Timer, Zap, Clock,
   ChevronDown, Sparkles, Activity, BookOpen,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type {
   FightPlan, PhaseStrategy, OffensiveTactic, DefensiveTactic, Warrior,
   AttackTarget, ProtectTarget,
 } from "@/types/game";
-import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from "@/engine/planBias";
-import { getOffensivePenalty, getDefensivePenalty } from "@/engine/antiSynergy";
+import { getTempoBonus, getStyleAntiSynergy, type Phase } from "@/engine/stylePassives";
 import {
   getOffensiveSuitability, getDefensiveSuitability,
   SUITABILITY_COLORS, SUITABILITY_LABELS, type SuitabilityRating,
@@ -70,6 +71,53 @@ const STYLE_GUIDANCE: Partial<Record<FightingStyle, string>> = {
   [FightingStyle.TotalParry]: "Endurance fortress. OE 2-4, AL 2-4. Parry is Well Suited. Wins by exhausting opponents. Low KD until very late.",
   [FightingStyle.WallOfSteel]: "Blade wall. Moderate OE+AL, Responsiveness Well Suited. Grinds through constant blade motion. Avoid high extremes.",
 };
+
+// ─── Style Intel ──────────────────────────────────────────────────────────
+
+function StyleIntel({ style, offTactic, defTactic }: { style: FightingStyle; offTactic?: string; defTactic?: string }) {
+  const { offMult, defMult, warning } = getStyleAntiSynergy(style, offTactic, defTactic);
+  const profiles = [
+    { label: "Opening", val: getTempoBonus(style, "OPENING"), icon: <Zap className="h-3 w-3" /> },
+    { label: "Mid", val: getTempoBonus(style, "MID"), icon: <Timer className="h-3 w-3" /> },
+    { label: "Late", val: getTempoBonus(style, "LATE"), icon: <Clock className="h-3 w-3" /> },
+  ];
+
+  return (
+    <div className="space-y-3 p-3 rounded-lg border bg-secondary/10 border-border/40">
+      <div className="flex items-center justify-between">
+        <Label className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Style Intel</Label>
+        <div className="flex gap-2">
+          {profiles.map(p => (
+            <div key={p.label} className="flex items-center gap-1 bg-background/50 px-1.5 py-0.5 rounded border border-border/50">
+              <span className="text-[9px] font-medium uppercase text-muted-foreground">{p.label}</span>
+              <span className={cn(
+                "text-[10px] font-black font-mono",
+                p.val > 0 ? "text-primary" : p.val < 0 ? "text-destructive" : "text-muted-foreground"
+              )}>
+                {p.val > 0 ? "+" : ""}{p.val}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {(offMult < 1 || defMult < 1) && (
+        <div className="space-y-1">
+          <div className="text-[10px] text-destructive font-black uppercase flex items-center gap-1">
+             <AlertTriangle className="h-3 w-3" /> Anti-Synergy Detected
+          </div>
+          <div className="text-[10px] text-muted-foreground leading-relaxed italic">
+            {warning || "Tactical choice conflicts with style mastery, reducing overall effectiveness."}
+          </div>
+          <div className="flex gap-2 mt-1">
+            {offMult < 1 && <Badge variant="destructive" className="text-[9px] py-0 h-4">Off: -{Math.round((1 - offMult) * 100)}%</Badge>}
+            {defMult < 1 && <Badge variant="destructive" className="text-[9px] py-0 h-4">Def: -{Math.round((1 - defMult) * 100)}%</Badge>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── Stamina Projection ────────────────────────────────────────────────────
 
@@ -344,8 +392,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
 
   const merged = useMemo(() => ({ ...plan, ...draft }), [plan, draft]);
 
-  const offPenalty = useMemo(() => getOffensivePenalty(merged.style, merged.offensiveTactic), [merged.style, merged.offensiveTactic]);
-  const defPenalty = useMemo(() => getDefensivePenalty(merged.style, merged.defensiveTactic), [merged.style, merged.defensiveTactic]);
+  const { offMult, defMult } = useMemo(() => getStyleAntiSynergy(merged.style, merged.offensiveTactic, merged.defensiveTactic), [merged.style, merged.offensiveTactic, merged.defensiveTactic]);
 
   const warnings = useMemo(() => computeWarnings(plan), [plan]);
 
@@ -434,6 +481,8 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
+        <StyleIntel style={plan.style} offTactic={plan.offensiveTactic} defTactic={plan.defensiveTactic} />
+
         {/* Style Presets */}
         {presets.length > 0 && (
           <div className="space-y-2">
@@ -583,8 +632,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                 ))}
               </SelectContent>
             </Select>
-            <PenaltyBadge penalty={offPenalty} />
-            {offPenalty < 0 && <Badge variant="destructive" className="animate-pulse absolute -top-2 -right-2 text-[10px] px-1 py-0 shadow-sm">⚠️ Mismatch</Badge>}
+            {offMult < 1 && <Badge variant="destructive" className="animate-pulse absolute -top-2 -right-2 text-[10px] px-1 py-0 shadow-sm">⚠️ Mismatch</Badge>}
           </div>
 
           <div className="space-y-1.5 relative">
@@ -604,8 +652,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                 ))}
               </SelectContent>
             </Select>
-            <PenaltyBadge penalty={defPenalty} />
-            {defPenalty < 0 && <Badge variant="destructive" className="animate-pulse absolute -top-2 -right-2 text-[10px] px-1 py-0 shadow-sm">⚠️ Mismatch</Badge>}
+            {defMult < 1 && <Badge variant="destructive" className="animate-pulse absolute -top-2 -right-2 text-[10px] px-1 py-0 shadow-sm">⚠️ Mismatch</Badge>}
           </div>
         </div>
 
@@ -639,7 +686,6 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                       {OFFENSIVE_TACTICS.map(t => <SelectItem key={t} value={t}>{t === "none" ? "(none)" : t}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <PenaltyBadge penalty={offPenalty} />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Def. Tactic</Label>
@@ -649,7 +695,6 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                       {DEFENSIVE_TACTICS.map(t => <SelectItem key={t} value={t}>{t === "none" ? "(none)" : t}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <PenaltyBadge penalty={defPenalty} />
                 </div>
               </div>
               <div className="flex items-center gap-2 pt-1">

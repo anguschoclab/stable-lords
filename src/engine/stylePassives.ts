@@ -63,10 +63,10 @@ export interface MasteryInfo {
 }
 
 const MASTERY_THRESHOLDS: { tier: MasteryTier; minFights: number; bonus: number; mult: number }[] = [
-  { tier: "Grandmaster", minFights: 50, bonus: 1, mult: 1.25 },
-  { tier: "Master",      minFights: 30, bonus: 1, mult: 1.15 },
-  { tier: "Veteran",     minFights: 20, bonus: 1, mult: 1.08 },
-  { tier: "Practiced",   minFights: 10, bonus: 0, mult: 1.04 },
+  { tier: "Grandmaster", minFights: 50, bonus: 2, mult: 1.50 },
+  { tier: "Master",      minFights: 30, bonus: 1, mult: 1.30 },
+  { tier: "Veteran",     minFights: 20, bonus: 1, mult: 1.15 },
+  { tier: "Practiced",   minFights: 10, bonus: 0, mult: 1.05 },
   { tier: "Novice",      minFights: 0,  bonus: 0, mult: 1.00 },
 ];
 
