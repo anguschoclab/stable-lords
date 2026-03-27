@@ -56,7 +56,7 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
               Warrior Dossier
             </div>
             <Link to={`/warrior/${resolvedId}` as any}>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full profile" aria-label="View full warrior profile">
                 <ExternalLink className="h-4 w-4" />
               </Button>
             </Link>
@@ -126,7 +126,7 @@ export function StableLink({ name, className, children }: StableLinkProps) {
               Stable Records
             </div>
             <Link to={isPlayer ? "/stable" : (`/stable/${stableId}` as any)}>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
                 <ExternalLink className="h-4 w-4" />
               </Button>
             </Link>
