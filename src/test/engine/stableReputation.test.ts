@@ -103,9 +103,9 @@ describe("computeStableReputation", () => {
     // totalKills = 2
     // graveyardKills = 3
     // killBouts = 2
-    // notorietyRaw = (2 * 2) + (3 * 3) + (2 * 2) = 4 + 9 + 4 = 17
-    // notoriety = 17 * 2 = 34
-    expect(rep.notoriety).toBe(34);
+    // notorietyRaw = (2 * 3) + (3 * 4) + (2 * 3) = 6 + 12 + 6 = 24
+    // notoriety = 24 * 2 = 48
+    expect(rep.notoriety).toBe(48);
   });
 
   it("calculates honor correctly", () => {
@@ -125,8 +125,8 @@ describe("computeStableReputation", () => {
 
     // cleanBouts (not Kill, winner != null) = 2
     // totalKills = 1
-    // honorRaw = 50 + 2 * 0.5 - 1 * 3 = 50 + 1 - 3 = 48
-    expect(rep.honor).toBe(48);
+    // honorRaw = 50 + 2 * 0.5 - 1 * 5 = 50 + 1 - 5 = 46
+    expect(rep.honor).toBe(46);
   });
 
   it("calculates adaptability correctly", () => {
@@ -201,11 +201,11 @@ describe("computeRivalReputation", () => {
     // cleanBouts for w2 = 3 + 1 - 0 = 4
     // totalCleanBouts = 9
 
-    // notoriety = 2 * 4 = 8
-    expect(rep.notoriety).toBe(8);
+    // notoriety = 2 * 6 = 12
+    expect(rep.notoriety).toBe(12);
 
-    // honor = 50 + 9 * 0.3 - 2 * 3 = 50 + 2.7 - 6 = 46.7 -> 47
-    expect(rep.honor).toBe(47);
+    // honor = 50 + 9 * 0.3 - 2 * 5 = 50 + 2.7 - 10 = 42.7 -> 43
+    expect(rep.honor).toBe(43);
   });
 
   it("calculates rival adaptability correctly", () => {

@@ -285,7 +285,7 @@ export function processTraining(state: GameState): GameState {
   if (!state.trainingAssignments || state.trainingAssignments.length === 0) return state;
 
   const results: TrainingResult[] = [];
-  let roster = [...state.roster];
+  const roster = [...state.roster];
   let seasonalGrowth = [...(state.seasonalGrowth ?? [])];
   const healingBonus = getHealingTrainerBonus(state.trainers ?? []);
 
