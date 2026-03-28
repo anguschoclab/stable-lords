@@ -85,22 +85,37 @@ export default function EquipmentOptimizerPage() {
 
       {/* Recommendations */}
       <div className="grid gap-4 sm:grid-cols-2">
-        {recs.map((rec, i) => {
-          const matchingWarriors = activeWarriors.filter(w => w.style === selectedStyle);
-          const [targetWarriorId, setTargetWarriorId] = useState<string>(matchingWarriors[0]?.id ?? "");
-          const { doUpdateEquipment } = useGameStore();
+        {recs.map((rec, i) => (
+          <RecommendationCard
+            key={i}
+            rec={rec}
+            isPrimary={i === 0}
+            selectedStyle={selectedStyle}
+            activeWarriors={activeWarriors}
+            carryCap={carryCap}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-          const handleApply = () => {
-            if (!targetWarriorId) return;
-            doUpdateEquipment(targetWarriorId, rec.loadout);
-            import("sonner").then(({ toast }) => {
-               const w = matchingWarriors.find(mw => mw.id === targetWarriorId);
-               toast.success(`Applied ${rec.label} to ${w?.name}`);
-            });
-          };
+function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, carryCap }: { rec: any; isPrimary: boolean; selectedStyle: FightingStyle; activeWarriors: any[]; carryCap: number }) {
+  const matchingWarriors = activeWarriors.filter(w => w.style === selectedStyle);
+  const [targetWarriorId, setTargetWarriorId] = useState<string>(matchingWarriors[0]?.id ?? "");
+  const { doUpdateEquipment } = useGameStore();
 
-          return (
-            <Card key={i} className={i === 0 ? "border-primary/30 glow-primary" : ""}>
+  const handleApply = () => {
+    if (!targetWarriorId) return;
+    doUpdateEquipment(targetWarriorId, rec.loadout);
+    import("sonner").then(({ toast }) => {
+       const w = matchingWarriors.find(mw => mw.id === targetWarriorId);
+       toast.success(`Applied ${rec.label} to ${w?.name}`);
+    });
+  };
+
+  return (
+    <Card className={isPrimary ? "border-primary/30 glow-primary" : ""}>
               <CardHeader className="pb-2">
                 <CardTitle className="font-display text-base flex items-center justify-between">
                   <span className="flex items-center gap-2">
@@ -186,11 +201,7 @@ export default function EquipmentOptimizerPage() {
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
