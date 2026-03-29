@@ -42,5 +42,6 @@ export function truncateState(state: GameState): GameState {
     recruitPool: (state.recruitPool || []).slice(-50),
     trainers: (state.trainers || []).slice(-50),
     rivals: (state.rivals || []).slice(-50),
+    unacknowledgedDeaths: (state.unacknowledgedDeaths || []).slice(-100),
   };
 }
