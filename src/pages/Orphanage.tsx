@@ -15,7 +15,7 @@ import { LoreArchive } from "@/lore/LoreArchive";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge } from "@/components/ui/StatBadge";
+import { StatBadge } from "@/components/ui/WarriorBadges";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {

@@ -9,8 +9,7 @@ import type { Warrior, ScoutReportData, RivalStableData, FightSummary } from "@/
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge } from "@/components/ui/StatBadge";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";

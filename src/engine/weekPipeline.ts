@@ -20,24 +20,44 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
   const yearNum = Math.floor(newWeek / 52);
   const hofNews: string[] = [];
 
-  const allWarriors: Warrior[] = [
-    ...state.roster,
-    ...state.graveyard,
-    ...state.retired,
-    ...(state.rivals || []).flatMap(r => r.roster),
-  ];
+  // ⚡ Bolt: Prevent massive O(N log N) sorting and array allocation overhead
+  // by doing a single O(N) pass across all rosters to find the Hall of Fame inductees.
+  let bestByFame: Warrior | undefined;
+  let bestKiller: Warrior | undefined;
+  let bestWins: Warrior | undefined;
 
-  const bestByFame = [...allWarriors].sort((a, b) => (b.fame ?? 0) - (a.fame ?? 0))[0];
+  const checkWarrior = (w: Warrior) => {
+    if (!bestByFame || (w.fame ?? 0) > (bestByFame.fame ?? 0)) {
+      bestByFame = w;
+    }
+    if (w.career.kills > 0 && (!bestKiller || w.career.kills > bestKiller.career.kills)) {
+      bestKiller = w;
+    }
+    if (w.career.wins > 0 && (!bestWins || w.career.wins > bestWins.career.wins)) {
+      bestWins = w;
+    }
+  };
+
+  for (let i = 0; i < state.roster.length; i++) checkWarrior(state.roster[i]);
+  for (let i = 0; i < state.graveyard.length; i++) checkWarrior(state.graveyard[i]);
+  for (let i = 0; i < state.retired.length; i++) checkWarrior(state.retired[i]);
+  if (state.rivals) {
+    for (let r = 0; r < state.rivals.length; r++) {
+      const roster = state.rivals[r].roster;
+      for (let i = 0; i < roster.length; i++) {
+        checkWarrior(roster[i]);
+      }
+    }
+  }
+
   if (bestByFame && (bestByFame.fame ?? 0) > 0) {
     hofNews.push(`🏛️ HALL OF FAME: ${bestByFame.name} (${bestByFame.style}) inducted as Year ${yearNum}'s greatest warrior with ${bestByFame.fame} fame!`);
   }
 
-  const bestKiller = [...allWarriors].filter(w => w.career.kills > 0).sort((a, b) => b.career.kills - a.career.kills)[0];
   if (bestKiller && bestKiller.name !== bestByFame?.name) {
     hofNews.push(`💀 DEADLIEST BLADE: ${bestKiller.name} earns the "Deadliest Blade" honor with ${bestKiller.career.kills} kills in Year ${yearNum}.`);
   }
 
-  const bestWins = [...allWarriors].filter(w => w.career.wins > 0).sort((a, b) => b.career.wins - a.career.wins)[0];
   if (bestWins && bestWins.name !== bestByFame?.name && bestWins.name !== bestKiller?.name) {
     hofNews.push(`⚔️ IRON CHAMPION: ${bestWins.name} recorded the most victories (${bestWins.career.wins}) in Year ${yearNum}.`);
   }
@@ -74,16 +94,19 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
 
   const promotionNews: string[] = [];
   const updatedRivals = (state.rivals || []).map(r => {
-    const { totalWins, totalKills, totalFights, activeCount } = r.roster.reduce(
-      (acc, w) => {
-        acc.totalWins += w.career.wins;
-        acc.totalKills += w.career.kills;
-        acc.totalFights += w.career.wins + w.career.losses;
-        if (w.status === "Active") acc.activeCount++;
-        return acc;
-      },
-      { totalWins: 0, totalKills: 0, totalFights: 0, activeCount: 0 }
-    );
+    // ⚡ Bolt: Single pass over roster to compute stats instead of reduce allocating objects
+    let totalWins = 0;
+    let totalKills = 0;
+    let totalFights = 0;
+    let activeCount = 0;
+
+    for (let i = 0; i < r.roster.length; i++) {
+      const w = r.roster[i];
+      totalWins += w.career.wins;
+      totalKills += w.career.kills;
+      totalFights += w.career.wins + w.career.losses;
+      if (w.status === "Active") activeCount++;
+    }
 
     let newTier = r.tier;
 

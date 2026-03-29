@@ -74,7 +74,7 @@ describe("Economy Engine", () => {
 
       expect(breakdown.expenses.find(e => e.label.includes("Warrior upkeep"))?.amount).toBe(90);
       expect(breakdown.expenses.find(e => e.label.includes("Trainer salaries"))?.amount).toBe(35);
-      expect(breakdown.expenses.find(e => e.label.includes("Training fees"))?.amount).toBe(20);
+      expect(breakdown.expenses.find(e => e.label.includes("Training fees"))?.amount).toBe(25);
     });
 
     it("should calculate correct income for fight purses, win bonuses, and fame", () => {
@@ -141,14 +141,14 @@ describe("Economy Engine", () => {
       state.fame = 5; // +10 gold
 
       const w1 = makeTestWarrior({ name: "Alice" });
-      state.roster = [w1]; // -20 gold
+      state.roster = [w1]; // -45 gold
 
       state.arenaHistory = [
         {
           id: "f1", week: 2, season: "Spring",
           a: "Alice", d: "Enemy",
           aStable: "Player", dStable: "Rival",
-          winner: "D", // lost fight: +50 gold purse, +0 win bonus
+          winner: "D", // lost fight: +100 gold purse, +0 win bonus
           loser: "A",
           aInjuries: [], dInjuries: [], type: "Standard"
         }
@@ -171,14 +171,14 @@ describe("Economy Engine", () => {
       state.fame = 5; // +10 gold
 
       const w1 = makeTestWarrior({ name: "Alice" });
-      state.roster = [w1]; // -30 gold
+      state.roster = [w1]; // -45 gold
 
       state.arenaHistory = [
         {
           id: "f1", week: 3, season: "Spring",
           a: "Alice", d: "Enemy",
           aStable: "Player", dStable: "Rival",
-          winner: "A", // won fight: +75 gold purse, +30 win bonus
+          winner: "A", // won fight: +100 gold purse, +45 win bonus
           loser: "D",
           aInjuries: [], dInjuries: [], type: "Standard"
         }

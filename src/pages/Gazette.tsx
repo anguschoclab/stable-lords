@@ -12,7 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Newspaper, Trophy, Swords, TrendingUp, Skull, Flame, Star, ChevronDown, BarChart3, Crown, Grid3X3, Zap, BookOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FightSummary } from "@/types/game";
-import { StatBadge } from "@/components/ui/StatBadge";
+import { StatBadge } from "@/components/ui/WarriorBadges";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 

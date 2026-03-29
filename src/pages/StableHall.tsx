@@ -9,8 +9,7 @@ import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, type Warrior } from 
 import { computeStableReputation } from "@/engine/stableReputation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge } from "@/components/ui/StatBadge";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {

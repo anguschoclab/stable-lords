@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, X, Trophy, Heart, AlertTriangle, Lock } from "lucide-react";
 import { computeGainChance } from "@/engine/training";
-import { WarriorLink } from "@/components/EntityLink";
+import { WarriorNameTag } from "@/components/ui/WarriorBadges";
 
 export function WarriorTrainingCard({ warrior, assignment, seasonalGains, trainers, onAssign, onAssignRecovery, onClear }: {
   warrior: Warrior;
@@ -31,8 +31,7 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-              <WarriorLink name={warrior.name} id={warrior.id}>{warrior.name}</WarriorLink>
-              {warrior.champion && <Trophy className="h-3 w-3 text-arena-gold" />}
+              <WarriorNameTag id={warrior.id} name={warrior.name} isChampion={warrior.champion} />
             </div>
             <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
                 <span className="text-[10px] font-bold uppercase tracking-wider">{STYLE_DISPLAY_NAMES[warrior.style]}</span>

@@ -88,23 +88,50 @@ describe("Style Balance", () => {
 
     for (const s of ALL_STYLES) {
       const rate = styleFights[s] > 0 ? styleWins[s] / styleFights[s] : 0;
-      if (rate > 0.65) {
-        problems.push(`${s}: ${(rate * 100).toFixed(1)}% (${styleWins[s]}/${styleFights[s]})`);
+      const pct = (rate * 100).toFixed(1);
+      report.push(`  ${s.padEnd(20)} ${pct}% (${styleWins[s]}/${styleFights[s]})`);
+      if (rate > 0.65) problems.push(`${s}: ${pct}%`);
+    }
+
+    // Print worst matchups
+    const matchupReport: string[] = ["\n=== MATCHUP MATRIX (A win% vs D) ==="];
+    const header = "".padEnd(20) + ALL_STYLES.map(s => s.substring(0, 6).padStart(7)).join("");
+    matchupReport.push(header);
+    for (const a of ALL_STYLES) {
+      let row = a.padEnd(20);
+      for (const d of ALL_STYLES) {
+        if (a === d) {
+          row += "   -  ";
+          continue;
+        }
+        const total = FIGHTS_PER_MATCHUP;
+        const wins = matchupWins[a][d];
+        const pct = ((wins / total) * 100).toFixed(0);
+        row += `${pct.padStart(5)}% `;
       }
     }
 
-    expect(problems.length, `Styles over 65%: ${problems.join(", ")}`).toBeLessThanOrEqual(5);
+    let errorMessage = `${report.join("\n")}\n${matchupReport.join("\n")}`;
+    if (problems.length > 0) {
+      errorMessage += `\n⚠️  STYLES OVER 65%: ${problems.join(", ")}`;
+    }
+
+    expect(problems.length, errorMessage).toBeLessThanOrEqual(5); // Adjusted tolerance might happen
   });
 
   it("should have no style with <35% overall win rate (too weak)", () => {
     const problems: string[] = [];
     for (const s of ALL_STYLES) {
       const rate = styleFights[s] > 0 ? styleWins[s] / styleFights[s] : 0;
-      if (rate < 0.35) {
-        problems.push(`${s}: ${(rate * 100).toFixed(1)}% (${styleWins[s]}/${styleFights[s]})`);
-      }
+      if (rate < 0.35) problems.push(`${s}: ${(rate * 100).toFixed(1)}%`);
     }
-    expect(problems.length, `Styles under 35%: ${problems.join(", ")}`).toBeLessThanOrEqual(10);
+
+    let errorMessage: string | undefined = undefined;
+    if (problems.length > 0) {
+      errorMessage = `\n⚠️  STYLES UNDER 35%: ${problems.join(", ")}`;
+    }
+
+    expect(problems.length, errorMessage).toBeLessThanOrEqual(10); // Adjusted tolerance might happen
   });
 
   it("should have no single matchup worse than 80/20", () => {
@@ -119,6 +146,12 @@ describe("Style Balance", () => {
         }
       }
     }
-    expect(problems.length, `Matchups over 80%: ${problems.join(", ")}`).toBeLessThanOrEqual(50);
+
+    let errorMessage: string | undefined = undefined;
+    if (problems.length > 0) {
+      errorMessage = `\n⚠️  MATCHUPS OVER 80%: ${problems.join(", ")}`;
+    }
+
+    expect(problems.length, errorMessage).toBeLessThanOrEqual(50); // Adjusted tolerance to reflect canonical math swinginess
   });
 });

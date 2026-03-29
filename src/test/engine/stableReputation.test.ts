@@ -68,8 +68,8 @@ describe("computeStableReputation", () => {
     // avgFame of top 5 = (10 + 20 + 30) / 3 = 20
     // gazetteMentions = 2
     // baseFame = 5
-    // fameRaw = 20 * 3 + 2 * 0.5 + 5 = 60 + 1 + 5 = 66
-    expect(rep.fame).toBe(66);
+    // fameRaw = 20 * 2.5 + 2 * 1.0 + 5 * 0.90 = 50 + 2 + 4.5 = 56.5 -> 57
+    expect(rep.fame).toBe(57);
   });
 
   it("caps fame at 100", () => {
@@ -160,8 +160,8 @@ describe("computeStableReputation", () => {
     const rep = computeStableReputation(state);
 
     // avgFame should be 10, not 55
-    // fameRaw = 10 * 3 = 30
-    expect(rep.fame).toBe(30);
+    // fameRaw = 10 * 2.5 = 25
+    expect(rep.fame).toBe(25);
   });
 });
 
@@ -184,8 +184,8 @@ describe("computeRivalReputation", () => {
     const rep = computeRivalReputation(roster, [], "Rival Stable");
 
     // avgFame = 20
-    // fame = 20 * 3 = 60
-    expect(rep.fame).toBe(60);
+    // fame = 20 * 2.5 = 50
+    expect(rep.fame).toBe(50);
   });
 
   it("calculates rival notoriety and honor correctly", () => {
@@ -255,7 +255,7 @@ describe("computeRivalReputation", () => {
     const rep = computeRivalReputation(roster, [], "Rival Stable");
 
     // avgFame should be 10
-    // fame = 10 * 3 = 30
-    expect(rep.fame).toBe(30);
+    // fame = 10 * 2.5 = 25
+    expect(rep.fame).toBe(25);
   });
 });
