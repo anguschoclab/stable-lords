@@ -58,8 +58,10 @@ const WARRIOR_NAMES = [
   "ASHRENDER", "GOREFANG", "DUSKWEAVER", "SKULLSPLITTER", "BLOODCRAZE",
   "DEATHBRING", "GRAVETIDE", "HELLSPAWN", "SLAGHEART", "FLESHRIPPER",
   "MUDSTOMPER", "SPINEBREAKER", "GUTSPILL", "MEATHAMMER", "SLUICEGORE",
-  "VENOMSTRIKE", "ROTBRINGER", "GRIMVISAGE", "BONECHOPPER", "IRONHIDE"
-];
+  "VENOMSTRIKE", "ROTBRINGER", "GRIMVISAGE", "BONECHOPPER", "IRONHIDE",
+  // Chronicler Additions
+  "BONECHOKER", "BLOODWRINGER", "GRIMFEAST", "GUTRENDER", "MARROWMUNCHER", "SLAGBONE", "ASHENHOOF", "GRAVEGUT", "ROTBLOOD", "FLESHFLAYER", "DEATHBITE", "SKULLDRAB", "DIRGEBONE", "HELLGRIND", "MUCKSOAK", "SCARHOLLOW", "IRONFLAIL", "VENOMSPIT", "CORPSEMAW", "GOREDRENCH",
+  ];
 
 const OWNER_FIRST = [
   "Aldric", "Balthazar", "Cassian", "Draven", "Edric",
@@ -114,7 +116,9 @@ const STABLE_PREFIXES = [
   // Procedural Chronicle Additions v3
   "The Butcher's", "The Bloodsoaked", "The Slaughtered", "The Severed", "The Putrefied",
   // Procedural Chronicle Additions v4
-  "The Cursed", "The Bloodstained", "The Ashen", "The Shattered", "The Ironbound"
+  "The Cursed", "The Bloodstained", "The Ashen", "The Shattered", "The Ironbound",
+  // Chronicler Additions
+  "The Blood-Soaked", "The Meat-Eaten", "The Gristle", "The Marrow", "The Bone-Crunched", "The Slag-Forged", "The Scabbed", "The Rot-Blooded"
 ];
 
 const STABLE_SUFFIXES = [
@@ -134,7 +138,9 @@ const STABLE_SUFFIXES = [
   // Procedural Chronicle Additions v3
   "Manglers", "Flayers", "Mutilators", "Eviscerators", "Decapitators",
   // Procedural Chronicle Additions v4
-  "Legion", "Reapers", "Vanguards", "Butchers", "Desolators"
+  "Legion", "Reapers", "Vanguards", "Butchers", "Desolators",
+  // Chronicler Additions
+  "Meat-Hounds", "Grave-Dogs", "Bone-Eaters", "Flesh-Mongers", "Corpse-Tearers", "Flense-Blades", "Gore-Drinkers"
 ];
 
 const STABLE_ALT = [
@@ -164,7 +170,9 @@ const STABLE_ALT = [
   "The Ashen Brotherhood", "The Gilded Abattoir",
   // Procedural Chronicle Additions v4
   "Brotherhood of Ash", "The Iron Syndicate", "Cult of the Flayed",
-  "Lords of the Pit", "The Crimson Circle"
+  "Lords of the Pit", "The Crimson Circle",
+  // Chronicler Additions
+  "House of Rot", "The Meat Hooks", "The Bone Pile", "Brotherhood of Rust", "Cult of the Scab", "The Slaughter-Pens", "The Flaying Pits", "The Abattoir Brothers"
 ];
 
 function pick<T>(arr: T[]): T {

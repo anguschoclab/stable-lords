@@ -32,7 +32,7 @@ export const ARMOR_INTRO_VERBS = [
   "is checking the straps of his",
   "has drawn on a suit of",
   "has put on a suit of",
-  "is clad in",
+  "is clad in"
 ];
 
 export const WEAPON_INTRO_VERBS = [
@@ -45,7 +45,7 @@ export const WEAPON_INTRO_VERBS = [
   "is drawing a %W from its sheath",
   "tests the balance of a %W",
   "grins down his %W at his foe",
-  "grins down his %W at her foe",
+  "grins down his %W at her foe"
 ];
 
 export const HELM_DESCS: Record<string, string[]> = {
@@ -67,7 +67,7 @@ export const BATTLE_OPENERS = [
   "The crowd watches intently as the warriors square off.",
   "A brutal cheer rises as the combatants face each other.",
   "The scent of old blood fills the air as the bout commences.",
-  "Anticipation grips the arena as the duel gets underway.",
+  "Anticipation grips the arena as the duel gets underway."
 ];
 
 export const PARRY_TEMPLATES = [
@@ -77,7 +77,7 @@ export const PARRY_TEMPLATES = [
   "blocks the attack effortlessly.",
   "sweeps the attack away using his %W.",
   "catches the vicious swing on the flat of his %W.",
-  "turns the strike aside with a screech of steel against his %W.",
+  "turns the strike aside with a screech of steel against his %W."
 ];
 
 export const PARRY_SHIELD_TEMPLATES = [
@@ -86,7 +86,7 @@ export const PARRY_SHIELD_TEMPLATES = [
   "interposes his SHIELD.",
   "angles his SHIELD to deflect the attack.",
   "absorbs the impact entirely with his SHIELD.",
-  "raises his SHIELD just in time to catch the blow.",
+  "raises his SHIELD just in time to catch the blow."
 ];
 
 export const DODGE_TEMPLATES = [
@@ -97,7 +97,7 @@ export const DODGE_TEMPLATES = [
   "evades the attack smoothly.",
   "shifts aside, avoiding the strike.",
   "twists his body, the strike missing by a hair's breadth.",
-  "slips beneath the attack with surprising agility.",
+  "slips beneath the attack with surprising agility."
 ];
 
 export const COUNTERSTRIKE_TEMPLATES = [
@@ -105,7 +105,7 @@ export const COUNTERSTRIKE_TEMPLATES = [
   "%N parries and IMMEDIATELY strikes back!",
   "A sudden opening—%N exploits it with a COUNTERSTRIKE!",
   "Exploiting the overextension, %N delivers a rapid COUNTERSTRIKE!",
-  "%N bats the attack aside, leaving his foe open for a COUNTERSTRIKE!",
+  "%N bats the attack aside, leaving his foe open for a COUNTERSTRIKE!"
 ];
 
 export const HIT_TEMPLATES = [
@@ -136,6 +136,17 @@ export const HIT_TEMPLATES = [
   "drives deeply into the trembling body of",
   "carves a fresh, bleeding channel across",
   "impacts with a hollow, sickening thud against",
+  // Chronicler Additions
+  "burrows agonizingly deep into the meat of",
+  "obliterates the vulnerable flesh of",
+  "tears a terrifying gash through",
+  "splinters the ribcage guarding",
+  "shears off a horrific chunk of",
+  "drives through the weakened defense of",
+  "carves a fresh path of agony across",
+  "crushes the failing armor protecting",
+  "inflicts a sickening, jagged wound upon",
+  "forces a breathless scream from"
 ];
 
 export const PARRY_BREAK_TEMPLATES = [
@@ -157,7 +168,7 @@ export const PARRY_BREAK_TEMPLATES = [
   "The desperate parry crumbles like parchment under %A's %W!",
   "%A's %W simply ignores the fragile block, driving straight through!",
   "A violent clash of steel leaves %D's defense completely open to %A's %W!",
-  "%A batters down the weak guard with a brutal sweep of their %W!",
+  "%A batters down the weak guard with a brutal sweep of their %W!"
 ];
 
 export const CROWD_REACTIONS_POSITIVE = [
@@ -165,7 +176,7 @@ export const CROWD_REACTIONS_POSITIVE = [
   "Cheers erupt from the stands!",
   "The audience leaps to their feet!",
   "A thunderous cheer sweeps the arena!",
-  "The crowd howls for more blood!",
+  "The crowd howls for more blood!"
 ];
 
 export const CROWD_REACTIONS_NEGATIVE = [
@@ -173,13 +184,13 @@ export const CROWD_REACTIONS_NEGATIVE = [
   "The crowd murmurs in disappointment.",
   "Derisive laughter from the high seats.",
   "The audience groans at the clumsy display.",
-  "Insults rain down from the disappointed onlookers.",
+  "Insults rain down from the disappointed onlookers."
 ];
 
 export const CROWD_REACTIONS_ENCOURAGE = [
   "Chants of encouragement begin to build.",
   "The crowd urges the warriors on.",
-  "Shouts of support ring out from the pit edge.",
+  "Shouts of support ring out from the pit edge."
 ];
 
 export const INI_WIN_TEMPLATES = [
@@ -188,7 +199,7 @@ export const INI_WIN_TEMPLATES = [
   "A sudden burst of speed puts %N on the offensive.",
   "%N presses the attack.",
   "%N dictates the deadly tempo of the fight.",
-  "%N steals the momentum!",
+  "%N steals the momentum!"
 ];
 
 export const INI_KEEP_TEMPLATES = [
@@ -196,7 +207,7 @@ export const INI_KEEP_TEMPLATES = [
   "%N continues to press the advantage.",
   "Relentless, %N strikes again.",
   "%N refuses to yield the offensive.",
-  "Giving his foe no quarter, %N presses on.",
+  "Giving his foe no quarter, %N presses on."
 ];
 
 export const EXECUTION_TEMPLATES = [
@@ -273,7 +284,18 @@ export const EXECUTION_TEMPLATES = [
   "%A shatters what remains of %D's armor, carving out a bloody finish with their %W!",
   "Utterly exhausted, %D can only watch as %A's %W brings their gruesome end!",
   "%D collapses to their knees just as %A unleashes a merciless, fatal strike with a %W!",
-  "A horrifying crunch echoes through the arena as %A crushes %D's life entirely with a brutal %W!"
+  "A horrifying crunch echoes through the arena as %A crushes %D's life entirely with a brutal %W!",
+  // Chronicler Additions
+  "%A brings %D's life to a horrific end with a sickening %W strike!",
+  "%D's legs finally buckle, and %A ruthlessly decapitates them with a %W!",
+  "Exploiting %D's utter exhaustion, %A crushes their skull with a devastating %W blow!",
+  "With %D gasping for air, %A severs their final lifeline with a merciless %W!",
+  "Utterly drained, %D watches hopelessly as %A's %W ends the bout in a spray of gore!",
+  "%A brutally punishes %D's drooping guard, executing them with a savage %W!",
+  "%D's armor crumples under the fatigue, leaving them exposed to %A's fatal %W!",
+  "A deafening crack echoes as %A violently ends %D's suffering with a %W!",
+  "Too weak to lift their own shield, %D is violently butchered by %A's %W!",
+  "The life leaves %D's eyes as %A twists the %W deep into their shattered ribcage!"
 ];
 
 export const KO_TEMPLATES = [
@@ -281,7 +303,7 @@ export const KO_TEMPLATES = [
   "%D goes down hard and doesn't move.",
   "The strike knocks %D senseless.",
   "%D's eyes roll back as he slumps to the blood-soaked sand.",
-  "Unable to bear the punishment, %D crumples into darkness.",
+  "Unable to bear the punishment, %D crumples into darkness."
 ];
 
 export const SURRENDER_TEMPLATES = [
@@ -289,7 +311,7 @@ export const SURRENDER_TEMPLATES = [
   "%D signals surrender.",
   "Unable to continue, %D throws down his weapon.",
   "Bleeding and broken, %D begs for mercy from %A.",
-  "%D raises a trembling hand, conceding the bout to %A.",
+  "%D raises a trembling hand, conceding the bout to %A."
 ];
 
 export const FATIGUE_COLLAPSE_TEMPLATES = [
@@ -332,7 +354,16 @@ export const FATIGUE_COLLAPSE_TEMPLATES = [
   "Choking on dust and exhaustion, %N drops to the bloodstained sand.",
   "Their lungs screaming for air, %N crumbles in a heap of useless armor.",
   "Unable to lift their weapon an inch further, %N spirals into total exhaustion.",
-  "The brutal slaughter finally breaks %N, dragging them down into complete unconsciousness."
+  "The brutal slaughter finally breaks %N, dragging them down into complete unconsciousness.",
+  // Chronicler Additions
+  "Their lungs burning, %N pitches violently into the blood-soaked dirt.",
+  "%N staggers, their arms too heavy to lift, before collapsing completely.",
+  "Utterly exhausted by the slaughter, %N crumbles like a broken statue.",
+  "Choking on dust, %N surrenders to the unbearable weight of total fatigue.",
+  "%N's legs turn to water, dragging them face-first into the arena sand.",
+  "With a final, desperate wheeze, %N spirals down into complete unconsciousness.",
+  "The relentless pace finally breaks %N, sending them crashing to the floor.",
+  "%N's overtaxed heart forces them to their knees, their fight entirely spent."
 ];
 
 export const TAUNT_TEMPLATES = [
@@ -341,7 +372,7 @@ export const TAUNT_TEMPLATES = [
   '"Prepare to die," %N hisses.',
   '"I will wear your entrails as a necklace!" %N roars.',
   '"Your stablemaster will weep today!" %N mocks.',
-  '"You look tired. Let me end it," %N chuckles.',
+  '"You look tired. Let me end it," %N chuckles.'
 ];
 
 export const STALEMATE_TEMPLATES = [
@@ -349,7 +380,7 @@ export const STALEMATE_TEMPLATES = [
   "A moment's pause as both catch their breath.",
   "They trade feints, looking for an opening.",
   "The pace slows as the fighters evaluate the carnage.",
-  "Footsteps crunch on the sand as the combatants reassess their strategies.",
+  "Footsteps crunch on the sand as the combatants reassess their strategies."
 ];
 
 export const SLASH_ATTACK_TEMPLATES = [
@@ -380,7 +411,16 @@ export const SLASH_ATTACK_TEMPLATES = [
   "lashes out with their %W in a vicious attempt to open the throat of",
   "draws the razor edge of their %W across the air, hoping to slice open",
   "attempts to shear right through the unarmored flesh of",
-  "whips their %W in a brutal, flesh-parting slash aimed straight at"
+  "whips their %W in a brutal, flesh-parting slash aimed straight at",
+  // Chronicler Additions
+  "swings a wide, dismembering arc of their %W attempting to sever",
+  "lashes out, hoping to shear through the exposed flesh of",
+  "draws the razor edge of their %W across the air, eager to part the flesh of",
+  "whips their %W in a brutal, flesh-parting slash aimed directly at",
+  "attempts to cleanly decapitate",
+  "swings a vicious, tearing arc of their %W to carve open",
+  "hopes to amputate a limb with a sweeping slash of their %W toward",
+  "drags their %W in a lethal, horizontal slice at"
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
@@ -411,7 +451,16 @@ export const BASH_ATTACK_TEMPLATES = [
   "swings a concussive, bone-crushing blow with their %W toward",
   "hurls the immense weight of their %W to pulverize the ribcage of",
   "attempts to break every bone in the body of",
-  "delivers a bludgeoning, heavy strike of their %W aiming to completely flatten"
+  "delivers a bludgeoning, heavy strike of their %W aiming to completely flatten",
+  // Chronicler Additions
+  "brings down the heavy bulk of their %W aiming to shatter the bones of",
+  "swings a concussive, bone-crushing blow with their %W toward",
+  "hurls the immense weight of their %W to pulverize the defenses of",
+  "attempts to cave in the ribcage of",
+  "delivers a bludgeoning, heavy strike of their %W aiming to completely flatten",
+  "swings their %W with crushing fury to shatter the skull of",
+  "hurls the full, blunt force of their %W to break the guard of",
+  "attempts to pulverize armor and bone alike with a heavy heave of their %W at"
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [
@@ -437,7 +486,16 @@ export const THRUST_ATTACK_TEMPLATES = [
   "lunges violently, seeking to bore their %W through the exposed vitals of",
   "stabs with lethal intent, hoping to impale",
   "pierces the distance with a pinpoint thrust of their %W toward",
-  "drives their %W deep, seeking the vulnerable, unarmored gaps of"
+  "drives their %W deep, seeking the vulnerable, unarmored gaps of",
+  // Chronicler Additions
+  "drives their %W forward, aiming a deadly puncture at the heart of",
+  "lunges violently, seeking to bore their %W through the exposed vitals of",
+  "stabs with lethal intent, hoping to impale",
+  "pierces the distance with a pinpoint thrust of their %W toward",
+  "drives their %W deep, seeking the vulnerable, unarmored gaps of",
+  "aims a deadly, pinpoint thrust of their %W to skewer",
+  "stabs forward with their %W, seeking a fatal puncture on",
+  "lunges viciously, attempting to spear the lungs of"
 ];
 
 export const FIST_ATTACK_TEMPLATES = [
@@ -445,12 +503,12 @@ export const FIST_ATTACK_TEMPLATES = [
   "strikes out with an OPEN HAND at",
   "jabs quickly at",
   "delivers a brutal haymaker toward",
-  "drives a crushing fist into",
+  "drives a crushing fist into"
 ];
 
 export const GENERIC_ATTACK_TEMPLATES = [
   "attacks with his %W targeting",
   "strikes out at",
   "lashes out with his %W against",
-  "unleashes a vicious assault upon",
+  "unleashes a vicious assault upon"
 ];
