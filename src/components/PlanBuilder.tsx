@@ -100,7 +100,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
         onPlanChange({ ...plan, defensiveTactic: tactic.id as DefensiveTactic });
       }
     } else {
-      const phases = { ...plan.phases } || {};
+      const phases = { ...plan.phases };
       const currentPhase = phases[phaseKey] || { OE: plan.OE, AL: plan.AL, killDesire: plan.killDesire || 5 };
       
       if (tactic.type === "offensive") {
@@ -317,7 +317,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                                 <Slider 
                                   value={[plan.phases?.[p]?.OE ?? plan.OE]} 
                                   onValueChange={([v]) => {
-                                    const next = { ...plan.phases } || {};
+                                    const next = { ...plan.phases };
                                     next[p] = { ...(next[p] || { OE: plan.OE, AL: plan.AL, killDesire: plan.killDesire || 5 }), OE: v };
                                     onPlanChange({ ...plan, phases: next });
                                   }} 
