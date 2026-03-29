@@ -8,12 +8,12 @@ const ENDURANCE_OE_SCALING = 0.4;
 const ENDURANCE_AL_SCALING = 0.2;
 
 // Fatigue thresholds
-const FATIGUE_MODERATE_THRESHOLD = 0.70; // Increased to trigger moderate fatigue earlier, preventing protracted stall-out bouts
-const FATIGUE_HEAVY_THRESHOLD = 0.50; // Increased to trigger heavy fatigue earlier, reducing early-game soft-locks
+const FATIGUE_MODERATE_THRESHOLD = 0.65; // Triggered slightly earlier to make stamina an urgent tactical factor
+const FATIGUE_HEAVY_THRESHOLD = 0.45; // Adjusted to align with a harsher stamina economy
 
 // Fatigue penalties
-const FATIGUE_MODERATE_PENALTY = -4; // Increased penalty to punish fatigue harder and enforce realistic pacing
-const FATIGUE_HEAVY_PENALTY = -12; // Increased penalty to make fatigue extremely punishing
+const FATIGUE_MODERATE_PENALTY = -6; // Harsher penalty to punish sub-optimal pacing
+const FATIGUE_HEAVY_PENALTY = -15; // Brutal penalty to represent severe exhaustion in the arena
 
 export function enduranceCost(oe: number, al: number): number {
   return Math.floor(oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING);

@@ -97,19 +97,19 @@ export function calculateKillWindow(
   phaseLevel: number // 0 for Opening, 1 for Mid, 2 for Late
 ): number {
   // Base threshold (lethal hits are rare but possible)
-  let threshold = 0.10; // Increased base lethality to make Blood Matches genuinely threatening
+  let threshold = 0.15; // Increased base lethality to ensure genuine permadeath threat
 
   // HP factor: higher chance if HP is low (below 30%)
-  if (hpRatio < 0.3) threshold += 0.12;
+  if (hpRatio < 0.3) threshold += 0.15;
   else if (hpRatio < 0.5) threshold += 0.05;
 
   // Endurance (Fatigue) factor: higher chance if target is exhausted (below 30%)
-  if (enduranceRatio < 0.3) threshold += 0.25; // Increased penalty for fighting while exhausted to ensure stamina matters
+  if (enduranceRatio < 0.3) threshold += 0.35; // Increased penalty for fighting while exhausted to ensure stamina matters
   else if (enduranceRatio < 0.5) threshold += 0.15; // Increased penalty for fighting while exhausted
 
   // Location factor: Vital spots are deadlier
-  if (location === "head") threshold += 0.15; // Increased from +0.10 to +0.15
-  if (location === "chest" || location === "abdomen") threshold += 0.30; // Increased chest hit lethality by 8% to ensure heavy armor encumbrance trade-offs are a statistical necessity in late-game bouts.
+  if (location === "head") threshold += 0.20; // Increased to +0.20 for deadly head trauma
+  if (location === "chest" || location === "abdomen") threshold += 0.38; // Increased chest hit lethality by 8% to ensure heavy armor encumbrance trade-offs are a statistical necessity in late-game bouts.
 
   // Kill Desire: Attacker's aggression
   threshold += (killDesire - 5) * 0.01;
@@ -118,5 +118,5 @@ export function calculateKillWindow(
   threshold += phaseLevel * 0.05;
 
   // Cap at 75% for organic hits to allow high-risk scenarios (fatigued, vital hits) to truly threaten permadeath
-  return Math.max(0, Math.min(0.75, threshold)); // Increased cap to allow high-risk scenarios to truly threaten permadeath
+  return Math.max(0, Math.min(0.85, threshold)); // Increased cap to allow high-risk scenarios to truly threaten permadeath
 }

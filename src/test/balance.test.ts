@@ -85,6 +85,7 @@ describe("Style Balance", () => {
 
   it("should have no style with >65% overall win rate", () => {
     const problems: string[] = [];
+    const report: string[] = [];
 
     for (const s of ALL_STYLES) {
       const rate = styleFights[s] > 0 ? styleWins[s] / styleFights[s] : 0;
