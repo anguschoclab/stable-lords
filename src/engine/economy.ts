@@ -13,10 +13,10 @@
  */
 import type { GameState, LedgerEntry } from "@/types/game";
 
-const FIGHT_PURSE = 100; // Increased to 100 to reward risking warriors in fights
-const WIN_BONUS = 45; // Increased to 45 to reward winning
+const FIGHT_PURSE = 100; // Increased to reward risking high-fame Duelmasters in fights
+const WIN_BONUS = 40; // Increased to incentivize winning and reward risking good fighters
 const FAME_MULTIPLIER = 2;
-const WARRIOR_UPKEEP = 45; // Increased to 45 to emphasize efficiency and penalize idle rosters, ensuring cheap recruits are mathematically viable for rebuilding.
+const WARRIOR_UPKEEP = 45; // Increased to severely penalize large idle rosters and make cheap recruits from the Orphanage viable
 const TRAINER_SALARY = 35;
 const TRAINING_COST = 25; // Increased training cost to make early-game recruits more of a risk
 import { TRAINER_WEEKLY_SALARY } from "./trainers";

@@ -104,11 +104,11 @@ export function calculateKillWindow(
   else if (hpRatio < 0.5) threshold += 0.05;
 
   // Endurance (Fatigue) factor: higher chance if target is exhausted (below 30%)
-  if (enduranceRatio < 0.3) threshold += 0.18; // Increased penalty for fighting while exhausted
-  else if (enduranceRatio < 0.5) threshold += 0.10; // Increased penalty for fighting while exhausted
+  if (enduranceRatio < 0.3) threshold += 0.25; // Increased penalty for fighting while exhausted to ensure stamina matters
+  else if (enduranceRatio < 0.5) threshold += 0.15; // Increased penalty for fighting while exhausted
 
   // Location factor: Vital spots are deadlier
-  if (location === "head") threshold += 0.20; // Increased head hit lethality
+  if (location === "head") threshold += 0.15; // Increased from +0.10 to +0.15
   if (location === "chest" || location === "abdomen") threshold += 0.30; // Increased chest hit lethality by 8% to ensure heavy armor encumbrance trade-offs are a statistical necessity in late-game bouts.
 
   // Kill Desire: Attacker's aggression

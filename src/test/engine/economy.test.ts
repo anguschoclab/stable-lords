@@ -63,9 +63,9 @@ describe("Economy Engine", () => {
       // Expenses:
       // Warriors: 2 * 45 = 90
       // Trainers: 1 * 35 = 35
-      // Training: 1 * 25 = 25
-      // Total expenses: 150
-      expect(breakdown.totalExpenses).toBe(150);
+      // Training: 1 * 20 = 20
+      // Total expenses: 145
+      expect(breakdown.totalExpenses).toBe(145);
 
       const expenseLabels = breakdown.expenses.map(e => e.label);
       expect(expenseLabels).toContain("Warrior upkeep (2)");
@@ -120,10 +120,10 @@ describe("Economy Engine", () => {
 
       // Income:
       // Fights: 2 * 100 = 200
-      // Wins: 1 * 45 = 45
+      // Wins: 1 * 40 = 40
       // Fame: 10 * 2 = 20
-      // Total income: 265
-      expect(breakdown.totalIncome).toBe(265);
+      // Total income: 260
+      expect(breakdown.totalIncome).toBe(260);
 
       const incomeLabels = breakdown.income.map(i => i.label);
       expect(incomeLabels).toContain("Fight purses (2)");
@@ -131,7 +131,7 @@ describe("Economy Engine", () => {
       expect(incomeLabels).toContain("Fame dividends");
 
       expect(breakdown.income.find(i => i.label.includes("Fight purses"))?.amount).toBe(200);
-      expect(breakdown.income.find(i => i.label.includes("Win bonuses"))?.amount).toBe(45);
+      expect(breakdown.income.find(i => i.label.includes("Win bonuses"))?.amount).toBe(40);
       expect(breakdown.income.find(i => i.label.includes("Fame dividends"))?.amount).toBe(20);
     });
 
@@ -189,12 +189,12 @@ describe("Economy Engine", () => {
 
       const newState = processEconomy(state);
 
-      // Income: 10 (fame) + 100 (fight) + 45 (win) = 155
+      // Income: 10 (fame) + 100 (fight) + 40 (win) = 150
       // Expenses: 45 (upkeep) = 45
-      // Net = 110
-      // Expected new gold = 100 + 110 = 210
+      // Net = 105
+      // Expected new gold = 100 + 105 = 205
 
-      expect(newState.gold).toBe(210);
+      expect(newState.gold).toBe(205);
 
       // Verify immutability
       expect(newState).not.toBe(state);
@@ -215,7 +215,7 @@ describe("Economy Engine", () => {
 
       const winBonusEntry = newLedgerEntries.find(e => e.label.includes("Win bonuses"));
       expect(winBonusEntry).toBeDefined();
-      expect(winBonusEntry?.amount).toBe(45);
+      expect(winBonusEntry?.amount).toBe(40);
       expect(winBonusEntry?.category).toBe("fight");
       expect(winBonusEntry?.week).toBe(3);
 

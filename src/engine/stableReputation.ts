@@ -80,12 +80,12 @@ export function computeStableReputation(state: GameState): StableReputation {
 
   // ── Notoriety ──
   // Make recent kills and historical lethality impact reputation more quickly
-  const notorietyRaw = (totalKills * 2) + (graveyardKills * 3) + (killBouts * 2);
+  const notorietyRaw = (totalKills * 3) + (graveyardKills * 4) + (killBouts * 3);
   const notoriety = Math.min(100, Math.round(notorietyRaw * 2));
 
   // ── Honor ──
   // Base 50, reduced by kills, boosted by clean bouts
-  const honorRaw = 50 + cleanBouts * 0.5 - totalKills * 3;
+  const honorRaw = 50 + cleanBouts * 0.5 - totalKills * 5;
   const honor = Math.min(100, Math.max(0, Math.round(honorRaw)));
 
   // ── Adaptability ──
@@ -131,8 +131,8 @@ export function computeRivalReputation(
   const avgFame = topFame.length > 0 ? topFameSum / topFame.length : 0;
   const fame = Math.min(100, Math.round(avgFame * 2.5));
 
-  const notoriety = Math.min(100, Math.round(totalKills * 4));
-  const honor = Math.min(100, Math.max(0, Math.round(50 + cleanBouts * 0.3 - totalKills * 3)));
+  const notoriety = Math.min(100, Math.round(totalKills * 6));
+  const honor = Math.min(100, Math.max(0, Math.round(50 + cleanBouts * 0.3 - totalKills * 5)));
 
   const adaptability = Math.min(100, Math.round(uniqueStyles.size * 10));
 
