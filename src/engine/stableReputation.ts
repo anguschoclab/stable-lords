@@ -75,7 +75,8 @@ export function computeStableReputation(state: GameState): StableReputation {
     topFameSum += topFame[i].fame;
   }
   const avgFame = topFame.length > 0 ? topFameSum / topFame.length : 0;
-  const fame = Math.min(100, Math.round(avgFame * 3 + gazetteMentions * 0.5 + (state.fame ?? 0)));
+  // Reduced average fame multiplier and scaled down carryover fame to prevent early-game snowballing
+  const fame = Math.min(100, Math.round(avgFame * 2.5 + gazetteMentions * 1.0 + (state.fame ?? 0) * 0.90));
 
   // ── Notoriety ──
   // Make recent kills and historical lethality impact reputation more quickly
@@ -128,7 +129,7 @@ export function computeRivalReputation(
     topFameSum += topFame[i].fame;
   }
   const avgFame = topFame.length > 0 ? topFameSum / topFame.length : 0;
-  const fame = Math.min(100, Math.round(avgFame * 3));
+  const fame = Math.min(100, Math.round(avgFame * 2.5));
 
   const notoriety = Math.min(100, Math.round(totalKills * 4));
   const honor = Math.min(100, Math.max(0, Math.round(50 + cleanBouts * 0.3 - totalKills * 3)));
