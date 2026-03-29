@@ -32,7 +32,7 @@ export const ARMOR_INTRO_VERBS = [
   "is checking the straps of his",
   "has drawn on a suit of",
   "has put on a suit of",
-  "is clad in",
+  "is clad in"
 ];
 
 export const WEAPON_INTRO_VERBS = [
@@ -45,7 +45,7 @@ export const WEAPON_INTRO_VERBS = [
   "is drawing a %W from its sheath",
   "tests the balance of a %W",
   "grins down his %W at his foe",
-  "grins down his %W at her foe",
+  "grins down his %W at her foe"
 ];
 
 export const HELM_DESCS: Record<string, string[]> = {
@@ -67,7 +67,7 @@ export const BATTLE_OPENERS = [
   "The crowd watches intently as the warriors square off.",
   "A brutal cheer rises as the combatants face each other.",
   "The scent of old blood fills the air as the bout commences.",
-  "Anticipation grips the arena as the duel gets underway.",
+  "Anticipation grips the arena as the duel gets underway."
 ];
 
 export const PARRY_TEMPLATES = [
@@ -77,7 +77,7 @@ export const PARRY_TEMPLATES = [
   "blocks the attack effortlessly.",
   "sweeps the attack away using his %W.",
   "catches the vicious swing on the flat of his %W.",
-  "turns the strike aside with a screech of steel against his %W.",
+  "turns the strike aside with a screech of steel against his %W."
 ];
 
 export const PARRY_SHIELD_TEMPLATES = [
@@ -86,7 +86,7 @@ export const PARRY_SHIELD_TEMPLATES = [
   "interposes his SHIELD.",
   "angles his SHIELD to deflect the attack.",
   "absorbs the impact entirely with his SHIELD.",
-  "raises his SHIELD just in time to catch the blow.",
+  "raises his SHIELD just in time to catch the blow."
 ];
 
 export const DODGE_TEMPLATES = [
@@ -97,7 +97,7 @@ export const DODGE_TEMPLATES = [
   "evades the attack smoothly.",
   "shifts aside, avoiding the strike.",
   "twists his body, the strike missing by a hair's breadth.",
-  "slips beneath the attack with surprising agility.",
+  "slips beneath the attack with surprising agility."
 ];
 
 export const COUNTERSTRIKE_TEMPLATES = [
@@ -105,7 +105,7 @@ export const COUNTERSTRIKE_TEMPLATES = [
   "%N parries and IMMEDIATELY strikes back!",
   "A sudden opening—%N exploits it with a COUNTERSTRIKE!",
   "Exploiting the overextension, %N delivers a rapid COUNTERSTRIKE!",
-  "%N bats the attack aside, leaving his foe open for a COUNTERSTRIKE!",
+  "%N bats the attack aside, leaving his foe open for a COUNTERSTRIKE!"
 ];
 
 export const HIT_TEMPLATES = [
@@ -186,7 +186,7 @@ export const CROWD_REACTIONS_POSITIVE = [
   "Cheers erupt from the stands!",
   "The audience leaps to their feet!",
   "A thunderous cheer sweeps the arena!",
-  "The crowd howls for more blood!",
+  "The crowd howls for more blood!"
 ];
 
 export const CROWD_REACTIONS_NEGATIVE = [
@@ -194,13 +194,13 @@ export const CROWD_REACTIONS_NEGATIVE = [
   "The crowd murmurs in disappointment.",
   "Derisive laughter from the high seats.",
   "The audience groans at the clumsy display.",
-  "Insults rain down from the disappointed onlookers.",
+  "Insults rain down from the disappointed onlookers."
 ];
 
 export const CROWD_REACTIONS_ENCOURAGE = [
   "Chants of encouragement begin to build.",
   "The crowd urges the warriors on.",
-  "Shouts of support ring out from the pit edge.",
+  "Shouts of support ring out from the pit edge."
 ];
 
 export const INI_WIN_TEMPLATES = [
@@ -209,7 +209,7 @@ export const INI_WIN_TEMPLATES = [
   "A sudden burst of speed puts %N on the offensive.",
   "%N presses the attack.",
   "%N dictates the deadly tempo of the fight.",
-  "%N steals the momentum!",
+  "%N steals the momentum!"
 ];
 
 export const INI_KEEP_TEMPLATES = [
@@ -217,7 +217,7 @@ export const INI_KEEP_TEMPLATES = [
   "%N continues to press the advantage.",
   "Relentless, %N strikes again.",
   "%N refuses to yield the offensive.",
-  "Giving his foe no quarter, %N presses on.",
+  "Giving his foe no quarter, %N presses on."
 ];
 
 export const EXECUTION_TEMPLATES = [
@@ -361,7 +361,7 @@ export const KO_TEMPLATES = [
   "%D goes down hard and doesn't move.",
   "The strike knocks %D senseless.",
   "%D's eyes roll back as he slumps to the blood-soaked sand.",
-  "Unable to bear the punishment, %D crumples into darkness.",
+  "Unable to bear the punishment, %D crumples into darkness."
 ];
 
 export const SURRENDER_TEMPLATES = [
@@ -369,7 +369,7 @@ export const SURRENDER_TEMPLATES = [
   "%D signals surrender.",
   "Unable to continue, %D throws down his weapon.",
   "Bleeding and broken, %D begs for mercy from %A.",
-  "%D raises a trembling hand, conceding the bout to %A.",
+  "%D raises a trembling hand, conceding the bout to %A."
 ];
 
 export const FATIGUE_COLLAPSE_TEMPLATES = [
@@ -437,7 +437,7 @@ export const TAUNT_TEMPLATES = [
   '"Prepare to die," %N hisses.',
   '"I will wear your entrails as a necklace!" %N roars.',
   '"Your stablemaster will weep today!" %N mocks.',
-  '"You look tired. Let me end it," %N chuckles.',
+  '"You look tired. Let me end it," %N chuckles.'
 ];
 
 export const STALEMATE_TEMPLATES = [
@@ -445,7 +445,7 @@ export const STALEMATE_TEMPLATES = [
   "A moment's pause as both catch their breath.",
   "They trade feints, looking for an opening.",
   "The pace slows as the fighters evaluate the carnage.",
-  "Footsteps crunch on the sand as the combatants reassess their strategies.",
+  "Footsteps crunch on the sand as the combatants reassess their strategies."
 ];
 
 export const SLASH_ATTACK_TEMPLATES = [
@@ -529,12 +529,12 @@ export const FIST_ATTACK_TEMPLATES = [
   "strikes out with an OPEN HAND at",
   "jabs quickly at",
   "delivers a brutal haymaker toward",
-  "drives a crushing fist into",
+  "drives a crushing fist into"
 ];
 
 export const GENERIC_ATTACK_TEMPLATES = [
   "attacks with his %W targeting",
   "strikes out at",
   "lashes out with his %W against",
-  "unleashes a vicious assault upon",
+  "unleashes a vicious assault upon"
 ];

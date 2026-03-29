@@ -7,8 +7,7 @@ import {
   Trophy, Star, Flame, Shield, Activity, 
   History, Swords, Heart, Zap, Skull, Users
 } from "lucide-react";
-import { StatBadge } from "@/components/ui/StatBadge";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
 
 interface StableDossierProps {
   stableId?: string;

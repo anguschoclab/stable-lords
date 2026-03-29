@@ -11,7 +11,7 @@ import {
   Trophy, Star, Flame, Shield, Activity, 
   History, Swords, Heart, Zap, Skull 
 } from "lucide-react";
-import { StatBadge } from "@/components/ui/StatBadge";
+import { StatBadge } from "@/components/ui/WarriorBadges";
 import WarriorPaperDoll from "@/components/WarriorPaperDoll";
 import { cn } from "@/lib/utils";
 

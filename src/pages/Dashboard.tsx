@@ -9,9 +9,9 @@ import { BASE_ROSTER_CAP } from "@/data/constants";
 import { Badge } from "@/components/ui/badge";
 import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
 
-import { StatBadge } from "@/components/ui/StatBadge";
-import TagBadge from "@/components/TagBadge";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge } from "@/components/ui/WarriorBadges";
+import { TagBadge } from "@/components/ui/WarriorBadges";
+import { WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {

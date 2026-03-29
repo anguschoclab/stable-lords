@@ -20,7 +20,7 @@ import WarriorBuilder from "@/components/WarriorBuilder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge } from "@/components/ui/StatBadge";
+import { StatBadge } from "@/components/ui/WarriorBadges";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {

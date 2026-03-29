@@ -16,8 +16,7 @@ import {
   ArrowLeft, Quote, Scroll, Dumbbell, Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
-import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import { FormSparkline } from "@/components/charts/FormSparkline";
 import { ConditionBattery } from "@/components/ui/ConditionBattery";
 

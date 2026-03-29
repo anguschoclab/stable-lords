@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair, User, Crosshair, Shirt, History, TrendingUp, ScrollText, Zap, Skull, Target, Activity, Eye, Lightbulb } from "lucide-react";
-import TagBadge from "@/components/TagBadge";
+import { TagBadge } from "@/components/ui/WarriorBadges";
 import PlanBuilder from "@/components/PlanBuilder";
 import { SchedulingWidget } from "@/components/widgets/SchedulingWidget";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";

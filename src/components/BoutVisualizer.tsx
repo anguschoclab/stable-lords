@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import type { MinuteEvent, FightOutcomeBy, CombatEvent } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
-import TagBadge from "@/components/TagBadge";
+import { TagBadge } from "@/components/ui/WarriorBadges";
 import { Button } from "@/components/ui/button";
 import { 
   Play, 

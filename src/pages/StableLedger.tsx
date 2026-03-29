@@ -17,8 +17,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { WarriorLink } from "@/components/EntityLink";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
-import { StatBadge } from "@/components/ui/StatBadge";
+import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import {
   BookOpen, Coins, FileText, ScrollText, Skull, Shield,
   Trophy, Star, Swords, Heart, Zap, GraduationCap,

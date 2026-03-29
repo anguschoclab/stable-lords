@@ -4,8 +4,7 @@ import { STYLE_DISPLAY_NAMES, type Warrior } from "@/types/game";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge } from "@/components/ui/StatBadge";
-import { WarriorNameTag } from "@/components/ui/WarriorNameTag";
+import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
