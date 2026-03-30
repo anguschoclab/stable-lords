@@ -231,18 +231,18 @@ async function runDailySimulation() {
 
   if (inflationRatio > 2.0) {
     needsChanges = true;
-    report += `- **Economy Issue:** High inflation. Consider reviewing engine constants related to fight purses, win bonuses, or adding scaling gold sinks like trainer tier salaries.\n`;
+    report += `- **Economy Issue:** High inflation. Consider lowering \`WIN_BONUS\` or \`FIGHT_PURSE\` in \`src/engine/economy.ts\`, or adding scaling gold sinks like trainer tier salaries.\n`;
   } else if (inflationRatio < 0.5) {
     needsChanges = true;
-    report += `- **Economy Issue:** Negative economy balance. Consider increasing baseline payouts or reviewing weekly upkeep/training costs to prevent early bankruptcies.\n`;
+    report += `- **Economy Issue:** Negative economy balance. Consider increasing baseline payouts or reviewing weekly upkeep/training costs in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
   }
 
   if (killRateNum < 8.0) {
     needsChanges = true;
-    report += `- **Lethality Issue:** Kill rate (${killRate}%) is lower than the 8-15% target. Consider lowering the required thresholds in the combat resolution engine.\n`;
+    report += `- **Lethality Issue:** Kill rate (${killRate}%) is lower than the 8-15% target. Consider increasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\` to make kills more frequent.\n`;
   } else if (killRateNum > 15.0) {
     needsChanges = true;
-    report += `- **Lethality Issue:** Kill rate (${killRate}%) exceeds the 8-15% target. Consider increasing the required thresholds or defensive mitigations in the combat resolution engine.\n`;
+    report += `- **Lethality Issue:** Kill rate (${killRate}%) exceeds the 8-15% target. Consider decreasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\` to reduce lethality.\n`;
   }
 
   if (highWinRates.length > 0) {
