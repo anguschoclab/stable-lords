@@ -106,12 +106,16 @@ export function CoachOverlay() {
                 <button 
                   onClick={() => setMinimized(true)}
                   className="p-1 hover:bg-white/5 rounded transition-colors text-muted-foreground"
+                  aria-label="Minimize coach tip"
+                  title="Minimize tip"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => setCoachDismissed([...coachDismissed, activeTip.id])}
                   className="p-1 hover:bg-destructive/10 rounded transition-colors text-muted-foreground hover:text-destructive"
+                  aria-label="Dismiss coach tip"
+                  title="Dismiss tip"
                 >
                   <X className="w-4 h-4" />
                 </button>
