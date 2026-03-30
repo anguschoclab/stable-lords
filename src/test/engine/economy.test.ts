@@ -63,9 +63,9 @@ describe("Economy Engine", () => {
       // Expenses:
       // Warriors: 2 * 45 = 90
       // Trainers: 1 * 35 = 35
-      // Training: 1 * 20 = 20
-      // Total expenses: 145
-      expect(breakdown.totalExpenses).toBe(145);
+      // Training: 1 * 25 = 25
+      // Total expenses: 150
+      expect(breakdown.totalExpenses).toBe(150);
 
       const expenseLabels = breakdown.expenses.map(e => e.label);
       expect(expenseLabels).toContain("Warrior upkeep (2)");
