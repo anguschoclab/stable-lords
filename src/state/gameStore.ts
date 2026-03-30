@@ -261,6 +261,7 @@ export function migrateGameState(parsed: any): GameState {
   if (parsed.recruitPool) parsed.recruitPool = parsed.recruitPool.slice(-50);
   if (parsed.trainers) parsed.trainers = parsed.trainers.slice(-50);
   if (parsed.rivals) parsed.rivals = parsed.rivals.slice(-50);
+  if (parsed.unacknowledgedDeaths) parsed.unacknowledgedDeaths = parsed.unacknowledgedDeaths.slice(-100);
   return parsed as GameState;
 }
 
