@@ -344,14 +344,22 @@ function checkGiantKillerFlair(
     const winnerW = outcome.winner === "A" ? warrior : opponent;
     const loserW = outcome.winner === "A" ? opponent : warrior;
     if (loserW.fame >= winnerW.fame + 10 && loserW.fame >= winnerW.fame * 2) {
-      const upsetCount = s.arenaHistory.filter(af => {
-        if (af.fameA == null || af.fameD == null || !af.winner) return false;
+      // ⚡ Bolt: Replaced O(N) .filter().length with an early-breaking backward loop
+      // since we only need to verify if upsetCount reaches 3.
+      let upsetCount = 0;
+      for (let i = s.arenaHistory.length - 1; i >= 0; i--) {
+        const af = s.arenaHistory[i];
+        if (af.fameA == null || af.fameD == null || !af.winner) continue;
         const wName = af.winner === "A" ? af.a : af.d;
-        if (wName !== winnerW.name) return false;
+        if (wName !== winnerW.name) continue;
         const wFame = af.winner === "A" ? af.fameA : af.fameD;
         const lFame = af.winner === "A" ? af.fameD : af.fameA;
-        return lFame >= wFame + 10 && lFame >= wFame * 2;
-      }).length;
+        if (lFame >= wFame + 10 && lFame >= wFame * 2) {
+          upsetCount++;
+          if (upsetCount >= 3) break;
+        }
+      }
+
       if (upsetCount >= 3 && !winnerW.flair.includes("Giant Killer")) {
         s.roster = s.roster.map(w => w.id === winnerW.id ? { ...w, flair: [...w.flair, "Giant Killer"] } : w);
       }
