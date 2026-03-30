@@ -39,6 +39,10 @@ const createMockDirHandle = (name) => ({
   values: async function* () {}
 });
 
+if (typeof global.navigator === 'undefined') {
+  (global as any).navigator = {};
+}
+
 Object.defineProperty(global.navigator, 'storage', {
   value: {
     getDirectory: async () => createMockDirHandle('root')
