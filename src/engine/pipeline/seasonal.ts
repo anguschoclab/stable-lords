@@ -2,7 +2,7 @@ import { type GameState } from "@/types/game";
 import { processHallOfFame, processTierProgression, computeNextSeason } from "@/engine/weekPipeline";
 import { generateOwnerNarratives } from "@/engine/ownerNarrative";
 import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
-import { processOwnerGrudges } from "@/engine/ownerAI";
+import { processOwnerGrudges } from "@/engine/ownerGrudges";
 
 export const applySeasonalUpdates: (state: GameState) => GameState = (state) => {
   const newWeek = state.week + 1;

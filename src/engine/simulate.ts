@@ -1,12 +1,13 @@
 /**
- * Stable Lords — Full Combat Engine (Decoupled v1)
- * 
- * Simulates a fight between two warriors.
- * Refactored to separate Math (resolution.ts) from Drama (narrator.ts).
+ * Stable Lords — Full Combat Engine (Decoupled v2)
+ *
+ * Refactored for:
+ * 1. Determinism - Injectable RNG and seeds.
+ * 2. Simpler setup - Decomposed stat calculation.
+ * 3. Pure Logic - Separated simulation from narrative side-effects.
  */
 import {
   FightingStyle,
-  STYLE_DISPLAY_NAMES,
   type Warrior,
   type FightPlan,
   type FightOutcome,
@@ -30,13 +31,18 @@ import {
   resolveEffectiveTactics,
   DECISION_HIT_MARGIN,
   MAX_EXCHANGES,
-  EXCHANGES_PER_MINUTE
+  EXCHANGES_PER_MINUTE,
 } from "./combat/resolution";
 import { narrateEvents, type NarrationContext } from "./combat/narrator";
+import { generateId } from "@/utils/idUtils";
+
+// ─── Types ──────────────────────────────────────────────────────────────
+import { type CombatEvent as ExchangeEvent } from "@/types/game";
+
+type Phase = "OPENING" | "MID" | "LATE";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-type Phase = "OPENING" | "MID" | "LATE";
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const p = getCombatPhase(exchange, maxExchanges);
   return p.toUpperCase() as Phase;
@@ -55,7 +61,10 @@ function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
   };
 }
 
-function createFighterState(
+/**
+ * Prepares the combat state for a single fighter.
+ */
+export function createFighterState(
   label: "A" | "D",
   plan: FightPlan,
   warrior?: Warrior,
@@ -117,16 +126,36 @@ function createFighterState(
 
 // ─── Main Entry Point ─────────────────────────────────────────────────────
 
+/**
+ * Simulates a fight between two plans/warriors.
+ * 
+ * @param planA - Strategy for fighter A
+ * @param planB - Strategy for fighter D
+ * @param warriorA - Warrior data for A (optional)
+ * @param warriorD - Warrior data for D (optional)
+ * @param providedRng - Seeded RNG function (optional, generates one if missing)
+ * @param trainers - Active trainers providing global modifiers
+ */
 export function simulateFight(
   planA: FightPlan,
   planD: FightPlan,
   warriorA?: Warrior,
   warriorD?: Warrior,
-  seed?: number,
+  providedRng?: (() => number) | number,
   trainers?: TrainerData[]
 ): FightOutcome {
-  const secureSeed = typeof globalThis !== "undefined" && (globalThis as any).crypto ? (globalThis as any).crypto.getRandomValues(new Uint32Array(1))[0] : Math.floor(Math.random() * 0xFFFFFFFF);
-  const rng = mulberry32(seed ?? (Date.now() ^ secureSeed));
+  // 1. Deterministic RNG setup
+  let rng: () => number;
+  if (typeof providedRng === "function") {
+    rng = providedRng;
+  } else {
+    const seed = typeof providedRng === "number" 
+      ? providedRng 
+      : (typeof globalThis !== "undefined" && (globalThis as any).crypto 
+          ? (globalThis as any).crypto.getRandomValues(new Uint32Array(1))[0] 
+          : Math.floor(Math.random() * 0xFFFFFFFF));
+    rng = mulberry32(seed);
+  }
 
   const nameA = warriorA?.name ?? "Attacker";
   const nameD = warriorD?.name ?? "Defender";
@@ -151,7 +180,7 @@ export function simulateFight(
   };
 
   const log: MinuteEvent[] = [];
-  const tags: string[] = [];
+  const tags = new Set<string>();
   let prevHpRatioA = 1.0;
   let prevHpRatioD = 1.0;
   let winner: "A" | "D" | null = null;
@@ -159,13 +188,14 @@ export function simulateFight(
   let lastPhase: string | null = null;
   let lastMinuteMarker = 0;
   
-  let causeBucket: FightOutcome["post"]["causeBucket"] | undefined = undefined;
-  let fatalHitLocation: string | undefined = undefined;
-  let fatalExchangeIndex: number | undefined = undefined;
+  let causeBucket: FightOutcome["post"]["causeBucket"] | undefined;
+  let fatalHitLocation: string | undefined;
+  let fatalExchangeIndex: number | undefined;
 
   // ── 1. Introductions ──
   const introA = generateWarriorIntro(rng, { name: nameA, style: planA.style, weaponId: weaponA, armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor, helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm }, warriorA?.attributes?.SZ);
   const introD = generateWarriorIntro(rng, { name: nameD, style: planD.style, weaponId: weaponD, armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor, helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm }, warriorD?.attributes?.SZ);
+  
   introA.forEach(line => log.push({ minute: 0, text: line }));
   log.push({ minute: 0, text: "" });
   introD.forEach(line => log.push({ minute: 0, text: line }));
@@ -232,40 +262,24 @@ export function simulateFight(
       boutEndLines.forEach(line => log.push({ minute: min, text: line }));
       break;
     }
-    
-    // Streak tracking for Tactic Overuse
-    // (In a more complex engine, we'd update tacticStreakA/B here based on tactics used)
   }
 
-  // ── 3. Post-Bout Finalization ──
+  // ── 3. Decision Logic (if time limit reached) ──
   if (!winner) {
-    const finalMin = Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE);
-    if (fA.hitsLanded > fD.hitsLanded + DECISION_HIT_MARGIN) {
-      winner = "A"; by = "Stoppage";
-      log.push({ minute: finalMin, text: `Time! ${nameA} is awarded the decision on points.` });
-    } else if (fD.hitsLanded > fA.hitsLanded + DECISION_HIT_MARGIN) {
-      winner = "D"; by = "Stoppage";
-      log.push({ minute: finalMin, text: `Time! ${nameD} is awarded the decision on points.` });
-    } else if (fA.hp > fD.hp) {
-      winner = "A"; by = "Stoppage";
-      log.push({ minute: finalMin, text: `Time! ${nameA} wins a close decision.` });
-    } else if (fD.hp > fA.hp) {
-      winner = "D"; by = "Stoppage";
-      log.push({ minute: finalMin, text: `Time! ${nameD} wins a close decision.` });
-    } else {
-      by = "Draw";
-      log.push({ minute: finalMin, text: `Time! The Arenamaster declares a draw.` });
-    }
+    const finalOutcome = resolveDecision(fA, fD, nameA, nameD);
+    winner = finalOutcome.winner;
+    by = finalOutcome.by;
+    log.push({ minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE), text: finalOutcome.narrative });
   }
 
-  // Outcome Tags
+  // Outcome Tags & Postprocessing
   if (winner) {
     const w = winner === "A" ? fA : fD;
     const l = winner === "A" ? fD : fA;
-    if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) tags.push("Comeback");
-    if (w.hitsLanded >= 5) tags.push("Dominance");
-    if (by === "KO") tags.push("KO");
-    if (by === "Kill") tags.push("Kill");
+    if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) tags.add("Comeback");
+    if (w.hitsLanded >= 5) tags.add("Dominance");
+    if (by === "KO") tags.add("KO");
+    if (by === "Kill") tags.add("Kill");
   }
 
   return {
@@ -280,7 +294,7 @@ export function simulateFight(
       hitsD: fD.hitsLanded,
       gotKillA: winner === "A" && by === "Kill",
       gotKillD: winner === "D" && by === "Kill",
-      tags: [...new Set(tags)],
+      tags: Array.from(tags),
       causeBucket,
       fatalHitLocation,
       fatalExchangeIndex,
@@ -289,8 +303,27 @@ export function simulateFight(
 }
 
 /**
+ * Handles decision points at the end of a fight.
+ */
+function resolveDecision(fA: FighterState, fD: FighterState, nameA: string, nameD: string): { winner: "A"|"D"|null, by: FightOutcome["by"], narrative: string } {
+    if (fA.hitsLanded > fD.hitsLanded + DECISION_HIT_MARGIN) {
+      return { winner: "A", by: "Stoppage", narrative: `Time! ${nameA} is awarded the decision on points.` };
+    } 
+    if (fD.hitsLanded > fA.hitsLanded + DECISION_HIT_MARGIN) {
+      return { winner: "D", by: "Stoppage", narrative: `Time! ${nameD} is awarded the decision on points.` };
+    } 
+    if (fA.hp > fD.hp) {
+      return { winner: "A", by: "Stoppage", narrative: `Time! ${nameA} wins a close decision.` };
+    } 
+    if (fD.hp > fA.hp) {
+      return { winner: "D", by: "Stoppage", narrative: `Time! ${nameD} wins a close decision.` };
+    }
+    return { winner: null, by: "Draw", narrative: `Time! The Arenamaster declares a draw.` };
+}
+
+/**
  * Returns a sane default plan for a warrior based on their fighting style.
- * Used when a warrior has no custom plan set (e.g., orphanage, new recruits).
+ * Used when a warrior has no custom plan set.
  */
 export function defaultPlanForWarrior(warrior: Warrior): FightPlan {
   const style = warrior.style;
@@ -308,31 +341,19 @@ export function defaultPlanForWarrior(warrior: Warrior): FightPlan {
     FightingStyle.ParryRiposte,
   ].includes(style);
 
-  // Default values
-  let oe = 5;
-  let al = 6;
-  let kd = 5;
+  let oe = 5, al = 6, kd = 5;
 
   if (isAggressive) {
     oe = style === FightingStyle.BashingAttack ? 9 : 8;
-    al = 7;
+    al = style === FightingStyle.BashingAttack ? 3 : (style === FightingStyle.LungingAttack ? 8 : 5);
     kd = 7;
   } else if (isDefensive) {
     oe = style === FightingStyle.TotalParry ? 2 : 4;
-    al = 4;
-    kd = 2;
+    al = style === FightingStyle.TotalParry ? 2 : 5;
+    kd = 3;
   } else if (style === FightingStyle.AimedBlow) {
-    oe = 6;
-    al = 5;
-    kd = 8;
+    oe = 6; al = 5; kd = 8;
   }
 
-  return {
-    style,
-    OE: oe,
-    AL: al,
-    killDesire: kd,
-    target: "Any",
-    protect: "Any",
-  };
+  return { style, OE: oe, AL: al, killDesire: kd, target: "Any", protect: "Any" };
 }

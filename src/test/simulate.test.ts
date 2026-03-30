@@ -344,8 +344,8 @@ describe("simulateFight — initiative and tempo", () => {
         makePlan(FightingStyle.StrikingAttack, { OE: 6, AL: 1 }),
         w, makeWarrior("Slow", FightingStyle.StrikingAttack), seed,
       );
-      // Check first attack in log (simplified heuristic)
-      const firstAttack = rHigh.log.find(e => /attacks|strikes|swings/i.test(e.text));
+      // Check first attack in log (skipping intros in minute 0)
+      const firstAttack = rHigh.log.find(e => e.minute > 0 && /attacks|strikes|swings/i.test(e.text));
       if (firstAttack?.text.includes("Test")) highALFirst++;
       else lowALFirst++;
     }

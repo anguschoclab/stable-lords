@@ -159,3 +159,46 @@ export function processRivalStableWeekly(rival: RivalStableData, rng: () => numb
   });
   return { rival: { ...rival, roster: updatedRoster }, gazetteItems: [] };
 }
+
+/**
+ * Randomly picks an eligible opponent from a pool of rival stables.
+ * Used for AI-vs-AI matchmaking when local pools are empty.
+ */
+export function pickRivalOpponent(rivals: RivalStableData[], excludeIds: Set<string>): { warrior: Warrior; rival: RivalStableData } | null {
+  const allEligible: { warrior: Warrior; rival: RivalStableData }[] = [];
+  rivals.forEach(r => {
+    r.roster.forEach(w => {
+      if (w.status === "Active" && !excludeIds.has(w.id)) {
+        allEligible.push({ warrior: w, rival: r });
+      }
+    });
+  });
+
+  if (allEligible.length === 0) return null;
+  return allEligible[Math.floor(Math.random() * allEligible.length)];
+}
+
+export function generateRivalryNarrative(stableA: string, stableB: string, warriorA: string, warriorB: string): string {
+  const templates = [
+    `🔥 RIVALRY REPORT: The feud between ${stableA} and ${stableB} rages on — ${warriorA} faced ${warriorB} in a grudge match!`,
+    `⚔️ VENDETTA IN THE PITS: ${stableA} vs ${stableB} — ${warriorA} and ${warriorB} settled scores in the arena!`,
+    `🏟️ BAD BLOOD: ${stableA} and ${stableB} clashed again as ${warriorA} took on ${warriorB}!`,
+  ];
+  return templates[Math.floor(Math.random() * templates.length)];
+}
+
+/**
+ * Calculate rivalry intensity adjustment based on match outcomes.
+ * Base (bouts fought) + Death (+5) + Upset (+3).
+ */
+export function calculateRivalryScore(
+  boutsFought: number,
+  deathsCount: number,
+  upsetsCount: number
+): number {
+  let score = 0;
+  score += Math.floor(boutsFought / 3);
+  score += deathsCount * 5;
+  score += upsetsCount * 3;
+  return Math.max(1, Math.min(5, score));
+}
