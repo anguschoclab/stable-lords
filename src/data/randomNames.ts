@@ -4,6 +4,7 @@
  */
 
 const WARRIOR_NAMES = [
+  "BLOODSCOURGE", "GRAVEBORN", "ASHBRINGER", "SKULLTAKER", "BONEGRINDER", "HELLHOUND", "NIGHTSTALKER", "DEATHKNELL", "DOOMWEAVER", "SHADOWBANE", "GOREHOUND", "FLESHRIPPER", "SOULCLEAVER", "BLOODFANG", "IRONCLAW", "CARRIONCROW", "DARKSTAR", "VOIDWALKER", "ABYSSGAZE", "RUINMAKER", "BLIGHTFANG", "CORPSEGRINDER", "VENOMHEART", "WIDOWMAKER", "DREADNOUGHT", "BLACKHEART", "CRUELBLADE", "VILEBLOOD", "GRIMREAPER", "SPINEBREAKER",
   "KRAGOS",   "GORLAK",   "THUNDRAK",   "BREKKA",   "MORGUL",
   "SKARN",   "GARVOK",   "DRAXUS",   "KORGAN",   "BRUTAG",
   "IRONJAW",   "GROTHAK",   "WULFGAR",   "BOLVERK",   "MACEWARD",
@@ -96,6 +97,7 @@ const OWNER_LAST = [
 ];
 
 const STABLE_PREFIXES = [
+  "The Bleeding", "The Severed", "The Flayed", "The Shattered", "The Ruined",
   "The Iron",   "The Blood",   "The Shadow",   "The Storm",   "The Crimson",
   "The Ashen",   "The Golden",   "The Black",   "The Silver",   "The Burning",
   "The Steel",   "The Dark",   "The Scarlet",   "The Savage",   "The Fallen",
@@ -111,6 +113,7 @@ const STABLE_PREFIXES = [
 ];
 
 const STABLE_SUFFIXES = [
+  "Slaughterhouse", "Abattoir", "Crypt", "Ossuary", "Golgotha",
   "Wolves",   "Fang",   "Legion",   "Blades",   "Talons",
   "Wardens",   "Reapers",   "Lions",   "Hawks",   "Pit",
   "Company",   "Guard",   "Horde",   "Serpents",   "Ravens",
@@ -126,6 +129,7 @@ const STABLE_SUFFIXES = [
 ];
 
 const STABLE_ALT = [
+  "The Bloodied Gauntlet", "Cult of the Severed Head", "The Iron Maiden", "Lords of the Abyss", "The Ashen Crown", "The Crimson Brotherhood", "The Obsidian Order", "Guild of the Flayed Man", "The Shadow Cartel", "The Bone Orchard",
   "House of Blades",   "The Colosseum Elite",   "Arena Immortals",   "Order of the Crimson Sand",   "The Bone Collectors",
   "Gladiators of the Ashen Gate",   "The Sanguine Brotherhood",   "Circle of Steel",   "The Pitborn",   "Scions of the Arena",
   "The Deathless Company",   "Lords of the Red Sand",   "The Unbroken",   "Warlords of Dusk",   "The Chainbound",

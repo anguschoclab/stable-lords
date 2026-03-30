@@ -221,6 +221,18 @@ export const INI_KEEP_TEMPLATES = [
 ];
 
 export const EXECUTION_TEMPLATES = [
+  "%A brutally separates %D from their life with a horrifying arc of their %W!",
+  "With %D on their knees, %A steps in and ends the fight with a devastating %W strike!",
+  "The arena falls silent as %A delivers a butchering stroke with their %W to %D!",
+  "Exhausted and defenseless, %D is mercilessly put down by %A's %W!",
+  "%A capitalizes on the exposed guard of %D, driving their %W deep for a lethal kill!",
+  "A terrifying spray of crimson follows as %A uses their %W to fatally end %D!",
+  "%D's final mistake is met with %A's %W, ending their career and their life instantly!",
+  "%A shatters the last remnants of %D's hope, delivering a savage execution with their %W!",
+  "With a sickening, final impact, %A uses their %W to send %D to the grave!",
+  "The crowd roars as %A turns a fatal opening into a bloodbath, executing %D with their %W!",
+  "Unable to lift their shield, %D takes the full, lethal fury of %A's %W!",
+  "%A claims the victory by violently ripping the life from %D using their %W!",
   "%A delivers a brutal execution stroke!",
   "%A shows no mercy, finishing the bout!",
   "The final blow is devastating.",
@@ -449,6 +461,12 @@ export const STALEMATE_TEMPLATES = [
 ];
 
 export const SLASH_ATTACK_TEMPLATES = [
+  "draws a wide, disemboweling arc with their %W toward",
+  "lashes out, seeking to completely sever the arm of",
+  "whips their %W in a fast, tearing slice at the unarmored throat of",
+  "attempts a gruesome decapitation sweep with their %W aimed at",
+  "sweeps their %W in a brutal, flesh-rending slash against",
+  "draws the razor edge of their %W in a swift, maiming cut across the chest of",
   "slashes his %W at",
   "swings a wide arc at",
   "cuts fiercely at",
@@ -476,6 +494,12 @@ export const SLASH_ATTACK_TEMPLATES = [
 ];
 
 export const BASH_ATTACK_TEMPLATES = [
+  "brings the heavy mass of their %W down to cave in the skull of",
+  "swings their %W like a battering ram aimed squarely at the chest of",
+  "attempts to completely pulverize the knee of",
+  "delivers a bone-breaking, concussive smash with their %W toward",
+  "hurls the blunt weight of their %W in a rib-shattering arc at",
+  "drives their %W forward with the force to shatter armor and bone on",
   "bashes heavily with his %W toward",
   "swings a crushing blow at",
   "hammers down on",
@@ -503,6 +527,12 @@ export const BASH_ATTACK_TEMPLATES = [
 ];
 
 export const THRUST_ATTACK_TEMPLATES = [
+  "aims a surgical, deadly puncture with their %W toward the heart of",
+  "lunges deep, seeking to impale the unprotected flesh of",
+  "drives their %W forward like a spear, seeking a fatal puncture on",
+  "stabs violently with their %W, hoping to skewer",
+  "pierces the distance with a lightning-fast thrust of their %W targeting",
+  "lunges with fatal precision, attempting to bore their %W completely through",
   "thrusts his %W directly at",
   "lunges forward, aiming at",
   "stabs toward",
