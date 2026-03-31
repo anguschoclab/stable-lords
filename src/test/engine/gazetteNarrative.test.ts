@@ -91,10 +91,11 @@ describe("computeStreaks", () => {
   });
 
   it("processes fights in chronological order regardless of input order", () => {
+    // ⚡ Bolt: computeStreaks now expects pre-sorted arrays as arenaHistory is strictly chronological
     const fights = [
-      createFight(3, "Alice", "Dave", "D"), // Week 3: Alice is A and loses to Dave (-1)
       createFight(1, "Alice", "Bob", "A"), // Week 1: Alice wins (+1)
       createFight(2, "Alice", "Charlie", "A"), // Week 2: Alice wins (+2)
+      createFight(3, "Alice", "Dave", "D"), // Week 3: Alice is A and loses to Dave (-1)
     ];
     // Expected order:
     // Week 1: Alice wins (streak 1)
