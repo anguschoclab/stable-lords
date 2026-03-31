@@ -7,7 +7,7 @@ import {
   Trophy, Star, Flame, Shield, Activity, 
   History, Swords, Heart, Zap, Skull, Users
 } from "lucide-react";
-import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 
 interface StableDossierProps {
   stableId?: string;
@@ -73,7 +73,7 @@ export function StableDossier({ stableId, stableName }: StableDossierProps) {
             {stable.roster.filter(w => w.status === "Active").map((w) => (
               <div key={w.id} className="flex items-center justify-between p-2 rounded bg-secondary/10 border border-border/50">
                 <div className="flex items-center gap-2">
-                  <StatBadge styleName={w.style} />
+                  <WarriorBadge variant="stat" styleName={w.style} />
                   <span className="text-sm font-medium">{w.name}</span>
                 </div>
                 <div className="text-[10px] font-mono text-muted-foreground">

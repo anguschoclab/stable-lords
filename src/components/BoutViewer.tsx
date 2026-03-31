@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import type { MinuteEvent, FightOutcomeBy } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
-import { TagBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipForward, RotateCcw, Skull, Swords, Zap, Shield, ChevronDown, ChevronUp } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
@@ -191,7 +191,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                   <Swords className="h-4 w-4 text-arena-gold" />
                 </div>
                 {isRivalry && (
-                  <TagBadge tag="BLOOD FEUD" type="injury" className="mt-1 animate-pulse shadow-sm shadow-destructive/20" />
+                  <WarriorBadge variant="tag" tag="BLOOD FEUD" type="injury" className="mt-1 animate-pulse shadow-sm shadow-destructive/20" />
                 )}
                 {isComplete && by && (
                 <Badge

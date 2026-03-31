@@ -12,7 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Newspaper, Trophy, Swords, TrendingUp, Skull, Flame, Star, ChevronDown, BarChart3, Crown, Grid3X3, Zap, BookOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { FightSummary } from "@/types/game";
-import { StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -492,7 +492,7 @@ function BestByStyle({ allFights }: { allFights: FightSummary[] }) {
                       {w.name}
                     </span>
                   </div>
-                  <StatBadge styleName={style as any} career={{ wins: w.wins, losses: w.losses, kills: w.kills }} />
+                  <WarriorBadge variant="stat" styleName={style as any} career={{ wins: w.wins, losses: w.losses, kills: w.kills }} />
                 </div>
               ))}
             </div>

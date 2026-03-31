@@ -9,7 +9,7 @@ import { STYLE_DISPLAY_NAMES, STYLE_ABBREV, ATTRIBUTE_KEYS, type Warrior } from 
 import { computeStableReputation } from "@/engine/stableReputation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -116,14 +116,13 @@ function RosterWall() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <WarriorNameTag
-                      id={w.id}
+                    <WarriorBadge variant="name"                       id={w.id}
                       name={w.name}
                       isChampion={w.champion}
                       injuryCount={injuryCount}
                       useCrown
                     />
-                    <StatBadge styleName={w.style} career={w.career} />
+                    <WarriorBadge variant="stat" styleName={w.style} career={w.career} />
 
                     {/* Attribute mini-bar */}
                     <div className="flex gap-1.5 mt-1.5">

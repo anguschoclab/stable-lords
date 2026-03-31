@@ -17,7 +17,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { WarriorLink } from "@/components/EntityLink";
-import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import {
   BookOpen, Coins, FileText, ScrollText, Skull, Shield,
   Trophy, Star, Swords, Heart, Zap, GraduationCap,
@@ -437,10 +437,10 @@ function HallTab() {
                 {retired.map(w => (
                   <TableRow key={w.id}>
                     <TableCell>
-                      <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                      <WarriorBadge variant="name" id={w.id} name={w.name} isChampion={w.champion} />
                     </TableCell>
                     <TableCell>
-                      <StatBadge styleName={w.style} />
+                      <WarriorBadge variant="stat" styleName={w.style} />
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">
                       {w.career.wins}W-{w.career.losses}L-{w.career.kills}K
@@ -482,10 +482,10 @@ function HallTab() {
                 {graveyard.map(w => (
                   <TableRow key={w.id}>
                     <TableCell className="text-destructive/80">
-                      <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                      <WarriorBadge variant="name" id={w.id} name={w.name} isChampion={w.champion} />
                     </TableCell>
                     <TableCell>
-                      <StatBadge styleName={w.style} />
+                      <WarriorBadge variant="stat" styleName={w.style} />
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">
                       {w.career.wins}W-{w.career.losses}L-{w.career.kills}K

@@ -11,7 +11,7 @@ import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Swords, Zap, Skull, UserPlus, Flame, Shield, Clock, FastForward, Trophy, Heart, ChevronDown, Crosshair, Ban, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -464,8 +464,8 @@ export default function RunRound() {
               {matchCard.map((mp, i) => (
                 <div key={i} className="flex items-center justify-between py-3 text-sm">
                   <div className="flex items-center gap-2 flex-1">
-                    <WarriorNameTag name={mp.playerWarrior.name} id={mp.playerWarrior.id} />
-                    <StatBadge styleName={mp.playerWarrior.style} showFullName />
+                    <WarriorBadge variant="name" name={mp.playerWarrior.name} id={mp.playerWarrior.id} />
+                    <WarriorBadge variant="stat" styleName={mp.playerWarrior.style} showFullName />
                     <span className="text-muted-foreground text-xs hidden sm:inline">Fame {mp.playerWarrior.fame}</span>
                   </div>
                   <div className="flex items-center gap-1.5 flex-col px-2">
@@ -477,8 +477,8 @@ export default function RunRound() {
                   </div>
                   <div className="flex items-center gap-2 flex-1 justify-end">
                     <span className="text-muted-foreground text-xs">Fame {mp.rivalWarrior.fame}</span>
-                    <StatBadge styleName={mp.rivalWarrior.style} showFullName />
-                    <WarriorNameTag name={mp.rivalWarrior.name} id={mp.rivalWarrior.id} />
+                    <WarriorBadge variant="stat" styleName={mp.rivalWarrior.style} showFullName />
+                    <WarriorBadge variant="name" name={mp.rivalWarrior.name} id={mp.rivalWarrior.id} />
                     <StableLink name={mp.rivalStable.owner.stableName} className="text-xs text-muted-foreground">
                       ({mp.rivalStable.owner.stableName})
                     </StableLink>

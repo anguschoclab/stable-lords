@@ -4,7 +4,7 @@ import { STYLE_DISPLAY_NAMES, type Warrior } from "@/types/game";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -131,7 +131,7 @@ function ArenaLeaderboard() {
                     {String(i + 1).padStart(2, '0')}
                   </TableCell>
                   <TableCell>
-                    <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                    <WarriorBadge variant="name" id={w.id} name={w.name} isChampion={w.champion} />
                   </TableCell>
                   <TableCell className="text-[10px] font-medium text-muted-foreground italic">
                     {entry.stableName}

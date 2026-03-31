@@ -16,7 +16,7 @@ import {
   ArrowLeft, Quote, Scroll, Dumbbell, Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { FormSparkline } from "@/components/charts/FormSparkline";
 import { ConditionBattery } from "@/components/ui/ConditionBattery";
 
@@ -177,9 +177,9 @@ export default function StableDetail() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <WarriorNameTag name={w.name} id={w.id} />
+                        <WarriorBadge variant="name" name={w.name} id={w.id} />
                         <div className="flex items-center gap-2 mt-1">
-                          <StatBadge styleName={w.style} showFullName variant="secondary" />
+                          <WarriorBadge variant="stat" styleName={w.style} showFullName badgeVariant="secondary" />
                           {w.age && (
                             <span className="text-[10px] text-muted-foreground">Age {w.age}</span>
                           )}

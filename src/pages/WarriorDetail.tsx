@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ArrowLeft, Trophy, Flame, Star, Swords, Heart, Shield, Armchair, User, Crosshair, Shirt, History, TrendingUp, ScrollText, Zap, Skull, Target, Activity, Eye, Lightbulb } from "lucide-react";
-import { TagBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import PlanBuilder from "@/components/PlanBuilder";
 import { SchedulingWidget } from "@/components/widgets/SchedulingWidget";
 import EquipmentLoadoutUI from "@/components/EquipmentLoadout";
@@ -732,14 +732,14 @@ export default function WarriorDetail() {
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
               {displayWarrior.flair.map((f) => (
-                <TagBadge key={f} tag={f} type="flair" />
+                <WarriorBadge variant="tag" key={f} tag={f} type="flair" />
               ))}
               {displayWarrior.titles.map((t) => (
-                <TagBadge key={t} tag={t} type="title" />
+                <WarriorBadge variant="tag" key={t} tag={t} type="title" />
               ))}
               {displayWarrior.injuries.map((i) => {
                 const injName = typeof i === "string" ? i : i.name;
-                return <TagBadge key={injName} tag={injName} type="injury" />;
+                return <WarriorBadge variant="tag" key={injName} tag={injName} type="injury" />;
               })}
             </div>
           </div>

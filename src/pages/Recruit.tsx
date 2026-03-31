@@ -20,7 +20,7 @@ import WarriorBuilder from "@/components/WarriorBuilder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -90,7 +90,7 @@ function RecruitCard({
           <TierBadge tier={warrior.tier} />
         </div>
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
-          <StatBadge styleName={warrior.style} showFullName />
+          <WarriorBadge variant="stat" styleName={warrior.style} showFullName />
           <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> AGE {warrior.age}</span>
           {isScouted && (
             <Badge className={cn(

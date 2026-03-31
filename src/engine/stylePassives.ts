@@ -123,7 +123,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: ctx.hitLocation === "head" ? 0.4 : 0.3,
     }),
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1; const defMult = 1; let warning;
       if (off === "Bash") { offMult = 0.4; warning = "Aimed Blows sacrifice all precision when bashing"; }
       if (off === "Slash") { offMult = 0.6; warning = "Slashing undermines the Aimed Blow's precision"; }
       return { offMult, defMult, warning };
@@ -154,7 +154,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       };
     },
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1; const defMult = 1; let warning;
       if (off === "Lunge") { offMult = 0.5; warning = "Bashers are terrible lungers — too heavy and slow"; }
       if (off === "Decisiveness") { offMult = 0.85; }
       if (def === "Dodge") { defMult = 0.5; warning = (warning ? warning + "; " : "") + "Bashers are too heavy to dodge effectively"; }
@@ -183,7 +183,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: 0.3,
     }),
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1; const defMult = 1; let warning;
       if (off === "Bash") { offMult = 0.5; warning = "Lungers lack the weight for effective bashing"; }
       if (def === "Parry") { defMult = 0.6; warning = (warning ? warning + "; " : "") + "Lungers are overextended for strong parries"; }
       return { offMult, defMult, warning };
@@ -225,7 +225,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: 0.3,
     }),
     getAntiSynergy: (off) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1; const defMult = 1; let warning;
       if (off === "Bash") { offMult = 0.5; warning = "Riposte specialists lack bashing power"; }
       if (off === "Decisiveness") { offMult = 0.7; }
       return { offMult, defMult, warning };
@@ -266,7 +266,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: ctx.hitsLanded >= 5 ? 0.35 : 0.3,
     }),
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1; const defMult = 1; let warning;
       if (off === "Bash") { offMult = 0.5; warning = "Slashers rely on blade edge, not blunt force"; }
       if (def === "Parry") { defMult = 0.6; warning = (warning ? warning + "; " : "") + "Slashers struggle with disciplined parries"; }
       return { offMult, defMult, warning };

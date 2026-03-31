@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import type { MinuteEvent, FightOutcomeBy, CombatEvent } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
-import { TagBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Button } from "@/components/ui/button";
 import { 
   Play, 
@@ -110,7 +110,7 @@ function BoutHeader({ nameA, nameD, styleA, styleD, winner, isComplete, isPlayin
            </motion.div>
            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent" />
         </div>
-        {isRivalry && <TagBadge tag="VENDETTA" type="injury" className="mt-2 text-[8px]" />}
+        {isRivalry && <WarriorBadge variant="tag" tag="VENDETTA" type="injury" className="mt-2 text-[8px]" />}
       </div>
 
       <div className="flex flex-col items-center gap-1">

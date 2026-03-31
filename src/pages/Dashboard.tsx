@@ -9,9 +9,7 @@ import { BASE_ROSTER_CAP } from "@/data/constants";
 import { Badge } from "@/components/ui/badge";
 import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
 
-import { StatBadge } from "@/components/ui/WarriorBadges";
-import { TagBadge } from "@/components/ui/WarriorBadges";
-import { WarriorNameTag } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -274,8 +272,8 @@ function RankingsWidget() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
-                  <StatBadge styleName={w.style} career={w.career} />
+                  <WarriorBadge variant="name" id={w.id} name={w.name} isChampion={w.champion} />
+                  <WarriorBadge variant="stat" styleName={w.style} career={w.career} />
                 </div>
 
                 {/* Stats */}
@@ -559,8 +557,8 @@ function TrainingWidget() {
                 <div key={warriorId} className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <WarriorNameTag id={w.id} name={w.name} />
-                      <StatBadge styleName={w.style} />
+                      <WarriorBadge variant="name" id={w.id} name={w.name} />
+                      <WarriorBadge variant="stat" styleName={w.style} />
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-[10px] text-muted-foreground">Training</span>
@@ -667,7 +665,7 @@ function RivalsWidget() {
                       {topWarrior && (
                         <>
                           <span>·</span>
-                          <span className="truncate flex items-center gap-1">★ <WarriorNameTag name={topWarrior.name} id={topWarrior.id} /></span>
+                          <span className="truncate flex items-center gap-1">★ <WarriorBadge variant="name" name={topWarrior.name} id={topWarrior.id} /></span>
                         </>
                       )}
                     </div>
@@ -695,7 +693,7 @@ function RivalsWidget() {
                         {won ? "W" : f.winner ? "L" : "D"}
                       </Badge>
                       <span className="text-[11px] truncate flex items-center gap-1">
-                        <WarriorNameTag name={playerIsA ? f.a : f.d} /> vs <WarriorNameTag name={playerIsA ? f.d : f.a} />
+                        <WarriorBadge variant="name" name={playerIsA ? f.a : f.d} /> vs <WarriorBadge variant="name" name={playerIsA ? f.d : f.a} />
                       </span>
                     </div>
                   );

@@ -13,7 +13,7 @@ import { getFightsForTournament } from "@/engine/core/historyUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Trophy, Swords, Skull, Play, UserPlus, ChevronDown, ChevronUp, FastForward, Shield } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -518,8 +518,8 @@ export default function Tournaments() {
                   {activeWarriors.map((w) => (
                     <Card key={w.id} className="border-border">
                       <CardHeader className="p-3 pb-2 border-b border-border bg-secondary/10 flex flex-row items-center justify-between">
-                        <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
-                        <StatBadge styleName={w.style} />
+                        <WarriorBadge variant="name" id={w.id} name={w.name} isChampion={w.champion} />
+                        <WarriorBadge variant="stat" styleName={w.style} />
                       </CardHeader>
                       <CardContent className="p-3 space-y-2">
                         <div className="flex justify-between text-xs">

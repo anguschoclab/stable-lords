@@ -11,7 +11,7 @@ import {
   Trophy, Star, Flame, Shield, Activity, 
   History, Swords, Heart, Zap, Skull 
 } from "lucide-react";
-import { StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import WarriorPaperDoll from "@/components/WarriorPaperDoll";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +47,7 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-display font-black tracking-tight">{warrior.name}</h2>
-            <StatBadge styleName={warrior.style} />
+            <WarriorBadge variant="stat" styleName={warrior.style} />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-muted-foreground">{record}</span>

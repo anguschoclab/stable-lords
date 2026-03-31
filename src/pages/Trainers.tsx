@@ -21,7 +21,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
+import { WarriorBadge } from "@/components/ui/WarriorBadges";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -356,8 +356,8 @@ export default function Trainers() {
                         >
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
-                              <StatBadge styleName={w.style} career={w.career} />
+                              <WarriorBadge variant="name" id={w.id} name={w.name} isChampion={w.champion} />
+                              <WarriorBadge variant="stat" styleName={w.style} career={w.career} />
                             </div>
                             <div className="text-xs text-muted-foreground mt-0.5">
                               → {preview.tier} {preview.focus} Trainer
