@@ -6,7 +6,8 @@ import type { GameState, Season, Warrior, RivalStableData } from "@/types/game";
 import { OPFSArchiveService } from "./storage/opfsArchive";
 import type { PoolWarrior } from "./recruitment";
 import { aiDraftFromPool } from "./recruitment";
-import { processRivalStableWeekly, seededRng } from "./rivals";
+import { processRivalStableWeekly } from "./rivals";
+import { seededRng } from "@/utils/mathUtils";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 

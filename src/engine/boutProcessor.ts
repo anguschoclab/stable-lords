@@ -225,7 +225,7 @@ function handleDeath(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutco
   
   const event = { boutId, killerId: outcome.winner === "A" ? wA.id : wD.id, deathSummary: narrative, memorialTags: tags };
 
-  let nextS = killWarrior(s, victim.id, outcome.winner === "A" ? wA.name : wD.name, "Arena Combat", event);
+  const nextS = killWarrior(s, victim.id, outcome.winner === "A" ? wA.name : wD.name, "Arena Combat", event);
   
   if (isPlayerVictim) {
     nextS.fame = Math.max(0, (nextS.fame || 0) + 5);
@@ -256,7 +256,8 @@ function handleDeath(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutco
 }
 
 function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, week: number, rivalStableId?: string) {
-  let injured = false, names: string[] = [];
+  let injured = false;
+  const names: string[] = [];
   
   if (outcome.by === "KO") {
     s.restStates = addRestState(s.restStates || [], outcome.winner === "A" ? wD.id : wA.id, "KO", week);
@@ -378,7 +379,7 @@ export function processWeekBouts(state: GameState): { state: GameState; results:
   });
 
   // Final reporting side-effects
-  let playerFameGain = results.filter(r => r.outcome.winner === "A").length;
+  const playerFameGain = results.filter(r => r.outcome.winner === "A").length;
   s.player = { ...s.player, fame: (s.player.fame || 0) + playerFameGain };
   s.fame = (s.fame || 0) + playerFameGain;
   s.crowdMood = computeCrowdMood(s.arenaHistory);

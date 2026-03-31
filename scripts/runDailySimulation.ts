@@ -71,7 +71,9 @@ function topUpRosters(state: GameState) {
 
   if (activeRoster.length < 15) {
      for (let i = activeRoster.length; i < 20; i++) {
-        state.roster.push(generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]));
+        const w = generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]);
+        w.stableId = state.player.id;
+        state.roster.push(w);
      }
   }
 
@@ -80,7 +82,9 @@ function topUpRosters(state: GameState) {
        const activeRivalRoster = rival.roster.filter(w => w.status === "Active");
        if (activeRivalRoster.length < 15) {
          for (let i = activeRivalRoster.length; i < 20; i++) {
-           rival.roster.push(generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]));
+           const w = generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]);
+           w.stableId = rival.owner.id;
+           rival.roster.push(w);
          }
        }
     }
@@ -96,7 +100,22 @@ async function runDailySimulation() {
   const wealthHistory: number[] = [state.gold];
 
   // Initial Roster Seeding
-  if (!state.rivals) state.rivals = [];
+  if (!state.rivals || state.rivals.length === 0) {
+    state.rivals = [
+      {
+        owner: { id: "rival1", name: "Rival Owner", stableName: "Iron Wolves", fame: 10, renown: 0, titles: 0 },
+        roster: [],
+        tier: "Established",
+        philosophy: "Brute Force",
+      },
+      {
+        owner: { id: "rival2", name: "Rival Owner 2", stableName: "Silver Dragons", fame: 10, renown: 0, titles: 0 },
+        roster: [],
+        tier: "Established",
+        philosophy: "Cunning",
+      }
+    ];
+  }
   topUpRosters(state);
 
   let totalWeeksSimmed = 0;

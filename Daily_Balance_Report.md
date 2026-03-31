@@ -3,9 +3,9 @@ Generated dynamically after autosimming 100 weeks.
 
 ## 1. Economy Metrics
 - **Initial Gold:** 500
-- **Final Gold:** 159384
-- **Average Gold:** 66776.31
-- *Observation:* Hyper-inflation detected (wealth increased by 318.8x).
+- **Final Gold:** 308903
+- **Average Gold:** 131592.01
+- *Observation:* Hyper-inflation detected (wealth increased by 617.8x).
 
 ## 2. Lethality & Injuries
 - **Total Bouts Simulated:** 500
@@ -14,30 +14,31 @@ Generated dynamically after autosimming 100 weeks.
 - *Observation:* Kill rate is below the 8% target bound.
 
 ## 3. Meta-Drift (AI Adaptation & Style Dominance)
-- **AIMED BLOW**: -6 drift
-- **BASHING ATTACK**: 0 drift
-- **LUNGING ATTACK**: +6 drift
+- **AIMED BLOW**: 0 drift
+- **BASHING ATTACK**: +6 drift
+- **LUNGING ATTACK**: +5 drift
 - **PARRY-LUNGE**: -1 drift
-- **PARRY-RIPOSTE**: -10 drift
-- **PARRY-STRIKE**: -8 drift
-- **SLASHING ATTACK**: +8 drift
-- **STRIKING ATTACK**: +3 drift
-- **TOTAL PARRY**: -10 drift
-- **WALL OF STEEL**: -7 drift
+- **PARRY-RIPOSTE**: -5 drift
+- **PARRY-STRIKE**: -2 drift
+- **SLASHING ATTACK**: +5 drift
+- **STRIKING ATTACK**: +7 drift
+- **TOTAL PARRY**: -8 drift
+- **WALL OF STEEL**: -1 drift
 
 ### Style Win Rates (Overall)
-- **SLASHING ATTACK**: 156 wins / 171 fights (91.23%)
-- **LUNGING ATTACK**: 139 wins / 159 fights (87.42%)
-- **STRIKING ATTACK**: 120 wins / 154 fights (77.92%)
-- **PARRY-LUNGE**: 57 wins / 182 fights (31.32%)
-- **WALL OF STEEL**: 12 wins / 84 fights (14.29%)
-- **PARRY-STRIKE**: 8 wins / 71 fights (11.27%)
-- **AIMED BLOW**: 8 wins / 85 fights (9.41%)
-- **TOTAL PARRY**: 0 wins / 63 fights (0.00%)
-- **PARRY-RIPOSTE**: 0 wins / 31 fights (0.00%)
+- **STRIKING ATTACK**: 64 wins / 75 fights (85.33%)
+- **BASHING ATTACK**: 30 wins / 37 fights (81.08%)
+- **LUNGING ATTACK**: 35 wins / 45 fights (77.78%)
+- **AIMED BLOW**: 23 wins / 33 fights (69.70%)
+- **SLASHING ATTACK**: 65 wins / 95 fights (68.42%)
+- **PARRY-STRIKE**: 18 wins / 33 fights (54.55%)
+- **PARRY-LUNGE**: 19 wins / 40 fights (47.50%)
+- **WALL OF STEEL**: 31 wins / 88 fights (35.23%)
+- **PARRY-RIPOSTE**: 11 wins / 53 fights (20.75%)
+- **TOTAL PARRY**: 5 wins / 105 fights (4.76%)
 
 ## 4. Anomalies & Actionable Suggestions
 - **Economy Issue:** High inflation. Consider lowering `WIN_BONUS` or `FIGHT_PURSE` in `src/engine/economy.ts`, or adding scaling gold sinks like trainer tier salaries.
 - **Lethality Issue:** Kill rate (0.00%) is lower than the 8-15% target. Consider increasing `KILL_THRESHOLD_BASE` in `src/engine/combat/resolution.ts` to make kills more frequent.
-- **Meta-Drift Issue:** Styles like SLASHING ATTACK, LUNGING ATTACK, STRIKING ATTACK are overperforming (>60% win rate). Review their attack modifiers or stamina drain formulas.
-- **Meta-Drift Issue:** Styles like PARRY-LUNGE, WALL OF STEEL, PARRY-STRIKE, AIMED BLOW, TOTAL PARRY, PARRY-RIPOSTE are heavily underperforming (<40% win rate). Review their base defensive bonuses, riposte chances, or fatigue costs.
+- **Meta-Drift Issue:** Styles like STRIKING ATTACK, BASHING ATTACK, LUNGING ATTACK, AIMED BLOW, SLASHING ATTACK are overperforming (>60% win rate). Review their attack modifiers or stamina drain formulas.
+- **Meta-Drift Issue:** Styles like WALL OF STEEL, PARRY-RIPOSTE, TOTAL PARRY are heavily underperforming (<40% win rate). Review their base defensive bonuses, riposte chances, or fatigue costs.
