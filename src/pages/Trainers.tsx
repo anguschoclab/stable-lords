@@ -90,8 +90,8 @@ function TrainerCard({
               </div>
             </div>
             {owned && onFire && (
-              <Button variant="ghost" size="icon" onClick={onFire} className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0 h-8 w-8" title="Release trainer">
-                <UserMinus className="h-4 w-4" /><span className="sr-only">Release trainer</span>
+              <Button variant="ghost" size="icon" onClick={onFire} className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0 h-8 w-8" title="Release trainer" aria-label="Release trainer">
+                <UserMinus className="h-4 w-4" />
               </Button>
             )}
           </div>
