@@ -8,6 +8,7 @@ import { useGameStore } from "@/state/useGameStore";
 import AppShell from "@/components/AppShell";
 import ResolutionReveal from "@/components/ResolutionReveal";
 import StartGame from "@/pages/StartGame";
+import Orphanage from "@/pages/Orphanage";
 
 const queryClient = new QueryClient();
 
