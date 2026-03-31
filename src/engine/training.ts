@@ -360,24 +360,48 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
   return { updatedRoster: currentRoster, updatedSeasonalGrowth: seasonalGrowth, results };
 }
 
-/** Legacy wrapper to maintain compatibility while transition is in progress */
 export function processTraining(state: GameState): GameState {
   const impact = computeTrainingImpact(state);
+  const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact);
   
-  const newsItems = impact.results.reduce((acc, r) => {
-    if (r.type !== "blocked") acc.push(r.message);
-    return acc;
-  }, [] as string[]);
+  let newState = { ...state, seasonalGrowth, trainingAssignments: [] };
+  if (stateImpact.newsletterItems) {
+    newState.newsletter = [...newState.newsletter, ...stateImpact.newsletterItems];
+  }
+  
+  stateImpact.rosterUpdates?.forEach((update, id) => {
+    newState.roster = updateEntityInList(newState.roster, id, w => ({ ...w, ...update }));
+  });
 
-  const newsletter = newsItems.length > 0
-    ? [...state.newsletter, { week: state.week, title: "Training Report", items: newsItems }]
-    : state.newsletter;
+  return newState;
+}
+
+/**
+ * Convert a TrainingImpact to a generic StateImpact for the pipeline.
+ */
+export function trainingImpactToStateImpact(state: GameState, impact: TrainingImpact): { impact: any; seasonalGrowth: SeasonalGrowth[] } {
+  const rosterUpdates = new Map<string, Partial<Warrior>>();
+  
+  impact.updatedRoster.forEach(w => {
+    const original = state.roster.find(r => r.id === w.id);
+    if (original !== w) {
+      rosterUpdates.set(w.id, w);
+    }
+  });
+
+  const newsItems = impact.results
+    .filter(r => r.type !== "blocked")
+    .map(r => r.message);
 
   return {
-    ...state,
-    roster: impact.updatedRoster,
-    newsletter,
-    seasonalGrowth: impact.updatedSeasonalGrowth,
-    trainingAssignments: [],
+    impact: {
+      rosterUpdates,
+      newsletterItems: newsItems.length > 0 ? [{
+        week: state.week,
+        title: "Training Report",
+        items: newsItems
+      }] : []
+    },
+    seasonalGrowth: impact.updatedSeasonalGrowth
   };
 }

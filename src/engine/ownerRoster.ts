@@ -1,4 +1,5 @@
-import { GameState, Warrior, RivalStableData, OwnerPersonality, MetaAdaptation, FightingStyle } from "@/types/game";
+import type { GameState, Warrior, RivalStableData, OwnerPersonality, MetaAdaptation } from "@/types/game";
+import { FightingStyle } from "@/types/game";
 import { computeMetaDrift, type StyleMeta } from "./metaDrift";
 import { computeWarriorStats } from "./skillCalc";
 import { getRecentFightsForWarrior } from "@/engine/core/historyUtils";
@@ -67,8 +68,13 @@ export function processAIRosterManagement(
     const currentActive = r.roster.filter(w => w.status === "Active").length;
     const minRoster = personality === "Aggressive" ? 8 : personality === "Showman" ? 7 : 6;
     const recruitChance = personality === "Aggressive" ? 0.4 : personality === "Pragmatic" ? 0.25 : 0.15;
+    
+    // Gold Awareness: Recruitment costs 100g (signing fee)
+    const RECRUIT_COST = 100;
+    const canAfford = r.gold >= RECRUIT_COST + 200; // Keep a buffer
+    const intent = r.strategy?.intent ?? "CONSOLIDATION";
 
-    if (currentActive < minRoster && Math.random() < recruitChance) {
+    if (currentActive < minRoster && Math.random() < recruitChance && canAfford && intent !== "RECOVERY") {
       const adaptation = r.owner.metaAdaptation ?? "Opportunist";
       let customMeta = meta;
 
@@ -86,6 +92,7 @@ export function processAIRosterManagement(
 
       const newWarrior = generateAIRecruit(r, state.week, customMeta);
       if (newWarrior) {
+        r.gold -= RECRUIT_COST;
         r.roster.push(newWarrior);
         const adaptQuote = META_RECRUIT_QUOTES[adaptation] ?? "\"A new warrior joins.\"";
         gazetteItems.push(`📢 ${r.owner.stableName} recruits ${newWarrior.name} (${newWarrior.style}) — ${adaptQuote}`);
@@ -195,11 +202,15 @@ function generateRecruitAttrs(philosophy: string): { ST: number; CN: number; SZ:
     for (let i = 0; i < w; i++) weighted.push(k);
   }
 
-  while (pool > 0) {
+  let attempts = 0;
+  while (pool > 0 && attempts < 500) {
+    attempts++;
     const key = weighted[Math.floor(Math.random() * weighted.length)];
-    const max = Math.min(pool, 25 - attrs[key]);
-    if (max <= 0) continue;
-    const add = Math.min(max, Math.floor(Math.random() * 4) + 1);
+    const current = attrs[key];
+    if (current >= 25) continue;
+    
+    const maxAdd = Math.min(pool, 25 - current);
+    const add = Math.min(maxAdd, Math.floor(Math.random() * 4) + 1);
     attrs[key] += add;
     pool -= add;
   }

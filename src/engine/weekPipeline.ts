@@ -6,7 +6,7 @@ import type { GameState, Season, Warrior, RivalStableData } from "@/types/game";
 import { OPFSArchiveService } from "./storage/opfsArchive";
 import type { PoolWarrior } from "./recruitment";
 import { aiDraftFromPool } from "./draftService";
-import { processRivalStableWeekly, seededRng } from "./rivals";
+import { seededRng } from "./rivals";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 
@@ -135,30 +135,51 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
   return s;
 }
 
+import { updateAIStrategy } from "./ai/intentEngine";
+import { processAIStable } from "./ai/stableManager";
+import { generateRivalStables } from "./rivals";
+
 /**
- * Rival AI Actions — recruitment, training, and trainer management.
+ * Rival AI Actions — recruitment, training, and strategic management.
  */
 export function processRivalActions(state: GameState, newWeek: number): GameState {
   const rng = seededRng(newWeek * 7919 + 13);
-  let updatedRivals = [...(state.rivals || [])];
+  let currentRivals = [...(state.rivals || [])];
   const globalGazetteItems: string[] = [];
 
-  // 1) AI Recruitment (Every 4 weeks)
-  const draft = aiDraftFromPool(state.recruitPool, updatedRivals, newWeek);
-  updatedRivals = draft.updatedRivals;
-  const updatedPool = draft.updatedPool;
-  globalGazetteItems.push(...draft.gazetteItems);
+  // 1. Strategic Thinking & Management
+  let currentPool = [...(state.hiringPool || [])];
+  
+  const processedRivals = currentRivals.map((rival, index) => {
+    // A) Update Intent/Strategy
+    const strategy = updateAIStrategy(rival, state);
+    const rivalWithStrategy = { ...rival, strategy };
 
-  // 2) Training & Management for each stable
-  const finalRivals = updatedRivals.map(r => {
-    const result = processRivalStableWeekly(r, rng, newWeek);
-    return result.rival;
+    // B) Weekly Management (Economy, Training, Staffing)
+    const { updatedRival, isBankrupt, gazetteItems, updatedHiringPool } = processAIStable(rivalWithStrategy, state);
+    globalGazetteItems.push(...gazetteItems);
+    currentPool = updatedHiringPool;
+
+    // C) Bankruptcy Handling
+    if (isBankrupt) {
+      const replacementSeed = newWeek + index * 1000;
+      const [newStable] = generateRivalStables(1, replacementSeed);
+      globalGazetteItems.push(`🆕 EXPANSION: ${newStable.owner.stableName} has moved into the district as a new rival!`);
+      return newStable as any as RivalStableData;
+    }
+
+    return updatedRival;
   });
+
+  // 2. AI Recruitment (Delegated to draft service)
+  const draft = aiDraftFromPool(state.recruitPool, processedRivals, newWeek);
+  globalGazetteItems.push(...draft.gazetteItems);
 
   const newState = {
     ...state,
-    rivals: finalRivals,
-    recruitPool: updatedPool,
+    rivals: draft.updatedRivals,
+    recruitPool: draft.updatedPool,
+    hiringPool: currentPool,
   };
 
   if (globalGazetteItems.length > 0) {
@@ -171,7 +192,7 @@ export function processRivalActions(state: GameState, newWeek: number): GameStat
   return newState;
 }
 
-import { computeTrainingImpact } from "./training";
+import { computeTrainingImpact, trainingImpactToStateImpact } from "./training";
 import { computeEconomyImpact } from "./economy";
 import { computeAgingImpact } from "./aging";
 import { computeHealthImpact } from "./pipeline/health";
@@ -189,24 +210,11 @@ export function advanceWeek(state: GameState): GameState {
   const nextSeason = computeNextSeason(nextWeek);
 
   // 1. Collect all "Pure" Impacts
-  const trainingImpact = computeTrainingImpact(state);
-  
-  // Transform TrainingImpact to StateImpact
-  const trainingStateImpact: StateImpact = {
-    rosterUpdates: new Map<string, any>(),
-    newsletterItems: trainingImpact.results.length > 0 ? [{ 
-      week: currentWeek, 
-      title: "Training Report", 
-      items: trainingImpact.results.map(r => r.message) 
-    }] : []
-  };
-  trainingImpact.updatedRoster.forEach(w => {
-    const original = state.roster.find(r => r.id === w.id);
-    if (original !== w) trainingStateImpact.rosterUpdates!.set(w.id, w as any);
-  });
+  const trainingImpactRaw = computeTrainingImpact(state);
+  const { impact: trainingImpact, seasonalGrowth } = trainingImpactToStateImpact(state, trainingImpactRaw);
 
   const impacts: StateImpact[] = [
-    trainingStateImpact,
+    trainingImpact,
     computeEconomyImpact(state),
     computeAgingImpact(state),
     computeHealthImpact(state),
@@ -214,7 +222,7 @@ export function advanceWeek(state: GameState): GameState {
 
   // 2. Resolve Primary Impacts
   let newState = resolveImpacts(state, impacts);
-  newState.seasonalGrowth = trainingImpact.updatedSeasonalGrowth;
+  newState.seasonalGrowth = seasonalGrowth;
 
   // 3. Narrative & Recruitment Pool Refresh (Procedural)
   const usedNames = new Set<string>();

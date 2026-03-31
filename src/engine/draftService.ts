@@ -27,11 +27,17 @@ export function aiDraftFromPool(
   const isMajorDraftWeek = week % 4 === 0;
 
   for (const rival of updatedRivals) {
+    const intent = rival.strategy?.intent ?? "CONSOLIDATION";
     const activeCount = rival.roster.filter(w => w.status === "Active").length;
-    if (activeCount >= 6) continue;
+    
+    // Limits
+    const maxRoster = rival.owner.personality === "Aggressive" ? 10 : 8;
+    if (activeCount >= maxRoster) continue;
     
     // Deterministic recruitment chance
-    const willRecruit = isMajorDraftWeek || (activeCount < 3 && rng.chance(0.25)) || (rng.chance(0.05));
+    // EXPANSION intent significantly increases recruitment chance
+    const intentBonus = intent === "EXPANSION" ? 0.6 : 0;
+    const willRecruit = isMajorDraftWeek || (activeCount < 4 && rng.chance(0.3 + intentBonus)) || (rng.chance(0.05 + intentBonus));
     
     if (!willRecruit || remainingPool.length === 0) continue;
 
@@ -55,7 +61,7 @@ export function aiDraftFromPool(
        // Style preference
        if (prefsSet.has(w.style)) score += 30;
        
-       // Desperation factor (how long has the recruit been available?)
+       // Desperation factor
        const weeksAvailable = week - w.addedWeek;
        score += weeksAvailable * 10; 
 
@@ -65,34 +71,38 @@ export function aiDraftFromPool(
        }
     }
 
-    // AI will only take it if the score is high enough or it's a major week
-    if (bestIdx >= 0 && (bestScore > 40 || isMajorDraftWeek)) {
+    if (bestIdx >= 0 && (bestScore > 30 || isMajorDraftWeek)) {
        const recruit = remainingPool[bestIdx];
-       remainingPool.splice(bestIdx, 1);
+       
+       // Cost logic: Prodigy = 400, Exceptional = 250, rest = 100
+       const cost = recruit.tier === "Prodigy" ? 400 : recruit.tier === "Exceptional" ? 250 : 100;
+       
+       if (rival.gold >= cost) {
+         rival.gold -= cost;
+         remainingPool.splice(bestIdx, 1);
 
-       // Note: In a real implementation, we'd use a factory for this,
-       // but we'll follow the existing pattern for now.
-       rival.roster.push({
-         id: generateId(),
-         name: recruit.name,
-         style: recruit.style,
-         attributes: { ...recruit.attributes },
-         potential: { ...recruit.potential },
-         baseSkills: { ...recruit.baseSkills },
-         derivedStats: { ...recruit.derivedStats },
-         fame: 10,
-         popularity: 5,
-         titles: [],
-         injuries: [],
-         flair: [],
-         career: { wins: 0, losses: 0, kills: 0 },
-         champion: false,
-         status: "Active",
-         age: recruit.age,
-         stableId: rival.owner.id,
-       });
+         rival.roster.push({
+           id: generateId(),
+           name: recruit.name,
+           style: recruit.style,
+           attributes: { ...recruit.attributes },
+           potential: { ...recruit.potential },
+           baseSkills: { ...recruit.baseSkills },
+           derivedStats: { ...recruit.derivedStats },
+           fame: 10,
+           popularity: 5,
+           titles: [],
+           injuries: [],
+           flair: [],
+           career: { wins: 0, losses: 0, kills: 0 },
+           champion: false,
+           status: "Active",
+           age: recruit.age,
+           stableId: rival.owner.id,
+         });
 
-       gazetteItems.push(`MARKET: ${rival.owner.stableName} has signed the ${recruit.tier} prospect ${recruit.name}.`);
+         gazetteItems.push(`📣 MARKET: ${rival.owner.stableName} signed ${recruit.tier} ${recruit.name} for ${cost}g.`);
+       }
     }
   }
 

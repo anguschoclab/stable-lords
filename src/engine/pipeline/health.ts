@@ -11,11 +11,13 @@ export function computeHealthImpact(state: GameState): StateImpact {
     const injuryObjects = (w.injuries || []).filter((i): i is InjuryData => typeof i !== "string");
     if (injuryObjects.length === 0) continue;
     
-    const { active, healed } = tickInjuries(injuryObjects);
-    if (healed.length > 0) {
-      injuryNews.push(`${w.name} recovered from ${healed.join(", ")}.`);
-      rosterUpdates.set(w.id, { injuries: active });
+    const result = tickInjuries(injuryObjects);
+    if (result.healed.length > 0) {
+      injuryNews.push(`${w.name} recovered from ${result.healed.join(", ")}.`);
     }
+    
+    // Always update the roster with the new injury state (decremented weeksRemaining or empty)
+    rosterUpdates.set(w.id, { injuries: result.active });
   }
 
   return {

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
+import { simulateFight, defaultPlanForWarrior, fameFromTags, aiPlanForWarrior } from "@/engine";
 import { killWarrior } from "@/state/gameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { LoreArchive } from "@/lore/LoreArchive";
@@ -60,14 +60,36 @@ export default function Tournaments() {
     const active = state.roster.filter((w) => w.status === "Active");
     if (active.length < 2) return;
 
-    // Gather AI rival warriors for the bracket (up to 5 from rivals)
-    const rivalWarriors: { name: string; isAI: boolean; stableId: string }[] = [];
-    for (const rival of (state.rivals ?? [])) {
-      const eligibleRivals = rival.roster.filter((w) => w.status === "Active").slice(0, 2);
-      for (const rw of eligibleRivals) {
-        rivalWarriors.push({ name: rw.name, isAI: true, stableId: rival.owner.id });
+    // Gather AI rival warriors for the bracket
+    const rivalWarriors: { name: string; isAI: boolean; stableId: string; intent?: string }[] = [];
+    const rivals = state.rivals ?? [];
+    
+    // Check if player has entered warriors
+    const hasPlayerEntrants = active.length > 0;
+
+    for (const rival of rivals) {
+      const intent = rival.strategy?.intent ?? "CONSOLIDATION";
+      const gold = rival.gold || 0;
+      const activeRoster = rival.roster.filter((w) => w.status === "Active");
+      
+      let entryCount = 0;
+      if (intent === "VENDETTA" && hasPlayerEntrants) {
+        entryCount = 1; // Hunt the player
+      } else if (intent === "EXPANSION" && gold > 300) {
+        entryCount = 2; // Aggressive expansion
+      } else if (intent === "RECOVERY") {
+        entryCount = gold > 200 ? 1 : 0; // Play it safe
+      } else if (gold > 100) {
+        entryCount = 1; // Standard participation
       }
-      if (rivalWarriors.length >= 5) break;
+
+      const entrants = activeRoster
+        .sort((a, b) => b.fame - a.fame) // Send the best
+        .slice(0, entryCount);
+
+      for (const rw of entrants) {
+        rivalWarriors.push({ name: rw.name, isAI: true, stableId: rival.owner.id, intent });
+      }
     }
 
     // Combine player + AI warriors
@@ -158,8 +180,18 @@ export default function Tournaments() {
         continue;
       }
 
-      const planA = wA.plan ?? defaultPlanForWarrior(wA);
-      const planD = wD.plan ?? defaultPlanForWarrior(wD);
+      const findRivalByWarrior = (name: string) => {
+        return (updatedState.rivals ?? []).find(r => r.roster.some(w => w.name === name));
+      };
+
+      const getAIPlan = (w: any) => {
+        const rival = findRivalByWarrior(w.name);
+        if (!rival) return defaultPlanForWarrior(w);
+        return aiPlanForWarrior(w, rival.owner.personality, rival.philosophy || "Opportunist", undefined, rival.strategy?.intent);
+      };
+
+      const planA = wA.plan ?? (state.roster.some(w => w.name === bout.a) ? defaultPlanForWarrior(wA) : getAIPlan(wA));
+      const planD = wD.plan ?? (state.roster.some(w => w.name === bout.d) ? defaultPlanForWarrior(wD) : getAIPlan(wD));
       const outcome = simulateFight(planA, planD, wA, wD, undefined, updatedState.trainers);
 
       bout.winner = outcome.winner;
@@ -402,8 +434,18 @@ export default function Tournaments() {
           continue;
         }
 
-        const planA = wA.plan ?? defaultPlanForWarrior(wA);
-        const planD = wD.plan ?? defaultPlanForWarrior(wD);
+        const findRivalByWarrior = (name: string) => {
+          return (updatedState.rivals ?? []).find(r => r.roster.some(w => w.name === name));
+        };
+
+        const getAIPlan = (w: any) => {
+          const rival = findRivalByWarrior(w.name);
+          if (!rival) return defaultPlanForWarrior(w);
+          return aiPlanForWarrior(w, rival.owner.personality, rival.philosophy || "Opportunist", undefined, rival.strategy?.intent);
+        };
+
+        const planA = wA.plan ?? (state.roster.some(w => w.name === bout.a) ? defaultPlanForWarrior(wA) : getAIPlan(wA));
+        const planD = wD.plan ?? (state.roster.some(w => w.name === bout.d) ? defaultPlanForWarrior(wD) : getAIPlan(wD));
         const outcome = simulateFight(planA, planD, wA, wD, undefined, updatedState.trainers);
 
         bout.winner = outcome.winner;

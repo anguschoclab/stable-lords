@@ -102,7 +102,21 @@ export function generateRivalStables(count: number, seed: number): { owner: Owne
 
     const [minT, maxT] = tmpl.trainerRange;
     const trainers = generateStableTrainers(rng, stableId, tmpl.philosophy, minT + Math.floor(rng() * (maxT - minT + 1)), usedTrainerNames, tmpl.tier);
-    rivals.push({ owner, roster: warriors, template: tmpl, trainers });
+    
+    // Initial gold based on tier
+    const initialGold = tmpl.tier === "Legendary" ? 2000 : tmpl.tier === "Major" ? 1200 : tmpl.tier === "Established" ? 800 : 500;
+
+    rivals.push({ 
+      owner, 
+      roster: warriors, 
+      template: tmpl, 
+      trainers,
+      gold: initialGold,
+      strategy: {
+        intent: "CONSOLIDATION",
+        planWeeksRemaining: 4 + Math.floor(rng() * 4)
+      }
+    } as any);
   }
   return rivals;
 }
@@ -143,22 +157,6 @@ function generateStableTrainers(rng: () => number, stableId: string, philosophy:
     });
   }
   return trainers;
-}
-
-export function processRivalStableWeekly(rival: RivalStableData, rng: () => number, week: number): { rival: RivalStableData; gazetteItems: string[] } {
-  // Weekly training side-effects simulated
-  const updatedRoster = rival.roster.map(w => {
-    if (w.status !== "Active" || rng() > 0.05) return w;
-    const keys = (Object.keys(w.attributes) as (keyof typeof w.attributes)[]).filter(k => k !== "SZ");
-    const chosen = keys[Math.floor(rng() * keys.length)];
-    if (w.attributes[chosen] < 25) {
-      const newAttrs = { ...w.attributes, [chosen]: w.attributes[chosen] + 1 };
-      const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, w.style);
-      return { ...w, attributes: newAttrs, baseSkills, derivedStats };
-    }
-    return w;
-  });
-  return { rival: { ...rival, roster: updatedRoster }, gazetteItems: [] };
 }
 
 /**

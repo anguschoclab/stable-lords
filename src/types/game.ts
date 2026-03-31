@@ -506,10 +506,21 @@ export interface LedgerEntry {
   category: "fight" | "training" | "recruit" | "trainer" | "upkeep" | "prize" | "other";
 }
 
+export type AIIntent = "EXPANSION" | "CONSOLIDATION" | "VENDETTA" | "RECOVERY";
+
+export interface AIStrategy {
+  intent: AIIntent;
+  targetStableId?: string;
+  planWeeksRemaining: number;
+}
+
 export interface RivalStableData {
   owner: Owner;
   roster: Warrior[];
   trainers?: TrainerData[];
+  /** Economic and Strategic State */
+  gold: number;
+  strategy?: AIStrategy;
   /** Stable identity metadata */
   motto?: string;
   origin?: string;

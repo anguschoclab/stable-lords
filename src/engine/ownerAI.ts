@@ -1,30 +1,45 @@
-import { FightingStyle } from "@/types/game";
+import { FightingStyle, type AIIntent } from "@/types/game";
 import type { Warrior, FightPlan, OwnerPersonality } from "@/types/game";
 import { defaultPlanForWarrior } from "./simulate";
 import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from "@/data/ownerData";
 
 /**
  * Generate a personality-, philosophy-, meta-, and matchup-aware fight plan for an AI warrior.
- * Now includes per-style matchup heuristics from the Fighting Styles Compendium.
+ * Now includes per-style matchup heuristics and global strategic intent.
  */
 export function aiPlanForWarrior(
   w: Warrior,
   personality: OwnerPersonality,
   philosophy: string,
-  opponentStyle?: FightingStyle
+  opponentStyle?: FightingStyle,
+  intent?: AIIntent
 ): FightPlan {
   const base = defaultPlanForWarrior(w);
   const pMod = PERSONALITY_PLAN_MODS[personality] ?? {};
   const phMod = PHILOSOPHY_PLAN_MODS[philosophy] ?? {};
+
+  // Intent-based modifiers
+  let intentOE = 0;
+  let intentAL = 0;
+  let intentKD = 0;
+
+  if (intent === "RECOVERY") {
+    intentOE = -2; // Defensive to minimize damage
+    intentAL = -1;
+    intentKD = -2;
+  } else if (intent === "VENDETTA") {
+    intentAL = 2; // Relentless
+    intentKD = 2; 
+  }
 
   // Per-style matchup heuristics
   const matchup = opponentStyle ? getStyleMatchupMods(w.style, opponentStyle) : { oe: 0, al: 0, kd: 0 };
 
   return {
     ...base,
-    OE: clamp((base.OE ?? 5) + (pMod.OE ?? 0) + (phMod.OE ?? 0) + matchup.oe, 1, 10),
-    AL: clamp((base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0) + matchup.al, 1, 10),
-    killDesire: clamp((base.killDesire ?? 5) + (pMod.killDesire ?? 0) + (phMod.killDesire ?? 0) + matchup.kd, 1, 10),
+    OE: clamp((base.OE ?? 5) + (pMod.OE ?? 0) + (phMod.OE ?? 0) + matchup.oe + intentOE, 1, 10),
+    AL: clamp((base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0) + matchup.al + intentAL, 1, 10),
+    killDesire: clamp((base.killDesire ?? 5) + (pMod.killDesire ?? 0) + (phMod.killDesire ?? 0) + matchup.kd + intentKD, 1, 10),
   };
 }
 

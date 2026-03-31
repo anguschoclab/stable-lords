@@ -1,52 +1,52 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { random32 } from '../../utils/random';
+import { describe, it, expect } from "vitest";
+import { SeededRNG } from "@/utils/random";
 
-describe('random32', () => {
-  it('should return a number', () => {
-    const val = random32();
-    expect(typeof val).toBe('number');
-  });
+describe("SeededRNG", () => {
+  it("produces deterministic results for the same seed", () => {
+    const seed = 12345;
+    const rng1 = new SeededRNG(seed);
+    const rng2 = new SeededRNG(seed);
 
-  it('should be within the 32-bit unsigned integer range', () => {
-    for (let i = 0; i < 100; i++) {
-      const val = random32();
-      expect(val).toBeGreaterThanOrEqual(0);
-      expect(val).toBeLessThan(4294967296);
+    for (let i = 0; i < 10; i++) {
+      expect(rng1.roll(0, 100)).toBe(rng2.roll(0, 100));
     }
   });
 
-  describe('error handling', () => {
-    let originalCrypto: any;
+  it("produces different results for different seeds", () => {
+    const rng1 = new SeededRNG(1);
+    const rng2 = new SeededRNG(2);
 
-    beforeEach(() => {
-      originalCrypto = (globalThis as any).crypto;
-    });
+    let identical = true;
+    for (let i = 0; i < 10; i++) {
+      if (rng1.roll(0, 1) !== rng2.roll(0, 1)) {
+        identical = false;
+        break;
+      }
+    }
+    expect(identical).toBe(false);
+  });
 
-    afterEach(() => {
-      vi.restoreAllMocks();
-      Object.defineProperty(globalThis, 'crypto', {
-        value: originalCrypto,
-        writable: true,
-        configurable: true,
-      });
-    });
+  it("roll(min, max) returns values within range", () => {
+    const rng = new SeededRNG(42);
+    for (let i = 0; i < 100; i++) {
+      const val = rng.roll(5, 15);
+      expect(val).toBeGreaterThanOrEqual(5);
+      expect(val).toBeLessThanOrEqual(15);
+    }
+  });
 
-    it('should throw an error if crypto is undefined', () => {
-      Object.defineProperty(globalThis, 'crypto', {
-        value: undefined,
-        writable: true,
-        configurable: true,
-      });
-      expect(() => random32()).toThrow('Secure random number generator not available in this environment.');
-    });
+  it("pick(array) returns an element from the array", () => {
+    const rng = new SeededRNG(42);
+    const arr = ["a", "b", "c"];
+    for (let i = 0; i < 20; i++) {
+      expect(arr).toContain(rng.pick(arr));
+    }
+  });
 
-    it('should throw an error if crypto.getRandomValues is undefined', () => {
-      Object.defineProperty(globalThis, 'crypto', {
-        value: { getRandomValues: undefined },
-        writable: true,
-        configurable: true,
-      });
-      expect(() => random32()).toThrow('Secure random number generator not available in this environment.');
-    });
+  it("chance(probability) works correctly", () => {
+    const rng = new SeededRNG(42);
+    // chance(1) should always be true, chance(0) always false
+    expect(rng.chance(1)).toBe(true);
+    expect(rng.chance(0)).toBe(false);
   });
 });

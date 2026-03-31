@@ -24,11 +24,12 @@ export class MatchScoringService {
     isChallenged: boolean;
     isAvoided: boolean;
     rng: () => number;
+    rivalIntent?: string;
   }): number {
     const { 
       playerWarrior: p, rivalWarrior: r, rivalryIntensity, 
       lastMatchWeek, isRecentStyleMatch, isChallenged, 
-      isAvoided, week, rng 
+      isAvoided, week, rng, rivalIntent
     } = params;
 
     let score = 100;
@@ -36,27 +37,34 @@ export class MatchScoringService {
     // 1. Fame proximity bonus (0-30)
     score += Math.max(0, 30 - Math.abs(p.fame - r.fame) * 3);
 
-    // 2. Rivalry bonus
+    // 2. Rivalry & Strategic Intent
     if (rivalryIntensity !== undefined) {
-      // Give intense rivalries / blood feuds (intensity >= 4) a massive booking score boost
       score += (rivalryIntensity >= 4) ? 200 : 50;
     }
 
-    // 3. Style diversity bonus (+20 if this style matchup is fresh)
-    if (!isRecentStyleMatch) {
-      score += 20;
+    // VENDETTA: If intentional targeting of the player
+    if (rivalIntent === "VENDETTA") {
+      score += 300;
     }
 
-    // 4. Repeat penalty (-100 if fought in last 2 weeks)
+    // RECOVERY: Avoid high-risk bouts
+    if (rivalIntent === "RECOVERY" && p.fame > r.fame + 20) {
+      score -= 200;
+    }
+
+    // 3. Style diversity bonus
+    if (!isRecentStyleMatch) score += 20;
+
+    // 4. Repeat penalty
     if (lastMatchWeek !== undefined && lastMatchWeek >= week - 2) {
       score -= 100;
     }
 
-    // 5. Challenge / Avoid modifiers (override-level weights)
+    // 5. Challenge / Avoid modifiers
     if (isChallenged) score += 500;
     if (isAvoided) score -= 500;
 
-    // 6. Random jitter (0-15) for variety
+    // 6. Random jitter
     score += Math.floor(rng() * 16);
 
     return score;

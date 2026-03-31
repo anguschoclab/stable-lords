@@ -408,12 +408,49 @@ export default function WorldOverview() {
                             {rival.owner.metaAdaptation || "STABLE"} INTEL
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pl-14 text-left">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 pl-14 text-left">
                           <div className="relative">
                              <Quote className="h-4 w-4 text-primary/10 absolute -top-2 -left-3" />
                              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 block">RIVAL PHILOSOPHY</span>
                              <p className="text-[11px] leading-relaxed italic border-l-2 border-primary/20 pl-3">"{rival.philosophy || "Focusing on core martial excellence."}"</p>
                           </div>
+                          
+                          <div className="space-y-4">
+                            <div className="space-y-1">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block">STRATEGIC STATE</span>
+                              <div className="flex items-center gap-2">
+                                <Badge className={cn(
+                                  "text-[9px] font-black border-none uppercase tracking-widest px-2 py-0.5",
+                                  rival.strategy?.intent === "VENDETTA" ? "bg-red-500/20 text-red-400" :
+                                  rival.strategy?.intent === "EXPANSION" ? "bg-blue-500/20 text-blue-400" :
+                                  rival.strategy?.intent === "RECOVERY" ? "bg-orange-500/20 text-orange-400" :
+                                  "bg-emerald-500/20 text-emerald-400"
+                                )}>
+                                  {rival.strategy?.intent || "STABLE"}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground font-mono">Week {5 - (rival.strategy?.planWeeksRemaining || 0)}/4</span>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-1">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block">ECONOMIC HEALTH</span>
+                              <div className="flex items-center gap-2">
+                                <div className={cn(
+                                  "h-1.5 w-1.5 rounded-full animate-pulse",
+                                  rival.gold < 150 ? "bg-destructive shadow-[0_0_8px_red]" : 
+                                  rival.gold < 500 ? "bg-orange-500 shadow-[0_0_8px_orange]" : 
+                                  "bg-emerald-500 shadow-[0_0_8px_green]"
+                                )} />
+                                <span className="text-[10px] font-bold uppercase tracking-tight">
+                                  {rival.gold < 150 ? "At Risk" : rival.gold < 500 ? "Poor" : rival.gold < 1200 ? "Stable" : "Wealthy"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground font-mono ml-auto">
+                                  {rival.trainers?.length || 0} Staff
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
                           <div className="space-y-2">
                             <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block">FAVORED DOCTRINES</span>
                             <div className="flex flex-wrap gap-1.5">

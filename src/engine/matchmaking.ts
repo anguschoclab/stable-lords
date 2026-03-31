@@ -108,7 +108,8 @@ export function generateMatchCard(state: GameState): MatchPairing[] {
         isRecentStyleMatch: recentStylePairs.has(`${pw.style}|${rc.warrior.style}`) || recentStylePairs.has(`${rc.warrior.style}|${pw.style}`),
         isChallenged: playerChallengesSet.has(rc.warrior.id) || playerChallengesSet.has(rc.stable.owner.id),
         isAvoided: playerAvoidsSet.has(rc.warrior.id) || playerAvoidsSet.has(rc.stable.owner.id),
-        rng
+        rng,
+        rivalIntent: rc.stable.strategy?.intent
       });
 
       if (score > bestScore) { bestScore = score; bestCandidate = rc; }
@@ -226,13 +227,15 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
       a.warrior, 
       stableA.owner.personality, 
       stableA.philosophy, 
-      d.warrior.style
+      d.warrior.style,
+      stableA.strategy?.intent
     );
     const planD = d.warrior.plan ?? aiPlanForWarrior(
       d.warrior, 
       stableD.owner.personality, 
       stableD.philosophy, 
-      a.warrior.style
+      a.warrior.style,
+      stableD.strategy?.intent
     );
 
     const outcome = simulateFight(planA, planD, a.warrior, d.warrior, undefined, state.trainers);
