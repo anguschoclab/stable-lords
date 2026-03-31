@@ -125,14 +125,20 @@ export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType)
 /** Compute current win streaks from fight history */
 export function computeStreaks(allFights: FightSummary[]): Map<string, number> {
   const streaks = new Map<string, number>();
-  const sorted = [...allFights].sort((a, b) => a.week - b.week);
-  for (const f of sorted) {
+  // ⚡ Bolt: Avoid spreading and sorting the massive allFights array.
+  // arenaHistory is append-only and chronological by definition.
+  for (let i = 0; i < allFights.length; i++) {
+    const f = allFights[i];
     if (f.winner === "A") {
-      streaks.set(f.a, (streaks.get(f.a) ?? 0) >= 0 ? (streaks.get(f.a) ?? 0) + 1 : 1);
-      streaks.set(f.d, (streaks.get(f.d) ?? 0) <= 0 ? (streaks.get(f.d) ?? 0) - 1 : -1);
+      const aStreak = streaks.get(f.a) ?? 0;
+      const dStreak = streaks.get(f.d) ?? 0;
+      streaks.set(f.a, aStreak >= 0 ? aStreak + 1 : 1);
+      streaks.set(f.d, dStreak <= 0 ? dStreak - 1 : -1);
     } else if (f.winner === "D") {
-      streaks.set(f.d, (streaks.get(f.d) ?? 0) >= 0 ? (streaks.get(f.d) ?? 0) + 1 : 1);
-      streaks.set(f.a, (streaks.get(f.a) ?? 0) <= 0 ? (streaks.get(f.a) ?? 0) - 1 : -1);
+      const aStreak = streaks.get(f.a) ?? 0;
+      const dStreak = streaks.get(f.d) ?? 0;
+      streaks.set(f.d, dStreak >= 0 ? dStreak + 1 : 1);
+      streaks.set(f.a, aStreak <= 0 ? aStreak - 1 : -1);
     } else {
       streaks.set(f.a, 0);
       streaks.set(f.d, 0);
@@ -148,8 +154,12 @@ function detectRivalryMatchup(
 ): { a: string; b: string; count: number } | null {
   // Optimization: Only count pairs that fought this week
   const candidatePairs = new Set<string>();
-  for (const f of weekFights) {
+  const names = new Set<string>();
+  for (let i = 0; i < weekFights.length; i++) {
+    const f = weekFights[i];
     candidatePairs.add(f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`);
+    names.add(f.a);
+    names.add(f.d);
   }
 
   const pairCounts = new Map<string, number>();
@@ -157,15 +167,20 @@ function detectRivalryMatchup(
     pairCounts.set(key, 0);
   }
 
-  for (const f of allFights) {
-    const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
-    if (pairCounts.has(key)) {
-      pairCounts.set(key, pairCounts.get(key)! + 1);
+  // ⚡ Bolt: Fast existence check using names Set before template literal string allocation
+  for (let i = 0; i < allFights.length; i++) {
+    const f = allFights[i];
+    if (names.has(f.a) && names.has(f.d)) {
+      const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
+      if (pairCounts.has(key)) {
+        pairCounts.set(key, pairCounts.get(key)! + 1);
+      }
     }
   }
 
   let best: { a: string; b: string; count: number } | null = null;
-  for (const f of weekFights) {
+  for (let i = 0; i < weekFights.length; i++) {
+    const f = weekFights[i];
     const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
     const count = pairCounts.get(key) ?? 0;
     if (count >= 3 && (!best || count > best.count)) {
@@ -212,7 +227,8 @@ export function generateWeeklyGazette(
   const risingStars: string[] = [];
   if (allFights && fights.length > 0) {
     const candidates = new Set<string>();
-    for (const f of fights) {
+    for (let i = 0; i < fights.length; i++) {
+      const f = fights[i];
       if (f.winner) {
         candidates.add(f.winner === "A" ? f.a : f.d);
       }
@@ -223,13 +239,15 @@ export function generateWeeklyGazette(
       stats.set(c, { total: 0, wins: 0 });
     }
 
-    for (const af of allFights) {
-      if (stats.has(af.a)) {
+    // ⚡ Bolt: Check if candidates Set has a/d to avoid Map lookups for everyone
+    for (let i = 0; i < allFights.length; i++) {
+      const af = allFights[i];
+      if (candidates.has(af.a)) {
         const s = stats.get(af.a)!;
         s.total++;
         if (af.winner === "A") s.wins++;
       }
-      if (stats.has(af.d)) {
+      if (candidates.has(af.d)) {
         const s = stats.get(af.d)!;
         s.total++;
         if (af.winner === "D") s.wins++;
