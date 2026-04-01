@@ -30,7 +30,7 @@ describe("ownerPhilosophy - evolvePhilosophies", () => {
     it("should double down (no change) on season change if winning", () => {
         const winningState = {
             ...mockState,
-            arenaHistory: mockState.arenaHistory.map(f => ({ ...f, winner: "A" }))
+            arenaHistory: mockState.arenaHistory.map((f: any) => ({ ...f, winner: "A" }))
         };
         const { updatedRivals, gazetteItems } = evolvePhilosophies(winningState as any, "Summer");
         

@@ -5,9 +5,11 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { Button } from "@/components/ui/button";
-import { GripVertical, RotateCcw } from "lucide-react";
+import { GripVertical, RotateCcw, LayoutDashboard, Coins, Crown, Activity } from "lucide-react";
 import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
 
 // Extracted Widgets
 import { SeasonWidget } from "@/components/dashboard/SeasonWidget";
@@ -150,50 +152,55 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-secondary/30 p-4 rounded-xl border border-border/50">
-        <div className="flex-1">
-          <h1 className="text-2xl font-display font-bold tracking-wide flex items-center gap-2 text-foreground">
-            Arena Hub
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Welcome back, <span className="text-foreground font-medium">{state.player.name}</span> of <span className="text-primary font-bold">{state.player.stableName}</span>
-          </p>
-        </div>
+    <div className="space-y-12 max-w-7xl mx-auto">
+      <PageHeader 
+        title="Arena Hub"
+        subtitle={`COMMAND CENTER // ${state.player.stableName} // ${state.player.name}`}
+        icon={LayoutDashboard}
+        actions={
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-lg border border-white/5 shrink-0 shadow-inner">
+               <div className="flex items-center gap-2 border-r border-white/5 pr-4">
+                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Gold</span>
+                  <span className="font-mono text-arena-gold font-black">{Math.round(state.gold).toLocaleString()}G</span>
+               </div>
+               <div className="flex items-center gap-2 border-r border-white/5 pr-4">
+                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Fame</span>
+                  <span className="font-mono text-arena-fame font-black">{Math.round(state.fame).toLocaleString()}</span>
+               </div>
+               <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Pop</span>
+                  <span className="font-mono text-arena-pop font-black">{Math.round(state.popularity)}%</span>
+               </div>
+            </div>
 
-        <div className="flex items-center gap-4 text-sm bg-background/50 px-4 py-2 rounded-lg border border-border/40 shrink-0 shadow-inner">
-           <div className="flex items-center gap-2 border-r border-border/50 pr-4">
-              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Gold</span>
-              <span className="font-mono text-arena-gold font-bold">{Math.round(state.gold).toLocaleString()} G</span>
-           </div>
-           <div className="flex items-center gap-2 border-r border-border/50 pr-4">
-              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Fame</span>
-              <span className="font-mono text-arena-fame font-bold">{Math.round(state.fame).toLocaleString()}</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">Pop</span>
-              <span className="font-mono text-arena-pop font-bold">{Math.round(state.popularity)}%</span>
-           </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {isEditing && (
-            <Button variant="ghost" size="sm" className="text-xs gap-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors" onClick={resetLayout}>
-              <RotateCcw className="h-3 w-3" /> Reset
-            </Button>
-          )}
-          <Button
-            variant={isEditing ? "default" : "secondary"}
-            size="sm"
-            className={cn("text-xs gap-1 transition-colors shadow-sm", isEditing && "bg-primary text-primary-foreground")}
-            onClick={() => setIsEditing(v => !v)}
-          >
-            <GripVertical className="h-3 w-3" />
-            {isEditing ? "Done" : "Customize"}
-          </Button>
-        </div>
-      </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {isEditing && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-[10px] font-black uppercase tracking-widest gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all" 
+                  onClick={resetLayout}
+                >
+                  <RotateCcw className="h-3 w-3" /> Reset
+                </Button>
+              )}
+              <Button
+                variant={isEditing ? "default" : "secondary"}
+                size="sm"
+                className={cn(
+                  "text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-lg", 
+                  isEditing ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" : "bg-neutral-900/60 border border-white/5"
+                )}
+                onClick={() => setIsEditing(v => !v)}
+              >
+                <GripVertical className="h-3 w-3" />
+                {isEditing ? "Registry Closed" : "Modify Layout"}
+              </Button>
+            </div>
+          </div>
+        }
+      />
 
       {/* Widget Grid */}
       <div className="grid gap-4 md:grid-cols-3 auto-rows-min">

@@ -309,13 +309,13 @@ describe("Week Advancement Integration", () => {
     });
 
     it("should maintain retired warriors list", () => {
-      const state = {
+      const state: GameState = {
         ...initialState,
         roster: [makeWarrior("w1", "Old Warrior", { age: 35 })],
         retired: [],
       };
       
-      let current = state;
+      let current: GameState = state;
       for (let i = 0; i < 52; i++) {
         current = advanceWeek(current);
         

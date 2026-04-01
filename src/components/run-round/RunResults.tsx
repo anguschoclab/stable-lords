@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Skull, Activity, Swords, ChevronDown, ChevronUp } from "lucide-react";
+import { Trophy, Skull, Activity, Swords, ChevronDown, ChevronUp, Zap } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import BoutViewer from "@/components/BoutViewer";
 import type { BoutResult } from "@/engine/boutProcessor";
@@ -88,7 +88,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
                       nameD={res.d.name}
                       styleA={res.a.style}
                       styleD={res.d.style}
-                      log={res.outcome.log.map((text, i) => ({ minute: i + 1, text }))}
+                      log={res.outcome.log}
                       winner={res.outcome.winner}
                       by={res.outcome.by}
                       isRivalry={res.isRivalry}

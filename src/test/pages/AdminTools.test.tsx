@@ -43,21 +43,21 @@ describe('AdminTools Page', () => {
     render(<AdminTools />);
 
     // Check main title
-    expect(screen.getByText('Admin & Telemetry Tools')).toBeDefined();
+    expect(screen.getByText('Admin_Interface')).toBeDefined();
 
     // Check section headers
-    expect(screen.getByText('Save Management')).toBeDefined();
-    expect(screen.getByText('Time Control')).toBeDefined();
-    expect(screen.getByText('Telemetry & System State')).toBeDefined();
+    expect(screen.getByText('Save_Core')).toBeDefined();
+    expect(screen.getByText('temporal_Drift')).toBeDefined();
+    expect(screen.getByText('Telemetry_Output_Stream')).toBeDefined();
   });
 
   it('provides buttons for time skipping', () => {
     render(<AdminTools />);
 
-    const skipWeekBtn = screen.getByRole('button', { name: /Skip 1 Week/i });
+    const skipWeekBtn = screen.getByRole('button', { name: /Advance 1 Week/i });
     expect(skipWeekBtn).toBeDefined();
 
-    const skipSeasonBtn = screen.getByRole('button', { name: /Skip Season/i });
+    const skipSeasonBtn = screen.getByRole('button', { name: /Advance Season/i });
     expect(skipSeasonBtn).toBeDefined();
 
     // Test skip week fires setState
@@ -68,7 +68,7 @@ describe('AdminTools Page', () => {
   it('provides button for hard reset', () => {
     render(<AdminTools />);
 
-    const resetBtn = screen.getByRole('button', { name: /Hard Reset/i });
+    const resetBtn = screen.getByRole('button', { name: /Wipe_All_Data/i });
     expect(resetBtn).toBeDefined();
 
     // Test reset fires doReset
@@ -78,7 +78,7 @@ describe('AdminTools Page', () => {
 
   it('provides button to skip FTUE', () => {
     render(<AdminTools />);
-    const skipFtueBtn = screen.getByRole('button', { name: /Skip FTUE/i });
+    const skipFtueBtn = screen.getByRole('button', { name: /Bypass_FTUE_Gate/i });
     expect(skipFtueBtn).toBeDefined();
 
     fireEvent.click(skipFtueBtn);

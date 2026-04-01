@@ -11,6 +11,7 @@ import { processWeekBouts, type BoutResult } from "@/engine/boutProcessor";
 import { runAutosim, type AutosimResult, type WeekSummary } from "@/engine/autosim";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Swords, Zap, Skull, Shield, FastForward, Trophy, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useShallow } from 'zustand/react/shallow';

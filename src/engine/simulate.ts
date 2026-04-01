@@ -14,6 +14,7 @@ import {
   type MinuteEvent,
   type BaseSkills,
   type TrainerData,
+  type DeathCauseBucket,
 } from "@/types/game";
 import { getItemById, DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
 import { getTrainingBonus } from "@/engine/trainers";
@@ -188,7 +189,7 @@ export function simulateFight(
   let lastPhase: string | null = null;
   let lastMinuteMarker = 0;
   
-  let causeBucket: FightOutcome["post"]["causeBucket"] | undefined;
+  let causeBucket: DeathCauseBucket | undefined;
   let fatalHitLocation: string | undefined;
   let fatalExchangeIndex: number | undefined;
 

@@ -50,10 +50,10 @@ describe('Tournaments Page', () => {
     render(<Tournaments />);
 
     // Check main title
-    expect(screen.getByText(/Seasonal Tournaments/)).toBeDefined();
+    expect(screen.getByText(/Seasonal Campaigns/)).toBeDefined();
 
     // Check Prep Mode & Start button is present
-    const prepBtn = screen.getByRole('button', { name: /Prep Mode/i });
+    const prepBtn = screen.getByRole('button', { name: /OPEN_PREP_CONSOLE/i });
     expect(prepBtn).toBeDefined();
   });
 

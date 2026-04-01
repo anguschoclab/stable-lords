@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Swords, Flame, Skull } from "lucide-react";
+import { Swords, Flame } from "lucide-react";
 import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import { LethalityBadge } from "./LethalityBadge";
 import { StableLink } from "@/components/EntityLink";
@@ -53,7 +53,7 @@ export function MatchCard({ pairing, crowdMood }: MatchCardProps) {
                <WarriorNameTag id={wB.id} name={wB.name} isChampion={wB.champion} />
             </div>
             <div className="flex items-center justify-end gap-2 text-[9px] font-black uppercase tracking-widest text-accent/60">
-               <StableLink id={rivalStable.owner.id} name={rivalStable.owner.stableName} className="hover:text-accent transition-colors" />
+               <StableLink name={rivalStable.owner.stableName} className="hover:text-accent transition-colors" />
             </div>
           </div>
         </div>

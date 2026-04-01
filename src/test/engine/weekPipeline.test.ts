@@ -17,8 +17,8 @@ describe("processTierProgression", () => {
       }
     ],
     newsletter: [],
-    recruitPool: [{ id: 'old' }] as any
-  } as GameState;
+    recruitPool: [{ id: 'old' }]
+  } as unknown as GameState;
 
   it("should promote a stable and clear recruit pool", () => {
     const newState = processTierProgression(mockState, "Summer", 14);

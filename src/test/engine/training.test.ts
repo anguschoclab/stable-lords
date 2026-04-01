@@ -241,7 +241,7 @@ describe("Training System", () => {
 
     it("should recalculate stats after attribute gain", () => {
       const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 });
-      const oldHP = warrior.derivedStats.hp;
+      const oldHP = warrior.derivedStats?.hp ?? 100;
       
       const state = makeState({
         roster: [warrior],
@@ -257,7 +257,7 @@ describe("Training System", () => {
       
       if (result.roster[0].attributes.CN > 12) {
         // HP should increase with CN
-        expect(result.roster[0].derivedStats.hp).toBeGreaterThan(oldHP);
+        expect(result.roster[0].derivedStats?.hp).toBeGreaterThan(oldHP);
       }
     });
 

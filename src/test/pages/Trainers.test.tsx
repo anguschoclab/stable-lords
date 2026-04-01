@@ -43,7 +43,7 @@ describe("Trainers Component", () => {
     id: "t1",
     name: "Master Splinter",
     tier: "Master",
-    focus: "Fundamentals",
+    focus: "Aggression",
     fame: 10,
     contractWeeksLeft: 8,
   };
@@ -52,7 +52,7 @@ describe("Trainers Component", () => {
     id: "t2",
     name: "Coach Rocky",
     tier: "Seasoned",
-    focus: "Aggression",
+    focus: "Defense",
     fame: 5,
     contractWeeksLeft: 12,
   };
@@ -72,7 +72,7 @@ describe("Trainers Component", () => {
     const staffElements = await screen.findAllByText("Master Splinter");
     expect(staffElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Fundamentals SPECIALIST", { exact: false });
+    const focusBadge = screen.getByText("Aggression SPECIALIST", { exact: false });
     expect(focusBadge).toBeInTheDocument();
   });
 
@@ -82,7 +82,7 @@ describe("Trainers Component", () => {
     const poolElements = await screen.findAllByText("Coach Rocky");
     expect(poolElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Aggression SPECIALIST", { exact: false });
+    const focusBadge = screen.getByText("Defense SPECIALIST", { exact: false });
     expect(focusBadge).toBeInTheDocument();
   });
 

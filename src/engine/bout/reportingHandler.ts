@@ -32,7 +32,7 @@ export function handleReporting(
   StyleRollups.addFight({ week, styleA: wA.style, styleD: wD.style, winner: outcome.winner, by: outcome.by });
   ArenaHistory.append(summary);
   LoreArchive.signalFight(summary);
-  NewsletterFeed.appendFightResult({ summary, transcript: summary.transcript });
+  NewsletterFeed.appendFightResult({ summary, transcript: summary.transcript ?? [] });
 
   const tone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") ? "hype" : "neutral");
   const announcement = (outcome.by === "Kill" || outcome.by === "KO") 

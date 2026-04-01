@@ -8,7 +8,8 @@ import {
   LogOut, PanelLeftClose, PanelLeft, Save, Download, 
   Dumbbell, Sun, Moon, Search, Globe, Newspaper, 
   Crown, Shield, BarChart3, Target, Award, BookOpen, 
-  Eye, Landmark, Settings, Users, Activity, Volume2, VolumeX
+  Eye, Landmark, Settings, Users, Activity, Volume2, VolumeX,
+  Coins
 } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import { Button } from "@/components/ui/button";
@@ -112,13 +113,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
 
-  // useCoachTip removed in favor of CoachOverlay
   useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
   useRivalryAlerts();
 
   useEffect(() => {
     const isOrphan = selectActiveWarriors(state).length < 3;
-    if (isOrphan && location.pathname !== "/welcome") {
+    if (isOrphan && location.pathname !== "/welcome" && location.pathname !== "/start") {
       if (typeof window !== "undefined") {
         window.location.href = "/welcome";
       }
@@ -142,144 +142,172 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const activePath = location.pathname;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-hidden text-foreground">
+    <div className="min-h-screen bg-[#050506] flex flex-col overflow-hidden text-foreground selection:bg-primary/30">
       {/* ─── Global Status Header ─── */}
-      <header className="h-14 border-b border-border/60 bg-glass backdrop-blur-md z-50 flex items-center justify-between px-6 sticky top-0 flex-shrink-0">
+      <header className="h-14 border-b border-white/5 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-between px-6 sticky top-0 flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3 group active:scale-95 transition-transform">
             <motion.div 
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20"
+              whileHover={{ rotate: 15 }}
+              className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
-              <Swords className="h-5 w-5 text-background" />
+              <Swords className="h-5 w-5 text-white" />
             </motion.div>
             <div className="flex flex-col">
-              <span className="font-display font-black text-sm tracking-tight leading-none uppercase group-hover:text-primary transition-colors">
-                {state.player.stableName}
-              </span>
-              <span className="text-[10px] text-muted-foreground font-bold tracking-widest leading-none mt-1 uppercase">
-                Est. Year {new Date(state.meta.createdAt).getFullYear()}
-              </span>
+              <span className="font-display font-black text-sm tracking-tighter uppercase leading-none group-hover:text-primary transition-colors">Stable Lords</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">ALPHA_DISTRICT_412</span>
             </div>
           </Link>
 
-          <Separator orientation="vertical" className="h-6 bg-border/40" />
+          <Separator orientation="vertical" className="h-6 bg-white/5" />
 
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-8">
             <div className="flex flex-col">
-              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">Chronicle</span>
-              <span className="text-xs font-mono font-bold">W{state.week} · {state.season}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Arena Week</span>
+              <span className="font-mono font-black text-xs text-foreground bg-white/5 px-2 py-0.5 rounded border border-white/5">{state.week}</span>
             </div>
-            <div className="flex flex-col px-3 border-l border-border/20">
-              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">Treasury</span>
-              <motion.span 
-                key={state.gold}
-                initial={{ scale: 1.2, color: "#facc15" }}
-                animate={{ scale: 1, color: "var(--arena-gold)" }}
-                className="text-xs font-mono font-bold"
-              >
-                ${state.gold}
-              </motion.span>
+            
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Treasury</span>
+              <span className="font-mono font-black text-xs text-arena-gold flex items-center gap-1">
+                {(state.gold ?? 0).toLocaleString()} <Coins className="h-3 w-3 opacity-60" />
+              </span>
             </div>
-            <div className="flex flex-col px-3 border-l border-border/20">
-              <span className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">Mood</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs">{moodIcon}</span>
-                <span className="text-[10px] font-bold uppercase text-accent tracking-tighter">{state.crowdMood}</span>
-              </div>
+
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Influence</span>
+              <span className="font-mono font-black text-xs text-arena-fame flex items-center gap-1">
+                {state.fame} <Crown className="h-3 w-3 opacity-60" />
+              </span>
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Crowd Mood</span>
+              <span className="font-mono font-black text-xs text-arena-pop flex items-center gap-1">
+                {moodIcon} <Activity className="h-3 w-3 opacity-60" />
+              </span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {lastSavedAt && (
-             <div className={cn(
-               "flex items-center gap-1.5 text-[10px] font-bold font-mono px-2 py-1 rounded bg-secondary/40 transition-colors",
-               saveFlash ? "text-primary bg-primary/10 border border-primary/20" : "text-muted-foreground/60"
-             )}>
-               <Save className="h-3 w-3" />
-               <span>{formatSaveTime(lastSavedAt)}</span>
-             </div>
-          )}
-          
-          <Separator orientation="vertical" className="h-6 bg-border/40 hidden sm:block" />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-lg hover:bg-white/5 transition-colors"
+                onClick={toggleMute}
+              >
+                {isMuted ? <VolumeX className="h-4 w-4 text-destructive" /> : <Volume2 className="h-4 w-4 text-primary" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
+              Toggle Acoustic Signal ({isMuted ? "Muted" : "Active"})
+            </TooltipContent>
+          </Tooltip>
 
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={toggleMute} title={isMuted ? "Unmute" : "Mute"} aria-label={isMuted ? "Unmute" : "Mute"}>
-              {isMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
-              {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setResetOpen(true)} title="Reset save" aria-label="Reset save">
-              <RotateCcw className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={returnToTitle} title="Return to title menu" aria-label="Return to title menu">
-              <LogOut className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-9 w-9 rounded-lg transition-all",
+                  saveFlash ? "bg-primary/20 text-primary scale-110" : "hover:bg-white/5"
+                )}
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
+              {lastSavedAt ? `Auto-Saved: ${formatSaveTime(lastSavedAt)}` : "Registry Idle"}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
+                onClick={() => setResetOpen(true)}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
+              Terminal Reset (Delete Save)
+            </TooltipContent>
+          </Tooltip>
+
+          <Separator orientation="vertical" className="h-6 bg-white/5 mx-1" />
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
+                onClick={returnToTitle}
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
+              Exit to Command Center
+            </TooltipContent>
+          </Tooltip>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* ─── Persistent Left Sidebar ─── */}
-        <motion.aside 
-          initial={false}
-          animate={{ 
-            width: sidebarOpen ? 256 : (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 80 : 0),
-            marginLeft: sidebarOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 0 : -256)
-          }}
-          className="border-r border-border/60 bg-secondary/10 flex flex-col z-40 relative overflow-hidden h-full"
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* ─── Persistent Sidebar ─── */}
+        <aside 
+          className={cn(
+            "border-r border-white/5 bg-[#080809] flex flex-col transition-all duration-500 ease-in-out z-40 group",
+            sidebarOpen ? "w-64" : "w-16"
+          )}
         >
-          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8 no-scrollbar">
+          <div className="p-3 border-b border-white/5 flex items-center justify-between">
+            {sidebarOpen && <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pl-3 opacity-40">Main Sequence</span>}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleSidebar} 
+              className={cn("h-8 w-8 hover:bg-white/5", !sidebarOpen && "mx-auto")}
+            >
+              {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+            </Button>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto py-6 space-y-8 scrollbar-hide">
             {NAV_SECTIONS.map((section) => (
               <div key={section.id} className="space-y-2">
-                <h3 className={cn(
-                  "text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground px-3 mb-3",
-                  !sidebarOpen && "lg:text-center lg:px-0"
-                )}>
-                  {sidebarOpen ? section.label : section.label[0]}
-                </h3>
-                <div className="space-y-1">
+                {sidebarOpen && <h4 className="px-6 text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">{section.label}</h4>}
+                <div className="space-y-0.5">
                   {section.items.map((item) => {
-                    const active = activePath === item.to || (item.to !== "/" && activePath.startsWith(item.to));
-                    const Icon = item.icon;
+                    const isActive = activePath === item.to || (item.to !== "/" && activePath.startsWith(item.to));
                     return (
-                      <Tooltip key={item.to}>
+                      <Tooltip key={item.to} delayDuration={sidebarOpen ? 1000 : 0}>
                         <TooltipTrigger asChild>
-                          <Link to={item.to}>
-                            <motion.div
-                              whileHover={{ x: 4, backgroundColor: active ? "var(--primary)" : "rgba(255,255,255,0.05)" }}
-                              whileTap={{ scale: 0.98 }}
-                              className={cn(
-                                "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all group relative",
-                                active 
-                                  ? "bg-primary text-background shadow-lg shadow-primary/20" 
-                                  : "text-muted-foreground hover:text-foreground"
-                              )}
-                            >
-                              <Icon className={cn("h-4 w-4 shrink-0 transition-transform group-hover:scale-110", active && "text-background")} />
-                              <AnimatePresence>
-                                {sidebarOpen && (
-                                  <motion.span 
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    className="whitespace-nowrap uppercase tracking-wider"
-                                  >
-                                    {item.label}
-                                  </motion.span>
-                                )}
-                              </AnimatePresence>
-                              {active && !sidebarOpen && (
-                                <div className="absolute right-0 top-1 bottom-1 w-1 bg-background rounded-l-full" />
-                              )}
-                            </motion.div>
+                          <Link
+                            to={item.to as any}
+                            className={cn(
+                              "flex items-center gap-3 px-6 py-2.5 text-sm font-semibold transition-all relative group h-10",
+                              isActive 
+                                ? "text-primary bg-primary/5" 
+                                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                            )}
+                          >
+                            {isActive && <motion.div layoutId="nav-glow" className="absolute inset-y-0 left-0 w-1 bg-primary shadow-[0_0_10px_rgba(255,0,0,0.8)]" />}
+                            <item.icon className={cn("h-4 w-4 flex-shrink-0 transition-transform group-hover:scale-110", isActive && "text-primary")} />
+                            {sidebarOpen && <span className="truncate">{item.label}</span>}
                           </Link>
                         </TooltipTrigger>
                         {!sidebarOpen && (
-                          <TooltipContent side="right" sideOffset={10}>
-                            <p className="font-black uppercase tracking-widest text-[10px]">{item.label}</p>
+                          <TooltipContent side="right" className="text-[10px] font-black uppercase tracking-widest font-mono">
+                            {item.label}
                           </TooltipContent>
                         )}
                       </Tooltip>
@@ -288,140 +316,78 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
             ))}
+          </nav>
+
+          <div className="p-4 border-t border-white/5">
+            <Button 
+              onClick={() => doAdvanceWeek()}
+              className={cn(
+                "w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.3)] border border-white/10",
+                !sidebarOpen && "p-0"
+              )}
+            >
+              <RotateCcw className={cn("h-4 w-4", sidebarOpen && "mr-2")} />
+              {sidebarOpen && "End Week Sequence"}
+            </Button>
           </div>
-
-          <div className="p-4 border-t border-border/40">
-             <Button 
-               variant="ghost" 
-               className="w-full justify-start gap-3 h-10 hover:bg-secondary/40 px-3"
-               onClick={toggleSidebar}
-             >
-               <PanelLeft className={cn("h-4 w-4 transition-transform", !sidebarOpen && "rotate-180")} />
-               <span className={cn("text-xs font-bold whitespace-nowrap", !sidebarOpen && "lg:hidden font-display uppercase tracking-widest text-[9px]")}>Collapse</span>
-             </Button>
-          </div>
-        </motion.aside>
-
-        {/* ─── Main Content Canvas ─── */}
-        <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden relative">
-          <main className="flex-1 overflow-y-auto no-scrollbar relative">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-
-            <div className="max-w-7xl mx-auto px-6 py-8 min-h-full">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                >
-                  {children}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </main>
-
-          <footer className="h-10 border-t border-border/40 bg-background/50 backdrop-blur-sm px-6 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 flex-shrink-0">
-            <div className="flex items-center gap-4">
-              <span>SYSTEM_STABLE_V2.0</span>
-              <Separator orientation="vertical" className="h-3 bg-border/20" />
-              <span>S{state.season.toUpperCase()[0]}W{state.week}</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 animate-pulse">
-                <Activity className="h-3 w-3" /> HEARTBEAT_OK
-              </span>
-            </div>
-          </footer>
-        </div>
-
-        {/* Global Event Log Sidebar */}
-        <aside className={cn(
-          "hidden xl:block border-l border-border/60 bg-secondary/5 transition-all duration-300 overflow-hidden",
-          sidebarOpen ? "w-80 opacity-100" : "w-0 opacity-0 pointer-events-none"
-        )}>
-           <div className="h-full px-4 py-6 min-w-[20rem]">
-              <div className="flex items-center gap-2 mb-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                <ScrollText className="h-3.5 w-3.5" /> Event Chronicle
-              </div>
-              <div className="h-[calc(100%-2.5rem)]">
-                 <EventLog />
-              </div>
-           </div>
         </aside>
+
+        {/* ─── Main Content Area ─── */}
+        <main className="flex-1 flex flex-col relative bg-[#050506] overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
+          
+          <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20
+                }}
+                className="relative z-10"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <EventLog />
+          <CoachOverlay />
+        </main>
       </div>
 
-      {!state.isFTUE && (
-        <div className="fixed bottom-8 right-8 z-[60]">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button
-              size="lg"
-              className={cn(
-                 "h-16 px-10 rounded-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] font-display font-black text-xl tracking-tighter uppercase transition-all active:shadow-inner border-2 group relative overflow-hidden",
-                 state.phase === "planning" 
-                   ? "bg-arena-gold text-black border-arena-gold/50 hover:bg-arena-gold/90 shadow-arena-gold/20" 
-                   : "bg-primary text-background border-primary/50 hover:bg-primary/90 shadow-primary/20"
-              )}
-              onClick={() => {
-                if (state.phase === "planning") {
-                  doAdvanceWeek();
-                } else {
-                  window.location.href = "/run-round";
-                }
-              }}
-            >
-              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              {state.phase === "planning" ? (
-                <>
-                  Advance Cycle
-                  <Zap className="ml-3 h-5 w-5 fill-current transition-transform group-hover:scale-125 group-hover:rotate-12" />
-                </>
-              ) : (
-                <>
-                  Resolve Bouts
-                  <Swords className="ml-3 h-5 w-5 transition-transform group-hover:scale-125 group-hover:-rotate-12" />
-                </>
-              )}
-            </Button>
-          </motion.div>
-        </div>
-      )}
+      <DeathModal />
 
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-          <AlertDialogContent className="bg-glass-card border-neon">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="font-display text-2xl tracking-tighter uppercase">Terminate Operation?</AlertDialogTitle>
-              <AlertDialogDescription className="text-muted-foreground">
-                This will permanently delete the stable <span className="text-foreground font-bold font-display">"{state.player.stableName}"</span> and all associated chronicle data. This erasure is non-recoverable.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-xl">Retain Mission</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  const slotId = getActiveSlot();
-                  if (slotId) deleteSlot(slotId);
-                  doReset();
-                  setResetOpen(false);
-                }}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-bold uppercase tracking-widest text-[10px]"
-              >
-                Confirm Termination
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </motion.div>
+        <AlertDialogContent className="bg-neutral-900 border-destructive/20 scale-105">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display font-black text-2xl uppercase tracking-tighter text-destructive">Terminal Purge Protocol</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground font-medium selection:bg-destructive/20">
+              You are about to initiate the Purge Protocol. This sequence will permanently erase the current combat history, stable roster, and financial records. 
+              <br/><br/>
+              <span className="text-destructive font-black uppercase tracking-widest text-[10px]">Data loss is irreversible. Proceed?</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6">
+            <AlertDialogCancel className="bg-secondary/40 border-white/5 hover:bg-white/10 hover:text-foreground">Abort Protocol</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-black uppercase text-[11px] tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.3)]"
+              onClick={() => {
+                const currentSlot = getActiveSlot();
+                if (currentSlot) deleteSlot(currentSlot.id);
+                doReset();
+                setResetOpen(false);
+              }}
+            >
+              Confirm Purge
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
       </AlertDialog>
-      <DeathModal />
-      <CoachOverlay />
     </div>
   );
 }

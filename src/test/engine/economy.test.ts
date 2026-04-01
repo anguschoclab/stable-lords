@@ -61,10 +61,10 @@ describe("Economy Engine", () => {
 
       // Expenses:
       // Warriors: 2 * 55 = 110
-      // Trainers: 1 * 35 = 35
+      // Trainers: 1 * 10 = 10 (Novice tier)
       // Training: 1 * 35 = 35
-      // Total expenses: 180
-      expect(breakdown.totalExpenses).toBe(180);
+      // Total expenses: 155
+      expect(breakdown.totalExpenses).toBe(155);
 
       const expenseLabels = breakdown.expenses.map(e => e.label);
       expect(expenseLabels).toContain("Warrior upkeep (2)");
@@ -72,7 +72,7 @@ describe("Economy Engine", () => {
       expect(expenseLabels).toContain("Training fees (1)");
 
       expect(breakdown.expenses.find(e => e.label.includes("Warrior upkeep"))?.amount).toBe(110);
-      expect(breakdown.expenses.find(e => e.label.includes("Trainer salaries"))?.amount).toBe(35);
+      expect(breakdown.expenses.find(e => e.label.includes("Trainer salaries"))?.amount).toBe(10);
       expect(breakdown.expenses.find(e => e.label.includes("Training fees"))?.amount).toBe(35);
     });
 
