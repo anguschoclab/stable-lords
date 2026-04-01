@@ -16,6 +16,11 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Eye, Shield, Coins, Users, Swords, ArrowLeftRight, Trophy, Skull, TrendingUp, UserRoundSearch } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 const QUALITIES: ScoutQuality[] = ["Basic", "Detailed", "Expert"];
@@ -105,24 +110,30 @@ function StableSelector({
         <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">TACTICAL_ASSET_A</label>
         <div className="grid grid-cols-1 gap-1.5">
           {rivals.map((r) => (
-            <button
-              key={r.owner.id}
-              onClick={() => setIdA(r.owner.id === idA ? null : r.owner.id)}
-              disabled={r.owner.id === idB}
-              className={cn(
-                "w-full text-left px-4 py-2.5 rounded-xl border font-display font-black uppercase text-[10px] tracking-tight transition-all",
-                idA === r.owner.id
-                  ? "border-primary bg-primary/10 text-primary shadow-[0_0_15px_-5px_rgba(var(--primary-rgb),0.3)]"
-                  : r.owner.id === idB
-                  ? "border-border/10 text-muted-foreground/20 cursor-not-allowed grayscale"
-                  : "border-border/30 bg-glass-card hover:border-primary/40 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <Shield className="h-3.5 w-3.5" />
-                {r.owner.stableName}
-              </div>
-            </button>
+            <Tooltip key={r.owner.id}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setIdA(r.owner.id === idA ? null : r.owner.id)}
+                  disabled={r.owner.id === idB}
+                  className={cn(
+                    "w-full text-left px-4 py-2.5 rounded-xl border font-display font-black uppercase text-[10px] tracking-tight transition-all",
+                    idA === r.owner.id
+                      ? "border-primary bg-primary/10 text-primary shadow-[0_0_15px_-5px_rgba(var(--primary-rgb),0.3)]"
+                      : r.owner.id === idB
+                      ? "border-border/10 text-muted-foreground/20 cursor-not-allowed grayscale"
+                      : "border-border/30 bg-glass-card hover:border-primary/40 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-3.5 w-3.5" />
+                    {r.owner.stableName}
+                  </div>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <p className="text-[10px] font-black uppercase tracking-widest">Compare this stable (A)</p>
+              </TooltipContent>
+            </Tooltip>
           ))}
         </div>
       </div>
@@ -130,24 +141,30 @@ function StableSelector({
         <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">TACTICAL_ASSET_B</label>
         <div className="grid grid-cols-1 gap-1.5">
           {rivals.map((r) => (
-            <button
-              key={r.owner.id}
-              onClick={() => setIdB(r.owner.id === idB ? null : r.owner.id)}
-              disabled={r.owner.id === idA}
-              className={cn(
-                "w-full text-left px-4 py-2.5 rounded-xl border font-display font-black uppercase text-[10px] tracking-tight transition-all",
-                idB === r.owner.id
-                  ? "border-accent bg-accent/10 text-accent shadow-[0_0_15px_-5px_rgba(var(--accent-rgb),0.3)]"
-                  : r.owner.id === idA
-                  ? "border-border/10 text-muted-foreground/20 cursor-not-allowed grayscale"
-                  : "border-border/30 bg-glass-card hover:border-accent/40 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <Shield className="h-3.5 w-3.5" />
-                {r.owner.stableName}
-              </div>
-            </button>
+            <Tooltip key={r.owner.id}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setIdB(r.owner.id === idB ? null : r.owner.id)}
+                  disabled={r.owner.id === idA}
+                  className={cn(
+                    "w-full text-left px-4 py-2.5 rounded-xl border font-display font-black uppercase text-[10px] tracking-tight transition-all",
+                    idB === r.owner.id
+                      ? "border-accent bg-accent/10 text-accent shadow-[0_0_15px_-5px_rgba(var(--accent-rgb),0.3)]"
+                      : r.owner.id === idA
+                      ? "border-border/10 text-muted-foreground/20 cursor-not-allowed grayscale"
+                      : "border-border/30 bg-glass-card hover:border-accent/40 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-3.5 w-3.5" />
+                    {r.owner.stableName}
+                  </div>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p className="text-[10px] font-black uppercase tracking-widest">Compare this stable (B)</p>
+              </TooltipContent>
+            </Tooltip>
           ))}
         </div>
       </div>
@@ -454,24 +471,30 @@ function WarriorComparison({ rivals, playerRoster }: { rivals: RivalStableData[]
             <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">{label}</label>
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {allWarriors.map(({ warrior: w, stable }) => (
-                <button
-                  key={w.id}
-                  onClick={() => setSel(w.id === sel ? null : w.id)}
-                  disabled={w.id === other}
-                  className={`w-full text-left px-3 py-1.5 rounded-lg border text-[11px] transition-all ${
-                    sel === w.id
-                      ? `border-${color} bg-${color}/10 text-foreground`
-                      : w.id === other
-                      ? "border-border/30 text-muted-foreground/30 cursor-not-allowed"
-                      : "border-border hover:border-primary/40 text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <WarriorNameTag id={w.id} name={w.name} />
-                    <StatBadge styleName={w.style} showFullName />
-                  </div>
-                  <div className="text-[9px] text-muted-foreground">{stable}</div>
-                </button>
+                <Tooltip key={w.id}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setSel(w.id === sel ? null : w.id)}
+                      disabled={w.id === other}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg border text-[11px] transition-all ${
+                        sel === w.id
+                          ? `border-${color} bg-${color}/10 text-foreground`
+                          : w.id === other
+                          ? "border-border/30 text-muted-foreground/30 cursor-not-allowed"
+                          : "border-border hover:border-primary/40 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <WarriorNameTag id={w.id} name={w.name} />
+                        <StatBadge styleName={w.style} showFullName />
+                      </div>
+                      <div className="text-[9px] text-muted-foreground">{stable}</div>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side={color === "primary" ? "left" : "right"}>
+                    <p className="text-[10px] font-black uppercase tracking-widest">Compare {w.name}</p>
+                  </TooltipContent>
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -607,15 +630,38 @@ export default function Scouting() {
 
       <Tabs defaultValue="scout" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-lg">
-          <TabsTrigger value="scout" className="gap-1.5">
-            <Eye className="h-3.5 w-3.5" /> Scout Intel
-          </TabsTrigger>
-          <TabsTrigger value="compare" className="gap-1.5">
-            <ArrowLeftRight className="h-3.5 w-3.5" /> Stables
-          </TabsTrigger>
-          <TabsTrigger value="warriors" className="gap-1.5">
-            <UserRoundSearch className="h-3.5 w-3.5" /> Warriors
-          </TabsTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger value="scout" className="gap-1.5">
+                <Eye className="h-3.5 w-3.5" /> Scout Intel
+              </TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-[10px] font-black uppercase tracking-widest">Gather intel on rivals</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger value="compare" className="gap-1.5">
+                <ArrowLeftRight className="h-3.5 w-3.5" /> Stables
+              </TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-[10px] font-black uppercase tracking-widest">Compare stable performance</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger value="warriors" className="gap-1.5">
+                <UserRoundSearch className="h-3.5 w-3.5" /> Warriors
+              </TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-[10px] font-black uppercase tracking-widest">Face-off rival warriors</p>
+            </TooltipContent>
+          </Tooltip>
         </TabsList>
 
         {/* Scout Tab */}
@@ -635,29 +681,35 @@ export default function Scouting() {
                   Rival Stables
                 </h3>
                 {rivals.map((rival) => (
-                  <Card
-                    key={rival.owner.id}
-                    className={`cursor-pointer transition-all ${
-                      selectedRival === rival.owner.id ? "border-primary ring-1 ring-primary/30" : "hover:border-primary/30"
-                    }`}
-                    onClick={() => {
-                      setSelectedRival(rival.owner.id);
-                      setSelectedWarrior(null);
-                    }}
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-accent" />
-                        <span className="font-display font-semibold text-sm">{rival.owner.stableName}</span>
-                      </div>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" /> {rival.roster.filter((w) => w.status === "Active").length} warriors
-                        </span>
-                        <span>{rival.owner.personality}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <Tooltip key={rival.owner.id}>
+                    <TooltipTrigger asChild>
+                      <Card
+                        className={`cursor-pointer transition-all ${
+                          selectedRival === rival.owner.id ? "border-primary ring-1 ring-primary/30" : "hover:border-primary/30"
+                        }`}
+                        onClick={() => {
+                          setSelectedRival(rival.owner.id);
+                          setSelectedWarrior(null);
+                        }}
+                      >
+                        <CardContent className="p-3">
+                          <div className="flex items-center gap-2">
+                            <Shield className="h-4 w-4 text-accent" />
+                            <span className="font-display font-semibold text-sm">{rival.owner.stableName}</span>
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3" /> {rival.roster.filter((w) => w.status === "Active").length} warriors
+                            </span>
+                            <span>{rival.owner.personality}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p className="text-[10px] font-black uppercase tracking-widest">Select {rival.owner.stableName}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
 
@@ -669,30 +721,36 @@ export default function Scouting() {
                 {activeRival?.roster.filter((w) => w.status === "Active").map((w) => {
                   const hasReport = reports.some((r) => r.warriorName === w.name);
                   return (
-                    <Card
-                      key={w.id}
-                      className={`cursor-pointer transition-all ${
-                        selectedWarrior === w.id ? "border-primary ring-1 ring-primary/30" : "hover:border-primary/30"
-                      }`}
-                      onClick={() => setSelectedWarrior(w.id)}
-                    >
-                      <CardContent className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <WarriorNameTag id={w.id} name={w.name} />
-                            <StatBadge styleName={w.style} showFullName />
-                          </div>
-                          {hasReport && (
-                            <Badge variant="secondary" className="text-[10px] gap-1">
-                              <Eye className="h-3 w-3" /> Scouted
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {w.career.wins}W-{w.career.losses}L
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <Tooltip key={w.id}>
+                      <TooltipTrigger asChild>
+                        <Card
+                          className={`cursor-pointer transition-all ${
+                            selectedWarrior === w.id ? "border-primary ring-1 ring-primary/30" : "hover:border-primary/30"
+                          }`}
+                          onClick={() => setSelectedWarrior(w.id)}
+                        >
+                          <CardContent className="p-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <WarriorNameTag id={w.id} name={w.name} />
+                                <StatBadge styleName={w.style} showFullName />
+                              </div>
+                              {hasReport && (
+                                <Badge variant="secondary" className="text-[10px] gap-1">
+                                  <Eye className="h-3 w-3" /> Scouted
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {w.career.wins}W-{w.career.losses}L
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p className="text-[10px] font-black uppercase tracking-widest">Select {w.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   );
                 })}
                 {!activeRival && (
@@ -724,6 +782,7 @@ export default function Scouting() {
                                   className="w-full justify-between"
                                   disabled={!canAfford}
                                   onClick={() => handleScout(q)}
+                                  tooltip={q === "Basic" ? "General record & style info" : q === "Detailed" ? "Estimate attribute ranges" : "Detailed attribute estimates & injury data"}
                                 >
                                   <span className="flex items-center gap-2">
                                     <Eye className="h-3.5 w-3.5" /> {q} Scout
@@ -797,6 +856,7 @@ export default function Scouting() {
                               size="sm"
                               className="w-full"
                               onClick={() => handleScout(existingReport.quality === "Basic" ? "Detailed" : "Expert")}
+                              tooltip={existingReport.quality === "Basic" ? "Upgrade to Detailed Scouting" : "Upgrade to Expert Scouting"}
                             >
                               Upgrade Intel
                             </Button>

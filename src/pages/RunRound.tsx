@@ -196,6 +196,7 @@ export default function RunRound() {
             )}
           </p>
         </div>
+        <div className="flex gap-2 w-full sm:w-auto">
           <Button
             onClick={runWeek}
             disabled={running || autosimming || state.phase === "resolution" || (fightReady.length < 1 && matchCard.length === 0)}

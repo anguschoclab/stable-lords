@@ -40,18 +40,16 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
             </div>
           </div>
           {hasInjury && (
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="bg-destructive/10 text-destructive px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border border-destructive/20 shadow-sm">
-                     <AlertTriangle className="h-3 w-3" /> Injured
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="text-xs max-w-xs font-mono">
-                  {warrior.injuries.map(i => typeof i === "string" ? i : i.name).join(", ")}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="bg-destructive/10 text-destructive px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border border-destructive/20 shadow-sm cursor-help">
+                   <AlertTriangle className="h-3 w-3" /> Injured
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs max-w-xs font-mono">
+                {warrior.injuries.map(i => typeof i === "string" ? i : i.name).join(", ")}
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
       </CardHeader>
@@ -62,23 +60,30 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
 
         {/* Recovery option */}
         {hasInjury && !isTraining && (
-          <button
-            onClick={isRecovery ? onClear : onAssignRecovery}
-            className={`w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors border ${
-              isRecovery
-                ? "border-destructive bg-destructive/20 text-foreground glow-neon-red"
-                : "border-border hover:border-arena-pop/50 hover:bg-secondary/50 cursor-pointer"
-            }`}
-          >
-            <Heart className="h-3.5 w-3.5 text-arena-pop" />
-            <div className="flex-1">
-              <span className="text-xs font-medium">Active Recovery</span>
-              <span className="text-[10px] text-muted-foreground ml-1.5">
-                — accelerated healing, no risk
-              </span>
-            </div>
-            {isRecovery && <Check className="h-3.5 w-3.5 text-destructive drop-shadow-[0_0_5px_hsl(var(--destructive))]" />}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={isRecovery ? onClear : onAssignRecovery}
+                className={`w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors border ${
+                  isRecovery
+                    ? "border-destructive bg-destructive/20 text-foreground glow-neon-red"
+                    : "border-border hover:border-arena-pop/50 hover:bg-secondary/50 cursor-pointer"
+                }`}
+              >
+                <Heart className="h-3.5 w-3.5 text-arena-pop" />
+                <div className="flex-1">
+                  <span className="text-xs font-medium">Active Recovery</span>
+                  <span className="text-[10px] text-muted-foreground ml-1.5">
+                    — accelerated healing, no risk
+                  </span>
+                </div>
+                {isRecovery && <Check className="h-3.5 w-3.5 text-destructive drop-shadow-[0_0_5px_hsl(var(--destructive))]" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-[10px] font-black uppercase tracking-widest">{isRecovery ? 'Clear recovery assignment' : 'Prioritize healing and injury restoration'}</p>
+            </TooltipContent>
+          </Tooltip>
         )}
 
         {/* Attribute grid */}
@@ -102,46 +107,44 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
               const displayVal = isRevealed ? `${val}/${potVal}` : `${val}/???`;
 
               return (
-                <TooltipProvider key={key} delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        disabled={disabled}
-                        onClick={() => onAssign(key)}
-                        className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition-colors border ${
-                          isSelected
-                            ? "border-primary bg-primary/20 text-foreground glow-neon-green"
-                            : disabled
-                            ? "border-border bg-muted/30 text-muted-foreground cursor-not-allowed"
-                            : "border-border hover:border-primary/50 hover:bg-secondary/50 cursor-pointer"
-                        }`}
-                      >
-                        <span className="text-xs w-20 font-medium flex items-center gap-1">
-                          {isSZ && <Lock className="h-2.5 w-2.5" />}
-                          {ATTRIBUTE_LABELS[key]}
-                        </span>
-                        <div className="flex-1">
-                          <Progress value={(val / 25) * 100} className="h-1.5 [&>div]:bg-accent [&>div]:shadow-[0_0_8px_hsl(var(--accent))]" />
-                        </div>
-                        <span className="text-[11px] font-mono w-10 text-right whitespace-nowrap">{displayVal}</span>
-                        {!disabled && !isSelected && (
-                          <span className="text-[9px] text-muted-foreground w-8 text-right">{chance}%</span>
-                        )}
-                        {isSelected && <Check className="h-3.5 w-3.5 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />}
-                        {maxed && <span className="text-[10px] text-muted-foreground ml-1">MAX</span>}
-                        {seasonCapped && !maxed && !isSZ && (
-                          <span className="text-[9px] text-arena-gold">3/3</span>
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left" className="text-xs max-w-[200px]">
-                      {isSZ ? "Size cannot be trained — fixed at creation." :
-                       maxed ? "Already at maximum (25)." :
-                       seasonCapped ? `Seasonal cap reached (${ATTRIBUTE_LABELS[key]} gained 3 this season).` :
-                       `${chance}% chance to gain +1. Season: ${seasonalGains[key] ?? 0}/3`}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip key={key}>
+                  <TooltipTrigger asChild>
+                    <button
+                      disabled={disabled}
+                      onClick={() => onAssign(key)}
+                      className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition-colors border ${
+                        isSelected
+                          ? "border-primary bg-primary/20 text-foreground glow-neon-green"
+                          : disabled
+                          ? "border-border bg-muted/30 text-muted-foreground cursor-not-allowed"
+                          : "border-border hover:border-primary/50 hover:bg-secondary/50 cursor-pointer"
+                      }`}
+                    >
+                      <span className="text-xs w-20 font-medium flex items-center gap-1">
+                        {isSZ && <Lock className="h-2.5 w-2.5" />}
+                        {ATTRIBUTE_LABELS[key]}
+                      </span>
+                      <div className="flex-1">
+                        <Progress value={(val / 25) * 100} className="h-1.5 [&>div]:bg-accent [&>div]:shadow-[0_0_8px_hsl(var(--accent))]" />
+                      </div>
+                      <span className="text-[11px] font-mono w-10 text-right whitespace-nowrap">{displayVal}</span>
+                      {!disabled && !isSelected && (
+                        <span className="text-[9px] text-muted-foreground w-8 text-right">{chance}%</span>
+                      )}
+                      {isSelected && <Check className="h-3.5 w-3.5 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />}
+                      {maxed && <span className="text-[10px] text-muted-foreground ml-1">MAX</span>}
+                      {seasonCapped && !maxed && !isSZ && (
+                        <span className="text-[9px] text-arena-gold">3/3</span>
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="text-xs max-w-[200px]">
+                    {isSZ ? "Size cannot be trained — fixed at creation." :
+                     maxed ? "Already at maximum (25)." :
+                     seasonCapped ? `Seasonal cap reached (${ATTRIBUTE_LABELS[key]} gained 3 this season).` :
+                     `${chance}% chance to gain +1. Season: ${seasonalGains[key] ?? 0}/3`}
+                  </TooltipContent>
+                </Tooltip>
               );
             })}
           </div>
@@ -153,7 +156,7 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
             Total: {total}/80
           </span>
           {assignment ? (
-            <Button variant="ghost" size="sm" onClick={onClear} className="h-7 gap-1 text-xs text-muted-foreground hover:text-destructive">
+            <Button variant="ghost" size="sm" onClick={onClear} className="h-7 gap-1 text-xs text-muted-foreground hover:text-destructive" tooltip="Cancel current assignment">
               <X className="h-3 w-3" /> Clear
             </Button>
           ) : (

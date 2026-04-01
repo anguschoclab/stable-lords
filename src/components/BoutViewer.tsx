@@ -160,13 +160,16 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-arena-gold/5" />
         <div className="relative">
           {/* Toggle */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setExpanded(!expanded)}
             aria-label={expanded ? 'Collapse bout details' : 'Expand bout details'}
-            className="absolute top-0 right-0 p-1 text-muted-foreground hover:text-foreground transition-colors"
+            tooltip={expanded ? 'Collapse details' : 'View full match log'}
+            className="absolute top-0 right-0 h-8 w-8 text-muted-foreground hover:text-foreground transition-colors"
           >
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
+          </Button>
 
           <div className="flex items-center justify-between gap-3">
             {/* Fighter A */}
@@ -255,14 +258,16 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
               <SkipForward className="h-3.5 w-3.5" />
             </Button>
             <div className="h-4 w-px bg-border mx-1" />
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => setSpeed((s) => (s === 1 ? 2 : s === 2 ? 3 : 1) as 1 | 2 | 3)}
-              className="text-[11px] font-mono text-muted-foreground hover:text-foreground px-2 py-1 rounded bg-secondary border border-border transition-colors"
-              title="Playback speed"
+              className="h-7 text-[11px] font-mono px-2 py-0"
+              tooltip="Cycle playback speed (1x, 2x, 3x)"
               aria-label="Toggle playback speed"
             >
               {speed}×
-            </button>
+            </Button>
             <span className="text-[10px] text-muted-foreground ml-2 font-mono">
               {visibleCount}/{totalEvents}
             </span>

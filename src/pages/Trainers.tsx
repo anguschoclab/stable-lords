@@ -34,6 +34,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { GraduationCap, UserPlus, UserMinus, RefreshCw, Armchair, Sparkles, Clock, Coins, Trophy, Zap, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 const TIER_ACCENTS: Record<string, string> = {
@@ -90,7 +95,14 @@ function TrainerCard({
               </div>
             </div>
             {owned && onFire && (
-              <Button variant="ghost" size="icon" onClick={onFire} className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0 h-8 w-8" title="Release trainer" aria-label="Release trainer">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onFire} 
+                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0 h-8 w-8" 
+                tooltip="Release trainer from contract" 
+                aria-label="Release trainer"
+              >
                 <UserMinus className="h-4 w-4" />
               </Button>
             )}
@@ -269,12 +281,27 @@ export default function Trainers() {
 
       <Tabs defaultValue="current">
         <TabsList>
-          <TabsTrigger value="current" className="gap-1.5">
-            <GraduationCap className="h-3.5 w-3.5" /> Your Staff ({currentTrainers.length})
-          </TabsTrigger>
-          <TabsTrigger value="hire" className="gap-1.5">
-            <UserPlus className="h-3.5 w-3.5" /> Hire
-          </TabsTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger value="current" className="gap-1.5">
+                <GraduationCap className="h-3.5 w-3.5" /> Your Staff ({currentTrainers.length})
+              </TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-[10px] font-black uppercase tracking-widest">Manage your active trainers</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger value="hire" className="gap-1.5">
+                <UserPlus className="h-3.5 w-3.5" /> Hire
+              </TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-[10px] font-black uppercase tracking-widest">Recruit new training staff</p>
+            </TooltipContent>
+          </Tooltip>
         </TabsList>
 
         {/* Current Trainers */}
@@ -337,7 +364,7 @@ export default function Trainers() {
               <Separator />
               <Dialog open={convertDialogOpen} onOpenChange={setConvertDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full gap-2">
+                  <Button variant="outline" className="w-full gap-2" tooltip="Bring back a legendary veteran as a specialist trainer">
                     <Armchair className="h-4 w-4" />
                     Convert Retired Warrior to Trainer ({convertableRetired.length} available)
                   </Button>
@@ -363,7 +390,7 @@ export default function Trainers() {
                               → {preview.tier} {preview.focus} Trainer
                             </div>
                           </div>
-                          <Button size="sm" onClick={() => convertWarrior(w.id)}>
+                          <Button size="sm" onClick={() => convertWarrior(w.id)} tooltip={`Finalize ${w.name}'s return to the stable staff`}>
                             Convert
                           </Button>
                         </div>
@@ -384,7 +411,7 @@ export default function Trainers() {
                 ? `${hiringPool.length} trainers available for hire.`
                 : "No trainers available. Refresh to see new candidates."}
             </p>
-            <Button variant="outline" size="sm" onClick={refreshPool} className="gap-1.5">
+            <Button variant="outline" size="sm" onClick={refreshPool} className="gap-1.5" tooltip="Refresh the current pool of hiring candidates">
               <RefreshCw className="h-3.5 w-3.5" /> Refresh Pool
             </Button>
           </div>
@@ -404,6 +431,7 @@ export default function Trainers() {
                       disabled={!canHire || (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50)}
                       onClick={() => hireTrainer(t)}
                       className="gap-1.5"
+                      tooltip={!canHire ? "Staff roster is full" : (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50) ? "Insufficient funds" : `Hire ${t.name} for ${TIER_COST[t.tier as TrainerTier] ?? 50}g`}
                     >
                       <UserPlus className="h-3.5 w-3.5" />
                       {!canHire ? "Full" : (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50) ? "Can't Afford" : "Hire"}

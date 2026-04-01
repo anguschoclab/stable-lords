@@ -99,7 +99,7 @@ export default function Training() {
               {state.roster.length - assignedCount} idle
             </Badge>
             {assignedCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-xs text-muted-foreground">
+              <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-xs text-muted-foreground" tooltip="Reset all warriors to idle status">
                 Clear all
               </Button>
             )}
