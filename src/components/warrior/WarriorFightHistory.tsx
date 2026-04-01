@@ -62,6 +62,8 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
                 isExpanded ? "border-primary/40 bg-primary/5" : "border-border hover:bg-secondary/50"
               }`}
               onClick={() => setExpandedId(isExpanded ? null : f.id)}
+              aria-expanded={isExpanded}
+              aria-label={`${isExpanded ? "Collapse" : "Expand"} bout details between ${f.a} and ${f.d}`}
             >
               <div className="flex items-center gap-2">
                 <Badge

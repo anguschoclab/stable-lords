@@ -705,6 +705,8 @@ export default function Tournaments() {
                                 <button
                                   onClick={() => setExpandedBout(isExpanded ? null : boutKey)}
                                   className="w-full py-1.5 px-3 border-t border-border/10 flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-colors group"
+                                  aria-expanded={isExpanded}
+                                  aria-label={`${isExpanded ? "Collapse" : "Expand"} engagement log for ${bout.a} vs ${bout.b}`}
                                 >
                                   <span className="text-[9px] font-black uppercase text-muted-foreground group-hover:text-primary">Engagement Log</span>
                                   {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3 text-primary animate-pulse" />}
