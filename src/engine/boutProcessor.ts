@@ -218,7 +218,7 @@ export function processWeekBouts(state: GameState): { state: GameState; results:
   });
 
   // Final reporting side-effects
-  let playerFameGain = results.filter(r => r.outcome.winner === "A").length;
+  const playerFameGain = results.filter(r => r.outcome.winner === "A").length;
   s.player = { ...s.player, fame: (s.player.fame || 0) + playerFameGain };
   s.fame = (s.fame || 0) + playerFameGain;
   s.crowdMood = computeCrowdMood(s.arenaHistory);

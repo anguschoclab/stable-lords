@@ -18,7 +18,7 @@ export interface StateImpact {
  * This is the "Single Point of Mutation" for the advancement pipeline.
  */
 export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameState {
-  let newState = { ...state };
+  const newState = { ...state };
 
   for (const impact of impacts) {
     // 1. Gold

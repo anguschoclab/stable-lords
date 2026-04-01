@@ -123,7 +123,8 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: ctx.hitLocation === "head" ? 0.4 : 0.3,
     }),
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1, warning;
+      const defMult = 1;
       if (off === "Bash") { offMult = 0.4; warning = "Aimed Blows sacrifice all precision when bashing"; }
       if (off === "Slash") { offMult = 0.6; warning = "Slashing undermines the Aimed Blow's precision"; }
       return { offMult, defMult, warning };
@@ -225,7 +226,8 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: 0.3,
     }),
     getAntiSynergy: (off) => {
-      let offMult = 1, defMult = 1, warning;
+      let offMult = 1, warning;
+      const defMult = 1;
       if (off === "Bash") { offMult = 0.5; warning = "Riposte specialists lack bashing power"; }
       if (off === "Decisiveness") { offMult = 0.7; }
       return { offMult, defMult, warning };

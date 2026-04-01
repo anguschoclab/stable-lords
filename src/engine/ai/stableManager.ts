@@ -32,7 +32,7 @@ export function processAIStable(
   const gazetteItems: string[] = [];
   const activeRoster = rival.roster.filter(w => w.status === "Active");
   let updatedHiringPool = [...(state.hiringPool || [])];
-  let currentTrainers = [...(rival.trainers || [])];
+  const currentTrainers = [...(rival.trainers || [])];
   let currentGold = rival.gold;
   
   // 1. Calculate Income (Fights + Fame)

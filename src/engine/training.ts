@@ -364,7 +364,7 @@ export function processTraining(state: GameState): GameState {
   const impact = computeTrainingImpact(state);
   const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact);
   
-  let newState = { ...state, seasonalGrowth, trainingAssignments: [] };
+  const newState = { ...state, seasonalGrowth, trainingAssignments: [] };
   if (stateImpact.newsletterItems) {
     newState.newsletter = [...newState.newsletter, ...stateImpact.newsletterItems];
   }

@@ -16,6 +16,6 @@ export { processOwnerGrudges, calculateRivalryScore } from "./ownerGrudges";
 export { processAIRosterManagement } from "./ownerRoster";
 export { generateOwnerNarratives } from "./ownerNarrative";
 export { evolvePhilosophies } from "./ownerPhilosophy";
-export { generateRivalStables, processRivalStableWeekly } from "./rivals";
+export { generateRivalStables } from "./rivals";
 export { processWeekBouts, generatePairings, resolveBout } from "./boutProcessor";
 export { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, getMastery } from "./stylePassives";

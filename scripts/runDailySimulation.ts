@@ -71,7 +71,9 @@ function topUpRosters(state: GameState) {
 
   if (activeRoster.length < 15) {
      for (let i = activeRoster.length; i < 20; i++) {
-        state.roster.push(generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]));
+        const warrior = generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]);
+        warrior.stableId = "owner_1";
+        state.roster.push(warrior);
      }
   }
 
@@ -80,7 +82,9 @@ function topUpRosters(state: GameState) {
        const activeRivalRoster = rival.roster.filter(w => w.status === "Active");
        if (activeRivalRoster.length < 15) {
          for (let i = activeRivalRoster.length; i < 20; i++) {
-           rival.roster.push(generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]));
+           const warrior = generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]);
+           warrior.stableId = rival.owner.id;
+           rival.roster.push(warrior);
          }
        }
     }
@@ -96,7 +100,10 @@ async function runDailySimulation() {
   const wealthHistory: number[] = [state.gold];
 
   // Initial Roster Seeding
-  if (!state.rivals) state.rivals = [];
+  if (!state.rivals || state.rivals.length === 0) {
+     const { generateRivalStables } = await import("../src/engine/rivals");
+     state.rivals = generateRivalStables(5, 42);
+  }
   topUpRosters(state);
 
   let totalWeeksSimmed = 0;
@@ -146,7 +153,7 @@ async function runDailySimulation() {
 
   for (const f of state.arenaHistory) {
       totalBouts++;
-      if (f.isFatal) totalKills++;
+      if (f.by === "Kill" || f.isDeathEvent) totalKills++;
       // Basic approximation for injuries since full history doesn't strictly track all injury severities in a simple boolean flag
       if (f.injurySeverity && f.injurySeverity !== "None") totalInjuries++;
 

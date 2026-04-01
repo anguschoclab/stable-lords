@@ -144,7 +144,7 @@ import { generateRivalStables } from "./rivals";
  */
 export function processRivalActions(state: GameState, newWeek: number): GameState {
   const rng = seededRng(newWeek * 7919 + 13);
-  let currentRivals = [...(state.rivals || [])];
+  const currentRivals = [...(state.rivals || [])];
   const globalGazetteItems: string[] = [];
 
   // 1. Strategic Thinking & Management

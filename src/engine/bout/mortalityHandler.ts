@@ -20,7 +20,7 @@ export function handleDeath(s: GameState, wA: Warrior, wD: Warrior, outcome: Fig
   
   const event = { boutId, killerId: outcome.winner === "A" ? wA.id : wD.id, deathSummary: narrative, memorialTags: tags };
 
-  let nextS = killWarrior(s, victim.id, outcome.winner === "A" ? wA.name : wD.name, "Arena Combat", event);
+  const nextS = killWarrior(s, victim.id, outcome.winner === "A" ? wA.name : wD.name, "Arena Combat", event);
   
   if (isPlayerVictim) {
     nextS.fame = Math.max(0, (nextS.fame || 0) + 5);

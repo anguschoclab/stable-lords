@@ -4,7 +4,8 @@ import { addRestState } from "@/engine/matchmaking";
 import { updateEntityInList } from "@/utils/stateUtils";
 
 export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, week: number, rivalStableId?: string) {
-  let injured = false, names: string[] = [];
+  let injured = false;
+  const names: string[] = [];
   
   if (outcome.by === "KO") {
     const victimId = outcome.winner === "A" ? wD.id : wA.id;
