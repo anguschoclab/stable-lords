@@ -105,86 +105,187 @@ function generateWarriorSim(id: string, style: FightingStyle) {
   };
 }
 
-async function runBalanceReport() {
-  console.log("\nStarting long-term headless simulation for Balance & Meta Report...");
+import { writeFileSync } from "fs";
+import { createFreshState, advanceWeek } from "./src/state/gameStore";
+import { runAutosim, type AutosimResult } from "./src/engine/autosim";
+import { computeMetaDrift } from "./src/engine/metaDrift";
+import { FightingStyle, type GameState, type Warrior } from "./src/types/game";
+import { computeWarriorStats } from "./src/engine/skillCalc";
+
+// Simple UUID alternative without external dependencies for headless testing
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Polyfill crypto for node if needed
+import crypto from "crypto";
+if (typeof globalThis.crypto === "undefined") {
+  (globalThis as any).crypto = crypto.webcrypto;
+}
+
+// Polyfill localStorage to prevent errors in Zustand/autosim
+if (typeof localStorage === "undefined") {
+  (globalThis as any).localStorage = {
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+  };
+}
+
+function randInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateWarriorSim(style: FightingStyle): Warrior {
+  const attrs = {
+    ST: randInt(10, 16),
+    CN: randInt(10, 16),
+    SZ: randInt(10, 16),
+    WT: randInt(10, 16),
+    WL: randInt(10, 16),
+    SP: randInt(10, 16),
+    DF: randInt(10, 16)
+  };
+  const stats = computeWarriorStats(attrs, style);
+  const id = generateUUID();
+  return {
+    id,
+    name: `W-${id.substring(0, 4)}`,
+    style,
+    attributes: attrs,
+    baseSkills: stats.baseSkills,
+    derivedStats: stats.derivedStats,
+    fame: 0,
+    popularity: 0,
+    titles: [],
+    injuries: [],
+    flair: [],
+    career: { wins: 0, losses: 0, kills: 0 },
+    champion: false,
+    status: "Active" as const,
+    age: 20,
+    equipment: { weapon: "shortsword", armor: "leather", shield: "none", helm: "none" }
+  };
+}
+
+function topUpRosters(state: GameState) {
+  const styles = Object.values(FightingStyle);
+  const activeRoster = state.roster.filter(w => w.status === "Active");
+
+  if (activeRoster.length < 15) {
+     for (let i = activeRoster.length; i < 20; i++) {
+        const warrior = generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]);
+        warrior.stableId = "owner_1";
+        state.roster.push(warrior);
+     }
+  }
+
+  if (state.rivals) {
+    for (const rival of state.rivals) {
+       const activeRivalRoster = rival.roster.filter(w => w.status === "Active");
+       if (activeRivalRoster.length < 15) {
+         for (let i = activeRivalRoster.length; i < 20; i++) {
+           const warrior = generateWarriorSim(styles[Math.floor(Math.random() * styles.length)]);
+           warrior.stableId = rival.owner.id;
+           rival.roster.push(warrior);
+         }
+       }
+    }
+  }
+}
+
+async function runDailySimulation() {
+  console.log("\nStarting headless AUTOSIM simulation for Balance & Meta Report...");
   let state = createFreshState();
   const WEEKS_TO_SIM = 100;
 
-  // Seed the roster so we actually have fights
-  const styles = Object.values(FightingStyle);
-  for (let i = 0; i < 20; i++) {
-    state.roster.push(generateWarriorSim(`player-${i}`, styles[i % styles.length]));
-  }
+  // Track continuous metrics
+  const wealthHistory: number[] = [state.gold];
 
-  if (!state.rivals) state.rivals = [];
-  for (let r = 0; r < 3; r++) {
-    const roster = [];
-    for (let i = 0; i < 20; i++) {
-      roster.push(generateWarriorSim(`rival-${r}-${i}`, styles[(i + r) % styles.length]));
+  // Initial Roster Seeding
+  if (!state.rivals || state.rivals.length === 0) {
+     const { generateRivalStables } = await import("./src/engine/rivals");
+     state.rivals = generateRivalStables(5, 42);
+  }
+  topUpRosters(state);
+
+  let totalWeeksSimmed = 0;
+
+  const noopProgress = () => {};
+
+  while (totalWeeksSimmed < WEEKS_TO_SIM) {
+    topUpRosters(state);
+    const remainingWeeks = WEEKS_TO_SIM - totalWeeksSimmed;
+
+    // Autosim runs until a stop condition is met, or it finishes remainingWeeks.
+    const result: AutosimResult = await runAutosim(state, remainingWeeks, noopProgress);
+
+    // Autosim naturally stops on "death", "injury", etc.
+    // If it stopped due to "no_pairings", the topUpRosters loop will handle it on the next cycle.
+    state = result.finalState;
+    totalWeeksSimmed += result.weeksSimmed;
+
+    // If autosim didn't actually simulate any weeks (e.g. stopped on week 0 due to an injury),
+    // we must manually advance to prevent an infinite loop.
+    if (result.weeksSimmed === 0 && result.stopReason !== "max_weeks") {
+       state = advanceWeek(state);
+       totalWeeksSimmed += 1;
     }
-    state.rivals.push({
-      owner: { id: `r-${r}`, name: `Owner ${r}`, stableName: `Rival ${r}`, fame: 0, renown: 0, titles: 0 },
-      roster,
-      tier: "Established"
-    });
+
+    wealthHistory.push(state.gold);
+
+    if (totalWeeksSimmed % 10 === 0) {
+       console.log(`Simulated ${totalWeeksSimmed} weeks... (Last Stop Reason: ${result.stopReason})`);
+    }
   }
 
-  // Track metrics
+  console.log("Autosim complete. Calculating metrics and generating dynamic report...");
+
+  // Calculate Economy
+  const initialWealth = wealthHistory[0];
+  const finalWealth = state.gold;
+  const avgWealth = wealthHistory.reduce((a, b) => a + b, 0) / wealthHistory.length;
+
+  // Calculate Lethality & Meta-Drift from state.arenaHistory
   let totalBouts = 0;
   let totalKills = 0;
   let totalInjuries = 0;
-  const wealthHistory: number[] = [];
+
   const styleWins: Record<string, number> = {};
   const styleFights: Record<string, number> = {};
 
-  for (let i = 0; i < WEEKS_TO_SIM; i++) {
-    // Top up missing roster due to deaths to keep sim going
-    while (state.roster.filter(w => w.status === "Active").length < 10) {
-       state.roster.push(generateWarriorSim(`player-rep-${i}-${Math.random()}`, styles[Math.floor(Math.random() * styles.length)]));
-    }
-    for (const rival of state.rivals) {
-       while (rival.roster.filter(w => w.status === "Active").length < 10) {
-         rival.roster.push(generateWarriorSim(`rival-rep-${i}-${Math.random()}`, styles[Math.floor(Math.random() * styles.length)]));
-       }
-    }
+  for (const f of state.arenaHistory) {
+      totalBouts++;
+      if (f.by === "Kill" || f.isDeathEvent) totalKills++;
+      // Basic approximation for injuries since full history doesn't strictly track all injury severities in a simple boolean flag
+      if (f.injurySeverity && f.injurySeverity !== "None") totalInjuries++;
 
-    const processed = processWeekBouts(state);
+      const wA = state.roster.find(w => w.name === f.a) || state.graveyard.find(w => w.name === f.a) || (state.rivals || []).flatMap(r => r.roster).find(w => w.name === f.a);
+      const wD = state.roster.find(w => w.name === f.d) || state.graveyard.find(w => w.name === f.d) || (state.rivals || []).flatMap(r => r.roster).find(w => w.name === f.d);
 
-    totalBouts += processed.summary.bouts;
-    totalKills += processed.summary.deaths;
-    totalInjuries += processed.summary.injuries;
+      const sA = wA ? wA.style : "Unknown";
+      const sD = wD ? wD.style : "Unknown";
 
-    for (const bout of processed.results) {
-      if (!bout.outcome) continue;
-      const sA = bout.a.style;
-      const sD = bout.d.style;
-      styleFights[sA] = (styleFights[sA] || 0) + 1;
-      styleFights[sD] = (styleFights[sD] || 0) + 1;
-      if (bout.outcome.winner === "A") {
-        styleWins[sA] = (styleWins[sA] || 0) + 1;
-      } else if (bout.outcome.winner === "D") {
-        styleWins[sD] = (styleWins[sD] || 0) + 1;
+      if (sA !== "Unknown" && sD !== "Unknown") {
+         styleFights[sA] = (styleFights[sA] || 0) + 1;
+         styleFights[sD] = (styleFights[sD] || 0) + 1;
+
+         if (f.winner === "A") styleWins[sA] = (styleWins[sA] || 0) + 1;
+         if (f.winner === "D") styleWins[sD] = (styleWins[sD] || 0) + 1;
       }
-    }
-
-    state = advanceWeek(processed.state);
-    wealthHistory.push(state.gold);
-
-    if (i % 10 === 0) {
-      console.log(`Week ${i} completed. Bouts so far: ${totalBouts}`);
-    }
   }
-
-  console.log("Simulation complete. Generating report...");
-
-  const avgWealth = wealthHistory.reduce((a, b) => a + b, 0) / wealthHistory.length;
-  const initialWealth = wealthHistory[0];
-  const finalWealth = wealthHistory[wealthHistory.length - 1];
 
   const meta = computeMetaDrift(state.arenaHistory, Math.min(200, state.arenaHistory.length));
 
-  const killRate = totalBouts > 0 ? ((totalKills / totalBouts) * 100).toFixed(2) : "0.00";
-  const injuryRate = totalBouts > 0 ? ((totalInjuries / totalBouts) * 100).toFixed(2) : "0.00";
+  const killRateNum = totalBouts > 0 ? (totalKills / totalBouts) * 100 : 0;
+  const injuryRateNum = totalBouts > 0 ? (totalInjuries / totalBouts) * 100 : 0;
+
+  const killRate = killRateNum.toFixed(2);
+  const injuryRate = injuryRateNum.toFixed(2);
 
   const sortedStyles = Object.keys(styleFights).sort((a, b) => {
     const rateA = (styleWins[a] || 0) / styleFights[a];
@@ -192,25 +293,40 @@ async function runBalanceReport() {
     return rateB - rateA;
   });
 
-  let report = `# Daily Balance & Meta Report
-Generated after simulating ${WEEKS_TO_SIM} weeks.
+  const highWinRates = sortedStyles.filter(s => ((styleWins[s] || 0) / styleFights[s]) > 0.60);
+  const lowWinRates = sortedStyles.filter(s => ((styleWins[s] || 0) / styleFights[s]) < 0.40);
 
-## 1. Economy Metrics
-- **Initial Gold:** ${initialWealth}
-- **Final Gold:** ${finalWealth}
-- **Average Gold (over time):** ${avgWealth.toFixed(2)}
-- *Observation:* ${finalWealth > initialWealth * 2 ? "Potential hyper-inflation detected. Consider adding more gold sinks." : "Economy appears stable."}
+  // Dynamic String Generation
+  let report = `# Daily Balance & Meta Report\nGenerated dynamically after autosimming ${WEEKS_TO_SIM} weeks.\n\n`;
 
-## 2. Lethality & Injuries
-- **Total Bouts:** ${totalBouts}
-- **Total Deaths:** ${totalKills} (Kill Rate: ${killRate}%)
-- **Total Injuries:** ${totalInjuries} (Injury Rate: ${injuryRate}%)
-- *Observation:* Check against the \`Stable_Lords_Kill_Death_and_Permadeath_Spec_v0.2.md\`. Are these rates within expected bounds?
+  report += `## 1. Economy Metrics\n`;
+  report += `- **Initial Gold:** ${initialWealth}\n`;
+  report += `- **Final Gold:** ${finalWealth}\n`;
+  report += `- **Average Gold:** ${avgWealth.toFixed(2)}\n`;
 
-## 3. Meta-Drift (AI Adaptation & Style Dominance)
-Current Meta Drift Window Analysis:
-`;
+  const inflationRatio = finalWealth / (initialWealth || 1);
+  if (inflationRatio > 2.0) {
+    report += `- *Observation:* Hyper-inflation detected (wealth increased by ${(inflationRatio).toFixed(1)}x).\n`;
+  } else if (inflationRatio < 0.5) {
+    report += `- *Observation:* Deflation / poverty detected (wealth decreased by ${(1/inflationRatio).toFixed(1)}x).\n`;
+  } else {
+    report += `- *Observation:* Economy appears balanced.\n`;
+  }
 
+  report += `\n## 2. Lethality & Injuries\n`;
+  report += `- **Total Bouts Simulated:** ${totalBouts}\n`;
+  report += `- **Total Deaths:** ${totalKills} (Kill Rate: ${killRate}%)\n`;
+  report += `- **Total Injuries:** ${totalInjuries} (Injury Rate: ${injuryRate}%)\n`;
+  report += `- *Observation:* `;
+  if (killRateNum < 8.0) {
+     report += `Kill rate is below the 8% target bound.\n`;
+  } else if (killRateNum > 15.0) {
+     report += `Kill rate is above the 15% target bound.\n`;
+  } else {
+     report += `Kill rate is safely within the target 8-15% bounds.\n`;
+  }
+
+  report += `\n## 3. Meta-Drift (AI Adaptation & Style Dominance)\n`;
   for (const [style, drift] of Object.entries(meta)) {
     report += `- **${style}**: ${drift > 0 ? '+' : ''}${drift} drift\n`;
   }
@@ -223,38 +339,42 @@ Current Meta Drift Window Analysis:
     report += `- **${style}**: ${wins} wins / ${fights} fights (${rate}%)\n`;
   }
 
-  report += `
-## 4. Anomalies & Suggestions
-- *Mathematical Anomalies:* `;
+  report += `\n## 4. Anomalies & Actionable Suggestions\n`;
 
-  const highWinRates = sortedStyles.filter(s => ((styleWins[s] || 0) / styleFights[s]) > 0.60);
-  const lowWinRates = sortedStyles.filter(s => ((styleWins[s] || 0) / styleFights[s]) < 0.40);
+  let needsChanges = false;
 
-  if (highWinRates.length === 0 && lowWinRates.length === 0) {
-    report += `None detected. Styles are well balanced.\n`;
-  } else {
-    if (highWinRates.length > 0) report += `Styles with >60% win rate: ${highWinRates.join(", ")}. `;
-    if (lowWinRates.length > 0) report += `Styles with <40% win rate: ${lowWinRates.join(", ")}. `;
-    report += `\n`;
+  if (inflationRatio > 2.0) {
+    needsChanges = true;
+    report += `- **Economy Issue:** High inflation. Consider lowering \`WIN_BONUS\` or \`FIGHT_PURSE\` in \`src/engine/economy.ts\`, or adding scaling gold sinks like trainer tier salaries.\n`;
+  } else if (inflationRatio < 0.5) {
+    needsChanges = true;
+    report += `- **Economy Issue:** Negative economy balance. Consider increasing baseline payouts or reviewing weekly upkeep/training costs in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
   }
 
-      report += `- *Suggested Tweaks:* `;
-  if (parseFloat(killRate) > 15) {
-    report += `Lethality is high (${killRate}% vs expected 8-15%). Consider reducing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\`. `;
-  } else if (parseFloat(killRate) < 8) {
-    report += `Lethality is low (${killRate}% vs expected 8-15%). Consider increasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\`. `;
-  } else {
-    report += `Lethality (${killRate}%) is within the target 8-15% bound. `;
+  if (killRateNum < 8.0) {
+    needsChanges = true;
+    report += `- **Lethality Issue:** Kill rate (${killRate}%) is lower than the 8-15% target. Consider increasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\` to make kills more frequent.\n`;
+  } else if (killRateNum > 15.0) {
+    needsChanges = true;
+    report += `- **Lethality Issue:** Kill rate (${killRate}%) exceeds the 8-15% target. Consider decreasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\` to reduce lethality.\n`;
   }
 
-  if (finalWealth > initialWealth * 2) {
-    report += `Economy is inflating. Consider reducing \`FIGHT_PURSE\` or \`WIN_BONUS\` in \`src/engine/economy.ts\`, or adding more gold sinks.`;
+  if (highWinRates.length > 0) {
+    needsChanges = true;
+    report += `- **Meta-Drift Issue:** Styles like ${highWinRates.join(", ")} are overperforming (>60% win rate). Review their attack modifiers or stamina drain formulas.\n`;
   }
 
-  report += `\n`;
+  if (lowWinRates.length > 0) {
+    needsChanges = true;
+    report += `- **Meta-Drift Issue:** Styles like ${lowWinRates.join(", ")} are heavily underperforming (<40% win rate). Review their base defensive bonuses, riposte chances, or fatigue costs.\n`;
+  }
+
+  if (!needsChanges) {
+    report += `- **System Stable:** The autosim run detected no major economic, lethality, or meta-drift anomalies. Current engine math appears robust.\n`;
+  }
 
   writeFileSync("Daily_Balance_Report.md", report);
-  console.log("Report generated at Daily_Balance_Report.md");
+  console.log("Dynamic report generated at Daily_Balance_Report.md");
 }
 
-runBalanceReport().catch(console.error);
+runDailySimulation().catch(console.error);
