@@ -17,13 +17,14 @@ import { StableWidget } from "@/components/dashboard/StableWidget";
 import { RankingsWidget } from "@/components/dashboard/RankingsWidget";
 import { FinancesWidget } from "@/components/dashboard/FinancesWidget";
 import { MetaPulseWidget } from "@/components/dashboard/MetaPulseWidget";
-import { GazetteWidget } from "@/components/dashboard/GazetteWidget";
 import { RecentBoutsWidget } from "@/components/dashboard/RecentBoutsWidget";
 import { TrainingWidget } from "@/components/dashboard/TrainingWidget";
 import { RivalsListWidget } from "@/components/dashboard/RivalsListWidget";
 import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
 import { StableComparisonWidget } from "@/components/dashboard/StableComparisonWidget";
 import { CrowdMoodWidget } from "@/components/widgets/CrowdMoodWidget";
+import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
+import { IntelligenceHubWidget } from "@/components/dashboard/IntelligenceHubWidget";
 
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
@@ -44,9 +45,10 @@ const MemoRivalryWidget = React.memo(RivalryWidget);
 const MemoRankingsWidget = React.memo(RankingsWidget);
 const MemoMetaPulseWidget = React.memo(MetaPulseWidget);
 const MemoRecentBoutsWidget = React.memo(RecentBoutsWidget);
-const MemoGazetteWidget = React.memo(GazetteWidget);
 const MemoCrowdMoodWidget = React.memo(CrowdMoodWidget);
 const MemoStableComparisonWidget = React.memo(StableComparisonWidget);
+const MemoMedicalAuditWidget = React.memo(MedicalAuditWidget);
+const MemoIntelligenceHubWidget = React.memo(IntelligenceHubWidget);
 
 const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
@@ -58,9 +60,10 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "stableCompare", label: "Stable Comparison", component: MemoStableComparisonWidget, wide: true },
   { id: "rivalries", label: "Rivalries",          component: MemoRivalryWidget, wide: true },
   { id: "rankings", label: "Warrior Rankings",   component: MemoRankingsWidget, wide: true },
+  { id: "intel",    label: "Intelligence Hub",   component: MemoIntelligenceHubWidget, wide: true },
+  { id: "medical",   label: "Medical Audit",     component: MemoMedicalAuditWidget },
   { id: "meta",     label: "Meta Pulse",         component: MemoMetaPulseWidget },
   { id: "bouts",    label: "Recent Bouts",       component: MemoRecentBoutsWidget, wide: true },
-  { id: "gazette",  label: "Arena Gazette",       component: MemoGazetteWidget, wide: true },
 ];
 
 const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);

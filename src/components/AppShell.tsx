@@ -89,9 +89,16 @@ import { CoachOverlay } from "@/components/ui/CoachOverlay";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { state, doReset, returnToTitle, lastSavedAt, doAdvanceWeek } = useGameStore(
+  const { 
+    week, gold, fame, crowdMood, roster, 
+    doReset, returnToTitle, lastSavedAt, doAdvanceWeek 
+  } = useGameStore(
     useShallow((s) => ({
-      state: s.state,
+      week: s.state.week,
+      gold: s.state.gold,
+      fame: s.state.fame,
+      crowdMood: s.state.crowdMood,
+      roster: s.state.roster,
       doReset: s.doReset,
       returnToTitle: s.returnToTitle,
       lastSavedAt: s.lastSavedAt,
@@ -99,7 +106,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }))
   );
   const { theme, setTheme } = useTheme();
-  const moodIcon = MOOD_ICONS[state.crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
+  const activePath = location.pathname;
+  const moodIcon = MOOD_ICONS[crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [saveFlash, setSaveFlash] = useState(false);
@@ -117,13 +125,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useRivalryAlerts();
 
   useEffect(() => {
-    const isOrphan = selectActiveWarriors(state).length < 3;
-    if (isOrphan && location.pathname !== "/welcome" && location.pathname !== "/start") {
-      if (typeof window !== "undefined") {
-        window.location.href = "/welcome";
-      }
+    // Only check for "Orphan" status if we are in the main game loops
+    if (activePath === "/welcome" || activePath === "/start" || activePath === "/design-bible") return;
+    
+    const activeWarriors = roster.filter(w => w.status === "Active");
+    if (activeWarriors.length < 3) {
+      console.warn("Personnel deficit detected. Redirecting to recruitment protocol.");
+      window.location.href = "/welcome";
     }
-  }, [state.roster, location.pathname, state]);
+  }, [roster, activePath]);
 
   useEffect(() => {
     if (!lastSavedAt) return;
@@ -139,7 +149,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     } catch { return ""; }
   };
 
-  const activePath = location.pathname;
+  // const activePath = location.pathname;
 
   return (
     <div className="min-h-screen bg-[#050506] flex flex-col overflow-hidden text-foreground selection:bg-primary/30">
@@ -164,20 +174,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="hidden lg:flex items-center gap-8">
             <div className="flex flex-col">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Arena Week</span>
-              <span className="font-mono font-black text-xs text-foreground bg-white/5 px-2 py-0.5 rounded border border-white/5">{state.week}</span>
+              <span className="font-mono font-black text-xs text-foreground bg-white/5 px-2 py-0.5 rounded border border-white/5">{week}</span>
             </div>
             
             <div className="flex flex-col">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Treasury</span>
               <span className="font-mono font-black text-xs text-arena-gold flex items-center gap-1">
-                {(state.gold ?? 0).toLocaleString()} <Coins className="h-3 w-3 opacity-60" />
+                {(gold ?? 0).toLocaleString()} <Coins className="h-3 w-3 opacity-60" />
               </span>
             </div>
 
             <div className="flex flex-col">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Influence</span>
               <span className="font-mono font-black text-xs text-arena-fame flex items-center gap-1">
-                {state.fame} <Crown className="h-3 w-3 opacity-60" />
+                {fame} <Crown className="h-3 w-3 opacity-60" />
               </span>
             </div>
 

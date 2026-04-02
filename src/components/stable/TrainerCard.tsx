@@ -101,8 +101,9 @@ export function TrainerCard({
               {owned && onFire && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button 
+                     <button 
                       onClick={onFire} 
+                      aria-label="Release Trainer"
                       className="p-2.5 rounded-xl bg-neutral-900 border border-white/5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all group/fire"
                     >
                       <UserMinus className="h-4 w-4 group-hover/fire:scale-110 transition-transform" />

@@ -1,25 +1,14 @@
-/**
- * Stable Lords — Full Combat Engine (Decoupled v2)
- *
- * Refactored for:
- * 1. Determinism - Injectable RNG and seeds.
- * 2. Simpler setup - Decomposed stat calculation.
- * 3. Pure Logic - Separated simulation from narrative side-effects.
- */
 import {
   FightingStyle,
   type Warrior,
   type FightPlan,
   type FightOutcome,
   type MinuteEvent,
-  type BaseSkills,
   type TrainerData,
   type DeathCauseBucket,
 } from "@/types/game";
-import { getItemById, DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
-import { getTrainingBonus } from "@/engine/trainers";
+import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
 import { mulberry32, getPhase as getCombatPhase } from "./combat/combatMath";
-import { getFavoriteWeaponBonus } from "./favorites";
 import {
   generateWarriorIntro, battleOpener, conservingLine, minuteStatusLine,
   narrateBoutEnd
@@ -30,108 +19,29 @@ import {
   type FighterState, 
   type ResolutionContext, 
   resolveEffectiveTactics,
-  DECISION_HIT_MARGIN,
   MAX_EXCHANGES,
   EXCHANGES_PER_MINUTE,
 } from "./combat/resolution";
 import { narrateEvents, type NarrationContext } from "./combat/narrator";
-import { generateId } from "@/utils/idUtils";
+import { createFighterState } from "./bout/fighterState";
+import { resolveDecision } from "./bout/decisionLogic";
+import { defaultPlanForWarrior } from "./bout/planDefaults";
 
-// ─── Types ──────────────────────────────────────────────────────────────
-import { type CombatEvent as ExchangeEvent } from "@/types/game";
+// ─── Exports from sub-modules for backward compatibility ───
+export { createFighterState, resolveDecision, defaultPlanForWarrior };
 
 type Phase = "OPENING" | "MID" | "LATE";
-
-// ─── Helpers ──────────────────────────────────────────────────────────────
 
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const p = getCombatPhase(exchange, maxExchanges);
   return p.toUpperCase() as Phase;
 }
 
-function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
-  const bonus = getTrainingBonus(trainers as any[], style);
-  return {
-    attMod: bonus.Aggression,
-    parMod: Math.floor(bonus.Defense * 0.6),
-    defMod: Math.floor(bonus.Defense * 0.4),
-    iniMod: Math.floor(bonus.Mind * 0.6),
-    decMod: Math.floor(bonus.Mind * 0.4),
-    endMod: bonus.Endurance * 2,
-    healMod: bonus.Healing,
-  };
-}
-
-/**
- * Prepares the combat state for a single fighter.
- */
-export function createFighterState(
-  label: "A" | "D",
-  plan: FightPlan,
-  warrior?: Warrior,
-  trainers?: TrainerData[]
-): FighterState {
-  const attrs = warrior?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
-  const skills = warrior?.baseSkills ?? { ATT: 5, PAR: 5, DEF: 5, INI: 5, RIP: 5, DEC: 5 };
-  const derived = warrior?.derivedStats ?? { hp: 100, endurance: 100, damage: 5, encumbrance: 0 };
-  
-  const equip = warrior?.equipment ?? DEFAULT_LOADOUT;
-  const classicBonus = getClassicWeaponBonus(plan.style, equip.weapon);
-  const trainerMods = trainers ? getTrainerMods(trainers, plan.style) : null;
-  const favWeapon = warrior ? getFavoriteWeaponBonus(warrior) : 0;
-
-  const getShieldBonus = (id: string) => {
-    if (id === "small_shield") return { def: 1, att: 0 };
-    if (id === "medium_shield") return { def: 2, att: 0 };
-    if (id === "large_shield") return { def: 3, att: -1 };
-    return { def: 0, att: 0 };
-  };
-  const wShield = getShieldBonus(equip.weapon);
-  const oShield = getShieldBonus(equip.shield);
-  const totalShieldDef = wShield.def + oShield.def;
-  const totalShieldAtt = wShield.att + oShield.att;
-
-  const weaponReq = checkWeaponRequirements(
-    equip.weapon,
-    { ST: attrs.ST, DF: attrs.DF, SP: attrs.SP }
-  );
-
-  const effSkills: BaseSkills = {
-    ATT: skills.ATT + (trainerMods?.attMod ?? 0) + classicBonus + favWeapon + weaponReq.attPenalty + totalShieldAtt,
-    PAR: skills.PAR + (trainerMods?.parMod ?? 0) + totalShieldDef,
-    DEF: skills.DEF + (trainerMods?.defMod ?? 0) + totalShieldDef,
-    INI: skills.INI + (trainerMods?.iniMod ?? 0),
-    RIP: skills.RIP,
-    DEC: skills.DEC + (trainerMods?.decMod ?? 0),
-  };
-
-  return {
-    label,
-    style: plan.style,
-    attributes: attrs,
-    skills: effSkills,
-    derived: { ...derived, damage: derived.damage },
-    plan,
-    hp: derived.hp,
-    maxHp: derived.hp,
-    endurance: derived.endurance + (trainerMods?.endMod ?? 0),
-    maxEndurance: derived.endurance + (trainerMods?.endMod ?? 0),
-    hitsLanded: 0,
-    hitsTaken: 0,
-    ripostes: 0,
-    consecutiveHits: 0,
-    armHits: 0,
-    legHits: 0,
-  };
-}
-
-// ─── Main Entry Point ─────────────────────────────────────────────────────
-
 /**
  * Simulates a fight between two plans/warriors.
  * 
  * @param planA - Strategy for fighter A
- * @param planB - Strategy for fighter D
+ * @param planD - Strategy for fighter D
  * @param warriorA - Warrior data for A (optional)
  * @param warriorD - Warrior data for D (optional)
  * @param providedRng - Seeded RNG function (optional, generates one if missing)
@@ -172,8 +82,8 @@ export function simulateFight(
     exchange: 0,
     matchupA: getMatchupBonus(planA.style, planD.style),
     matchupD: getMatchupBonus(planD.style, planA.style),
-    trainerModsA: trainers ? getTrainerMods(trainers, planA.style) : null,
-    trainerModsD: trainers ? getTrainerMods(trainers, planD.style) : null,
+    trainerModsA: null, // Computed inside simulate.ts if needed, or better inside createFighterState
+    trainerModsD: null,
     weaponReqA: checkWeaponRequirements(weaponA, { ST: fA.attributes.ST, DF: fA.attributes.DF, SP: fA.attributes.SP }),
     weaponReqD: checkWeaponRequirements(weaponD, { ST: fD.attributes.ST, DF: fD.attributes.DF, SP: fD.attributes.SP }),
     tacticStreakA: 0,
@@ -301,60 +211,4 @@ export function simulateFight(
       fatalExchangeIndex,
     },
   };
-}
-
-/**
- * Handles decision points at the end of a fight.
- */
-function resolveDecision(fA: FighterState, fD: FighterState, nameA: string, nameD: string): { winner: "A"|"D"|null, by: FightOutcome["by"], narrative: string } {
-    if (fA.hitsLanded > fD.hitsLanded + DECISION_HIT_MARGIN) {
-      return { winner: "A", by: "Stoppage", narrative: `Time! ${nameA} is awarded the decision on points.` };
-    } 
-    if (fD.hitsLanded > fA.hitsLanded + DECISION_HIT_MARGIN) {
-      return { winner: "D", by: "Stoppage", narrative: `Time! ${nameD} is awarded the decision on points.` };
-    } 
-    if (fA.hp > fD.hp) {
-      return { winner: "A", by: "Stoppage", narrative: `Time! ${nameA} wins a close decision.` };
-    } 
-    if (fD.hp > fA.hp) {
-      return { winner: "D", by: "Stoppage", narrative: `Time! ${nameD} wins a close decision.` };
-    }
-    return { winner: null, by: "Draw", narrative: `Time! The Arenamaster declares a draw.` };
-}
-
-/**
- * Returns a sane default plan for a warrior based on their fighting style.
- * Used when a warrior has no custom plan set.
- */
-export function defaultPlanForWarrior(warrior: Warrior): FightPlan {
-  const style = warrior.style;
-
-  const isAggressive = [
-    FightingStyle.BashingAttack,
-    FightingStyle.StrikingAttack,
-    FightingStyle.LungingAttack,
-    FightingStyle.SlashingAttack,
-  ].includes(style);
-
-  const isDefensive = [
-    FightingStyle.TotalParry,
-    FightingStyle.WallOfSteel,
-    FightingStyle.ParryRiposte,
-  ].includes(style);
-
-  let oe = 5, al = 6, kd = 5;
-
-  if (isAggressive) {
-    oe = style === FightingStyle.BashingAttack ? 9 : 8;
-    al = style === FightingStyle.BashingAttack ? 3 : (style === FightingStyle.LungingAttack ? 8 : 5);
-    kd = 7;
-  } else if (isDefensive) {
-    oe = style === FightingStyle.TotalParry ? 2 : 4;
-    al = style === FightingStyle.TotalParry ? 2 : 5;
-    kd = 3;
-  } else if (style === FightingStyle.AimedBlow) {
-    oe = 6; al = 5; kd = 8;
-  }
-
-  return { style, OE: oe, AL: al, killDesire: kd, target: "Any", protect: "Any" };
 }

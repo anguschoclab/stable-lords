@@ -27,22 +27,19 @@ type HeadToHeadRecord = {
   deaths: number;
 };
 
-// Helper: Extracts key stats for a single stable in O(n)
-function calculateStableStats(roster: readonly Warrior[], stableName: string, isPlayer: boolean): StableComparisonStats {
-  let activeCount = 0;
-  let totalFame = 0;
-  let wins = 0;
-  let kills = 0;
-  for (const w of roster) {
-    wins += w.career.wins;
-    kills += w.career.kills;
-    if (w.status === "Active") {
-      activeCount++;
-      totalFame += w.fame ?? 0;
-    }
-  }
-  const avgFame = activeCount > 0 ? Math.round(totalFame / activeCount) : 0;
-  return { name: stableName, warriors: activeCount, wins, kills, avgFame, isPlayer };
+import { calculateStableStats } from "@/engine/stats/stableStats";
+
+// Helper: Extracts key stats for a single stable in O(n) using the centralized engine
+function getWidgetStats(roster: readonly Warrior[], stableName: string, isPlayer: boolean): StableComparisonStats {
+  const stats = calculateStableStats(roster as Warrior[]);
+  return { 
+    name: stableName, 
+    warriors: stats.activeCount, 
+    wins: stats.totalWins, 
+    kills: stats.totalKills, 
+    avgFame: stats.avgFame, 
+    isPlayer 
+  };
 }
 
 export function StableComparisonWidget() {
@@ -51,7 +48,7 @@ export function StableComparisonWidget() {
   const playerNames = useMemo(() => new Set((state.roster || []).map(w => w.name)), [state.roster]);
 
   const playerStats = useMemo(() => {
-    return calculateStableStats(state.roster || [], state.player.stableName, true);
+    return getWidgetStats(state.roster || [], state.player.stableName, true);
   }, [state.roster, state.player.stableName]);
 
   const { rivalStats, h2hRecords } = useMemo(() => {
@@ -60,7 +57,7 @@ export function StableComparisonWidget() {
 
     const stats = rivals.map(r => {
       const rivalNameSet = new Set((r.roster || []).map(w => w.name));
-      const rStats = calculateStableStats(r.roster || [], r.owner.stableName, false);
+      const rStats = getWidgetStats(r.roster || [], r.owner.stableName, false);
 
       const record: HeadToHeadRecord = { wins: 0, losses: 0, kills: 0, deaths: 0 };
       for (const f of (state.arenaHistory || [])) {

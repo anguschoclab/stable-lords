@@ -91,15 +91,11 @@ describe("WorldOverview Component", () => {
     renderWithGameState(<WorldOverview />, mockState);
 
     // Use findAllByText since stable names might appear multiple times due to tooltips/links
-    // In this view, they should be rendered as a Link, and the table rows contain the stats.
     const playerStables = await screen.findAllByText("Player Stable");
     expect(playerStables.length).toBeGreaterThan(0);
-    expect(screen.getByText("Player Owner")).toBeInTheDocument();
+    expect(screen.getByText(/Commanded by Player Owner/i)).toBeInTheDocument();
 
-    // We look for the cell containing '15' which corresponds to wins and losses.
-    // The closest('tr') from the first text matching might be the wrong thing depending on if it's the tab.
-    // Let's use a distinct text element in the row.
-    const pOwner = screen.getByText("Player Owner");
+    const pOwner = screen.getByText(/Commanded by Player Owner/i);
     const playerRow = pOwner.closest("tr")!;
     expect(playerRow).not.toBeNull();
     const playerWlkCell = within(playerRow).getAllByText(/15/);
@@ -109,7 +105,7 @@ describe("WorldOverview Component", () => {
     const rivalStables = await screen.findAllByText("Rival Stable");
     expect(rivalStables.length).toBeGreaterThan(0);
 
-    const rOwner = screen.getByText("Rival Owner");
+    const rOwner = screen.getByText(/Commanded by Rival Owner/i);
     const rivalRow = rOwner.closest("tr")!;
     expect(rivalRow).not.toBeNull();
     const rivalWlkCell = within(rivalRow).getAllByText(/20/);

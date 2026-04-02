@@ -9,57 +9,19 @@ import { ATTRIBUTE_KEYS, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { ComparisonBar } from "./ComparisonBar";
 import { ComparisonHeader } from "./ComparisonHeader";
 import { HeadToHead } from "./HeadToHead";
+import { calculateStableStats } from "@/engine/stats/stableStats";
 
 interface StableComparisonProps {
   rivals: RivalStableData[];
 }
 
 function stableStats(rival: RivalStableData) {
-  const active: Warrior[] = [];
-  let totalWins = 0;
-  let totalLosses = 0;
-  let totalKills = 0;
-  let totalFame = 0;
-
-  const styleCounts: Record<string, number> = {};
-  const sumAttrs: Record<string, number> = {};
-  let topWarrior: Warrior | null = null;
-
-  // ⚡ Bolt: Single O(N) pass to collect stats, compute totals, and find max
-  for (let i = 0; i < rival.roster.length; i++) {
-    const w = rival.roster[i];
-    if (w.status !== "Active") continue;
-
-    active.push(w);
-    totalWins += w.career.wins;
-    totalLosses += w.career.losses;
-    totalKills += w.career.kills;
-    totalFame += w.fame ?? 0;
-
-    styleCounts[w.style] = (styleCounts[w.style] ?? 0) + 1;
-
-    for (let j = 0; j < ATTRIBUTE_KEYS.length; j++) {
-      const key = ATTRIBUTE_KEYS[j];
-      sumAttrs[key] = (sumAttrs[key] ?? 0) + (w.attributes[key] ?? 0);
-    }
-
-    if (!topWarrior || (w.fame ?? 0) > (topWarrior.fame ?? 0)) {
-      topWarrior = w;
-    }
-  }
-
-  const avgFame = active.length > 0 ? Math.round(totalFame / active.length) : 0;
-  const winRate = totalWins + totalLosses > 0 ? Math.round((totalWins / (totalWins + totalLosses)) * 100) : 0;
-
-  const avgAttrs: Record<string, number> = {};
-  if (active.length > 0) {
-    for (let j = 0; j < ATTRIBUTE_KEYS.length; j++) {
-      const key = ATTRIBUTE_KEYS[j];
-      avgAttrs[key] = Math.round((sumAttrs[key] ?? 0) / active.length);
-    }
-  }
-
-  return { active, totalWins, totalLosses, totalKills, totalFame, avgFame, winRate, styleCounts, avgAttrs, topWarrior, rosterSize: active.length };
+  const stats = calculateStableStats(rival.roster);
+  return { 
+    ...stats, 
+    rosterSize: stats.activeCount,
+    avgAttrs: stats.avgAttributes
+  };
 }
 
 function StableSelector({

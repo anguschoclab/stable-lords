@@ -5,12 +5,13 @@ import {
   ATTRIBUTE_LABELS,
   type TrainingAssignment, type Attributes,
 } from "@/types/game";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Heart } from "lucide-react";
+import { Dumbbell, Heart, Activity, Target, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { WarriorTrainingCard } from "@/components/training/WarriorTrainingCard";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
 
 export default function Training() {
   const { state, setState } = useGameStore(
@@ -23,7 +24,6 @@ export default function Training() {
     return map;
   }, [state.trainingAssignments]);
 
-  // Seasonal growth lookup
   const seasonalGainsMap = useMemo(() => {
     const map = new Map<string, Partial<Record<keyof Attributes, number>>>();
     for (const sg of (state.seasonalGrowth ?? [])) {
@@ -72,67 +72,88 @@ export default function Training() {
   const trainingCount = assignedCount - recoveryCount;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-secondary via-card to-secondary p-6 sm:p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 glow-neon-blue rounded-xl mix-blend-overlay" />
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <Dumbbell className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide">Training Grounds</h1>
-          </div>
-          <p className="text-muted-foreground text-sm max-w-xl">
-            Assign warriors to train attributes or recover from injuries. Training has a chance to improve stats each week, 
-            modified by trainers, wit, and age. <span className="text-foreground/70">Size cannot be trained.</span> Each attribute 
-            can gain at most <span className="text-foreground font-medium">3 points per season</span>.
-          </p>
-          <div className="flex items-center gap-3 mt-4 flex-wrap">
-            <Badge variant="outline" className="gap-1">
-              <Dumbbell className="h-3 w-3" /> {trainingCount} training
-            </Badge>
-            {recoveryCount > 0 && (
-              <Badge variant="outline" className="gap-1 text-arena-pop border-arena-pop/30">
-                <Heart className="h-3 w-3" /> {recoveryCount} recovering
-              </Badge>
-            )}
-            <Badge variant="outline" className="text-muted-foreground">
-              {state.roster.length - assignedCount} idle
-            </Badge>
+    <div className="space-y-12 max-w-7xl mx-auto pb-20">
+      <PageHeader 
+        title="Training Grounds"
+        subtitle="ACADEMY // REGIMEN_CONTROL // POTENTIAL_UNLEASHED"
+        icon={Dumbbell}
+        actions={
+          <div className="flex items-center gap-6">
+            <div className="hidden sm:flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
+              <div className="flex items-center gap-1.5">
+                <Activity className="h-3 w-3 text-primary" />
+                <span>LOAD: {Math.round((trainingCount / (state.roster.length || 1)) * 100)}%</span>
+              </div>
+              <div className="h-3 w-px bg-border/40" />
+              <div className="flex items-center gap-1.5">
+                <Heart className="h-3 w-3 text-destructive" />
+                <span>RECOV: {recoveryCount}</span>
+              </div>
+            </div>
             {assignedCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={handleClearAll} className="text-xs text-muted-foreground" tooltip="Reset all warriors to idle status">
-                Clear all
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleClearAll}
+                className="h-8 text-[10px] font-black tracking-widest uppercase border-white/5 bg-white/5 hover:bg-white/10"
+              >
+                RESET_ALL
               </Button>
             )}
           </div>
-        </div>
+        }
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+         <Surface variant="glass" className="p-6 flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-primary">
+              <Zap className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Active_Drills</span>
+            </div>
+            <div className="text-3xl font-display font-black tracking-tighter">{trainingCount}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Warriors pursuing growth</div>
+         </Surface>
+         <Surface variant="glass" className="p-6 flex flex-col gap-2 border-l-destructive/20">
+            <div className="flex items-center gap-2 text-destructive">
+              <Heart className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Medical_Bay</span>
+            </div>
+            <div className="text-3xl font-display font-black tracking-tighter">{recoveryCount}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Warriors in active healing</div>
+         </Surface>
+         <Surface variant="glass" className="p-6 flex flex-col gap-2 opacity-60">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Target className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Reserve_Pool</span>
+            </div>
+            <div className="text-3xl font-display font-black tracking-tighter">{state.roster.length - assignedCount}</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Idle personnel available</div>
+         </Surface>
       </div>
 
-      {/* Warrior Cards */}
       {state.roster.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            No warriors in your stable. Recruit some first!
-          </CardContent>
-        </Card>
+        <Surface variant="glass" className="py-24 text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
+            // NO_PERSONNEL_DETECTED // PLEASE_RECRUIT_WARRIORS_TO_COMMENCE_TRAINING
+          </p>
+          <Button variant="link" className="mt-4 text-xs uppercase tracking-widest font-black" onClick={() => window.location.href = '/recruit'}>
+            Go to Recruitments
+          </Button>
+        </Surface>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {state.roster.reduce<React.ReactNode[]>((acc, warrior) => {
-            if (warrior.status === "Active") {
-              acc.push(
-                <WarriorTrainingCard
-                  key={warrior.id}
-                  warrior={warrior}
-                  assignment={assignmentMap.get(warrior.id)}
-                  seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
-                  trainers={state.trainers ?? []}
-                  onAssign={(attr) => handleAssign(warrior.id, attr)}
-                  onAssignRecovery={() => handleAssignRecovery(warrior.id)}
-                  onClear={() => handleClear(warrior.id)}
-                />
-              );
-            }
-            return acc;
-          }, [])}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {state.roster.filter(w => w.status === "Active").map(warrior => (
+            <WarriorTrainingCard
+              key={warrior.id}
+              warrior={warrior}
+              assignment={assignmentMap.get(warrior.id)}
+              seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
+              trainers={state.trainers ?? []}
+              onAssign={(attr) => handleAssign(warrior.id, attr)}
+              onAssignRecovery={() => handleAssignRecovery(warrior.id)}
+              onClear={() => handleClear(warrior.id)}
+            />
+          ))}
         </div>
       )}
     </div>

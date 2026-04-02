@@ -72,7 +72,8 @@ describe("Trainers Component", () => {
     const staffElements = await screen.findAllByText("Master Splinter");
     expect(staffElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Aggression SPECIALIST", { exact: false });
+    // Matching the focus text in the new UI impact box
+    const focusBadge = screen.getAllByText(/Aggression/i)[0];
     expect(focusBadge).toBeInTheDocument();
   });
 
@@ -82,18 +83,18 @@ describe("Trainers Component", () => {
     const poolElements = await screen.findAllByText("Coach Rocky");
     expect(poolElements.length).toBeGreaterThan(0);
 
-    const focusBadge = screen.getByText("Defense SPECIALIST", { exact: false });
+    const focusBadge = screen.getAllByText(/Defense/i)[0];
     expect(focusBadge).toBeInTheDocument();
   });
 
   it("allows firing a trainer", async () => {
     renderWithGameState(<Trainers />, mockState);
 
-    // Find the current trainer card - we need to go up to the card element
+    // Find the current trainer card
     const staffElement = (await screen.findAllByText("Master Splinter"))[0];
-    const trainerCard = staffElement.closest(".rounded-lg")!;
+    const trainerCard = staffElement.closest(".rounded-xl")!;
 
-    // The fire button now uses aria-label and a custom tooltip
+    // The fire button now uses aria-label="Release Trainer"
     const fireBtn = within(trainerCard as HTMLElement).getByLabelText(/release trainer/i);
     fireEvent.click(fireBtn);
 
@@ -104,16 +105,16 @@ describe("Trainers Component", () => {
   it("allows hiring a trainer", async () => {
     renderWithGameState(<Trainers />, mockState);
 
-    // Find the hiring pool trainer container (it has a wrapping relative div containing the absolute button)
+    // Find the hiring pool trainer container
     const poolElement = (await screen.findAllByText("Coach Rocky"))[0];
-    const poolRow = poolElement.closest(".relative")!;
+    const poolRow = poolElement.closest(".flex-1")!; // Container for the card content
 
-    // Find and click the Hire button. Note: "Hire" is also the name of the tab trigger, so use within()
-    const hireBtn = within(poolRow as HTMLElement).getByRole("button", { name: /hire/i });
+    // Find and click the Secure Contract button.
+    const hireBtn = within(poolRow.parentElement as HTMLElement).getByRole("button", { name: /Secure_Contract/i });
     fireEvent.click(hireBtn);
 
-    // Test that the Hire button within the pool row is gone (the trainer was removed from the pool)
-    expect(within(poolRow as HTMLElement).queryByRole("button", { name: /hire/i })).not.toBeInTheDocument();
+    // Test that the button within the pool row is gone
+    expect(within(poolRow.parentElement as HTMLElement).queryByRole("button", { name: /Secure_Contract/i })).not.toBeInTheDocument();
   });
 
 });

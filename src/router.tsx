@@ -1,3 +1,4 @@
+import React from "react";
 import { RootRoute, Route, Router, Outlet, createMemoryHistory, createBrowserHistory } from "@tanstack/react-router";
 import AppShell from "@/components/AppShell";
 import Dashboard from "@/pages/Dashboard";
@@ -29,21 +30,36 @@ import ArenaHub from "@/pages/ArenaHub";
 import StableLedger from "@/pages/StableLedger";
 import StableHall from "@/pages/StableHall";
 
-// Create a root route
-const rootRoute = new RootRoute({
-  component: () => (
+// ─── Route Components ───────────────────────────────────────────────────────
+
+function Root() {
+  return (
     <AppShell>
       <Outlet />
     </AppShell>
-  ),
+  );
+}
+
+// Create a root route
+const rootRoute = new RootRoute({
+  component: Root,
   notFoundComponent: () => <NotFound />,
 });
 
+function Welcome() {
+  const Orphanage = React.lazy(() => import("@/pages/Orphanage"));
+  return (
+    <React.Suspense fallback={<div className="h-screen w-screen bg-[#050506] flex items-center justify-center font-mono text-[10px] uppercase tracking-[0.5em] text-primary animate-pulse">Initializing_Nodal_Link...</div>}>
+      <Orphanage />
+    </React.Suspense>
+  );
+}
+
 // Create child routes
-const indexRoute = new Route({ getParentRoute: () => rootRoute, path: "/", component: ArenaHub });
+const indexRoute = new Route({ getParentRoute: () => rootRoute, path: "/", component: Dashboard });
 const runRoundRoute = new Route({ getParentRoute: () => rootRoute, path: "/run-round", component: RunRound });
 const warriorDetailRoute = new Route({ getParentRoute: () => rootRoute, path: "/warrior/$id", component: WarriorDetail });
-const welcomeRoute = new Route({ getParentRoute: () => rootRoute, path: "/welcome", component: () => import("@/pages/Orphanage").then(m => m.default) });
+const welcomeRoute = new Route({ getParentRoute: () => rootRoute, path: "/welcome", component: Welcome });
 
 // Pillar 2: Stable Management
 const stablePillar = new Route({ getParentRoute: () => rootRoute, path: "/stable" });

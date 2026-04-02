@@ -1,95 +1,88 @@
 import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
+import { useShallow } from 'zustand/react/shallow';
 import { STYLE_DISPLAY_NAMES, type Warrior } from "@/types/game";
-import { MOOD_DESCRIPTIONS, MOOD_ICONS, CROWD_MOODS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MOOD_DESCRIPTIONS, MOOD_ICONS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Badge } from "@/components/ui/badge";
-import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { WarriorNameTag } from "@/components/ui/WarriorBadges";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { WarriorLink } from "@/components/EntityLink";
 import {
   Trophy, Swords, Flame, Star, Skull, Zap, Eye,
-  TrendingUp, TrendingDown, Minus, LayoutDashboard,
-  Activity, Bell, Target, Wallet, Info
+  TrendingUp, Activity, Target, Shield, Info, BarChart3
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Surface } from "@/components/ui/Surface";
+import { PageHeader } from "@/components/ui/PageHeader";
 
-// Import new Widgets
-import { MedicalWidget } from "@/components/widgets/MedicalWidget";
-import { InboxWidget } from "@/components/widgets/InboxWidget";
+// Unified Widgets
+import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
+import { IntelligenceHubWidget } from "@/components/dashboard/IntelligenceHubWidget";
 import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
-import { TreasuryWidget } from "@/components/widgets/TreasuryWidget";
 import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
 
 // ─── Crowd Mood Meter ──────────────────────────────────────────────────────
 
 function CrowdMoodWidget() {
-  const { state } = useGameStore();
+  const { state } = useGameStore(useShallow(s => ({ state: s.state })));
   const mood = state.crowdMood as CrowdMood;
   const mods = getMoodModifiers(mood);
 
   return (
-    <Card className="h-full border-l-4 border-l-accent/50 shadow-md">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-display font-black flex items-center gap-2 uppercase tracking-tighter">
-          <Eye className="h-4 w-4 text-accent" /> Crowd Temperament
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center justify-between">
-           <span className="text-2xl">{MOOD_ICONS[mood]}</span>
-           <div className="text-right">
-             <span className="text-[10px] uppercase font-bold text-muted-foreground block">Current State</span>
-             <span className="text-xs font-black uppercase text-accent">{mood}</span>
-           </div>
+    <Surface variant="glass" className="h-full flex flex-col p-5 border-l-4 border-l-accent/50 animate-in fade-in zoom-in-95 duration-500">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Eye className="h-4 w-4 text-accent" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Crowd_Temperament</span>
         </div>
-        
-        <div className="grid grid-cols-2 gap-2 text-center pt-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="rounded border border-border/40 p-1.5 bg-secondary/20 cursor-help transition-colors hover:bg-secondary/40">
-                  <div className={`text-xs font-bold font-mono ${mods.fameMultiplier > 1 ? "text-primary" : "text-muted-foreground"}`}>
-                    ×{mods.fameMultiplier.toFixed(1)}
-                  </div>
-                  <div className="text-[8px] text-muted-foreground uppercase font-medium">Fame</div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="text-[10px]">Multiplies all fame gains from this week's bouts.</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        <Badge variant="outline" className="border-accent/40 bg-accent/5 text-accent text-[9px] font-black tracking-widest">{mood.toUpperCase()}</Badge>
+      </div>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="rounded border border-border/40 p-1.5 bg-secondary/20 cursor-help transition-colors hover:bg-secondary/40">
-                  <div className={`text-xs font-bold font-mono ${mods.killChanceBonus > 0 ? "text-destructive" : "text-muted-foreground"}`}>
-                    {mods.killChanceBonus > 0 ? "+" : ""}{(mods.killChanceBonus * 100).toFixed(0)}%
-                  </div>
-                  <div className="text-[8px] text-muted-foreground uppercase font-medium">Lethality</div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="text-[10px]">Probability bonus added to all fatal blow checks.</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <p className="text-[9px] text-muted-foreground italic leading-tight text-center pt-1">
-          {MOOD_DESCRIPTIONS[mood]}
-        </p>
-      </CardContent>
-    </Card>
+      <div className="flex items-center justify-between mb-4">
+         <span className="text-4xl drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">{MOOD_ICONS[mood]}</span>
+         <div className="text-right">
+           <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Impact_Matrix</div>
+           <p className="text-[10px] text-muted-foreground italic leading-tight max-w-[140px] border-r-2 border-accent/20 pr-3">
+            {MOOD_DESCRIPTIONS[mood]}
+           </p>
+         </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-3 pt-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="rounded-md border border-white/5 p-2 bg-white/[0.02] cursor-help transition-all hover:bg-white/[0.05] hover:border-white/10">
+              <div className={cn("text-lg font-display font-black tracking-tighter", mods.fameMultiplier > 1 ? "text-primary" : "text-muted-foreground")}>
+                ×{mods.fameMultiplier.toFixed(1)}
+              </div>
+              <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">FAME_MULT</div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="text-[10px] uppercase font-black tracking-widest">Multiplies all fame gains from this week's bouts.</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="rounded-md border border-white/5 p-2 bg-white/[0.02] cursor-help transition-all hover:bg-white/[0.05] hover:border-white/10">
+              <div className={cn("text-lg font-display font-black tracking-tighter", mods.killChanceBonus > 0 ? "text-destructive" : "text-muted-foreground")}>
+                {mods.killChanceBonus > 0 ? "+" : ""}{(mods.killChanceBonus * 100).toFixed(0)}%
+              </div>
+              <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">LETHALITY</div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="text-[10px] uppercase font-black tracking-widest">Probability bonus added to all fatal blow checks.</TooltipContent>
+        </Tooltip>
+      </div>
+    </Surface>
   );
 }
 
 // ─── Arena Leaderboard ────────────────────────────────────────────────────
 
 function ArenaLeaderboard() {
-  const { state } = useGameStore();
+  const { state } = useGameStore(useShallow(s => ({ state: s.state })));
 
   const allWarriors = useMemo(() => {
     const warriors: { warrior: Warrior; stableName: string; isPlayer: boolean }[] = [];
@@ -105,158 +98,149 @@ function ArenaLeaderboard() {
   }, [state.roster, state.rivals, state.player.stableName]);
 
   return (
-    <Card className="shadow-lg border-t-2 border-t-primary/20">
-      <CardHeader className="pb-2 border-b border-border/50">
-        <CardTitle className="text-sm font-display font-black flex items-center gap-2 uppercase tracking-tighter">
-          <Trophy className="h-4 w-4 text-arena-gold" /> Global Power Rankings
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader className="bg-muted/30">
-            <TableRow className="h-8 hover:bg-transparent">
-              <TableHead className="w-8 pl-4 h-8 text-[10px] font-bold uppercase">#</TableHead>
-              <TableHead className="h-8 text-[10px] font-bold uppercase">Warrior</TableHead>
-              <TableHead className="h-8 text-[10px] font-bold uppercase">Stable</TableHead>
-              <TableHead className="h-8 text-[10px] font-bold uppercase text-center">W-L-K</TableHead>
-              <TableHead className="h-8 pr-4 text-[10px] font-bold uppercase text-right">Fame</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {allWarriors.map((entry, i) => {
-              const w = entry.warrior;
-              return (
-                <TableRow key={w.id} className={cn("h-10 border-b border-border/20", entry.isPlayer ? "bg-primary/5" : "hover:bg-muted/20")}>
-                  <TableCell className="pl-4 font-mono text-[10px] font-black text-muted-foreground">
-                    {String(i + 1).padStart(2, '0')}
-                  </TableCell>
-                  <TableCell>
-                    <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
-                  </TableCell>
-                  <TableCell className="text-[10px] font-medium text-muted-foreground italic">
-                    {entry.stableName}
-                  </TableCell>
-                  <TableCell className="text-center font-mono text-[10px]">
-                    <span className="text-primary">{w.career.wins}</span>
-                    <span className="mx-0.5 opacity-30">/</span>
-                    <span className="text-destructive">{w.career.losses}</span>
-                    <span className="mx-0.5 opacity-30">/</span>
-                    <span className="text-arena-blood font-bold">{w.career.kills}</span>
-                  </TableCell>
-                  <TableCell className="pr-4 text-right">
-                    <span className="font-mono font-bold text-arena-fame">{w.fame}</span>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <Surface variant="glass" className="overflow-hidden p-0 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+      <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-4 w-4 text-arena-gold" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Global_Power_Rankings</span>
+        </div>
+        <div className="text-[10px] font-mono text-muted-foreground flex items-center gap-2">
+          <Activity className="h-3 w-3 text-primary" /> LIVE_ARENA_FEED
+        </div>
+      </div>
+      <Table>
+        <TableHeader className="bg-white/[0.03]">
+          <TableRow className="h-10 hover:bg-transparent border-white/5">
+            <TableHead className="w-12 pl-6 text-[9px] font-black uppercase tracking-widest">RANK</TableHead>
+            <TableHead className="text-[9px] font-black uppercase tracking-widest">WARRIOR</TableHead>
+            <TableHead className="text-[9px] font-black uppercase tracking-widest">STABLE</TableHead>
+            <TableHead className="text-center text-[9px] font-black uppercase tracking-widest">W_L_K</TableHead>
+            <TableHead className="pr-6 text-right text-[9px] font-black uppercase tracking-widest">FAME</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {allWarriors.map((entry, i) => {
+            const w = entry.warrior;
+            return (
+              <TableRow key={w.id} className={cn("h-12 border-white/5 transition-colors", entry.isPlayer ? "bg-primary/[0.03] border-l-2 border-l-primary" : "hover:bg-white/[0.02]")}>
+                <TableCell className="pl-6 font-mono text-[10px] font-black text-muted-foreground">
+                  {String(i + 1).padStart(2, '0')}
+                </TableCell>
+                <TableCell>
+                  <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} />
+                </TableCell>
+                <TableCell className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 italic">
+                  {entry.stableName}
+                </TableCell>
+                <TableCell className="text-center font-mono text-[10px]">
+                  <span className="text-primary font-bold">{w.career.wins}</span>
+                  <span className="mx-1 opacity-20">/</span>
+                  <span className="text-destructive font-bold">{w.career.losses}</span>
+                  <span className="mx-1 opacity-20">/</span>
+                  <span className="text-arena-blood font-black">{w.career.kills}</span>
+                </TableCell>
+                <TableCell className="pr-6 text-right">
+                  <span className="font-display font-black text-arena-fame text-lg tracking-tighter">{w.fame}</span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </Surface>
   );
 }
 
 // ─── Main Hub Page ────────────────────────────────────────────────────────────
 
 export default function ArenaHub() {
-  const { state } = useGameStore();
+  const { state } = useGameStore(useShallow(s => ({ state: s.state })));
+
+  const lifetimeKills = useMemo(() => state.roster.reduce((s,w)=>s+w.career.kills,0), [state.roster]);
 
   return (
-    <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Welcome & Context Strip */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-4xl font-display font-black tracking-tighter uppercase text-glow-gold">
-             Command Center
-          </h1>
-          <p className="text-xs text-muted-foreground font-bold uppercase tracking-[0.3em] flex items-center gap-2">
-            <Activity className="h-3 w-3 text-primary" /> System Status: Operational · <span className="text-accent">{state.phase.toUpperCase()} PHASE</span>
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-           <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black uppercase tracking-widest text-[10px] px-3 py-1">
-             {state.roster.filter(w=>w.status==="Active").length} Warriors Active
-           </Badge>
-           <Badge variant="outline" className="bg-arena-gold/5 text-arena-gold border-arena-gold/20 font-black uppercase tracking-widest text-[10px] px-3 py-1">
-             Ranked #{Math.floor(Math.random() * 5) + 1} Global
-           </Badge>
-        </div>
-      </div>
+    <div className="space-y-12 max-w-7xl mx-auto pb-20">
+      <PageHeader 
+        title="Arena Command Hub"
+        subtitle="VIRTUAL_COLOSSEUM // SPECTACLE_ENGINE // WORLD_STATE"
+        icon={Swords}
+        actions={
+          <div className="flex gap-3">
+             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black uppercase tracking-widest text-[9px] px-3 py-1">
+               {state.roster.filter(w=>w.status==="Active").length}_UNITS_ACTIVE
+             </Badge>
+             <Badge variant="outline" className="bg-arena-gold/5 text-arena-gold border-arena-gold/20 font-black uppercase tracking-widest text-[9px] px-3 py-1">
+               PREMIUM_ACCESS
+             </Badge>
+          </div>
+        }
+      />
 
-      {/* Primary Intelligence Layer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* News & Communications (Critical) */}
-        <div className="lg:col-span-8 space-y-6">
-           <div className="bg-glass-card rounded-3xl overflow-hidden border-neon transition-all hover:shadow-primary/5">
-             <InboxWidget />
-           </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Primary Intel Channel */}
+        <div className="lg:col-span-8 space-y-8">
+           <IntelligenceHubWidget />
            
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-glass-card rounded-2xl p-1 border-neon">
-                 <NextBoutWidget />
-              </div>
-              <div className="bg-glass-card rounded-2xl p-1 border-neon">
-                 <MedicalWidget />
-              </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <NextBoutWidget />
+              <MedicalAuditWidget />
            </div>
         </div>
 
-        {/* Tactical Intel Side Pane */}
-        <div className="lg:col-span-4 space-y-6">
-           <div className="bg-glass-card rounded-2xl p-1 border-neon-gold border-2">
-              <CrowdMoodWidget />
-           </div>
-           <div className="bg-glass-card rounded-2xl p-1 border-neon">
-              <MetaDriftWidget />
-           </div>
+        {/* Tactical Feed Side Pane */}
+        <div className="lg:col-span-4 space-y-8">
+           <CrowdMoodWidget />
+           <MetaDriftWidget />
            
-           {/* Quick Stats / Ticker */}
-           <Card className="bg-secondary/20 border-border/40 overflow-hidden">
-             <CardContent className="p-4 space-y-4">
-                <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-muted-foreground">
-                  <span>Arena Analytics</span>
-                  <Activity className="h-3 w-3" />
+           <Surface variant="glass" className="p-6 space-y-6 bg-gradient-to-br from-white/[0.01] to-white/[0.03]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Arena_Analytics</span>
                 </div>
-                <div className="space-y-2">
-                   <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Stable Renown</span>
-                      <span className="font-mono font-bold text-arena-fame">{state.player.renown}</span>
-                   </div>
-                   <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Lifetime Kills</span>
-                      <span className="font-mono font-bold text-destructive">{state.roster.reduce((s,w)=>s+w.career.kills,0)}</span>
-                   </div>
-                   <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground">Win Ratio</span>
-                      <span className="font-mono font-bold text-primary">64%</span>
-                   </div>
-                </div>
-             </CardContent>
-           </Card>
+                <Activity className="h-3 w-3 text-primary animate-pulse" />
+              </div>
+              
+              <div className="space-y-4">
+                 <div className="flex justify-between items-center group">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">Stable_Renown</span>
+                    <span className="font-display font-black text-xl text-arena-fame tracking-tighter">{state.player.renown}</span>
+                 </div>
+                 <div className="flex justify-between items-center group">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">Lifetime_Kills</span>
+                    <span className="font-display font-black text-xl text-destructive tracking-tighter">{lifetimeKills}</span>
+                 </div>
+                 <div className="flex justify-between items-center group">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">Combat_Yield</span>
+                    <span className="font-display font-black text-xl text-primary tracking-tighter">72%</span>
+                 </div>
+              </div>
+
+              <div className="pt-4 border-t border-white/5">
+                <p className="text-[9px] text-muted-foreground/60 leading-relaxed uppercase tracking-wider font-mono">
+                  All metrics updated in real-time. Combat performance influences world-state drift.
+                </p>
+              </div>
+           </Surface>
         </div>
       </div>
 
-      {/* Secondary Data Layer */}
-      <div className="grid grid-cols-1 gap-6">
-         <div className="bg-glass-card rounded-3xl overflow-hidden border-border/40">
-           <ArenaLeaderboard />
-         </div>
-      </div>
+      {/* Global Rankings Channel */}
+      <ArenaLeaderboard />
 
-      {/* Immersive Legend Footer */}
-      <div className="pb-12 pt-4 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 opacity-50 overflow-hidden px-6">
-         <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
-            <Skull className="h-4 w-4 text-destructive group-hover:scale-125 transition-transform" /> Bloodshed Protocols Enabled
+      {/* Immersive Operational Strip */}
+      <div className="py-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6 opacity-30 px-6 border-t border-white/5">
+         <div className="flex items-center gap-2.5 text-[9px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
+            <Skull className="h-3.5 w-3.5 text-destructive" /> Blood_Shed_Protocols: V1.4
          </div>
-         <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
-            <TrendingUp className="h-4 w-4 text-primary group-hover:scale-125 transition-transform" /> Market Adaptation Level: High
+         <div className="flex items-center gap-2.5 text-[9px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
+            <TrendingUp className="h-3.5 w-3.5 text-primary" /> Market_Drift: Synchronized
          </div>
-         <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
-            <Star className="h-4 w-4 text-arena-gold group-hover:scale-125 transition-transform" /> Global Fame Coefficient: 1.2x
+         <div className="flex items-center gap-2.5 text-[9px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
+            <Star className="h-3.5 w-3.5 text-arena-gold" /> Fame_Coefficient_Active
          </div>
-         <div className="flex items-center gap-3 text-[9px] uppercase font-black tracking-[0.2em] whitespace-nowrap group cursor-default">
-            <Activity className="h-4 w-4 text-accent group-hover:scale-125 transition-transform animate-pulse" /> Neural Feed: Synchronized
+         <div className="flex items-center gap-2.5 text-[9px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
+            <Shield className="h-3.5 w-3.5 text-accent" /> Integrity_Hash_Verified
          </div>
       </div>
     </div>
