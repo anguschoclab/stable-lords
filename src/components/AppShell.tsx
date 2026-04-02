@@ -198,6 +198,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 size="icon"
                 className="h-9 w-9 rounded-lg hover:bg-white/5 transition-colors"
                 onClick={toggleMute}
+                title={isMuted ? "Unmute audio" : "Mute audio"}
+                aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+                aria-pressed={!isMuted}
               >
                 {isMuted ? <VolumeX className="h-4 w-4 text-destructive" /> : <Volume2 className="h-4 w-4 text-primary" />}
               </Button>
@@ -216,6 +219,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   "h-9 w-9 rounded-lg transition-all",
                   saveFlash ? "bg-primary/20 text-primary scale-110" : "hover:bg-white/5"
                 )}
+                title="Save status"
+                aria-label="Save status"
               >
                 <Save className="h-4 w-4" />
               </Button>
@@ -232,6 +237,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 size="icon"
                 className="h-9 w-9 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
                 onClick={() => setResetOpen(true)}
+                title="Reset game"
+                aria-label="Reset game"
               >
                 <RotateCcw className="h-4 w-4" />
               </Button>
@@ -250,6 +257,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 size="icon"
                 className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
                 onClick={returnToTitle}
+                title="Exit to title"
+                aria-label="Exit to title"
               >
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -276,6 +285,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               size="icon" 
               onClick={toggleSidebar} 
               className={cn("h-8 w-8 hover:bg-white/5", !sidebarOpen && "mx-auto")}
+              title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+              aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+              aria-expanded={sidebarOpen}
             >
               {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
             </Button>
