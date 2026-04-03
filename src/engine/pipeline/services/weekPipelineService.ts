@@ -54,7 +54,7 @@ export function processRivalActions(state: GameState, newWeek: number): GameStat
     return updatedRival;
   });
 
-  const draft = aiDraftFromPool(state.recruitPool, processedRivals, newWeek);
+  const draft = aiDraftFromPool(state.recruitPool, processedRivals, newWeek, state);
   globalGazetteItems.push(...draft.gazetteItems);
 
   const newState = { ...state, rivals: draft.updatedRivals, recruitPool: draft.updatedPool, hiringPool: currentPool };
