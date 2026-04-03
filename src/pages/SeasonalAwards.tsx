@@ -60,6 +60,8 @@ interface UpsetEntry {
 
 /* ── Computation ─────────────────────────────────────────── */
 
+export { computeSeasonalAwards };
+
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 const SEASON_ICONS: Record<Season, string> = {
   Spring: "🌱", Summer: "☀️", Fall: "🍂", Winter: "❄️",
@@ -100,13 +102,25 @@ function computeSeasonalAwards(
   // Process each completed season (13-week blocks)
   const completedSeasons = Math.floor((maxWeek - 1) / 13);
 
+  // Group fights by season (13-week blocks)
+  const fightsBySeason = new Map<number, FightSummary[]>();
+  for (const f of fights) {
+    const s = Math.floor((f.week - 1) / 13);
+    if (s >= 0 && s < completedSeasons) {
+      if (!fightsBySeason.has(s)) {
+        fightsBySeason.set(s, []);
+      }
+      fightsBySeason.get(s)!.push(f);
+    }
+  }
+
   for (let s = 0; s < completedSeasons; s++) {
     const weekStart = s * 13 + 1;
     const weekEnd = (s + 1) * 13;
     const season = SEASONS[s % 4];
     const seasonIndex = Math.floor(s / 4) + 1;
 
-    const seasonFights = fights.filter(f => f.week >= weekStart && f.week <= weekEnd);
+    const seasonFights = fightsBySeason.get(s) || [];
     if (seasonFights.length === 0) continue;
 
     // Aggregate per-warrior stats for this season
