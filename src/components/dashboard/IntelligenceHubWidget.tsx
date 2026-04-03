@@ -67,7 +67,7 @@ export function IntelligenceHubWidget() {
 
           <div className="flex-1 overflow-hidden">
             <TabsContent value="gazette" className="m-0 h-full">
-              <ScrollArea className="h-[300px] px-6">
+              <ScrollArea className="h-72 px-6">
                 {recentGazettes.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 opacity-20">
                     <Zap className="h-8 w-8 mb-4" />
@@ -101,7 +101,7 @@ export function IntelligenceHubWidget() {
             </TabsContent>
 
             <TabsContent value="briefing" className="m-0 h-full">
-              <ScrollArea className="h-[300px] px-6">
+              <ScrollArea className="h-72 px-6">
                 {recentNewsletter.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 opacity-20">
                     <Info className="h-8 w-8 mb-4 text-arena-gold" />

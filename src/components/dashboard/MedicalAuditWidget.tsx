@@ -48,7 +48,7 @@ export function MedicalAuditWidget() {
          )}
       </div>
 
-      <div className="p-6 flex-1 relative z-10 custom-scrollbar overflow-y-auto max-h-[400px]">
+      <div className="p-6 flex-1 relative z-10 custom-scrollbar overflow-y-auto max-h-96">
         {atRisk.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 opacity-20 group-hover:opacity-30 transition-opacity">
              <Activity className="h-12 w-12 mb-4" />

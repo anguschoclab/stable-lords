@@ -137,7 +137,7 @@ export function RivalryWidget() {
   const mostWanted = useMostWantedRival(state as GameState, rosterNames, rivalWarriorStable);
 
   return (
-    <Surface variant="glass" padding="none" className="md:col-span-2 border-border/10 group overflow-hidden relative flex flex-col min-h-[400px]">
+    <Surface variant="glass" padding="none" className="md:col-span-2 border-border/10 group overflow-hidden relative flex flex-col min-h-96">
       <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
          <Flame className="h-48 w-48 text-destructive" />
       </div>

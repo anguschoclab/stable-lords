@@ -34,7 +34,7 @@ export function WarriorRadarChart({ warrior }: WarriorRadarChartProps) {
   }));
 
   return (
-    <div className="w-full aspect-square max-w-[400px] mx-auto">
+    <div className="w-full aspect-square max-w-md mx-auto">
       <ChartContainer config={chartConfig} className="h-full w-full">
         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
           <PolarGrid className="fill-muted/20" />

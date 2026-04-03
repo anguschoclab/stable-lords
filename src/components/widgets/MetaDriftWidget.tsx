@@ -78,14 +78,11 @@ export function MetaDriftWidget() {
                   <div 
                     className={cn(
                       "absolute h-full transition-all duration-1000",
-                      isPositive ? "bg-arena-gold right-1/2" : 
-                      isNeutral ? "bg-muted-foreground left-1/2 w-0" : 
-                      "bg-destructive left-1/2"
+                      isPositive ? "bg-arena-gold right-1/2 mr-0" :
+                      isNeutral ? "bg-muted-foreground left-1/2 ml-0 w-0" :
+                      "bg-destructive left-1/2 ml-0"
                     )}
-                    style={{ 
-                      width: `${percentage / 2}%`,
-                      [isPositive ? 'marginRight' : 'marginLeft']: '0'
-                    }}
+                    style={{ width: `${percentage / 2}%` }}
                   />
                   {/* Center line */}
                   <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border/60 z-10" />
