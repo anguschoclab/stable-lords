@@ -53,7 +53,8 @@ export function simulateFight(
   warriorA?: Warrior,
   warriorD?: Warrior,
   providedRng?: (() => number) | number,
-  trainers?: TrainerData[]
+  trainers?: TrainerData[],
+  weather: WeatherType = "Clear"
 ): FightOutcome {
   // 1. Deterministic RNG setup
   let rng: () => number;
@@ -80,6 +81,7 @@ export function simulateFight(
     rng,
     phase: "OPENING",
     exchange: 0,
+    weather,
     matchupA: getMatchupBonus(planA.style, planD.style),
     matchupD: getMatchupBonus(planD.style, planA.style),
     trainerModsA: null, // Computed inside simulate.ts if needed, or better inside createFighterState
@@ -165,9 +167,9 @@ export function simulateFight(
     if (boutEnd) {
       winner = boutEnd.actor === "A" ? "A" : "D";
       by = boutEnd.result as any;
-      fatalHitLocation = boutEnd.metadata?.location;
+      fatalHitLocation = boutEnd.metadata?.location as string;
       fatalExchangeIndex = ex;
-      causeBucket = boutEnd.metadata?.cause;
+      causeBucket = boutEnd.metadata?.cause as DeathCauseBucket;
       
       const boutEndLines = narrateBoutEnd(rng, by as string, boutEnd.actor === "A" ? nameA : nameD, boutEnd.actor === "A" ? nameD : nameA);
       boutEndLines.forEach(line => log.push({ minute: min, text: line }));

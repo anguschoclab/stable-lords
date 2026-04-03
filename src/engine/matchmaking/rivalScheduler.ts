@@ -4,6 +4,7 @@ import {
 import { simulateFight } from "../simulate";
 import { aiPlanForWarrior } from "../ownerAI";
 import { computeMetaDrift } from "../metaDrift";
+import { logAgentAction } from "../ai/agentCore";
 import { pickRivalOpponent } from "../rivals";
 import { AIBoutService } from "../matchmakingServices";
 import { getStablePairKey } from "@/utils/keyUtils";
@@ -49,24 +50,23 @@ export function collectEligibleAIWarriors(state: GameState, rivals: RivalStableD
   return pool;
 }
 
-import { collectEligibleAIWarriors, AIPoolWarrior } from "./rivalSchedulerUtils"; // Assume refactored out or kept local
 import { generateBoutBids, verifyBoutAcceptance, BoutBid } from "../ai/workers/competitionWorker";
 
 /**
  * pairAIWarriors: Refactored to an "Agentic Market" model.
  * 1. Collect bids from all eligible agents.
- * 2. reconcile bids into pairings.
+ * 2. Reconcile bids into pairings.
  * 3. Skeptically verify acceptance.
  */
-export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[]): { a: AIPoolWarrior; d: AIPoolWarrior }[] {
-  const maxBouts = Math.min(Math.floor(pool.length / 2), 6); // Increased cap for more active world
+export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[], state: GameState): { a: AIPoolWarrior; d: AIPoolWarrior }[] {
+  const maxBouts = Math.min(Math.floor(pool.length / 2), 6); 
   const paired = new Set<string>();
   const boutPairs: { a: AIPoolWarrior; d: AIPoolWarrior }[] = [];
 
   // A) Collect Bids
   const allBids: { rivalIdx: number; bids: BoutBid[] }[] = rivals.map((r, idx) => ({
     rivalIdx: idx,
-    bids: generateBoutBids(r, 0).bids // week handled by caller if needed
+    bids: generateBoutBids(r, state.week).bids 
   }));
 
   // Sort bids by priority (VENDETTA highest)
@@ -104,12 +104,24 @@ export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[])
       const attackerStable = rivals[bid.rivalIdx];
       
       if (defenderStable && attackerPoolEntry && d) {
-        const decision = verifyBoutAcceptance(defenderStable, d.warrior, attackerPoolEntry.warrior, attackerStable);
+        const decision = verifyBoutAcceptance(defenderStable, d.warrior, attackerPoolEntry.warrior, attackerStable, state.weather);
         
         if (decision.accepted) {
           boutPairs.push({ a: attackerPoolEntry, d });
           paired.add(attackerPoolEntry.warrior.id);
           paired.add(d.warrior.id);
+          
+          // ⚡ Log Acceptance: Use the rivalIdx from the bid to find attacker stable
+          rivals[bid.rivalIdx] = logAgentAction(rivals[bid.rivalIdx], "STRATEGY", `Proposed bout: ${attackerPoolEntry.warrior.name} vs ${d.warrior.name} - ${bid.description}`, "Medium", state.week);
+          const defIdx = rivals.findIndex(r => r.owner.id === d.stableId);
+          if (defIdx !== -1) {
+            rivals[defIdx] = logAgentAction(rivals[defIdx], "STRATEGY", `Accepted bout: ${d.warrior.name} vs ${attackerPoolEntry.warrior.name} from ${attackerStable.owner.stableName}.`, "Low", state.week);
+          }
+        } else {
+          const defIdx = rivals.findIndex(r => r.owner.id === d.stableId);
+          if (defIdx !== -1) {
+             rivals[defIdx] = logAgentAction(rivals[defIdx], "STRATEGY", `Declined bout for ${d.warrior.name}: ${decision.reason}`, "Low", state.week);
+          }
         }
       }
     }
@@ -121,7 +133,7 @@ export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[])
 export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; updatedRivals: RivalStableData[]; gazetteItems: string[] } {
   const rivals = [...(state.rivals || [])];
   const pool = collectEligibleAIWarriors(state, rivals);
-  const boutPairs = pairAIWarriors(pool, rivals);
+  const boutPairs = pairAIWarriors(pool, rivals, state);
 
   const results: AIBoutResult[] = [];
   const gazetteItems: string[] = [];

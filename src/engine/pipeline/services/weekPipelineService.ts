@@ -12,7 +12,7 @@ import type { PoolWarrior, RivalStableData } from "@/types/game";
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeEconomyImpact } from "@/engine/economy";
 import { computeAgingImpact } from "@/engine/aging";
-import { computeHealthImpact } from "@/engine/pipeline/health";
+import { computeHealthImpact } from "@/engine/health";
 import { resolveImpacts, StateImpact } from "@/engine/impacts";
 import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { generateWeeklyGazette } from "@/engine/gazetteNarrative";

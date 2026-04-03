@@ -1,6 +1,6 @@
 import { GameState, Warrior, FightOutcome } from "@/types/game";
 import { rollForInjury } from "@/engine/injuries";
-import { addRestState } from "@/engine/matchmaking";
+import { addRestState } from "@/engine/matchmaking/historyLogic";
 import { updateEntityInList } from "@/utils/stateUtils";
 
 export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, week: number, rivalStableId?: string) {

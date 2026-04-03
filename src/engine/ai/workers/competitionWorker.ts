@@ -1,4 +1,5 @@
-import { type RivalStableData, type Warrior } from "@/types/state.types";
+import { type RivalStableData, type Warrior, type WeatherType } from "@/types/state.types";
+import { FightingStyle } from "@/types/shared.types";
 import { logAgentAction } from "../agentCore";
 
 /**
@@ -13,49 +14,56 @@ export interface BoutBid {
   minFame?: number;
   maxFame?: number;
   priority: number; // 1-10
+  description?: string;
 }
 
 export function generateBoutBids(
   rival: RivalStableData,
-  currentWeek: number
+  currentWeek: number,
+  weather: WeatherType = "Clear"
 ): { bids: BoutBid[]; updatedRival: RivalStableData } {
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
   const activeRoster = rival.roster.filter(w => w.status === "Active");
   const bids: BoutBid[] = [];
 
   for (const warrior of activeRoster) {
-    // ⚡ Skeptical Matchmaking: Don't fight if injured or exhausted (Handled by eligibility, but worker adds preference)
-    
+    // ⚡ Skeptical Matchmaking: Weather Check
+    let weatherCaution = 0;
+    if (weather === "Rainy" && warrior.style === FightingStyle.LungingAttack) {
+      weatherCaution = 3; // Precision styles hate rain
+    } else if (weather === "Scalding" && warrior.attributes.CN < 10) {
+      weatherCaution = 2; // Low constitution warriors hate heat
+    }
+
     if (intent === "VENDETTA" && rival.strategy?.targetStableId) {
       bids.push({
         proposingWarriorId: warrior.id,
         targetStableId: rival.strategy.targetStableId,
-        priority: 10,
-        description: "Assigned to Vendetta target."
-      } as any);
+        priority: Math.max(1, 10 - weatherCaution),
+        description: `Vendetta target. ${weatherCaution > 0 ? "(Weather caution applied)" : ""}`
+      });
     } else if (intent === "RECOVERY") {
-      // Seek low-fame, low-risk opponents
+      if (weatherCaution > 2) continue; // Skip recovery bouts in bad weather
       bids.push({
         proposingWarriorId: warrior.id,
         maxFame: 50,
         priority: 5,
         description: "Seeking low-risk recovery bout."
-      } as any);
+      });
     } else if (intent === "EXPANSION") {
-      // Seek high-visibility bouts
       bids.push({
         proposingWarriorId: warrior.id,
         minFame: 100,
-        priority: 7,
+        priority: Math.max(1, 7 - weatherCaution),
         description: "Seeking high-visibility expansion bout."
-      } as any);
+      });
     } else {
-      // CONSOLIDATION: Standard parity bout
+      // CONSOLIDATION
       bids.push({
         proposingWarriorId: warrior.id,
-        priority: 3,
+        priority: Math.max(1, 3 - weatherCaution),
         description: "Standard training bout."
-      } as any);
+      });
     }
   }
 
@@ -69,10 +77,16 @@ export function verifyBoutAcceptance(
   rival: RivalStableData,
   warrior: Warrior,
   opponent: Warrior,
-  opponentStable: RivalStableData
+  opponentStable: RivalStableData,
+  weather: WeatherType = "Clear"
 ): { accepted: boolean; reason?: string } {
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
   
+  // ⚡ Weather Skepticism
+  if (weather === "Rainy" && warrior.style === FightingStyle.LungingAttack) {
+    return { accepted: false, reason: "Precision style at disadvantage in Rainy conditions." };
+  }
+
   // Skeptical Check: RECOVERY agents refuse fights with "Killers"
   if (intent === "RECOVERY") {
     if (opponent.career.kills > 0 || (opponent.fame || 0) > (warrior.fame || 0) + 100) {
@@ -80,8 +94,11 @@ export function verifyBoutAcceptance(
     }
   }
 
-  // Skeptical Check: AGGRESSIVE agents accept most things
+  // Skeptical Check: AGGRESSIVE agents accept most things (unless weather is lethal)
   if (rival.owner.personality === "Aggressive") {
+    if (weather === "Scalding" && warrior.attributes.CN < 8) {
+      return { accepted: false, reason: "Aggressive but not suicidal; heat is too dangerous for this unit." };
+    }
     return { accepted: true };
   }
 

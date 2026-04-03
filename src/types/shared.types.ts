@@ -160,6 +160,10 @@ export type TrainerFocus = "Aggression" | "Defense" | "Endurance" | "Mind" | "He
 
 export type ScoutQuality = "Basic" | "Detailed" | "Expert";
 
+// ─── Weather Types ────────────────────────────────────────────────────────
+
+export type WeatherType = "Clear" | "Rainy" | "Scalding" | "Drafty" | "Overcast";
+
 // ─── Events ─────────────────────────────────────────────────────────────────
 
 export interface DeathEvent {

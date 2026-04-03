@@ -1,6 +1,6 @@
 import { GameState, Warrior, FightOutcome } from "@/types/game";
 import { updateEntityInList } from "@/utils/stateUtils";
-import { addMatchRecord } from "@/engine/matchmaking";
+import { addMatchRecord } from "@/engine/matchmaking/historyLogic";
 
 export function applyRecords(
   s: GameState, 

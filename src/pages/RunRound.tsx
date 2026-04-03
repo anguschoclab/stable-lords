@@ -5,7 +5,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { advanceWeek } from "@/state/gameStore";
-import { generateMatchCard } from "@/engine/matchmaking";
+import { generateMatchCard } from "@/engine/matchmaking/bracketEngine";
 import { isFightReady } from "@/engine/warriorStatus";
 import { processWeekBouts, type BoutResult } from "@/engine/boutProcessor";
 import { runAutosim, type AutosimResult, type WeekSummary } from "@/engine/autosim";

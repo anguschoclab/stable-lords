@@ -1,7 +1,7 @@
 import { GameState, Warrior, FightOutcome } from "@/types/game";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
-import { updateRivalriesFromBouts } from "@/engine/matchmaking";
+import { updateRivalriesFromBouts } from "@/engine/matchmaking/rivalryLogic";
 import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
 import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { engineEventBus } from "@/engine/core/EventBus";

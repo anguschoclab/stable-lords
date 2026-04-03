@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { applyRivalAI, applyRecruitment } from "@/engine/pipeline/rivals";
 import { type GameState } from "@/types/game";
-import * as matchmakingModule from "@/engine/matchmaking";
+import * as matchmakingModule from "@/engine/matchmaking/rivalScheduler";
 import * as ownerRosterModule from "@/engine/ownerRoster";
 import * as draftServiceModule from "@/engine/draftService";
 
-vi.mock("@/engine/matchmaking", () => ({
+vi.mock("@/engine/matchmaking/rivalScheduler", () => ({
   runAIvsAIBouts: vi.fn(),
 }));
 

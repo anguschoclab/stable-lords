@@ -1,8 +1,12 @@
 import { type GameState, type Warrior, type InjuryData } from "@/types/game";
 import { tickInjuries } from "@/engine/injuries";
 import { clearExpiredRest } from "@/engine/matchmaking";
-import { type StateImpact } from "../impacts";
+import { type StateImpact } from "./impacts";
 
+/**
+ * Health Impact calculation — extracted from the legacy pipeline.
+ * Processes injury ticks and recovers rested status.
+ */
 export function computeHealthImpact(state: GameState): StateImpact {
   const injuryNews: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();

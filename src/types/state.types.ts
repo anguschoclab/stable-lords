@@ -6,10 +6,11 @@ import {
   type NewsletterItem,
   type TrainerTier,
   type TrainerFocus,
-  type ScoutQuality
+  type ScoutQuality,
+  type WeatherType
 } from "./shared.types";
 import { type Warrior, type DeathEvent } from "./warrior.types";
-export type { Warrior, DeathEvent };
+export type { Warrior, DeathEvent, WeatherType };
 import { type FightSummary, type FightOutcomeBy } from "./combat.types";
 import type { PoolWarrior } from "@/engine/recruitment";
 export type { PoolWarrior };
@@ -215,6 +216,7 @@ export interface GameState {
   week: number;
   phase: "planning" | "resolution";
   season: Season;
+  weather: WeatherType;
   roster: Warrior[];
   graveyard: Warrior[];
   retired: Warrior[];

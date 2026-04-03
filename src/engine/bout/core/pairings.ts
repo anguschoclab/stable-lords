@@ -1,6 +1,6 @@
 import { GameState, Warrior } from "@/types/game";
 import { isFightReady } from "@/engine/warriorStatus";
-import { generateMatchCard } from "@/engine/matchmaking";
+import { generateMatchCard } from "@/engine/matchmaking/bracketEngine";
 
 export interface BoutPairing {
   a: Warrior;

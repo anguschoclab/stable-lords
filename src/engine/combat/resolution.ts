@@ -11,6 +11,7 @@ import {
   type OffensiveTactic,
   type DefensiveTactic,
   type FightPlan,
+  type WeatherType,
 } from "@/types/game";
 import { skillCheck, contestCheck } from "./combatMath";
 import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "./combatDamage";
@@ -19,28 +20,28 @@ import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getS
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "../tacticSuitability";
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
-export const GLOBAL_ATT_BONUS = -1;
-export const GLOBAL_PAR_PENALTY = 1;
+const GLOBAL_ATT_BONUS = -1;
+const GLOBAL_PAR_PENALTY = 1;
 export const MAX_EXCHANGES = 15;
 export const EXCHANGES_PER_MINUTE = 3;
-export const DECISION_HIT_MARGIN = 2;
-export const INITIATIVE_PRESS_BONUS = 1;
-export const OE_ATT_SCALING = 0.7;
-export const OE_DEF_SCALING = 0.5;
-export const AL_INI_SCALING = 0.7; // Final boost for test compliance
-export const AL_ATTR_SCALING = 0.5;
-export const RIPOSTE_WHIFF_PENALTY = 0; // Removed penalty
-export const RIPOSTE_PARRY_PENALTY = 0; // Removed penalty
-export const DEFENDER_ENDURANCE_DISCOUNT = 0.92;
-export const DAMAGE_TAX_SCALING = 0.7;
-export const KILL_WINDOW_ENDURANCE = 0.4;
-export const KILL_DESIRE_SCALING = 0.04;
-export const KILL_PHASE_LATE_BONUS = 0.15;
-export const KILL_THRESHOLD_MIN = 0.05;
-export const KILL_THRESHOLD_BASE = 0.3;
-export const TRAINER_HEALING_REDUCTION = 0.03;
-export const TACTIC_OVERUSE_CAP = 3;
-export const CRIT_DAMAGE_MULT = 1.5;
+const DECISION_HIT_MARGIN = 2;
+const INITIATIVE_PRESS_BONUS = 1;
+const OE_ATT_SCALING = 0.7;
+const OE_DEF_SCALING = 0.5;
+const AL_INI_SCALING = 0.7; // Final boost for test compliance
+const AL_ATTR_SCALING = 0.5;
+const RIPOSTE_WHIFF_PENALTY = 0; // Removed penalty
+const RIPOSTE_PARRY_PENALTY = 0; // Removed penalty
+const DEFENDER_ENDURANCE_DISCOUNT = 0.92;
+const DAMAGE_TAX_SCALING = 0.7;
+const KILL_WINDOW_ENDURANCE = 0.4;
+const KILL_DESIRE_SCALING = 0.04;
+const KILL_PHASE_LATE_BONUS = 0.15;
+const KILL_THRESHOLD_MIN = 0.05;
+const KILL_THRESHOLD_BASE = 0.3;
+const TRAINER_HEALING_REDUCTION = 0.03;
+const TACTIC_OVERUSE_CAP = 3;
+const CRIT_DAMAGE_MULT = 1.5;
 
 // ─── Style Matchup Matrix ──────────────────────────────────────────────────
 const STYLE_ORDER = [
@@ -95,6 +96,7 @@ export interface ResolutionContext {
   rng: () => number;
   phase: string; // "OPENING" | "MID" | "LATE"
   exchange: number;
+  weather: WeatherType;
   matchupA: number;
   matchupD: number;
   trainerModsA: any;
@@ -341,11 +343,27 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const antiSynA = getStyleAntiSynergy(fA.style, tacticsA.offTactic, tacticsA.defTactic);
   const antiSynD = getStyleAntiSynergy(fD.style, tacticsD.offTactic, tacticsD.defTactic);
 
+  // 🌩️ Weather Modifiers
+  let weatherEndA = 1.0; let weatherEndD = 1.0;
+  let weatherIniA = 0; let weatherIniD = 0;
+  let weatherAttA = 0; let weatherAttD = 0;
+
+  if (ctx.weather === "Rainy") {
+    weatherIniA -= 1; weatherIniD -= 1; // Slick ground
+    weatherAttA -= 1; weatherAttD -= 1; // Poor visibility
+    if (fA.style === FightingStyle.LungingAttack) weatherIniA -= 1; // Precision styles suffer
+    if (fD.style === FightingStyle.LungingAttack) weatherIniD -= 1;
+  } else if (ctx.weather === "Scalding") {
+    weatherEndA = 1.2; weatherEndD = 1.2; // Heat exhaustion
+  } else if (ctx.weather === "Drafty") {
+    weatherIniA += 1; weatherIniD += 1; // Bracing wind
+  }
+
   if (passiveA.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "A", result: passiveA.narrative });
   if (passiveD.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "D", result: passiveD.narrative });
 
-  const iniA = fA.skills.INI + alIniMod(finalAL_A) + ctx.matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits;
-  const iniD = fD.skills.INI + alIniMod(finalAL_D) + ctx.matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits;
+  const iniA = fA.skills.INI + alIniMod(finalAL_A) + ctx.matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits + weatherIniA;
+  const iniD = fD.skills.INI + alIniMod(finalAL_D) + ctx.matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits + weatherIniD;
   
   const { aGoesFirst, attacker, defender, attLabel, defLabel } = resolveInitiative(rng, fA, fD, iniA, iniD);
 
@@ -370,13 +388,14 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const attKD = aGoesFirst ? effKD_A : effKD_D;
   const attAggBias = aGoesFirst ? biasAttA : biasAttD;
   const defAggBias = aGoesFirst ? biasDefD : biasDefA;
+  const attWeatherMod = aGoesFirst ? weatherAttA : weatherAttD;
 
   const tacticOveruseAtt = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakA) : Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakD);
   const tacticOveruseDef = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakD) : Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakA);
 
   const attOEmod = oeAttMod(attOE, attacker.style);
   const attAntiSynMod = Math.round((attAntiSyn.offMult - 1) * 5);
-  const attackSuccess = resolveAttack(rng, attacker, attOEmod, attMatchup, attFat, attOffMods, attPassive, attAntiSynMod, attAggBias, tacticOveruseAtt);
+  const attackSuccess = resolveAttack(rng, attacker, attOEmod, attMatchup, attFat, attOffMods, attPassive, attAntiSynMod, attAggBias + attWeatherMod, tacticOveruseAtt);
 
   if (!attackSuccess) {
     events.push({ type: "ATTACK", actor: attLabel, result: "WHIFF" });
@@ -407,8 +426,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     }
   }
 
-  const attEndurMult = getEnduranceMult(attacker.style);
-  const defEndurMult = getEnduranceMult(defender.style);
+  const attEndurMult = getEnduranceMult(attacker.style) * (aGoesFirst ? weatherEndA : weatherEndD);
+  const defEndurMult = getEnduranceMult(defender.style) * (aGoesFirst ? weatherEndD : weatherEndA);
   const attWepEndMult = attLabel === "A" ? ctx.weaponReqA.endurancePenalty : ctx.weaponReqD.endurancePenalty;
   const defWepEndMult = defLabel === "A" ? ctx.weaponReqA.endurancePenalty : ctx.weaponReqD.endurancePenalty;
 
