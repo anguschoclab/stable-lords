@@ -389,7 +389,7 @@ export const EXECUTION_TEMPLATES = [
   "%D's legs finally betray them, and %A answers the collapse with a merciless, killing stroke from their %W!",
   "%A turns a simple opening into a butchery, fatally dropping %D with sickening precision!",
   "Unable to maintain the frantic tempo, %D suffers a catastrophic, life-ending blow from %A!",
-  "%A feints low, catching %D off guard before severing their sword-arm at the elbow. The crowd erupts!",
+  "%A feints low, catching %D off guard before severing their sword-arm at the elbow with their %W. The crowd erupts!",
   "A spray of arterial blood paints the sand as %A's %W finds the agonizing gap in %D's faltering defense!",
   "With a sickening crunch that echoes through the coliseum, %A completely destroys %D's ribcage with their %W!",
   "The life immediately leaves %D's eyes as %A brutally hooks their %W into an unarmored joint, ending the bout!",
