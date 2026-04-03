@@ -49,36 +49,72 @@ export function collectEligibleAIWarriors(state: GameState, rivals: RivalStableD
   return pool;
 }
 
+import { collectEligibleAIWarriors, AIPoolWarrior } from "./rivalSchedulerUtils"; // Assume refactored out or kept local
+import { generateBoutBids, verifyBoutAcceptance, BoutBid } from "../ai/workers/competitionWorker";
+
+/**
+ * pairAIWarriors: Refactored to an "Agentic Market" model.
+ * 1. Collect bids from all eligible agents.
+ * 2. reconcile bids into pairings.
+ * 3. Skeptically verify acceptance.
+ */
 export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[]): { a: AIPoolWarrior; d: AIPoolWarrior }[] {
-  const maxBouts = Math.min(Math.floor(pool.length / 2), 4);
+  const maxBouts = Math.min(Math.floor(pool.length / 2), 6); // Increased cap for more active world
   const paired = new Set<string>();
   const boutPairs: { a: AIPoolWarrior; d: AIPoolWarrior }[] = [];
 
-  for (const a of pool) {
-    if (paired.has(a.warrior.id) || boutPairs.length >= maxBouts) break;
+  // A) Collect Bids
+  const allBids: { rivalIdx: number; bids: BoutBid[] }[] = rivals.map((r, idx) => ({
+    rivalIdx: idx,
+    bids: generateBoutBids(r, 0).bids // week handled by caller if needed
+  }));
 
-    let found = false;
-    for (const d of pool) {
-      if (paired.has(d.warrior.id) || disallowStablemates(a.stableId, d.stableId)) continue;
-      boutPairs.push({ a, d });
-      paired.add(a.warrior.id);
-      paired.add(d.warrior.id);
-      found = true;
-      break;
-    }
+  // Sort bids by priority (VENDETTA highest)
+  const flattenedBids = allBids.flatMap(ab => ab.bids.map(b => ({ ...b, rivalIdx: ab.rivalIdx })))
+    .sort((a, b) => b.priority - a.priority);
 
-    if (!found && rivals.length > 0) {
-      const pick = pickRivalOpponent(rivals, paired);
-      if (pick && !disallowStablemates(a.stableId, pick.rival.owner.id)) {
-        const dIdx = pool.findIndex(p => p.warrior.id === pick.warrior.id);
-        if (dIdx >= 0) {
-          boutPairs.push({ a, d: pool[dIdx] });
-          paired.add(a.warrior.id);
-          paired.add(pool[dIdx].warrior.id);
+  // B) Reconcile Bids
+  for (const bid of flattenedBids) {
+    if (paired.has(bid.proposingWarriorId) || boutPairs.length >= maxBouts) continue;
+
+    const attackerPoolEntry = pool.find(p => p.warrior.id === bid.proposingWarriorId);
+    if (!attackerPoolEntry) continue;
+
+    // Find best defender based on bid criteria
+    const candidates = pool.filter(p => {
+      if (paired.has(p.warrior.id)) return false;
+      if (disallowStablemates(bid.targetStableId || "", p.stableId)) return false; // This check was slightly bugged in bid, corrected logic here
+      if (p.stableId === attackerPoolEntry.stableId) return false;
+
+      // Bid Filters
+      if (bid.targetStableId && p.stableId !== bid.targetStableId) return false;
+      if (bid.targetWarriorId && p.warrior.id !== bid.targetWarriorId) return false;
+      if (bid.minFame && (p.warrior.fame || 0) < bid.minFame) return false;
+      if (bid.maxFame && (p.warrior.fame || 0) > bid.maxFame) return false;
+
+      return true;
+    });
+
+    if (candidates.length > 0) {
+      // Pick best candidate (e.g. closest fame or random)
+      const d = candidates[0];
+      
+      // ⚡ Skeptical Acceptance Check for the Defender
+      const defenderStable = rivals.find(r => r.owner.id === d.stableId);
+      const attackerStable = rivals[bid.rivalIdx];
+      
+      if (defenderStable && attackerPoolEntry && d) {
+        const decision = verifyBoutAcceptance(defenderStable, d.warrior, attackerPoolEntry.warrior, attackerStable);
+        
+        if (decision.accepted) {
+          boutPairs.push({ a: attackerPoolEntry, d });
+          paired.add(attackerPoolEntry.warrior.id);
+          paired.add(d.warrior.id);
         }
       }
     }
   }
+
   return boutPairs;
 }
 
