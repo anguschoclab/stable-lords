@@ -22,37 +22,45 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
     ],
   },
   Bloodthirsty: {
-    adjectives: ["savage", "brutal", "merciless", "vicious"],
+    adjectives: ["savage", "brutal", "merciless", "vicious", "gruesome", "blood-drenched"],
     opener: [
       "Blood painted the sands this week as the arena demanded sacrifice!",
       "The crowd bayed for blood — and the fighters delivered!",
       "Violence ruled the coliseum in a week of savage combat!",
       "A horrifying symphony of steel and slaughter opened this week's bouts!",
-      "No mercy was shown, and none was asked for in a week of absolute carnage!"
+      "No mercy was shown, and none was asked for in a week of absolute carnage!",
+      "The sands ran thick with gore as fighters were mercilessly butchered this week!",
+      "A terrifying festival of slaughter unfolded in the coliseum!"
     ],
     closer: [
       "The sands drink deep tonight.",
       "The crowd's thirst is satisfied — for now.",
       "Death stalks the arena, and the people love it.",
       "A trail of shattered bones and ruined armor litters the coliseum.",
-      "The arena echoes with the dying screams of the defeated."
+      "The arena echoes with the dying screams of the defeated.",
+      "The crows feast well upon the shattered remains tonight.",
+      "A thick stench of blood and death permanently stains the coliseum."
     ],
   },
   Theatrical: {
-    adjectives: ["dramatic", "spectacular", "breathtaking", "legendary"],
+    adjectives: ["dramatic", "spectacular", "breathtaking", "legendary", "mythic", "awe-inspiring"],
     opener: [
       "What a spectacle! The arena delivered drama worthy of the old legends!",
       "The poets will write songs about this week's extraordinary bouts!",
       "Pure theater! Every bout was a performance for the ages!",
       "A breathtaking showcase of martial prowess captivated the roaring stands!",
-      "From the first strike to the last fall, the arena was a stage for demigods!"
+      "From the first strike to the last fall, the arena was a stage for demigods!",
+      "A breathtaking opera of violence and valor commanded the arena this week!",
+      "Epic rivalries and glorious final stands painted a masterpiece on the sands!"
     ],
     closer: [
       "The bards already compose their verses.",
       "What stories will be told of this week!",
       "The crowd departs buzzing with tales of glory.",
       "Legends were forged in blood and steel today.",
-      "The crowd leaves exhausted, their voices hoarse from cheering this epic drama."
+      "The crowd leaves exhausted, their voices hoarse from cheering this epic drama.",
+      "The tale of this week's battles will be sung for generations.",
+      "A breathtaking finale to a week of mythical combat."
     ],
   },
   Solemn: {
