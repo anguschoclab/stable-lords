@@ -281,4 +281,20 @@ describe('OPFS Archival System', () => {
       errorSpy.mockRestore();
     });
   });
+
+  describe('Suite 6: Hot State Storage', () => {
+    it('Test 6.1: retrieveHotState handles missing files gracefully', async () => {
+      const hotStateHandle = {
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn().mockRejectedValue(new DOMException('File not found', 'NotFoundError'))
+      } as unknown;
+
+      rootHandle.getDirectoryHandle.mockResolvedValueOnce(hotStateHandle);
+
+      const service = new OPFSArchiveService();
+      const result = await service.retrieveHotState('save-slot-1');
+
+      expect(result).toBeNull();
+    });
+  });
 });
