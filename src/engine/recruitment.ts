@@ -49,7 +49,8 @@ export const TIER_STARS: Record<RecruitTier, number> = {
 };
 
 const REFRESH_COST = 50;
-export { REFRESH_COST };
+const DEFAULT_POOL_SIZE = 12; // Increased from 5 to maintain world population
+export { REFRESH_COST, DEFAULT_POOL_SIZE };
 
 // ─── Name Pool ────────────────────────────────────────────────────────────
 
@@ -178,7 +179,7 @@ export function generateRecruit(
 // ─── Pool Management ──────────────────────────────────────────────────────
 
 export function generateRecruitPool(
-  count: number,
+  count: number = DEFAULT_POOL_SIZE,
   week: number,
   usedNames: Set<string>,
   seed?: number
@@ -186,26 +187,27 @@ export function generateRecruitPool(
   const rng = new SeededRNG(seed ?? (week * 9973 + 42));
   const pool: PoolWarrior[] = [];
 
-  // Guarantee at least one Promising+ warrior
+  // Guarantee at least two Promising+ warriors in a larger pool
   pool.push(generateRecruit(rng, usedNames, week, rng.chance(0.3) ? "Exceptional" : "Promising"));
+  pool.push(generateRecruit(rng, usedNames, week, rng.chance(0.1) ? "Prodigy" : "Promising"));
 
-  for (let i = 1; i < count; i++) {
+  while (pool.length < count) {
     pool.push(generateRecruit(rng, usedNames, week));
   }
 
   return pool;
 }
 
-/** Partial weekly refresh — replace oldest 1-2 warriors */
+/** Partial weekly refresh — replace oldest 3-4 warriors */
 export function partialRefreshPool(
   pool: PoolWarrior[],
   week: number,
   usedNames: Set<string>
 ): PoolWarrior[] {
-  if (pool.length === 0) return generateRecruitPool(5, week, usedNames);
+  if (pool.length === 0) return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames);
 
   const sorted = [...pool].sort((a, b) => a.addedWeek - b.addedWeek);
-  const removeCount = Math.min(2, Math.max(1, Math.floor(pool.length * 0.3)));
+  const removeCount = Math.min(4, Math.max(2, Math.floor(pool.length * 0.3)));
   const remaining = sorted.slice(removeCount);
 
   // Rebuild used names from remaining
@@ -218,9 +220,9 @@ export function partialRefreshPool(
     newWarriors.push(generateRecruit(rng, allUsed, week));
   }
 
-  // Ensure pool stays at 5
+  // Ensure pool stays at size
   const result = [...remaining, ...newWarriors];
-  while (result.length < 4) {
+  while (result.length < DEFAULT_POOL_SIZE) {
     result.push(generateRecruit(rng, allUsed, week));
   }
 
@@ -232,7 +234,7 @@ export function fullRefreshPool(
   week: number,
   usedNames: Set<string>
 ): PoolWarrior[] {
-  return generateRecruitPool(5, week, usedNames, Date.now());
+  return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames, Date.now());
 }
 
 // AI Draft behavior has been moved to src/engine/draftService.ts

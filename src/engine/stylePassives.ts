@@ -299,16 +299,16 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       ...EMPTY_PASSIVE,
       mastery: m.tier,
       attBonus: -2,
-      parBonus: 3 + m.bonus,
-      iniBonus: 1,
+      parBonus: 4 + m.bonus, // Increased from 3
+      iniBonus: 2, // Increased from 1
       narrative: ctx.phase === "LATE" && ctx.endRatio > 0.5 ? `[${m.tier}] stands fresh as the opponent gasps for breath!` : undefined,
     }),
     getKillMechanic: () => ({
-      killBonus: -0.1,
-      decBonus: -2,
+      killBonus: -0.05, // Buffed from -0.1
+      decBonus: -1, // Buffed from -2
       killNarrative: "finds a rare opening and delivers a measured KILLING thrust!",
       extendedKillWindow: false,
-      killWindowHpMult: 0.2,
+      killWindowHpMult: 0.25, // Buffed from 0.2
     }),
     getAntiSynergy: (off) => {
       let offMult = 1, warning;
@@ -327,18 +327,18 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        defBonus: scale(wallBonus, m) + 1,
+        defBonus: scale(wallBonus, m) + 2, // Buffed from +1
         parBonus: 1,
-        iniBonus: scale(1, m) + 1,
+        iniBonus: scale(wallBonus + 1, m) + 1, // Scaled with wallBonus
         narrative: wallBonus >= 1 ? `[${m.tier}] the constant blade motion becomes an impenetrable wall!` : undefined,
       };
     },
     getKillMechanic: () => ({
-      killBonus: -0.05,
+      killBonus: -0.03, // Buffed from -0.05
       decBonus: 0,
       killNarrative: "the constant blade arc catches a vital point — KILLING BLOW from the steel wall!",
       extendedKillWindow: false,
-      killWindowHpMult: 0.25,
+      killWindowHpMult: 0.28, // Buffed from 0.25
     }),
     getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
   },

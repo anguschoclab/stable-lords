@@ -12,14 +12,14 @@
  *  - Training costs: 15g per warrior in training
  */
 import type { GameState, LedgerEntry } from "@/types/game";
-
-export const FIGHT_PURSE = 75; // Increased to heavily reward participation and risk
-export const WIN_BONUS = 40; // Further incentivized to prioritize skill and victories
-const FAME_MULTIPLIER = 2;
-export const WARRIOR_UPKEEP = 55; // Steeply increased to enforce rapid turnover and lean rosters, making cheap recruits from the Orphanage viable
-const TRAINER_SALARY = 35;
-const TRAINING_COST = 35; // Increased to make developing a recruit a significant financial investment
-import { TRAINER_WEEKLY_SALARY } from "./trainers";
+import { 
+  FIGHT_PURSE, 
+  WIN_BONUS, 
+  FAME_DIVIDEND, 
+  WARRIOR_UPKEEP_BASE, 
+  TRAINING_COST,
+  TRAINER_WEEKLY_SALARY
+} from "@/data/economyConstants";
 
 export interface WeeklyBreakdown {
   income: { label: string; amount: number }[];
@@ -42,20 +42,27 @@ export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
   for (let i = state.arenaHistory.length - 1; i >= 0; i--) {
     const f = state.arenaHistory[i];
     if (f.week !== week) break;
-
+ 
     const aIsPlayer = playerWarriorNames.has(f.a);
     const dIsPlayer = playerWarriorNames.has(f.d);
     if (aIsPlayer) { fightCount++; if (f.winner === "A") winCount++; }
     if (dIsPlayer) { fightCount++; if (f.winner === "D") winCount++; }
   }
-
+ 
   const income: { label: string; amount: number }[] = [];
   if (fightCount > 0) income.push({ label: `Fight purses (${fightCount})`, amount: fightCount * FIGHT_PURSE });
   if (winCount > 0) income.push({ label: `Win bonuses (${winCount})`, amount: winCount * WIN_BONUS });
-  if (state.fame > 0) income.push({ label: "Fame dividends", amount: state.fame * FAME_MULTIPLIER });
+  if (state.fame > 0) income.push({ label: "Fame dividends", amount: Math.round(state.fame * FAME_DIVIDEND) });
 
   const expenses: { label: string; amount: number }[] = [];
-  if (state.roster.length > 0) expenses.push({ label: `Warrior upkeep (${state.roster.length})`, amount: state.roster.length * WARRIOR_UPKEEP });
+  if (state.roster.length > 0) {
+    // 🏛️ Unification: Fame-bracketed upkeep (High fame = High pay)
+    const rosterUpkeep = state.roster.reduce((sum, w) => {
+      const famePremium = Math.floor((w.fame || 0) / 10) * 10;
+      return sum + WARRIOR_UPKEEP_BASE + famePremium;
+    }, 0);
+    expenses.push({ label: `Warrior upkeep (${state.roster.length})`, amount: rosterUpkeep });
+  }
   
   const activeTrainers = state.trainers.filter(t => t.contractWeeksLeft > 0);
   if (activeTrainers.length > 0) {

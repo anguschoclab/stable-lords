@@ -3,14 +3,13 @@ import { processStaff } from "./workers/staffWorker";
 import { processRoster } from "./workers/rosterWorker";
 import { consolidateAgentMemory, createAgentContext } from "./agentCore";
 
-const FIGHT_PURSE = 75;
-const WIN_BONUS = 40;
-const FAME_DIVIDEND = 2;
-const WARRIOR_UPKEEP = 55;
-const BASE_OPS_COST = 20;
-
-// Trainer Economics (Salary)
-const SALARY: Record<string, number> = { Novice: 10, Seasoned: 25, Master: 75 };
+import { 
+  FIGHT_PURSE, 
+  WIN_BONUS, 
+  FAME_DIVIDEND, 
+  WARRIOR_UPKEEP_BASE,
+  TRAINER_WEEKLY_SALARY
+} from "@/data/economyConstants";
 
 /**
  * processAIStable - The Lead Agent Orchestrator for a Rival Stable.
@@ -41,7 +40,7 @@ export function processAIStable(
     }
   }
   const totalFame = activeRoster.reduce((sum, w) => sum + (w.fame || 0), 0);
-  weeklyIncome += totalFame * FAME_DIVIDEND;
+  weeklyIncome += Math.round(totalFame * FAME_DIVIDEND);
 
   // 3. Delegate to Workers (Hierarchical Delegation)
   
@@ -55,9 +54,16 @@ export function processAIStable(
   updatedRival = processRoster(updatedRival, state.week, state.season);
 
   // 4. Calculate Final Expenses
-  let weeklyExpenses = BASE_OPS_COST;
-  weeklyExpenses += activeRoster.length * WARRIOR_UPKEEP;
-  weeklyExpenses += (updatedRival.trainers || []).reduce((sum, t) => sum + (SALARY[t.tier] || 10), 0);
+  let weeklyExpenses = 20; // Base ops
+  
+  // 🏛️ Unification: Fame-bracketed upkeep for AI
+  const rosterUpkeep = activeRoster.reduce((sum, w) => {
+    const famePremium = Math.floor((w.fame || 0) / 10) * 10;
+    return sum + WARRIOR_UPKEEP_BASE + famePremium;
+  }, 0);
+  weeklyExpenses += rosterUpkeep;
+
+  weeklyExpenses += (updatedRival.trainers || []).reduce((sum, t) => sum + (TRAINER_WEEKLY_SALARY[t.tier] || 10), 0);
 
   // 5. Update Gold & Check Bankruptcy (Risk Control)
   const goldDelta = weeklyIncome - weeklyExpenses;

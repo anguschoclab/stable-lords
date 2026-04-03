@@ -76,19 +76,42 @@ export function updateWarriorAfterFight(
   won: boolean,
   killed: boolean,
   fameDelta: number,
-  popDelta: number
+  popDelta: number,
+  rivalStableId?: string
 ): GameState {
+  if (rivalStableId) {
+    return {
+      ...state,
+      rivals: (state.rivals || []).map(r => r.owner.id === rivalStableId
+        ? {
+            ...r,
+            roster: updateEntityInList(r.roster, warriorId, (w) => ({
+              ...w,
+              fame: Math.max(0, (w.fame || 0) + fameDelta),
+              popularity: Math.max(0, (w.popularity || 0) + popDelta),
+              career: {
+                ...w.career,
+                wins: (w.career?.wins || 0) + (won ? 1 : 0),
+                losses: (w.career?.losses || 0) + (won ? 0 : 1),
+                kills: (w.career?.kills || 0) + (killed ? 1 : 0),
+              },
+            }))
+          }
+        : r)
+    };
+  }
+
   return {
     ...state,
     roster: updateEntityInList(state.roster, warriorId, (w) => ({
       ...w,
-      fame: Math.max(0, w.fame + fameDelta),
-      popularity: Math.max(0, w.popularity + popDelta),
+      fame: Math.max(0, (w.fame || 0) + fameDelta),
+      popularity: Math.max(0, (w.popularity || 0) + popDelta),
       career: {
         ...w.career,
-        wins: w.career.wins + (won ? 1 : 0),
-        losses: w.career.losses + (won ? 0 : 1),
-        kills: w.career.kills + (killed ? 1 : 0),
+        wins: (w.career?.wins || 0) + (won ? 1 : 0),
+        losses: (w.career?.losses || 0) + (won ? 0 : 1),
+        kills: (w.career?.kills || 0) + (killed ? 1 : 0),
       },
     })),
   };
@@ -105,12 +128,30 @@ export function killWarrior(
   warriorId: string,
   killedBy: string,
   cause: string,
-  deathEvent?: DeathEvent
+  deathEvent?: any // Using any to avoid circular import if needed, but DeathEvent is defined in types
 ): GameState {
-  const warrior = state.roster.find((w) => w.id === warriorId);
-  if (!warrior) return state;
+  let victim: Warrior | undefined = state.roster.find((w) => w.id === warriorId);
+  const nextState = { ...state };
+
+  if (victim) {
+    nextState.roster = state.roster.filter((w) => w.id !== warriorId);
+  } else {
+    // Check Rivals
+    for (const rival of (state.rivals || [])) {
+      victim = rival.roster.find(w => w.id === warriorId);
+      if (victim) {
+        nextState.rivals = (nextState.rivals || []).map(r => r.owner.id === rival.owner.id 
+          ? { ...r, roster: r.roster.filter(w => w.id !== warriorId) }
+          : r);
+        break;
+      }
+    }
+  }
+
+  if (!victim) return state;
+
   const dead: Warrior = {
-    ...warrior,
+    ...victim,
     status: "Dead",
     deathWeek: state.week,
     deathCause: cause,
@@ -120,9 +161,9 @@ export function killWarrior(
     dateOfDeath: `Week ${state.week}, ${state.season}`,
     causeOfDeath: cause,
   };
+
   return {
-    ...state,
-    roster: state.roster.filter((w) => w.id !== warriorId),
+    ...nextState,
     graveyard: [...state.graveyard, dead],
     unacknowledgedDeaths: [...(state.unacknowledgedDeaths || []), warriorId],
   };
@@ -191,8 +232,17 @@ export function updateWarriorEquipment(
     armor: string;
     shield: string;
     helm: string;
-  }
+  },
+  rivalStableId?: string
 ): GameState {
+  if (rivalStableId) {
+    return {
+      ...state,
+      rivals: (state.rivals || []).map(r => r.owner.id === rivalStableId
+        ? { ...r, roster: updateEntityInList(r.roster, warriorId, (w) => ({ ...w, equipment })) }
+        : r)
+    };
+  }
   return {
     ...state,
     roster: updateEntityInList(state.roster, warriorId, (w) => ({ ...w, equipment })),

@@ -20,9 +20,9 @@ import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getS
 import { getOffensiveSuitability, getDefensiveSuitability, suitabilityMultiplier } from "../tacticSuitability";
 
 // ─── Combat Constants ─────────────────────────────────────────────────────
-const GLOBAL_ATT_BONUS = -1;
-const GLOBAL_PAR_PENALTY = 1;
-export const MAX_EXCHANGES = 15;
+const GLOBAL_ATT_BONUS = -1.5; // Slightly increased penalty for raw aggression
+const GLOBAL_PAR_PENALTY = 0.5; // Reduced penalty to aid technical parry styles
+export const MAX_EXCHANGES = 21; // 7 minutes (Canonical Duelmasters length)
 export const EXCHANGES_PER_MINUTE = 3;
 const DECISION_HIT_MARGIN = 2;
 const INITIATIVE_PRESS_BONUS = 1;

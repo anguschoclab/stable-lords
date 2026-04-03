@@ -17,6 +17,7 @@ import { resolveImpacts, StateImpact } from "@/engine/impacts";
 import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
 import { partialRefreshPool } from "@/engine/recruitment";
+import { InsightTokenService } from "@/engine/tokens/insightTokenService";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 export function computeNextSeason(newWeek: number): Season { return SEASONS[Math.floor((newWeek - 1) / 13) % 4]; }
@@ -90,6 +91,14 @@ export function advanceWeek(state: GameState): GameState {
 
   newState = processHallOfFame(newState, nextWeek);
   newState = processTierProgression(newState, nextSeason, nextWeek);
+
+  // 🏆 Phase 4: Tournament Reward Tokens (Week 13, 26, 39, 52)
+  if (currentWeek % 13 === 0) {
+    const tokenRng = seededRng(currentWeek * 42 + 7);
+    const type = tokenRng() > 0.5 ? "Weapon" : "Rhythm";
+    newState = InsightTokenService.awardToken(newState, type, `${newState.season} Championship`);
+  }
+
   newState = processRivalActions(newState, nextWeek);
 
   // ⚡ World Expansion: Roll next week's weather
