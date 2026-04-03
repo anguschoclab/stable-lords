@@ -51,6 +51,7 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
                 className
               )}
               onClick={(e) => e.stopPropagation()}
+              aria-label={`Open details for warrior ${name}`}
             >
               {children ?? name}
             </button>
@@ -128,6 +129,7 @@ export function StableLink({ name, className, children }: StableLinkProps) {
                 className
               )}
               onClick={(e) => e.stopPropagation()}
+              aria-label={`Open details for stable ${name}`}
             >
               {children ?? name}
             </button>

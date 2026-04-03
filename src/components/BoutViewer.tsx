@@ -111,6 +111,8 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                   <button
                     onClick={() => setExpanded(!expanded)}
                     className="p-2 rounded-xl bg-neutral-900 border border-white/10 text-muted-foreground hover:text-foreground transition-all hover:border-white/30"
+                    aria-label={expanded ? "Minimize battle log" : "Reveal battle log"}
+                    aria-expanded={expanded}
                   >
                     {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </button>
@@ -217,7 +219,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                 <div className="flex items-center px-4 py-2 rounded-xl bg-black border border-white/5 gap-4">
                    <Tooltip>
                       <TooltipTrigger asChild>
-                         <button onClick={reset} className="text-muted-foreground/40 hover:text-white transition-colors">
+                         <button onClick={reset} className="text-muted-foreground/40 hover:text-white transition-colors" aria-label="Reset bout viewer">
                             <RotateCcw className="h-4 w-4" />
                          </button>
                       </TooltipTrigger>
@@ -232,6 +234,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                        "flex items-center justify-center p-2.5 rounded-full transition-all active:scale-95 group/play",
                        isPlaying ? "bg-white/10 text-white" : "bg-primary text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]"
                      )}
+                     aria-label={isPlaying ? "Pause playback" : "Play bout"}
                    >
                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5 fill-current" />}
                    </button>
@@ -240,7 +243,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                    
                    <Tooltip>
                       <TooltipTrigger asChild>
-                         <button onClick={skipToEnd} className="text-muted-foreground/40 hover:text-white transition-colors">
+                         <button onClick={skipToEnd} className="text-muted-foreground/40 hover:text-white transition-colors" aria-label="Skip to end of bout">
                             <SkipForward className="h-4 w-4" />
                          </button>
                       </TooltipTrigger>
@@ -257,6 +260,8 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                         "px-4 py-1.5 rounded-lg text-[10px] font-mono font-black transition-all",
                         speed === s ? "bg-white/10 text-white" : "text-muted-foreground/20 hover:text-muted-foreground/60"
                       )}
+                      aria-label={`Set playback speed to ${s}x`}
+                      aria-pressed={speed === s}
                     >
                       {s}X
                     </button>

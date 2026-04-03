@@ -62,6 +62,8 @@ import { processWeekBouts } from "./src/engine/boutProcessor";
 import { computeMetaDrift } from "./src/engine/metaDrift";
 import { FightingStyle } from "./src/types/game";
 import { computeWarriorStats } from "./src/engine/skillCalc";
+import { FIGHT_PURSE, WIN_BONUS, WARRIOR_UPKEEP } from "./src/engine/economy";
+import { KILL_THRESHOLD_BASE } from "./src/engine/combat/resolution";
 
 // Polyfill crypto for node if needed
 import crypto from "crypto";
@@ -345,28 +347,28 @@ async function runDailySimulation() {
 
   if (inflationRatio > 2.0) {
     needsChanges = true;
-    report += `- **Economy Issue:** High inflation. Consider lowering \`WIN_BONUS\` or \`FIGHT_PURSE\` in \`src/engine/economy.ts\`, or adding scaling gold sinks like trainer tier salaries.\n`;
+    report += `- **Economy Issue:** High inflation. **Recommendation:** Lower \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${Math.max(10, FIGHT_PURSE - 25)}, and \`WIN_BONUS\` from ${WIN_BONUS} to ${Math.max(10, WIN_BONUS - 15)} in \`src/engine/economy.ts\` to curb hyper-inflation.\n`;
   } else if (inflationRatio < 0.5) {
     needsChanges = true;
-    report += `- **Economy Issue:** Negative economy balance. Consider increasing baseline payouts or reviewing weekly upkeep/training costs in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
+    report += `- **Economy Issue:** Negative economy balance. **Recommendation:** Increase \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${FIGHT_PURSE + 25} or lower \`WARRIOR_UPKEEP\` from ${WARRIOR_UPKEEP} to ${Math.max(0, WARRIOR_UPKEEP - 10)} in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
   }
 
   if (killRateNum < 8.0) {
     needsChanges = true;
-    report += `- **Lethality Issue:** Kill rate (${killRate}%) is lower than the 8-15% target. Consider increasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\` to make kills more frequent.\n`;
+    report += `- **Lethality Issue:** Kill rate (${killRate}%) is lower than the 8-15% target. **Recommendation:** Increase \`KILL_THRESHOLD_BASE\` from ${KILL_THRESHOLD_BASE} to ${(KILL_THRESHOLD_BASE + 0.05).toFixed(2)} in \`src/engine/combat/resolution.ts\` to make kills more frequent.\n`;
   } else if (killRateNum > 15.0) {
     needsChanges = true;
-    report += `- **Lethality Issue:** Kill rate (${killRate}%) exceeds the 8-15% target. Consider decreasing \`KILL_THRESHOLD_BASE\` in \`src/engine/combat/resolution.ts\` to reduce lethality.\n`;
+    report += `- **Lethality Issue:** Kill rate (${killRate}%) exceeds the 8-15% target. **Recommendation:** Decrease \`KILL_THRESHOLD_BASE\` from ${KILL_THRESHOLD_BASE} to ${Math.max(0, KILL_THRESHOLD_BASE - 0.05).toFixed(2)} in \`src/engine/combat/resolution.ts\` to reduce lethality.\n`;
   }
 
   if (highWinRates.length > 0) {
     needsChanges = true;
-    report += `- **Meta-Drift Issue:** Styles like ${highWinRates.join(", ")} are overperforming (>60% win rate). Review their attack modifiers or stamina drain formulas.\n`;
+    report += `- **Meta-Drift Issue:** Styles like ${highWinRates.join(", ")} are overperforming (>60% win rate). **Recommendation:** Increase base stamina drain for attacks by 10% or reduce their base damage modifier by 5%.\n`;
   }
 
   if (lowWinRates.length > 0) {
     needsChanges = true;
-    report += `- **Meta-Drift Issue:** Styles like ${lowWinRates.join(", ")} are heavily underperforming (<40% win rate). Review their base defensive bonuses, riposte chances, or fatigue costs.\n`;
+    report += `- **Meta-Drift Issue:** Styles like ${lowWinRates.join(", ")} are heavily underperforming (<40% win rate). **Recommendation:** Increase riposte chance on successful parries by 10% or lower base fatigue costs for parries.\n`;
   }
 
   if (!needsChanges) {
