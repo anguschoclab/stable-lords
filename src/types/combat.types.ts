@@ -65,7 +65,7 @@ export interface CombatEvent {
   value?: number;
   location?: string;
   result?: string | boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface MinuteEvent {

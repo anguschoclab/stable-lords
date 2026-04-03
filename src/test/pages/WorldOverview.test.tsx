@@ -52,7 +52,7 @@ function createDummyWarrior(name: string, status: Warrior["status"], wins: numbe
     injuries: [],
     flair: [],
     champion: false,
-  } as any;
+  } as unknown;
 }
 
 describe("WorldOverview Component", () => {
@@ -83,7 +83,7 @@ describe("WorldOverview Component", () => {
         roster: [
           createDummyWarrior("RivalWarrior1", "Active", 20, 0, 90),
         ],
-      } as any
+      } as unknown
     ];
   });
 

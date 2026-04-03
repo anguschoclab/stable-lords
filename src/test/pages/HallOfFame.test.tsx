@@ -55,7 +55,7 @@ function createDummyWarrior(name: string, status: Warrior["status"], wins: numbe
     injuries: [],
     flair: [],
     champion: false,
-  } as any;
+  } as unknown;
 }
 
 describe("HallOfFame Component", () => {

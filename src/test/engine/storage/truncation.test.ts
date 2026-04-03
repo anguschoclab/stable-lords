@@ -24,30 +24,30 @@ describe("truncateState", () => {
     const makeArray = (size: number) => Array.from({ length: size }, (_, i) => ({ id: i }));
 
     const state = createMockState({
-      arenaHistory: makeArray(505) as any,
-      newsletter: makeArray(105) as any,
-      ledger: makeArray(505) as any,
-      matchHistory: makeArray(505) as any,
-      moodHistory: makeArray(55) as any,
-      graveyard: makeArray(205) as any,
-      retired: makeArray(205) as any,
-      tournaments: makeArray(105) as any,
-      scoutReports: makeArray(105) as any,
-      hallOfFame: makeArray(105) as any,
-      rivalries: makeArray(105) as any,
-      ownerGrudges: makeArray(105) as any,
-      seasonalGrowth: makeArray(505) as any,
-      insightTokens: makeArray(505) as any,
-      playerChallenges: makeArray(105) as any,
-      playerAvoids: makeArray(105) as any,
-      trainingAssignments: makeArray(205) as any,
-      gazettes: makeArray(55) as any,
-      coachDismissed: makeArray(105) as any,
-      restStates: makeArray(505) as any,
-      hiringPool: makeArray(25) as any,
-      recruitPool: makeArray(55) as any,
-      trainers: makeArray(55) as any,
-      rivals: makeArray(55) as any,
+      arenaHistory: makeArray(505) as unknown,
+      newsletter: makeArray(105) as unknown,
+      ledger: makeArray(505) as unknown,
+      matchHistory: makeArray(505) as unknown,
+      moodHistory: makeArray(55) as unknown,
+      graveyard: makeArray(205) as unknown,
+      retired: makeArray(205) as unknown,
+      tournaments: makeArray(105) as unknown,
+      scoutReports: makeArray(105) as unknown,
+      hallOfFame: makeArray(105) as unknown,
+      rivalries: makeArray(105) as unknown,
+      ownerGrudges: makeArray(105) as unknown,
+      seasonalGrowth: makeArray(505) as unknown,
+      insightTokens: makeArray(505) as unknown,
+      playerChallenges: makeArray(105) as unknown,
+      playerAvoids: makeArray(105) as unknown,
+      trainingAssignments: makeArray(205) as unknown,
+      gazettes: makeArray(55) as unknown,
+      coachDismissed: makeArray(105) as unknown,
+      restStates: makeArray(505) as unknown,
+      hiringPool: makeArray(25) as unknown,
+      recruitPool: makeArray(55) as unknown,
+      trainers: makeArray(55) as unknown,
+      rivals: makeArray(55) as unknown,
     });
 
     const truncated = truncateState(state);
@@ -109,7 +109,7 @@ describe("truncateState", () => {
   it("slices keeping the most recent items (tail of the array)", () => {
     const makeArray = (size: number) => Array.from({ length: size }, (_, i) => ({ id: i }));
     // 105 items, ids 0 to 104
-    const state = createMockState({ newsletter: makeArray(105) as any });
+    const state = createMockState({ newsletter: makeArray(105) as unknown });
     const truncated = truncateState(state);
 
     expect(truncated.newsletter.length).toBe(100);

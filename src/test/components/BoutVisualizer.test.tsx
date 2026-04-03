@@ -22,7 +22,7 @@ describe("BoutVisualizer", () => {
         nameD="Warrior D" 
         styleA="Slasher" 
         styleD="Basher" 
-        log={mockLog as any} 
+        log={mockLog as unknown as Mock}
         winner="A" 
         by="KO" 
       />
@@ -40,7 +40,7 @@ describe("BoutVisualizer", () => {
         nameD="Warrior D" 
         styleA="Slasher" 
         styleD="Basher" 
-        log={mockLog as any} 
+        log={mockLog as unknown as Mock}
         winner="A" 
         by="KO" 
       />

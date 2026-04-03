@@ -9,8 +9,8 @@ function makeWarrior(id: string, name: string): Warrior {
     name,
     style: FightingStyle.StrikingAttack,
     attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
-    baseSkills: {} as any,
-    derivedStats: {} as any,
+    baseSkills: {} as unknown,
+    derivedStats: {} as unknown,
     fame: 0,
     popularity: 0,
     titles: [],
@@ -32,7 +32,7 @@ function makeInitialState(): GameState {
     newsletter: [],
     ledger: [],
     // ... rest of state fields
-  } as any;
+  } as unknown;
 }
 
 describe("resolveImpacts", () => {

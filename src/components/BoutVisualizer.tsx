@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import type { MinuteEvent, FightOutcomeBy, CombatEvent } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
@@ -21,7 +21,8 @@ import {
   Target
 } from "lucide-react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import { audioManager } from "@/lib/AudioManager";
+import { classifyEvent } from "@/lib/boutUtils";
+import { useBoutPlayback } from "@/hooks/useBoutPlayback";
 
 interface BoutVisualizerProps {
   nameA: string;
@@ -33,26 +34,6 @@ interface BoutVisualizerProps {
   by: FightOutcomeBy;
   announcement?: string;
   isRivalry?: boolean;
-}
-
-// Re-using classification logic with metadata support
-function classifyEvent(event: MinuteEvent): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" | "phase" {
-  if (event.text.startsWith("—") && event.text.includes("Phase")) return "phase";
-  
-  // Check raw events for metadata first
-  const hasCrit = event.events?.some(e => e.metadata?.critical || e.metadata?.lethal);
-  if (hasCrit) return "crit";
-
-  const t = event.text.toLowerCase();
-  if (t.includes("kill") || t.includes("death") || t.includes("slain") || t.includes("fatal")) return "death";
-  if (t.includes("knocked out") || t.includes("ko") || t.includes("unconscious") || t.includes("no longer continue")) return "ko";
-  if (t.includes("exhausted") || t.includes("exhaustion") || t.includes("tiring") || t.includes("sluggish")) return "exhaust";
-  if (t.includes("devastating") || t.includes("critical") || t.includes("massive") || t.includes("lethal")) return "crit";
-  if (t.includes("counter-attack") || t.includes("riposte")) return "riposte";
-  if (t.includes("initiative") || t.includes("seizes")) return "initiative";
-  if (t.includes("damage") || t.includes("strikes") || t.includes("hits") || t.includes("lands") || t.includes("striking")) return "hit";
-  if (t.includes("miss") || t.includes("parr") || t.includes("dodge") || t.includes("turns") || t.includes("no opening") || t.includes("blocks")) return "miss";
-  return "status";
 }
 
 function getEventIcon(type: ReturnType<typeof classifyEvent>) {
@@ -328,18 +309,20 @@ function OutcomeBanner({ isComplete, winner, nameA, nameD, by, logLength, announ
 
 export function BoutVisualizer({ nameA, nameD, styleA, styleD, log, winner, by, announcement, isRivalry }: BoutVisualizerProps) {
 
-
-
-
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState<1 | 2 | 3>(1);
   const stageControls = useAnimation();
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const totalEvents = log.length;
-  const isComplete = visibleCount >= totalEvents;
-  const speedMs = speed === 1 ? 1000 : speed === 2 ? 500 : 200;
+  const {
+    visibleCount,
+    setVisibleCount,
+    isPlaying,
+    speed,
+    setSpeed,
+    isComplete,
+    totalEvents,
+    reset,
+    skipToEnd,
+    togglePlay,
+  } = useBoutPlayback(log);
 
   const currentEvent = useMemo(() => {
     return visibleCount > 0 ? log[visibleCount - 1] : null;
@@ -358,52 +341,6 @@ export function BoutVisualizer({ nameA, nameD, styleA, styleD, log, winner, by, 
       });
     }
   }, [visibleCount, eventType, stageControls]);
-
-  const advanceOne = useCallback(() => {
-    setVisibleCount((c) => {
-      const next = Math.min(c + 1, totalEvents);
-      if (next > c) {
-        const event = log[c];
-        const type = classifyEvent(event);
-        if (type === "hit") audioManager.play("hit");
-        else if (type === "crit") audioManager.play("crit");
-        else if (type === "death") audioManager.play("death");
-        else if (type === "riposte") audioManager.play("clash");
-      }
-      return next;
-    });
-  }, [totalEvents, log]);
-
-  const reset = useCallback(() => {
-    setIsPlaying(false);
-    setVisibleCount(0);
-  }, []);
-
-  const skipToEnd = useCallback(() => {
-    setIsPlaying(false);
-    setVisibleCount(totalEvents);
-  }, [totalEvents]);
-
-  const togglePlay = useCallback(() => {
-    if (isComplete) {
-      setVisibleCount(0);
-      setIsPlaying(true);
-    } else {
-      setIsPlaying((p) => !p);
-    }
-  }, [isComplete]);
-
-  useEffect(() => {
-    if (isPlaying && !isComplete) {
-      timerRef.current = setTimeout(advanceOne, speedMs);
-    } else if (isComplete) {
-      setIsPlaying(false);
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isPlaying, visibleCount, isComplete, speedMs, advanceOne]);
-
 
   return (
     <div className="flex flex-col gap-4 w-full bg-card/50 backdrop-blur-sm border border-border rounded-xl overflow-hidden shadow-2xl">

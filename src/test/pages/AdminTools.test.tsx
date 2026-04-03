@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach , Mock} from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AdminTools from '../../pages/AdminTools';
 import { useGameStore } from '@/state/useGameStore';
@@ -32,7 +32,7 @@ describe('AdminTools Page', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useGameStore as any).mockReturnValue({
+    (useGameStore as unknown as Mock).mockReturnValue({
       state: mockState,
       setState: mockSetState,
       doReset: mockDoReset

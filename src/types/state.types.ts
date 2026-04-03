@@ -198,10 +198,10 @@ export interface GameState {
     createdAt: string;
   };
   pendingResolutionData?: {
-    gazette: any[];
+    gazette: NewsletterItem[];
     injuries: string[];
     deaths: string[];
-    bouts: any[];
+    bouts: import("@/engine/boutProcessor").BoutResult[];
     promotions: string[];
   };
   ftueComplete: boolean;

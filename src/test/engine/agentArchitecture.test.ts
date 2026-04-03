@@ -10,9 +10,9 @@ describe("AI Agent Architecture - Skeptical Intent", () => {
   } as unknown as GameState;
 
   const mockRival: Partial<RivalStableData> = {
-    owner: { id: "r1", personality: "Methodical" } as any,
+    owner: { id: "r1", personality: "Methodical" } as unknown,
     gold: 500,
-    roster: [{ status: "Active" }, { status: "Active" }, { status: "Active" }] as any,
+    roster: [{ status: "Active" }, { status: "Active" }, { status: "Active" }] as unknown,
     strategy: { intent: "VENDETTA", planWeeksRemaining: 5 }
   };
 
@@ -41,7 +41,7 @@ describe("AI Agent Architecture - Skeptical Intent", () => {
     // Let's verify that too.
     const aggressiveRival = { 
       ...mockRival, 
-      owner: { id: "r1", personality: "Aggressive" } as any,
+      owner: { id: "r1", personality: "Aggressive" } as unknown,
       gold: 140 
     } as RivalStableData;
     const isDisproved = verifyIntentSkepticism(aggressiveRival, mockState);

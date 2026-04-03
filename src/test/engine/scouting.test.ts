@@ -25,7 +25,7 @@ function makeWarrior(overrides?: Partial<Warrior>): Warrior {
     champion: false,
     status: "Active",
     age: 24,
-    plan: { OE: 7, AL: 5, killDesire: 6 } as any,
+    plan: { OE: 7, AL: 5, killDesire: 6 } as unknown,
     ...overrides,
   };
 }
@@ -74,7 +74,7 @@ describe("Scouting System", () => {
 
     it("should show injuries in Detailed report", () => {
       const warrior = makeWarrior({
-        injuries: ["Broken Arm" as any],
+        injuries: ["Broken Arm" as unknown],
       });
       const { report } = generateScoutReport(warrior, "Detailed", 1);
       
@@ -82,7 +82,7 @@ describe("Scouting System", () => {
     });
 
     it("should not reveal plan tendencies in Basic or Detailed reports", () => {
-      const warrior = makeWarrior({ plan: { OE: 9, AL: 3, killDesire: 8 } as any });
+      const warrior = makeWarrior({ plan: { OE: 9, AL: 3, killDesire: 8 } as unknown });
       
       const { report: basicReport } = generateScoutReport(warrior, "Basic", 1);
       const { report: detailedReport } = generateScoutReport(warrior, "Detailed", 1);
@@ -94,7 +94,7 @@ describe("Scouting System", () => {
     });
 
     it("should reveal plan tendencies in Expert report", () => {
-      const warrior = makeWarrior({ plan: { OE: 9, AL: 3, killDesire: 8 } as any });
+      const warrior = makeWarrior({ plan: { OE: 9, AL: 3, killDesire: 8 } as unknown });
       const { report } = generateScoutReport(warrior, "Expert", 1);
       
       expect(report.suspectedOE).toBe("High");
@@ -102,9 +102,9 @@ describe("Scouting System", () => {
     });
 
     it("should categorize OE/AL as Low/Medium/High correctly", () => {
-      const low = makeWarrior({ plan: { OE: 2, AL: 3, killDesire: 5 } as any });
-      const medium = makeWarrior({ plan: { OE: 5, AL: 5, killDesire: 5 } as any });
-      const high = makeWarrior({ plan: { OE: 8, AL: 9, killDesire: 5 } as any });
+      const low = makeWarrior({ plan: { OE: 2, AL: 3, killDesire: 5 } as unknown });
+      const medium = makeWarrior({ plan: { OE: 5, AL: 5, killDesire: 5 } as unknown });
+      const high = makeWarrior({ plan: { OE: 8, AL: 9, killDesire: 5 } as unknown });
       
       const { report: reportL } = generateScoutReport(low, "Expert", 1);
       const { report: reportM } = generateScoutReport(medium, "Expert", 1);

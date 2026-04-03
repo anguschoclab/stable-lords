@@ -96,7 +96,7 @@ describe("Economy Engine", () => {
           winner: "A",
           loser: "D",
           aInjuries: [], dInjuries: [], type: "Standard"
-        } as any,
+        } as unknown as FightSummary,
         {
           id: "f1", week: 5, season: "Spring",
           a: "Alice", d: "Enemy 1",
@@ -104,7 +104,7 @@ describe("Economy Engine", () => {
           winner: "A", // Player won
           loser: "D",
           aInjuries: [], dInjuries: [], type: "Standard"
-        } as any,
+        } as unknown,
         {
           id: "f2", week: 5, season: "Spring",
           a: "Enemy 2", d: "Alice",
@@ -112,7 +112,7 @@ describe("Economy Engine", () => {
           winner: "A", // Player lost
           loser: "D",
           aInjuries: [], dInjuries: [], type: "Standard"
-        } as any
+        } as unknown
       ];
 
       const breakdown = computeWeeklyBreakdown(state);
@@ -152,7 +152,7 @@ describe("Economy Engine", () => {
           styleA: "StrikingAttack",
           styleD: "ParryLunge",
           createdAt: new Date().toISOString()
-        } as any
+        } as unknown
       ];
 
       const breakdown = computeWeeklyBreakdown(state);
@@ -184,7 +184,7 @@ describe("Economy Engine", () => {
           styleA: "StrikingAttack",
           styleD: "ParryLunge",
           createdAt: new Date().toISOString()
-        } as any
+        } as unknown
       ];
 
       const prevStateRef = { ...state };

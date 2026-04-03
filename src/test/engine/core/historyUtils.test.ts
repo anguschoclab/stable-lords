@@ -14,7 +14,7 @@ describe('getRecentFightsForWarrior', () => {
     week: 1,
     createdAt: new Date().toISOString(),
     ...overrides,
-  } as any);
+  } as unknown as FightSummary);
 
   it('returns empty array when history is empty', () => {
     const history: FightSummary[] = [];

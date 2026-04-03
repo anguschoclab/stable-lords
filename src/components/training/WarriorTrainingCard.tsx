@@ -111,6 +111,7 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
                           ? "bg-white/[0.02] border-white/5 opacity-40 cursor-not-allowed"
                           : "bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.08]"
                       )}
+                      aria-label={`Assign ${ATTRIBUTE_LABELS[key]} training for ${warrior.name}`}
                     >
                       {/* Label & Value */}
                       <div className="w-16 shrink-0">

@@ -32,7 +32,7 @@ describe("ownerPhilosophy - evolvePhilosophies", () => {
             ...mockState,
             arenaHistory: mockState.arenaHistory.map((f: any) => ({ ...f, winner: "A" }))
         };
-        const { updatedRivals, gazetteItems } = evolvePhilosophies(winningState as any, "Summer");
+        const { updatedRivals, gazetteItems } = evolvePhilosophies(winningState as unknown, "Summer");
         
         expect(updatedRivals[0].philosophy).toBe("Brute Force");
         expect(gazetteItems.length).toBe(0);

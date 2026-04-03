@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { MinuteEvent, FightOutcomeBy } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
@@ -12,7 +12,8 @@ import {
   ChevronDown, ChevronUp, History, Timer, Target, Activity, 
   Dna, Boxes, Crosshair, BarChart3, TrendingUp, Trophy
 } from "lucide-react";
-import { audioManager } from "@/lib/AudioManager";
+import { classifyEvent } from "@/lib/boutUtils";
+import { useBoutPlayback } from "@/hooks/useBoutPlayback";
 
 interface BoutViewerProps {
   nameA: string;
@@ -24,21 +25,6 @@ interface BoutViewerProps {
   by: FightOutcomeBy;
   announcement?: string;
   isRivalry?: boolean;
-}
-
-// Classify log lines for visual treatment
-function classifyEvent(text: string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" | "phase" {
-  if (text.startsWith("—") && text.includes("Phase")) return "phase";
-  const t = text.toLowerCase();
-  if (t.includes("kill") || t.includes("death") || t.includes("slain") || t.includes("fatal")) return "death";
-  if (t.includes("knocked out") || t.includes("ko") || t.includes("unconscious") || t.includes("no longer continue")) return "ko";
-  if (t.includes("exhausted") || t.includes("exhaustion") || t.includes("tiring") || t.includes("sluggish")) return "exhaust";
-  if (t.includes("devastating") || t.includes("critical") || t.includes("massive") || t.includes("lethal")) return "crit";
-  if (t.includes("counter-attack") || t.includes("riposte")) return "riposte";
-  if (t.includes("initiative") || t.includes("seizes")) return "initiative";
-  if (t.includes("damage") || t.includes("strikes") || t.includes("hits") || t.includes("lands") || t.includes("striking")) return "hit";
-  if (t.includes("miss") || t.includes("parr") || t.includes("dodge") || t.includes("turns") || t.includes("no opening") || t.includes("blocks")) return "miss";
-  return "status";
 }
 
 function getEventIcon(type: ReturnType<typeof classifyEvent>) {
@@ -82,66 +68,20 @@ function getOutcomeStyles(by: FightOutcomeBy) {
 }
 
 export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, by, announcement, isRivalry }: BoutViewerProps) {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState<1 | 2 | 3>(1);
   const [expanded, setExpanded] = useState(true);
   const logEndRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const totalEvents = log.length;
-  const isComplete = visibleCount >= totalEvents;
-  const speedMs = speed === 1 ? 800 : speed === 2 ? 400 : 150;
-
-  const advanceOne = useCallback(() => {
-    setVisibleCount((c) => {
-      const next = Math.min(c + 1, totalEvents);
-      if (next > c) {
-        const latestEvent = log[c];
-        if (latestEvent) {
-          const type = classifyEvent(latestEvent.text);
-          if (type === "hit") audioManager.play("hit");
-          else if (type === "crit") audioManager.play("crit");
-          else if (type === "death") audioManager.play("death");
-          else if (type === "riposte") audioManager.play("clash");
-        }
-      }
-      return next;
-    });
-  }, [totalEvents, log]);
-
-  const reset = useCallback(() => {
-    setIsPlaying(false);
-    setVisibleCount(0);
-  }, []);
-
-  const skipToEnd = useCallback(() => {
-    setIsPlaying(false);
-    setVisibleCount(totalEvents);
-  }, [totalEvents]);
-
-  const togglePlay = useCallback(() => {
-    if (isComplete) {
-      setVisibleCount(0);
-      setIsPlaying(true);
-    } else {
-      setIsPlaying((p) => !p);
-    }
-  }, [isComplete]);
-
-  useEffect(() => {
-    if (isPlaying && !isComplete) {
-      timerRef.current = setTimeout(() => {
-        advanceOne();
-      }, speedMs);
-    }
-    if (isComplete && isPlaying) {
-      setIsPlaying(false);
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isPlaying, visibleCount, isComplete, speedMs, advanceOne]);
+  const {
+    visibleCount,
+    isPlaying,
+    speed,
+    setSpeed,
+    isComplete,
+    totalEvents,
+    reset,
+    skipToEnd,
+    togglePlay,
+  } = useBoutPlayback(log);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -171,6 +111,8 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                   <button
                     onClick={() => setExpanded(!expanded)}
                     className="p-2 rounded-xl bg-neutral-900 border border-white/10 text-muted-foreground hover:text-foreground transition-all hover:border-white/30"
+                    aria-label={expanded ? "Minimize battle log" : "Reveal battle log"}
+                    aria-expanded={expanded}
                   >
                     {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </button>
@@ -277,7 +219,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                 <div className="flex items-center px-4 py-2 rounded-xl bg-black border border-white/5 gap-4">
                    <Tooltip>
                       <TooltipTrigger asChild>
-                         <button onClick={reset} className="text-muted-foreground/40 hover:text-white transition-colors">
+                         <button onClick={reset} className="text-muted-foreground/40 hover:text-white transition-colors" aria-label="Reset bout viewer">
                             <RotateCcw className="h-4 w-4" />
                          </button>
                       </TooltipTrigger>
@@ -292,6 +234,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                        "flex items-center justify-center p-2.5 rounded-full transition-all active:scale-95 group/play",
                        isPlaying ? "bg-white/10 text-white" : "bg-primary text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]"
                      )}
+                     aria-label={isPlaying ? "Pause playback" : "Play bout"}
                    >
                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5 fill-current" />}
                    </button>
@@ -300,7 +243,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                    
                    <Tooltip>
                       <TooltipTrigger asChild>
-                         <button onClick={skipToEnd} className="text-muted-foreground/40 hover:text-white transition-colors">
+                         <button onClick={skipToEnd} className="text-muted-foreground/40 hover:text-white transition-colors" aria-label="Skip to end of bout">
                             <SkipForward className="h-4 w-4" />
                          </button>
                       </TooltipTrigger>
@@ -317,6 +260,8 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                         "px-4 py-1.5 rounded-lg text-[10px] font-mono font-black transition-all",
                         speed === s ? "bg-white/10 text-white" : "text-muted-foreground/20 hover:text-muted-foreground/60"
                       )}
+                      aria-label={`Set playback speed to ${s}x`}
+                      aria-pressed={speed === s}
                     >
                       {s}X
                     </button>
