@@ -7,7 +7,7 @@ export function classifyEvent(event: MinuteEvent | string): "hit" | "miss" | "cr
 
   if (typeof event !== "string") {
     // Check raw events for metadata first
-    const hasCrit = event.events?.some((e: any) => e.metadata?.critical || e.metadata?.lethal);
+    const hasCrit = event.events?.some((e) => e.metadata?.critical || e.metadata?.lethal);
     if (hasCrit) return "crit";
   }
 
