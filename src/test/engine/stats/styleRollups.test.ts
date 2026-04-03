@@ -84,4 +84,95 @@ describe('StyleRollups', () => {
       });
     });
   });
+
+  describe('loadTour (via tournament)', () => {
+    let originalLocalStorage: any;
+
+    beforeEach(() => {
+      originalLocalStorage = globalThis.localStorage;
+      const localStorageMock = {
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+        clear: vi.fn(),
+        removeItem: vi.fn(),
+        length: 0,
+        key: vi.fn(),
+      };
+      Object.defineProperty(globalThis, 'localStorage', {
+        value: localStorageMock,
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(globalThis, 'localStorage', {
+        value: originalLocalStorage,
+        writable: true,
+        configurable: true,
+      });
+      vi.restoreAllMocks();
+    });
+
+    it('returns [] if localStorage is undefined', () => {
+      Object.defineProperty(globalThis, 'localStorage', {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
+      expect(StyleRollups.tournament('tour1')).toEqual([]);
+    });
+
+    it('returns [] if localStorage.getItem returns null', () => {
+      (globalThis.localStorage.getItem as Mock).mockReturnValue(null);
+      expect(StyleRollups.tournament('tour1')).toEqual([]);
+    });
+
+    it('returns [] if localStorage.getItem returns invalid JSON', () => {
+      (globalThis.localStorage.getItem as Mock).mockReturnValue('{ invalid json');
+      expect(StyleRollups.tournament('tour1')).toEqual([]);
+    });
+
+    it('returns [] if localStorage.getItem throws an Error', () => {
+      (globalThis.localStorage.getItem as Mock).mockImplementation(() => {
+        throw new Error('QuotaExceededError');
+      });
+      expect(StyleRollups.tournament('tour1')).toEqual([]);
+    });
+
+    it('returns valid records if localStorage has valid data', () => {
+      const validData = {
+        'tour1': {
+          'Sword': { W: 1, L: 0, K: 0, fights: 1 }
+        }
+      };
+      (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(validData));
+      const result = StyleRollups.tournament('tour1');
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        style: 'Sword',
+        W: 1,
+        L: 0,
+        K: 0,
+        fights: 1,
+        P: 100
+      });
+    });
+
+    it('filters out invalid records', () => {
+      const mixedData = {
+        'tour1': {
+          'Sword': { W: 1, L: 0, K: 0, fights: 1 },
+          'Axe': { invalid: 'data' },
+        },
+        'tour2': {
+           'Spear': { W: 0, L: 1, K: 0, fights: 1 }
+        }
+      };
+      (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(mixedData));
+      const result = StyleRollups.tournament('tour1');
+      expect(result).toHaveLength(1);
+      expect(result[0].style).toBe('Sword');
+    });
+  });
 });
