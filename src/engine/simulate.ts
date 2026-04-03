@@ -64,9 +64,7 @@ export function simulateFight(
   } else {
     const seed = typeof providedRng === "number" 
       ? providedRng 
-      : (typeof globalThis !== "undefined" && (globalThis as any).crypto 
-          ? (globalThis as any).crypto.getRandomValues(new Uint32Array(1))[0] 
-          : Math.floor(Math.random() * 0xFFFFFFFF));
+      : crypto.getRandomValues(new Uint32Array(1))[0];
     rng = mulberry32(seed);
   }
 
