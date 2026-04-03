@@ -22,6 +22,7 @@ import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
 import { IntelligenceHubWidget } from "@/components/dashboard/IntelligenceHubWidget";
 import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
 import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
+import { WeatherWidget } from "@/components/widgets/WeatherWidget";
 
 // ─── Crowd Mood Meter ──────────────────────────────────────────────────────
 
@@ -190,6 +191,7 @@ export default function ArenaHub() {
         {/* Tactical Feed Side Pane */}
         <div className="lg:col-span-4 space-y-8">
            <CrowdMoodWidget />
+           <WeatherWidget />
            <MetaDriftWidget />
            
            <Surface variant="glass" className="p-6 space-y-6 bg-gradient-to-br from-white/[0.01] to-white/[0.03]">

@@ -7,7 +7,7 @@ import { createFreshState } from "@/state/gameStore";
 import * as Training from "@/engine/training";
 import * as Economy from "@/engine/economy";
 import * as Aging from "@/engine/aging";
-import * as Health from "@/engine/pipeline/health";
+import * as Health from "@/engine/health";
 import * as Impacts from "@/engine/impacts";
 
 // Mock engine modules
@@ -24,8 +24,9 @@ vi.mock("@/engine/aging", () => ({
   computeAgingImpact: vi.fn(() => ({})) 
 }));
 
-vi.mock("@/engine/pipeline/health", () => ({ 
-  computeHealthImpact: vi.fn(() => ({})) 
+vi.mock("@/engine/health", () => ({ 
+  computeHealthImpact: vi.fn(() => ({})),
+  applyHealthUpdates: vi.fn((state) => state)
 }));
 
 vi.mock("@/engine/impacts", () => ({

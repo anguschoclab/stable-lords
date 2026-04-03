@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AgentReasoningWidget } from "./AgentReasoningWidget";
 
 export function IntelligenceHubWidget() {
   const { state } = useGameStore();
@@ -61,6 +62,12 @@ export function IntelligenceHubWidget() {
                 className="bg-transparent border-none p-0 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 data-[state=active]:text-arena-gold data-[state=active]:shadow-none relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-arena-gold after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
               >
                 Intelligence_Reports
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reasoning" 
+                className="bg-transparent border-none p-0 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 data-[state=active]:text-primary data-[state=active]:shadow-none relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+              >
+                Cognitive_Sync
               </TabsTrigger>
             </TabsList>
           </div>
@@ -136,6 +143,14 @@ export function IntelligenceHubWidget() {
                     ))}
                   </div>
                 )}
+                <div className="h-6" />
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="reasoning" className="m-0 h-full">
+              <ScrollArea className="h-72 px-6">
+                <div className="py-6">
+                  <AgentReasoningWidget />
+                </div>
                 <div className="h-6" />
               </ScrollArea>
             </TabsContent>

@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { generateMatchCard, addRestState, clearExpiredRest, runAIvsAIBouts } from '../engine/matchmaking';
+import { generateMatchCard } from '../engine/matchmaking/bracketEngine';
+import { addRestState, clearExpiredRest } from '../engine/matchmaking/historyLogic';
+import { runAIvsAIBouts } from '../engine/matchmaking/rivalScheduler';
 import type { GameState, Warrior, RivalStableData, RestState, Rivalry, MatchRecord } from '../types/game';
 import type { InjuryData } from '../../src/types/game';
 

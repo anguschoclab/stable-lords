@@ -1,6 +1,6 @@
 import { type GameState, type Warrior, type InjuryData } from "@/types/game";
 import { tickInjuries } from "@/engine/injuries";
-import { clearExpiredRest } from "@/engine/matchmaking";
+import { clearExpiredRest } from "@/engine/matchmaking/historyLogic";
 import { type StateImpact } from "./impacts";
 
 /**

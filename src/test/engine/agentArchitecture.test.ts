@@ -37,14 +37,55 @@ describe("AI Agent Architecture - Skeptical Intent", () => {
   });
 
   it("should NOT disprove if personality is Aggressive despite low gold (higher risk tolerance)", () => {
-    // Wait, the current implementation of verifyIntentSkepticism uses a hard threshold of 150 gold.
-    // Let's verify that too.
     const aggressiveRival = { 
       ...mockRival, 
       owner: { id: "r1", personality: "Aggressive" } as unknown,
       gold: 140 
     } as RivalStableData;
     const isDisproved = verifyIntentSkepticism(aggressiveRival, mockState);
-    expect(isDisproved).toBe(true); // Aggressive still respects the absolute "Bankruptcy" floor of 150 for non-RECOVERY plans.
+    expect(isDisproved).toBe(true); 
+  });
+});
+
+import { verifyBoutAcceptance } from "@/engine/ai/workers/competitionWorker";
+import { type Warrior, type WeatherType } from "@/types/game";
+
+describe("AI Agent Architecture - Weather Skepticism", () => {
+  const lungeWarrior = { 
+    id: "w1", 
+    name: "Lunge Buster", 
+    style: "LungingAttack", 
+    attributes: { CON: 10 } 
+  } as unknown as Warrior;
+  
+  const tankWarrior = { 
+    id: "w2", 
+    name: "Iron Wall", 
+    style: "Guard", 
+    attributes: { CON: 60 } 
+  } as unknown as Warrior;
+
+  const mockRival = { gold: 500 } as RivalStableData;
+
+  it("should decline a bout for LungingAttack in Rainy weather", () => {
+    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Rainy");
+    expect(decision.accepted).toBe(false);
+    expect(decision.reason).toContain("Precision penalty");
+  });
+
+  it("should accept a bout for LungingAttack in Clear weather", () => {
+    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Clear");
+    expect(decision.accepted).toBe(true);
+  });
+
+  it("should decline a bout for low CON warrior in Scalding weather", () => {
+    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Scalding");
+    expect(decision.accepted).toBe(false);
+    expect(decision.reason).toContain("Heatstroke");
+  });
+
+  it("should accept a bout for high CON warrior in Scalding weather", () => {
+    const decision = verifyBoutAcceptance(mockRival, tankWarrior, lungeWarrior, mockRival, "Scalding");
+    expect(decision.accepted).toBe(true);
   });
 });

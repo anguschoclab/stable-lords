@@ -63,12 +63,7 @@ export default function RunRound() {
       ...updatedState,
       phase: "resolution",
       pendingResolutionData: {
-        bouts: processed.results.map(r => ({
-          a: r.a.name,
-          d: r.d.name,
-          winner: r.outcome.winner,
-          by: r.outcome.by
-        })),
+        bouts: processed.results,
         deaths: processed.summary.deathNames,
         injuries: processed.summary.injuryNames,
         promotions: playerPromotions,

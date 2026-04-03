@@ -365,7 +365,13 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const iniA = fA.skills.INI + alIniMod(finalAL_A) + ctx.matchupA + fatA + defModsA.iniBonus + tempoA + passiveA.iniBonus - fA.legHits + weatherIniA;
   const iniD = fD.skills.INI + alIniMod(finalAL_D) + ctx.matchupD + fatD + defModsD.iniBonus + tempoD + passiveD.iniBonus - fD.legHits + weatherIniD;
   
-  const { aGoesFirst, attacker, defender, attLabel, defLabel } = resolveInitiative(rng, fA, fD, iniA, iniD);
+  const { aGoesFirst, attacker, defender, attLabel, defLabel } = resolveInitiative(rng, fA, fD, iniA, iniD) as { 
+    aGoesFirst: boolean; 
+    attacker: FighterState; 
+    defender: FighterState; 
+    attLabel: "A" | "D"; 
+    defLabel: "A" | "D" 
+  };
 
   events.push({ type: "INITIATIVE", actor: attLabel, value: aGoesFirst ? iniA : iniD, result: true });
 

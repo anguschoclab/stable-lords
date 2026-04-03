@@ -6,6 +6,7 @@ import {
   type MinuteEvent,
   type TrainerData,
   type DeathCauseBucket,
+  type WeatherType,
 } from "@/types/game";
 import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
 import { mulberry32, getPhase as getCombatPhase } from "./combat/combatMath";

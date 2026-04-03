@@ -21,6 +21,16 @@ import { partialRefreshPool } from "@/engine/recruitment";
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 export function computeNextSeason(newWeek: number): Season { return SEASONS[Math.floor((newWeek - 1) / 13) % 4]; }
 
+import { type WeatherType } from "@/types/game";
+export function rollWeather(rng: () => number): WeatherType {
+  const roll = rng();
+  if (roll < 0.6) return "Clear";
+  if (roll < 0.75) return "Overcast";
+  if (roll < 0.85) return "Rainy";
+  if (roll < 0.95) return "Scalding";
+  return "Drafty";
+}
+
 export function processRivalActions(state: GameState, newWeek: number): GameState {
   const rng = seededRng(newWeek * 7919 + 13);
   const currentRivals = [...(state.rivals || [])];
@@ -82,7 +92,11 @@ export function advanceWeek(state: GameState): GameState {
   newState = processTierProgression(newState, nextSeason, nextWeek);
   newState = processRivalActions(newState, nextWeek);
 
-  newState = { ...newState, week: nextWeek, season: nextSeason, trainingAssignments: [] };
+  // ⚡ World Expansion: Roll next week's weather
+  const weatherRng = seededRng(nextWeek * 1337 + 42);
+  const nextWeather = rollWeather(() => weatherRng());
+
+  newState = { ...newState, week: nextWeek, season: nextSeason, trainingAssignments: [], weather: nextWeather };
 
   return archiveWeekLogs(newState);
 }
