@@ -156,7 +156,7 @@ export function runAIvsAIBouts(state: GameState): { results: AIBoutResult[]; upd
       stableD.strategy?.intent
     );
 
-    const outcome = simulateFight(planA, planD, a.warrior, d.warrior, undefined, state.trainers);
+    const outcome = simulateFight(planA, planD, a.warrior, d.warrior, undefined, state.trainers, state.weather);
     const isKill = outcome.by === "Kill";
     const winnerSide = outcome.winner;
     const isRivalryBout = rivalryMap.has(getStablePairKey(a.stableId, d.stableId));

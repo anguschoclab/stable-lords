@@ -127,7 +127,8 @@ export function resolveBout(
     currentW, 
     currentO, 
     undefined, 
-    state.trainers
+    state.trainers,
+    state.weather
   );
   
   const tags = outcome.post?.tags ?? [];

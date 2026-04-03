@@ -35,5 +35,37 @@ export const applySeasonalUpdates: (state: GameState) => GameState = (state) => 
     s.newsletter = [...(s.newsletter || []), { week: s.week, title: "Strategy Shifts", items: philResult.gazetteItems }];
   }
 
+  // Weather System
+  const weathers: import("@/types/game").WeatherType[] = ["Clear", "Blazing Sun", "Heavy Rain", "Fog", "Snow"];
+  s.weather = weathers[Math.floor(Math.random() * weathers.length)];
+
+  // Tavern Brawl (Off-season spontaneous event)
+  if (Math.random() < 0.20 && s.roster && s.roster.length > 0) {
+    const brawlIdx = Math.floor(Math.random() * s.roster.length);
+    const brawler = s.roster[brawlIdx];
+
+    brawler.fame = (brawler.fame || 0) + 2;
+    brawler.popularity = (brawler.popularity || 0) + 1;
+
+    const injuryId = typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2);
+
+    brawler.injuries.push({
+      id: injuryId,
+      name: "Brawl Bruises",
+      description: "Got into a minor scuffle at the tavern.",
+      severity: "Minor",
+      weeksRemaining: 2,
+      penalties: { ST: -1 }
+    } as import("@/types/game").InjuryData);
+
+    s.newsletter = [...(s.newsletter || []), {
+      week: s.week,
+      title: "Tavern Brawl",
+      items: [`${brawler.name} was caught in a minor tavern brawl! They gained some local notoriety but suffered minor bruises (-1 ST for 2 weeks).`]
+    }];
+  }
+
   return { ...s, week: newWeek, season: newSeason };
 };

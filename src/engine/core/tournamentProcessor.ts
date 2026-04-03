@@ -63,7 +63,7 @@ export function processTournamentRound(state: GameState, tournamentId: string): 
 
     const planA = wA.plan ?? defaultPlanForWarrior(wA);
     const planD = wD.plan ?? defaultPlanForWarrior(wD);
-    const outcome = simulateFight(planA, planD, wA, wD, undefined, updatedState.trainers);
+    const outcome = simulateFight(planA, planD, wA, wD, undefined, updatedState.trainers, updatedState.weather);
 
     bout.winner = outcome.winner;
     bout.by = outcome.by;
