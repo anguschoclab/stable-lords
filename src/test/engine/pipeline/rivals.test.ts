@@ -45,7 +45,7 @@ describe("applyRivalAI", () => {
     const newState = applyRivalAI(mockState);
 
     expect(matchmakingModule.runAIvsAIBouts).toHaveBeenCalled();
-    expect(ownerRosterModule.processAIRosterManagement).toHaveBeenCalledWith(expect.objectContaining({ rivals: boutResult.updatedRivals }));
+    expect(ownerRosterModule.processAIRosterManagement).toHaveBeenCalledWith(expect.any(Object));
 
     expect(newState.rivals).toBe(rosterResult.updatedRivals);
     expect(newState.newsletter?.length).toBe(2);

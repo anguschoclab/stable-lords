@@ -27,7 +27,7 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
 
   const promotionNews: string[] = [];
   const updatedRivals = (state.rivals || []).map(r => {
-    let stats: TierStats = { totalWins: 0, totalKills: 0, totalFights: 0, activeCount: 0 };
+    const stats: TierStats = { totalWins: 0, totalKills: 0, totalFights: 0, activeCount: 0 };
     for (let i = 0; i < r.roster.length; i++) {
       const w = r.roster[i];
       stats.totalWins += w.career.wins;
