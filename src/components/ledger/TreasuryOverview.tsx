@@ -18,13 +18,15 @@ export function TreasuryOverview() {
   const gold = state.gold ?? 0;
   
   const activeWarriors = (state.roster ?? []).filter(w => w.status === "Active");
-  const { wins: totalWins, kills: totalKills } = (state.roster ?? []).reduce(
-    (acc, w) => ({
-      wins: acc.wins + (w.career.wins ?? 0),
-      kills: acc.kills + (w.career.kills ?? 0),
-    }),
-    { wins: 0, kills: 0 }
-  );
+
+  // ⚡ Bolt: Fast accumulation without allocating objects per iteration
+  let totalWins = 0;
+  let totalKills = 0;
+  const roster = state.roster ?? [];
+  for (let i = 0; i < roster.length; i++) {
+    totalWins += roster[i].career.wins ?? 0;
+    totalKills += roster[i].career.kills ?? 0;
+  }
 
   const recentLedger = (state.ledger ?? []).slice(-15).reverse();
 
