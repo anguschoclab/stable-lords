@@ -96,7 +96,7 @@ describe("Economy Engine", () => {
           winner: "A",
           loser: "D",
           aInjuries: [], dInjuries: [], type: "Standard"
-        } as unknown,
+        } as unknown as FightSummary,
         {
           id: "f1", week: 5, season: "Spring",
           a: "Alice", d: "Enemy 1",
