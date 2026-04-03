@@ -350,7 +350,7 @@ async function runDailySimulation() {
     report += `- **Economy Issue:** High inflation. **Recommendation:** Lower \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${Math.max(10, FIGHT_PURSE - 25)}, and \`WIN_BONUS\` from ${WIN_BONUS} to ${Math.max(10, WIN_BONUS - 15)} in \`src/engine/economy.ts\` to curb hyper-inflation.\n`;
   } else if (inflationRatio < 0.5) {
     needsChanges = true;
-    report += `- **Economy Issue:** Negative economy balance. **Recommendation:** Increase \`FIGHT_PURSE\` by 25 or lower \`WARRIOR_UPKEEP\` by 10 in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
+    report += `- **Economy Issue:** Negative economy balance. **Recommendation:** Increase \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${FIGHT_PURSE + 25} or lower \`WARRIOR_UPKEEP\` from ${WARRIOR_UPKEEP} to ${Math.max(0, WARRIOR_UPKEEP - 10)} in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
   }
 
   if (killRateNum < 8.0) {
