@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon } from "lucide-react";
+import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim } from "lucide-react";
 import { useGameStore } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Progress } from "@/components/ui/progress";
@@ -24,6 +24,29 @@ export function SeasonWidget() {
   const phaseDesc = week <= 4 ? "Early season scouting and roster consolidation." : 
                     week <= 9 ? "Intense divisional rivalries and meta-drift analysis." : 
                     "Final championship qualification and legendary bouts.";
+
+  const weather = state.weather || "Clear";
+  let WeatherIcon = Sun;
+  let weatherColor = "text-yellow-500";
+  let weatherBg = "bg-yellow-500/10 border-yellow-500/20";
+
+  if (weather === "Rainy") {
+    WeatherIcon = CloudRain;
+    weatherColor = "text-blue-500";
+    weatherBg = "bg-blue-500/10 border-blue-500/20";
+  } else if (weather === "Scalding") {
+    WeatherIcon = Sun;
+    weatherColor = "text-orange-500";
+    weatherBg = "bg-orange-500/10 border-orange-500/20";
+  } else if (weather === "Overcast") {
+    WeatherIcon = Cloud;
+    weatherColor = "text-gray-400";
+    weatherBg = "bg-gray-400/10 border-gray-400/20";
+  } else if (weather === "Drafty") {
+    WeatherIcon = Wind;
+    weatherColor = "text-cyan-400";
+    weatherBg = "bg-cyan-400/10 border-cyan-400/20";
+  }
 
   return (
     <Surface variant="glass" className="h-full border-border/10 group overflow-hidden relative p-0">
@@ -99,11 +122,22 @@ export function SeasonWidget() {
                 </TooltipContent>
              </Tooltip>
 
-             <div className="flex flex-col gap-1 text-right">
-                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-40">System_Status</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center justify-end gap-2">
-                   SYNCED <Sparkles className="h-2.5 w-2.5 animate-pulse" />
-                </span>
+             <div className="flex flex-col gap-1 items-end text-right">
+                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Weather_Condition</span>
+                <Tooltip>
+                   <TooltipTrigger asChild>
+                      <Badge variant="outline" className={cn("text-[9px] font-mono font-black uppercase tracking-widest gap-1 mt-1 cursor-help", weatherBg, weatherColor)}>
+                         <WeatherIcon className="h-3 w-3" />
+                         {weather}
+                      </Badge>
+                   </TooltipTrigger>
+                   <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest max-w-[200px]">
+                      {weather === "Scalding" ? "20% more stamina drain in combat." :
+                       weather === "Drafty" ? "10% less stamina drain in combat." :
+                       weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
+                       "Standard atmospheric conditions."}
+                   </TooltipContent>
+                </Tooltip>
              </div>
           </div>
         </div>

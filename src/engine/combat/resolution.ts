@@ -406,7 +406,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   if (!attackSuccess) {
     events.push({ type: "ATTACK", actor: attLabel, result: "WHIFF" });
     attacker.consecutiveHits = 0;
-    attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, aGoesFirst ? effAL_A : effAL_D) * 0.5)) + attOffMods.endCost;
+    attacker.endurance -= Math.max(1, Math.floor(enduranceCost(attOE, aGoesFirst ? effAL_A : effAL_D, ctx.weather) * 0.5)) + attOffMods.endCost;
 
     const defAntiSynRip = Math.round((defAntiSyn.defMult - 1) * 3);
     const ripCheck = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_WHIFF_PENALTY + defDefMods.ripBonus + defPassive.ripBonus + defAntiSynRip);
@@ -437,8 +437,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const attWepEndMult = attLabel === "A" ? ctx.weaponReqA.endurancePenalty : ctx.weaponReqD.endurancePenalty;
   const defWepEndMult = defLabel === "A" ? ctx.weaponReqA.endurancePenalty : ctx.weaponReqD.endurancePenalty;
 
-  const attCost = Math.round(enduranceCost(attOE, attAL) * attEndurMult * attWepEndMult);
-  const defCost = Math.max(1, Math.round(enduranceCost(defOE, defAL) * DEFENDER_ENDURANCE_DISCOUNT * defEndurMult * defWepEndMult));
+  const attCost = Math.round(enduranceCost(attOE, attAL, ctx.weather) * attEndurMult * attWepEndMult);
+  const defCost = Math.max(1, Math.round(enduranceCost(defOE, defAL, ctx.weather) * DEFENDER_ENDURANCE_DISCOUNT * defEndurMult * defWepEndMult));
   
   attacker.endurance -= attCost;
   defender.endurance -= defCost;

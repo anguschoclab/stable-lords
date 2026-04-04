@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { computeHealthImpact, applyHealthUpdates } from "@/engine/health";
 import { type GameState, type Warrior, type InjuryData } from "@/types/game";
 import * as injuriesModule from "@/engine/injuries";

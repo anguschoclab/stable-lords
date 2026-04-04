@@ -30,11 +30,13 @@ describe('StyleRollups', () => {
 
     afterEach(() => {
       // Restore original
-      Object.defineProperty(globalThis, 'localStorage', {
-        value: originalLocalStorage,
-        writable: true,
-        configurable: true,
-      });
+      if (originalLocalStorage) {
+        Object.defineProperty(globalThis, 'localStorage', {
+          value: originalLocalStorage,
+          writable: true,
+          configurable: true,
+        });
+      }
       vi.restoreAllMocks();
     });
 
@@ -204,11 +206,13 @@ describe('StyleRollups', () => {
     });
 
     afterEach(() => {
-      Object.defineProperty(globalThis, 'localStorage', {
-        value: originalLocalStorage,
-        writable: true,
-        configurable: true,
-      });
+      if (originalLocalStorage) {
+        Object.defineProperty(globalThis, 'localStorage', {
+          value: originalLocalStorage,
+          writable: true,
+          configurable: true,
+        });
+      }
       vi.restoreAllMocks();
     });
 

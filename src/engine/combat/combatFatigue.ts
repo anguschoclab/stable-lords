@@ -3,6 +3,8 @@
  * Single source of truth for fatigue mechanics used by simulate.ts.
  */
 
+import { weatherStaminaModifier } from "./combatMath";
+
 // Endurance scaling
 const ENDURANCE_OE_SCALING = 0.4;
 const ENDURANCE_AL_SCALING = 0.2;
@@ -15,8 +17,10 @@ const FATIGUE_HEAVY_THRESHOLD = 0.45; // Adjusted to align with a harsher stamin
 const FATIGUE_MODERATE_PENALTY = -6; // Harsher penalty to punish sub-optimal pacing
 const FATIGUE_HEAVY_PENALTY = -15; // Brutal penalty to represent severe exhaustion in the arena
 
-export function enduranceCost(oe: number, al: number): number {
-  return Math.floor(oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING);
+export function enduranceCost(oe: number, al: number, weather?: string): number {
+  const baseCost = oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING;
+  const weatherMod = weatherStaminaModifier(weather);
+  return Math.floor(baseCost * weatherMod);
 }
 
 export function fatiguePenalty(endurance: number, maxEndurance: number): number {

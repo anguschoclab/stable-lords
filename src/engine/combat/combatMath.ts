@@ -49,3 +49,18 @@ export function contestCheck(
   const rollD = Math.floor(rng() * 20) + 1 + d + modD;
   return rollA > rollD;
 }
+
+export function weatherStaminaModifier(weather?: string): number {
+  if (!weather) return 1.0;
+  switch (weather) {
+    case "Scalding":
+      return 1.2; // 20% more stamina drain
+    case "Drafty":
+      return 0.9; // 10% less stamina drain
+    case "Overcast":
+    case "Clear":
+    case "Rainy":
+    default:
+      return 1.0;
+  }
+}
