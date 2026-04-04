@@ -8,7 +8,7 @@ import { generateId } from "@/utils/idUtils";
  */
 
 export function runEventPass(state: GameState, nextWeek: number): GameState {
-  let nextState = { ...state };
+  const nextState = { ...state };
   const brawlRng = seededRng(nextWeek * 999 + 1);
   
   // 🍺 Tavern Brawl Event
