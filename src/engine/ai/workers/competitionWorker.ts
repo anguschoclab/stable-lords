@@ -1,7 +1,8 @@
-import { type RivalStableData, type Warrior, type WeatherType } from "@/types/state.types";
+import { type GameState, type Warrior, type RivalStableData, type BoutOffer, type WeatherType } from "@/types/state.types";
 import { type CrowdMood } from "../../crowdMood";
 import { FightingStyle } from "@/types/shared.types";
 import { logAgentAction } from "../agentCore";
+import { respondToBoutOffer } from "@/state/mutations/contractMutations";
 
 /**
  * CompetitionWorker: Handles boutique reasoning, tournament entry, and matchmaking bids.
@@ -26,6 +27,7 @@ export function generateBoutBids(
 ): { bids: BoutBid[]; updatedRival: RivalStableData } {
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
   const activeRoster = rival.roster.filter(w => w.status === "Active");
+  const news: string[] = [];
   const bids: BoutBid[] = [];
 
   for (const warrior of activeRoster) {
@@ -92,7 +94,8 @@ export function verifyBoutAcceptance(
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
   
   // ⚡ Weather Skepticism
-  if (weather === "Rainy" && warrior.style === "LungingAttack") {
+  const isLunger = warrior.style === FightingStyle.LungingAttack;
+  if (weather === "Rainy" && isLunger) {
     return { accepted: false, reason: "Precision penalty in rain." };
   }
 
@@ -121,4 +124,55 @@ export function verifyBoutAcceptance(
   }
 
   return { accepted: true };
+}
+/**
+ * Validates whether a rival stable should accept a bout offer.
+ * Incorporates strategy (EXPANSION/CONSOLIDATION) and warrior health.
+ */
+export function evaluateBoutOffer(
+  state: GameState,
+  offer: BoutOffer,
+  rival: RivalStableData,
+  warrior: Warrior
+): "Accepted" | "Declined" {
+  // 1. Health Guard: Protective owners decline if HP < 80%
+  const currentHP = warrior.derivedStats?.hp ?? 100;
+  if (currentHP < 80 && rival.owner.personality !== "Aggressive") {
+    return "Declined";
+  }
+
+  // 2. Personality Logic
+  const personality = rival.owner.personality;
+  const hype = offer.hype;
+  const purse = offer.purse;
+
+  if (personality === "Aggressive" && (hype > 120 || purse > 500)) return "Accepted";
+  if (personality === "Methodical" && currentHP < 95) return "Declined";
+  if (personality === "Showman" && hype > 130) return "Accepted";
+  if (personality === "Pragmatic" && purse > 400) return "Accepted";
+
+  // Default: Accept if reasonable
+  return "Accepted";
+}
+
+/**
+ * AI Decision Engine — processes all pending offers for a rival stable.
+ */
+export function processRivalBoutOffers(state: GameState, rival: RivalStableData): GameState {
+  let currentState = state;
+  const pendingOffers = Object.values(state.boutOffers).filter(o => 
+    o.status === "Proposed" && 
+    o.warriorIds.some(id => rival.roster.some(w => w.id === id)) &&
+    o.responses[rival.roster.find(w => o.warriorIds.includes(w.id))?.id || ""] === "Pending"
+  );
+
+  pendingOffers.forEach(offer => {
+    const rivalWarrior = rival.roster.find(w => offer.warriorIds.includes(w.id));
+    if (rivalWarrior) {
+      const response = evaluateBoutOffer(state, offer, rival, rivalWarrior);
+      currentState = respondToBoutOffer(currentState, offer.id, rivalWarrior.id, response);
+    }
+  });
+
+  return currentState;
 }

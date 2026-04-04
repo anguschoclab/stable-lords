@@ -15,6 +15,9 @@ import { runWarriorPass } from "../passes/WarriorPass";
 import { runWorldPass } from "../passes/WorldPass";
 import { runRivalStrategyPass } from "../passes/RivalStrategyPass";
 import { runEventPass } from "../passes/EventPass";
+import { runRankingsPass } from "../passes/RankingsPass";
+import { runPromoterPass } from "../passes/PromoterPass";
+import { runPromoterLifecyclePass } from "../passes/PromoterLifecyclePass";
 
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeEconomyImpact } from "@/engine/economy";
@@ -49,6 +52,10 @@ export function advanceWeek(state: GameState): GameState {
   newState = runWorldPass(newState);
   const nextSeason = newState.season;
 
+  // 2.1 — Global Rankings & Promoter Logic
+  newState = runRankingsPass(newState);
+  newState = runPromoterPass(newState);
+
   // 3. Recruitment & Administrative Churn
   const usedNames = new Set<string>();
   newState.roster.forEach(w => usedNames.add(w.name));
@@ -70,6 +77,9 @@ export function advanceWeek(state: GameState): GameState {
   if (trainerNews.length > 0) {
     newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: "Trainer Career Updates", items: trainerNews }];
   }
+
+  // 5.1 — Promoter Careers & Succession
+  newState = runPromoterLifecyclePass(newState);
 
   // 6. Seasonal Adaptation (Narrative, Philosophy, and Churn)
   if (nextSeason !== state.season) {

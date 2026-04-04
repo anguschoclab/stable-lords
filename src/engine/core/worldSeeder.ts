@@ -6,6 +6,8 @@ import { generateHiringPool } from "@/engine/trainers";
 import { SeededRNG } from "@/utils/random";
 import { FightingStyle } from "@/types/shared.types";
 
+import { generatePromoters } from "@/engine/promoters/promoterGenerator";
+
 /**
  * Seed the world with initial rivals, recruits, and a starter player roster.
  * Bypasses the FTUE for headless simulation.
@@ -17,6 +19,9 @@ export function populateInitialWorld(state: GameState, seed: number): GameState 
   // 1. Generate Rivals (45 stables for the fluid population target)
   const rivals = generateRivalStables(45, seed + 1);
   rivals.forEach(r => r.roster.forEach(w => usedNames.add(w.name)));
+
+  // 1.1 Generate Promoters (30 for the tiered system)
+  const promoters = generatePromoters(30, seed + 3);
 
   // 2. Generate Initial Recruit Pool
   const recruitPool = generateRecruitPool(12, 1, usedNames, seed + 2);
@@ -47,6 +52,9 @@ export function populateInitialWorld(state: GameState, seed: number): GameState 
   return {
     ...state,
     rivals,
+    promoters, // Seeded Promoters
+    boutOffers: {},
+    realmRankings: {},
     recruitPool,
     hiringPool: generateHiringPool(8, seed + 100),
     roster: playerRoster,

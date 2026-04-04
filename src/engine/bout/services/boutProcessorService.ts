@@ -1,4 +1,5 @@
-import { GameState, Warrior, FightOutcome } from "@/types/game";
+import { GameState, Warrior, BoutOffer } from "@/types/state.types";
+import { type FightOutcome } from "@/types/combat.types";
 import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
 import { updateRivalriesFromBouts } from "@/engine/matchmaking/rivalryLogic";
@@ -6,6 +7,7 @@ import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
 import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { engineEventBus } from "@/engine/core/EventBus";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
+import { updatePromoterHistory } from "@/state/mutations/promoterMutations";
 
 import { applyRecords } from "../recordHandler";
 import { handleDeath } from "../mortalityHandler";
@@ -14,10 +16,10 @@ import { handleProgressions } from "../progressionHandler";
 import { handleReporting } from "../reportingHandler";
 import { generatePairings, BoutPairing } from "../core/pairings";
 
-export interface BoutResult { a: Warrior; d: Warrior; outcome: FightOutcome; announcement?: string; isRivalry: boolean; rivalStable?: string; }
+export interface BoutResult { a: Warrior; d: Warrior; outcome: FightOutcome; announcement?: string; isRivalry: boolean; rivalStable?: string; contractId?: string; }
 export interface BoutImpact { state: GameState; result: BoutResult; stats: { death: boolean; playerDeath: boolean; injured: boolean; deathNames: string[]; injuredNames: string[]; }; }
 export interface WeekBoutSummary { bouts: number; deaths: number; injuries: number; deathNames: string[]; injuryNames: string[]; hadPlayerDeath: boolean; hadRivalryEscalation: boolean; }
-export interface BoutContext { warriorMap: Map<string, Warrior>; warrior: Warrior; opponent: Warrior; isRivalry: boolean; rivalStable?: string; rivalStableId?: string; moodMods: ReturnType<typeof getMoodModifiers>; week: number; playerId: string; }
+export interface BoutContext { warriorMap: Map<string, Warrior>; warrior: Warrior; opponent: Warrior; isRivalry: boolean; rivalStable?: string; rivalStableId?: string; moodMods: ReturnType<typeof getMoodModifiers>; week: number; playerId: string; contract?: BoutOffer; }
 
 /** Simple FNV-1a hash for deterministic seeds from IDs */
 function hashStr(s: string): number {
@@ -30,11 +32,11 @@ function hashStr(s: string): number {
 }
 
 export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
-  const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, warriorMap } = ctx;
+  const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, warriorMap, contract } = ctx;
   const currentW = warriorMap.get(warrior.id);
   const currentO = warriorMap.get(opponent.id);
 
-  if (!currentW || currentW.status !== "Active" || !currentO) return { state, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as any, isRivalry, rivalStable }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
+  if (!currentW || currentW.status !== "Active" || !currentO) return { state, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as any, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
 
   // 🛡️ Determinism: Generate a unique seed for this specific bout
   const boutSeed = hashStr(`${week}|${currentW.id}|${currentO.id}`);
@@ -49,6 +51,40 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   const popD = Math.round(rawFameD.pop * moodMods.popMultiplier);
 
   let s = { ...state };
+  
+  // 💰 Apply Contract Payouts
+  if (contract) {
+    const winnerId = outcome.winner === "A" ? currentW.id : outcome.winner === "D" ? currentO.id : null;
+    const purse = contract.purse;
+    const showFee = Math.floor(purse * 0.2);
+
+    // Winner gets full purse, Loser gets show fee
+    if (winnerId === currentW.id) {
+       s.gold += purse;
+       // If D is a rival, give them show fee
+       if (rivalStableId) {
+         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, gold: r.gold + showFee } : r);
+       }
+    } else if (winnerId === currentO.id) {
+       if (rivalStableId) {
+         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, gold: r.gold + purse } : r);
+       }
+       s.gold += showFee;
+    } else {
+       // Draw: both get show fee
+       s.gold += showFee;
+       if (rivalStableId) {
+         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, gold: r.gold + showFee } : r);
+       }
+    }
+    
+    // Update Promoter History
+    s = updatePromoterHistory(s, contract.promoterId, purse, `bout_${week}_${currentW.id}_vs_${currentO.id}`);
+    
+    // Close the contract
+    delete s.boutOffers[contract.id];
+  }
+
   s = applyRecords(s, currentW, currentO, outcome, tags, fameA, popA, fameD, popD, rivalStableId);
   const deathRes = handleDeath(s, currentW, currentO, outcome, week, tags, rivalStableId);
   s = deathRes.s;
@@ -60,11 +96,47 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   s.arenaHistory = [...s.arenaHistory, summary];
   engineEventBus.emit({ type: 'BOUT_COMPLETED', payload: { summary, transcript: summary.transcript } });
 
-  return { state: s, result: { a: warrior, d: opponent, outcome, announcement, isRivalry, rivalStable }, stats: { death: deathRes.death, playerDeath: deathRes.playerDeath, injured: injuryRes.injured, deathNames: deathRes.deathNames, injuredNames: injuryRes.injuredNames } };
+  return { state: s, result: { a: warrior, d: opponent, outcome, announcement, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: deathRes.death, playerDeath: deathRes.playerDeath, injured: injuryRes.injured, deathNames: deathRes.deathNames, injuredNames: injuryRes.injuredNames } };
+}
+
+export function processWeekBouts(state: GameState): { state: GameState; results: BoutResult[]; summary: WeekBoutSummary } {
+  const warriorMap = new Map<string, Warrior>();
+  state.roster.forEach(w => warriorMap.set(w.id, w));
+  (state.rivals || []).forEach(r => r.roster.forEach(w => warriorMap.set(w.id, w)));
+
+  const pairings = generatePairings(state);
+  const moodMods = getMoodModifiers(state.crowdMood as any);
+
+  let s = { ...state };
+  const results: BoutResult[] = [];
+  const summary: WeekBoutSummary = { bouts: 0, deaths: 0, injuries: 0, deathNames: [], injuryNames: [], hadPlayerDeath: false, hadRivalryEscalation: false };
+
+  pairings.forEach(p => {
+    const contract = p.contractId ? s.boutOffers[p.contractId] : undefined;
+    const res = resolveBout(s, { 
+      warrior: p.a, 
+      opponent: p.d, 
+      isRivalry: p.isRivalry, 
+      rivalStable: p.rivalStable, 
+      rivalStableId: p.rivalStableId, 
+      moodMods, 
+      week: s.week, 
+      playerId: s.player.id, 
+      warriorMap,
+      contract
+    });
+    s = res.state;
+    results.push(res.result);
+    accumulateWeekStats(summary, res);
+  });
+
+  finalizeWeekSideEffects(s, results);
+  return { state: s, results, summary };
 }
 
 function processSingleBout(s: GameState, p: BoutPairing, moodMods: any, warriorMap: Map<string, Warrior>): BoutImpact {
-  return resolveBout(s, { warrior: p.a, opponent: p.d, isRivalry: p.isRivalry, rivalStable: p.rivalStable, rivalStableId: p.rivalStableId, moodMods, week: s.week, playerId: s.player.id, warriorMap });
+  const contract = p.contractId ? s.boutOffers[p.contractId] : undefined;
+  return resolveBout(s, { warrior: p.a, opponent: p.d, isRivalry: p.isRivalry, rivalStable: p.rivalStable, rivalStableId: p.rivalStableId, moodMods, week: s.week, playerId: s.player.id, warriorMap, contract });
 }
 
 function accumulateWeekStats(summary: WeekBoutSummary, res: BoutImpact) {
@@ -86,29 +158,4 @@ function finalizeWeekSideEffects(s: GameState, results: BoutResult[]) {
   s.gazettes = [...(s.gazettes || []), generateWeeklyGazette(weekFights, s.crowdMood, s.week, s.graveyard, s.arenaHistory, gazetteSeed)];
   s.rivalries = updateRivalriesFromBouts(s.rivalries || [], weekFights, s.week, s.week * 13);
   NewsletterFeed.closeWeekToIssue(s.week);
-}
-
-export function processWeekBouts(state: GameState): { state: GameState; results: BoutResult[]; summary: WeekBoutSummary } {
-  const warriorMap = new Map<string, Warrior>();
-  state.roster.forEach(w => warriorMap.set(w.id, w));
-  (state.rivals || []).forEach(r => r.roster.forEach(w => warriorMap.set(w.id, w)));
-
-  const pairings = generatePairings(state);
-  const moodMods = getMoodModifiers(state.crowdMood as any);
-
-  let s = { ...state };
-  const results: BoutResult[] = [];
-  const summary: WeekBoutSummary = { bouts: 0, deaths: 0, injuries: 0, deathNames: [], injuryNames: [], hadPlayerDeath: false, hadRivalryEscalation: false };
-
-  pairings.forEach(p => {
-    const res = processSingleBout(s, p, moodMods, warriorMap);
-    s = res.state;
-    results.push(res.result);
-    accumulateWeekStats(summary, res);
-
-    // Redundant map refresh removed for performance
-  });
-
-  finalizeWeekSideEffects(s, results);
-  return { state: s, results, summary };
 }

@@ -113,5 +113,8 @@ export function createFreshState(): GameState {
     },
     isFTUE: true,
     unacknowledgedDeaths: [],
+    promoters: {},
+    boutOffers: {},
+    realmRankings: {},
   };
 }

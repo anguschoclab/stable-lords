@@ -1,6 +1,4 @@
-import { GameState, Warrior } from "@/types/game";
-import { isFightReady } from "@/engine/warriorStatus";
-import { generateMatchCard } from "@/engine/matchmaking/bracketEngine";
+import { GameState, Warrior, BoutOffer } from "@/types/state.types";
 
 export interface BoutPairing {
   a: Warrior;
@@ -8,32 +6,46 @@ export interface BoutPairing {
   isRivalry: boolean;
   rivalStable?: string;
   rivalStableId?: string;
+  contractId?: string;
 }
 
 export function generatePairings(state: GameState): BoutPairing[] {
-  const matchCard = generateMatchCard(state);
-  if (matchCard.length > 0) {
-    return matchCard.map(mp => ({
-      a: mp.playerWarrior,
-      d: mp.rivalWarrior,
-      isRivalry: mp.isRivalryBout,
-      rivalStable: mp.rivalStable.owner.stableName,
-      rivalStableId: mp.rivalStable.owner.id,
-    }));
-  }
-
-  const activeWarriors = state.roster.filter(w => isFightReady(w));
+  const currentWeek = state.week;
   const pairings: BoutPairing[] = [];
-  const pairedIds = new Set<string>();
-  for (let i = 0; i < activeWarriors.length; i++) {
-    if (pairedIds.has(activeWarriors[i].id)) continue;
-    for (let j = i + 1; j < activeWarriors.length; j++) {
-      if (pairedIds.has(activeWarriors[j].id) || activeWarriors[i].stableId === activeWarriors[j].stableId) continue;
-      pairings.push({ a: activeWarriors[i], d: activeWarriors[j], isRivalry: false });
-      pairedIds.add(activeWarriors[i].id);
-      pairedIds.add(activeWarriors[j].id);
-      break;
+  const warriorMap = new Map<string, Warrior>();
+
+  // 1. Build a fast lookup map for all active warriors
+  state.roster.forEach(w => warriorMap.set(w.id, w));
+  (state.rivals || []).forEach(r => {
+    r.roster.forEach(w => warriorMap.set(w.id, w));
+  });
+
+  // 2. Derive pairings from Signed Contracts for this week
+  const currentOffers = Object.values(state.boutOffers).filter(
+    o => o.status === "Signed" && o.boutWeek === currentWeek
+  );
+
+  currentOffers.forEach(offer => {
+    const wA = warriorMap.get(offer.warriorIds[0]);
+    const wD = warriorMap.get(offer.warriorIds[1]);
+
+    if (wA && wD) {
+      // Find which stable wD belongs to
+      const rivalStable = state.rivals.find(r => r.roster.some(w => w.id === wD.id));
+      
+      pairings.push({
+        a: wA,
+        d: wD,
+        isRivalry: offer.hype > 150, // Use hype as a proxy for rivalry
+        rivalStable: rivalStable?.owner.stableName,
+        rivalStableId: rivalStable?.owner.id,
+        contractId: offer.id
+      });
     }
-  }
+  });
+
+  // 3. TODO: Integrate Tournament Matchups
+  // (Assuming tournaments will eventually use the same signed status or a separate bracket lookup)
+
   return pairings;
 }

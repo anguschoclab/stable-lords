@@ -16,6 +16,47 @@ import { type FightSummary, type FightOutcomeBy } from "./combat.types";
 import type { PoolWarrior } from "@/engine/recruitment";
 export type { PoolWarrior };
 
+// ─── Ranking & Contracts ───────────────────────────────────────────────────
+
+export interface RankingEntry {
+  overallRank: number;
+  classRank: number;
+  compositeScore: number;
+}
+
+export type BoutOfferStatus = "Proposed" | "Signed" | "Rejected" | "Canceled" | "Expired";
+export type BoutOfferResponse = "Pending" | "Accepted" | "Declined";
+
+export interface BoutOffer {
+  id: string;
+  promoterId: string;
+  warriorIds: string[];
+  boutWeek: number;
+  expirationWeek: number;
+  purse: number;
+  hype: number;
+  status: BoutOfferStatus;
+  responses: Record<string, BoutOfferResponse>;
+}
+
+export type PromoterPersonality = "Greedy" | "Honorable" | "Sadistic" | "Flashy" | "Corporate";
+
+export interface Promoter {
+  id: string;
+  name: string;
+  age: number;
+  personality: PromoterPersonality;
+  tier: "Local" | "Regional" | "National" | "Legendary";
+  capacity: number; // Max bouts per week
+  biases: FightingStyle[];
+  history: {
+    totalPursePaid: number;
+    notableBouts: string[];
+    mentorId?: string;
+    legacyFame: number;
+  };
+}
+
 // ─── Owner / Stable ─────────────────────────────────────────────────────────
 
 export type OwnerPersonality = "Aggressive" | "Methodical" | "Showman" | "Pragmatic" | "Tactician";
@@ -242,6 +283,10 @@ export interface GameState {
   };
   isFTUE: boolean;
   unacknowledgedDeaths: string[];
+  // ─── Promoter System ───
+  promoters: Record<string, Promoter>;
+  boutOffers: Record<string, BoutOffer>;
+  realmRankings: Record<string, RankingEntry>;
 }
 
 export interface UIPrefs {
