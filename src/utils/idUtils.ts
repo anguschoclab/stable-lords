@@ -36,5 +36,5 @@ export function generateId(): string {
   }
 
   // Ultimate fallback
-  return `${Date.now()}_${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] % 1000000)}`;
+  return Date.now() + "_" + Math.floor(Math.random() * 1e6);
 }
