@@ -21,6 +21,16 @@ import {
   CRIT_DAMAGE_MULT,
   TACTIC_OVERUSE_CAP,
 } from "./combatConstants";
+import { 
+  getMatchupBonus as rawMatchupBonus 
+} from "./combatConstants"; 
+
+export const MAX_EXCHANGES = 250;
+export const EXCHANGES_PER_MINUTE = 25;
+
+export function getMatchupBonus(styleA: FightingStyle, styleD: FightingStyle): number {
+  return rawMatchupBonus(styleA, styleD);
+}
 import {
   oeAttMod,
   oeDefMod,
@@ -53,15 +63,15 @@ export interface FighterState {
 
 export interface ResolutionContext {
   rng: () => number;
-  phase: string; 
+  phase: "OPENING" | "MID" | "LATE";
   exchange: number;
   weather: WeatherType;
   matchupA: number;
   matchupD: number;
-  trainerModsA: any;
-  trainerModsD: any;
-  weaponReqA: any;
-  weaponReqD: any;
+  trainerModsA: { [key: string]: number };
+  trainerModsD: { [key: string]: number };
+  weaponReqA: { endurancePenalty: number };
+  weaponReqD: { endurancePenalty: number };
   tacticStreakA: number;
   tacticStreakD: number;
 }
@@ -155,17 +165,25 @@ function executeHit(
     hitLocation: hitLoc,
   });
 
+  let didKill = false;
+  let causeBucket = "KO";
+
   if (defender.hp <= defender.maxHp * killMech.killWindowHpMult) {
     const killPos = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
     const killThreshold = calculateKillWindow(defender.hp / defender.maxHp, defender.endurance / defender.maxEndurance, hitLoc, attKD + killMech.killBonus, killPos, attOE, attAL, attMatchup);
     if (rng() < killThreshold) {
       defender.hp = 0;
-      events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { cause: "EXECUTION", causeBucket: "EXECUTION", location: hitLoc } });
+      didKill = true;
+      causeBucket = "EXECUTION";
     }
   }
 
-  if (defender.hp <= 0 && (!events.length || events[events.length - 1].result !== "Kill")) {
-    events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { cause: "FATAL_DAMAGE", causeBucket: "FATAL_DAMAGE", location: hitLoc } });
+  if (defender.hp <= 0) {
+    if (didKill) {
+      events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { location: hitLoc, cause: causeBucket } });
+    } else {
+      events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { location: hitLoc, cause: "FATAL_DAMAGE" } });
+    }
   }
 }
 
@@ -265,7 +283,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   att.endurance -= Math.round(enduranceCost(curAttOE, curAttAL, ctx.weather) * getEnduranceMult(att.style) * attWepReq.endurancePenalty);
   def.endurance -= Math.max(1, Math.round(enduranceCost(aGoesFirst ? OE_D : OE_A, aGoesFirst ? AL_D : AL_A, ctx.weather) * DEFENDER_ENDURANCE_DISCOUNT * getEnduranceMult(def.style) * defWepReq.endurancePenalty));
   
-  if ((fA.endurance <= 0 || fD.endurance <= 0) && !events.some(e => e.result === "Kill")) {
+  if ((fA.endurance <= 0 || fD.endurance <= 0) && !events.some(e => e.result === "Kill" || e.result === "KO")) {
     if (fA.endurance <= 0 && fD.endurance <= 0) events.push({ type: "BOUT_END", actor: "A", result: "Exhaustion" });
     else events.push({ type: "BOUT_END", actor: fA.endurance <= 0 ? "A" : "D", result: "Stoppage" });
   }

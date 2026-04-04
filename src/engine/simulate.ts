@@ -4,7 +4,7 @@ import {
   type FightPlan,
   type FightOutcome,
   type MinuteEvent,
-  type TrainerData,
+  type Trainer,
   type DeathCauseBucket,
   type WeatherType,
 } from "@/types/game";
@@ -27,6 +27,7 @@ import { narrateEvents, type NarrationContext } from "./combat/narrator";
 import { createFighterState } from "./bout/fighterState";
 import { resolveDecision } from "./bout/decisionLogic";
 import { defaultPlanForWarrior } from "./bout/planDefaults";
+import { getTrainingBonus } from "./trainers";
 
 // ─── Exports from sub-modules for backward compatibility ───
 export { createFighterState, resolveDecision, defaultPlanForWarrior };
@@ -36,6 +37,19 @@ type Phase = "OPENING" | "MID" | "LATE";
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const p = getCombatPhase(exchange, maxExchanges);
   return p.toUpperCase() as Phase;
+}
+
+function getTrainerMods(trainers: Trainer[], style: FightingStyle) {
+  const bonus = getTrainingBonus(trainers, style);
+  return {
+    attMod: bonus.Aggression,
+    parMod: Math.floor(bonus.Defense * 0.6),
+    defMod: Math.floor(bonus.Defense * 0.4),
+    iniMod: Math.floor(bonus.Mind * 0.6),
+    decMod: Math.floor(bonus.Mind * 0.4),
+    endMod: bonus.Endurance * 2,
+    healMod: bonus.Healing,
+  };
 }
 
 /**
@@ -54,7 +68,7 @@ export function simulateFight(
   warriorA?: Warrior,
   warriorD?: Warrior,
   providedRng?: (() => number) | number,
-  trainers?: TrainerData[],
+  trainers?: Trainer[],
   weather: WeatherType = "Clear"
 ): FightOutcome {
   // 1. Deterministic RNG setup
@@ -76,6 +90,9 @@ export function simulateFight(
   const fA = createFighterState("A", planA, warriorA, trainers);
   const fD = createFighterState("D", planD, warriorD, trainers);
 
+  const modsA = trainers ? getTrainerMods(trainers, planA.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
+  const modsD = trainers ? getTrainerMods(trainers, planD.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
+
   const resCtx: ResolutionContext = {
     rng,
     phase: "OPENING",
@@ -83,10 +100,10 @@ export function simulateFight(
     weather,
     matchupA: getMatchupBonus(planA.style, planD.style),
     matchupD: getMatchupBonus(planD.style, planA.style),
-    trainerModsA: null, // Computed inside simulate.ts if needed, or better inside createFighterState
-    trainerModsD: null,
-    weaponReqA: checkWeaponRequirements(weaponA, { ST: fA.attributes.ST, DF: fA.attributes.DF, SP: fA.attributes.SP }),
-    weaponReqD: checkWeaponRequirements(weaponD, { ST: fD.attributes.ST, DF: fD.attributes.DF, SP: fD.attributes.SP }),
+    trainerModsA: modsA,
+    trainerModsD: modsD,
+    weaponReqA: { endurancePenalty: 1.0 },
+    weaponReqD: { endurancePenalty: 1.0 },
     tacticStreakA: 0,
     tacticStreakD: 0,
   };

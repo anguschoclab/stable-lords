@@ -3,15 +3,15 @@ import {
   type Warrior,
   type FightPlan,
   type BaseSkills,
-  type TrainerData,
+  type Trainer,
 } from "@/types/game";
 import { DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
 import { getTrainingBonus } from "@/engine/trainers";
 import { getFavoriteWeaponBonus } from "@/engine/favorites";
 import { type FighterState } from "../combat/resolution";
 
-function getTrainerMods(trainers: TrainerData[], style: FightingStyle) {
-  const bonus = getTrainingBonus(trainers as any[], style);
+function getTrainerMods(trainers: Trainer[], style: FightingStyle) {
+  const bonus = getTrainingBonus(trainers, style);
   return {
     attMod: bonus.Aggression,
     parMod: Math.floor(bonus.Defense * 0.6),
@@ -30,7 +30,7 @@ export function createFighterState(
   label: "A" | "D",
   plan: FightPlan,
   warrior?: Warrior,
-  trainers?: TrainerData[]
+  trainers?: Trainer[]
 ): FighterState {
   const attrs = warrior?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
   const skills = warrior?.baseSkills ?? { ATT: 5, PAR: 5, DEF: 5, INI: 5, RIP: 5, DEC: 5 };

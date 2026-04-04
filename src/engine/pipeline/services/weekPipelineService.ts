@@ -1,22 +1,20 @@
-import type { GameState, Season } from "@/types/game";
+import type { GameState } from "@/types/game";
+import { archiveWeekLogs } from "../adapters/opfsArchiver";
 import { processHallOfFame } from "../core/hallOfFame";
 import { processTierProgression } from "../core/tierProgression";
-import { archiveWeekLogs } from "../adapters/opfsArchiver";
-import { updateAIStrategy } from "@/engine/ai/intentEngine";
-import { processAIStable } from "@/engine/ai/stableManager";
-import { generateRivalStables } from "@/engine/rivals";
-import { aiDraftFromPool } from "@/engine/draftService";
-import { seededRng } from "@/engine/rivals";
+import { computeTrainerAging } from "@/engine/trainerAging";
 import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
 import { generateOwnerNarratives } from "@/engine/ownerNarrative";
-import { processAIRosterManagement } from "@/engine/ownerRoster";
-import { generateId } from "@/utils/idUtils";
-import { updateEntityInList } from "@/utils/stateUtils";
-import type { PoolWarrior, RivalStableData, Trainer } from "@/types/game";
-import { convertRetiredToTrainer } from "@/engine/trainers";
-import { computeTrainerAging } from "@/engine/trainerAging";
-import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 import { WorldManagementService } from "@/engine/ai/worldManagement";
+import { InsightTokenService } from "@/engine/tokens/insightTokenService";
+import { seededRng } from "@/engine/rivals";
+
+// 🌩️ New Modular Passes
+import { runEconomyPass } from "../passes/EconomyPass";
+import { runWarriorPass } from "../passes/WarriorPass";
+import { runWorldPass } from "../passes/WorldPass";
+import { runRivalStrategyPass } from "../passes/RivalStrategyPass";
+import { runEventPass } from "../passes/EventPass";
 
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeEconomyImpact } from "@/engine/economy";
@@ -26,138 +24,46 @@ import { resolveImpacts, StateImpact } from "@/engine/impacts";
 import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
 import { partialRefreshPool } from "@/engine/recruitment";
-import { InsightTokenService } from "@/engine/tokens/insightTokenService";
-import { runAIvsAIBouts } from "@/engine/matchmaking/rivalScheduler";
 
-const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
-export function computeNextSeason(newWeek: number): Season { return SEASONS[Math.floor((newWeek - 1) / 13) % 4]; }
-
-import { type WeatherType } from "@/types/game";
-export function rollWeather(rng: () => number): WeatherType {
-  const roll = rng();
-  if (roll < 0.6) return "Clear";
-  if (roll < 0.75) return "Overcast";
-  if (roll < 0.85) return "Rainy";
-  if (roll < 0.95) return "Scalding";
-  return "Drafty";
-}
-
-export function processRivalActions(state: GameState, newWeek: number): GameState {
-  const rng = seededRng(newWeek * 7919 + 13);
-  const currentRivals = [...(state.rivals || [])];
-  const globalGazetteItems: string[] = [];
-
-  let currentPool = [...(state.hiringPool || [])];
-
-  const processedRivals = currentRivals.map((rival, index) => {
-    const strategySeed = newWeek * 31 + index * 997 + rival.owner.id.length;
-    const strategy = updateAIStrategy(rival, state, strategySeed);
-    const rivalWithStrategy = { ...rival, strategy };
-    const { updatedRival, isBankrupt, gazetteItems, updatedHiringPool } = processAIStable(rivalWithStrategy, state);
-    globalGazetteItems.push(...gazetteItems);
-    currentPool = updatedHiringPool;
-
-    if (isBankrupt) {
-      const replacementSeed = newWeek + index * 1000;
-      const [newStable] = generateRivalStables(1, replacementSeed);
-      globalGazetteItems.push(`🆕 EXPANSION: ${newStable.owner.stableName} has moved into the district as a new rival!`);
-      return newStable as any as RivalStableData;
-    }
-    return updatedRival;
-  });
-
-  const draft = aiDraftFromPool(state.recruitPool, processedRivals, newWeek, state);
-  globalGazetteItems.push(...draft.gazetteItems);
-
-  // 3. AI Roster Management (Recruitment/Retirement)
-  const rosterSeed = newWeek * 13 + 7;
-  const { updatedRivals: finalizedRivals, gazetteItems: rosterGazette } = processAIRosterManagement({
-    ...state,
-    rivals: draft.updatedRivals,
-    recruitPool: draft.updatedPool,
-    week: newWeek
-  }, rosterSeed);
-  globalGazetteItems.push(...rosterGazette);
-
-  let newState = { 
-    ...state, 
-    rivals: finalizedRivals, 
-    recruitPool: draft.updatedPool, 
-    hiringPool: currentPool 
-  };
-  
-  // 🏆 Phase 0: Tournament Check (Week 13 finale)
-  const isTournamentWeek = newWeek > 0 && newWeek % 13 === 0;
-
-  if (isTournamentWeek) {
-    const tiers = ["Minor", "Established", "Major", "Legendary"];
-    const tournamentBouts: string[] = [];
-    
-    tiers.forEach((tier, tIdx) => {
-      const tour = TournamentSelectionService.generateTournament(state, tier, newWeek, state.season, newWeek * 100 + tIdx);
-      newState.tournaments = [...(newState.tournaments || []), tour];
-      
-      // 🏆 Engine Adjudication: Resolve the tournament immediately for the world
-      // This ensures results exist in arenaHistory for the next week advance.
-      newState = TournamentSelectionService.resolveCompleteTournament(newState, tour.id, newWeek * 500 + tIdx);
-      
-      const completedTour = newState.tournaments.find(t => t.id === tour.id);
-      tournamentBouts.push(`${tour.name} concluded. Champion: ${completedTour?.champion || "None"}`);
-    });
-    
-    newState.newsletter = [...(newState.newsletter || []), { 
-      week: newWeek, 
-      title: "🏆 GRAND CHAMPIONSHIP SEASON", 
-      items: tournamentBouts 
-    }];
-    
-    // In a tournament week, we bypass regular AI-vs-AI exhibitions
-    return newState;
-  }
-
-  // 4. Background Rival Simulation (Rival-vs-Rival)
-  const rivalSeed = newWeek * 7919 + 777;
-  const aiResults = runAIvsAIBouts(newState, rivalSeed);
-  newState.rivals = aiResults.updatedRivals;
-  globalGazetteItems.push(...aiResults.gazetteItems);
-
-  if (globalGazetteItems.length > 0) {
-    newState.newsletter = [...(newState.newsletter || []), { week: newWeek, title: "Intelligence Report", items: globalGazetteItems }];
-  }
-  return newState;
-}
-
+/**
+ * Stable Lords — Consolidated Weekly Pipeline
+ * Orchestrates the simulation tick by executing a series of specialized passes.
+ */
 export function advanceWeek(state: GameState): GameState {
   const currentWeek = state.week;
   const nextWeek = currentWeek + 1;
-  const nextSeason = computeNextSeason(nextWeek);
 
+  // 1. Core Simulation Impact Phase (Deterministic)
   const trainingImpactRaw = computeTrainingImpact(state);
   const { impact: trainingImpact, seasonalGrowth } = trainingImpactToStateImpact(state, trainingImpactRaw);
-
   const impacts: StateImpact[] = [
-    trainingImpact, computeEconomyImpact(state), computeAgingImpact(state), computeHealthImpact(state),
+    trainingImpact, 
+    computeEconomyImpact(state), 
+    computeAgingImpact(state), 
+    computeHealthImpact(state),
   ];
-
   let newState = resolveImpacts(state, impacts);
   newState.seasonalGrowth = seasonalGrowth;
 
+  // 2. World State Update (Week, Season, Weather)
+  newState = runWorldPass(newState);
+  const nextSeason = newState.season;
+
+  // 3. Recruitment & Administrative Churn
   const usedNames = new Set<string>();
   newState.roster.forEach(w => usedNames.add(w.name));
   newState.graveyard.forEach(w => usedNames.add(w.name));
   (newState.rivals || []).forEach(r => r.roster.forEach(w => usedNames.add(w.name)));
-
   newState.recruitPool = partialRefreshPool(newState.recruitPool || [], currentWeek, usedNames);
 
+  // 4. Gazette & Hall of Fame
   const weekFights = getFightsForWeek(newState.arenaHistory, currentWeek);
-  const gazetteSeed = currentWeek * 9973 + 456;
-  const story = generateWeeklyGazette(weekFights, newState.crowdMood, currentWeek, newState.graveyard, newState.arenaHistory, gazetteSeed);
+  const story = generateWeeklyGazette(weekFights, newState.crowdMood, currentWeek, newState.graveyard, newState.arenaHistory, currentWeek * 9973 + 456);
   newState.gazettes = [...(newState.gazettes || []), { ...story, week: currentWeek }].slice(-50);
-
   newState = processHallOfFame(newState, nextWeek);
   newState = processTierProgression(newState, nextSeason, nextWeek);
 
-  // 🏆 Phase 2.5: Trainer Aging & Recruitment Legacy
+  // 5. Trainer Aging & Legacy
   const { updatedTrainers, news: trainerNews, updatedHiringPool } = computeTrainerAging(newState);
   newState.trainers = updatedTrainers;
   newState.hiringPool = updatedHiringPool;
@@ -165,71 +71,37 @@ export function advanceWeek(state: GameState): GameState {
     newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: "Trainer Career Updates", items: trainerNews }];
   }
 
-  // 🏆 Phase 3: Seasonal adaptation (Narrative, Philosophy, and Churn)
+  // 6. Seasonal Adaptation (Narrative, Philosophy, and Churn)
   if (nextSeason !== state.season) {
     const seasonSeed = nextWeek * 133;
-    
-    // 🏛️ World Stability: Seasonal Churn (Bankruptcy & Expansion)
     const { updatedRivals: churnRivals, news: churnNews } = WorldManagementService.processSeasonalChurn(newState, seasonSeed + 55);
     newState.rivals = churnRivals;
-
     const { updatedRivals: philRivals, gazetteItems: philGazette } = evolvePhilosophies(newState, nextSeason, seasonSeed);
     newState.rivals = philRivals;
     const narrGazette = generateOwnerNarratives(newState, nextSeason, seasonSeed + 1);
-    
     const combinedNews = [...churnNews, ...philGazette, ...narrGazette];
     if (combinedNews.length > 0) {
-      newState.newsletter = [...(newState.newsletter || []), { 
-        week: nextWeek, 
-        title: `${state.season} Season Summary`, 
-        items: combinedNews 
-      }];
+      newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: `${state.season} Season Summary`, items: combinedNews }];
     }
   }
 
-  // 🏆 Phase 4: Tournament Reward Tokens (Week 13, 26, 39, 52)
+  // 7. Tournament Reward Tokens
   if (currentWeek % 13 === 0) {
     const tokenRng = seededRng(currentWeek * 42 + 7);
-    const type = tokenRng() > 0.5 ? "Weapon" : "Rhythm";
-    newState = InsightTokenService.awardToken(newState, type, `${newState.season} Championship`);
+    newState = InsightTokenService.awardToken(newState, tokenRng() > 0.5 ? "Weapon" : "Rhythm", `${newState.season} Championship`);
   }
 
-  newState = processRivalActions(newState, nextWeek);
+  // 8. Rival Strategy & Background Actions
+  newState = runRivalStrategyPass(newState, nextWeek);
 
-  // ⚡ World Expansion: Roll next week's weather
-  const weatherRng = seededRng(nextWeek * 1337 + 42);
-  const nextWeather = rollWeather(() => weatherRng());
+  // 9. Economy & Financial Maintenance
+  newState = runEconomyPass(newState);
 
-  // 🍺 World Expansion: Random Tavern Brawl event
-  const brawlRng = seededRng(nextWeek * 999 + 1);
-  if (brawlRng() < 0.05 && newState.roster.length > 0) {
-    const activeWarriors = newState.roster.filter(w => w.status === "Active" && (!w.injuries || w.injuries.length === 0));
-    if (activeWarriors.length > 0) {
-      const brawlerIndex = Math.floor(brawlRng() * activeWarriors.length);
-      const brawler = activeWarriors[brawlerIndex];
-      
-      newState.roster = updateEntityInList(newState.roster, brawler.id, (w) => ({
-        ...w,
-        fame: (w.fame || 0) + 5,
-        injuries: [...(w.injuries || []), {
-          id: generateId(),
-          name: "Bruised knuckles (Tavern Brawl)",
-          description: "Got into a scrap at the local tavern. The crowd loved it, but the hands took a beating.",
-          severity: "Minor",
-          weeksRemaining: 1,
-          penalties: { ATT: -1 }
-        }]
-      }));
+  // 10. Random Events (Tavern Brawl, etc.)
+  newState = runEventPass(newState, nextWeek);
 
-      newState.newsletter = [...(newState.newsletter || []), {
-        week: nextWeek,
-        title: "Tavern Brawl!",
-        items: [`${brawler.name} got into a wild tavern brawl last night! They gained +5 Fame but suffered a minor injury.`]
-      }];
-    }
-  }
-
-  newState = { ...newState, week: nextWeek, season: nextSeason, trainingAssignments: [], weather: nextWeather };
+  // 11. Final Cleanup
+  newState = { ...newState, trainingAssignments: [] };
 
   return archiveWeekLogs(newState);
 }
