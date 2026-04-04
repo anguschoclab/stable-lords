@@ -19,6 +19,6 @@
 **Learning:** When optimizing history arrays by removing O(N log N) sorts because the production data (`arenaHistory`) is strictly chronological, test suites that construct history arrays out-of-order will fail unless the mock data is also chronological.
 **Action:** When performing optimizations that rely on an array being append-only and chronological, ensure that mock test data remains strictly chronological to prevent test failures when early breaking or sorting removals are introduced.
 
-## 2024-05-15 - [PERF] Avoid Intermediate Array Allocations in React `useMemo`
+## 2024-05-15 - [Avoid Intermediate Array Allocations]
 **Learning:** Chaining `.filter()` immediately before a `for...of` loop inside a hot path (like `useMemo`) creates unnecessary intermediate array allocations, adding GC pressure.
 **Action:** Replace `.filter()` with an inline `if` condition directly inside the `for...of` loop to eliminate the intermediate allocation step.
