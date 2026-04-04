@@ -29,6 +29,7 @@ import StyleGuide from "@/pages/StyleGuide";
 import ArenaHub from "@/pages/ArenaHub";
 import StableLedger from "@/pages/StableLedger";
 import StableHall from "@/pages/StableHall";
+import BookingOffice from "@/pages/BookingOffice";
 
 // ─── Route Components ───────────────────────────────────────────────────────
 
@@ -71,6 +72,7 @@ const stableGearRoute = new Route({ getParentRoute: () => stablePillar, path: "/
 const stablePlannerRoute = new Route({ getParentRoute: () => stablePillar, path: "/planner", component: TrainingPlanner });
 const stableTrainersRoute = new Route({ getParentRoute: () => stablePillar, path: "/trainers", component: Trainers });
 const stableFinanceRoute = new Route({ getParentRoute: () => stablePillar, path: "/finance", component: StableLedger });
+const stableContractsRoute = new Route({ getParentRoute: () => stablePillar, path: "/contracts", component: BookingOffice });
 
 // Pillar 3: World
 const worldPillar = new Route({ getParentRoute: () => rootRoute, path: "/world" });
@@ -110,6 +112,7 @@ const routeTree = rootRoute.addChildren([
     stablePlannerRoute,
     stableTrainersRoute,
     stableFinanceRoute,
+    stableContractsRoute,
   ]),
   worldPillar.addChildren([
     worldIndexRoute,

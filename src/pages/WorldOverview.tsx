@@ -94,6 +94,7 @@ export default function WorldOverview() {
   const warriorRows = useMemo(() => {
     const mapWarrior = (w: Warrior, stableName: string, stableId: string, isPlayer: boolean) => {
       const total = w.career.wins + w.career.losses;
+      const ranking = state.realmRankings?.[w.id];
       return {
         id: w.id,
         name: w.name,
@@ -106,6 +107,8 @@ export default function WorldOverview() {
         winRate: total > 0 ? Math.round((w.career.wins / total) * 100) : 0,
         style: w.style,
         isPlayer,
+        officialRank: ranking?.overallRank || 999,
+        compositeScore: ranking?.compositeScore || 0,
       };
     };
 
@@ -131,9 +134,16 @@ export default function WorldOverview() {
       }
     }
 
+    // Sort by official rank by default, or the selected field
     return rows.sort((a, b) => {
       const f = warriorSort.field;
       const dir = warriorSort.dir === "asc" ? 1 : -1;
+      
+      // If default (fame), use official rank instead for better meritocracy
+      if (f === "fame" && dir === -1) {
+        return (a.officialRank - b.officialRank);
+      }
+
       if (f === "name" || f === "stable" || f === "style") {
         const va = f === "stable" ? a.stableName : a[f];
         const vb = f === "stable" ? b.stableName : b[f];

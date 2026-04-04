@@ -1,16 +1,144 @@
-import type { GameState, Warrior, RivalStableData, TournamentEntry, TournamentBout, WarriorStatus } from "@/types/game";
+import type { GameState, Warrior, RivalStableData, TournamentEntry, TournamentBout } from "@/types/state.types";
+import { type WarriorStatus } from "@/types/warrior.types";
 import { makeWarrior } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNG } from "@/utils/random";
 import { simulateFight, aiPlanForWarrior, defaultPlanForWarrior } from "@/engine";
-import { updateEntityInList } from "@/utils/stateUtils";
 import { generateId } from "@/utils/idUtils";
 
 /**
- * TournamentSelectionService - Handles qualification and filler logic for 64-man tournaments.
+ * Stable Lords — Tournament Selection Committee (v1.0)
+ * Implements a 4-tier NCAA-style loop for 256-warrior seasonal coverage.
  */
+
+export const TOURNAMENT_TIERS = [
+  { id: "Gold", name: "Imperial Gold Cup", minRank: 1, maxRank: 64 },
+  { id: "Silver", name: "Proconsul Silver Plate", minRank: 65, maxRank: 128 },
+  { id: "Bronze", name: "Steel Bronze Gauntlet", minRank: 129, maxRank: 192 },
+  { id: "Iron", name: "Foundry Iron Trials", minRank: 193, maxRank: 256 }
+];
+
 export const TournamentSelectionService = {
-  // 🏛️ Engine Resolution: Progress the tournament by one round
+  
+  /**
+   * Generates all 4 seasonal tournaments using the committee selection logic.
+   */
+  generateSeasonalTiers(state: GameState, week: number, season: string, seed: number): TournamentEntry[] {
+    const rng = new SeededRNG(seed);
+    const tournaments: TournamentEntry[] = [];
+    const lockedWarriorIds = new Set<string>();
+
+    TOURNAMENT_TIERS.forEach((tierConfig, idx) => {
+      const { warriors, updatedLockedIds } = this.committeeSelection(state, tierConfig.id, seed + idx, lockedWarriorIds);
+      
+      // Update locked IDs for the next tier
+      updatedLockedIds.forEach(id => lockedWarriorIds.add(id));
+
+      const tournament = this.buildTournament(tierConfig.id, tierConfig.name, warriors, week, season);
+      tournaments.push(tournament);
+    });
+
+    return tournaments;
+  },
+
+  /**
+   * The "Committee" Model:
+   * 1. Top 40 by Composite Rank (unlocked).
+   * 2. Style Champions: #1 of each style (if unlocked).
+   * 3. Bubble Watch: Random selection from next 30 eligible ranks.
+   */
+  committeeSelection(
+    state: GameState, 
+    tier: string, 
+    seed: number, 
+    lockedIds: Set<string>
+  ): { warriors: Warrior[]; updatedLockedIds: Set<string> } {
+    const rng = new SeededRNG(seed);
+    const rankings = state.realmRankings || {};
+    const qualified: Warrior[] = [];
+    const newLocks = new Set<string>();
+
+    // Gather all active, unlocked warriors
+    const pool: { w: Warrior; rank: number; score: number }[] = [];
+    
+    const collect = (roster: Warrior[]) => {
+      roster.forEach(w => {
+        if (w.status === "Active" && !lockedIds.has(w.id)) {
+          const r = rankings[w.id];
+          if (r) pool.push({ w, rank: r.overallRank, score: r.compositeScore });
+        }
+      });
+    };
+
+    collect(state.roster);
+    state.rivals.forEach(r => collect(r.roster));
+
+    // Sort pool by rank
+    const sortedPool = pool.sort((a, b) => a.rank - b.rank);
+
+    // 1. Mandatory Invites (Top 40 of available)
+    const top40 = sortedPool.slice(0, 40);
+    top40.forEach(p => { qualified.push(p.w); newLocks.add(p.w.id); });
+
+    // 2. Style Champions Auto-Bid (Top 1 of each style not yet invited)
+    Object.values(FightingStyle).forEach(style => {
+      if (qualified.length >= 50) return;
+      const styleLead = sortedPool.find(p => p.w.style === style && !newLocks.has(p.w.id));
+      if (styleLead) {
+        qualified.push(styleLead.w);
+        newLocks.add(styleLead.w.id);
+      }
+    });
+
+    // 3. Bubble Watch (Fill to 64 from the next 40 candidates)
+    const remainingNeeded = 64 - qualified.length;
+    const bubblePool = sortedPool.filter(p => !newLocks.has(p.w.id)).slice(0, 40);
+    const shuffledBubble = rng.shuffle(bubblePool);
+    
+    shuffledBubble.slice(0, remainingNeeded).forEach(p => {
+      qualified.push(p.w);
+      newLocks.add(p.w.id);
+    });
+
+    // 4. Emergency Fillers (If world population is decimated)
+    if (qualified.length < 64) {
+      const fillersNeeded = 64 - qualified.length;
+      for (let i = 0; i < fillersNeeded; i++) {
+        const freelancer = this.generateFreelancer(tier, i, rng);
+        qualified.push(freelancer);
+      }
+    }
+
+    return { warriors: qualified.slice(0, 64), updatedLockedIds: newLocks };
+  },
+
+  buildTournament(tierId: string, name: string, participants: Warrior[], week: number, season: string): TournamentEntry {
+    const shuffled = [...participants].sort(() => Math.random() - 0.5);
+    const bracket: TournamentBout[] = [];
+    
+    for (let i = 0; i < 64; i += 2) {
+      bracket.push({
+        round: 1,
+        matchIndex: i / 2,
+        a: shuffled[i].name,
+        d: shuffled[i+1].name,
+        stableA: shuffled[i].stableId,
+        stableD: shuffled[i+1].stableId,
+      });
+    }
+
+    return {
+      id: `t_${tierId.toLowerCase()}_${week}`,
+      season: season as any,
+      week,
+      name,
+      bracket,
+      participants,
+      completed: false
+    };
+  },
+
+  // 🏛️ Engine Resolution (Modular for Round-by-Round or Instant)
   resolveRound(state: GameState, tournamentId: string, seed: number): { updatedState: GameState; roundResults: string[] } {
     const rng = new SeededRNG(seed);
     let updatedState = { ...state };
@@ -24,7 +152,6 @@ export const TournamentSelectionService = {
     const currentRound = Math.min(...unresolved.map(b => b.round));
     const roundBouts = unresolved.filter(b => b.round === currentRound);
     const winners: string[] = [];
-    const resultsNews: string[] = [];
 
     for (const bout of roundBouts) {
       if (bout.d === "(bye)") {
@@ -51,10 +178,7 @@ export const TournamentSelectionService = {
       bout.by = outcome.by;
       bout.fightId = `tf_${tournament.id}_${bout.round}_${bout.matchIndex}`;
       
-      const winnerName = outcome.winner === "A" ? bout.a : bout.d;
-      winners.push(winnerName);
-      
-      // Update records and history
+      winners.push(outcome.winner === "A" ? bout.a : bout.d);
       updatedState = this.applyBoutResults(updatedState, wA, wD, outcome, tournament.id, tournament.name);
     }
 
@@ -73,26 +197,17 @@ export const TournamentSelectionService = {
     const isComplete = winners.length <= 1;
     const champion = isComplete ? winners[0] : undefined;
 
-    // Update tournament state
     updatedState.tournaments = (updatedState.tournaments || []).map(t => 
       t.id === tournamentId ? { ...t, bracket, completed: isComplete, champion } : t
     );
 
-    if (isComplete && champion) {
-      resultsNews.push(`🏆 CHAMPION: ${champion} has won the ${tournament.name}!`);
-    }
-
-    return { updatedState, roundResults: resultsNews };
+    return { updatedState, roundResults: isComplete && champion ? [`🏆 CHAMPION: ${champion} has won the ${tournament.name}!`] : [] };
   },
 
-  /**
-   * Resolves an entire tournament to completion in one go.
-   * Useful for AI-only tiers or headless testing.
-   */
   resolveCompleteTournament(state: GameState, tournamentId: string, seed: number): GameState {
     let current = { ...state };
     let safety = 0;
-    while (safety < 10) { // Max 6 rounds for 64-man + padding
+    while (safety < 10) {
       const tour = (current.tournaments || []).find(t => t.id === tournamentId);
       if (!tour || tour.completed) break;
       const result = this.resolveRound(current, tournamentId, seed + safety);
@@ -102,33 +217,23 @@ export const TournamentSelectionService = {
     return current;
   },
 
-  /** Helper: Find warrior by name across player/rivals/tournament-participants */
   findWarrior(state: GameState, name: string, tournament?: TournamentEntry): Warrior | undefined {
     const playerW = state.roster.find(w => w.name === name);
     if (playerW) return playerW;
-    
-    for (const r of (state.rivals || [])) {
+    for (const r of state.rivals) {
       const rw = r.roster.find(w => w.name === name);
       if (rw) return rw;
     }
-
-    if (tournament) {
-      const tourW = tournament.participants.find(w => w.name === name);
-      if (tourW) return tourW;
-    }
-
-    return undefined;
+    return tournament?.participants.find(w => w.name === name);
   },
 
-  /** Helper: Get AI plan for tournament warrior */
   getAIPlan(state: GameState, w: Warrior) {
-     const rival = (state.rivals || []).find(r => r.roster.some(rw => rw.name === w.name));
+     const rival = state.rivals.find(r => r.roster.some(rw => rw.name === w.name));
      if (!rival) return { ...defaultPlanForWarrior(w), killDesire: 7 };
      const plan = aiPlanForWarrior(w, rival.owner.personality || "Pragmatic", rival.philosophy || "Opportunist", undefined, rival.strategy?.intent);
-     return { ...plan, killDesire: 7 }; // Force championship stakes
+     return { ...plan, killDesire: 7 };
   },
 
-  /** Helper: Apply updates after tournament bout */
   applyBoutResults(state: GameState, wA: Warrior, wD: Warrior, outcome: any, tId: string, tName: string): GameState {
     const isKill = outcome.by === "Kill";
     const winnerSide = outcome.winner;
@@ -168,19 +273,16 @@ export const TournamentSelectionService = {
           kills: (w.career?.kills || 0) + (didKill ? 1 : 0),
         },
         fame: Math.max(0, (w.fame || 0) + (isWinner ? (didKill ? 3 : 1) : 0)),
-        seasonPoints: (w.seasonPoints || 0) + (isWinner ? 3 : 0) + (didKill ? 5 : 0)
       };
     };
 
-    // Update Player Roster
     updatedState.roster = updatedState.roster.map(w => {
       if (w.id === wA.id) return updateWarrior(w, true);
       if (w.id === wD.id) return updateWarrior(w, false);
       return w;
     });
 
-    // Update Rivals
-    updatedState.rivals = (updatedState.rivals || []).map(r => ({
+    updatedState.rivals = updatedState.rivals.map(r => ({
       ...r,
       roster: r.roster.map(w => {
         if (w.id === wA.id) return updateWarrior(w, true);
@@ -190,159 +292,26 @@ export const TournamentSelectionService = {
     }));
 
     if (isKill) {
-       const deadA = winnerSide === "D";
-       const victim = deadA ? wA : wD;
-       const deadWarrior = updateWarrior(victim, deadA);
-       
-       // Record in Graveyard
-       updatedState.graveyard = [...(updatedState.graveyard || []), { 
-         ...deadWarrior, 
-         status: "Dead",
-         deathWeek: state.week,
-       }];
-
-       // Filter from Roster/Rivals
-       updatedState.roster = updatedState.roster.filter(w => w.id !== deadWarrior.id);
-       updatedState.rivals = (updatedState.rivals || []).map(r => ({
-         ...r,
-         roster: r.roster.filter(w => w.id !== deadWarrior.id)
-       }));
-
-       // If it was a stabled warrior, add a memorial news item
-       const rivalOwner = (state.rivals || []).find(r => r.owner.id === deadWarrior.stableId);
-       if (rivalOwner || state.player.id === deadWarrior.stableId) {
-         updatedState.newsletter = [...(updatedState.newsletter || []), {
-           week: state.week,
-           title: "⚰️ FUNERAL RITES",
-           items: [`${deadWarrior.name} of ${rivalOwner?.owner.stableName || "your stable"} has been killed in the tournament.`]
-         }];
-       }
+       const victim = winnerSide === "D" ? wA : wD;
+       updatedState.graveyard = [...(updatedState.graveyard || []), { ...victim, status: "Dead", deathWeek: state.week }];
+       updatedState.roster = updatedState.roster.filter(w => w.id !== victim.id);
+       updatedState.rivals = updatedState.rivals.map(r => ({ ...r, roster: r.roster.filter(w => w.id !== victim.id) }));
     }
 
     return updatedState;
   },
 
-  /**
-   * Selects the top 64 warriors for a specific tier.
-   * If not enough stable-affiliated warriors, generates NPC freelancers.
-   */
-  selectQualifiedWarriors(state: GameState, tier: string, seed: number): { warriors: Warrior[]; stabledIds: string[] } {
-    const rng = new SeededRNG(seed);
-    const qualified: Warrior[] = [];
-    
-    // 1. Collect all stable-affiliated warriors in this tier
-    const worldWarriors: { warrior: Warrior; stable: RivalStableData | null }[] = [];
-    
-    // Rivals
-    (state.rivals || []).forEach(r => {
-      if (r.tier === tier) {
-        r.roster.forEach(w => {
-          if (w.status === "Active") {
-            worldWarriors.push({ warrior: w, stable: r });
-          }
-        });
-      }
-    });
-
-    // Player (if matching tier)
-    if (state.player.renown === (tier === "Legendary" ? 5 : tier === "Major" ? 2 : tier === "Established" ? 1 : 0)) {
-      state.roster.forEach(w => {
-         if (w.status === "Active") {
-           worldWarriors.push({ warrior: w, stable: null });
-         }
-      });
-    }
-
-    // 2. Rank by Season Points (Wins/Kills)
-    // Formula: (Wins * 3) + (Kills * 5) + (Fame / 10)
-    const ranked = worldWarriors.sort((a, b) => {
-      const scoreA = (a.warrior.career?.wins || 0) * 3 + (a.warrior.career?.kills || 0) * 5 + (a.warrior.fame || 0) / 10;
-      const scoreB = (b.warrior.career?.wins || 0) * 3 + (b.warrior.career?.kills || 0) * 5 + (b.warrior.fame || 0) / 10;
-      return scoreB - scoreA;
-    });
-
-    // Take top 64 (or all available if < 64)
-    const elite = ranked.slice(0, 64).map(r => r.warrior);
-    qualified.push(...elite);
-
-    // 3. Fill with NPC Freelancers if < 64
-    const fillersNeeded = 64 - qualified.length;
-    for (let i = 0; i < fillersNeeded; i++) {
-        const freelancer = this.generateFreelancer(tier, i, rng);
-        qualified.push(freelancer);
-    }
-
-    return { 
-      warriors: qualified.slice(0, 64), 
-      stabledIds: elite.map(w => w.id) 
-    };
-  },
-
-  /**
-   * Generates a full 64-man tournament entry for a given week and season.
-   */
-  generateTournament(state: GameState, tier: string, week: number, season: string, seed: number): TournamentEntry {
-    const { warriors } = this.selectQualifiedWarriors(state, tier, seed);
-    const shuffled = [...warriors].sort(() => Math.random() - 0.5);
-    
-    const bracket: TournamentBout[] = [];
-    // Round 1 has 32 matches
-    for (let i = 0; i < 64; i += 2) {
-      bracket.push({
-        round: 1,
-        matchIndex: i / 2,
-        a: shuffled[i].name,
-        d: shuffled[i+1].name,
-        stableA: shuffled[i].stableId,
-        stableD: shuffled[i+1].stableId,
-      });
-    }
-
-    return {
-      id: `t_${tier.toLowerCase()}_${week}`,
-      season: season as any,
-      week,
-      name: `${season} ${tier} Grand Championship`,
-      bracket,
-      participants: warriors,
-      completed: false
-    };
-  },
-
-  /**
-   * Generates a "Freelancer" NPC to fill tournament brackets.
-   * Tier influences their attribute pool.
-   */
   generateFreelancer(tier: string, index: number, rng: SeededRNG): Warrior {
     const styles = Object.values(FightingStyle);
     const style = rng.pick(styles);
-    
-    // Attribute Pool scaling
-    // Minor: 70 pts, Established: 85 pts, Major: 100 pts, Legendary: 120 pts
-    const pool = tier === "Legendary" ? 120 : tier === "Major" ? 100 : tier === "Established" ? 85 : 70;
-    
-    const attrs = {
-      ST: 5, CN: 5, SZ: 10, WT: 10, WL: 10, SP: 5, DF: 5
-    };
-    
-    let remaining = pool - (5+5+10+10+10+5+5);
+    const pool = tier === "Gold" ? 120 : tier === "Silver" ? 100 : tier === "Bronze" ? 85 : 70;
+    const attrs = { ST: 5, CN: 5, SZ: 10, WT: 10, WL: 10, SP: 5, DF: 5 };
+    let remaining = pool - 50;
     const keys: (keyof typeof attrs)[] = ["ST", "CN", "SP", "DF", "WL", "WT"];
-    
     while (remaining > 0) {
       const key = rng.pick(keys);
-      if (attrs[key] < 25) {
-        attrs[key]++;
-        remaining--;
-      }
+      if (attrs[key] < 25) { attrs[key]++; remaining--; }
     }
-
-    return makeWarrior(
-      undefined, 
-      `Freelancer ${rng.pick(["Thrax", "Murmillo", "Retiarius", "Dimachaerus"])} #${index}`,
-      style,
-      attrs,
-      {},
-      () => rng.next()
-    );
+    return makeWarrior(undefined, `Freelancer ${rng.pick(["Thrax", "Murmillo", "Kaeso"])} #${index}`, style, attrs, {}, () => rng.next());
   }
 };

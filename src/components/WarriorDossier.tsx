@@ -45,14 +45,32 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
     <ScrollArea className="h-full pr-4">
       <div className="space-y-6 pb-20">
         {/* Header Section */}
-        <div className="space-y-2">
+        {/* Header Section */}
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-display font-black tracking-tight">{warrior.name}</h2>
-            <StatBadge styleName={warrior.style} />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-muted-foreground">{record}</span>
-            <FormSparkline warriorId={warrior.id} />
+            <div className="space-y-1">
+              <h2 className="text-2xl font-display font-black tracking-tight uppercase">{warrior.name}</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase opacity-60 tracking-widest">{record}</span>
+                <FormSparkline warriorId={warrior.id} />
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <StatBadge styleName={warrior.style} />
+              {state.realmRankings?.[warrior.id] && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={cn(
+                    "text-[10px] font-black uppercase tracking-tighter border-primary/20",
+                    state.realmRankings[warrior.id]!.overallRank <= 64 ? "text-arena-gold bg-arena-gold/5" : "text-primary bg-primary/5"
+                  )}>
+                    RANK #{state.realmRankings[warrior.id]!.overallRank}
+                  </Badge>
+                  <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-tighter bg-neutral-900 border border-white/5 opacity-80">
+                    {Math.round(state.realmRankings[warrior.id]!.compositeScore)} PTS
+                  </Badge>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
