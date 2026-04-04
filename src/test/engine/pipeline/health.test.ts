@@ -12,6 +12,23 @@ describe("pipeline/health", () => {
   });
 
   describe("computeHealthImpact", () => {
+    it("should handle warriors with missing, null, or string-only injuries gracefully", () => {
+      const mockState = {
+        week: 5,
+        roster: [
+          { id: "w1", name: "Warrior 1" }, // missing injuries
+          { id: "w2", name: "Warrior 2", injuries: null }, // null injuries
+          { id: "w3", name: "Warrior 3", injuries: ["string_injury"] }, // string-only injuries
+        ],
+      } as unknown as GameState;
+
+      const impact = computeHealthImpact(mockState);
+
+      expect(injuriesModule.tickInjuries).not.toHaveBeenCalled();
+      expect(impact.rosterUpdates?.size).toBe(0);
+      expect(impact.newsletterItems).toEqual([]);
+    });
+
     it("should process injuries and return updates", () => {
       const mockInjury = { id: "i1", name: "cut", description: "cut", severity: "Minor", weeksRemaining: 2, penalties: {} } as InjuryData;
       const mockState = {
