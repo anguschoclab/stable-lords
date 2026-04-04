@@ -1,4 +1,4 @@
-import { GameState, RivalStableData } from "@/types/game";
+import { GameState, RivalStableData } from "@/types/state.types";
 import { seededRng } from "@/engine/rivals";
 import { updateAIStrategy } from "@/engine/ai/intentEngine";
 import { processAIStable } from "@/engine/ai/stableManager";
@@ -6,7 +6,7 @@ import { generateRivalStables } from "@/engine/rivals";
 import { aiDraftFromPool } from "@/engine/draftService";
 import { processAIRosterManagement } from "@/engine/ownerRoster";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
-import { runAIvsAIBouts } from "@/engine/matchmaking/rivalScheduler";
+import { processRivalBoutOffers } from "@/engine/ai/workers/competitionWorker";
 
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
@@ -14,88 +14,96 @@ import { runAIvsAIBouts } from "@/engine/matchmaking/rivalScheduler";
 
 export function runRivalStrategyPass(state: GameState, nextWeek: number): GameState {
   const rng = seededRng(nextWeek * 7919 + 13);
-  const currentRivals = [...(state.rivals || [])];
+  let currentState = state;
   const globalGazetteItems: string[] = [];
 
-  let currentPool = [...(state.hiringPool || [])];
-
   // 1. Process Individual Rival Stables (Economy/Strategy)
-  const processedRivals = currentRivals.map((rival, index) => {
+  const processedRivals = (state.rivals || []).map((rival, index) => {
     const strategySeed = nextWeek * 31 + index * 997 + rival.owner.id.length;
-    const strategy = updateAIStrategy(rival, state, strategySeed);
+    const strategy = updateAIStrategy(rival, currentState, strategySeed);
     const rivalWithStrategy = { ...rival, strategy };
-    const { updatedRival, isBankrupt, gazetteItems, updatedHiringPool } = processAIStable(rivalWithStrategy, state);
+    const { updatedRival, isBankrupt, gazetteItems } = processAIStable(rivalWithStrategy, currentState);
     globalGazetteItems.push(...gazetteItems);
-    currentPool = updatedHiringPool;
 
     if (isBankrupt) {
-      const replacementSeed = nextWeek + index * 1000;
-      const [newStable] = generateRivalStables(1, replacementSeed);
-      globalGazetteItems.push(`🆕 EXPANSION: ${newStable.owner.stableName} has moved into the district as a new rival!`);
+      const retirementSeed = nextWeek + index * 1000;
+      const [newStable] = generateRivalStables(1, retirementSeed);
+      globalGazetteItems.push(`🆕 RECRUITMENT: ${newStable.owner.stableName} has debuted in the league under ${newStable.owner.name}!`);
       return newStable as any as RivalStableData;
     }
     return updatedRival;
   });
 
+  currentState.rivals = processedRivals;
+
   // 2. Draft from Recruitment Pool
-  const draft = aiDraftFromPool(state.recruitPool, processedRivals, nextWeek, state);
+  const draft = aiDraftFromPool(state.recruitPool, currentState.rivals, nextWeek, currentState);
   globalGazetteItems.push(...draft.gazetteItems);
+  currentState.rivals = draft.updatedRivals;
+  currentState.recruitPool = draft.updatedPool;
 
   // 3. AI Roster Management (Recruitment/Retirement)
   const rosterSeed = nextWeek * 13 + 7;
   const { updatedRivals: finalizedRivals, gazetteItems: rosterGazette } = processAIRosterManagement({
-    ...state,
-    rivals: draft.updatedRivals,
-    recruitPool: draft.updatedPool,
+    ...currentState,
     week: nextWeek
   }, rosterSeed);
   globalGazetteItems.push(...rosterGazette);
+  currentState.rivals = finalizedRivals;
 
-  let newState = { 
-    ...state, 
-    rivals: finalizedRivals, 
-    recruitPool: draft.updatedPool, 
-    hiringPool: currentPool 
-  };
+  // 4. Contract Decision Phase: AI Stables accept/decline pending boutique offers
+  finalizedRivals.forEach(rival => {
+    currentState = processRivalBoutOffers(currentState, rival);
+  });
   
-  // 4. Tournament Handling
+  // 5. Tournament Handling (Every 13 weeks)
   if (nextWeek > 0 && nextWeek % 13 === 0) {
-    newState = handleSeasonalTournaments(newState, nextWeek);
-    return newState;
+    currentState = handleSeasonalTournaments(currentState, nextWeek);
   }
-
-  // 5. Background Rival Simulation (Rival-vs-Rival)
-  const rivalSeed = nextWeek * 7919 + 777;
-  const aiResults = runAIvsAIBouts(newState, rivalSeed);
-  newState.rivals = aiResults.updatedRivals;
-  globalGazetteItems.push(...aiResults.gazetteItems);
 
   if (globalGazetteItems.length > 0) {
-    newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: "Intelligence Report", items: globalGazetteItems }];
+    currentState.newsletter = [...(currentState.newsletter || []), { 
+      week: nextWeek, 
+      title: "Intelligence & Strategy Report", 
+      items: globalGazetteItems 
+    }];
   }
 
-  return newState;
+  return currentState;
 }
 
 function handleSeasonalTournaments(state: GameState, week: number): GameState {
   let newState = { ...state };
-  const tiers = ["Minor", "Established", "Major", "Legendary"];
-  const tournamentBouts: string[] = [];
   
-  tiers.forEach((tier, tIdx) => {
-    const tour = TournamentSelectionService.generateTournament(state, tier, week, state.season, week * 100 + tIdx);
+  // 🏆 4-Tier Selection Committee Logic: Generates and resolves all tiers
+  const tournaments = TournamentSelectionService.generateSeasonalTiers(newState, week, state.season, week * 881);
+  const tournamentNews: string[] = [];
+
+  tournaments.forEach((tour) => {
+    // 1. Add to state
     newState.tournaments = [...(newState.tournaments || []), tour];
-    newState = TournamentSelectionService.resolveCompleteTournament(newState, tour.id, week * 500 + tIdx);
+    
+    // 2. Resolve the entire tournament deterministically
+    newState = TournamentSelectionService.resolveCompleteTournament(newState, tour.id, week * 500 + hashStr(tour.id));
     
     const completedTour = newState.tournaments.find(t => t.id === tour.id);
-    tournamentBouts.push(`${tour.name} concluded. Champion: ${completedTour?.champion || "None"}`);
+    tournamentNews.push(`🏆 ${tour.name} finalized: ${completedTour?.champion || "Undisputed"} crowned champion.`);
   });
   
   newState.newsletter = [...(newState.newsletter || []), { 
     week: week, 
-    title: "🏆 GRAND CHAMPIONSHIP SEASON", 
-    items: tournamentBouts 
+    title: "🎖️ TOURNAMENT ARCHIVE", 
+    items: tournamentNews 
   }];
   
   return newState;
+}
+
+function hashStr(s: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    hash ^= s.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
 }
