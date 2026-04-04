@@ -75,7 +75,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
           .map(([key, config]) => {
             const color = config.theme?.["light"] || config.color;
             if (!color) return null;
-            return `[data-chart=${id}] { --color-${key}: ${color}; }`;
+            const safeKey = String(key).replace(/[^a-zA-Z0-9-]/g, "");
+            const safeColor = String(color).replace(/[<>"';{}]/g, "");
+            return `[data-chart=${id}] { --color-${safeKey}: ${safeColor}; }`;
           })
           .join("\n"),
       }}
