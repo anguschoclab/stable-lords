@@ -1,12 +1,11 @@
 import React from "react";
 import { type Warrior } from "@/types/game";
-import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { growthNarrative } from "./GrowthHelpers";
 import { generateWarriorStatements } from "@/data/warriorStatements";
+import { StatBattery } from "@/components/ui/StatBattery";
 
 export function AttrBar({ label, value, potential, max = 25 }: { label: string; value: number; potential?: number; max?: number }) {
-  const currentPct = (value / max) * 100;
   const growth = growthNarrative(value, potential);
 
   return (
@@ -28,27 +27,20 @@ export function AttrBar({ label, value, potential, max = 25 }: { label: string; 
               </Tooltip>
             </TooltipProvider>
           )}
-          <span className="text-sm font-mono font-semibold w-6 text-right">{value}</span>
         </div>
       </div>
-      <div className="relative">
-        <Progress value={currentPct} className="h-2 rounded-full overflow-hidden shadow-[0_0_5px_currentColor]" />
-      </div>
+      <StatBattery
+        label=""
+        value={value}
+        max={max}
+        className="[&>span:first-child]:hidden"
+      />
     </div>
   );
 }
 
 export function SkillBar({ label, value, max = 20 }: { label: string; value: number; max?: number }) {
-  const pct = (value / max) * 100;
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-muted-foreground w-8 font-mono">{label}</span>
-      <div className="flex-1">
-        <Progress value={pct} className="h-2 rounded-full overflow-hidden shadow-[0_0_5px_currentColor]" />
-      </div>
-      <span className="text-sm font-mono font-semibold w-6 text-right">{value}</span>
-    </div>
-  );
+  return <StatBattery label={label} value={value} max={max} />;
 }
 
 export function WarriorStatementsPanel({ warrior }: { warrior: Warrior }) {

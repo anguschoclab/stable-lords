@@ -1,15 +1,6 @@
-import { GameState, RivalStableData, OwnerPersonality } from "@/types/game";
+import { GameState, RivalStableData, OwnerPersonality, OwnerGrudge } from "@/types/game";
 import { getRecentFights } from "@/engine/core/historyUtils";
 import { PERSONALITY_CLASH } from "@/data/ownerData";
-
-export interface OwnerGrudge {
-  ownerIdA: string;
-  ownerIdB: string;
-  intensity: number; // 1-5
-  reason: string;
-  startWeek: number;
-  lastEscalation: number;
-}
 
 /**
  * Detect and escalate owner-to-owner grudges based on personality clashes

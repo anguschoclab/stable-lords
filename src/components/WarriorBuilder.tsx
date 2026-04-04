@@ -20,6 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { UserPlus, Shuffle, Shield, Swords, Heart, Zap, Eye, Brain, Dumbbell, Dices } from "lucide-react";
 import { randomWarriorName } from "@/data/randomNames";
+import { SkillBar } from "@/components/warrior/WarriorStats";
 import {
   FightingStyle,
   STYLE_DISPLAY_NAMES,
@@ -227,13 +228,7 @@ export default function WarriorBuilder({
             </CardHeader>
             <CardContent className="space-y-3">
               {Object.entries(stats.baseSkills).map(([key, val]) => (
-                <div key={key} className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-8 font-mono">{key}</span>
-                  <div className="flex-1">
-                    <Progress value={(val / 20) * 100} className="h-2" />
-                  </div>
-                  <span className="text-sm font-mono font-semibold w-6 text-right">{val}</span>
-                </div>
+                <SkillBar key={key} label={key} value={val} max={20} />
               ))}
             </CardContent>
           </Card>

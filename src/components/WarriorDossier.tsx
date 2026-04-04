@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { StatBadge } from "@/components/ui/WarriorBadges";
 import WarriorPaperDoll from "@/components/WarriorPaperDoll";
+import { StatBattery } from "@/components/ui/StatBattery";
 import { cn } from "@/lib/utils";
 
 interface WarriorDossierProps {
@@ -58,32 +59,27 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
         {/* Condition & PaperDoll Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-4">
-             <Card className="bg-secondary/20 border-none">
-              <CardContent className="p-3 space-y-2">
-                <div className="flex items-center justify-between text-[10px] uppercase font-bold text-muted-foreground">
-                  <span>Condition</span>
-                  <span>{condition}%</span>
-                </div>
-                <Progress 
-                  value={condition} 
-                  className={cn(
-                    "h-1.5",
-                    condition > 70 ? "[&>div]:bg-arena-fame" : condition > 30 ? "[&>div]:bg-arena-gold" : "[&>div]:bg-destructive"
-                  )}
-                />
-              </CardContent>
-            </Card>
             <Card className="bg-secondary/20 border-none">
-              <CardContent className="p-3 space-y-2">
-                <div className="flex items-center justify-between text-[10px] uppercase font-bold text-muted-foreground">
-                  <span>Fame</span>
-                  <span>{warrior.fame}</span>
+              <CardContent className="p-3 space-y-3">
+                <div className="space-y-1">
+                  <StatBattery
+                    label="CND"
+                    value={condition}
+                    max={100}
+                    labelValue={`${condition}%`}
+                    colorClass={condition > 70 ? "[&>div]:bg-arena-fame" : condition > 30 ? "[&>div]:bg-arena-gold" : "[&>div]:bg-destructive"}
+                    className="[&>span]:text-[10px] [&>span]:uppercase [&>span]:font-bold [&>span]:text-muted-foreground [&>.flex-1>div]:h-1.5"
+                  />
                 </div>
-                <div className="flex items-center gap-1">
-                  <Flame className="h-3 w-3 text-arena-fame" />
-                  <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                     <div className="h-full bg-arena-fame" style={{ width: `${Math.min(100, (warrior.fame / 100) * 100)}%` }} />
-                  </div>
+                <div className="space-y-1">
+                  <StatBattery
+                    label="FAME"
+                    value={warrior.fame}
+                    max={100}
+                    labelValue={warrior.fame}
+                    colorClass="[&>div]:bg-arena-fame"
+                    className="[&>span]:text-[10px] [&>span]:uppercase [&>span]:font-bold [&>span]:text-muted-foreground [&>.flex-1>div]:h-1.5"
+                  />
                 </div>
               </CardContent>
             </Card>

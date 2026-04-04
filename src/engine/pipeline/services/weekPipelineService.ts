@@ -122,6 +122,30 @@ export function advanceWeek(state: GameState): GameState {
   const weatherRng = seededRng(nextWeek * 1337 + 42);
   const nextWeather = rollWeather(() => weatherRng());
 
+  // 🍺 World Expansion: Random Tavern Brawl event
+  const brawlRng = seededRng(nextWeek * 999 + 1);
+  if (brawlRng() < 0.05 && newState.roster.length > 0) {
+    const activeWarriors = newState.roster.filter(w => w.status === "Active" && (!w.injuries || w.injuries.length === 0));
+    if (activeWarriors.length > 0) {
+      const brawlerIndex = Math.floor(brawlRng() * activeWarriors.length);
+      const brawler = activeWarriors[brawlerIndex];
+      brawler.fame += 5; // Boost reputation
+      brawler.injuries.push({
+        id: `injury_brawl_${nextWeek}_${brawler.id}`,
+        name: "Bruised knuckles (Tavern Brawl)",
+        description: "Got into a scrap at the local tavern. The crowd loved it, but the hands took a beating.",
+        severity: "Minor",
+        weeksRemaining: 1,
+        penalties: { ATT: -1 }
+      });
+      newState.newsletter = [...newState.newsletter, {
+        week: nextWeek,
+        title: "Tavern Brawl!",
+        items: [`${brawler.name} got into a wild tavern brawl last night! They gained +5 Fame but suffered a minor injury.`]
+      }];
+    }
+  }
+
   newState = { ...newState, week: nextWeek, season: nextSeason, trainingAssignments: [], weather: nextWeather };
 
   return archiveWeekLogs(newState);

@@ -4,6 +4,7 @@
  */
 import type { GameState, Warrior, FightSummary } from "@/types/game";
 import { isActive, isDead, isRetired, isFightReady } from "@/engine/warriorStatus";
+import { StableStats } from "@/engine/stats/stableStats";
 
 // ─── Roster Selectors ───────────────────────────────────────────────────
 
@@ -21,14 +22,7 @@ export const selectFightReadyWarriors = (state: GameState): Warrior[] =>
 
 // ─── Aggregate Stats ────────────────────────────────────────────────────
 
-export interface StableStats {
-  totalWins: number;
-  totalLosses: number;
-  totalKills: number;
-  winRate: number;
-}
-
-export const selectStableStats = (state: GameState): StableStats => {
+export const selectStableStats = (state: GameState): Pick<StableStats, 'totalWins' | 'totalLosses' | 'totalKills' | 'winRate'> => {
   let wins = 0;
   let losses = 0;
   let kills = 0;
