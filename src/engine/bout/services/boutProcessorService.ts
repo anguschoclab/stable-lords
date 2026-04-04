@@ -52,7 +52,7 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   s = applyRecords(s, currentW, currentO, outcome, tags, fameA, popA, fameD, popD, rivalStableId);
   const deathRes = handleDeath(s, currentW, currentO, outcome, week, tags, rivalStableId);
   s = deathRes.s;
-  const injuryRes = handleInjuries(s, currentW, currentO, outcome, week, rivalStableId);
+  const injuryRes = handleInjuries(s, currentW, currentO, outcome, week, rivalStableId, boutSeed);
   s = injuryRes.s;
   s = handleProgressions(s, currentW, currentO, outcome, tags, week, rivalStableId, boutSeed);
 

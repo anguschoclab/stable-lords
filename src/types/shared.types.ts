@@ -164,11 +164,26 @@ export type ScoutQuality = "Basic" | "Detailed" | "Expert";
 
 export type WeatherType = "Clear" | "Rainy" | "Scalding" | "Drafty" | "Overcast";
 
-// ─── Events ─────────────────────────────────────────────────────────────────
-
 export interface DeathEvent {
   boutId: string;
   killerId: string;
   deathSummary: string;
   memorialTags: string[];
+}
+
+// ─── Trainer Interface ───────────────────────────────────────────────────────
+
+export interface Trainer {
+  id: string;
+  name: string;
+  tier: TrainerTier;
+  focus: TrainerFocus;
+  fame: number;
+  age: number;
+  contractWeeksLeft: number; // 0 = expired
+  retiredFromWarrior?: string; // warrior name if converted
+  retiredFromStyle?: FightingStyle;
+  styleBonusStyle?: FightingStyle; // bonus for warriors of this style
+  legacyWins?: number;
+  legacyKills?: number;
 }

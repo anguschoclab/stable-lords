@@ -7,7 +7,14 @@ import { processAIStable } from "@/engine/ai/stableManager";
 import { generateRivalStables } from "@/engine/rivals";
 import { aiDraftFromPool } from "@/engine/draftService";
 import { seededRng } from "@/engine/rivals";
-import type { PoolWarrior, RivalStableData } from "@/types/game";
+import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
+import { generateOwnerNarratives } from "@/engine/ownerNarrative";
+import { processAIRosterManagement } from "@/engine/ownerRoster";
+import { generateId } from "@/utils/idUtils";
+import { updateEntityInList } from "@/utils/stateUtils";
+import type { PoolWarrior, RivalStableData, Trainer } from "@/types/game";
+import { convertRetiredToTrainer } from "@/engine/trainers";
+import { computeTrainerAging } from "@/engine/trainerAging";
 
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeEconomyImpact } from "@/engine/economy";
@@ -60,9 +67,19 @@ export function processRivalActions(state: GameState, newWeek: number): GameStat
   const draft = aiDraftFromPool(state.recruitPool, processedRivals, newWeek, state);
   globalGazetteItems.push(...draft.gazetteItems);
 
+  // 3. AI Roster Management (Recruitment/Retirement)
+  const rosterSeed = newWeek * 13 + 7;
+  const { updatedRivals: finalizedRivals, gazetteItems: rosterGazette } = processAIRosterManagement({
+    ...state,
+    rivals: draft.updatedRivals,
+    recruitPool: draft.updatedPool,
+    week: newWeek
+  }, rosterSeed);
+  globalGazetteItems.push(...rosterGazette);
+
   const newState = { 
     ...state, 
-    rivals: draft.updatedRivals, 
+    rivals: finalizedRivals, 
     recruitPool: draft.updatedPool, 
     hiringPool: currentPool 
   };
@@ -109,6 +126,30 @@ export function advanceWeek(state: GameState): GameState {
   newState = processHallOfFame(newState, nextWeek);
   newState = processTierProgression(newState, nextSeason, nextWeek);
 
+  // 🏆 Phase 2.5: Trainer Aging & Recruitment Legacy
+  const { updatedTrainers, news: trainerNews, updatedHiringPool } = computeTrainerAging(newState);
+  newState.trainers = updatedTrainers;
+  newState.hiringPool = updatedHiringPool;
+  if (trainerNews.length > 0) {
+    newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: "Trainer Career Updates", items: trainerNews }];
+  }
+
+  // 🏆 Phase 3: Seasonal adaptation (Narrative and Philosophy)
+  if (nextSeason !== state.season) {
+    const seasonSeed = nextWeek * 133;
+    const { updatedRivals, gazetteItems: philGazette } = evolvePhilosophies(newState, nextSeason, seasonSeed);
+    newState.rivals = updatedRivals;
+    const narrGazette = generateOwnerNarratives(newState, nextSeason, seasonSeed + 1);
+    
+    if (philGazette.length > 0 || narrGazette.length > 0) {
+      newState.newsletter = [...(newState.newsletter || []), { 
+        week: nextWeek, 
+        title: `${state.season} Season Wrap-up`, 
+        items: [...philGazette, ...narrGazette] 
+      }];
+    }
+  }
+
   // 🏆 Phase 4: Tournament Reward Tokens (Week 13, 26, 39, 52)
   if (currentWeek % 13 === 0) {
     const tokenRng = seededRng(currentWeek * 42 + 7);
@@ -129,16 +170,21 @@ export function advanceWeek(state: GameState): GameState {
     if (activeWarriors.length > 0) {
       const brawlerIndex = Math.floor(brawlRng() * activeWarriors.length);
       const brawler = activeWarriors[brawlerIndex];
-      brawler.fame += 5; // Boost reputation
-      brawler.injuries.push({
-        id: `injury_brawl_${nextWeek}_${brawler.id}`,
-        name: "Bruised knuckles (Tavern Brawl)",
-        description: "Got into a scrap at the local tavern. The crowd loved it, but the hands took a beating.",
-        severity: "Minor",
-        weeksRemaining: 1,
-        penalties: { ATT: -1 }
-      });
-      newState.newsletter = [...newState.newsletter, {
+      
+      newState.roster = updateEntityInList(newState.roster, brawler.id, (w) => ({
+        ...w,
+        fame: (w.fame || 0) + 5,
+        injuries: [...(w.injuries || []), {
+          id: generateId(),
+          name: "Bruised knuckles (Tavern Brawl)",
+          description: "Got into a scrap at the local tavern. The crowd loved it, but the hands took a beating.",
+          severity: "Minor",
+          weeksRemaining: 1,
+          penalties: { ATT: -1 }
+        }]
+      }));
+
+      newState.newsletter = [...(newState.newsletter || []), {
         week: nextWeek,
         title: "Tavern Brawl!",
         items: [`${brawler.name} got into a wild tavern brawl last night! They gained +5 Fame but suffered a minor injury.`]

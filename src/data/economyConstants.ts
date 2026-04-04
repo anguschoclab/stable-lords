@@ -2,12 +2,12 @@
  * Centralized Economy Constants for Stable Lords.
  * Ensures parity between Player and AI economic calculations.
  */
-export const FIGHT_PURSE = 15;     // Reduced from 75 to curb hyper-inflation
-export const WIN_BONUS = 10;       // Reduced from 40
-export const FAME_DIVIDEND = 0.5;   // Reduced from 2x (Critical for long-term balance)
+export const FIGHT_PURSE = 45;     // Increased for sustainability
+export const WIN_BONUS = 25;       // Increased for sustainability
+export const FAME_DIVIDEND = 0.5;   // Stable 0.5x fame dividend
 
-export const WARRIOR_UPKEEP_BASE = 55;
-export const TRAINING_COST = 35;
+export const WARRIOR_UPKEEP_BASE = 25; // Halved for sustainability
+export const TRAINING_COST = 20;     // Reduced to encourage progression
 export const SCOUT_COST = 25;
 export const REFRESH_COST = 50;
 

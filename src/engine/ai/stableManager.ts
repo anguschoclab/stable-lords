@@ -1,4 +1,4 @@
-import { type GameState, type RivalStableData, type TrainerData, type Season } from "@/types/game";
+import { type GameState, type RivalStableData, type Trainer, type Season } from "@/types/game";
 import { processStaff } from "./workers/staffWorker";
 import { processRoster } from "./workers/rosterWorker";
 import { consolidateAgentMemory, createAgentContext } from "./agentCore";
@@ -18,7 +18,7 @@ import {
 export function processAIStable(
   rival: RivalStableData,
   state: GameState
-): { updatedRival: RivalStableData; isBankrupt: boolean; gazetteItems: string[]; updatedHiringPool: TrainerData[] } {
+): { updatedRival: RivalStableData; isBankrupt: boolean; gazetteItems: string[]; updatedHiringPool: Trainer[] } {
   // 1. Initialize Context & Skeptical Memory
   const context = createAgentContext(rival, state);
   let updatedRival = { ...context.rival };
@@ -39,8 +39,9 @@ export function processAIStable(
       }
     }
   }
-  const totalFame = activeRoster.reduce((sum, w) => sum + (w.fame || 0), 0);
-  weeklyIncome += Math.round(totalFame * FAME_DIVIDEND);
+  const weeklyIncomeFromFights = weeklyIncome; // Bouts income
+  const fameDividend = Math.round((updatedRival.owner.fame || 0) * FAME_DIVIDEND);
+  weeklyIncome = weeklyIncomeFromFights + fameDividend;
 
   // 3. Delegate to Workers (Hierarchical Delegation)
   
@@ -55,7 +56,7 @@ export function processAIStable(
   updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed);
 
   // 4. Calculate Final Expenses
-  let weeklyExpenses = 20; // Base ops
+  let weeklyExpenses = 0; // Removed 20g hidden tax for parity
   
   // 🏛️ Unification: Fame-bracketed upkeep for AI
   const rosterUpkeep = activeRoster.reduce((sum, w) => {

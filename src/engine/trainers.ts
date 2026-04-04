@@ -48,10 +48,13 @@ export interface Trainer {
   tier: TrainerTier;
   focus: TrainerFocus;
   fame: number;
+  age: number; // New field for longevity
   contractWeeksLeft: number; // 0 = expired
   retiredFromWarrior?: string; // warrior name if converted
   retiredFromStyle?: FightingStyle;
   styleBonusStyle?: FightingStyle; // bonus for warriors of this style
+  legacyWins?: number; // Career stats for legend protection
+  legacyKills?: number;
 }
 
 // ─── Name Generation ──────────────────────────────────────────────────────
@@ -95,6 +98,7 @@ export function generateHiringPool(count: number, seed: number): Trainer[] {
       tier,
       focus,
       fame: tier === "Master" ? 5 : tier === "Seasoned" ? 3 : 1,
+      age: 30 + Math.floor(rng() * 25), // Diverse ages from 30 to 55
       contractWeeksLeft: 52, // 1 year
     });
   }
@@ -130,10 +134,13 @@ export function convertRetiredToTrainer(warrior: Warrior): Trainer {
     tier,
     focus,
     fame: warrior.fame,
+    age: warrior.age ?? 35, // Carry over warrior age
     contractWeeksLeft: 52,
     retiredFromWarrior: warrior.name,
     retiredFromStyle: warrior.style,
     styleBonusStyle: warrior.style,
+    legacyWins: warrior.career.wins,
+    legacyKills: warrior.career.kills,
   };
 }
 

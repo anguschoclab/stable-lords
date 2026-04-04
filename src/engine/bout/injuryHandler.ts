@@ -3,7 +3,7 @@ import { rollForInjury } from "@/engine/injuries";
 import { addRestState } from "@/engine/matchmaking/historyLogic";
 import { updateEntityInList } from "@/utils/stateUtils";
 
-export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, week: number, rivalStableId?: string) {
+export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, week: number, rivalStableId?: string, seed?: number) {
   let injured = false;
   const names: string[] = [];
   
@@ -12,8 +12,8 @@ export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: 
     s.restStates = addRestState(s.restStates || [], victimId, "KO", week);
   }
   
-  // 1. Process Warrior A (Usually Player, but let's be safe)
-  const injA = rollForInjury(wA, outcome, "A");
+  // 1. Process Warrior A
+  const injA = rollForInjury(wA, outcome, "A", seed);
   if (injA) { 
     injured = true; 
     names.push(wA.name); 
@@ -27,8 +27,8 @@ export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: 
     }
   }
   
-  // 2. Process Warrior D (Usually Rival)
-  const injD = rollForInjury(wD, outcome, "D");
+  // 2. Process Warrior D
+  const injD = rollForInjury(wD, outcome, "D", seed ? seed + 1 : undefined);
   if (injD) { 
     injured = true; 
     names.push(wD.name); 

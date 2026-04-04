@@ -6,6 +6,7 @@ import {
   type NewsletterItem,
   type TrainerTier,
   type TrainerFocus,
+  type Trainer,
   type ScoutQuality,
   type WeatherType
 } from "./shared.types";
@@ -83,17 +84,7 @@ export interface AIStrategy {
   planWeeksRemaining: number;
 }
 
-export interface TrainerData {
-  id: string;
-  name: string;
-  tier: TrainerTier;
-  focus: TrainerFocus;
-  fame: number;
-  contractWeeksLeft: number;
-  retiredFromWarrior?: string;
-  retiredFromStyle?: string;
-  styleBonusStyle?: string;
-}
+// TrainerData was here, now using Trainer from shared.types
 
 export interface AIEvent {
   week: number;
@@ -112,7 +103,7 @@ export interface AIAgentMemory {
 export interface RivalStableData {
   owner: Owner;
   roster: Warrior[];
-  trainers?: TrainerData[];
+  trainers?: Trainer[];
   gold: number;
   strategy?: AIStrategy;
   agentMemory?: AIAgentMemory;
@@ -226,8 +217,8 @@ export interface GameState {
   hallOfFame: HallEntry[];
   crowdMood: CrowdMoodType;
   tournaments: TournamentEntry[];
-  trainers: TrainerData[];
-  hiringPool: TrainerData[];
+  trainers: Trainer[];
+  hiringPool: Trainer[];
   trainingAssignments: TrainingAssignment[];
   seasonalGrowth: SeasonalGrowth[];
   rivals: RivalStableData[];

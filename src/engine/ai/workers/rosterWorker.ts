@@ -21,9 +21,12 @@ export function processRoster(
 
   // 1. Training (Low Risk)
   // ⚡ TSA: Prioritize Champion or high-fame units for training
-  const trainee = activeRoster.find(w => w.champion) || activeRoster.sort((a, b) => (b.fame || 0) - (a.fame || 0))[0];
+  const trainingLimit = updatedRival.gold > 500 ? 3 : 1;
+  const trainees = activeRoster
+    .sort((a, b) => (a.fame || 0) - (b.fame || 0))
+    .slice(0, trainingLimit);
   
-  if (trainee && updatedRival.gold > 200) {
+  for (const trainee of trainees) {
     const trainingCost = 35;
     const budgetReport = checkBudget(updatedRival, trainingCost, "ROSTER");
     
@@ -35,7 +38,7 @@ export function processRoster(
 
   // 2. Equipment (High Risk)
   if (intent === "EXPANSION" || (intent === "VENDETTA" && updatedRival.gold > 1000)) {
-    const gearCost = 400;
+    const gearCost = 150;
     const budgetReport = checkBudget(updatedRival, gearCost, "ROSTER");
     
     if (budgetReport.isAffordable) {
@@ -47,7 +50,7 @@ export function processRoster(
       if (gearCandidate) {
         updatedRival.gold -= gearCost;
         updatedRival.roster = updatedRival.roster.map(w => w.id === gearCandidate.id ? applyGearUpgrade(w, rng) : w);
-        updatedRival = logAgentAction(updatedRival, "ROSTER", `Invested 400g in gear for ${gearCandidate.name}.`, budgetReport.riskTier, currentWeek);
+        updatedRival = logAgentAction(updatedRival, "ROSTER", `Invested 150g in gear for ${gearCandidate.name}.`, budgetReport.riskTier, currentWeek);
       }
     }
   }

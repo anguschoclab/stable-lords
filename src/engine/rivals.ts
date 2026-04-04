@@ -1,4 +1,4 @@
-import { FightingStyle, type Warrior, type Owner, type RivalStableData } from "@/types/game";
+import { FightingStyle, type Warrior, type Owner, type RivalStableData, type Trainer } from "@/types/game";
 import { computeWarriorStats } from "./skillCalc";
 import { STABLE_TEMPLATES, type StableTemplate } from "@/data/stableTemplates";
 import { seededRng } from "@/utils/mathUtils";
@@ -9,15 +9,7 @@ export { seededRng };
  * AI Rival Stables — maintains the 23 AI stables that populate the world.
  */
 
-interface StableTrainer {
-  id: string;
-  name: string;
-  tier: "Novice" | "Seasoned" | "Master";
-  focus: "Aggression" | "Defense" | "Endurance" | "Mind" | "Healing";
-  fame: number;
-  contractWeeksLeft: number;
-  stableId: string;
-}
+// StableTrainer interface was here, now using Trainer from shared.types
 
 const TRAINER_FIRST_NAMES = [
   "Aldric", "Brenna", "Caius", "Dara", "Eryx", "Fenna", "Galthor", "Hessa",
@@ -42,8 +34,9 @@ export function getStableTemplates(): StableTemplate[] {
 
 /**
  * Generate rival stables from templates.
+ * Scaling: Provides bonus gold and stats for expansion stables joining mid-game.
  */
-export function generateRivalStables(count: number, seed: number): RivalStableData[] {
+export function generateRivalStables(count: number, seed: number, week: number = 0): RivalStableData[] {
   const rng = seededRng(seed);
   const usedWarriorNames = new Set<string>();
   const usedTrainerNames = new Set<string>();
@@ -82,7 +75,9 @@ export function generateRivalStables(count: number, seed: number): RivalStableDa
         ? tmpl.preferredStyles[Math.floor(rng() * tmpl.preferredStyles.length)]
         : Object.values(FightingStyle)[Math.floor(rng() * Object.values(FightingStyle).length)];
 
-      const attrs = biasedAttrs(rng, tmpl.attrBias);
+      // Catch-up Attribute Scaling: +1 point per week (cap +40)
+      const catchupStats = Math.min(40, week);
+      const attrs = biasedAttrs(rng, tmpl.attrBias, catchupStats);
       const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
 
       warriors.push({
@@ -104,8 +99,9 @@ export function generateRivalStables(count: number, seed: number): RivalStableDa
     const [minT, maxT] = tmpl.trainerRange;
     const trainers = generateStableTrainers(rng, stableId, tmpl.philosophy, minT + Math.floor(rng() * (maxT - minT + 1)), usedTrainerNames, tmpl.tier);
     
-    // Initial gold based on tier
-    const initialGold = tmpl.tier === "Legendary" ? 2000 : tmpl.tier === "Major" ? 1200 : tmpl.tier === "Established" ? 800 : 500;
+    // Initial gold based on tier + weekly catch-up (50g/week)
+    const catchupGold = week * 50;
+    const initialGold = (tmpl.tier === "Legendary" ? 2000 : tmpl.tier === "Major" ? 1200 : tmpl.tier === "Established" ? 800 : 500) + catchupGold;
 
     rivals.push({ 
       owner, 
@@ -132,9 +128,9 @@ export function generateRivalStables(count: number, seed: number): RivalStableDa
   return rivals;
 }
 
-function biasedAttrs(rng: () => number, bias: Record<string, number>) {
+function biasedAttrs(rng: () => number, bias: Record<string, number>, catchupPool: number = 0) {
   const attrs = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };
-  let pool = 70 - 21;
+  let pool = (70 - 21) + catchupPool;
   const weighted: (keyof typeof attrs)[] = [];
   for (const k of Object.keys(attrs) as (keyof typeof attrs)[]) {
     const w = bias[k] ?? 1;
@@ -150,7 +146,7 @@ function biasedAttrs(rng: () => number, bias: Record<string, number>) {
   return attrs;
 }
 
-function generateStableTrainers(rng: () => number, stableId: string, philosophy: string, count: number, usedNames: Set<string>, tier: string): StableTrainer[] {
+function generateStableTrainers(rng: () => number, stableId: string, philosophy: string, count: number, usedNames: Set<string>, tier: string): Trainer[] {
   const trainers: StableTrainer[] = [];
   const focusPool = PHILOSOPHY_TO_FOCUS[philosophy] ?? ["Aggression", "Defense", "Mind"];
   for (let i = 0; i < count; i++) {
@@ -163,8 +159,8 @@ function generateStableTrainers(rng: () => number, stableId: string, philosophy:
       tier: trainerTier,
       focus,
       fame: trainerTier === "Master" ? 5 : 1,
+      age: 30 + Math.floor(rng() * 35), // Diverse ages for rivals
       contractWeeksLeft: 52,
-      stableId,
     });
   }
   return trainers;

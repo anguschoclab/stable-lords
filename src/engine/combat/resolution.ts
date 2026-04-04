@@ -210,7 +210,10 @@ export function executeHit(
   defLabel: "A" | "D",
   stylePhase: StylePhase,
   phase: string,
-  attKD: number
+  attKD: number,
+  attOE: number,
+  attAL: number,
+  attMatchup: number
 ) {
   const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
   let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
@@ -251,7 +254,10 @@ export function executeHit(
         defender.endurance / defender.maxEndurance,
         hitLoc,
         attKD + killMech.killBonus,
-        phaseLevel
+        phaseLevel,
+        attOE,
+        attAL,
+        attMatchup
     );
 
     const decSuccess = skillCheck(rng, attacker.skills.DEC, Math.floor(attKD - 5) * 0.5 + phaseLevel + attOffMods.decBonus + killMech.decBonus);
@@ -425,7 +431,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     }
 
     if (!defResult.defended) {
-      executeHit(events, rng, attacker, defender, attTactics, attOffMods, attPassive, attLabel, defLabel, stylePhase, phase, attKD);
+      executeHit(events, rng, attacker, defender, attTactics, attOffMods, attPassive, attLabel, defLabel, stylePhase, phase, attKD, attOE, attAL, attMatchup);
     } else if (defResult.canRiposte) {
       const ripAfterParry = skillCheck(rng, defender.skills.RIP, defMatchup + defFat + RIPOSTE_PARRY_PENALTY + defDefMods.ripBonus + defPassive.ripBonus);
       if (ripAfterParry) executeRiposte(events, rng, attacker, defender, defTactics, defPassive, attLabel, defLabel);

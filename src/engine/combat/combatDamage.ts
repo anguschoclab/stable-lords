@@ -87,36 +87,52 @@ export function computeHitDamage(rng: () => number, damageClass: number, locatio
 
 /**
  * Calculates the probability of a lethal hit (Kill Window).
- * Tie fatal conversion rates to fatigue and vital locations (Head/Torso/Abdomen).
+ * Tie fatal conversion rates to fatigue, vital locations, and strategic risk (OE/AL).
  */
 export function calculateKillWindow(
   hpRatio: number,
   enduranceRatio: number,
   location: HitLocation,
   killDesire: number,
-  phaseLevel: number // 0 for Opening, 1 for Mid, 2 for Late
+  phaseLevel: number, // 0 for Opening, 1 for Mid, 2 for Late
+  attOE: number = 5,
+  attAL: number = 5,
+  matchupBonus: number = 0
 ): number {
   // Base threshold (lethal hits are rare but possible)
-  let threshold = 0.15; // Increased base lethality to ensure genuine permadeath threat
+  // Target: ~10% overall mortality across the league
+  let threshold = 0.08; 
 
   // HP factor: higher chance if HP is low (below 30%)
-  if (hpRatio < 0.3) threshold += 0.15;
-  else if (hpRatio < 0.5) threshold += 0.05;
+  if (hpRatio < 0.3) threshold += 0.12;
+  else if (hpRatio < 0.5) threshold += 0.04;
 
   // Endurance (Fatigue) factor: higher chance if target is exhausted (below 30%)
-  if (enduranceRatio < 0.3) threshold += 0.35; // Increased penalty for fighting while exhausted to ensure stamina matters
-  else if (enduranceRatio < 0.5) threshold += 0.15; // Increased penalty for fighting while exhausted
+  if (enduranceRatio < 0.3) threshold += 0.20; 
+  else if (enduranceRatio < 0.5) threshold += 0.08;
 
-  // Location factor: Vital spots are deadlier
-  if (location === "head") threshold += 0.20; // Increased to +0.20 for deadly head trauma
-  if (location === "chest" || location === "abdomen") threshold += 0.38; // Increased chest hit lethality by 8% to ensure heavy armor encumbrance trade-offs are a statistical necessity in late-game bouts.
+  // Location factor: Vital spots are deadlier (Now using multipliers for vital dominance)
+  let locMult = 1.0;
+  if (location === "head") locMult = 1.6;
+  if (location === "chest" || location === "abdomen") locMult = 1.4;
+  if (location === "right leg" || location === "left leg" || location === "right arm" || location === "left arm") locMult = 0.4;
+
+  threshold *= locMult;
+
+  // Strategic Risk (AL/OE): Aggression fuels lethality
+  // (attOE + attAL - 10) range is -8 to +10. 
+  // At OE 10/AL 10, bonus is +0.10. At OE 1/AL 1, penalty is -0.08.
+  threshold += (attOE + attAL - 10) * 0.01;
+
+  // Matchup Bias: Dominant styles find more fatal openings
+  threshold += matchupBonus * 0.04;
 
   // Kill Desire: Attacker's aggression
   threshold += (killDesire - 5) * 0.01;
 
   // Phase escalation: fights get more dangerous as time passes
-  threshold += phaseLevel * 0.05;
+  threshold += phaseLevel * 0.04;
 
-  // Cap at 75% for organic hits to allow high-risk scenarios (fatigued, vital hits) to truly threaten permadeath
-  return Math.max(0, Math.min(0.85, threshold)); // Increased cap to allow high-risk scenarios to truly threaten permadeath
+  // Cap at 85% for vitals, but limb hits are naturally capped by their locMult
+  return Math.max(0, Math.min(0.85, threshold));
 }
