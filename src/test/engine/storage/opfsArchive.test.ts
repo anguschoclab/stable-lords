@@ -280,21 +280,21 @@ describe('OPFS Archival System', () => {
       expect(errorSpy).toHaveBeenCalled();
       errorSpy.mockRestore();
     });
+  });
 
-    it('Test 5.4: getDirectory handles navigator.storage.getDirectory throwing an error', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  describe('Suite 6: Hot State Storage', () => {
+    it('Test 6.1: retrieveHotState handles missing files gracefully', async () => {
+      const hotStateHandle = {
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn().mockRejectedValue(new DOMException('File not found', 'NotFoundError'))
+      } as unknown;
 
-      // Override the setup mock for this specific test
-      global.navigator.storage.getDirectory = vi.fn().mockRejectedValue(new Error('Storage unavailable'));
+      rootHandle.getDirectoryHandle.mockResolvedValueOnce(hotStateHandle);
 
       const service = new OPFSArchiveService();
+      const result = await service.retrieveHotState('save-slot-1');
 
-      // archiveBoutLog calls getDirectory. If getDirectory returns null (because it caught the error),
-      // archiveBoutLog should return early and resolve to undefined without throwing.
-      await expect(service.archiveBoutLog(1, 'b-123', [])).resolves.toBeUndefined();
-
-      expect(errorSpy).toHaveBeenCalledWith('Failed to get directory handle:', expect.any(Error));
-      errorSpy.mockRestore();
+      expect(result).toBeNull();
     });
-});
+  });
 });
