@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Swords, Star, AlertTriangle, Lightbulb, Shirt, HardHat, Zap } from "lucide-react";
+import { Shield, Swords, Star, AlertTriangle, Lightbulb, Shirt, HardHat, Zap, Search } from "lucide-react";
 
 
 export default function EquipmentOptimizerPage() {
@@ -102,7 +103,14 @@ export default function EquipmentOptimizerPage() {
 }
 
 function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, carryCap }: { rec: any; isPrimary: boolean; selectedStyle: FightingStyle; activeWarriors: any[]; carryCap: number }) {
-  const matchingWarriors = activeWarriors.filter(w => w.style === selectedStyle);
+  const matchingWarriors = useMemo(() => activeWarriors.filter((w: any) => w.style === selectedStyle), [activeWarriors, selectedStyle]);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const filteredWarriors = useMemo(() => {
+    if (!searchQuery) return matchingWarriors;
+    return matchingWarriors.filter((w: any) => w.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [matchingWarriors, searchQuery]);
+
   const [targetWarriorId, setTargetWarriorId] = useState<string>(matchingWarriors[0]?.id ?? "");
   const { doUpdateEquipment } = useGameStore();
 
@@ -110,7 +118,7 @@ function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, car
     if (!targetWarriorId) return;
     doUpdateEquipment(targetWarriorId, rec.loadout);
     import("sonner").then(({ toast }) => {
-       const w = matchingWarriors.find(mw => mw.id === targetWarriorId);
+       const w = matchingWarriors.find((mw: any) => mw.id === targetWarriorId);
        toast.success(`Applied ${rec.label} to ${w?.name}`);
     });
   };
@@ -180,25 +188,39 @@ function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, car
                 {/* Apply Actions */}
                 {matchingWarriors.length > 0 && (
                   <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Select value={targetWarriorId} onValueChange={setTargetWarriorId}>
-                        <SelectTrigger className="h-8 text-xs flex-1">
-                          <SelectValue placeholder="Target warrior..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {matchingWarriors.map(w => (
-                            <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button 
-                        size="sm" 
-                        className="h-8 px-3 text-[10px]" 
-                        onClick={handleApply}
-                        disabled={!targetWarriorId}
-                      >
-                        Apply Loadout
-                      </Button>
+                    <div className="flex flex-col gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
+                        <Input 
+                          placeholder="Search name..." 
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="h-8 pl-7 text-[10px] bg-background/50"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Select value={targetWarriorId} onValueChange={setTargetWarriorId}>
+                          <SelectTrigger className="h-8 text-xs flex-1">
+                            <SelectValue placeholder="Select warrior..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {filteredWarriors.map((w: any) => (
+                              <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                            ))}
+                            {filteredWarriors.length === 0 && (
+                              <div className="p-2 text-[10px] text-center text-muted-foreground">No matches</div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <Button 
+                          size="sm" 
+                          className="h-8 px-3 text-[10px]" 
+                          onClick={handleApply}
+                          disabled={!targetWarriorId}
+                        >
+                          Apply
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}

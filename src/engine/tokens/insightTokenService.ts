@@ -1,4 +1,4 @@
-import { GameState, InsightToken, InsightTokenType, Warrior } from "@/types/game";
+import { GameState, InsightToken, InsightTokenType, Warrior, Attributes } from "@/types/game";
 import { generateId } from "@/utils/idUtils";
 
 /**
@@ -55,6 +55,23 @@ export const InsightTokenService = {
           ...updatedWarrior.favorites, 
           discovered: { ...updatedWarrior.favorites.discovered, rhythm: true } 
         };
+      } else if (token.type === "Attribute") {
+        // Permanent +1 to a primary attribute
+        const primaries: (keyof Attributes)[] = ["ST", "WT", "SP", "DF"];
+        const attrKey = primaries[Math.floor(Math.random() * primaries.length)];
+        const currentVal = updatedWarrior.attributes[attrKey] || 10;
+        updatedWarrior.attributes = { ...updatedWarrior.attributes, [attrKey]: currentVal + 1 };
+        token.detail = `Internalized: +1 ${attrKey}`;
+      } else if (token.type === "Style") {
+        // Permanent +1 to Attack (ATT) skill
+        if (updatedWarrior.baseSkills) {
+          updatedWarrior.baseSkills = { ...updatedWarrior.baseSkills, ATT: updatedWarrior.baseSkills.ATT + 1 };
+        }
+        token.detail = `Mastered Style: +1 ATT`;
+      } else if (token.type === "Tactic") {
+        // Add a "Tactical Insight" flair
+        updatedWarrior.flair = [...(updatedWarrior.flair || []), "Tactical Insight"];
+        token.detail = "Unlocked: Tactical Insight (Legacy)";
       }
     }
 

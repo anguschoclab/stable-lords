@@ -1,4 +1,4 @@
-import type { GameState, Warrior, RivalStableData, TournamentEntry, TournamentBout } from "@/types/game";
+import type { GameState, Warrior, RivalStableData, TournamentEntry, TournamentBout, WarriorStatus } from "@/types/game";
 import { makeWarrior } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNG } from "@/utils/random";
@@ -159,7 +159,7 @@ export const TournamentSelectionService = {
       
       return {
         ...w,
-        status: isVictim ? "Dead" : "Active" as any,
+        status: (isVictim ? "Dead" : "Active") as WarriorStatus,
         fatigue: isVictim ? 0 : Math.min(100, (w.fatigue || 0) + 25),
         career: {
           ...w.career,
@@ -197,9 +197,9 @@ export const TournamentSelectionService = {
        // Record in Graveyard
        updatedState.graveyard = [...(updatedState.graveyard || []), { 
          ...deadWarrior, 
-         status: "Dead" as any,
+         status: "Dead",
          deathWeek: state.week,
-       } as any];
+       }];
 
        // Filter from Roster/Rivals
        updatedState.roster = updatedState.roster.filter(w => w.id !== deadWarrior.id);

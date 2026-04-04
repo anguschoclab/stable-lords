@@ -1,5 +1,5 @@
 import type { Rivalry, FightSummary } from "@/types/game";
-import { MatchScoringService } from "../matchmakingServices";
+import { MatchScoringService, calculateRivalryScore } from "../matchmakingServices";
 import { getStablePairKey } from "@/utils/keyUtils";
 import { SeededRNG } from "@/utils/random";
 
@@ -13,12 +13,12 @@ export function updateRivalriesFromBouts(
   seed?: number
 ): Rivalry[] {
   const rivalries = [...existingRivalries];
-  const pairs = new Map<string, { a: string; b: string; bouts: number; deaths: number; upsets: number; lastReason: string }>();
+  const pairs = new Map<string, { a: string; b: string; bouts: number; deaths: number; upsets: number; lastReason: string; aFame: number; dFame: number }>();
   
   for (const f of weekFights) {
-    if (!f.stableA || !f.stableD) continue;
-    const key = getStablePairKey(f.stableA, f.stableD);
-    const entry = pairs.get(key) ?? { a: f.stableA, b: f.stableD, bouts: 0, deaths: 0, upsets: 0, lastReason: "" };
+    if (!f.a || !f.d) continue;
+    const key = getStablePairKey(f.a, f.d);
+    const entry = pairs.get(key) ?? { a: f.a, b: f.d, bouts: 0, deaths: 0, upsets: 0, lastReason: "", aFame: f.fameA || 0, dFame: f.fameD || 0 };
     
     entry.bouts++;
     if (f.by === "Kill") {
@@ -45,29 +45,31 @@ export function updateRivalriesFromBouts(
       (r.stableIdB === data.a && r.stableIdA === data.b)
     );
     
+    const rawDelta = calculateRivalryScore(data.bouts, data.deaths, data.upsets);
     const intensityDelta = MatchScoringService.calculatePairingScore({
-        playerWarrior: {} as any, 
-        rivalWarrior: {} as any,
+        p_fame: data.aFame || 0, 
+        r_fame: data.dFame || 0,
         playerStableId: data.a,
         rivalStableId: data.b,
         week: week,
         isRecentStyleMatch: false,
         isChallenged: false,
         isAvoided: false,
-        rng: new SeededRNG(seed ?? (week * 7919 + data.a.length + data.b.length)).next
+        rng: () => new SeededRNG(seed ?? (week * 7919 + data.a.length + data.dFame)).next()
     }) > 200 ? 2 : 1;
     
     if (existing) {
-      existing.intensity = Math.max(existing.intensity, Math.min(5, existing.intensity + Math.floor(intensityDelta / 2)));
+      // Direct update using the canonical score, clamped to 5
+      existing.intensity = Math.max(existing.intensity, Math.min(5, existing.intensity + intensityDelta + (rawDelta - 1)));
       if (data.deaths > 0 || data.upsets > 0) {
           existing.reason = data.lastReason || existing.reason;
       }
-    } else if (data.bouts >= 3) {
+    } else if (data.bouts >= 1) { // Any clash can start a rivalry
       rivalries.push({
         stableIdA: data.a,
         stableIdB: data.b,
-        intensity: 2,
-        reason: data.lastReason || `Frequent clashes in the arena`,
+        intensity: Math.min(5, intensityDelta + (rawDelta - 1)),
+        reason: data.lastReason || `Clashed in the arena`,
         startWeek: week
       });
     }

@@ -14,8 +14,8 @@ export class MatchScoringService {
    * Higher score = more likely to be booked.
    */
   static calculatePairingScore(params: {
-    playerWarrior: Warrior;
-    rivalWarrior: Warrior;
+    p_fame: number;
+    r_fame: number;
     rivalStableId: string;
     playerStableId: string;
     week: number;
@@ -28,7 +28,7 @@ export class MatchScoringService {
     rivalIntent?: string;
   }): number {
     const { 
-      playerWarrior: p, rivalWarrior: r, rivalryIntensity, 
+      p_fame, r_fame, rivalryIntensity, 
       lastMatchWeek, isRecentStyleMatch, isChallenged, 
       isAvoided, week, rng, rivalIntent
     } = params;
@@ -36,7 +36,7 @@ export class MatchScoringService {
     let score = 100;
 
     // 1. Fame proximity bonus (0-30)
-    score += Math.max(0, 30 - Math.abs(p.fame - r.fame) * 3);
+    score += Math.max(0, 30 - Math.abs(p_fame - r_fame) * 3);
 
     // 2. Rivalry & Strategic Intent
     if (rivalryIntensity !== undefined) {
@@ -49,7 +49,7 @@ export class MatchScoringService {
     }
 
     // RECOVERY: Avoid high-risk bouts
-    if (rivalIntent === "RECOVERY" && p.fame > r.fame + 20) {
+    if (rivalIntent === "RECOVERY" && p_fame > r_fame + 20) {
       score -= 200;
     }
 
