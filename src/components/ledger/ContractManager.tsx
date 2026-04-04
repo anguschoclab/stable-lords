@@ -140,7 +140,7 @@ export function ContractManager() {
                                           style={{ width: `${pct}%` }}
                                        />
                                     </div>
-                                    <span className={cn("text-[10px] font-mono font-black min-w-[30px] text-right", isExpiring ? "text-destructive" : "text-primary/60")}>
+                                    <span className={cn("text-[10px] font-mono font-black min-w-8 text-right", isExpiring ? "text-destructive" : "text-primary/60")}>
                                        {weeksLeft}W
                                     </span>
                                  </div>

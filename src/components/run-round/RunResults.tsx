@@ -46,7 +46,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
                 <CollapsibleTrigger asChild>
                   <div className="p-4 cursor-pointer flex items-center justify-between group">
                     <div className="flex items-center gap-6 flex-1">
-                       <div className="flex items-center gap-3 min-w-[140px]">
+                       <div className="flex items-center gap-3 min-w-36">
                           <div className={cn("w-1.5 h-6 rounded-full", isWinnerA ? "bg-primary" : "bg-muted-foreground/20")} />
                           <span className={cn("font-display font-black uppercase text-xs tracking-tight", isWinnerA ? "text-primary" : "text-muted-foreground")}>
                             {res.a.name}
@@ -60,7 +60,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
                           </Badge>
                        </div>
 
-                       <div className="flex items-center gap-3 min-w-[140px] justify-end text-right">
+                       <div className="flex items-center gap-3 min-w-36 justify-end text-right">
                           <span className={cn("font-display font-black uppercase text-xs tracking-tight", isWinnerD ? "text-primary" : "text-muted-foreground")}>
                             {res.d.name}
                           </span>

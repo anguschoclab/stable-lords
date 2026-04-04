@@ -91,7 +91,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
               >
                 <TableCell className="text-center">
                   <div className={cn(
-                    "font-mono text-xs font-black p-1 rounded border inline-block min-w-[24px]",
+                    "font-mono text-xs font-black p-1 rounded border inline-block min-w-6",
                     row.officialRank <= 64 ? "bg-arena-gold/10 text-arena-gold border-arena-gold/20" : 
                     row.officialRank <= 128 ? "bg-slate-400/10 text-slate-400 border-slate-400/20" :
                     "bg-neutral-800 text-muted-foreground border-border/10"

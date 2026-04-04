@@ -38,7 +38,7 @@ function StableSelector({
            </div>
            <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
         </div>
-        <div className="grid grid-cols-1 gap-1.5 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="grid grid-cols-1 gap-1.5 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           {rivals.map((r) => (
             <Tooltip key={r.owner.id}>
               <TooltipTrigger asChild>
@@ -84,7 +84,7 @@ function StableSelector({
               <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em]">Asset_Beta</span>
            </div>
         </div>
-        <div className="grid grid-cols-1 gap-1.5 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="grid grid-cols-1 gap-1.5 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
           {rivals.map((r) => (
             <Tooltip key={r.owner.id}>
               <TooltipTrigger asChild>

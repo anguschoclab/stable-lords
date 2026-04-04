@@ -214,7 +214,7 @@ export default function ResolutionReveal() {
                   <h2 className="text-3xl font-serif text-center mb-8 uppercase tracking-widest text-zinc-300">The Arena Remembers</h2>
                   <div className="flex gap-6 overflow-x-auto pb-4 max-w-[100%]">
                     {deadWarriors.map((w: Warrior) => (
-                      <div key={w.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg text-center min-w-[280px] shadow-2xl relative">
+                      <div key={w.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg text-center min-w-72 shadow-2xl relative">
                          <h3 className="text-2xl font-display font-bold text-red-500 mb-1 drop-shadow-md">{w.name}</h3>
                          <p className="text-sm text-zinc-400 mb-4 italic leading-relaxed">{w.deathCause || "Fallen in combat."}</p>
                          <Separator className="bg-zinc-800 mb-4" />

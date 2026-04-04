@@ -30,7 +30,7 @@ export function TournamentPrepDialog({ isOpen, onOpenChange, activeWarriors, sea
             Ensure fame limits and tactical equipment classes are synchronized.
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 thin-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2 thin-scrollbar">
             {activeWarriors.map((w) => (
               <Card key={w.id} className="border-border/40 bg-secondary/5 group hover:border-primary/40 transition-all">
                 <CardHeader className="p-4 pb-2 border-b border-border/10 bg-secondary/10 flex flex-row items-center justify-between">

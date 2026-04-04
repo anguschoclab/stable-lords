@@ -65,7 +65,7 @@ export function BiometricsTab({ warrior, displayWarrior }: BiometricsTabProps) {
                 <Eye className="h-4 w-4 text-primary" /> Coach's Notes
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 overflow-y-auto max-h-[300px] no-scrollbar">
+            <CardContent className="pt-4 overflow-y-auto max-h-80 no-scrollbar">
               <WarriorStatementsPanel warrior={warrior} />
             </CardContent>
           </Card>

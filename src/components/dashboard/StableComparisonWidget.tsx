@@ -227,7 +227,7 @@ export function StableComparisonWidget() {
       </div>
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
-         <button className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
+         <button aria-label="Global Registry Analysis" className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
             Global_Registry_Analysis <BarChart3 className="h-3 w-3 group-hover:scale-110 transition-transform" />
          </button>
       </div>

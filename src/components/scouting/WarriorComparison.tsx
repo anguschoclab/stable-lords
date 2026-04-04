@@ -60,7 +60,7 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
                )} />
             </div>
             
-            <div className="grid grid-cols-1 gap-1.5 max-h-[360px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <div className="grid grid-cols-1 gap-1.5 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
               {allWarriors.map(({ warrior: w, stable }) => (
                 <Tooltip key={w.id}>
                   <TooltipTrigger asChild>

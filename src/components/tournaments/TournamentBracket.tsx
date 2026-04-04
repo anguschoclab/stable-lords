@@ -110,7 +110,7 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                   </div>
 
                   {isExpanded && hasTranscript && fightSummary && (
-                    <div className="absolute top-0 left-full ml-4 z-50 w-[400px] animate-in fade-in slide-in-from-left-4 duration-300">
+                    <div className="absolute top-0 left-full ml-4 z-50 w-full max-w-md animate-in fade-in slide-in-from-left-4 duration-300">
                       <Card className="bg-glass-card border-primary/50 shadow-2xl overflow-hidden">
                         <CardHeader className="p-4 border-b border-border/20 bg-secondary/40">
                           <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center justify-between">

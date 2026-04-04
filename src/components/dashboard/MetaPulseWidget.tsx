@@ -89,7 +89,7 @@ export function MetaPulseWidget() {
       </div>
 
       <div className="px-6 py-4 border-t border-white/5 bg-black/40 flex justify-center mt-auto">
-         <button className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
+         <button aria-label="Access Full Intelligence" className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
             Access_Full_Intelligence <Activity className="h-3 w-3 group-hover:scale-110 transition-transform" />
          </button>
       </div>

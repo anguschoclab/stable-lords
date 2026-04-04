@@ -252,7 +252,7 @@ export function RivalryWidget() {
       </div>
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
-         <button className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-destructive transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
+         <button aria-label="Access Conflict Archives" className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-destructive transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
             Access_Conflict_Archives <TrendingUp className="h-3 w-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
          </button>
       </div>
