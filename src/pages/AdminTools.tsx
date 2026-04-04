@@ -7,7 +7,7 @@ import { useGameStore } from '@/state/useGameStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Download, Upload, Trash2, ShieldAlert, FastForward, Activity, Coins, Trophy, UserPlus } from 'lucide-react';
+import { Settings, Download, Upload, Trash2, ShieldAlert, FastForward, Activity, Coins, Trophy, UserPlus, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportActiveSlot } from '@/state/saveSlots';
 import { advanceWeek } from '@/state/gameStore';
@@ -179,8 +179,7 @@ export default function AdminTools() {
               </Button>
               <Button 
                 onClick={() => {
-                  const escalatedGrudges: Record<string, number> = { ...state.ownerGrudges };
-                  Object.keys(escalatedGrudges).forEach(k => escalatedGrudges[k] = 5);
+                  const escalatedGrudges = state.ownerGrudges.map(g => ({ ...g, intensity: 5 }));
                   setState({ ...state, ownerGrudges: escalatedGrudges });
                   toast.success('Blood feuds escalated to maximum.');
                 }} 
