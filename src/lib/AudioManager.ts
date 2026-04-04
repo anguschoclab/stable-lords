@@ -27,13 +27,13 @@ class AudioManager {
 
   private loadSfx() {
     const sfxMap: Record<SfxType, string> = {
-      ui_click: "https://assets.mixkit.co/sfx/preview/mixkit-click-melodic-tone-1157.mp3",
-      hit: "https://assets.mixkit.co/sfx/preview/mixkit-sword-clash-2160.mp3",
-      crit: "https://assets.mixkit.co/sfx/preview/mixkit-heavy-sword-clash-2161.mp3",
-      clash: "https://assets.mixkit.co/sfx/preview/mixkit-metal-blade-strike-2158.mp3",
-      death: "https://assets.mixkit.co/sfx/preview/mixkit-horror-low-reverb-drum-hit-2250.mp3",
-      recovery: "https://assets.mixkit.co/sfx/preview/mixkit-breath-of-relief-of-a-man-445.mp3",
-      coin: "https://assets.mixkit.co/sfx/preview/mixkit-clinking-coins-752.mp3",
+      ui_click: "/audio/ui_click.mp3",
+      hit:      "/audio/hit.mp3",
+      crit:     "/audio/crit.mp3",
+      clash:    "/audio/clash.mp3",
+      death:    "/audio/death.mp3",
+      recovery: "/audio/recovery.mp3",
+      coin:     "/audio/coin.mp3",
     };
 
     Object.entries(sfxMap).forEach(([key, url]) => {

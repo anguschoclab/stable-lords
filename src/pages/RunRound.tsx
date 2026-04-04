@@ -5,10 +5,10 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { advanceWeek } from "@/state/gameStore";
-import { generateMatchCard } from "@/engine/matchmaking/bracketEngine";
+import { generatePairings } from "@/engine/bout/core/pairings";
 import { isFightReady } from "@/engine/warriorStatus";
 import { processWeekBouts, type BoutResult } from "@/engine/boutProcessor";
-import { runAutosim, type AutosimResult, type WeekSummary } from "@/engine/autosim";
+import { runAutosim, type AutosimResult } from "@/engine/autosim";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,12 +28,19 @@ export default function RunRound() {
   const [results, setResults] = useState<BoutResult[]>([]);
   const [running, setRunning] = useState(false);
   const [autosimming, setAutosimming] = useState(false);
-  const [autosimProgress, setAutosimProgress] = useState<{ current: number; total: number; lastSummary?: WeekSummary } | null>(null);
+  const [autosimProgress, setAutosimProgress] = useState<{ current: number; total: number } | null>(null);
   const [autosimResult, setAutosimResult] = useState<AutosimResult | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const fightReady = useMemo(() => state.roster.filter(isFightReady), [state.roster]);
-  const matchCard = useMemo(() => generateMatchCard(state), [state]);
+  const fightReady = useMemo(() => state.roster.filter(w => isFightReady(w)), [state.roster]);
+  const matchCard = useMemo(() => {
+    return generatePairings(state).map(p => ({
+      playerWarrior: p.a,
+      rivalWarrior: p.d,
+      rivalStable: state.rivals.find(r => r.owner.id === p.rivalStableId) || { owner: { id: p.rivalStableId, stableName: p.rivalStable } } as any,
+      isRivalryBout: p.isRivalry
+    }));
+  }, [state]);
 
   const handleRunWeek = useCallback(() => {
     if (running) return;
@@ -82,8 +89,9 @@ export default function RunRound() {
     setAutosimming(true);
     setAutosimResult(null);
 
-    const result = await runAutosim(state, weeks, (current, total, lastSummary) => {
-      setAutosimProgress({ current, total, lastSummary });
+    // Filter autosim call to match expected single-arg callback if necessary or use proper any
+    const result = await runAutosim(state, weeks, (currentWeek: number) => {
+      setAutosimProgress({ current: currentWeek, total: weeks });
     });
 
     setAutosimming(false);
