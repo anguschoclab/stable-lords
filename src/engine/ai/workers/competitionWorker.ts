@@ -92,8 +92,12 @@ export function verifyBoutAcceptance(
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
   
   // ⚡ Weather Skepticism
-  if (weather === "Rainy" && warrior.style === FightingStyle.LungingAttack) {
-    return { accepted: false, reason: "Precision style at disadvantage in Rainy conditions." };
+  if (weather === "Rainy" && warrior.style === "LungingAttack") {
+    return { accepted: false, reason: "Precision penalty in rain." };
+  }
+
+  if (weather === "Scalding" && warrior.attributes.CN < 15) {
+     return { accepted: false, reason: "Heatstroke risk too high." };
   }
 
   // Skeptical Check: RECOVERY agents refuse fights with "Killers"

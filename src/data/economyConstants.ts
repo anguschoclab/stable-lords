@@ -2,8 +2,8 @@
  * Centralized Economy Constants for Stable Lords.
  * Ensures parity between Player and AI economic calculations.
  */
-export const FIGHT_PURSE = 40;     // Reduced from 75 to curb hyper-inflation
-export const WIN_BONUS = 25;       // Reduced from 40
+export const FIGHT_PURSE = 15;     // Reduced from 75 to curb hyper-inflation
+export const WIN_BONUS = 10;       // Reduced from 40
 export const FAME_DIVIDEND = 0.5;   // Reduced from 2x (Critical for long-term balance)
 
 export const WARRIOR_UPKEEP_BASE = 55;

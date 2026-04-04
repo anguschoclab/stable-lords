@@ -22,6 +22,7 @@ import { WarriorDossier } from "@/components/WarriorDossier";
 import { StableDossier } from "@/components/StableDossier";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, User, Landmark } from "lucide-react";
+import type { GameState, Warrior } from "@/types/game";
 
 // ─── Warrior Link ──────────────────────────────────────────────────────────
 
@@ -63,11 +64,13 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
                   <User className="h-5 w-5 text-primary" />
                   Warrior Dossier
                 </div>
-                <Link to={`/warrior/${resolvedId}` as any}>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full profile" aria-label="View full warrior profile">
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </Link>
+                {resolvedId && (
+                  <Link to={`/warrior/$id`} params={{ id: resolvedId }}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full profile" aria-label="View full warrior profile">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
               </SheetTitle>
             </SheetHeader>
             <div className="mt-6 h-full">
@@ -83,16 +86,16 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
   );
 }
 
-function resolveWarriorId(name: string, state: any): string | undefined {
+function resolveWarriorId(name: string, state: GameState): string | undefined {
   if (!state) return undefined;
-  const active = state.roster?.find((w: any) => w.name === name);
+  const active = state.roster?.find((w: Warrior) => w.name === name);
   if (active) return active.id;
-  const dead = state.graveyard?.find((w: any) => w.name === name);
+  const dead = state.graveyard?.find((w: Warrior) => w.name === name);
   if (dead) return dead.id;
-  const retired = state.retired?.find((w: any) => w.name === name);
+  const retired = state.retired?.find((w: Warrior) => w.name === name);
   if (retired) return retired.id;
   for (const rival of state.rivals ?? []) {
-    const rw = rival.roster?.find((w: any) => w.name === name);
+    const rw = rival.roster?.find((w: Warrior) => w.name === name);
     if (rw) return rw.id;
   }
   return undefined;
@@ -141,11 +144,19 @@ export function StableLink({ name, className, children }: StableLinkProps) {
                   <Landmark className="h-5 w-5 text-arena-gold" />
                   Stable Records
                 </div>
-                <Link to={isPlayer ? "/stable" : (`/stable/${stableId}` as any)}>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </Link>
+                {isPlayer ? (
+                  <Link to="/stable">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                ) : stableId ? (
+                  <Link to="/stable/$id" params={{ id: stableId }}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                ) : null}
               </SheetTitle>
             </SheetHeader>
             <div className="mt-6 h-full">

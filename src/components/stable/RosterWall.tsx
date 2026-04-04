@@ -88,6 +88,7 @@ export function RosterWall() {
                     <button
                       onClick={() => navigate({ to: "/warrior/$id", params: { id: w.id } as any })}
                       className="w-full relative group"
+                      aria-label={`View profile for ${w.name}`}
                     >
                       <Surface 
                         variant="paper" 
@@ -191,7 +192,10 @@ export function RosterWall() {
                                        </span>
                                     </div>
                                  </div>
-                                 <button className="flex items-center gap-2 group/btn px-4 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-primary/50 transition-all">
+                                 <button
+                                    className="flex items-center gap-2 group/btn px-4 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-primary/50 transition-all"
+                                    aria-label={`View tactical report for ${w.name}`}
+                                 >
                                     <span className="text-[9px] font-black uppercase tracking-widest group-hover/btn:text-primary transition-colors">Tactical_Report</span>
                                     <ChevronRight className="h-3 w-3 opacity-20 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all" />
                                  </button>

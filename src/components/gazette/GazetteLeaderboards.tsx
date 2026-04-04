@@ -122,17 +122,27 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
 }
 
 export function BestByStyle({ allFights }: LeaderboardProps) {
-  const styles = ["Brawler", "Technician", "High-Flyer", "Powerhouse", "Grappler"];
+  const styles = useMemo(() => ["Brawler", "Technician", "High-Flyer", "Powerhouse", "Grappler"], []);
   const bestData = useMemo(() => {
     return styles.map(style => {
       const warriors: Record<string, number> = {};
-      allFights.forEach(f => {
-        if (f.winnerStyle === style) warriors[f.winner] = (warriors[f.winner] || 0) + 1;
-      });
-      const top = Object.entries(warriors).sort((a, b) => b[1] - a[1])[0];
-      return { style, name: top?.[0] || "No Data", wins: top?.[1] || 0 };
+      for (let i = 0; i < allFights.length; i++) {
+        const f = allFights[i];
+        if (f.winnerStyle === style) {
+          warriors[f.winner] = (warriors[f.winner] || 0) + 1;
+        }
+      }
+      let topName = "No Data";
+      let topWins = 0;
+      for (const [name, wins] of Object.entries(warriors)) {
+         if (wins > topWins) {
+            topWins = wins;
+            topName = name;
+         }
+      }
+      return { style, name: topName, wins: topWins };
     });
-  }, [allFights]);
+  }, [allFights, styles]);
 
   return (
     <Surface variant="glass" className="border-border/10 bg-neutral-900/40 relative overflow-hidden h-full">

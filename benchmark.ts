@@ -62,7 +62,7 @@ import { processWeekBouts } from "./src/engine/boutProcessor";
 import { computeMetaDrift } from "./src/engine/metaDrift";
 import { FightingStyle } from "./src/types/game";
 import { computeWarriorStats } from "./src/engine/skillCalc";
-import { FIGHT_PURSE, WIN_BONUS, WARRIOR_UPKEEP } from "./src/engine/economy";
+import { FIGHT_PURSE, WIN_BONUS, WARRIOR_UPKEEP_BASE } from "./src/data/economyConstants";
 import { KILL_THRESHOLD_BASE } from "./src/engine/combat/resolution";
 
 // Polyfill crypto for node if needed
@@ -347,10 +347,10 @@ async function runDailySimulation() {
 
   if (inflationRatio > 2.0) {
     needsChanges = true;
-    report += `- **Economy Issue:** High inflation. **Recommendation:** Lower \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${Math.max(10, FIGHT_PURSE - 25)}, and \`WIN_BONUS\` from ${WIN_BONUS} to ${Math.max(10, WIN_BONUS - 15)} in \`src/engine/economy.ts\` to curb hyper-inflation.\n`;
+    report += `- **Economy Issue:** High inflation. **Recommendation:** Lower \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${Math.max(10, FIGHT_PURSE - 25)}, and \`WIN_BONUS\` from ${WIN_BONUS} to ${Math.max(10, WIN_BONUS - 15)} in \`src/data/economyConstants.ts\` to curb hyper-inflation.\n`;
   } else if (inflationRatio < 0.5) {
     needsChanges = true;
-    report += `- **Economy Issue:** Negative economy balance. **Recommendation:** Increase \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${FIGHT_PURSE + 25} or lower \`WARRIOR_UPKEEP\` from ${WARRIOR_UPKEEP} to ${Math.max(0, WARRIOR_UPKEEP - 10)} in \`src/engine/economy.ts\` to prevent early bankruptcies.\n`;
+    report += `- **Economy Issue:** Negative economy balance. **Recommendation:** Increase \`FIGHT_PURSE\` from ${FIGHT_PURSE} to ${FIGHT_PURSE + 25} or lower \`WARRIOR_UPKEEP_BASE\` from ${WARRIOR_UPKEEP_BASE} to ${Math.max(0, WARRIOR_UPKEEP_BASE - 10)} in \`src/data/economyConstants.ts\` to prevent early bankruptcies.\n`;
   }
 
   if (killRateNum < 8.0) {
