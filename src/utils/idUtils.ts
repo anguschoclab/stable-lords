@@ -36,5 +36,5 @@ export function generateId(): string {
   }
 
   // Ultimate fallback
-  return `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+  return Date.now() + "_" + Math.floor(Math.random() * 1e6);
 }
