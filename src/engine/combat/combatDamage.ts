@@ -100,8 +100,8 @@ export function calculateKillWindow(
   matchupBonus: number = 0
 ): number {
   // Base threshold (lethal hits are rare but possible)
-  // Target: ~10% overall mortality across the league (~0.8% per bout at 12 bouts/yr)
-  let threshold = 0.008; 
+  // Target: ~10% overall mortality across the league (~1.2% per bout at 12 bouts/yr)
+  let threshold = 0.012; 
 
   // HP factor: higher chance if HP is low (below 30%)
   if (hpRatio < 0.3) threshold += 0.012;
