@@ -106,7 +106,7 @@ export function setActiveSlot(slotId: string): void {
 
 /** Generate a unique slot ID */
 export function newSlotId(): string {
-  return `slot_${Date.now()}_${Math.floor(Math.random() * 1e4)}`;
+  return `slot_${Date.now()}_${crypto.getRandomValues(new Uint32Array(1))[0]}`;
 }
 
 /**

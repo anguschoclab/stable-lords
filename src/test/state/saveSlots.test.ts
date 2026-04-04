@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { parseImportedSave } from "../../state/saveSlots";
+import { parseImportedSave, newSlotId } from "../../state/saveSlots";
 
 describe("saveSlots", () => {
   describe("parseImportedSave", () => {
@@ -35,6 +35,16 @@ describe("saveSlots", () => {
       });
       expect(() => parseImportedSave(json)).toThrow("Save file is missing required fields (player/meta).");
       errorSpy.mockRestore();
+    });
+  });
+
+  describe("newSlotId", () => {
+    it("should generate a unique slot ID securely", () => {
+      const id1 = newSlotId();
+      const id2 = newSlotId();
+      expect(id1).toMatch(/^slot_\d+_\d+$/);
+      expect(id2).toMatch(/^slot_\d+_\d+$/);
+      expect(id1).not.toBe(id2);
     });
   });
 });
