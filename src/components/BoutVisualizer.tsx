@@ -220,6 +220,8 @@ function PlaybackControls({
                      "w-8 h-6 rounded flex items-center justify-center text-[10px] font-mono transition-all border",
                      speed === s ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-muted-foreground border-border hover:border-primary/50"
                    )}
+                   aria-label={`Set playback speed to ${s}x`}
+                   aria-pressed={speed === s}
                  >
                    {s}x
                  </button>

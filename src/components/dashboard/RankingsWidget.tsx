@@ -56,6 +56,7 @@ export function RankingsWidget() {
                 key={w.id}
                 className="w-full flex items-center gap-6 px-6 py-4 hover:bg-white/2 transition-all group/row text-left relative overflow-hidden"
                 onClick={() => navigate({ to: `/warrior/${w.id}` as any })}
+                aria-label={`View profile for ${w.name}`}
               >
                 {/* Visual Rank Indicator */}
                 <div className="flex items-center gap-4 shrink-0">

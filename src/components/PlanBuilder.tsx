@@ -259,6 +259,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
                                       onPlanChange({ ...plan, phases: next });
                                     }}
                                     className="text-[9px] font-black uppercase text-arena-blood hover:underline"
+                                    aria-label={`Clear phase ${p}`}
                                   >Clear</button>
                                 )}
                               </div>
