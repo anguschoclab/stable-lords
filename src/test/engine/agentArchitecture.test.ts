@@ -55,37 +55,41 @@ describe("AI Agent Architecture - Weather Skepticism", () => {
     id: "w1", 
     name: "Lunge Buster", 
     style: "LungingAttack", 
-    attributes: { CON: 10 } 
+    attributes: { CN: 10 }
   } as unknown as Warrior;
   
   const tankWarrior = { 
     id: "w2", 
     name: "Iron Wall", 
     style: "Guard", 
-    attributes: { CON: 60 } 
+    attributes: { CN: 60 }
   } as unknown as Warrior;
 
-  const mockRival = { gold: 500 } as RivalStableData;
+  const mockRival = { gold: 500, owner: { personality: "Aggressive" } } as unknown as RivalStableData;
 
   it("should decline a bout for LungingAttack in Rainy weather", () => {
-    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Rainy");
+    const mockCalculated = { gold: 500, owner: { personality: "Calculated" } } as unknown as RivalStableData;
+    const decision = verifyBoutAcceptance(mockCalculated, lungeWarrior, tankWarrior, mockRival, "Rainy");
     expect(decision.accepted).toBe(false);
     expect(decision.reason).toContain("Precision penalty");
   });
 
   it("should accept a bout for LungingAttack in Clear weather", () => {
-    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Clear");
+    const mockCalculated = { gold: 500, owner: { personality: "Calculated" } } as unknown as RivalStableData;
+    const decision = verifyBoutAcceptance(mockCalculated, lungeWarrior, tankWarrior, mockRival, "Clear");
     expect(decision.accepted).toBe(true);
   });
 
   it("should decline a bout for low CON warrior in Scalding weather", () => {
-    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Scalding");
+    const mockCalculated = { gold: 500, owner: { personality: "Calculated" } } as unknown as RivalStableData;
+    const decision = verifyBoutAcceptance(mockCalculated, lungeWarrior, tankWarrior, mockRival, "Scalding");
     expect(decision.accepted).toBe(false);
     expect(decision.reason).toContain("Heatstroke");
   });
 
   it("should accept a bout for high CON warrior in Scalding weather", () => {
-    const decision = verifyBoutAcceptance(mockRival, tankWarrior, lungeWarrior, mockRival, "Scalding");
+    const mockCalculated = { gold: 500, owner: { personality: "Calculated" } } as unknown as RivalStableData;
+    const decision = verifyBoutAcceptance(mockCalculated, tankWarrior, lungeWarrior, mockRival, "Scalding");
     expect(decision.accepted).toBe(true);
   });
 });

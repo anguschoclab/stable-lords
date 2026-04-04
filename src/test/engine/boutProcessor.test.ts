@@ -40,7 +40,8 @@ describe("boutProcessor - resolveBout", () => {
         player: { id: "p1" },
         crowdMood: "Calm",
         rivalries: [],
-        matchHistory: []
+        matchHistory: [],
+        graveyard: []
     };
 
     it("should update records after a bout", () => {
