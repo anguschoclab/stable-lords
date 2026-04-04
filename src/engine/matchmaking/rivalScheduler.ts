@@ -83,8 +83,7 @@ export function pairAIWarriors(pool: AIPoolWarrior[], rivals: RivalStableData[],
     // Find best defender based on bid criteria
     const candidates = pool.filter(p => {
       if (paired.has(p.warrior.id)) return false;
-      if (disallowStablemates(bid.targetStableId || "", p.stableId)) return false; // This check was slightly bugged in bid, corrected logic here
-      if (p.stableId === attackerPoolEntry.stableId) return false;
+      if (disallowStablemates(attackerPoolEntry.stableId, p.stableId)) return false; // Ensure they aren't from the same stable
 
       // Bid Filters
       if (bid.targetStableId && p.stableId !== bid.targetStableId) return false;
