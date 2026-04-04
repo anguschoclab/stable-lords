@@ -11,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getRecentFights } from "@/engine/core/historyUtils";
 
 export interface DerivedRivalry {
   stableName: string;
@@ -46,8 +47,9 @@ function useRivalWarriorStable(state: GameState): Map<string, string> {
 function useRivalriesList(state: GameState, rosterNames: Set<string>, rivalWarriorStable: Map<string, string>): DerivedRivalry[] {
   return useMemo(() => {
     const map = new Map<string, DerivedRivalry>();
+    const recentHistory = getRecentFights(state.arenaHistory || [], Math.max(1, state.week - 13));
 
-    for (const bout of (state.arenaHistory || [])) {
+    for (const bout of recentHistory) {
       const aIsPlayer = rosterNames.has(bout.a);
       const dIsPlayer = rosterNames.has(bout.d);
       if (!aIsPlayer && !dIsPlayer) continue;
@@ -95,14 +97,15 @@ function useRivalriesList(state: GameState, rosterNames: Set<string>, rivalWarri
     }
 
     return [...map.values()].filter(r => r.bouts > 0).sort((a, b) => b.intensity - a.intensity);
-  }, [state.arenaHistory, rosterNames, rivalWarriorStable, state.rivals]);
+  }, [state.arenaHistory, state.week, rosterNames, rivalWarriorStable, state.rivals]);
 }
 
 // Custom Hook to calculate the most wanted rival
 function useMostWantedRival(state: GameState, rosterNames: Set<string>, rivalWarriorStable: Map<string, string>) {
   return useMemo(() => {
     const winCounts = new Map<string, { name: string; stable: string; wins: number; kills: number }>();
-    for (const bout of (state.arenaHistory || [])) {
+    const recentHistory = getRecentFights(state.arenaHistory || [], Math.max(1, state.week - 13));
+    for (const bout of recentHistory) {
       const aIsPlayer = rosterNames.has(bout.a);
       const dIsPlayer = rosterNames.has(bout.d);
       if (!aIsPlayer && !dIsPlayer) continue;
@@ -119,7 +122,7 @@ function useMostWantedRival(state: GameState, rosterNames: Set<string>, rivalWar
     }
     return [...winCounts.values()].sort((a, b) => b.wins - a.wins || b.kills - a.kills)[0] ?? null;
 
-  }, [state.arenaHistory, rosterNames, rivalWarriorStable]);
+  }, [state.arenaHistory, state.week, rosterNames, rivalWarriorStable]);
 }
 
 const intensityLabel = (n: number) =>
