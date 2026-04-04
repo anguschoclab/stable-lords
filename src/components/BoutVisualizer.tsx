@@ -20,7 +20,7 @@ import {
   Flame,
   Target
 } from "lucide-react";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { motion, AnimatePresence, useAnimation, type AnimationControls } from "framer-motion";
 import { classifyEvent } from "@/lib/boutUtils";
 import { useBoutPlayback } from "@/hooks/useBoutPlayback";
 
@@ -114,10 +114,10 @@ function BoutHeader({ nameA, nameD, styleA, styleD, winner, isComplete, isPlayin
 
 
 interface ImpactStageProps {
-  stageControls: any;
-  currentEvent: any;
+  stageControls: AnimationControls;
+  currentEvent: MinuteEvent | null;
   visibleCount: number;
-  eventType: string;
+  eventType: ReturnType<typeof classifyEvent>;
 }
 
 function ImpactStage({ stageControls, currentEvent, visibleCount, eventType }: ImpactStageProps) {
@@ -141,7 +141,7 @@ function ImpactStage({ stageControls, currentEvent, visibleCount, eventType }: I
                 animate={{ rotate: 0 }}
                 className="p-4 rounded-full bg-secondary/80 border border-arena-gold/30 shadow-[0_0_20px_rgba(255,191,0,0.1)]"
               >
-                {getEventIcon(eventType as any)}
+                {getEventIcon(eventType)}
               </motion.div>
             </div>
             <p className={cn(
@@ -165,7 +165,7 @@ interface PlaybackControlsProps {
   speed: 1 | 2 | 3;
   visibleCount: number;
   totalEvents: number;
-  log: any[];
+  log: MinuteEvent[];
   isComplete: boolean;
   reset: () => void;
   togglePlay: () => void;
@@ -215,7 +215,7 @@ function PlaybackControls({
                {[1, 2, 3].map(s => (
                  <button
                    key={s}
-                   onClick={() => setSpeed(s as any)}
+                   onClick={() => setSpeed(s as 1 | 2 | 3)}
                    className={cn(
                      "w-8 h-6 rounded flex items-center justify-center text-[10px] font-mono transition-all border",
                      speed === s ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-muted-foreground border-border hover:border-primary/50"

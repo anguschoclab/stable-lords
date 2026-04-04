@@ -8,6 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import BoutViewer from "./BoutViewer";
 import { Newspaper, Skull, Activity, Swords, ChevronRight } from "lucide-react";
+import type { GazetteStory, Warrior } from "@/types/game";
+import type { BoutResult } from "@/engine/boutProcessor";
 
 type RevealStep = "gazette" | "injuries" | "bouts" | "memorial";
 
@@ -88,7 +90,7 @@ export default function ResolutionReveal() {
                 <ScrollArea className="h-[calc(100%-4rem)] pr-4">
                   {data.gazette.length > 0 ? (
                     <div className="space-y-6">
-                      {data.gazette.map((article: any, i: number) => (
+                      {data.gazette.map((article: GazetteStory, i: number) => (
                         <div key={i} className="space-y-2 border-l-2 border-primary/50 pl-4">
                           <h4 className="text-lg font-bold font-serif leading-tight">{article.headline}</h4>
                           <p className="text-sm text-muted-foreground whitespace-pre-line">{article.body}</p>
@@ -167,7 +169,7 @@ export default function ResolutionReveal() {
                 <ScrollArea className="flex-1 pr-4">
                   {data.bouts.length > 0 ? (
                     <div className="space-y-6">
-                      {data.bouts.map((r: any, i: number) => (
+                      {data.bouts.map((r: BoutResult, i: number) => (
                         <div key={i} className="space-y-2">
                           {r.isRivalry && (
                             <div className="text-xs text-destructive font-semibold uppercase tracking-wider">
@@ -211,7 +213,7 @@ export default function ResolutionReveal() {
                   <Skull className="h-16 w-16 mb-4 text-zinc-600 animate-pulse drop-shadow-[0_0_15px_rgba(200,0,0,0.3)]" />
                   <h2 className="text-3xl font-serif text-center mb-8 uppercase tracking-widest text-zinc-300">The Arena Remembers</h2>
                   <div className="flex gap-6 overflow-x-auto pb-4 max-w-[100%]">
-                    {deadWarriors.map((w: any) => (
+                    {deadWarriors.map((w: Warrior) => (
                       <div key={w.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg text-center min-w-[280px] shadow-2xl relative">
                          <h3 className="text-2xl font-display font-bold text-red-500 mb-1 drop-shadow-md">{w.name}</h3>
                          <p className="text-sm text-zinc-400 mb-4 italic leading-relaxed">{w.deathCause || "Fallen in combat."}</p>

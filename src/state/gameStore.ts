@@ -128,7 +128,7 @@ export function killWarrior(
   warriorId: string,
   killedBy: string,
   cause: string,
-  deathEvent?: any // Using any to avoid circular import if needed, but DeathEvent is defined in types
+  deathEvent?: DeathEvent
 ): GameState {
   let victim: Warrior | undefined = state.roster.find((w) => w.id === warriorId);
   const nextState = { ...state };
