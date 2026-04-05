@@ -40,7 +40,7 @@ export function runRankingsPass(state: GameState): GameState {
   const globalSorted = [...scores].sort((a, b) => b.score - a.score);
   
   // 4. Sort by Class
-  const styleSorted: Record<FightingStyle, string[]> = {} as any;
+  const styleSorted: Record<FightingStyle, string[]> = {} as Record<import("@/types/game").FightingStyle, string[]>;
   Object.values(FightingStyle).forEach(s => {
     styleSorted[s] = globalSorted
       .filter(entry => entry.style === s)

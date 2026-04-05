@@ -323,7 +323,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       <Tooltip key={item.to} delayDuration={sidebarOpen ? 1000 : 0}>
                         <TooltipTrigger asChild>
                           <Link
-                            to={item.to as any}
+                            to={item.to as "/" | "/world" | "/trainers" | "/physicals" | "/stable/hall" | "/recruitment" | "/tournaments"}
                             className={cn(
                               "flex items-center gap-3 px-6 py-2.5 text-sm font-semibold transition-all relative group h-10",
                               isActive 

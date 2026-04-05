@@ -35,7 +35,7 @@ const TIER_ACCENTS: Record<string, string> = {
 interface StableRankingsProps {
   rows: StableRow[];
   sort: { field: string; dir: "asc" | "desc" };
-  onSort: (field: any) => void;
+  onSort: (field: string) => void;
 }
 
 export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
@@ -108,7 +108,7 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                       <TooltipTrigger asChild>
                         <div>
                            <Link
-                             to={row.isPlayer ? "/stable/hall" : `/stable/${row.id}` as any}
+                             to={row.isPlayer ? "/stable/hall" : "/stable/$id"} params={row.isPlayer ? {} : { id: row.id }}
                              className={cn(
                                 "font-display font-black uppercase text-xs tracking-tight transition-all",
                                 row.isPlayer ? "text-primary hover:text-white" : "text-foreground hover:text-primary"

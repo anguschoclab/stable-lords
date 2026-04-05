@@ -55,7 +55,7 @@ export function calculateXP(
 /** Apply XP to a warrior, potentially triggering a level-up improvement */
 export function applyXP(warrior: Warrior, xpGained: number, seed?: number): { warrior: Warrior; gain: XPGain } {
   const rng = new SeededRNG(seed ?? (xpGained * 7919 + 42));
-  const currentXp = (warrior as any).xp ?? 0;
+  const currentXp = (warrior as import("@/types/game").Warrior).xp ?? 0;
   const newXp = currentXp + xpGained;
   const oldLevel = Math.floor(currentXp / XP_PER_LEVEL);
   const newLevel = Math.floor(newXp / XP_PER_LEVEL);

@@ -70,7 +70,7 @@ export default function Graveyard() {
   );
 }
 
-function FallenGrid({ warriors, emptyTitle, emptyDesc }: { warriors: any[], emptyTitle: string, emptyDesc: string }) {
+function FallenGrid({ warriors, emptyTitle, emptyDesc }: { warriors: import("@/types/game").Warrior[], emptyTitle: string, emptyDesc: string }) {
   const { state } = useGameStore();
 
   if (warriors.length === 0) {

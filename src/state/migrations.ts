@@ -5,7 +5,7 @@ import { truncateArray } from "@/utils/stateUtils";
  * Ensures a loaded state has all the necessary properties for the current version.
  * Handles backward compatibility and memory management (truncation).
  */
-export function migrateGameState(parsed: any): GameState {
+export function migrateGameState(parsed: Record<string, unknown>): GameState {
   // 1. Basic property defaults
   if (!parsed.graveyard) parsed.graveyard = [];
   if (!parsed.arenaHistory) parsed.arenaHistory = [];
@@ -24,7 +24,7 @@ export function migrateGameState(parsed: any): GameState {
   
   // Migrate old training assignments (ensure type field exists)
   if (Array.isArray(parsed.trainingAssignments)) {
-    parsed.trainingAssignments = parsed.trainingAssignments.map((a: any) => {
+    parsed.trainingAssignments = parsed.trainingAssignments.map((a: Record<string, unknown>) => {
       if (typeof a === 'object' && a !== null) {
         return { ...a, type: a.type ?? "attribute" };
       }
@@ -92,7 +92,7 @@ export function migrateGameState(parsed: any): GameState {
   }
   
   if (parsed.rivals) {
-    parsed.rivals.forEach((r: any) => {
+    parsed.rivals.forEach((r: Record<string, unknown>) => {
       if (r.owner) {
         r.owner.metaAdaptation = r.owner.metaAdaptation || "Opportunist";
         r.owner.favoredStyles = r.owner.favoredStyles || [];
@@ -102,7 +102,7 @@ export function migrateGameState(parsed: any): GameState {
 
   // 3. Truncation for performance (using truncateArray utility)
   // Memory Leak Prevention: Keep only the most recent data
-  parsed.arenaHistory = truncateArray(parsed.arenaHistory || [], 500).map((f: any, i: number, arr: any[]) => {
+  parsed.arenaHistory = truncateArray(parsed.arenaHistory || [], 500).map((f: import("@/types/game").FightSummary, i: number, arr: import("@/types/game").FightSummary[]) => {
     // Keep transcripts only for the 20 most recent fights
     if (arr.length - i > 20 && f.transcript) {
         const { transcript, ...rest } = f;
@@ -140,7 +140,7 @@ export function migrateGameState(parsed: any): GameState {
 }
 
 /** Legacy logic to avoid prototype pollution when parsing localStorage */
-export function sanitizeReviver(key: string, value: any) {
+export function sanitizeReviver(key: string, value: unknown) {
   if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
     return undefined;
   }

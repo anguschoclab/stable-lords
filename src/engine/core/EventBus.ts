@@ -3,7 +3,7 @@
  */
 
 export type EngineEvent = 
-  | { type: 'BOUT_COMPLETED'; payload: { summary: any; transcript?: string[] } }
+  | { type: 'BOUT_COMPLETED'; payload: { summary: import("@/types/game").FightSummary; transcript?: string[] } }
   | { type: 'WARRIOR_KILLED'; payload: { warriorId: string; killerName: string; narrative: string } }
   | { type: 'WARRIOR_TRAINED'; payload: { warriorId: string; message: string; isGain: boolean } }
   | { type: 'RIVALRY_ESCALATED'; payload: { stableA: string; stableB: string; reason: string } }

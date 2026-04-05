@@ -105,17 +105,17 @@ export default function EquipmentOptimizerPage() {
   );
 }
 
-function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, carryCap }: { rec: any; isPrimary: boolean; selectedStyle: FightingStyle; activeWarriors: any[]; carryCap: number }) {
-  const matchingWarriors = useMemo(() => activeWarriors.filter((w: any) => w.style === selectedStyle), [activeWarriors, selectedStyle]);
+function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, carryCap }: { rec: { id: string, name: string, type: string, attributes: import("@/types/game").Attributes, effects: string[] }; isPrimary: boolean; selectedStyle: FightingStyle; activeWarriors: import("@/types/game").Warrior[]; carryCap: number }) {
+  const matchingWarriors = useMemo(() => activeWarriors.filter((w: import("@/types/game").Warrior) => w.style === selectedStyle), [activeWarriors, selectedStyle]);
   const [searchQuery, setSearchQuery] = useState("");
   
   const filteredWarriors = useMemo(() => {
     if (!searchQuery) return matchingWarriors;
-    return matchingWarriors.filter((w: any) => w.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchingWarriors.filter((w: import("@/types/game").Warrior) => w.name.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [matchingWarriors, searchQuery]);
 
   const [targetWarriorId, setTargetWarriorId] = useState<string>(matchingWarriors[0]?.id ?? "");
-  const targetWarrior = useMemo(() => matchingWarriors.find((w: any) => w.id === targetWarriorId), [matchingWarriors, targetWarriorId]);
+  const targetWarrior = useMemo(() => matchingWarriors.find((w: import("@/types/game").Warrior) => w.id === targetWarriorId), [matchingWarriors, targetWarriorId]);
   const reqCheck = useMemo(() => {
     if (!targetWarrior || !rec.loadout.weapon) return null;
     return checkWeaponRequirements(rec.loadout.weapon, targetWarrior.attributes);
@@ -127,7 +127,7 @@ function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, car
     if (!targetWarriorId) return;
     doUpdateEquipment(targetWarriorId, rec.loadout);
     import("sonner").then(({ toast }) => {
-       const w = matchingWarriors.find((mw: any) => mw.id === targetWarriorId);
+       const w = matchingWarriors.find((mw: import("@/types/game").Warrior) => mw.id === targetWarriorId);
        toast.success(`Applied ${rec.label} to ${w?.name}`);
     });
   };
@@ -235,7 +235,7 @@ function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, car
                             <SelectValue placeholder="Select warrior..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {filteredWarriors.map((w: any) => (
+                            {filteredWarriors.map((w: import("@/types/game").Warrior) => (
                               <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
                             ))}
                             {filteredWarriors.length === 0 && (

@@ -80,7 +80,7 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
                     >
                       <div className="flex items-center justify-between mb-1">
                         <WarriorNameTag id={w.id} name={w.name} useCrown={false} />
-                        <StatBadge styleName={w.style as any} />
+                        <StatBadge styleName={w.style as import("@/types/game").FightingStyle} />
                       </div>
                       <div className="flex items-center justify-between">
                          <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest">{stable}</span>

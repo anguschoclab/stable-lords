@@ -53,7 +53,7 @@ export default function PhysicalsSimulator() {
     };
   }, [styleA, styleB, statsA, statsB]);
 
-  const renderFighterConfig = (label: string, style: FightingStyle, setStyle: any, stats: any, setStats: any, colorClass: string) => (
+  const renderFighterConfig = (label: string, style: FightingStyle, setStyle: (s: import("@/types/game").FightingStyle) => void, stats: import("@/types/game").Attributes, setStats: (s: import("@/types/game").Attributes) => void, colorClass: string) => (
     <Card>
       <CardHeader className="pb-4 border-b border-border">
         <CardTitle className="font-display text-lg flex items-center justify-between">

@@ -129,7 +129,7 @@ export const TournamentSelectionService = {
 
     return {
       id: `t_${tierId.toLowerCase()}_${week}`,
-      season: season as any,
+      season: season as import("@/types/game").Season,
       week,
       name,
       bracket,
@@ -206,7 +206,7 @@ export const TournamentSelectionService = {
           a: losers[0], 
           d: losers[1],
           label: "Bronze Match" 
-        } as any);
+        } as import("@/types/game").TournamentEntry);
       }
     }
 
@@ -380,12 +380,12 @@ export const TournamentSelectionService = {
      );
   },
 
-  applyBoutResults(state: GameState, wA: Warrior, wD: Warrior, outcome: any, tId: string, tName: string): GameState {
+  applyBoutResults(state: GameState, wA: Warrior, wD: Warrior, outcome: import("@/engine/boutProcessor").BoutResult, tId: string, tName: string): GameState {
     const isKill = outcome.by === "Kill";
     const winnerSide = outcome.winner;
     const updatedState = { ...state };
 
-    const summary: any = {
+    const summary: import("@/types/game").FightSummary = {
       id: `tf_${tId}_${generateId()}`,
       week: state.week,
       phase: "resolution" as const,
@@ -397,7 +397,7 @@ export const TournamentSelectionService = {
       by: outcome.by,
       styleA: wA.style,
       styleD: wD.style,
-      transcript: outcome.log.map((e: any) => e.text),
+      transcript: outcome.log.map((e: { text: string }) => e.text),
       createdAt: new Date().toISOString(),
     };
 

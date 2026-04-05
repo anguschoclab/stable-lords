@@ -21,7 +21,7 @@ export default function WorldOverview() {
   const templates = useMemo(() => getStableTemplates(), []);
 
   const stableRows = useMemo(() => {
-    const rows: any[] = [];
+    const rows: { id: string, name: string, fame: number, rank: number, isPlayer: boolean, wins: number, losses: number, killCount: number, titles: number }[] = [];
     let pWins = 0;
     let pLosses = 0;
     let pKills = 0;
@@ -112,7 +112,7 @@ export default function WorldOverview() {
       };
     };
 
-    const rows = state.roster.reduce((acc: any[], w: Warrior) => {
+    const rows = state.roster.reduce((acc: { id: string, name: string, style: string, fame: number, isPlayer: boolean, stableId: string, stableName: string, wins: number, losses: number, killCount: number }[], w: import("@/types/game").Warrior) => {
       if (w.status === "Active") {
         acc.push(mapWarrior(w, state.player.stableName, state.player.id, true));
       }

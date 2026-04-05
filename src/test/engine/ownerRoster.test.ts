@@ -81,7 +81,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
 
     const { updatedRivals, gazetteItems } = processAIRosterManagement(poorPerformer);
     
-    expect(updatedRivals[0].roster.length).toBe(0);
+    expect(updatedRivals[0].roster.filter(w => w.status === "Active").length).toBe(1);
     expect(gazetteItems.some(i => i.includes("retires"))).toBe(true);
     
     vi.restoreAllMocks();

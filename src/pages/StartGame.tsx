@@ -107,8 +107,8 @@ export default function StartGame() {
         // Auto-load the imported save
         const state = await loadFromSlot(slotId);
         if (state) loadGame(slotId, state);
-      } catch (err: any) {
-        toast.error(err?.message ?? "Failed to import save file.");
+      } catch (err) {
+        toast.error((err as Error)?.message ?? "Failed to import save file.");
       }
     };
     reader.readAsText(file);

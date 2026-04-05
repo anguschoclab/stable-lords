@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 
 interface LeaderboardProps {
-  allFights: any[];
+  allFights: import("@/types/game").FightSummary[];
 }
 
 export function GazetteLeaderboard({ allFights }: LeaderboardProps) {

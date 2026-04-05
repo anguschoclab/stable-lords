@@ -203,7 +203,7 @@ function generateRecruitAttrs(philosophy: string, rng: SeededRNG): { ST: number;
 
   const weighted: (keyof typeof attrs)[] = [];
   for (const k of keys) {
-    const w = ((bias as any)[k] ?? 1);
+    const w = ((bias as Record<string, number>)[k] ?? 1);
     for (let i = 0; i < w; i++) weighted.push(k);
   }
 

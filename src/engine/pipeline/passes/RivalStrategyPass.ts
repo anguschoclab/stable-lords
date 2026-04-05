@@ -29,7 +29,7 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number): GameSt
       const retirementSeed = nextWeek + index * 1000;
       const [newStable] = generateRivalStables(1, retirementSeed);
       globalGazetteItems.push(`🆕 RECRUITMENT: ${newStable.owner.stableName} has debuted in the league under ${newStable.owner.name}!`);
-      return newStable as any as RivalStableData;
+      return newStable as RivalStableData;
     }
     return updatedRival;
   });

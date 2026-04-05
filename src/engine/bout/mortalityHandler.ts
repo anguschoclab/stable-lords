@@ -16,7 +16,7 @@ export function handleDeath(s: GameState, wA: Warrior, wD: Warrior, outcome: Fig
   const narrative = generateFightNarrative({ 
     id: boutId, week, a: wA.name, d: wD.name, winner: outcome.winner, by: outcome.by, 
     styleA: wA.style, styleD: wD.style, transcript: [], title: `${wA.name} vs ${wD.name}`, phase: "resolution" 
-  } as any, s.crowdMood);
+  } as import("@/types/game").FightSummary, s.crowdMood);
   
   const event = { boutId, killerId: outcome.winner === "A" ? wA.id : wD.id, deathSummary: narrative, memorialTags: tags };
 
@@ -30,7 +30,7 @@ export function handleDeath(s: GameState, wA: Warrior, wD: Warrior, outcome: Fig
   const deathSummary: FightSummary = { 
     id: boutId, week, winner: outcome.winner, by: outcome.by, a: wA.name, d: wD.name, 
     styleA: wA.style, styleD: wD.style, isDeathEvent: true, deathEventData: event, createdAt: new Date().toISOString() 
-  } as any;
+  } as import("@/types/game").FightSummary;
   
   nextS.arenaHistory = [...nextS.arenaHistory, deathSummary];
   nextS.newsletter = [...(nextS.newsletter || []), { week, title: "Arena Obituary", items: [narrative] }];

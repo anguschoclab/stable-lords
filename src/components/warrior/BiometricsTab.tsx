@@ -11,7 +11,7 @@ import { Warrior } from "@/types/game";
 
 interface BiometricsTabProps {
   warrior: Warrior;
-  displayWarrior: any;
+  displayWarrior: import("@/types/game").Warrior;
 }
 
 export function BiometricsTab({ warrior, displayWarrior }: BiometricsTabProps) {

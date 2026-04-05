@@ -16,7 +16,7 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
   warrior: Warrior;
   assignment?: TrainingAssignment;
   seasonalGains: Partial<Record<keyof Attributes, number>>;
-  trainers: any[];
+  trainers: import("@/types/game").Trainer[];
   onAssign: (attr: keyof Attributes) => void;
   onAssignRecovery: () => void;
   onClear: () => void;

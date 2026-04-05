@@ -147,8 +147,8 @@ export function simulateFight(
     // Phase Change & Tactic Reveal
     if (phase !== lastPhase) {
       lastPhase = phase;
-      const tacticsA = resolveEffectiveTactics(fA.plan, phase.toLowerCase() as any);
-      const tacticsD = resolveEffectiveTactics(fD.plan, phase.toLowerCase() as any);
+      const tacticsA = resolveEffectiveTactics(fA.plan, phase.toLowerCase() as import("@/types/game").FightPlan["phases"]["opening"]);
+      const tacticsD = resolveEffectiveTactics(fD.plan, phase.toLowerCase() as import("@/types/game").FightPlan["phases"]["opening"]);
       log.push({
         minute: min,
         text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,
@@ -185,7 +185,7 @@ export function simulateFight(
     const boutEnd = events.find(e => e.type === "BOUT_END");
     if (boutEnd) {
       winner = boutEnd.actor === "A" ? "A" : "D";
-      by = boutEnd.result as any;
+      by = boutEnd.result as import("@/types/game").FightOutcomeBy;
       fatalHitLocation = boutEnd.metadata?.location as string;
       fatalExchangeIndex = ex;
       causeBucket = boutEnd.metadata?.cause as DeathCauseBucket;

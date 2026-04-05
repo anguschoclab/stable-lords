@@ -288,7 +288,7 @@ export default function Trainers() {
                             <div>
                                <div className="flex items-center gap-3 mb-2">
                                   <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} useCrown={w.champion} />
-                                  <StatBadge styleName={w.style as any} />
+                                  <StatBadge styleName={w.style as import("@/types/game").FightingStyle} />
                                </div>
                                <div className="flex items-center gap-2">
                                   <ChevronRight className="h-3 w-3 text-primary" />
