@@ -202,6 +202,10 @@ export const EVEN_STATUS = [
 ];
 
 export const KILL_TEMPLATES = [
+  "%D falls to their knees, their life spilling onto the sands. %A stands victorious!",
+  "The match concludes in horrific fashion as %D is butchered by %A!",
+  "With no mercy shown, %A ends %D's misery in a spray of crimson!",
+  "The Lords of the Arena nod in approval as %A violently ends the life of %D.",
   "%D is gravely injured!\n%A delivers the killing blow!",
   "%D crumples to the ground, lifeless.\n%A's strike was unerring and final.",
   "%D falls to the arena floor. The wound is mortal.\nSilence grips the crowd.",
@@ -304,6 +308,10 @@ export const STALEMATE_LINES = [
 ];
 
 export const WINNER_TAUNTS = [
+  "%N roars, 'Who else wants to die today?!'",
+  "%N wipes the blood from their face and sneers, 'Too easy.'",
+  "%N points their weapon at the VIP box and bows deeply.",
+  "%N kicks the fallen opponent and laughs maniacally.",
   "%N says, 'Another blow and I'll send you to Ahringol!'",
   "%N says, 'And that is how a real warrior fights. Pay attention next time.'",
   "%N says, 'That was a well fought, and honorable fight.'",

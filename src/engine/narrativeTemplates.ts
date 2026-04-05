@@ -192,6 +192,10 @@ export const PARRY_BREAK_TEMPLATES = [
 ];
 
 export const CROWD_REACTIONS_POSITIVE = [
+  "The entire coliseum shakes with the roar of the bloodthirsty crowd!",
+  "Chants of the warrior's name ripple through the stands in a deafening wave!",
+  "The audience erupts into a frenzied cheer, demanding more blood!",
+  "Spectators throw coins into the bloody sand in sheer appreciation of the carnage!",
   "The crowd ROARS in approval!",
   "Cheers erupt from the stands!",
   "The audience leaps to their feet!",
@@ -231,6 +235,11 @@ export const INI_KEEP_TEMPLATES = [
 ];
 
 export const EXECUTION_TEMPLATES = [
+  "A sickening crunch echoes off the arena walls as %A caves in %D's skull with their %W!",
+  "%A brutally twists their %W deep into %D's unprotected vitals, bringing a gruesome end to the match!",
+  "The crowd shrieks in terror as %A completely eviscerates %D with a ruthless %W sweep!",
+  "With cold precision, %A parts %D's head from their shoulders using their %W!",
+  "%A steps over the falling body, delivering one final, devastating %W strike to end it all!",
   "%A brutally separates %D from their life with a horrifying arc of their %W!",
   "With %D on their knees, %A steps in and ends the fight with a devastating %W strike!",
   "The arena falls silent as %A delivers a butchering stroke with their %W to %D!",
