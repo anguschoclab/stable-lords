@@ -193,7 +193,7 @@ export const PARRY_BREAK_TEMPLATES = [
 
 export const CROWD_REACTIONS_POSITIVE = [
   "The entire coliseum shakes with the roar of the bloodthirsty crowd!",
-  "Chants of %A's name ripple through the stands in a deafening wave!",
+  "Chants of the warrior's name ripple through the stands in a deafening wave!",
   "The audience erupts into a frenzied cheer, demanding more blood!",
   "Spectators throw coins into the bloody sand in sheer appreciation of the carnage!",
   "The crowd ROARS in approval!",
