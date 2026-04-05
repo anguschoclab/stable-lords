@@ -311,7 +311,7 @@ export const WINNER_TAUNTS = [
   "%N roars, 'Who else wants to die today?!'",
   "%N wipes the blood from their face and sneers, 'Too easy.'",
   "%N points their weapon at the VIP box and bows deeply.",
-  "%N kicks the lifeless body and laughs maniacally.",
+  "%N kicks the fallen opponent and laughs maniacally.",
   "%N says, 'Another blow and I'll send you to Ahringol!'",
   "%N says, 'And that is how a real warrior fights. Pay attention next time.'",
   "%N says, 'That was a well fought, and honorable fight.'",
