@@ -5,13 +5,13 @@ import { FightingStyle } from "@/types/game";
  */
 
 export const HIT_LOC_VARIANTS: Record<string, string[]> = {
-  "head":      ["HEAD", "JAW", "TEMPLE", "FOREHEAD", "SKULL", "FACE", "THROAT", "NECK", "side of the HEAD", "CHEEK", "BROW"],
-  "chest":     ["CHEST", "RIBS", "RIGHT RIBCAGE", "LEFT RIBCAGE", "upper BODY", "BREAST", "STERNUM", "COLLARBONE"],
-  "abdomen":   ["STOMACH", "ABDOMEN", "PELVIS", "KIDNEYS", "GROIN", "BELLY", "LOWER BODY", "SOLAR PLEXUS", "MIDSECTION"],
-  "right arm": ["RIGHT ARM", "RIGHT FOREARM", "RIGHT BICEPS", "RIGHT ELBOW", "RIGHT HAND", "RIGHT WRIST", "RIGHT SHOULDER"],
-  "left arm":  ["LEFT ARM", "LEFT FOREARM", "LEFT BICEPS", "LEFT ELBOW", "LEFT HAND", "LEFT WRIST", "LEFT SHOULDER"],
-  "right leg": ["RIGHT LEG", "RIGHT THIGH", "RIGHT KNEE", "RIGHT SHIN", "RIGHT BUTTOCKS", "RIGHT HIP", "RIGHT CALF"],
-  "left leg":  ["LEFT LEG", "LEFT THIGH", "LEFT KNEE", "LEFT SHIN", "LEFT HIP", "LEFT CALF"],
+  "head":      ["HEAD", "JAW", "TEMPLE", "FOREHEAD", "SKULL", "FACE", "THROAT", "NECK", "side of the HEAD", "CHEEK", "BROW", "CHIN", "EAR", "NOSE", "CROWN"],
+  "chest":     ["CHEST", "RIBS", "RIGHT RIBCAGE", "LEFT RIBCAGE", "upper BODY", "BREAST", "STERNUM", "COLLARBONE", "SHOULDER BLADE", "UPPER CHEST"],
+  "abdomen":   ["STOMACH", "ABDOMEN", "PELVIS", "KIDNEYS", "GROIN", "BELLY", "LOWER BODY", "SOLAR PLEXUS", "MIDSECTION", "SIDE", "FLANK", "GUT"],
+  "right arm": ["RIGHT ARM", "RIGHT FOREARM", "RIGHT BICEPS", "RIGHT ELBOW", "RIGHT HAND", "RIGHT WRIST", "RIGHT SHOULDER", "RIGHT KNUCKLES", "RIGHT UPPER ARM"],
+  "left arm":  ["LEFT ARM", "LEFT FOREARM", "LEFT BICEPS", "LEFT ELBOW", "LEFT HAND", "LEFT WRIST", "LEFT SHOULDER", "LEFT KNUCKLES", "LEFT UPPER ARM"],
+  "right leg": ["RIGHT LEG", "RIGHT THIGH", "RIGHT KNEE", "RIGHT SHIN", "RIGHT BUTTOCKS", "RIGHT HIP", "RIGHT CALF", "RIGHT ANKLE", "RIGHT HAMSTRING"],
+  "left leg":  ["LEFT LEG", "LEFT THIGH", "LEFT KNEE", "LEFT SHIN", "LEFT HIP", "LEFT CALF", "LEFT ANKLE", "LEFT HAMSTRING", "LEFT QUADRICEP"],
 };
 
 export const STYLE_PBP_DESC: Record<FightingStyle, string> = {
@@ -28,10 +28,10 @@ export const STYLE_PBP_DESC: Record<FightingStyle, string> = {
 };
 
 export const HELM_DESCS: Record<string, string[]> = {
-  "leather_cap": ["LEATHER CAP", "battered LEATHER CAP"],
-  "steel_cap":   ["STEEL CAP", "etched STEEL CAP", "dented STEEL CAP"],
-  "helm":        ["HELM", "spectacular HELM", "visored HELM", "scarred HELM"],
-  "full_helm":   ["FULL HELM", "fearsome FULL HELM", "imposing FULL HELM"],
+  "leather_cap": ["LEATHER CAP", "battered LEATHER CAP", "worn LEATHER CAP"],
+  "steel_cap":   ["STEEL CAP", "etched STEEL CAP", "dented STEEL CAP", "burnished STEEL CAP"],
+  "helm":        ["HELM", "spectacular HELM", "visored HELM", "scarred HELM", "battle-worn HELM"],
+  "full_helm":   ["FULL HELM", "fearsome FULL HELM", "imposing FULL HELM", "visored FULL HELM"],
 };
 
 export type WeaponType = "slash" | "bash" | "thrust" | "fist" | "generic";
@@ -58,6 +58,16 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N commits to a wide sweeping arc with his %W!",
     "%N steps inside and rips his %W across at close range!",
     "%N drops his shoulder and drives a savage upward cut with his %W!",
+    "%N launches a double slash — high then low — with his %W!",
+    "%N angles his body and snaps a blindingly fast cut with his %W!",
+    "%N rolls his wrist and lets the %W arc in a tight, vicious circle!",
+    "%N takes a half-step forward and whips his %W in a flat, brutal cut!",
+    "The %W seems to move on its own as %N launches a flowing, multi-arc slash!",
+    "%N's whole body uncoils in a spinning slash with his %W!",
+    "%N cuts low, then pivots and slashes high — a murderous combination!",
+    "%N advances behind a screen of slashes from his %W!",
+    "%N snaps a quick forehand cut then immediately follows with a backhand from his %W!",
+    "%N lunges forward and rakes his %W in a ripping diagonal!",
   ],
   bash: [
     "%N bashes with his %W!",
@@ -75,6 +85,16 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N hammers a savage overhand blow with his %W!",
     "%N crashes his %W in from the side, aiming for the ribs!",
     "%N heaves his %W in a wild, momentum-heavy arc!",
+    "%N swings his %W in a great looping overhead smash!",
+    "%N shuffles forward and drives his %W into a short, brutal uppercut swing!",
+    "%N leans into it and unleashes a devastating horizontal sweep with his %W!",
+    "%N plants his feet and brings his %W down like a judge's gavel!",
+    "%N catches his foe off balance and clubs down with his %W!",
+    "%N spins a half-turn and smashes his %W in a backhand arc!",
+    "%N feints left and then bombs his %W down from the right!",
+    "%N drops his weight low and drives his %W upward in a rising smash!",
+    "The sand shakes as %N charges and swings his %W with everything he has!",
+    "%N draws his %W back and throws his hips through a thunderous strike!",
   ],
   thrust: [
     "%N lunges wielding an %W!",
@@ -95,6 +115,16 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N launches a controlled, perfectly balanced lunge with his %W!",
     "%N spins his wrist and drives his %W in a twisting thrust!",
     "%N drops into a low crouch and rockets his %W upward!",
+    "%N extends fully, every ounce of reach behind his %W!",
+    "%N glides forward with footwork as smooth as his thrust, %W aimed true!",
+    "%N crosses his feet and lunges — an unorthodox burst of speed with his %W!",
+    "%N dips his shoulder and launches a short, vicious punch-thrust with his %W!",
+    "The %W snaps forward from %N's hand with the speed of a striking serpent!",
+    "%N breaks rhythm and suddenly accelerates, %W driving at the throat!",
+    "%N winds his arm back in a slow feint, then fires his %W at lightning speed!",
+    "%N advances with a probing jab from his %W — then commits to the real thing!",
+    "%N's %W flickers in and out twice before driving home for real!",
+    "%N pivots his hips and launches a rising lunge with his %W from a low line!",
   ],
   fist: [
     "%N PUNCHES from the waist with unbelievable quickness!",
@@ -110,6 +140,17 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N dips and drives a rising UPPERCUT from the floor!",
     "%N spins and delivers a savage HEEL KICK at his opponent!",
     "%N launches a rapid COMBINATION — jab, cross, body shot!",
+    "%N feints with his left and detonates a right HOOK at his foe!",
+    "%N drops low and fires a brutal BODY SHOT into his opponent's ribs!",
+    "%N throws a flying KNEE at his staggered opponent!",
+    "%N clinches and slams a short ELBOW into his foe's face!",
+    "%N snaps a fast JAB to create distance, then steps in with a hammering CROSS!",
+    "%N spins his whole body and releases a devastating SPINNING BACK FIST!",
+    "%N stomps forward and drives his KNEE up into his opponent's midsection!",
+    "%N opens with a HOOK to the body to drop the guard, then goes upstairs!",
+    "%N explodes forward with a wild, crushing OVERHAND right!",
+    "%N's FOOT lashes out in a precise front kick to the chest!",
+    "%N flurries — both FISTS hammering at his opponent like a storm!",
   ],
   generic: [
     "%N strikes using his %W!",
@@ -118,6 +159,10 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N lashes out with his %W!",
     "%N presses with his %W!",
     "%N unleashes a fierce strike with his %W!",
+    "%N drives an attack home with his %W!",
+    "%N throws a dangerous strike with his %W!",
+    "%N moves with sudden violence, %W crashing toward his foe!",
+    "%N finds an opening and exploits it with his %W!",
   ],
 };
 
@@ -132,6 +177,11 @@ export const MASTERY_TEMPLATES: Record<string, string[]> = {
     "The %W becomes a part of %N — the cut arrives before the thought.",
     "%N's wrist snaps with the effortless authority of ten thousand practice cuts.",
     "The crowd feels it. Something in the quality of that slash — it belongs to a master.",
+    "%N reads the entire exchange in an instant and delivers a slash of absolute economy.",
+    "The %W is almost lazy in %N's hand — and yet it arrives exactly where it must.",
+    "%N's footwork and blade become one flowing motion — a master's cut.",
+    "There is no wasted flourish in %N's slash. Only purpose. Only precision.",
+    "The steel traces a line so clean and true the crowd doesn't breathe.",
   ],
   bash: [
     "%N delivers a crushing blow with the perfect weight of his mastered %W!",
@@ -141,6 +191,11 @@ export const MASTERY_TEMPLATES: Record<string, string[]> = {
     "No wasted motion — %N's %W finds the mark with horrible mechanical certainty.",
     "%N's entire body becomes a battering ram, the %W merely the point of impact.",
     "The weight behind that strike is inhuman — %N's mastery of the %W is complete.",
+    "%N uses gravity, momentum, and years of experience to deliver a perfect blow.",
+    "Every muscle fires in sequence as %N brings the %W down with total mastery.",
+    "The %W sings a deep, resonant note on impact — %N hit that perfectly.",
+    "That was not a swing. That was a lesson in force delivered by a master.",
+    "%N's %W lands with an inevitability that only mastery can produce.",
   ],
   thrust: [
     "%N's %W flickers like a serpent's tongue, a mastered thrust of absolute lethality!",
@@ -150,6 +205,11 @@ export const MASTERY_TEMPLATES: Record<string, string[]> = {
     "%N's thrust arrives not where his foe is — but where his foe will be.",
     "A decade of lunges compressed into one instant — %N's %W strikes with terrifying precision.",
     "The crowd catches its breath. That was not a lucky hit. That was mastery.",
+    "%N's rear foot pushes, his hips uncoil, his arm extends — a single perfect motion.",
+    "The thrust is so clean that the wound is almost an afterthought.",
+    "%N's %W finds the gap between heartbeats — pure, mastered timing.",
+    "The point of %N's %W follows a line as straight and true as fate itself.",
+    "No one in the crowd tracks the %W until it has already arrived.",
   ],
   fist: [
     "%N's hands move in a mastered blur, the rhythm of a true brawler!",
@@ -159,6 +219,11 @@ export const MASTERY_TEMPLATES: Record<string, string[]> = {
     "%N hits without telegraphing, without hesitation — the strike simply appears.",
     "There is no wasted motion in %N's hands. Each impact is placed with terrible purpose.",
     "The crowd can barely track his hands. %N has crossed into something beyond training.",
+    "%N's whole body flows into the strike — hips, shoulder, fist in perfect sequence.",
+    "The punch arrives before the crowd can react. That is what mastery looks like.",
+    "%N reads his opponent's micro-movement and fires his fist into the exact space it creates.",
+    "The sound of the impact is different when %N hits. Heavier. More complete.",
+    "%N doesn't swing. He places. The difference is everything.",
   ]
 };
 
@@ -169,6 +234,9 @@ export const SUPER_FLASHY_TEMPLATES: string[] = [
   "✨ GOLDEN FURY! %N's mastery is absolute, his %W crushing all before it! ✨",
   "✨ PERFECT FORM! The crowd falls silent, awed by the terrifying beauty of %N's technique! ✨",
   "✨ A STRIKE OUT OF LEGEND! %N transcends the merely skilled — this is art! ✨",
+  "✨ THE ARENA ERUPTS! %N has delivered a blow that will be spoken of long after this sand is raked! ✨",
+  "✨ SUBLIME VIOLENCE! %N's %W moves with a perfection that borders on the divine! ✨",
+  "✨ TRANSCENDENCE! In this moment, %N is not a fighter — he is a force! ✨",
 ];
 
 export const INI_FEINT_TEMPLATES = [
@@ -182,6 +250,16 @@ export const INI_FEINT_TEMPLATES = [
   "%N's hips twist to open the line — his opponent reads it wrong!",
   "%N feints the body, goes high — his foe bought every bit of it.",
   "%N draws back as if to parry, then strikes!",
+  "%N's shoulder dips in a convincing fake — his opponent is a step behind.",
+  "%N makes a slow, obvious threat — then moves twice as fast as expected!",
+  "%N drops his guard just enough to invite a strike, then isn't there.",
+  "%N sells the feint with his whole body — his foe commits completely.",
+  "%N's footwork creates a false opening — and his opponent takes it!",
+  "%N shows a high attack, switches to low at the last instant.",
+  "A dummy thrust from %N sets up the real attack perfectly.",
+  "%N fakes a retreat then surges forward — his timing is impeccable!",
+  "%N's feint draws the parry, and then his real weapon is already moving.",
+  "%N bobs once, twice — then strikes on the third beat.",
 ];
 
 export const EVEN_STATUS = [
@@ -199,6 +277,16 @@ export const EVEN_STATUS = [
   "No quarter given. None taken. The sand says nothing yet.",
   "Both men are bleeding. Neither will admit it matters.",
   "The fighters are locked in step — reading each other, waiting.",
+  "The skill gap here is invisible. This one goes to the wire.",
+  "Neither warrior can find the edge. The fight grinds on.",
+  "A chess match at full speed — neither side gaining ground.",
+  "The crowd is exhausted just watching. Neither fighter will break.",
+  "Trade for trade. Blow for blow. Nothing separates these two.",
+  "Both fighters know the other's game now. Every move is anticipated.",
+  "The longer this goes, the more even it looks.",
+  "There is no leading combatant. Only two men surviving each other.",
+  "The arena falls into a tense hush — this is anyone's fight.",
+  "Blood on both faces. Neither man cares.",
 ];
 
 export const KILL_TEMPLATES = [
@@ -224,6 +312,16 @@ export const KILL_TEMPLATES = [
   "The LORD PROTECTORS turn away. %A has won with terrible completeness.",
   "%D makes one final sound — then nothing. %A has done their worst.",
   "The killing blow lands. The crowd's roar drowns out everything else.",
+  "%D's weapon drops first. Then %D follows it into the sand. It is over.",
+  "%A steps back. %D does not get up. The bout is finished in blood.",
+  "The crimson sand tells the story. %A stands. %D will not.",
+  "A killing stroke from %A — clean, final, and without regret.",
+  "%D is struck down where he stands. %A claims victory and walks away.",
+  "The crowd erupts as %D falls and stays fallen. %A has won by killing blow.",
+  "No one in the arena moves for a moment. Then — pandemonium. %A wins!",
+  "%A delivers the final strike with awful precision. %D is dead.",
+  "The killing blow is decisive, total, and merciless. %A is the victor.",
+  "A spray of blood. A body in the sand. %A stands over it all.",
 ];
 
 export const STOPPAGE_TEMPLATES = [
@@ -239,6 +337,14 @@ export const STOPPAGE_TEMPLATES = [
   "The ARENAMASTER signals the end. %D is done. %A claims the victory.",
   "%D goes to one knee. He cannot answer the count.\n%A wins!",
   "Bleeding badly, %D shakes his head at the corner. %A is declared victor.",
+  "The LORD PROTECTORS intervene — %D is in no state to continue.\n%A wins!",
+  "%D drops his weapon, signaling an end. %A accepts the surrender.",
+  "Enough is enough. The ARENAMASTER stops the contest. %A is victorious!",
+  "%D's corner has seen enough — they signal the stoppage.\n%A wins!",
+  "The crowd calls for it to be stopped. The ARENAMASTER obliges.\n%A wins!",
+  "%D can no longer protect himself. The bout is waved off in favor of %A.",
+  "%D collapses and cannot rise. The officials declare %A the winner.",
+  "%D gestures to his wound — a clear surrender. %A nods and steps back.",
 ];
 
 export const EXHAUSTION_TEMPLATES = [
@@ -252,6 +358,16 @@ export const EXHAUSTION_TEMPLATES = [
   "The crowd is breathless. So are the fighters. %A wins on accumulated punishment.",
   "%D's legs simply stop working. %A, barely upright himself, is called the winner.",
   "It was never going to be pretty. %A just had a little more left than %D.",
+  "Both men lean on their weapons, gasping. The ARENAMASTER awards it to %A.",
+  "The bout dies quietly from exhaustion. %A edges %D on the count.",
+  "The warriors have fought themselves to nothing. %A takes the decision.",
+  "%D's body gives out before his will does. %A is named the winner.",
+  "The sand remembers them both. The scorers remember %A.",
+  "Arms heavy, lungs burning — %D concedes the decision to %A.",
+  "Neither man could finish it. The ARENAMASTER gives the nod to %A.",
+  "%A and %D have emptied themselves completely. The judges favor %A.",
+  "The bout exhausts itself before either fighter can. %A wins by margin.",
+  "A slow, brutal grind — and at the end, %A had the edge.",
 ];
 
 export const POPULARITY_TEMPLATES = {
@@ -273,6 +389,14 @@ export const SKILL_LEARNS = [
   "%N refined a RIPOSTE timing he hadn't noticed before.",
   "%N internalized a new DEFENSIVE footwork pattern.",
   "%N studies how his last ATTACK landed and adjusts.",
+  "%N's ATTACK sharpens as he finds the right rhythm.",
+  "Something clicks — %N's PARRY mechanics improve mid-fight.",
+  "%N recognizes a gap in his DEFENSE and mentally notes it.",
+  "A near-miss teaches %N a new INITIATIVE read.",
+  "%N adapts his RIPOSTE timing to match his foe's style.",
+  "Hard experience teaches %N a new ATTACK angle.",
+  "%N's pain is his teacher — he learns a DEFENSIVE adjustment.",
+  "Under pressure, %N discovers a new way to use his INITIATIVE.",
 ];
 
 export const TRADING_BLOWS = [
@@ -290,6 +414,20 @@ export const TRADING_BLOWS = [
   "The sound of impact after impact fills the arena. Neither man retreats.",
   "They hammer at each other like rivals who have waited years for this.",
   "A savage exchange at close range — both fighters staggered but upright.",
+  "A wild flurry — the crowd roars as both men take and give in equal measure!",
+  "Neither warrior takes a backward step. The exchange is savage and mutual.",
+  "They meet in the center of the sand and PUNISH each other.",
+  "Weapons clatter and spark as the two fighters go toe to toe!",
+  "A breathtaking exchange — neither man will back down!",
+  "The arena holds its breath as both warriors throw everything at each other.",
+  "They're both bleeding. They both keep going. The crowd loves it.",
+  "A furious, grinding close-quarters battle — neither man gaining the edge.",
+  "Three hard blows traded. Three more land. Neither warrior yields an inch.",
+  "The sand flies as both fighters commit to a wild, total exchange.",
+  "The crowd screams as the warriors crash into each other with full force.",
+  "Each hit they land, they absorb one in return. Neither cares.",
+  "A grinding exchange — the kind that leaves marks for weeks.",
+  "Back and forth, back and forth. The crowd is delirious.",
 ];
 
 export const STALEMATE_LINES = [
@@ -305,6 +443,18 @@ export const STALEMATE_LINES = [
   "A long beat of silence before the storm resumes.",
   "Boots scrape sand as both fighters reset their stances.",
   "The arena quiets. Everyone can feel the next exchange coming.",
+  "The two fighters circle, taking stock. This is far from over.",
+  "A cautious moment — both men have learned respect for the other.",
+  "The warriors reset, eyes locked, each waiting for the other to flinch.",
+  "Slow footwork as both men look for the gap they haven't found yet.",
+  "The crowd is almost as tense as the fighters. No one breathes.",
+  "A strange quiet settles — then a boot drags the sand, and it begins again.",
+  "Eye contact. Stillness. Then the slow, dangerous circling resumes.",
+  "Neither man commits. Neither man retreats. The sand between them grows charged.",
+  "The pause stretches. The crowd grows restless. Then — movement.",
+  "Two seasoned fighters assessing. The next exchange will matter.",
+  "The warriors catch their breath in silence, weapons raised, eyes watchful.",
+  "This is the moment before the moment. Both fighters know it.",
 ];
 
 export const WINNER_TAUNTS = [
@@ -329,6 +479,17 @@ export const WINNER_TAUNTS = [
   "%N calls out to no one in particular, 'Who else wants to try?'",
   "%N breathes hard for a moment, then straightens and smiles.",
   "%N raises a fist to the crowd, blood still on his knuckles.",
+  "%N crouches beside his fallen foe and says something only they can hear.",
+  "%N strides the length of the arena, weapon aloft, working the crowd.",
+  "%N tilts his head back and roars at the sky.",
+  "%N takes a knee briefly — not in defeat, but in private acknowledgment.",
+  "%N flicks blood from his blade and sheathes it without looking at his foe.",
+  "%N grabs his fallen foe's weapon and holds both aloft to the crowd.",
+  "%N laughs — a genuine, delighted sound — and bows to all four corners.",
+  "%N points to his own stablemaster and nods. A private acknowledgment.",
+  "'Your reputation lied,' %N says flatly, stepping over the body.",
+  "%N simply walks away. No flourish. The crowd fills the silence.",
+  "'Tell your stablemaster to train you better next time,' %N says with a smirk.",
 ];
 
 export const LOSER_TAUNTS = [
@@ -346,6 +507,16 @@ export const LOSER_TAUNTS = [
   "%N roars something wordless at his foe.",
   "%N stumbles but refuses to go down.",
   "%N spits, 'Is that the best you have?'",
+  "%N breathes through the pain and raises his weapon again.",
+  "%N growls low — a dangerous, cornered sound.",
+  "%N's hands shake, but his eyes are steady.",
+  "%N wipes blood from his brow and gestures his foe forward.",
+  "'Not done yet,' %N rasps, refusing to yield.",
+  "%N spits a tooth into the sand and grins.",
+  "%N snarls something in a language no one recognizes.",
+  "%N's legs nearly buckle — but he steadies himself on pure spite.",
+  "%N beats his own chest and lets out a battle cry.",
+  "%N points a trembling weapon at his opponent and holds the line.",
 ];
 
 export const PRESSING_TEMPLATES = [
@@ -357,6 +528,14 @@ export const PRESSING_TEMPLATES = [
   "%N has his opponent on the back foot and will not let up!",
   "%N advances, step by relentless step, forcing his foe toward the edge!",
   "%N is relentless — he won't give his opponent a moment to recover!",
+  "%N drives his advantage with controlled aggression!",
+  "%N has seized the initiative and is not about to let it go!",
+  "%N pours it on — his opponent is crumbling under the pressure!",
+  "%N is everywhere at once — his foe has nowhere left to go!",
+  "There's no breathing room — %N has his opponent penned in!",
+  "%N commits fully to the attack, overwhelming his foe!",
+  "%N's relentless assault is breaking the other fighter's will!",
+  "The crowd feels it — %N has broken through and won't stop!",
 ];
 
 export const INSIGHT_ST_HINTS = [
@@ -366,6 +545,12 @@ export const INSIGHT_ST_HINTS = [
   "The raw strength in his arms is alarming — your weapon nearly flies free.",
   "He shoves your guard aside like it isn't there. Pure animal strength.",
   "You feel it in your bones — this man is frighteningly powerful.",
+  "He catches your strike on his forearm and barely notices.",
+  "His grip is iron. You felt that exchange in your whole arm.",
+  "He doesn't parry so much as simply stop your weapon with his.",
+  "The strength gap is real. He's stronger than he looks.",
+  "Your blow lands, but he shrugs it off like rain.",
+  "He overwhelms your defense with brute force — technique barely matters to him.",
 ];
 
 export const INSIGHT_SP_HINTS = [
@@ -375,6 +560,12 @@ export const INSIGHT_SP_HINTS = [
   "He's faster than he looks — the strike comes from nowhere.",
   "A flicker of movement — that's all the warning you get.",
   "You can feel his reactions starting to lag. He's slowing down.",
+  "His hands are faster than his feet — note that.",
+  "You barely track his footwork. He's deceptively quick.",
+  "His first step is explosive. Don't give him the first step.",
+  "The blow arrives before you expected it. He's faster than you thought.",
+  "He's slowing in this heat — press the pace.",
+  "His speed is real and dangerous. Respect it.",
 ];
 
 export const INSIGHT_DF_HINTS = [
@@ -384,6 +575,12 @@ export const INSIGHT_DF_HINTS = [
   "There's a nervousness to his guard — he's not comfortable here.",
   "His defense is a wall of steel. You haven't found the crack yet.",
   "He barely moves to avoid you. His reading of your attacks is unsettling.",
+  "That guard has a hole in it — low right. He doesn't protect it.",
+  "His parries are getting slower. The defense is eroding.",
+  "He reads high attacks brilliantly. Go low.",
+  "His footwork is elite. He takes no position twice.",
+  "The defense is excellent but reactive — make him guess.",
+  "His technique is clean but there's a moment after each parry where he's open.",
 ];
 
 export const INSIGHT_WL_HINTS = [
@@ -393,4 +590,10 @@ export const INSIGHT_WL_HINTS = [
   "He is not done. Not yet. That look says everything.",
   "He's bleeding and hurting, but there's something burning in his eyes.",
   "You see the moment he decides — he will not go down without a fight.",
+  "He has taken more than most men could and keeps moving forward.",
+  "His will is cracking. One more clean exchange should end it.",
+  "The pain is visible but he refuses to let it matter.",
+  "He is fighting on something beyond endurance now. Respect and beware.",
+  "He grits his teeth and squares up again. This one won't quit easily.",
+  "There's a wildness in his eyes now — a man with nothing left to lose.",
 ];
