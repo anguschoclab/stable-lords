@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { 
@@ -123,6 +123,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       isInitialized: s.isInitialized,
     }))
   );
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const activePath = location.pathname;
   const moodIcon = MOOD_ICONS[crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
@@ -144,12 +145,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Only check for "Orphan" status if we are in the main game loops
-    if (activePath === "/welcome" || activePath === "/start" || activePath === "/design-bible") return;
-    
+    if (activePath === "/welcome") return;
+
     const activeWarriors = roster.filter(w => w.status === "Active");
     if (activeWarriors.length < 3) {
       console.warn("Personnel deficit detected. Redirecting to recruitment protocol.");
-      window.location.href = "/welcome";
+      navigate({ to: "/welcome" });
     }
   }, [roster, activePath]);
 

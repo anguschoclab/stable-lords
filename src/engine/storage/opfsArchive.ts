@@ -47,7 +47,7 @@ export class OPFSArchiveService implements ArchiveService {
       const seasonHandle = await rootHandle.getDirectoryHandle(`season_${season}`, { create: true });
       return await seasonHandle.getDirectoryHandle(type, { create: true });
     } catch (error) {
-      console.error('Failed to get directory handle:', error);
+      console.warn('Failed to get directory handle (OPFS may be restricted in this environment):', error);
       return null;
     }
   }
@@ -58,7 +58,7 @@ export class OPFSArchiveService implements ArchiveService {
       const rootHandle = await navigator.storage.getDirectory();
       return await rootHandle.getDirectoryHandle('hot_state', { create: true });
     } catch (error) {
-      console.error('Failed to get hot_state directory handle:', error);
+      console.warn('Failed to get hot_state directory handle (OPFS may be restricted in this environment):', error);
       return null;
     }
   }
@@ -75,7 +75,7 @@ export class OPFSArchiveService implements ArchiveService {
         await writable.close();
       } catch (error: any) {
         if (error.name === 'QuotaExceededError') {
-           console.error('OPFS Quota Exceeded during hot state archival', error);
+           console.warn('OPFS Quota Exceeded during hot state archival', error);
            if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
            return;
         }
@@ -100,7 +100,7 @@ export class OPFSArchiveService implements ArchiveService {
       if (error.name === 'NotFoundError') {
         return null;
       }
-      console.error('Error retrieving hot state:', error);
+      console.warn('Error retrieving hot state:', error);
       return null;
     }
   }
@@ -136,7 +136,7 @@ export class OPFSArchiveService implements ArchiveService {
           throw error;
         }
         if (error.name === 'QuotaExceededError') {
-          console.error('OPFS Quota Exceeded during bout log archival', error);
+          console.warn('OPFS Quota Exceeded during bout log archival', error);
           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
           return;
         }
@@ -167,7 +167,7 @@ export class OPFSArchiveService implements ArchiveService {
       if (error.name === 'NotFoundError') {
         return null;
       }
-      console.error('Error retrieving bout log:', error);
+      console.warn('Error retrieving bout log:', error);
       return null;
     }
   }
@@ -186,7 +186,7 @@ export class OPFSArchiveService implements ArchiveService {
 
       } catch (error: any) {
         if (error.name === 'QuotaExceededError') {
-           console.error('OPFS Quota Exceeded during gazette archival', error);
+           console.warn('OPFS Quota Exceeded during gazette archival', error);
            if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
            return;
         }
@@ -212,7 +212,7 @@ export class OPFSArchiveService implements ArchiveService {
       if (error.name === 'NotFoundError') {
         return null;
       }
-      console.error('Error retrieving gazette:', error);
+      console.warn('Error retrieving gazette:', error);
       return null;
     }
   }
@@ -231,7 +231,7 @@ export class OPFSArchiveService implements ArchiveService {
        }
        return boutIds;
      } catch (error) {
-       console.error('Error getting archived bout ids:', error);
+       console.warn('Error getting archived bout ids:', error);
        return [];
      }
   }

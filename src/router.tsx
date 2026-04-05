@@ -16,17 +16,12 @@ import StableDetail from "@/pages/StableDetail";
 import WorldOverview from "@/pages/WorldOverview";
 import NotFound from "./pages/NotFound";
 import Gazette from "@/pages/Gazette";
-import DesignBible from "@/pages/DesignBible";
-import PhysicalsSimulator from "@/pages/PhysicalsSimulator";
-import AdminTools from "@/pages/AdminTools";
 import HallOfFame from "@/pages/HallOfFame";
 import KillAnalytics from "@/pages/KillAnalytics";
 import EquipmentOptimizerPage from "@/pages/EquipmentOptimizerPage";
 import TrainingPlanner from "@/pages/TrainingPlanner";
 import SeasonalAwards from "@/pages/SeasonalAwards";
 import TournamentAwards from "@/pages/TournamentAwards";
-import StyleGuide from "@/pages/StyleGuide";
-import ArenaHub from "@/pages/ArenaHub";
 import StableLedger from "@/pages/StableLedger";
 import StableHall from "@/pages/StableHall";
 import BookingOffice from "@/pages/BookingOffice";
@@ -92,10 +87,6 @@ const legacyTourneyAwardsRoute = new Route({ getParentRoute: () => legacyPillar,
 
 // Development / Help Tools
 const helpRoute = new Route({ getParentRoute: () => rootRoute, path: "/help", component: Help });
-const designBibleRoute = new Route({ getParentRoute: () => rootRoute, path: "/design-bible", component: DesignBible });
-const physSimRoute = new Route({ getParentRoute: () => rootRoute, path: "/physicals-simulator", component: PhysicalsSimulator });
-const adminToolsRoute = new Route({ getParentRoute: () => rootRoute, path: "/admin-tools", component: AdminTools });
-const styleGuideRoute = new Route({ getParentRoute: () => rootRoute, path: "/style-guide", component: StyleGuide });
 
 // Create the route tree
 const routeTree = rootRoute.addChildren([
