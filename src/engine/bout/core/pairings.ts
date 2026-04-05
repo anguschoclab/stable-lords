@@ -21,7 +21,7 @@ export function generatePairings(state: GameState): BoutPairing[] {
   });
 
   // 2. Derive pairings from Signed Contracts for this week
-  const currentOffers = Object.values(state.boutOffers).filter(
+  const currentOffers = Object.values(state.boutOffers || {}).filter(
     o => o.status === "Signed" && o.boutWeek === currentWeek
   );
 
@@ -31,12 +31,12 @@ export function generatePairings(state: GameState): BoutPairing[] {
 
     if (wA && wD) {
       // Find which stable wD belongs to
-      const rivalStable = state.rivals.find(r => r.roster.some(w => w.id === wD.id));
+      const rivalStable = (state.rivals || []).find(r => r.roster.some(w => w.id === wD.id));
       
       pairings.push({
         a: wA,
         d: wD,
-        isRivalry: offer.hype > 150, // Use hype as a proxy for rivalry
+        isRivalry: (offer.hype || 0) > 150, // Use hype as a proxy for rivalry
         rivalStable: rivalStable?.owner.stableName,
         rivalStableId: rivalStable?.owner.id,
         contractId: offer.id
@@ -61,7 +61,7 @@ export function generatePairings(state: GameState): BoutPairing[] {
             a: wA,
             d: wD,
             isRivalry: true, // Tournaments are always high stakes
-            rivalStable: state.rivals.find(r => r.owner.id === bout.stableD)?.owner.stableName || "Rival",
+            rivalStable: (state.rivals || []).find(r => r.owner.id === bout.stableD)?.owner.stableName || "Rival",
             rivalStableId: bout.stableD,
             contractId: `tour_${tournament.id}_${bout.round}_${bout.matchIndex}`
           });

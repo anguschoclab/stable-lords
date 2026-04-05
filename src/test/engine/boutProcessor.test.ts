@@ -18,7 +18,17 @@ describe("boutProcessor - generatePairings", () => {
             matchHistory: [],
             arenaHistory: [],
             playerChallenges: [],
-            playerAvoids: []
+            playerAvoids: [],
+            boutOffers: {
+              "offer1": {
+                id: "offer1",
+                status: "Signed",
+                boutWeek: 1,
+                warriorIds: ["w1", "w2"],
+                hype: 100,
+                purse: 100
+              }
+            }
         };
         const pairings = generatePairings(state);
         expect(pairings.length).toBe(1);

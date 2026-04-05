@@ -44,6 +44,13 @@ export class SeededRNG {
     }
     return copy;
   }
+
+  /** Returns a new SeededRNG with the exact same state */
+  clone(): SeededRNG {
+    const clone = new SeededRNG(0);
+    (clone as any).state = this.state;
+    return clone;
+  }
 }
 
 /** Legacy secure RNG (kept for non-deterministic UI needs if any) */
