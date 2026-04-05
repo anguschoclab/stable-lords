@@ -16,7 +16,8 @@ export function rollWeather(rng: () => number): WeatherType {
   if (roll < 0.6) return "Clear";
   if (roll < 0.75) return "Overcast";
   if (roll < 0.85) return "Rainy";
-  if (roll < 0.95) return "Scalding";
+  if (roll < 0.90) return "Scalding";
+  if (roll < 0.95) return "Blazing Sun";
   return "Drafty";
 }
 
