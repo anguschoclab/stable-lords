@@ -68,6 +68,8 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N advances behind a screen of slashes from his %W!",
     "%N snaps a quick forehand cut then immediately follows with a backhand from his %W!",
     "%N lunges forward and rakes his %W in a ripping diagonal!",
+    "%N feints low, catching his foe off guard before sweeping his %W high!",
+    "%N steps off the centerline, unleashing a horrifying diagonal slash with his %W!",
   ],
   bash: [
     "%N bashes with his %W!",
@@ -95,6 +97,7 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N drops his weight low and drives his %W upward in a rising smash!",
     "The sand shakes as %N charges and swings his %W with everything he has!",
     "%N draws his %W back and throws his hips through a thunderous strike!",
+    "%N brings his %W around in a terrifying, skull-crushing arc!",
   ],
   thrust: [
     "%N lunges wielding an %W!",
@@ -125,6 +128,7 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N advances with a probing jab from his %W — then commits to the real thing!",
     "%N's %W flickers in and out twice before driving home for real!",
     "%N pivots his hips and launches a rising lunge with his %W from a low line!",
+    "%N rockets forward, turning his %W into a blurring needle of death!",
   ],
   fist: [
     "%N PUNCHES from the waist with unbelievable quickness!",
@@ -151,6 +155,7 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N explodes forward with a wild, crushing OVERHAND right!",
     "%N's FOOT lashes out in a precise front kick to the chest!",
     "%N flurries — both FISTS hammering at his opponent like a storm!",
+    "%N closes the distance instantly, detonating a brutal hook!",
   ],
   generic: [
     "%N strikes using his %W!",
@@ -237,6 +242,8 @@ export const SUPER_FLASHY_TEMPLATES: string[] = [
   "✨ THE ARENA ERUPTS! %N has delivered a blow that will be spoken of long after this sand is raked! ✨",
   "✨ SUBLIME VIOLENCE! %N's %W moves with a perfection that borders on the divine! ✨",
   "✨ TRANSCENDENCE! In this moment, %N is not a fighter — he is a force! ✨",
+  "✨ THE CROWD GASPS! %N transcends mortal limits, %W trailing a golden arc of pure devastation! ✨",
+  "✨ A GOD DESCENDS! %N delivers a magnificent, awe-inspiring strike! ✨",
 ];
 
 export const INI_FEINT_TEMPLATES = [
@@ -322,6 +329,9 @@ export const KILL_TEMPLATES = [
   "%A delivers the final strike with awful precision. %D is dead.",
   "The killing blow is decisive, total, and merciless. %A is the victor.",
   "A spray of blood. A body in the sand. %A stands over it all.",
+  "%A steps past a fading guard and ends %D's life with a chilling, masterful execution!",
+  "%D chokes on a final breath as %A's %W delivers a horrifying, fatal strike!",
+  "The arena goes dead silent as %A brutally ends %D in a spectacular spray of crimson!",
 ];
 
 export const STOPPAGE_TEMPLATES = [

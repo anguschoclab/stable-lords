@@ -33,7 +33,9 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
       "A horrifying symphony of steel and slaughter opened this week's bouts!",
       "No mercy was shown, and none was asked for in a week of absolute carnage!",
       "The sands ran thick with gore as fighters were mercilessly butchered this week!",
-      "A terrifying festival of slaughter unfolded in the coliseum!"
+      "A terrifying festival of slaughter unfolded in the coliseum!",
+      "The stench of fresh blood and terror defined a grueling week in the coliseum!",
+      "Gore rained upon the sands as the warriors delivered an unprecedented display of savagery!"
     ],
     closer: [
       "The cleaners will be scrubbing blood from the stones for weeks.",
@@ -44,7 +46,9 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
       "A trail of shattered bones and ruined armor litters the coliseum.",
       "The arena echoes with the dying screams of the defeated.",
       "The crows feast well upon the shattered remains tonight.",
-      "A thick stench of blood and death permanently stains the coliseum."
+      "A thick stench of blood and death permanently stains the coliseum.",
+      "The undertakers will be working overtime tonight.",
+      "The ravenous crowd departs, faces spattered with the crimson proof of this week's carnage."
     ],
   },
   Theatrical: {
@@ -56,7 +60,8 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
       "A breathtaking showcase of martial prowess captivated the roaring stands!",
       "From the first strike to the last fall, the arena was a stage for demigods!",
       "A breathtaking opera of violence and valor commanded the arena this week!",
-      "Epic rivalries and glorious final stands painted a masterpiece on the sands!"
+      "Epic rivalries and glorious final stands painted a masterpiece on the sands!",
+      "A tapestry of valor and violence was woven on the sands this week!"
     ],
     closer: [
       "The bards already compose their verses.",
@@ -65,7 +70,8 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
       "Legends were forged in blood and steel today.",
       "The crowd leaves exhausted, their voices hoarse from cheering this epic drama.",
       "The tale of this week's battles will be sung for generations.",
-      "A breathtaking finale to a week of mythical combat."
+      "A breathtaking finale to a week of mythical combat.",
+      "The echo of clashing steel and legendary deeds will linger in the air for ages."
     ],
   },
   Solemn: {

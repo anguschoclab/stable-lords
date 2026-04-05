@@ -202,6 +202,10 @@ export const HIT_TEMPLATES = [
   "connects with a wet sickening sound on",
   "opens up a nasty cut on",
   "thunders into",
+  "delivers a horrifying, bone-splintering impact to",
+  "paints the arena sand red with a brutal strike to",
+  "makes a sickening crunch as %W bites into",
+  "shears clean through the armor, punishing the exposed",
 ];
 
 // ─── Parry Breaks ────────────────────────────────────────────────────────────
@@ -238,6 +242,9 @@ export const PARRY_BREAK_TEMPLATES = [
   "Too little, too late — %A's %W punches past the raised defense!",
   "%A twists %W at the last moment and threads it past the parry!",
   "The strength behind %A's %W is simply too much to contain!",
+  "A shocking display of raw force! %A shatters the defense with %W!",
+  "%A's %W bites straight through the desperate parry!",
+  "The parry crumbles under a devastating blow from %A's %W!",
 ];
 
 // ─── Crowd ────────────────────────────────────────────────────────────────────
@@ -258,6 +265,8 @@ export const CROWD_REACTIONS_POSITIVE = [
   "Ecstatic screaming from the upper tiers!",
   "The pit crowd surges forward — they loved that!",
   "Whistles, stamps, and roaring approval fill the air!",
+  "The mob screams for blood, electrified by the display!",
+  "A deafening roar of pure adrenaline shakes the coliseum!",
 ];
 
 export const CROWD_REACTIONS_NEGATIVE = [
