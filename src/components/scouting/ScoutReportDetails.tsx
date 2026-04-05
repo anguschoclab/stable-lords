@@ -111,7 +111,7 @@ export function ScoutReportDetails({ report, warriorName, gold, onScout }: Scout
         
         <Tooltip>
            <TooltipTrigger asChild>
-              <button className="p-2 rounded-lg bg-neutral-900 border border-white/5 hover:border-primary/40 transition-colors">
+              <button className="p-2 rounded-lg bg-neutral-900 border border-white/5 hover:border-primary/40 transition-colors" aria-label="View report details information">
                  <Info className="h-4 w-4 text-muted-foreground/40" />
               </button>
            </TooltipTrigger>

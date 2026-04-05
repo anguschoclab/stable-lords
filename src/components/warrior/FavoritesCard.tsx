@@ -174,7 +174,7 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={() => handleInsight("weapon")} className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20">
+                    <Button variant="outline" size="sm" onClick={() => handleInsight("weapon")} className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20" aria-label="Reveal favorite weapon insight">
                       <Eye className="h-3.5 w-3.5" />
                     </Button>
                   </TooltipTrigger>
@@ -219,7 +219,7 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={() => handleInsight("rhythm")} className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20">
+                    <Button variant="outline" size="sm" onClick={() => handleInsight("rhythm")} className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20" aria-label="Reveal favorite rhythm insight">
                       <Eye className="h-3.5 w-3.5" />
                     </Button>
                   </TooltipTrigger>
