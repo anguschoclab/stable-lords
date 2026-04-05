@@ -11,7 +11,7 @@ import {
   draftInitialRoster,
   updateWarriorEquipment,
 } from "./gameStore";
-import { consumeInsightToken } from "./mutations/tokenMutations";
+import { consumeInsightToken, InsightTokenService } from "./mutations/tokenMutations";
 import { advanceDay } from "@/engine/dayPipeline";
 import {
   migrateLegacySave,
@@ -20,6 +20,7 @@ import {
   saveToSlot,
   listSaveSlots,
 } from "./saveSlots";
+import { hashStr } from "@/utils/idUtils";
 
 export interface GameStoreState {
   state: GameState;
@@ -226,10 +227,20 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
     },
     doConsumeInsightToken: (tokenId: string, warriorId: string) => {
       set((draft) => {
-        const next = consumeInsightToken(draft.state, tokenId, warriorId);
+        // Determinism: Seed RNG with week + warriorId for reproducible results
+        let seedValue = draft.state.week * 7 + hashStr(warriorId || tokenId);
+        const rng = () => {
+          const x = Math.sin(seedValue++) * 10000;
+          return x - Math.floor(x);
+        };
+        
+        const next = InsightTokenService.assignToken(draft.state, tokenId, warriorId, rng);
         draft.state = next;
-        if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
-        draft.lastSavedAt = new Date().toISOString();
+        const { activeSlotId } = draft;
+        if (activeSlotId) {
+          saveToSlot(activeSlotId, next);
+          draft.lastSavedAt = new Date().toISOString();
+        }
       });
     },
   }))

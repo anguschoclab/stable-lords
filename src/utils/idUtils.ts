@@ -38,3 +38,13 @@ export function generateId(): string {
   // Ultimate fallback
   return Date.now() + "_" + Math.floor(Math.random() * 1e6);
 }
+
+/** Simple FNV-1a hash for deterministic seeds from IDs */
+export function hashStr(s: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    hash ^= s.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
