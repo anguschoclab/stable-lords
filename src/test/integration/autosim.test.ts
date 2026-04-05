@@ -3,7 +3,7 @@
  * 
  * Tests the autosim system that allows multi-week advancement with stop conditions.
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, beforeAll, afterAll, vi } from "vitest";
 import { createFreshState } from "@/state/gameStore";
 
 // Mock localStorage for Vitest since autosim triggers stat rollup saves
