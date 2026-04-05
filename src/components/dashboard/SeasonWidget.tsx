@@ -34,6 +34,10 @@ export function SeasonWidget() {
     WeatherIcon = CloudRain;
     weatherColor = "text-blue-500";
     weatherBg = "bg-blue-500/10 border-blue-500/20";
+  } else if (weather === "Blazing Sun") {
+    WeatherIcon = Sun;
+    weatherColor = "text-red-500";
+    weatherBg = "bg-red-500/10 border-red-500/20";
   } else if (weather === "Scalding") {
     WeatherIcon = Sun;
     weatherColor = "text-orange-500";
@@ -132,7 +136,8 @@ export function SeasonWidget() {
                       </Badge>
                    </TooltipTrigger>
                    <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest max-w-[200px]">
-                      {weather === "Scalding" ? "20% more stamina drain in combat." :
+                      {weather === "Blazing Sun" ? "30% more stamina drain in combat." :
+                       weather === "Scalding" ? "20% more stamina drain in combat." :
                        weather === "Drafty" ? "10% less stamina drain in combat." :
                        weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
                        "Standard atmospheric conditions."}

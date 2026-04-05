@@ -9,6 +9,7 @@ import { WorldManagementService } from "@/engine/ai/worldManagement";
 import { InsightTokenService } from "@/engine/tokens/insightTokenService";
 import { seededRng } from "@/engine/rivals";
 import { processOwnerGrudges } from "@/engine/ownerGrudges";
+import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 
 // 🌩️ New Modular Passes
 import { runEconomyPass } from "../passes/EconomyPass";
@@ -97,10 +98,19 @@ export function advanceWeek(state: GameState): GameState {
     }
   }
 
-  // 7. Tournament Reward Tokens
-  if (currentWeek % 13 === 0) {
-    const tokenRng = seededRng(currentWeek * 42 + 7);
-    newState = InsightTokenService.awardToken(newState, tokenRng() > 0.5 ? "Weapon" : "Rhythm", `${newState.season} Championship`);
+  // 7. Tournament Generation & Daily Trigger
+  if (nextWeek % 13 === 0) {
+    const tours = TournamentSelectionService.generateSeasonalTiers(newState, nextWeek, newState.season, nextWeek * 777);
+    newState.tournaments = [...(newState.tournaments || []), ...tours];
+    newState.isTournamentWeek = true;
+    newState.activeTournamentId = tours[0].id; // Default focal tournament (Gold Cup)
+    newState.day = 0;
+    
+    newState.newsletter = [...(newState.newsletter || []), { 
+      week: nextWeek, 
+      title: "🏆 IMPERIAL CHAMPIONSHIPS BEGIN", 
+      items: ["The seasonal tournaments have been bracketed. Progression will shift to DAILY ticks until champions are crowned."]
+    }];
   }
 
   // 8. Physicality & Aging (Injuries, Development)

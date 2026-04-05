@@ -25,6 +25,14 @@ export class ArchiveConflictError extends Error {
 }
 
 export class OPFSArchiveService implements ArchiveService {
+  private writeQueue: Promise<any> = Promise.resolve();
+
+  private async enqueue<T>(task: () => Promise<T>): Promise<T> {
+    const p = this.writeQueue.then(task);
+    this.writeQueue = p.catch(() => {}); // catch errors to allow next task in queue
+    return p;
+  }
+
   isSupported(): boolean {
     return typeof navigator !== 'undefined' &&
            typeof navigator.storage !== 'undefined' &&
@@ -56,22 +64,24 @@ export class OPFSArchiveService implements ArchiveService {
   }
 
   async archiveHotState(slotId: string, stateData: any): Promise<void> {
-    try {
-      const dirHandle = await this.getHotStateDirectory();
-      if (!dirHandle) return;
-      const fileName = `${slotId}.json`;
-      const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(stateData));
-      await writable.close();
-    } catch (error: any) {
-      if (error.name === 'QuotaExceededError') {
-         console.error('OPFS Quota Exceeded during hot state archival', error);
-         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-         return;
+    return this.enqueue(async () => {
+      try {
+        const dirHandle = await this.getHotStateDirectory();
+        if (!dirHandle) return;
+        const fileName = `${slotId}.json`;
+        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(stateData));
+        await writable.close();
+      } catch (error: any) {
+        if (error.name === 'QuotaExceededError') {
+           console.error('OPFS Quota Exceeded during hot state archival', error);
+           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+           return;
+        }
+        console.error('Error archiving hot state:', error);
       }
-      console.error('Error archiving hot state:', error);
-    }
+    });
   }
 
   async retrieveHotState(slotId: string): Promise<any | null> {
@@ -96,46 +106,46 @@ export class OPFSArchiveService implements ArchiveService {
   }
 
   async archiveBoutLog(season: number, boutId: string, logData: any): Promise<void> {
-    try {
-      const dirHandle = await this.getDirectory(season, 'bouts');
-      if (!dirHandle) return;
-
-      const fileName = `${boutId}.json`;
-
-      let fileHandle;
+    return this.enqueue(async () => {
       try {
-        fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
-        if (fileHandle) {
+        const dirHandle = await this.getDirectory(season, 'bouts');
+        if (!dirHandle) return;
+
+        const fileName = `${boutId}.json`;
+
+        let fileHandle;
+        try {
+          fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
+          if (fileHandle) {
+            throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
+          }
+        } catch (error: any) {
+           if (error instanceof ArchiveConflictError) {
+               throw error;
+           }
+           // File doesn't exist, proceed
+           fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        }
+
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(logData));
+        await writable.close();
+
+      } catch (error: any) {
+        if (error instanceof ArchiveConflictError) {
+          throw error;
+        }
+        if (error.name === 'QuotaExceededError') {
+          console.error('OPFS Quota Exceeded during bout log archival', error);
+          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+          return;
+        }
+        if (error.name === 'NoModificationAllowedError') {
           throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
         }
-      } catch (error: any) {
-         if (error instanceof ArchiveConflictError) {
-             throw error;
-         }
-         // File doesn't exist, proceed
-         fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        console.error('Error archiving bout log:', error);
       }
-
-      const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(logData));
-      await writable.close();
-
-    } catch (error: any) {
-      if (error instanceof ArchiveConflictError) {
-        throw error;
-      }
-      if (error.name === 'QuotaExceededError') {
-        console.error('OPFS Quota Exceeded during bout log archival', error);
-        // Dispatch to Zustand to show Toast
-        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-        return;
-      }
-      if (error.name === 'NoModificationAllowedError') {
-        throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
-      }
-      console.error('Error archiving bout log:', error);
-      // Fail gracefully
-    }
+    });
   }
 
   async retrieveBoutLog(season: number, boutId: string): Promise<any | null> {
@@ -147,7 +157,6 @@ export class OPFSArchiveService implements ArchiveService {
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
       const file = await fileHandle.getFile();
 
-      // Handle standard File objects in tests
       if (typeof file.text === 'function') {
          const text = await file.text();
          return JSON.parse(text);
@@ -156,7 +165,7 @@ export class OPFSArchiveService implements ArchiveService {
       return null;
     } catch (error: any) {
       if (error.name === 'NotFoundError') {
-        return null; // Graceful degradation for missing files
+        return null;
       }
       console.error('Error retrieving bout log:', error);
       return null;
@@ -164,25 +173,26 @@ export class OPFSArchiveService implements ArchiveService {
   }
 
   async archiveGazette(season: number, week: number, markdown: string): Promise<void> {
-    try {
-      const dirHandle = await this.getDirectory(season, 'gazettes');
-      if (!dirHandle) return;
+    return this.enqueue(async () => {
+      try {
+        const dirHandle = await this.getDirectory(season, 'gazettes');
+        if (!dirHandle) return;
 
-      const fileName = `week_${week}.md`;
-      const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(markdown);
-      await writable.close();
+        const fileName = `week_${week}.md`;
+        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(markdown);
+        await writable.close();
 
-    } catch (error: any) {
-      if (error.name === 'QuotaExceededError') {
-         console.error('OPFS Quota Exceeded during gazette archival', error);
-         // Dispatch to Zustand to show Toast
-         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-         return;
+      } catch (error: any) {
+        if (error.name === 'QuotaExceededError') {
+           console.error('OPFS Quota Exceeded during gazette archival', error);
+           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+           return;
+        }
+        console.error('Error archiving gazette:', error);
       }
-      console.error('Error archiving gazette:', error);
-    }
+    });
   }
 
   async retrieveGazette(season: number, week: number): Promise<string | null> {

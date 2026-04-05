@@ -30,8 +30,9 @@ const finishers = [
 
 export type AnnounceTone = "neutral" | "hype" | "grim";
 
-function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+function pick<T>(arr: T[], rng?: () => number): T {
+  const safeRng = rng || Math.random;
+  return arr[Math.floor(safeRng() * arr.length)];
 }
 
 export function blurb(opts: {
@@ -39,14 +40,16 @@ export function blurb(opts: {
   winner?: string;
   loser?: string;
   by?: string;
+  rng?: () => number;
 }): string {
+  const { rng } = opts;
   const t = opts.tone || "neutral";
   const w = opts.winner || "The victor";
   const l = opts.loser || "his foe";
   const by = opts.by ? ` by ${opts.by.toLowerCase()}` : "";
 
   if (t === "hype")
-    return `${pick(exclaim)} ${w} ${pick(finishers)} ${pick(flourish)}!`;
+    return `${pick(exclaim, rng)} ${w} ${pick(finishers, rng)} ${pick(flourish, rng)}!`;
   if (t === "grim")
     return `${w} overcomes ${l}${by}, the arena falls hushed.`;
   return `${w} bests ${l}${by}.`;
@@ -55,8 +58,10 @@ export function blurb(opts: {
 // ── Short hype lines (formerly ui/commentator.ts) ─────────────────────────
 
 export function commentatorFor(
-  tag: "KO" | "Kill" | "Flashy" | "Upset"
+  tag: "KO" | "Kill" | "Flashy" | "Upset",
+  rng?: () => number
 ): string {
+  // Use the same pick helper for consistency if needed, but currently its static strings
   switch (tag) {
     case "KO":
       return "What a knockout! The crowd erupts!";

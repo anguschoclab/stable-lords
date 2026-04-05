@@ -56,8 +56,8 @@ function metaFromState(slotId: string, state: GameState, existingCreatedAt?: str
 }
 
 /** Save game state to a specific slot */
-export function saveToSlot(slotId: string, state: GameState): void {
-  archiveService.archiveHotState(slotId, state).catch(console.error);
+export async function saveToSlot(slotId: string, state: GameState): Promise<void> {
+  const p = archiveService.archiveHotState(slotId, state);
   const slots = listSaveSlots();
   const existingIdx = slots.findIndex((s) => s.slotId === slotId);
   const existing = existingIdx >= 0 ? slots[existingIdx] : undefined;
@@ -69,6 +69,7 @@ export function saveToSlot(slotId: string, state: GameState): void {
   }
   persistSlotIndex(slots);
   setActiveSlot(slotId);
+  return p;
 }
 
 /** Load game state from a specific slot */

@@ -50,90 +50,11 @@ export default function Tournaments() {
   );
 
   const activeWarriors = useMemo(() => state.roster.filter((w) => w.status === "Active"), [state.roster]);
-  const canStart = !currentTournament && activeWarriors.length >= 2;
 
   const pastTournaments = useMemo(
     () => state.tournaments.filter((t) => t.completed).reverse(),
     [state.tournaments]
   );
-
-  const startTournament = useCallback(() => {
-    const active = state.roster.filter((w) => w.status === "Active");
-    if (active.length < 2) return;
-
-    const rivalWarriors: { name: string; isAI: boolean; stableId: string; intent?: string }[] = [];
-    const rivals = state.rivals ?? [];
-    const hasPlayerEntrants = active.length > 0;
-
-    for (const rival of rivals) {
-      const intent = rival.strategy?.intent ?? "CONSOLIDATION";
-      const gold = rival.gold || 0;
-      const activeRoster = rival.roster.filter((w) => w.status === "Active");
-      
-      let entryCount = 0;
-      if (intent === "VENDETTA" && hasPlayerEntrants) entryCount = 1;
-      else if (intent === "EXPANSION" && gold > 300) entryCount = 2;
-      else if (intent === "RECOVERY") entryCount = gold > 200 ? 1 : 0;
-      else if (gold > 100) entryCount = 1;
-
-      const entrants = activeRoster
-        .filter(rw => {
-          // ⚡ Tournament Entry Skepticism: Weather Check
-          if (state.weather === "Rainy" && rw.style === FightingStyle.LungingAttack) return false;
-          if (state.weather === "Scalding" && rw.attributes.CN < 10) return false;
-          return true;
-        })
-        .sort((a, b) => b.fame - a.fame)
-        .slice(0, entryCount);
-
-      for (const rw of entrants) {
-        rivalWarriors.push({ name: rw.name, isAI: true, stableId: rival.owner.id });
-      }
-    }
-
-    const allEntrants = [
-      ...active.map((w) => ({ name: w.name, isAI: false, stableId: state.player.id })),
-      ...rivalWarriors,
-    ];
-
-    const shuffled = [...allEntrants].sort(() => Math.random() - 0.5);
-    const bracket: TournamentBout[] = [];
-    for (let i = 0; i < shuffled.length; i += 2) {
-      if (i + 1 < shuffled.length) {
-        bracket.push({
-          round: 1,
-          matchIndex: Math.floor(i / 2),
-          a: shuffled[i].name,
-          d: shuffled[i + 1].name,
-          stableA: shuffled[i].stableId,
-          stableD: shuffled[i + 1].stableId,
-        });
-      } else {
-        bracket.push({
-          round: 1,
-          matchIndex: Math.floor(i / 2),
-          a: shuffled[i].name,
-          d: "(bye)",
-          winner: "A",
-        });
-      }
-    }
-
-    const entry: TournamentEntry = {
-      id: `t_${Date.now()}`,
-      season: state.season,
-      week: state.week,
-      name: SEASON_NAMES[state.season] ?? "Tournament",
-      bracket,
-      completed: false,
-    };
-
-    setState({
-      ...state,
-      tournaments: [...state.tournaments, entry],
-    });
-    toast.success(`${entry.name} initiated.`);
-  }, [state, setState]);
 
   const runNextRound = useCallback(() => {
     if (!currentTournament) return;
@@ -427,15 +348,6 @@ export default function Tournaments() {
         </div>
         
         <div className="flex items-center gap-2">
-          {canStart && (
-            <Button 
-              variant="outline" 
-              onClick={() => setPrepModeOpen(true)}
-              className="h-11 border-accent/40 text-accent font-black uppercase text-[10px] tracking-widest hover:bg-accent/10 transition-all shadow-[0_0_15px_-5px_hsla(var(--accent),0.4)]"
-            >
-              <Shield className="h-4 w-4 mr-2" /> OPEN_PREP_CONSOLE
-            </Button>
-          )}
           {!currentTournament && activeWarriors.length < 2 && (
              <Link to="/stable/recruit">
               <Button variant="outline" className="h-11 font-black uppercase text-[10px] tracking-widest gap-2">
@@ -492,13 +404,6 @@ export default function Tournaments() {
         />
       </div>
 
-      <TournamentPrepDialog
-        isOpen={prepModeOpen}
-        onOpenChange={setPrepModeOpen}
-        activeWarriors={activeWarriors}
-        seasonName={SEASON_NAMES[state.season]}
-        onStart={startTournament}
-      />
     </div>
   );
 }

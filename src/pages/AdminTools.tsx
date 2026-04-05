@@ -33,7 +33,7 @@ export default function AdminTools() {
         if (typeof content !== 'string') throw new Error("Invalid file content");
         const data = JSON.parse(content);
         if (data && data.state) {
-           setState(data.state as GameState);
+           setState(() => data.state as GameState);
            toast.success('Temporal state synchronization restored.');
         } else {
            toast.error('Invalid save signature detected.');
@@ -46,19 +46,24 @@ export default function AdminTools() {
   }, [setState]);
 
   const skipWeek = useCallback(() => {
-    setState(advanceWeek(state));
-    toast.success(`Advanced to Week ${state.week + 1}`);
-  }, [state, setState]);
+    setState((prev) => {
+      const next = advanceWeek(prev);
+      toast.success(`Advanced to Week ${next.week}`);
+      return next;
+    });
+  }, [setState]);
 
   const skipSeason = useCallback(() => {
-    let newState = { ...state };
-    for(let i=0; i<13; i++) {
-        newState = advanceWeek(newState);
-    }
-    newState.season = computeNextSeason(newState.week);
-    setState(newState);
+    setState((prev) => {
+      let newState = { ...prev };
+      for(let i=0; i<13; i++) {
+          newState = advanceWeek(newState);
+      }
+      newState.season = computeNextSeason(newState.week);
+      return newState;
+    });
     toast.success('Seasonal transition forced.');
-  }, [state, setState]);
+  }, [setState]);
 
   const skipFTUE = useCallback(() => {
     const defaultPlayer = {
@@ -70,25 +75,25 @@ export default function AdminTools() {
       titles: 0,
     };
 
-    setState({ 
-      ...state, 
+    setState((prev) => ({ 
+      ...prev, 
       ftueComplete: true, 
       isFTUE: false,
       player: {
         ...defaultPlayer,
-        ...(state.player ?? {})
+        ...(prev.player ?? {})
       }
-    });
+    }));
     toast.success('FTUE constraints bypassed.');
-  }, [state, setState]);
+  }, [setState]);
 
   const resetRivals = useCallback(() => {
     import("@/engine/rivals").then(({ generateRivalStables }) => {
       const newRivals = generateRivalStables(23, Date.now()) as RivalStableData[];
-      setState({ ...state, rivals: newRivals });
+      setState((prev) => ({ ...prev, rivals: newRivals }));
       toast.success('Rival ecosystem regenerated.');
     });
-  }, [state, setState]);
+  }, [setState]);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-20">
@@ -160,16 +165,18 @@ export default function AdminTools() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-3">
-             <Button 
+              <Button 
                 onClick={() => {
-                  const updatedRoster = state.roster.map(w => ({
-                    ...w,
-                    favorites: w.favorites ? {
-                      ...w.favorites,
-                      discovered: { ...w.favorites.discovered, weapon: true, rhythm: true }
-                    } : w.favorites
-                  }));
-                  setState({ ...state, roster: updatedRoster });
+                  setState((prev) => {
+                    const updatedRoster = prev.roster.map(w => ({
+                      ...w,
+                      favorites: w.favorites ? {
+                        ...w.favorites,
+                        discovered: { ...w.favorites.discovered, weapon: true, rhythm: true }
+                      } : w.favorites
+                    }));
+                    return { ...prev, roster: updatedRoster };
+                  });
                   toast.success('Omniscient mastery achieved.');
                 }} 
                 className="w-full h-11 font-black uppercase text-[10px] tracking-widest border-arena-gold/30 text-arena-gold" 
@@ -179,8 +186,10 @@ export default function AdminTools() {
               </Button>
               <Button 
                 onClick={() => {
-                  const escalatedGrudges = state.ownerGrudges.map(g => ({ ...g, intensity: 5 }));
-                  setState({ ...state, ownerGrudges: escalatedGrudges });
+                  setState((prev) => {
+                    const escalatedGrudges = (prev.ownerGrudges ?? []).map(g => ({ ...g, intensity: 5 }));
+                    return { ...prev, ownerGrudges: escalatedGrudges };
+                  });
                   toast.success('Blood feuds escalated to maximum.');
                 }} 
                 className="w-full h-11 font-black uppercase text-[10px] tracking-widest border-destructive/30 text-destructive" 
@@ -191,8 +200,7 @@ export default function AdminTools() {
               <Button 
                 onClick={() => {
                   import("@/engine/pipeline/passes/EquipmentPass").then(({ runEquipmentPass }) => {
-                    const nextState = runEquipmentPass(state);
-                    setState(nextState);
+                    setState((prev) => runEquipmentPass(prev));
                     toast.success('AI tactical re-gearing pass complete.');
                   });
                 }} 

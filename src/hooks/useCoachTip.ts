@@ -201,13 +201,18 @@ function matchRoute(pathname: string): RouteEntry | undefined {
  */
 export function useCoachTip(pathname: string) {
   const { state, setState } = useGameStore();
+  const ftueComplete = state.ftueComplete;
 
   useEffect(() => {
-    if (!state.ftueComplete) return;
+    if (!ftueComplete) return;
 
     const entry = matchRoute(pathname);
     if (!entry) return;
 
+    // Use current store state for tip selection to avoid stale closure issues
+    // Note: while we access from 'state' here, tip.id is what we need for the timer
+    const dismissed = state.coachDismissed ?? [];
+    
     // Build context for dynamic routes
     const context: CoachContext = {};
     const warriorMatch = pathname.match(/^\/warrior\/(.+)/);
@@ -215,7 +220,6 @@ export function useCoachTip(pathname: string) {
       context.warrior = state.roster.find((w) => w.id === warriorMatch[1]);
     }
 
-    const dismissed = state.coachDismissed ?? [];
     const tip = entry.tips.find(
       (t) => !dismissed.includes(t.id) && (!t.condition || t.condition(state, context))
     );
@@ -230,21 +234,21 @@ export function useCoachTip(pathname: string) {
         action: {
           label: "Got it",
           onClick: () => {
-            setState({
-              ...state,
-              coachDismissed: [...(state.coachDismissed ?? []), tip.id],
-            });
+            setState((prev) => ({
+              ...prev,
+              coachDismissed: [...(prev.coachDismissed ?? []), tip.id],
+            }));
           },
         },
       });
-      // Mark dismissed after showing
-      setState({
-        ...state,
-        coachDismissed: [...(state.coachDismissed ?? []), tip.id],
-      });
+      // Mark dismissed after showing using functional update to avoid stale state data
+      setState((prev) => ({
+        ...prev,
+        coachDismissed: Array.from(new Set([...(prev.coachDismissed ?? []), tip.id])),
+      }));
     }, 1000);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, state.ftueComplete]);
+  }, [pathname, ftueComplete]);
 }

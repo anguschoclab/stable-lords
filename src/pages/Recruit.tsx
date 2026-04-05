@@ -207,116 +207,129 @@ export default function Recruit() {
   const canRefresh = gold >= REFRESH_COST;
 
   // Persist pool to state
-  const persistPool = useCallback((newPool: PoolWarrior[], newState?: typeof state) => {
-    const base = newState ?? state;
-    setState({ ...base, recruitPool: newPool } as any);
+  const persistPool = useCallback((newPool: PoolWarrior[]) => {
+    setState((prev) => ({ ...prev, recruitPool: newPool }));
     setPool(newPool);
-  }, [state, setState]);
+  }, [setState]);
 
   const handleRecruit = useCallback((w: PoolWarrior) => {
-    if (gold < w.cost) {
-      toast.error(`Not enough gold! Need ${w.cost}g.`);
-      return;
-    }
-    if (rosterFull) {
-      toast.error("Roster full! Retire or release a warrior first.");
-      return;
-    }
+    setState((prev) => {
+      const currentGold = prev.gold ?? 0;
+      if (currentGold < w.cost) {
+        toast.error(`Not enough gold! Need ${w.cost}g.`);
+        return prev;
+      }
+      if (prev.roster.length >= MAX_ROSTER) {
+        toast.error("Roster full! Retire or release a warrior first.");
+        return prev;
+      }
 
-    const warrior = makeWarrior(
-      `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
-      w.name, w.style, w.attributes,
-      { age: w.age, potential: w.potential }
-    );
+      const warrior = makeWarrior(
+        `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+        w.name, w.style, w.attributes,
+        { age: w.age, potential: w.potential }
+      );
 
-    const newPool = pool.filter(p => p.id !== w.id);
-    const updatedState = {
-      ...state,
-      roster: [...state.roster, warrior],
-      gold: gold - w.cost,
-      ledger: [...(state.ledger ?? []), {
-        week: state.week,
-        label: `Recruit: ${w.name} (${w.tier})`,
-        amount: -w.cost,
-        category: "recruit" as const,
-      }],
-      newsletter: [...state.newsletter, {
-        week: state.week,
-        title: "Recruitment",
-        items: [`${state.player.stableName} signed ${w.name}, a ${w.tier.toLowerCase()} ${STYLE_DISPLAY_NAMES[w.style]}.`],
-      }],
-    };
+      const newPool = (prev.recruitPool ?? []).filter(p => p.id !== w.id);
+      setPool(newPool);
+      toast.success(`${w.name} has joined your stable! (-${w.cost}g)`);
 
-    persistPool(newPool, updatedState);
-    toast.success(`${w.name} has joined your stable! (-${w.cost}g)`);
-  }, [gold, rosterFull, pool, state, persistPool]);
+      return {
+        ...prev,
+        roster: [...prev.roster, warrior],
+        gold: currentGold - w.cost,
+        recruitPool: newPool,
+        ledger: [...(prev.ledger ?? []), {
+          week: prev.week,
+          label: `Recruit: ${w.name} (${w.tier})`,
+          amount: -w.cost,
+          category: "recruit" as const,
+        }],
+        newsletter: [...(prev.newsletter ?? []), {
+          week: prev.week,
+          title: "Recruitment",
+          items: [`${prev.player.stableName} signed ${w.name}, a ${w.tier.toLowerCase()} ${STYLE_DISPLAY_NAMES[w.style]}.`],
+        }],
+      };
+    });
+  }, [MAX_ROSTER, setState]);
 
   const handleScout = useCallback((w: PoolWarrior) => {
-    if (gold < 25) {
-      toast.error("Not enough gold to scout potential (need 25g).");
-      return;
-    }
-    setState({
-      ...state,
-      gold: gold - 25,
-      ledger: [...(state.ledger ?? []), {
-        week: state.week,
-        label: `Scout Potential: ${w.name}`,
-        amount: -25,
-        category: "other" as const,
-      }],
+    setState((prev) => {
+      const currentGold = prev.gold ?? 0;
+      if (currentGold < 25) {
+        toast.error("Not enough gold to scout potential (need 25g).");
+        return prev;
+      }
+      setScoutedIds(s => new Set(s).add(w.id));
+      toast.success(`Scouted potential for ${w.name}! (-25g)`);
+      return {
+        ...prev,
+        gold: currentGold - 25,
+        ledger: [...(prev.ledger ?? []), {
+          week: prev.week,
+          label: `Scout Potential: ${w.name}`,
+          amount: -25,
+          category: "other" as const,
+        }],
+      };
     });
-    setScoutedIds(prev => new Set(prev).add(w.id));
-    toast.success(`Scouted potential for ${w.name}! (-25g)`);
-  }, [state, setState, gold]);
+  }, [setState]);
 
   const handleRefresh = useCallback(() => {
-    if (!canRefresh) {
-      toast.error(`Not enough gold! Need ${REFRESH_COST}g to refresh.`);
-      return;
-    }
-    const newPool = fullRefreshPool(state.week, usedNames);
-    const updatedState = {
-      ...state,
-      gold: gold - REFRESH_COST,
-      ledger: [...(state.ledger ?? []), {
-        week: state.week,
-        label: "Pool refresh",
-        amount: -REFRESH_COST,
-        category: "other" as const,
-      }],
-    };
-    persistPool(newPool, updatedState);
-    toast.success(`Scout pool refreshed! (-${REFRESH_COST}g)`);
-  }, [canRefresh, gold, state, usedNames, persistPool]);
+    setState((prev) => {
+      const currentGold = prev.gold ?? 0;
+      if (currentGold < REFRESH_COST) {
+        toast.error(`Not enough gold! Need ${REFRESH_COST}g to refresh.`);
+        return prev;
+      }
+      const newPool = fullRefreshPool(prev.week, usedNames);
+      setPool(newPool);
+      toast.success(`Scout pool refreshed! (-${REFRESH_COST}g)`);
+      return {
+        ...prev,
+        gold: currentGold - REFRESH_COST,
+        recruitPool: newPool,
+        ledger: [...(prev.ledger ?? []), {
+          week: prev.week,
+          label: "Pool refresh",
+          amount: -REFRESH_COST,
+          category: "other" as const,
+        }],
+      };
+    });
+  }, [usedNames, setState]);
 
   const handleCustomCreate = useCallback(
     (data: { name: string; style: FightingStyle; attributes: Attributes }) => {
-      if (gold < CUSTOM_COST) {
-        toast.error(`Not enough gold! Need ${CUSTOM_COST}g for custom build.`);
-        return;
-      }
-      if (rosterFull) {
-        toast.error("Roster full!");
-        return;
-      }
-      const id = `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
-      const warrior = makeWarrior(id, data.name, data.style, data.attributes);
-      setState({
-        ...state,
-        roster: [...state.roster, warrior],
-        gold: gold - CUSTOM_COST,
-        ledger: [...(state.ledger ?? []), {
-          week: state.week,
-          label: `Custom Build: ${data.name}`,
-          amount: -CUSTOM_COST,
-          category: "recruit" as const,
-        }],
+      setState((prev) => {
+        const currentGold = prev.gold ?? 0;
+        if (currentGold < CUSTOM_COST) {
+          toast.error(`Not enough gold! Need ${CUSTOM_COST}g for custom build.`);
+          return prev;
+        }
+        if (prev.roster.length >= MAX_ROSTER) {
+          toast.error("Roster full!");
+          return prev;
+        }
+        const id = `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
+        const warrior = makeWarrior(id, data.name, data.style, data.attributes);
+        toast.success(`${data.name} has joined your stable! (-${CUSTOM_COST}g)`);
+        setTimeout(() => navigate({ to: `/warrior/${id}` }), 0);
+        return {
+          ...prev,
+          roster: [...prev.roster, warrior],
+          gold: currentGold - CUSTOM_COST,
+          ledger: [...(prev.ledger ?? []), {
+            week: prev.week,
+            label: `Custom Build: ${data.name}`,
+            amount: -CUSTOM_COST,
+            category: "recruit" as const,
+          }],
+        };
       });
-      toast.success(`${data.name} has joined your stable! (-${CUSTOM_COST}g)`);
-      navigate({ to: `/warrior/${id}` });
     },
-    [state, setState, navigate, gold, rosterFull]
+    [setState, navigate, MAX_ROSTER]
   );
 
   return (

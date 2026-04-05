@@ -53,6 +53,8 @@ export function contestCheck(
 export function weatherStaminaModifier(weather?: string): number {
   if (!weather) return 1.0;
   switch (weather) {
+    case "Blazing Sun":
+      return 1.3; // 30% more stamina drain
     case "Scalding":
       return 1.2; // 20% more stamina drain
     case "Drafty":

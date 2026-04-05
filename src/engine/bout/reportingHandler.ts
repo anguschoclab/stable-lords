@@ -17,9 +17,12 @@ export function handleReporting(
   pD: number, 
   week: number, 
   rivalStableId?: string, 
-  isRivalry?: boolean
+  isRivalry?: boolean,
+  day: number = 0,
+  rng?: () => number
 ) {
-  const boutId = generateId();
+  const safeRng = rng || Math.random;
+  const boutId = `b_w${week}_d${day}_${Math.floor(safeRng() * 1000000)}`;
   const summary: FightSummary = { 
     id: boutId, week, title: `${wA.name} vs ${wD.name}`, a: wA.name, d: wD.name, 
     winner: outcome.winner, by: outcome.by, styleA: wA.style, styleD: wD.style, 

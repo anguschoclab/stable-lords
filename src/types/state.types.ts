@@ -283,6 +283,10 @@ export interface GameState {
   };
   isFTUE: boolean;
   unacknowledgedDeaths: string[];
+  // ─── Daily Progression ───
+  day: number; // 0-7
+  isTournamentWeek: boolean;
+  activeTournamentId?: string;
   // ─── Promoter System ───
   promoters: Record<string, Promoter>;
   boutOffers: Record<string, BoutOffer>;

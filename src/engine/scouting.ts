@@ -10,6 +10,7 @@
  */
 import type { Warrior, InsightToken, InsightTokenType } from "@/types/game";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
+import { generateId } from "@/utils/idUtils";
 
 export type ScoutQuality = "Basic" | "Detailed" | "Expert";
 
@@ -68,15 +69,16 @@ export function getAttributeRangeDescription(low: number, high: number): string 
 export function generateScoutReport(
   warrior: Warrior,
   quality: ScoutQuality,
-  week: number
+  week: number,
+  rng: () => number = Math.random
 ): { report: ScoutReport; newInsights: InsightToken[] } {
   const fuzz = QUALITY_FUZZ[quality];
 
   const attributeRanges: Record<string, string> = {};
   for (const key of ATTRIBUTE_KEYS) {
     const val = warrior.attributes[key];
-    const low = Math.max(3, val - fuzz + Math.floor(Math.random() * 2));
-    const high = Math.min(25, val + fuzz - Math.floor(Math.random() * 2));
+    const low = Math.max(3, val - fuzz + Math.floor(rng() * 2));
+    const high = Math.min(25, val + fuzz - Math.floor(rng() * 2));
     attributeRanges[key] = getAttributeRangeDescription(low, high);
   }
 
@@ -111,7 +113,7 @@ export function generateScoutReport(
 
   // Basic scouting reveals Style
   newInsights.push({
-    id: crypto.randomUUID(),
+    id: generateId(),
     type: "Style",
     warriorId: warrior.id,
     warriorName: warrior.name,
@@ -121,10 +123,10 @@ export function generateScoutReport(
 
   // Detailed scouting reveals 2 random attributes
   if (quality === "Detailed" || quality === "Expert") {
-    const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - Math.random()).slice(0, quality === "Expert" ? 4 : 2);
+    const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - rng()).slice(0, quality === "Expert" ? 4 : 2);
     attrsToReveal.forEach(attr => {
       newInsights.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         type: "Attribute",
         warriorId: warrior.id,
         warriorName: warrior.name,
@@ -138,7 +140,7 @@ export function generateScoutReport(
   // Expert scouting reveals Tactics
   if (quality === "Expert" && warrior.plan) {
     newInsights.push({
-      id: crypto.randomUUID(),
+      id: generateId(),
       type: "Tactic",
       warriorId: warrior.id,
       warriorName: warrior.name,
@@ -149,7 +151,7 @@ export function generateScoutReport(
 
   return {
     report: {
-      id: crypto.randomUUID(),
+      id: generateId(),
       warriorName: warrior.name,
       style: warrior.style,
       quality,

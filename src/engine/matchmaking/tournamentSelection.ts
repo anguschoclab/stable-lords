@@ -34,7 +34,7 @@ export const TournamentSelectionService = {
       // Update locked IDs for the next tier
       updatedLockedIds.forEach(id => lockedWarriorIds.add(id));
 
-      const tournament = this.buildTournament(tierConfig.id, tierConfig.name, warriors, week, season);
+      const tournament = this.buildTournament(tierConfig.id, tierConfig.name, warriors, week, season, rng);
       tournaments.push(tournament);
     });
 
@@ -64,6 +64,10 @@ export const TournamentSelectionService = {
     const collect = (roster: Warrior[]) => {
       roster.forEach(w => {
         if (w.status === "Active" && !lockedIds.has(w.id)) {
+          // 🌩️ Tournament Entry Skepticism: Weather Check
+          if (state.weather === "Rainy" && w.style === FightingStyle.LungingAttack) return;
+          if (state.weather === "Scalding" && (w.attributes.CN || 0) < 10) return;
+
           const r = rankings[w.id];
           if (r) pool.push({ w, rank: r.overallRank, score: r.compositeScore });
         }
@@ -112,8 +116,8 @@ export const TournamentSelectionService = {
     return { warriors: qualified.slice(0, 64), updatedLockedIds: newLocks };
   },
 
-  buildTournament(tierId: string, name: string, participants: Warrior[], week: number, season: string): TournamentEntry {
-    const shuffled = [...participants].sort(() => Math.random() - 0.5);
+  buildTournament(tierId: string, name: string, participants: Warrior[], week: number, season: string, rng: SeededRNG): TournamentEntry {
+    const shuffled = rng.shuffle([...participants]);
     const bracket: TournamentBout[] = [];
     
     for (let i = 0; i < 64; i += 2) {

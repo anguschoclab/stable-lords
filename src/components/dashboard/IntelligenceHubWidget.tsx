@@ -13,15 +13,11 @@ export function IntelligenceHubWidget() {
   const { state } = useGameStore();
 
   const recentGazettes = useMemo(() => {
-    return [...(state.gazettes || [])]
-      .sort((a, b) => b.week - a.week)
-      .slice(0, 5);
+    return (state.gazettes || []).slice(-5).reverse();
   }, [state.gazettes]);
 
   const recentNewsletter = useMemo(() => {
-    return [...(state.newsletter || [])]
-      .sort((a, b) => b.week - a.week)
-      .slice(0, 5);
+    return (state.newsletter || []).slice(-5).reverse();
   }, [state.newsletter]);
 
   const totalCommCount = recentGazettes.length + recentNewsletter.length;

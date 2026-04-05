@@ -1,5 +1,6 @@
 import { FightingStyle, type Warrior, type Owner, type RivalStableData, type Trainer } from "@/types/game";
 import { computeWarriorStats } from "./skillCalc";
+import { makeWarrior } from "./factories";
 import { STABLE_TEMPLATES, type StableTemplate } from "@/data/stableTemplates";
 import { seededRng } from "@/utils/mathUtils";
 import { SeededRNG } from "@/utils/random";
@@ -91,22 +92,22 @@ export function generateRivalStables(count: number, seed: number, week: number =
       // Catch-up Attribute Scaling: +1 point per week (cap +40)
       const catchupStats = Math.min(40, week);
       const attrs = biasedAttrs(rng, tmpl.attrBias, catchupStats);
-      const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
-
-      warriors.push({
-        id: `rival_w_${i}_${j}`,
-        name: wName,
-        style,
-        attributes: attrs,
-        baseSkills,
-        derivedStats,
-        fame: Math.floor(rng() * (tmpl.fameRange[1] - tmpl.fameRange[0] + 1)) + tmpl.fameRange[0],
-        popularity: Math.floor(rng() * 5),
-        titles: [], injuries: [], flair: [],
-        career: { wins: 0, losses: 0, kills: 0 },
-        champion: false, status: "Active",
-        stableId,
-      });
+      
+      const wId = `rival_w_${i}_${j}`;
+      const warrior = makeWarrior(
+        wId,
+        wName, 
+        style, 
+        attrs, 
+        { 
+          fame: Math.floor(rng() * (tmpl.fameRange[1] - tmpl.fameRange[0] + 1)) + tmpl.fameRange[0],
+          popularity: Math.floor(rng() * 5),
+          stableId
+        },
+        rng
+      );
+      
+      warriors.push(warrior);
     }
 
     const [minT, maxT] = tmpl.trainerRange;

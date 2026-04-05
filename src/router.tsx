@@ -129,10 +129,6 @@ const routeTree = rootRoute.addChildren([
     legacyTourneyAwardsRoute,
   ]),
   helpRoute,
-  designBibleRoute,
-  physSimRoute,
-  adminToolsRoute,
-  styleGuideRoute,
 ]);
 
 // Create the router

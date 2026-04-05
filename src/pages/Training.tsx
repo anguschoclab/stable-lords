@@ -39,31 +39,37 @@ export default function Training() {
   const handleAssign = (warriorId: string, attribute: keyof Attributes) => {
     if (attribute === "SZ") return;
     const warrior = state.roster.find(w => w.id === warriorId);
-    const next: TrainingAssignment[] = [
-      ...assignments.filter(a => a.warriorId !== warriorId),
-      { warriorId, type: "attribute", attribute },
-    ];
-    setState({ ...state, trainingAssignments: next });
+    setState((prev) => ({
+      ...prev,
+      trainingAssignments: [
+        ...(prev.trainingAssignments ?? []).filter(a => a.warriorId !== warriorId),
+        { warriorId, type: "attribute", attribute },
+      ],
+    }));
     toast.success(`${warrior?.name} assigned to train ${ATTRIBUTE_LABELS[attribute]}`);
   };
 
   const handleAssignRecovery = (warriorId: string) => {
     const warrior = state.roster.find(w => w.id === warriorId);
-    const next: TrainingAssignment[] = [
-      ...assignments.filter(a => a.warriorId !== warriorId),
-      { warriorId, type: "recovery" },
-    ];
-    setState({ ...state, trainingAssignments: next });
+    setState((prev) => ({
+      ...prev,
+      trainingAssignments: [
+        ...(prev.trainingAssignments ?? []).filter(a => a.warriorId !== warriorId),
+        { warriorId, type: "recovery" },
+      ],
+    }));
     toast.success(`${warrior?.name} assigned to active recovery`);
   };
 
   const handleClear = (warriorId: string) => {
-    const next = assignments.filter(a => a.warriorId !== warriorId);
-    setState({ ...state, trainingAssignments: next });
+    setState((prev) => ({
+      ...prev,
+      trainingAssignments: (prev.trainingAssignments ?? []).filter(a => a.warriorId !== warriorId),
+    }));
   };
 
   const handleClearAll = () => {
-    setState({ ...state, trainingAssignments: [] });
+    setState((prev) => ({ ...prev, trainingAssignments: [] }));
     toast("All training assignments cleared.");
   };
 

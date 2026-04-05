@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import type { GameState, FightSummary, Warrior } from "@/types/game";
+import { type BoutResult } from "@/engine/boutProcessor";
 import {
   createFreshState,
   advanceWeek,
@@ -11,6 +12,8 @@ import {
   updateWarriorEquipment,
 } from "./gameStore";
 import { consumeInsightToken } from "./mutations/tokenMutations";
+import { InsightTokenService } from "@/engine/tokens/insightTokenService";
+import { advanceDay } from "@/engine/dayPipeline";
 import {
   migrateLegacySave,
   getActiveSlot,
@@ -18,17 +21,22 @@ import {
   saveToSlot,
   listSaveSlots,
 } from "./saveSlots";
+import { hashStr } from "@/utils/idUtils";
 
 export interface GameStoreState {
   state: GameState;
   atTitleScreen: boolean;
   lastSavedAt: string | null;
   activeSlotId: string | null;
+  isSimulating: boolean;
+  isInitialized: boolean;
 }
 
 export interface GameStoreActions {
-  setState: (next: GameState) => void;
-  doAdvanceWeek: () => void;
+  setState: (next: GameState | ((prev: GameState) => GameState)) => void;
+  setSimulating: (simulating: boolean) => void;
+  doAdvanceWeek: (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => void;
+  doAdvanceDay: (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => void;
   doAppendFight: (summary: FightSummary) => void;
   doUpdateWarrior: (
     warriorId: string,
@@ -55,51 +63,109 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
     activeSlotId: initialData.activeSlotId,
     atTitleScreen: true,
     lastSavedAt: null,
+    isSimulating: false,
+    isInitialized: false,
 
     initialize: () => {
       migrateLegacySave();
       const slotId = getActiveSlot();
       if (slotId) {
         loadFromSlot(slotId).then((loaded) => {
-          if (loaded) {
-            set((draft) => {
+          set((draft) => {
+            if (loaded) {
               draft.state = loaded;
               draft.activeSlotId = slotId;
               draft.atTitleScreen = !listSaveSlots().some((s) => s.slotId === slotId);
-            });
-          }
+            }
+            draft.isInitialized = true;
+          });
+        });
+      } else {
+        set((draft) => {
+          draft.isInitialized = true;
         });
       }
     },
 
     loadGame: (slotId: string, state: GameState) => {
-      saveToSlot(slotId, state);
       set((draft) => {
         draft.state = state;
         draft.activeSlotId = slotId;
         draft.atTitleScreen = false;
         draft.lastSavedAt = new Date().toISOString();
+        saveToSlot(slotId, state);
       });
     },
 
-    setState: (next: GameState) => {
-      const { activeSlotId } = get();
-      if (activeSlotId) {
-        saveToSlot(activeSlotId, next);
-      }
+    setSimulating: (simulating: boolean) => {
       set((draft) => {
-        draft.state = next;
+        draft.isSimulating = simulating;
+      });
+    },
+
+    setState: (next: GameState | ((prev: GameState) => GameState)) => {
+      set((draft) => {
+        const nextState = typeof next === "function" ? next(draft.state) : next;
+        draft.state = nextState;
         draft.lastSavedAt = new Date().toISOString();
+        
+        if (draft.activeSlotId) {
+          saveToSlot(draft.activeSlotId, nextState);
+        }
       });
     },
 
-    doAdvanceWeek: () => {
+    doAdvanceWeek: (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => {
       set((draft) => {
-        const next = advanceWeek(draft.state);
+        let next = processedState || draft.state;
+        const currentWeek = next.week;
+
+        if (next.isTournamentWeek) {
+          for (let i = next.day; i < 7; i++) {
+            next = advanceDay(next);
+          }
+        } else {
+          next = advanceWeek(next);
+        }
+        
+        // Populate resolution data for the summary view
+        next.phase = "resolution";
+        next.pendingResolutionData = {
+          bouts: results || [],
+          deaths: deaths || [],
+          injuries: injuries || [],
+          promotions: [],
+          gazette: next.newsletter.filter(n => n.week === currentWeek),
+        };
+
         draft.state = next;
-        const { activeSlotId } = draft;
-        if (activeSlotId) {
-          saveToSlot(activeSlotId, next);
+        if (draft.activeSlotId) {
+          saveToSlot(draft.activeSlotId, next);
+          draft.lastSavedAt = new Date().toISOString();
+        }
+      });
+    },
+
+    doAdvanceDay: (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => {
+      set((draft) => {
+        const baseState = processedState || draft.state;
+        const currentWeek = baseState.week;
+        
+        const next = advanceDay(baseState);
+        
+        // Populate resolution data for the summary view
+        next.phase = "resolution";
+        next.pendingResolutionData = {
+          bouts: results || [],
+          deaths: deaths || [],
+          injuries: injuries || [],
+          promotions: [],
+          gazette: next.newsletter.filter(n => n.week === currentWeek),
+        };
+
+        draft.state = next;
+        if (draft.activeSlotId) {
+          saveToSlot(draft.activeSlotId, next);
           draft.lastSavedAt = new Date().toISOString();
         }
       });
@@ -109,9 +175,8 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
       set((draft) => {
         const next = appendFightToHistory(draft.state, summary);
         draft.state = next;
-        const { activeSlotId } = draft;
-        if (activeSlotId) {
-          saveToSlot(activeSlotId, next);
+        if (draft.activeSlotId) {
+          saveToSlot(draft.activeSlotId, next);
           draft.lastSavedAt = new Date().toISOString();
         }
       });
@@ -121,9 +186,8 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
       set((draft) => {
         const next = updateWarriorAfterFight(draft.state, warriorId, won, killed, fameDelta, popDelta);
         draft.state = next;
-        const { activeSlotId } = draft;
-        if (activeSlotId) {
-          saveToSlot(activeSlotId, next);
+        if (draft.activeSlotId) {
+          saveToSlot(draft.activeSlotId, next);
           draft.lastSavedAt = new Date().toISOString();
         }
       });
@@ -155,7 +219,6 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
       set((draft) => {
         const next = initializeStable(draft.state, name, stableName);
         draft.state = next;
-        // Also save if in a slot
         if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
       });
     },
@@ -167,6 +230,7 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
       });
     },
+
     doUpdateEquipment: (warriorId: string, equipment: { weapon: string; armor: string; shield: string; helm: string }) => {
       set((draft) => {
         const next = updateWarriorEquipment(draft.state, warriorId, equipment);
@@ -174,12 +238,22 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
       });
     },
+
     doConsumeInsightToken: (tokenId: string, warriorId: string) => {
       set((draft) => {
-        const next = consumeInsightToken(draft.state, tokenId, warriorId);
+        // Determinism: Seed RNG with week + warriorId for reproducible results
+        let seedValue = draft.state.week * 7 + hashStr(warriorId || tokenId);
+        const rng = () => {
+          const x = Math.sin(seedValue++) * 10000;
+          return x - Math.floor(x);
+        };
+        
+        const next = InsightTokenService.assignToken(draft.state, tokenId, warriorId, rng);
         draft.state = next;
-        if (draft.activeSlotId) saveToSlot(draft.activeSlotId, next);
-        draft.lastSavedAt = new Date().toISOString();
+        if (draft.activeSlotId) {
+          saveToSlot(draft.activeSlotId, next);
+          draft.lastSavedAt = new Date().toISOString();
+        }
       });
     },
   }))

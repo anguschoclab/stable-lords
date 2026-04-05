@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useState } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import type { TrainerData } from "@/types/game";
+import type { Trainer } from "@/types/game";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import {
   TRAINER_FOCUSES,
@@ -48,74 +48,49 @@ export default function Trainers() {
   React.useEffect(() => {
     if ((state.hiringPool ?? []).length === 0) {
       const pool = generateHiringPool(4, state.week * 1000 + Date.now());
-      const poolData: TrainerData[] = pool.map((t) => ({
-        id: t.id,
-        name: t.name,
-        tier: t.tier,
-        focus: t.focus,
-        fame: t.fame,
-        contractWeeksLeft: t.contractWeeksLeft,
-        retiredFromWarrior: t.retiredFromWarrior,
-        retiredFromStyle: t.retiredFromStyle,
-        styleBonusStyle: t.styleBonusStyle,
-      }));
-      setState({ ...state, hiringPool: poolData });
+      setState((prev) => ({ ...prev, hiringPool: pool }));
     }
-  }, [state, setState]);
+  }, [state.hiringPool, state.week, setState]);
 
   // Refresh hiring pool
   const refreshPool = useCallback(() => {
     const pool = generateHiringPool(4, state.week * 1000 + Date.now());
-    const poolData: TrainerData[] = pool.map((t) => ({
-      id: t.id,
-      name: t.name,
-      tier: t.tier,
-      focus: t.focus,
-      fame: t.fame,
-      contractWeeksLeft: t.contractWeeksLeft,
-      retiredFromWarrior: t.retiredFromWarrior,
-      retiredFromStyle: t.retiredFromStyle,
-      styleBonusStyle: t.styleBonusStyle,
-    }));
-    setState({ ...state, hiringPool: poolData });
+    setState((prev) => ({ ...prev, hiringPool: pool }));
     toast.success("Personnel registry updated. New candidates available.");
-  }, [state, setState]);
+  }, [state.week, setState]);
 
   const hireTrainer = useCallback(
-    (trainer: TrainerData) => {
-      if (!canHire) return;
+    (trainer: Trainer) => {
       const cost = TIER_COST[trainer.tier as TrainerTier] ?? 50;
       if ((state.gold ?? 0) < cost) {
         toast.error(`Insufficient credits. Access to ${trainer.name} requires ${cost}G.`);
         return;
       }
-      setState({
-        ...state,
-        trainers: [...currentTrainers, trainer],
-        hiringPool: hiringPool.filter((t) => t.id !== trainer.id),
-        gold: (state.gold ?? 0) - cost,
-        ledger: [...(state.ledger ?? []), {
-          week: state.week,
+      setState((prev) => ({
+        ...prev,
+        trainers: [...(prev.trainers ?? []), trainer],
+        hiringPool: (prev.hiringPool ?? []).filter((t) => t.id !== trainer.id),
+        gold: (prev.gold ?? 0) - cost,
+        ledger: [...(prev.ledger ?? []), {
+          week: prev.week,
           label: `Acquisition: ${trainer.name}`,
           amount: -cost,
           category: "trainer" as const,
         }],
-      });
+      }));
       toast.success(`${trainer.name} has signed with your stable. Personnel synchronized.`);
     },
-    [state, setState, canHire, currentTrainers, hiringPool]
+    [state.gold, setState]
   );
 
   const fireTrainer = useCallback(
     (trainerId: string) => {
-      const trainer = (currentTrainers || []).find((t) => t.id === trainerId);
-      setState({
-        ...state,
-        trainers: currentTrainers.filter((t) => t.id !== trainerId),
-      });
-      if (trainer) toast.success(`Contract terminated for ${trainer.name}. Personnel data archived.`);
+      setState((prev) => ({
+        ...prev,
+        trainers: (prev.trainers ?? []).filter((t) => t.id !== trainerId),
+      }));
     },
-    [state, setState, currentTrainers]
+    [setState]
   );
 
   const convertableRetired = useMemo(
@@ -128,27 +103,16 @@ export default function Trainers() {
   const convertWarrior = useCallback(
     (warriorId: string) => {
       const warrior = state.retired.find((w) => w.id === warriorId);
-      if (!warrior || !canHire) return;
+      if (!warrior) return;
       const trainer = convertRetiredToTrainer(warrior);
-      const trainerData: TrainerData = {
-        id: trainer.id,
-        name: trainer.name,
-        tier: trainer.tier,
-        focus: trainer.focus,
-        fame: trainer.fame,
-        contractWeeksLeft: trainer.contractWeeksLeft,
-        retiredFromWarrior: trainer.retiredFromWarrior,
-        retiredFromStyle: trainer.retiredFromStyle,
-        styleBonusStyle: trainer.styleBonusStyle,
-      };
-      setState({
-        ...state,
-        trainers: [...(state.trainers ?? []), trainerData],
-      });
+      setState((prev) => ({
+        ...prev,
+        trainers: [...(prev.trainers ?? []), trainer],
+      }));
       toast.success(`${warrior.name} confirmed for the retirement-to-trainer protocol. Tactical specialization: ${trainer.focus}.`);
       setConvertDialogOpen(false);
     },
-    [state, setState, canHire]
+    [state.retired, setState]
   );
 
   return (

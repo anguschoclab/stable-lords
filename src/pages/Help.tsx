@@ -137,17 +137,16 @@ export default function Help() {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="moods">
-          <AccordionTrigger className="font-display text-lg">Crowd Mood</AccordionTrigger>
+        <AccordionItem value="tokens">
+          <AccordionTrigger className="font-display text-lg">Insight Tokens</AccordionTrigger>
           <AccordionContent className="space-y-2 text-sm text-muted-foreground">
-            <p>The crowd's mood shifts based on recent fight outcomes and affects rewards:</p>
+            <p>Earned from tournament victories (2nd and 3rd place), these rare relics allow you to unmask your opponents' secrets:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong>😐 Calm</strong> — Default state. Normal fame/popularity gains.</li>
-              <li><strong>🩸 Bloodthirsty</strong> — After multiple kills. Kill chance +10%, popularity gain reduced.</li>
-              <li><strong>🎭 Theatrical</strong> — After flashy fights. Popularity gains ×1.5!</li>
-              <li><strong>🕯️ Solemn</strong> — After deaths with draws. Fame and popularity gains reduced to ×0.7.</li>
-              <li><strong>🎉 Festive</strong> — After 4+ fights with no deaths. Fame and popularity ×1.3!</li>
+              <li><strong>Weapon Token</strong> ⚔️ — Reveals the exact damage and weight of a target's equipped weapon.</li>
+              <li><strong>Rhythm Token</strong> 🥁 — Reveals a warrior's hidden tactical tendencies (OE, AL, and KD).</li>
+              <li><strong>Style Token</strong> 🥋 — Instantly identifies a warrior's core fighting style without scouting.</li>
             </ul>
+            <p className="mt-2">Use these tokens in the <strong>Booking Office</strong> or <strong>Treasury</strong> to gain a decisive advantage before a major clash.</p>
           </AccordionContent>
         </AccordionItem>
       </Accordion>

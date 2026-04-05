@@ -61,31 +61,37 @@ export default function WarriorDetail() {
   const handlePlanChange = useCallback(
     (newPlan: FightPlan) => {
       if (!warrior) return;
-      const nextRoster = state.roster.map((w) =>
-        w.id === warrior?.id ? { ...w, plan: newPlan } : w
-      );
-      setState({ ...state, roster: nextRoster });
+      setState((prev) => ({
+        ...prev,
+        roster: prev.roster.map((w) =>
+          w.id === warrior?.id ? { ...w, plan: newPlan } : w
+        ),
+      }));
     },
-    [warrior, state, setState]
+    [warrior, setState]
   );
 
   const handleRetire = useCallback(() => {
     if (!warrior) return;
-    const updated = retireWarrior(state, warrior!.id);
-    setState(updated);
+    setState((prev) => {
+      const updated = retireWarrior(prev, warrior!.id);
+      return updated;
+    });
     toast.success(`${warrior!.name} has been retired with honor.`);
     navigate({ to: "/" });
-  }, [warrior, state, setState, navigate]);
+  }, [warrior, setState, navigate]);
 
   const handleEquipmentChange = useCallback(
     (newLoadout: EquipmentLoadout) => {
       if (!warrior) return;
-      const nextRoster = state.roster.map((w) =>
-        w.id === warrior?.id ? { ...w, equipment: newLoadout } : w
-      );
-      setState({ ...state, roster: nextRoster });
+      setState((prev) => ({
+        ...prev,
+        roster: prev.roster.map((w) =>
+          w.id === warrior?.id ? { ...w, equipment: newLoadout } : w
+        ),
+      }));
     },
-    [warrior, state, setState]
+    [warrior, setState]
   );
 
   if (!warrior || !displayWarrior) {

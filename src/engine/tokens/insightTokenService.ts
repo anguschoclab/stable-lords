@@ -36,7 +36,7 @@ export const InsightTokenService = {
   /**
    * Assigns a token to a specific warrior.
    */
-  assignToken(state: GameState, tokenId: string, warriorId: string): GameState {
+  assignToken(state: GameState, tokenId: string, warriorId: string, rng?: () => number): GameState {
     const token = state.insightTokens?.find(t => t.id === tokenId);
     const warrior = state.roster.find(w => w.id === warriorId);
 
@@ -58,7 +58,8 @@ export const InsightTokenService = {
       } else if (token.type === "Attribute") {
         // Permanent +1 to a primary attribute
         const primaries: (keyof Attributes)[] = ["ST", "WT", "SP", "DF"];
-        const attrKey = primaries[Math.floor(Math.random() * primaries.length)];
+        const safeRng = rng || Math.random;
+        const attrKey = primaries[Math.floor(safeRng() * primaries.length)];
         const currentVal = updatedWarrior.attributes[attrKey] || 10;
         updatedWarrior.attributes = { ...updatedWarrior.attributes, [attrKey]: currentVal + 1 };
         token.detail = `Internalized: +1 ${attrKey}`;
