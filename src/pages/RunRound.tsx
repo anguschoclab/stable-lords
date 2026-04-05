@@ -43,7 +43,7 @@ export default function RunRound() {
     return generatePairings(state).map(p => ({
       playerWarrior: p.a,
       rivalWarrior: p.d,
-      rivalStable: state.rivals.find(r => r.owner.id === p.rivalStableId) || { owner: { id: p.rivalStableId, stableName: p.rivalStable } } as any,
+      rivalStable: state.rivals.find(r => r.owner.id === p.rivalStableId) || { owner: { id: p.rivalStableId, stableName: p.rivalStable } } as import("@/types/game").RivalStableData,
       isRivalryBout: p.isRivalry
     }));
   }, [state]);

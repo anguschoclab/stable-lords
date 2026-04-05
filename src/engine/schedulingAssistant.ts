@@ -87,7 +87,7 @@ function getEligibleRivals(state: GameState): { warrior: Warrior, stable: RivalS
     const rivals: { warrior: Warrior, stable: RivalStableData }[] = [];
     for (const stable of (state.rivals ?? [])) {
         for (const warrior of stable.roster) {
-            if (warrior.status === "Active" && !isTooInjuredToFight(warrior.injuries as any)) {
+            if (warrior.status === "Active" && !isTooInjuredToFight(warrior.injuries as import("@/types/game").InjuryData[])) {
                 rivals.push({ warrior, stable });
             }
         }

@@ -26,7 +26,7 @@ interface WarriorRow {
 interface WarriorLeaderboardProps {
   rows: WarriorRow[];
   sort: { field: string; dir: "asc" | "desc" };
-  onSort: (field: any) => void;
+  onSort: (field: string) => void;
 }
 
 export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardProps) {
@@ -103,7 +103,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                   <div className="flex flex-col">
                     {row.isPlayer ? (
                       <Link 
-                        to={`/warrior/${row.id}` as any} 
+                        to="/warrior/$id" params={{ id: row.id }}
                         className="font-display font-black uppercase text-xs tracking-tight text-primary hover:text-white transition-all flex items-center gap-2"
                       >
                         {row.name}
@@ -120,7 +120,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
                   <Link
-                    to={row.isPlayer ? "/stable/hall" : `/stable/${row.stableId}` as any}
+                    to={row.isPlayer ? "/stable/hall" : "/stable/$id"} params={row.isPlayer ? {} : { id: row.stableId! }}
                     className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                   >
                     <span className="text-[10px] opacity-20">PATRON:</span> {row.stableName}

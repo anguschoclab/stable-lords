@@ -62,7 +62,7 @@ export function RivalWarriorList({ warriors, selectedWarriorId, onSelectWarrior,
                         </div>
                         
                         <div className="flex items-center gap-4">
-                           <StatBadge styleName={w.style as any} />
+                           <StatBadge styleName={w.style as import("@/types/game").FightingStyle} />
                            <div className="flex items-center gap-2 text-[10px] font-mono font-black text-muted-foreground/60">
                              <span className="text-primary">{w.career.wins}W</span>
                              <span className="opacity-20">/</span>

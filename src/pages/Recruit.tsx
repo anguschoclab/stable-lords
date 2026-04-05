@@ -197,7 +197,7 @@ export default function Recruit() {
 
   // Initialize pool from state or generate fresh
   const [pool, setPool] = useState<PoolWarrior[]>(() => {
-    if ((state as any).recruitPool?.length > 0) return (state as any).recruitPool;
+    if ((state as import("@/types/game").GameState).recruitPool?.length > 0) return (state as import("@/types/game").GameState).recruitPool;
     return generateRecruitPool(5, state.week, usedNames);
   });
   const [scoutedIds, setScoutedIds] = useState<Set<string>>(new Set());
@@ -207,8 +207,9 @@ export default function Recruit() {
   const canRefresh = gold >= REFRESH_COST;
 
   // Persist pool to state
-  const persistPool = useCallback((newPool: PoolWarrior[]) => {
-    setState((prev) => ({ ...prev, recruitPool: newPool }));
+  const persistPool = useCallback((newPool: PoolWarrior[], newState?: typeof state) => {
+    const base = newState ?? state;
+    setState({ ...base, recruitPool: newPool } as import("@/types/game").GameState);
     setPool(newPool);
   }, [setState]);
 

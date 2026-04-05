@@ -46,7 +46,7 @@ export function evolvePhilosophies(
         gazetteItems.push(
           `💡 ${rival.owner.name} (${rival.owner.stableName}) shifts strategy from ${currentPhilosophy} to ${nextPhilosophy}.`
         );
-        return { ...rival, philosophy: nextPhilosophy } as any;
+        return { ...rival, philosophy: nextPhilosophy } as import("@/types/game").RivalStableData;
       }
     }
 

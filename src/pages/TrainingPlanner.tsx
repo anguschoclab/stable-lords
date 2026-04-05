@@ -27,7 +27,7 @@ interface BurnWarning {
   severity: "low" | "medium" | "high";
 }
 
-function assessBurnRisks(warrior: Warrior, trainers: any[]): BurnWarning[] {
+function assessBurnRisks(warrior: Warrior, trainers: import("@/types/game").Trainer[]): BurnWarning[] {
   const warnings: BurnWarning[] = [];
   const age = warrior.age ?? 18;
 
@@ -63,7 +63,7 @@ function assessBurnRisks(warrior: Warrior, trainers: any[]): BurnWarning[] {
 
 /* ── Trainability Score ──────────────────────────────────── */
 
-function computeTrainability(warrior: Warrior, trainers: any[]): number {
+function computeTrainability(warrior: Warrior, trainers: import("@/types/game").Trainer[]): number {
   let totalChance = 0;
   let trainable = 0;
   for (const key of ATTRIBUTE_KEYS) {
@@ -181,7 +181,7 @@ function AttributeRow({ attr }: { attr: {
 
 function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
   warrior: Warrior;
-  trainers: any[];
+  trainers: import("@/types/game").Trainer[];
   season: string;
   seasonalGains: Partial<Record<keyof Attributes, number>>;
 }) {

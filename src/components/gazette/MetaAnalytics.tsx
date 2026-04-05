@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 
 interface MetaAnalyticsProps {
-  allFights: any[];
+  allFights: import("@/types/game").FightSummary[];
 }
 
 export function TacticalStyleAnalysis({ allFights }: MetaAnalyticsProps) {

@@ -134,7 +134,14 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   if (passA.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "A", result: passA.narrative });
   if (passD.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "D", result: passD.narrative });
 
-  const { aGoesFirst, attMasteryIni, iniA, iniD } = evaluateInitiative(rng, fA, fD, ctx, stylePhase, OE_A, AL_A, OE_D, AL_D, fatA, fatD, defModsA, defModsD, passA, passD);
+  // 2. Initiative Phase
+  const masteryIniA = fA.favorites ? getFavoriteRhythmBonus(fA as unknown as import("@/types/game").Warrior, OE_A, AL_A) : 0;
+  const masteryIniD = fD.favorites ? getFavoriteRhythmBonus(fD as unknown as import("@/types/game").Warrior, OE_D, AL_D) : 0;
+
+  const iniA = fA.skills.INI + alIniMod(AL_A) + ctx.matchupA + fatA + defModsA.iniBonus + getTempoBonus(fA.style, stylePhase) + passA.iniBonus + masteryIniA - fA.legHits;
+  const iniD = fD.skills.INI + alIniMod(AL_D) + ctx.matchupD + fatD + defModsD.iniBonus + getTempoBonus(fD.style, stylePhase) + passD.iniBonus + masteryIniD - fD.legHits;
+  
+  const aGoesFirst = contestCheck(rng, iniA, iniD);
   const attLabel = aGoesFirst ? "A" : "D";
   const defLabel = aGoesFirst ? "D" : "A";
 

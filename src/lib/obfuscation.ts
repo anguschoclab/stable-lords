@@ -55,7 +55,7 @@ export function obfuscateWarrior(
 
   return {
     ...warrior,
-    style: knowsStyle ? warrior.style : "UNKNOWN" as any,
+    style: knowsStyle ? warrior.style : "UNKNOWN" as import("@/types/game").FightingStyle,
     attributes: {
       ST: getAttr("ST"),
       CN: getAttr("CN"),

@@ -97,6 +97,6 @@ export function AutosimConsole({ isSimulating, progress, result, onStart }: Auto
   );
 }
 
-function cn(...inputs: any[]) {
+function cn(...inputs: import("clsx").ClassValue[]) {
   return inputs.filter(Boolean).join(" ");
 }

@@ -203,6 +203,6 @@ export function InsightVault() {
 }
 
 // Minimal Unlocked shim since it's used at the end
-function Unlocked(props: any) {
+function Unlocked(props: React.SVGProps<SVGSVGElement>) {
   return <Unlock {...props} />;
 }

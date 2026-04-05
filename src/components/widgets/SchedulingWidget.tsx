@@ -29,7 +29,7 @@ function MatchupCard({ matchup, type }: MatchupCardProps) {
           {isGood ? <TrendingUp className="h-4 w-4 text-primary" /> : <TrendingDown className="h-4 w-4 text-destructive" />}
           <span className="font-display font-bold text-sm tracking-tight">{w.name}</span>
         </div>
-        <Link to="/warrior/$id" params={{ id: w.id } as any}>
+        <Link to="/warrior/$id" params={{ id: w.id }}>
           <Button variant="ghost" size="icon" className="h-6 w-6" title="View warrior profile" aria-label="View warrior profile">
             <ExternalLink className="h-3 w-3" />
           </Button>

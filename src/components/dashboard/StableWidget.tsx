@@ -67,7 +67,7 @@ export function StableWidget() {
                            <div className="flex items-center justify-between gap-2">
                               <Link 
                                  to="/warrior/$id" 
-                                 params={{ id: w.id } as any}
+                                 params={{ id: w.id }}
                                  className="text-xs font-black uppercase tracking-tight text-foreground/80 group-hover/item:text-primary transition-colors truncate"
                               >
                                  {w.name}

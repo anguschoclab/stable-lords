@@ -9,7 +9,7 @@ import { EquipmentLoadout } from "@/data/equipment";
 
 interface MissionControlTabProps {
   warrior: Warrior;
-  displayWarrior: any;
+  displayWarrior: import("@/types/game").Warrior;
   currentPlan: FightPlan;
   currentLoadout: EquipmentLoadout;
   onPlanChange: (plan: FightPlan) => void;

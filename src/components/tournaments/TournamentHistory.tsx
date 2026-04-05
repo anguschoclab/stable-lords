@@ -61,6 +61,6 @@ export function TournamentHistory({ pastTournaments, seasonIcons, seasonNames, c
   );
 }
 
-function cn(...inputs: any[]) {
+function cn(...inputs: import("clsx").ClassValue[]) {
   return inputs.filter(Boolean).join(" ");
 }

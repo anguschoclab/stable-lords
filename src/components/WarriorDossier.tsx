@@ -41,7 +41,7 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
   const favDisplay = getFavoritesDisplay(warrior);
 
   const record = `${warrior.career.wins}W - ${warrior.career.losses}L - ${warrior.career.kills}K`;
-  const fatigue = (warrior as any).fatigue ?? 0;
+  const fatigue = warrior.fatigue ?? 0;
   const condition = 100 - fatigue;
 
   return (

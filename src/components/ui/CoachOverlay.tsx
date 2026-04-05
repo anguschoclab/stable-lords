@@ -14,7 +14,7 @@ interface Tip {
   title: string;
   message: string;
   priority: number; // Higher is more urgent
-  condition: (state: any) => boolean;
+  condition: (state: import("@/types/game").GameState) => boolean;
 }
 
 const GLOBAL_TIPS: Tip[] = [
@@ -30,21 +30,21 @@ const GLOBAL_TIPS: Tip[] = [
     title: "Medical Advisory",
     message: "Multiple warriors are carrying injuries. Forcing them to fight now significantly increases the risk of permanent disability.",
     priority: 8,
-    condition: (s) => s.roster.filter((w: any) => w.injuries.length > 0 && w.status === "Active").length >= 2,
+    condition: (s) => s.roster.filter((w: import("@/types/game").Warrior) => w.injuries.length > 0 && w.status === "Active").length >= 2,
   },
   {
     id: "training-cap",
     title: "Tactical Limit",
     message: "Some warriors have reached their attribute caps (25 per stat). Further training in these areas is wasted effort.",
     priority: 5,
-    condition: (s) => s.roster.some((w: any) => Object.values(w.attributes).some((v: any) => v >= 25)),
+    condition: (s) => s.roster.some((w: import("@/types/game").Warrior) => Object.values(w.attributes).some((v: number) => v >= 25)),
   },
   {
     id: "recruit-debt",
     title: "Recruitment Strategy",
     message: "You have fewer than 3 active warriors. Your rotation is vulnerable. Scout the Orphanage for fresh blood.",
     priority: 9,
-    condition: (s) => s.roster.filter((w: any) => w.status === "Active").length < 3,
+    condition: (s) => s.roster.filter((w: import("@/types/game").Warrior) => w.status === "Active").length < 3,
   }
 ];
 

@@ -29,5 +29,5 @@ export function updateSeasonalGains(
         : sg
     );
   }
-  return [...seasonalGrowth, { warriorId, season: season as any, gains: { [attr]: 1 } }];
+  return [...seasonalGrowth, { warriorId, season: season as import("@/types/game").Season, gains: { [attr]: 1 } }];
 }

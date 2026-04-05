@@ -33,10 +33,10 @@ function hashStr(s: string): number {
 
 export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, warriorMap, contract } = ctx;
-  const currentW = warriorMap.get(warrior.id);
-  const currentO = warriorMap.get(opponent.id);
+  const currentW = warriorMap?.get(warrior?.id);
+  const currentO = warriorMap?.get(opponent?.id);
 
-  if (!currentW || currentW.status !== "Active" || !currentO) return { state, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as any, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
+  if (!currentW || currentW.status !== "Active" || !currentO) return { state, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as import("@/engine/boutProcessor").BoutResult, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
 
   // 🛡️ Determinism: Generate a unique seed for this specific bout
   const boutSeed = hashStr(`${week}|${currentW.id}|${currentO.id}`);
@@ -105,7 +105,7 @@ export function processWeekBouts(state: GameState): { state: GameState; results:
   (state.rivals || []).forEach(r => r.roster.forEach(w => warriorMap.set(w.id, w)));
 
   const pairings = generatePairings(state);
-  const moodMods = getMoodModifiers(state.crowdMood as any);
+  const moodMods = getMoodModifiers(state.crowdMood);
 
   let s = { ...state };
   const results: BoutResult[] = [];
@@ -134,7 +134,7 @@ export function processWeekBouts(state: GameState): { state: GameState; results:
   return { state: s, results, summary };
 }
 
-function processSingleBout(s: GameState, p: BoutPairing, moodMods: any, warriorMap: Map<string, Warrior>): BoutImpact {
+function processSingleBout(s: GameState, p: BoutPairing, moodMods: ReturnType<typeof import("@/engine/crowdMood").getMoodModifiers>, warriorMap: Map<string, Warrior>): BoutImpact {
   const contract = p.contractId ? s.boutOffers[p.contractId] : undefined;
   return resolveBout(s, { warrior: p.a, opponent: p.d, isRivalry: p.isRivalry, rivalStable: p.rivalStable, rivalStableId: p.rivalStableId, moodMods, week: s.week, playerId: s.player.id, warriorMap, contract });
 }

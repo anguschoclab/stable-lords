@@ -55,7 +55,7 @@ export function RankingsWidget() {
               <button
                 key={w.id}
                 className="w-full flex items-center gap-6 px-6 py-4 hover:bg-white/2 transition-all group/row text-left relative overflow-hidden"
-                onClick={() => navigate({ to: `/warrior/${w.id}` as any })}
+                onClick={() => navigate({ to: "/warrior/$id", params: { id: w.id } })}
                 aria-label={`View profile for ${w.name}`}
               >
                 {/* Visual Rank Indicator */}
@@ -122,8 +122,8 @@ export function RankingsWidget() {
 
       {/* Footer / CTA */}
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10">
-         <button aria-label="Sync Global Rankings"
-            onClick={() => navigate({ to: "/world" as any })}
+         <button 
+            onClick={() => navigate({ to: "/world" })}
             className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
          >
             Sync_Global_Rankings <TrendingUp className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

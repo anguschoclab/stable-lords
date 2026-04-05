@@ -88,7 +88,7 @@ export function processAging(state: GameState): GameState {
          const updated = { ...w, ...update };
          if (updated.status === "Retired") {
             roster = roster.filter(r => r.id !== id);
-            retired.push({ ...updated, retiredWeek: state.week } as any);
+            retired.push({ ...updated, retiredWeek: state.week } as import("@/types/game").Warrior);
          } else {
             roster = roster.map(r => r.id === id ? updated : r);
          }

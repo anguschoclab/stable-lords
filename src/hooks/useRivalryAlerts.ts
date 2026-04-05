@@ -22,7 +22,7 @@ const INTENSITY_LABELS: Record<number, string> = {
 /** Synthesize an impact/war-drum sound using Web Audio API */
 function playImpactSFX(intensity: number) {
   try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
 
     // Low rumble / war drum hit
     const osc = ctx.createOscillator();

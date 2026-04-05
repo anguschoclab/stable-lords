@@ -86,7 +86,7 @@ export function RosterWall() {
                     transition={{ delay: i * 0.05, duration: 0.5 }}
                   >
                     <button
-                      onClick={() => navigate({ to: "/warrior/$id", params: { id: w.id } as any })}
+                      onClick={() => navigate({ to: "/warrior/$id", params: { id: w.id } })}
                       className="w-full relative group"
                       aria-label={`View profile for ${w.name}`}
                     >
@@ -125,7 +125,7 @@ export function RosterWall() {
                                        useCrown
                                     />
                                     <div className="flex items-center gap-3">
-                                       <StatBadge styleName={w.style as any} career={w.career} />
+                                       <StatBadge styleName={w.style as import("@/types/game").FightingStyle} career={w.career} />
                                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-black border border-white/5 opacity-80 group-hover:border-primary/30 group-hover:opacity-100 transition-all">
                                           <Star className={cn("h-3 w-3", w.fame > 1000 ? "text-arena-gold" : "text-muted-foreground/60")} />
                                           <span className={cn("text-[10px] font-mono font-black", w.fame > 1000 ? "text-arena-gold" : "text-muted-foreground")}>{w.fame}G</span>

@@ -2,16 +2,16 @@ export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (season: number, boutId: string, logData: any) => Promise<void>;
-  retrieveBoutLog: (season: number, boutId: string) => Promise<any | null>;
+  archiveBoutLog: (season: number, boutId: string, logData: import("@/types/game").FightSummary) => Promise<void>;
+  retrieveBoutLog: (season: number, boutId: string) => Promise<import("@/types/game").FightSummary | null>;
 
   // Gazettes (Markdown)
   archiveGazette: (season: number, week: number, markdown: string) => Promise<void>;
   retrieveGazette: (season: number, week: number) => Promise<string | null>;
 
   // Hot State Save/Load (JSON)
-  archiveHotState: (slotId: string, stateData: any) => Promise<void>;
-  retrieveHotState: (slotId: string) => Promise<any | null>;
+  archiveHotState: (slotId: string, stateData: import("@/types/game").GameState) => Promise<void>;
+  retrieveHotState: (slotId: string) => Promise<import("@/types/game").GameState | null>;
 
   // Utility
   getArchivedBoutIdsForSeason: (season: number) => Promise<string[]>;
@@ -63,28 +63,25 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveHotState(slotId: string, stateData: any): Promise<void> {
-    return this.enqueue(async () => {
-      try {
-        const dirHandle = await this.getHotStateDirectory();
-        if (!dirHandle) return;
-        const fileName = `${slotId}.json`;
-        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(JSON.stringify(stateData));
-        await writable.close();
-      } catch (error: any) {
-        if (error.name === 'QuotaExceededError') {
-           console.warn('OPFS Quota Exceeded during hot state archival', error);
-           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-           return;
-        }
-        console.error('Error archiving hot state:', error);
+  async archiveHotState(slotId: string, stateData: import("@/types/game").GameState): Promise<void> {
+    try {
+      const dirHandle = await this.getHotStateDirectory();
+      if (!dirHandle) return;
+      const fileName = `${slotId}.json`;
+      const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(stateData));
+      await writable.close();
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+         console.error('OPFS Quota Exceeded during hot state archival', error);
+         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+         return;
       }
     });
   }
 
-  async retrieveHotState(slotId: string): Promise<any | null> {
+  async retrieveHotState(slotId: string): Promise<import("@/types/game").GameState | null> {
     try {
       const dirHandle = await this.getHotStateDirectory();
       if (!dirHandle) return null;
@@ -96,8 +93,8 @@ export class OPFSArchiveService implements ArchiveService {
          return JSON.parse(text);
       }
       return null;
-    } catch (error: any) {
-      if (error.name === 'NotFoundError') {
+    } catch (error) {
+      if ((error as Error)?.name === 'NotFoundError') {
         return null;
       }
       console.warn('Error retrieving hot state:', error);
@@ -105,8 +102,14 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(season: number, boutId: string, logData: any): Promise<void> {
-    return this.enqueue(async () => {
+  async archiveBoutLog(season: number, boutId: string, logData: import("@/types/game").FightSummary): Promise<void> {
+    try {
+      const dirHandle = await this.getDirectory(season, 'bouts');
+      if (!dirHandle) return;
+
+      const fileName = `${boutId}.json`;
+
+      let fileHandle;
       try {
         const dirHandle = await this.getDirectory(season, 'bouts');
         if (!dirHandle) return;
@@ -126,29 +129,35 @@ export class OPFSArchiveService implements ArchiveService {
            // File doesn't exist, proceed
            fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
         }
+      } catch (error) {
+         if (error instanceof ArchiveConflictError) {
+             throw error;
+         }
+         // File doesn't exist, proceed
+         fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+      }
 
         const writable = await fileHandle.createWritable();
         await writable.write(JSON.stringify(logData));
         await writable.close();
 
-      } catch (error: any) {
-        if (error instanceof ArchiveConflictError) {
-          throw error;
-        }
-        if (error.name === 'QuotaExceededError') {
-          console.warn('OPFS Quota Exceeded during bout log archival', error);
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-          return;
-        }
-        if (error.name === 'NoModificationAllowedError') {
-          throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
-        }
-        console.error('Error archiving bout log:', error);
+    } catch (error) {
+      if (error instanceof ArchiveConflictError) {
+        throw error;
+      }
+      if ((error as Error)?.name === 'QuotaExceededError') {
+        console.error('OPFS Quota Exceeded during bout log archival', error);
+        // Dispatch to Zustand to show Toast
+        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+        return;
+      }
+      if ((error as Error)?.name === 'NoModificationAllowedError') {
+        throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
       }
     });
   }
 
-  async retrieveBoutLog(season: number, boutId: string): Promise<any | null> {
+  async retrieveBoutLog(season: number, boutId: string): Promise<import("@/types/game").GameState | null> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return null;
@@ -163,9 +172,9 @@ export class OPFSArchiveService implements ArchiveService {
       }
 
       return null;
-    } catch (error: any) {
-      if (error.name === 'NotFoundError') {
-        return null;
+    } catch (error) {
+      if ((error as Error)?.name === 'NotFoundError') {
+        return null; // Graceful degradation for missing files
       }
       console.warn('Error retrieving bout log:', error);
       return null;
@@ -184,13 +193,12 @@ export class OPFSArchiveService implements ArchiveService {
         await writable.write(markdown);
         await writable.close();
 
-      } catch (error: any) {
-        if (error.name === 'QuotaExceededError') {
-           console.warn('OPFS Quota Exceeded during gazette archival', error);
-           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-           return;
-        }
-        console.error('Error archiving gazette:', error);
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+         console.error('OPFS Quota Exceeded during gazette archival', error);
+         // Dispatch to Zustand to show Toast
+         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+         return;
       }
     });
   }
@@ -208,8 +216,8 @@ export class OPFSArchiveService implements ArchiveService {
           return await file.text();
       }
       return null;
-    } catch (error: any) {
-      if (error.name === 'NotFoundError') {
+    } catch (error) {
+      if ((error as Error)?.name === 'NotFoundError') {
         return null;
       }
       console.warn('Error retrieving gazette:', error);

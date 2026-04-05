@@ -107,7 +107,7 @@ export function setActiveSlot(slotId: string): void {
 
 /** Generate a unique slot ID */
 export function newSlotId(): string {
-  return `slot_${Date.now()}_${(globalThis.crypto || (globalThis as any).msCrypto).getRandomValues(new Uint32Array(1))[0]}`;
+  return `slot_${Date.now()}_${(globalThis.crypto || (globalThis as unknown as { msCrypto: Crypto }).msCrypto).getRandomValues(new Uint32Array(1))[0]}`;
 }
 
 /**

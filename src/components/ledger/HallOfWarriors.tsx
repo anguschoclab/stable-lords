@@ -66,7 +66,7 @@ export function HallOfWarriors() {
                          </div>
                       </TableCell>
                       <TableCell className="py-5">
-                        <StatBadge styleName={w.style as any} />
+                        <StatBadge styleName={w.style as import("@/types/game").FightingStyle} />
                       </TableCell>
                       <TableCell className="py-5 text-center">
                          <div className="flex items-center justify-center gap-1">
