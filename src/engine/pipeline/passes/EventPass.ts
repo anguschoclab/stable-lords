@@ -1,5 +1,5 @@
 import { GameState } from "@/types/game";
-import { seededRng } from "@/engine/rivals";
+import { SeededRNG } from "@/utils/random";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { generateId } from "@/utils/idUtils";
 
@@ -7,15 +7,15 @@ import { generateId } from "@/utils/idUtils";
  * Stable Lords — Random Event Pipeline Pass
  */
 
-export function runEventPass(state: GameState, nextWeek: number): GameState {
+export function runEventPass(state: GameState, nextWeek: number, rootRng?: SeededRNG): GameState {
   const nextState = { ...state };
-  const brawlRng = seededRng(nextWeek * 999 + 1);
+  const brawlRng = rootRng?.clone() ?? new SeededRNG(nextWeek * 999 + 1);
   
   // 🍺 Tavern Brawl Event
-  if (brawlRng() < 0.05 && nextState.roster.length > 0) {
+  if (brawlRng.next() < 0.05 && nextState.roster.length > 0) {
     const activeWarriors = nextState.roster.filter(w => w.status === "Active" && (!w.injuries || w.injuries.length === 0));
     if (activeWarriors.length > 0) {
-      const brawlerIndex = Math.floor(brawlRng() * activeWarriors.length);
+      const brawlerIndex = Math.floor(brawlRng.next() * activeWarriors.length);
       const brawler = activeWarriors[brawlerIndex];
       
       nextState.roster = updateEntityInList(nextState.roster, brawler.id, (w) => ({

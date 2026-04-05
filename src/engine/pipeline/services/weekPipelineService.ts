@@ -7,7 +7,7 @@ import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
 import { generateOwnerNarratives } from "@/engine/ownerNarrative";
 import { WorldManagementService } from "@/engine/ai/worldManagement";
 import { InsightTokenService } from "@/engine/tokens/insightTokenService";
-import { seededRng } from "@/engine/rivals";
+import { SeededRNG } from "@/utils/random";
 import { processOwnerGrudges } from "@/engine/ownerGrudges";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 
@@ -38,6 +38,7 @@ import { partialRefreshPool } from "@/engine/recruitment";
 export function advanceWeek(state: GameState): GameState {
   const currentWeek = state.week;
   const nextWeek = currentWeek + 1;
+  const rootRng = new SeededRNG(nextWeek * 7919 + 101);
 
   // 1. Core Simulation Impact Phase (Deterministic)
   const trainingImpactRaw = computeTrainingImpact(state);
@@ -52,7 +53,7 @@ export function advanceWeek(state: GameState): GameState {
   newState.seasonalGrowth = seasonalGrowth;
 
   // 2. World State Update (Week, Season, Weather)
-  newState = runWorldPass(newState);
+  newState = runWorldPass(newState, rootRng);
   const nextSeason = newState.season;
 
   // 2.1 — Global Rankings & Promoter Logic
@@ -120,13 +121,13 @@ export function advanceWeek(state: GameState): GameState {
   newState = runEquipmentPass(newState);
 
   // 8.2. Rival Strategy & Background Actions
-  newState = runRivalStrategyPass(newState, nextWeek);
+  newState = runRivalStrategyPass(newState, nextWeek, rootRng);
 
   // 9. Economy & Financial Maintenance
   newState = runEconomyPass(newState);
 
   // 10. Random Events (Tavern Brawl, etc.)
-  newState = runEventPass(newState, nextWeek);
+  newState = runEventPass(newState, nextWeek, rootRng);
 
   // 10.1 — Owner Grudges & Rivalries
   const { grudges: updatedGrudges, gazetteItems: grudgeNews } = processOwnerGrudges(newState, newState.ownerGrudges || []);

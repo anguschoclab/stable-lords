@@ -146,8 +146,9 @@ export function simulateFight(
     // Phase Change & Tactic Reveal
     if (phase !== lastPhase) {
       lastPhase = phase;
-      const tacticsA = resolveEffectiveTactics(fA.plan, phase.toLowerCase() as import("@/types/game").FightPlan["phases"]["opening"]);
-      const tacticsD = resolveEffectiveTactics(fD.plan, phase.toLowerCase() as import("@/types/game").FightPlan["phases"]["opening"]);
+      const phaseKey = phase.toLowerCase() as "opening" | "mid" | "late";
+      const tacticsA = resolveEffectiveTactics(fA.plan, phaseKey);
+      const tacticsD = resolveEffectiveTactics(fD.plan, phaseKey);
       log.push({
         minute: min,
         text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,

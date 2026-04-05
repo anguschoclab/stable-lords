@@ -1,5 +1,5 @@
 import { GameState, RivalStableData } from "@/types/state.types";
-import { seededRng } from "@/engine/rivals";
+import { SeededRNG } from "@/utils/random";
 import { updateAIStrategy } from "@/engine/ai/intentEngine";
 import { processAIStable } from "@/engine/ai/stableManager";
 import { generateRivalStables } from "@/engine/rivals";
@@ -12,8 +12,8 @@ import { processRivalBoutOffers } from "@/engine/ai/workers/competitionWorker";
  * Stable Lords — Rival Strategy Pipeline Pass
  */
 
-export function runRivalStrategyPass(state: GameState, nextWeek: number): GameState {
-  const rng = seededRng(nextWeek * 7919 + 13);
+export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng?: SeededRNG): GameState {
+  const rng = rootRng?.clone() ?? new SeededRNG(nextWeek * 7919 + 13);
   let currentState = state;
   const globalGazetteItems: string[] = [];
 
@@ -58,7 +58,7 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number): GameSt
   
   // 5. Tournament Handling (Every 13 weeks)
   if (nextWeek > 0 && nextWeek % 13 === 0) {
-    currentState = handleSeasonalTournaments(currentState, nextWeek);
+    currentState = handleSeasonalTournaments(currentState, nextWeek, rng);
   }
 
   if (globalGazetteItems.length > 0) {
@@ -72,7 +72,7 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number): GameSt
   return currentState;
 }
 
-function handleSeasonalTournaments(state: GameState, week: number): GameState {
+function handleSeasonalTournaments(state: GameState, week: number, rng: SeededRNG): GameState {
   let newState = { ...state };
   
   // 🏆 4-Tier Selection Committee Logic: Generates and resolves all tiers

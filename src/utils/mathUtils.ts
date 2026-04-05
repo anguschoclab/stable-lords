@@ -1,3 +1,5 @@
+import { SeededRNG } from "./random";
+
 /**
  * Clamps a number between a minimum and maximum value.
  */
@@ -7,10 +9,9 @@ export function clamp(v: number, lo: number, hi: number): number {
 
 /**
  * Returns a deterministic, seeded pseudo-random number generator.
+ * Uses the unified SeededRNG utility (mulberry32).
  */
 export function seededRng(seed: number) {
-  return () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  };
+  const rng = new SeededRNG(seed);
+  return () => rng.next();
 }

@@ -8,8 +8,8 @@ import {
   DeathCauseBucket
 } from "@/types/game";
 import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
-import { mulberry32 } from "@/engine/combat/combatMath";
 import { getMatchupBonus, ResolutionContext, FighterState } from "@/engine/combat/resolution";
+import { SeededRNG } from "@/utils/random";
 import { createFighterState } from "@/engine/bout/fighterState";
 import { getTrainingBonus } from "@/engine/trainers";
 
@@ -20,7 +20,8 @@ export function setupRng(providedRng?: (() => number) | number): () => number {
   const seed = typeof providedRng === "number"
     ? providedRng
     : crypto.getRandomValues(new Uint32Array(1))[0];
-  return mulberry32(seed);
+  const sRng = new SeededRNG(seed);
+  return () => sRng.next();
 }
 
 export function getTrainerMods(trainers: Trainer[] | undefined, style: FightingStyle) {

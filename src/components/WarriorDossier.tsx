@@ -1,15 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { Warrior, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, STYLE_DISPLAY_NAMES } from "@/types/game";
+import { ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WarriorRadarChart } from "@/components/charts/WarriorRadarChart";
 import { FormSparkline } from "@/components/charts/FormSparkline";
 import { 
-  Trophy, Star, Flame, Shield, Activity, 
-  History, Swords, Heart, Zap, Skull 
+  Activity, Swords, Zap, Skull 
 } from "lucide-react";
 import { StatBadge } from "@/components/ui/WarriorBadges";
 import WarriorPaperDoll from "@/components/WarriorPaperDoll";
@@ -21,10 +19,10 @@ interface WarriorDossierProps {
   warriorId: string;
 }
 
-export function WarriorDossier({ warriorId }: WarriorDossierProps) {
-  const { state } = useGameStore();
-
-  const warrior = useMemo(() => {
+export const WarriorDossier = React.memo(function WarriorDossier({ warriorId }: WarriorDossierProps) {
+  // Use fine-grained selector to find the warrior
+  const warrior = useGameStore((s) => {
+    const state = s.state;
     let w = state.roster.find((w) => w.id === warriorId) ||
             state.graveyard.find((w) => w.id === warriorId) ||
             state.retired.find((w) => w.id === warriorId);
@@ -34,12 +32,14 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
       if (w) return w;
     }
     return undefined;
-  }, [warriorId, state.roster, state.graveyard, state.retired, state.rivals]);
+  });
+
+  // Also select rankings separately
+  const rankings = useGameStore((s) => s.state.realmRankings?.[warriorId]);
 
   if (!warrior) return <div className="p-8 text-center text-muted-foreground">Warrior not found.</div>;
 
   const favDisplay = getFavoritesDisplay(warrior);
-
   const record = `${warrior.career.wins}W - ${warrior.career.losses}L - ${warrior.career.kills}K`;
   const fatigue = warrior.fatigue ?? 0;
   const condition = 100 - fatigue;
@@ -47,8 +47,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
   return (
     <ScrollArea className="h-full pr-4">
       <div className="space-y-6 pb-20">
-        {/* Header Section */}
-        {/* Header Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
@@ -60,16 +58,16 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
             </div>
             <div className="flex flex-col items-end gap-2">
               <StatBadge styleName={warrior.style} />
-              {state.realmRankings?.[warrior.id] && (
+              {rankings && (
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className={cn(
                     "text-[10px] font-black uppercase tracking-tighter border-primary/20",
-                    state.realmRankings[warrior.id]!.overallRank <= 64 ? "text-arena-gold bg-arena-gold/5" : "text-primary bg-primary/5"
+                    rankings.overallRank <= 64 ? "text-arena-gold bg-arena-gold/5" : "text-primary bg-primary/5"
                   )}>
-                    RANK #{state.realmRankings[warrior.id]!.overallRank}
+                    RANK #{rankings.overallRank}
                   </Badge>
                   <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-tighter bg-neutral-900 border border-white/5 opacity-80">
-                    {Math.round(state.realmRankings[warrior.id]!.compositeScore)} PTS
+                    {Math.round(rankings.compositeScore)} PTS
                   </Badge>
                 </div>
               )}
@@ -77,7 +75,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
           </div>
         </div>
 
-        {/* Condition & PaperDoll Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-4">
             <Card className="bg-secondary/20 border-none">
@@ -105,7 +102,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
               </CardContent>
             </Card>
             
-            {/* Attributes Grid */}
             <div className="grid grid-cols-2 gap-2">
               {ATTRIBUTE_KEYS.map((key) => (
                 <div key={key} className="flex items-center justify-between p-2 rounded bg-secondary/10 border border-border/50">
@@ -131,7 +127,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
           </Card>
         </div>
 
-        {/* Radar Chart Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="bg-glass/5">
             <CardHeader className="pb-2">
@@ -142,7 +137,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
             </CardContent>
           </Card>
 
-          {/* Mastery Section */}
           <Card className="bg-glass/5 border-arena-gold/10">
             <CardHeader className="pb-2">
               <CardTitle className="text-[10px] uppercase tracking-widest text-arena-gold font-black flex items-center gap-2">
@@ -150,7 +144,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
-               {/* Weapon Mastery */}
                <div className="space-y-1.5">
                   <div className="text-[9px] font-black uppercase text-muted-foreground flex items-center gap-1.5 tracking-tighter">
                     <Swords className="h-3 w-3" /> Weapon Preference
@@ -169,7 +162,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
                   )}
                </div>
 
-               {/* Rhythm Mastery */}
                <div className="space-y-1.5">
                   <div className="text-[9px] font-black uppercase text-muted-foreground flex items-center gap-1.5 tracking-tighter">
                     <Activity className="h-3 w-3" /> Natural Rhythm
@@ -194,7 +186,6 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
           </Card>
         </div>
 
-        {/* Injuries List */}
         {warrior.injuries.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-1">
@@ -227,4 +218,4 @@ export function WarriorDossier({ warriorId }: WarriorDossierProps) {
       </div>
     </ScrollArea>
   );
-}
+});
