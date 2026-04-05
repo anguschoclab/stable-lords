@@ -40,7 +40,7 @@ export function MetaDriftWidget() {
               <TooltipTrigger asChild>
                 <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
               </TooltipTrigger>
-              <TooltipContent className="max-w-[200px] text-[10px] leading-relaxed">
+              <TooltipContent className="w-full max-w-[200px] text-[10px] leading-relaxed">
                 Tracks winning/losing trends over the last 20 bouts. Dominant styles gain subtle momentum bonuses.
               </TooltipContent>
             </Tooltip>
