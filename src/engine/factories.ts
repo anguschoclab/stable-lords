@@ -72,7 +72,7 @@ export function createFreshState(): GameState {
     },
     fame: 0,
     popularity: 0,
-    gold: 500,
+    treasury: 500,
     ledger: [],
     week: 1,
     phase: "planning",

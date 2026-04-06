@@ -1,12 +1,12 @@
 import { GameState, Warrior, LedgerEntry, PoolWarrior, NewsletterItem } from "@/types/game";
 import { updateEntityInList } from "@/utils/stateUtils";
 
-export interface StateImpact { goldDelta?: number; fameDelta?: number; rosterUpdates?: Map<string, Partial<Warrior>>; newsletterItems?: NewsletterItem[]; ledgerEntries?: LedgerEntry[]; newPoolRecruits?: PoolWarrior[]; }
+export interface StateImpact { treasuryDelta?: number; fameDelta?: number; rosterUpdates?: Map<string, Partial<Warrior>>; newsletterItems?: NewsletterItem[]; ledgerEntries?: LedgerEntry[]; newPoolRecruits?: PoolWarrior[]; }
 
 type ImpactHandler<K extends keyof StateImpact> = (state: GameState, value: Exclude<StateImpact[K], undefined>) => void;
 
 const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
-  goldDelta: (state, value) => { state.gold = (state.gold ?? 0) + value; },
+  treasuryDelta: (state, value) => { state.treasury = (state.treasury ?? 0) + value; },
   fameDelta: (state, value) => { state.fame = (state.fame ?? 0) + value; },
   rosterUpdates: (state, value) => {
     value.forEach((update, id) => { state.roster = updateEntityInList(state.roster, id, (w) => ({ ...w, ...update })); });
@@ -33,9 +33,9 @@ export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameSt
 }
 
 export function mergeImpacts(impacts: StateImpact[]): StateImpact {
-  const merged: StateImpact = { goldDelta: 0, fameDelta: 0, rosterUpdates: new Map(), newsletterItems: [], ledgerEntries: [] };
+  const merged: StateImpact = { treasuryDelta: 0, fameDelta: 0, rosterUpdates: new Map(), newsletterItems: [], ledgerEntries: [] };
   for (const imp of impacts) {
-    if (imp.goldDelta) merged.goldDelta! += imp.goldDelta;
+    if (imp.treasuryDelta) merged.treasuryDelta! += imp.treasuryDelta;
     if (imp.fameDelta) merged.fameDelta! += imp.fameDelta;
     if (imp.rosterUpdates) {
       imp.rosterUpdates.forEach((val, key) => { const existing = merged.rosterUpdates!.get(key) || {}; merged.rosterUpdates!.set(key, { ...existing, ...val }); });

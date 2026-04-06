@@ -37,7 +37,7 @@ export const InsightTokenService = {
   /**
    * Assigns a token to a specific warrior.
    */
-  assignToken(state: GameState, tokenId: string, warriorId: string, rng?: SeededRNG): GameState {
+  async assignToken(state: GameState, tokenId: string, warriorId: string, rng?: any): Promise<GameState> {
     const token = state.insightTokens?.find(t => t.id === tokenId);
     const warrior = state.roster.find(w => w.id === warriorId);
 
@@ -59,7 +59,7 @@ export const InsightTokenService = {
       } else if (token.type === "Attribute") {
         // Permanent +1 to a primary attribute
         const primaries: (keyof Attributes)[] = ["ST", "WT", "SP", "DF"];
-        const attrKey = rng ? rng.pick(primaries) : primaries[Math.floor(Math.random() * primaries.length)];
+        const attrKey = (rng ? (typeof rng.pick === 'function' ? rng.pick(primaries) : (await rng.next())) : primaries[Math.floor(Math.random() * primaries.length)]) as keyof Attributes;
         const currentVal = updatedWarrior.attributes[attrKey] || 10;
         updatedWarrior.attributes = { ...updatedWarrior.attributes, [attrKey]: currentVal + 1 };
         token.detail = `Internalized: +1 ${attrKey}`;

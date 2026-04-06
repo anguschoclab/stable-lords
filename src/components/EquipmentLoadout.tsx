@@ -240,9 +240,19 @@ export default function EquipmentLoadoutUI({ loadout, style, carryCap, warriorAt
             className={`h-2.5 ${overEncumbered ? "[&>div]:bg-destructive" : ""}`}
           />
           {overEncumbered && (
-            <div className="flex items-center gap-1.5 text-xs text-destructive">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Over-encumbered! Speed and initiative will be penalized.
+            <div className="space-y-1 mt-2">
+              <div className="flex items-center gap-1.5 text-xs text-destructive font-semibold">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Over-encumbered! Combat penalties apply:
+              </div>
+              <div className="grid grid-cols-2 gap-2 pl-5 text-[10px] font-mono">
+                <div className="bg-destructive/10 text-destructive p-1 rounded border border-destructive/20 text-center">
+                  -2 Initiative
+                </div>
+                <div className="bg-destructive/10 text-destructive p-1 rounded border border-destructive/20 text-center">
+                  +20% END Cost
+                </div>
+              </div>
             </div>
           )}
         </div>

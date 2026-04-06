@@ -7,7 +7,7 @@ import { FightingStyle, type OffensiveTactic, type DefensiveTactic } from "@/typ
 
 export type SuitabilityRating = "WS" | "S" | "U";
 
-const OFFENSIVE_SUITABILITY: Record<string, Record<string, SuitabilityRating>> = {
+const OFFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>> = {
   [FightingStyle.AimedBlow]:      { Lunge: "S",  Slash: "U",  Bash: "U",  Decisiveness: "WS" },
   [FightingStyle.BashingAttack]:  { Lunge: "U",  Slash: "S",  Bash: "WS", Decisiveness: "S"  },
   [FightingStyle.LungingAttack]:  { Lunge: "WS", Slash: "S",  Bash: "U",  Decisiveness: "S"  },
@@ -20,7 +20,7 @@ const OFFENSIVE_SUITABILITY: Record<string, Record<string, SuitabilityRating>> =
   [FightingStyle.WallOfSteel]:    { Lunge: "S",  Slash: "S",  Bash: "S",  Decisiveness: "S"  },
 };
 
-const DEFENSIVE_SUITABILITY: Record<string, Record<string, SuitabilityRating>> = {
+const DEFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>> = {
   [FightingStyle.AimedBlow]:      { Dodge: "WS", Parry: "S",  Riposte: "S",  Responsiveness: "S"  },
   [FightingStyle.BashingAttack]:  { Dodge: "U",  Parry: "S",  Riposte: "U",  Responsiveness: "S"  },
   [FightingStyle.LungingAttack]:  { Dodge: "WS", Parry: "U",  Riposte: "S",  Responsiveness: "S"  },
@@ -35,16 +35,21 @@ const DEFENSIVE_SUITABILITY: Record<string, Record<string, SuitabilityRating>> =
 
 export function getOffensiveSuitability(style: FightingStyle, tactic: OffensiveTactic): SuitabilityRating {
   if (tactic === "none") return "WS";
-  return OFFENSIVE_SUITABILITY[style]?.[tactic] ?? "S";
+  return OFFENSIVE_MATRIX[style]?.[tactic as string] ?? "S";
 }
 
 export function getDefensiveSuitability(style: FightingStyle, tactic: DefensiveTactic): SuitabilityRating {
   if (tactic === "none") return "WS";
-  return DEFENSIVE_SUITABILITY[style]?.[tactic] ?? "S";
+  return DEFENSIVE_MATRIX[style]?.[tactic as string] ?? "S";
 }
 
 export function suitabilityMultiplier(rating: SuitabilityRating): number {
-  return rating === "WS" ? 1.0 : rating === "S" ? 0.6 : 0.3;
+  const multipliers: Record<SuitabilityRating, number> = {
+    WS: 1.0,
+    S: 0.6,
+    U: 0.3
+  };
+  return multipliers[rating];
 }
 
 export const SUITABILITY_COLORS: Record<SuitabilityRating, string> = {
@@ -58,3 +63,30 @@ export const SUITABILITY_LABELS: Record<SuitabilityRating, string> = {
   S: "Suited",
   U: "Unsuited",
 };
+
+/**
+ * ⚡ Style Matchup Matrix — Rock-Paper-Scissors Logic
+ * Defines natural advantages/disadvantages between styles.
+ */
+export const STYLE_MATCHUP_MATRIX: Partial<Record<FightingStyle, Partial<Record<FightingStyle, number>>>> = {
+  [FightingStyle.LungingAttack]: {
+    [FightingStyle.AimedBlow]: 1.15, // Lunging beats Focused
+    [FightingStyle.ParryRiposte]: 0.85, // Parry-heavy beats Lunging
+  },
+  [FightingStyle.BashingAttack]: {
+    [FightingStyle.WallOfSteel]: 1.10, // Bash breaks Steel
+    [FightingStyle.SlashingAttack]: 0.90, // Slash evades Bash
+  },
+  [FightingStyle.AimedBlow]: {
+    [FightingStyle.SlashingAttack]: 1.12, // Focused hits Slashers
+    [FightingStyle.LungingAttack]: 0.88, // Lunge interrupts Aim
+  },
+  [FightingStyle.TotalParry]: {
+    [FightingStyle.BashingAttack]: 0.85, // Bash breaks Parry
+    [FightingStyle.SlashingAttack]: 1.15, // Parry catches Slashes
+  },
+};
+
+export function getStyleMatchupAdvantage(styleA: FightingStyle, styleD: FightingStyle): number {
+  return STYLE_MATCHUP_MATRIX[styleA]?.[styleD] ?? 1.0;
+}

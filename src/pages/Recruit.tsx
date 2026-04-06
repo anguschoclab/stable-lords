@@ -15,6 +15,7 @@ import {
   type PoolWarrior, type RecruitTier,
   TIER_COST, TIER_STARS, REFRESH_COST,
 } from "@/engine/recruitment";
+import { canTransact } from "@/utils/economyUtils";
 import { potentialRating, potentialGrade } from "@/engine/potential";
 import WarriorBuilder from "@/components/WarriorBuilder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -202,22 +203,21 @@ export default function Recruit() {
   });
   const [scoutedIds, setScoutedIds] = useState<Set<string>>(new Set());
 
-  const gold = state.gold ?? 0;
+  const treasury = useGameStore(s => s.treasury);
   const rosterFull = state.roster.length >= MAX_ROSTER;
-  const canRefresh = gold >= REFRESH_COST;
+  const canRefresh = canTransact(treasury, REFRESH_COST);
 
   // Persist pool to state
   const persistPool = useCallback((newPool: PoolWarrior[], newState?: typeof state) => {
     const base = newState ?? state;
     setState({ ...base, recruitPool: newPool } as import("@/types/game").GameState);
     setPool(newPool);
-  }, [setState]);
+  }, [setState, state]);
 
   const handleRecruit = useCallback((w: PoolWarrior) => {
     setState((prev) => {
-      const currentGold = prev.gold ?? 0;
-      if (currentGold < w.cost) {
-        toast.error(`Not enough gold! Need ${w.cost}g.`);
+      if (!canTransact(prev.treasury, w.cost)) {
+        toast.error(`Not enough funds! Need ${w.cost}g.`);
         return prev;
       }
       if (prev.roster.length >= MAX_ROSTER) {
@@ -238,7 +238,7 @@ export default function Recruit() {
       return {
         ...prev,
         roster: [...prev.roster, warrior],
-        gold: currentGold - w.cost,
+        treasury: prev.treasury - w.cost,
         recruitPool: newPool,
         ledger: [...(prev.ledger ?? []), {
           week: prev.week,
@@ -257,8 +257,7 @@ export default function Recruit() {
 
   const handleScout = useCallback((w: PoolWarrior) => {
     setState((prev) => {
-      const currentGold = prev.gold ?? 0;
-      if (currentGold < 25) {
+      if (!canTransact(prev.treasury, 25)) {
         toast.error("Not enough gold to scout potential (need 25g).");
         return prev;
       }
@@ -266,7 +265,7 @@ export default function Recruit() {
       toast.success(`Scouted potential for ${w.name}! (-25g)`);
       return {
         ...prev,
-        gold: currentGold - 25,
+        treasury: prev.treasury - 25,
         ledger: [...(prev.ledger ?? []), {
           week: prev.week,
           label: `Scout Potential: ${w.name}`,
@@ -279,8 +278,7 @@ export default function Recruit() {
 
   const handleRefresh = useCallback(() => {
     setState((prev) => {
-      const currentGold = prev.gold ?? 0;
-      if (currentGold < REFRESH_COST) {
+      if (!canTransact(prev.treasury, REFRESH_COST)) {
         toast.error(`Not enough gold! Need ${REFRESH_COST}g to refresh.`);
         return prev;
       }
@@ -289,7 +287,7 @@ export default function Recruit() {
       toast.success(`Scout pool refreshed! (-${REFRESH_COST}g)`);
       return {
         ...prev,
-        gold: currentGold - REFRESH_COST,
+        treasury: prev.treasury - REFRESH_COST,
         recruitPool: newPool,
         ledger: [...(prev.ledger ?? []), {
           week: prev.week,
@@ -304,8 +302,7 @@ export default function Recruit() {
   const handleCustomCreate = useCallback(
     (data: { name: string; style: FightingStyle; attributes: Attributes }) => {
       setState((prev) => {
-        const currentGold = prev.gold ?? 0;
-        if (currentGold < CUSTOM_COST) {
+        if (!canTransact(prev.treasury, CUSTOM_COST)) {
           toast.error(`Not enough gold! Need ${CUSTOM_COST}g for custom build.`);
           return prev;
         }
@@ -320,7 +317,7 @@ export default function Recruit() {
         return {
           ...prev,
           roster: [...prev.roster, warrior],
-          gold: currentGold - CUSTOM_COST,
+          treasury: prev.treasury - CUSTOM_COST,
           ledger: [...(prev.ledger ?? []), {
             week: prev.week,
             label: `Custom Build: ${data.name}`,
@@ -350,7 +347,7 @@ export default function Recruit() {
           </Badge>
           <Badge variant="outline" className="gap-1.5 font-mono">
             <Coins className="h-3 w-3 text-arena-gold" />
-            {gold}g
+            {treasury}g
           </Badge>
         </div>
       </div>
@@ -409,12 +406,12 @@ export default function Recruit() {
                 <RecruitCard
                   key={w.id}
                   warrior={w}
-                  canAfford={gold >= w.cost}
+                  canAfford={canTransact(treasury, w.cost)}
                   rosterFull={rosterFull}
                   onRecruit={handleRecruit}
                   isScouted={scoutedIds.has(w.id)}
                   onScout={handleScout}
-                  canAffordScout={gold >= 25}
+                  canAffordScout={canTransact(treasury, 25)}
                 />
               ))}
             </div>
@@ -433,9 +430,9 @@ export default function Recruit() {
           <div className="rounded-lg border border-border bg-secondary/30 p-3 text-sm text-muted-foreground">
             <Hammer className="h-4 w-4 inline mr-1.5" />
             Custom warriors cost <span className="font-semibold text-foreground">{CUSTOM_COST}g</span> and start with 66 total attribute points. You choose the distribution.
-            {gold < CUSTOM_COST && (
+            {!canTransact(treasury, CUSTOM_COST) && (
               <span className="text-destructive ml-1">
-                (Need {CUSTOM_COST - gold}g more)
+                (Need {CUSTOM_COST - treasury}g more)
               </span>
             )}
           </div>

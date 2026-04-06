@@ -10,8 +10,21 @@ import {
   type ScoutQuality,
   type WeatherType
 } from "./shared.types";
+
 import { type Warrior, type DeathEvent } from "./warrior.types";
-export type { Warrior, DeathEvent, WeatherType };
+
+export type { 
+  Warrior, 
+  DeathEvent, 
+  WeatherType,
+  Season,
+  CrowdMoodType,
+  NewsletterItem,
+  TrainerTier,
+  TrainerFocus,
+  Trainer,
+  ScoutQuality
+};
 import { type FightSummary, type FightOutcomeBy } from "./combat.types";
 import type { PoolWarrior } from "@/engine/recruitment";
 export type { PoolWarrior };
@@ -118,7 +131,7 @@ export interface LedgerEntry {
   category: "fight" | "training" | "recruit" | "trainer" | "upkeep" | "prize" | "other";
 }
 
-export type AIIntent = "EXPANSION" | "CONSOLIDATION" | "VENDETTA" | "RECOVERY";
+export type AIIntent = "EXPANSION" | "CONSOLIDATION" | "VENDETTA" | "RECOVERY" | "SURVIVAL" | "WEALTH_ACCUMULATION" | "AGGRESSIVE_EXPANSION" | "ROSTER_DIVERSITY";
 
 export interface AIStrategy {
   intent: AIIntent;
@@ -136,17 +149,18 @@ export interface AIEvent {
 }
 
 export interface AIAgentMemory {
-  lastGold: number;
+  lastTreasury: number;
   burnRate: number;
-  metaAwareness: Record<string, number>; // FightingStyle -> popularity/winrate
-  knownRivals: string[]; // List of stable IDs they are tracking
+  metaAwareness: Record<string, number>; 
+  knownRivals: string[]; 
+  currentIntent?: AIIntent;
 }
 
 export interface RivalStableData {
   owner: Owner;
   roster: Warrior[];
   trainers?: Trainer[];
-  gold: number;
+  treasury: number;
   strategy?: AIStrategy;
   agentMemory?: AIAgentMemory;
   actionHistory?: AIEvent[];
@@ -225,6 +239,14 @@ export interface HallEntry {
   fightId: string;
 }
 
+export interface SimulationReport {
+  week: number;
+  treasuryChange: number;
+  trainingGains: { warriorId: string; warriorName: string; attr: string; gain: number }[];
+  agingEvents: string[];
+  healthEvents: string[];
+}
+
 export interface GameState {
   meta: {
     gameName: string;
@@ -244,7 +266,7 @@ export interface GameState {
   player: Owner;
   fame: number;
   popularity: number;
-  gold: number;
+  treasury: number;
   ledger: LedgerEntry[];
   week: number;
   phase: "planning" | "resolution";
@@ -291,6 +313,7 @@ export interface GameState {
   promoters: Record<string, Promoter>;
   boutOffers: Record<string, BoutOffer>;
   realmRankings: Record<string, RankingEntry>;
+  lastSimulationReport?: SimulationReport;
 }
 
 export interface UIPrefs {

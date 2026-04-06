@@ -1,87 +1,162 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
-import { Brain, Cpu, ShieldAlert, Zap, TrendingUp, Target, User } from "lucide-react";
-import { Surface } from "@/components/ui/Surface";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { 
+  BrainCircuit, 
+  Target, 
+  Zap, 
+  History, 
+  TrendingUp, 
+  Activity,
+  ShieldAlert,
+  Coins,
+  Users
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import type { RivalStableData, AIIntent, AIEvent } from "@/types/state.types";
 
-export function AgentReasoningWidget() {
-  const { state } = useGameStore();
+interface AgentReasoningWidgetProps {
+  rival: RivalStableData;
+}
 
-  const allRivalEvents = React.useMemo(() => {
-    return (state.rivals || []).flatMap(rival => 
-      (rival.actionHistory || []).map(event => ({
-        ...event,
-        rivalName: rival.owner.stableName,
-        personality: rival.owner.personality,
-        intent: rival.strategy?.intent || "CONSOLIDATION"
-      }))
-    ).sort((a, b) => b.week - a.week);
-  }, [state.rivals]);
+const INTENT_METRICS: Record<AIIntent, { label: string; icon: any; color: string; description: string }> = {
+  SURVIVAL: { 
+    label: "Survival Protocol", 
+    icon: ShieldAlert, 
+    color: "text-amber-500", 
+    description: "Prioritizing stable preservation and low-risk engagements." 
+  },
+  WEALTH_ACCUMULATION: { 
+    label: "Treasury Hoarding", 
+    icon: Coins, 
+    color: "text-arena-gold", 
+    description: "Optimizing for maximum gold retention for future high-tier scouting." 
+  },
+  AGGRESSIVE_EXPANSION: { 
+    label: "Market Dominance", 
+    icon: Target, 
+    color: "text-arena-blood", 
+    description: "Actively seeking to eliminate rivals and seize regional fame." 
+  },
+  ROSTER_DIVERSITY: { 
+    label: "Talent Diversification", 
+    icon: Users, 
+    color: "text-primary", 
+    description: "Broadening style coverage to counter local tactical shifts." 
+  },
+  EXPANSION: { 
+    label: "Strategic Expansion", 
+    icon: TrendingUp, 
+    color: "text-arena-fame", 
+    description: "Investing in new facilities and increased roster capacity." 
+  },
+  CONSOLIDATION: { 
+    label: "Operational Consolidation", 
+    icon: Activity, 
+    color: "text-arena-steel", 
+    description: "Pruning underperforming assets to maintain a lean, elite roster." 
+  },
+  VENDETTA: { 
+    label: "Owner Vendetta", 
+    icon: Zap, 
+    color: "text-destructive", 
+    description: "Directly targeting specific rivals regardless of short-term profit." 
+  },
+  RECOVERY: { 
+    label: "System Recovery", 
+    icon: Activity, 
+    color: "text-primary/60", 
+    description: "Resting injured warriors and avoiding high-stakes bouts." 
+  }
+};
+
+export function AgentReasoningWidget({ rival }: AgentReasoningWidgetProps) {
+  const currentIntent = rival.agentMemory?.currentIntent || "SURVIVAL";
+  const metric = INTENT_METRICS[currentIntent];
+  const Icon = metric.icon;
 
   return (
-    <div className="space-y-4">
-      {allRivalEvents.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 opacity-30 shadow-inner rounded-2xl bg-black/20 border border-white/5">
-          <Brain className="h-10 w-10 mb-4 text-primary/40 animate-pulse" />
-          <p className="text-[10px] font-black uppercase tracking-[0.4em]">Awaiting_Cognitive_Sync</p>
-          <p className="text-[9px] text-muted-foreground mt-2 italic whitespace-pre-wrap">No rival activity logged this week.</p>
+    <Card className="bg-[#0a0a0b] border-white/5 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
+      
+      <CardHeader className="pb-4 relative">
+        <div className="flex items-center gap-3">
+          <div className={cn("p-2 rounded-xl bg-black border border-white/5", metric.color)}>
+            <BrainCircuit className="w-5 h-5" />
+          </div>
+          <div>
+            <CardTitle className="text-sm font-black uppercase tracking-widest">
+              Strategic Reasoning
+            </CardTitle>
+            <CardDescription className="text-[10px] font-mono uppercase tracking-tight opacity-40">
+              Simulation_Layer_v4.1 // Realtime_Inference
+            </CardDescription>
+          </div>
         </div>
-      ) : (
+      </CardHeader>
+
+      <CardContent className="space-y-6 relative">
+        {/* Active Intent */}
+        <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Icon className={cn("w-4 h-4", metric.color)} />
+              <span className={cn("text-xs font-black uppercase tracking-[0.2em]", metric.color)}>
+                {metric.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="h-1 w-1 rounded-full bg-green-500 animate-ping" />
+              <span className="text-[8px] font-black uppercase text-green-500/60">Active_Intent</span>
+            </div>
+          </div>
+          <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-medium">
+            {metric.description}
+          </p>
+        </div>
+
+        {/* Action History Log */}
         <div className="space-y-3">
-          {allRivalEvents.slice(0, 15).map((event, i) => (
-             <div 
-               key={i} 
-               className={cn(
-                 "group relative p-4 rounded-xl border border-white/5 transition-all hover:bg-white/[0.03]",
-                 event.riskTier === "High" ? "bg-red-500/5 hover:border-red-500/20" : 
-                 event.riskTier === "Medium" ? "bg-orange-500/5 hover:border-orange-500/20" : 
-                 "bg-blue-500/5 hover:border-blue-500/20"
-               )}
-             >
-               <div className="flex items-center justify-between mb-2">
-                 <div className="flex items-center gap-2">
-                   <div className={cn(
-                     "p-1.5 rounded-lg border",
-                     event.riskTier === "High" ? "bg-red-500/10 border-red-500/20 text-red-400" :
-                     event.riskTier === "Medium" ? "bg-orange-500/10 border-orange-500/20 text-orange-400" :
-                     "bg-blue-500/10 border-blue-500/20 text-blue-400"
-                   )}>
-                     {event.type === "STRATEGY" && <Target className="h-3 w-3" />}
-                     {event.type === "FINANCE" && <TrendingUp className="h-3 w-3" />}
-                     {event.type === "ROSTER" && <User className="h-3 w-3" />}
-                     {event.type === "STAFF" && <ShieldAlert className="h-3 w-3" />}
-                   </div>
-                   <span className="text-[10px] font-black uppercase tracking-widest text-foreground/80">
-                     {event.rivalName}
-                   </span>
-                 </div>
-                 <Badge variant="outline" className="text-[8px] font-mono border-white/10 opacity-60">
-                   WK_{event.week}
-                 </Badge>
-               </div>
-
-               <p className="text-[11px] leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors italic pl-7 border-l border-white/5 ml-2">
-                 {event.description}
-               </p>
-
-               <div className="mt-2 flex items-center gap-2 pl-9">
-                  <span className="text-[8px] font-black uppercase tracking-widest opacity-30">Intent:</span>
-                  <span className={cn(
-                    "text-[8px] font-black uppercase tracking-widest",
-                    event.intent === "VENDETTA" ? "text-red-400" :
-                    event.intent === "EXPANSION" ? "text-primary" :
-                    event.intent === "RECOVERY" ? "text-arena-gold" :
-                    "text-muted-foreground"
-                  )}>
-                    {event.intent}
-                  </span>
-               </div>
-             </div>
-          ))}
+          <div className="flex items-center gap-2 text-muted-foreground/40 px-1">
+            <History className="w-3.5 h-3.5" />
+            <span className="text-[9px] font-black uppercase tracking-widest">Action_Timeline</span>
+          </div>
+          
+          <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/5">
+            {rival.actionHistory && rival.actionHistory.length > 0 ? (
+              rival.actionHistory.map((event, i) => (
+                <div key={i} className="flex items-start gap-3 p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-[8px] font-mono text-primary mt-0.5">W{event.week}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-medium text-foreground truncate">
+                      {event.description}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={cn(
+                        "text-[7px] font-black uppercase px-1 rounded-sm",
+                        event.riskTier === "High" ? "bg-destructive/20 text-destructive" :
+                        event.riskTier === "Medium" ? "bg-amber-500/20 text-amber-500" :
+                        "bg-green-500/20 text-green-500"
+                      )}>
+                        {event.riskTier}_RISK
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center opacity-20 italic text-[10px] uppercase font-black tracking-widest">
+                No recent actions recorded.
+              </div>
+            )}
+          </div>
         </div>
-      )}
-    </div>
+
+        <div className="pt-2 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-muted-foreground/20">
+          <span>Targeting: {rival.strategy?.targetStableId || "Global_Meta"}</span>
+          <span>Confidence: 94.8%</span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

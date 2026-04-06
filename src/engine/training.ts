@@ -106,7 +106,7 @@ export function processTraining(state: GameState): GameState {
 /**
  * Convert a TrainingImpact to a generic StateImpact for the pipeline.
  */
-export function trainingImpactToStateImpact(state: GameState, impact: TrainingImpact): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[] } {
+export function trainingImpactToStateImpact(state: GameState, impact: TrainingImpact): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[]; results: TrainingResult[] } {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   
   impact.updatedRoster.forEach(w => {
@@ -129,6 +129,7 @@ export function trainingImpactToStateImpact(state: GameState, impact: TrainingIm
         items: newsItems
       }] : []
     },
-    seasonalGrowth: impact.updatedSeasonalGrowth
+    seasonalGrowth: impact.updatedSeasonalGrowth,
+    results: impact.results
   };
 }

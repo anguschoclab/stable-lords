@@ -35,6 +35,8 @@ export interface TrainingResult {
   type: "gain" | "injury" | "recovery" | "blocked";
   warriorId: string;
   message: string;
+  attr?: keyof Attributes;
+  gain?: number;
 }
 
 /**
@@ -120,6 +122,8 @@ export function processAttributeTraining(
       result: {
         type: "gain",
         warriorId: warrior.id,
+        attr,
+        gain: 1,
         message: `${warrior.name} improved ${attr} to ${currentVal + 1} through training.${ceilingNote}${newlyRevealed ? ` Their true potential in ${attr} is now fully revealed!` : ""}`,
       }
     };

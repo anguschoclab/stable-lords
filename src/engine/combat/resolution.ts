@@ -73,6 +73,7 @@ export interface FighterState {
   legHits: number;
   favorites?: WarriorFavorites;
   totalFights: number;
+  encumbrancePenalty?: { iniPenalty: number; enduranceMult: number };
 }
 
 export interface ResolutionContext {

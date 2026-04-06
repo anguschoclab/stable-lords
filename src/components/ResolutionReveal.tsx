@@ -7,11 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import BoutViewer from "./BoutViewer";
-import { Newspaper, Skull, Activity, Swords, ChevronRight } from "lucide-react";
-import type { GazetteStory, Warrior } from "@/types/game";
+import { Newspaper, Skull, Activity, Swords, ChevronRight, BarChart3, BrainCircuit } from "lucide-react";
+import { audioManager } from "@/lib/AudioManager";
+import type { NewsletterItem } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { GazetteStory } from "@/types/state.types";
 import type { BoutResult } from "@/engine/boutProcessor";
 
-type RevealStep = "gazette" | "injuries" | "bouts" | "memorial";
+type RevealStep = "gazette" | "injuries" | "bouts" | "math" | "memorial";
 
 export default function ResolutionReveal() {
   const { state, setState } = useGameStore();
@@ -37,11 +40,14 @@ export default function ResolutionReveal() {
   const hasInjuriesOrDeaths = data.injuries.length > 0 || data.deaths.length > 0;
 
   const handleNext = () => {
+    audioManager.play("ui_click");
     if (step === "gazette") {
       setStep(hasInjuriesOrDeaths ? "injuries" : "bouts");
     } else if (step === "injuries") {
       setStep("bouts");
-    } else if (step === "bouts" && data.deaths.length > 0) {
+    } else if (step === "bouts") {
+      setStep("math");
+    } else if (step === "math" && data.deaths.length > 0) {
       setStep("memorial");
     } else {
       doClearResolution();
@@ -64,9 +70,10 @@ export default function ResolutionReveal() {
                 2. Medical Report
               </Badge>
               <Badge variant={step === "bouts" ? "default" : "secondary"}>3. Combat Logs</Badge>
+              <Badge variant={step === "math" ? "default" : "secondary"}>4. Simulation Math</Badge>
               {data.deaths.length > 0 && (
                 <Badge variant={step === "memorial" ? "destructive" : "secondary"}>
-                  4. The Graveyard
+                  5. The Graveyard
                 </Badge>
               )}
             </div>
@@ -90,15 +97,14 @@ export default function ResolutionReveal() {
                 <ScrollArea className="h-[calc(100%-4rem)] pr-4">
                   {data.gazette.length > 0 ? (
                     <div className="space-y-6">
-                      {data.gazette.map((article: GazetteStory, i: number) => (
+                      {data.gazette.map((item: NewsletterItem, i: number) => (
                         <div key={i} className="space-y-2 border-l-2 border-primary/50 pl-4">
-                          <h4 className="text-lg font-bold font-serif leading-tight">{article.headline}</h4>
-                          <p className="text-sm text-muted-foreground whitespace-pre-line">{article.body}</p>
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {article.tags?.map((t: string) => (
-                              <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
+                          <h4 className="text-lg font-bold font-serif leading-tight">{item.title}</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {item.items.map((line: string, li: number) => (
+                              <li key={li} className="text-sm text-muted-foreground">{line}</li>
                             ))}
-                          </div>
+                          </ul>
                         </div>
                       ))}
                     </div>
@@ -159,7 +165,7 @@ export default function ResolutionReveal() {
                 key="bouts"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                exit={{ opacity: 0, x: -20 }}
                 className="h-full p-6 flex flex-col"
               >
                 <div className="flex items-center gap-2 mb-6 shrink-0">
@@ -200,6 +206,66 @@ export default function ResolutionReveal() {
               </motion.div>
             )}
 
+            {step === "math" && (
+              <motion.div
+                key="math"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="h-full p-6 space-y-6"
+              >
+                <div className="flex items-center gap-2">
+                  <Activity className="h-6 w-6 text-indigo-500" />
+                  <h3 className="text-xl font-semibold">Simulation Math & Metrics</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="bg-secondary/10">
+                    <CardHeader className="py-2 px-4">
+                      <CardTitle className="text-sm font-medium">Weekly Treasury Delta</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-2 px-4">
+                      <div className={`text-2xl font-mono font-bold ${state.lastSimulationReport?.treasuryChange && state.lastSimulationReport.treasuryChange >= 0 ? "text-green-500" : "text-amber-500"}`}>
+                        {state.lastSimulationReport?.treasuryChange && state.lastSimulationReport.treasuryChange > 0 ? "+" : ""}{state.lastSimulationReport?.treasuryChange ?? 0} GC
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-secondary/10">
+                    <CardHeader className="py-2 px-4">
+                      <CardTitle className="text-sm font-medium">Training Outcomes</CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-2 px-4">
+                      <div className="text-2xl font-mono font-bold text-primary">
+                        {state.lastSimulationReport?.trainingGains.length ?? 0} Improvements
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Granular Breakdown</h4>
+                  <ScrollArea className="h-[200px] border rounded-md p-4 bg-muted/30">
+                    <div className="space-y-4">
+                      {state.lastSimulationReport?.trainingGains.map((g, i) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span className="font-medium">{g.warriorName}</span>
+                          <div className="flex gap-2 font-mono">
+                            <Badge variant="outline" className="text-green-500">+{g.gain} {g.attr}</Badge>
+                          </div>
+                        </div>
+                      ))}
+                      {state.lastSimulationReport?.agingEvents.map((e, i) => (
+                        <div key={`age-${i}`} className="text-sm text-amber-500">
+                          <span className="font-bold mr-2">!</span> {e}
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </motion.div>
+            )}
+
             {step === "memorial" && deadWarriors.length > 0 && (
               <motion.div
                 key="memorial"
@@ -213,19 +279,22 @@ export default function ResolutionReveal() {
                   <Skull className="h-16 w-16 mb-4 text-zinc-600 animate-pulse drop-shadow-[0_0_15px_rgba(200,0,0,0.3)]" />
                   <h2 className="text-3xl font-serif text-center mb-8 uppercase tracking-widest text-zinc-300">The Arena Remembers</h2>
                   <div className="flex gap-6 overflow-x-auto pb-4 max-w-[100%]">
-                    {deadWarriors.map((w: Warrior) => (
-                      <div key={w.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg text-center min-w-72 shadow-2xl relative">
-                         <h3 className="text-2xl font-display font-bold text-red-500 mb-1 drop-shadow-md">{w.name}</h3>
-                         <p className="text-sm text-zinc-400 mb-4 italic leading-relaxed">{w.deathCause || "Fallen in combat."}</p>
-                         <Separator className="bg-zinc-800 mb-4" />
-                         <div className="grid grid-cols-2 gap-3 text-xs text-zinc-500 text-left">
-                           <div className="bg-zinc-950 p-2 rounded">Age: <span className="text-zinc-300 font-mono inline-block ml-1">{w.age}</span></div>
-                           <div className="bg-zinc-950 p-2 rounded">Fame: <span className="text-zinc-300 font-mono inline-block ml-1">{w.fame}</span></div>
-                           <div className="bg-zinc-950 p-2 rounded">Wins: <span className="text-zinc-300 font-mono inline-block ml-1">{w.career?.wins || 0}</span></div>
-                           <div className="bg-zinc-950 p-2 rounded">Kills: <span className="text-red-400 font-mono inline-block ml-1">{w.career?.kills || 0}</span></div>
-                         </div>
-                      </div>
-                    ))}
+                    {deadWarriors.map((w) => {
+                      if (!w) return null;
+                      return (
+                        <div key={w.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg text-center min-w-72 shadow-2xl relative">
+                          <h3 className="text-2xl font-display font-bold text-red-500 mb-1 drop-shadow-md">{w.name}</h3>
+                          <p className="text-sm text-zinc-400 mb-4 italic leading-relaxed">{w.deathCause || "Fallen in combat."}</p>
+                          <Separator className="bg-zinc-800 mb-4" />
+                          <div className="grid grid-cols-2 gap-3 text-xs text-zinc-500 text-left">
+                            <div className="bg-zinc-950 p-2 rounded">Age: <span className="text-zinc-300 font-mono inline-block ml-1">{w.age}</span></div>
+                            <div className="bg-zinc-950 p-2 rounded">Fame: <span className="text-zinc-300 font-mono inline-block ml-1">{w.fame}</span></div>
+                            <div className="bg-zinc-950 p-2 rounded">Wins: <span className="text-zinc-300 font-mono inline-block ml-1">{w.career?.wins || 0}</span></div>
+                            <div className="bg-zinc-950 p-2 rounded">Kills: <span className="text-red-400 font-mono inline-block ml-1">{w.career?.kills || 0}</span></div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </motion.div>
@@ -235,7 +304,7 @@ export default function ResolutionReveal() {
 
         <div className="p-4 bg-secondary/20 border-t shrink-0 flex justify-end">
           <Button onClick={handleNext} className="gap-2" size="lg" variant={step === "memorial" ? "destructive" : "default"}>
-            {step === "bouts" && data.deaths.length > 0 ? "Honor the Fallen" : (step === "bouts" || step === "memorial") ? "Acknowledge & Begin Planning" : "Next Report"}
+            {step === "math" && data.deaths.length > 0 ? "Honor the Fallen" : (step === "math" || step === "memorial") ? "Acknowledge & Begin Planning" : "Next Report"}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

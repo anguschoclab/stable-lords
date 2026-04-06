@@ -19,7 +19,7 @@ import type {
 } from "@/types/game";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { getTempoBonus, getStyleAntiSynergy } from "@/engine/stylePassives";
-import { getOffensiveSuitability, getDefensiveSuitability, SUITABILITY_COLORS } from "@/engine/tacticSuitability";
+import { getOffensiveSuitability, getDefensiveSuitability, SUITABILITY_COLORS, getStyleMatchupAdvantage } from "@/engine/tacticSuitability";
 import { STYLE_PRESETS } from "@/engine/stylePresets";
 
 import { computeStrategyScore, getScoreColor } from "@/engine/strategyAnalysis";
@@ -44,11 +44,17 @@ interface PlanBuilderProps {
   onPlanChange: (plan: FightPlan) => void;
   warriorName?: string;
   warrior?: Warrior;
+  rivalStyle?: FightingStyle;
 }
 
-export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }: PlanBuilderProps) {
+export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, rivalStyle }: PlanBuilderProps) {
   const [phaseMode, setPhaseMode] = useState<boolean>(!!plan.phases);
   
+  const matchupAdv = useMemo(() => {
+    if (!rivalStyle) return 1.0;
+    return getStyleMatchupAdvantage(plan.style, rivalStyle);
+  }, [plan.style, rivalStyle]);
+
   const score = useMemo(() => computeStrategyScore(plan, warrior), [plan, warrior]);
 
   const onDragEnd = (result: DropResult) => {
@@ -95,12 +101,28 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior }
             </p>
           </div>
           
-          <div className="text-right">
-            <div className={cn("text-3xl font-display font-black tracking-tighter leading-none transition-all", getScoreColor(score))}>
-              {score}<span className="text-xs ml-0.5 opacity-50">/100</span>
-            </div>
-            <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mt-1">
-              Strategy Score
+          <div className="text-right flex items-center gap-6">
+            {matchupAdv !== 1.0 && (
+              <div className="text-right">
+                <Badge className={cn(
+                  "rounded-none border-none font-black text-[10px] tracking-tight px-1.5 py-0.5",
+                  matchupAdv > 1.0 ? "bg-green-500/20 text-green-500" : "bg-destructive/20 text-destructive"
+                )}>
+                  {matchupAdv > 1.0 ? "MATCHUP_ADV" : "MATCHUP_PENALTY"}
+                </Badge>
+                <div className={cn("text-lg font-mono font-black italic", matchupAdv > 1.0 ? "text-green-500" : "text-destructive")}>
+                   {matchupAdv > 1.0 ? "+" : ""}{Math.round((matchupAdv - 1) * 100)}%
+                </div>
+              </div>
+            )}
+
+            <div className="text-right">
+              <div className={cn("text-3xl font-display font-black tracking-tighter leading-none transition-all", getScoreColor(score))}>
+                {score}<span className="text-xs ml-0.5 opacity-50">/100</span>
+              </div>
+              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mt-1">
+                Strategy Score
+              </div>
             </div>
           </div>
         </div>

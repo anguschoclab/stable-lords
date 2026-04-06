@@ -98,17 +98,17 @@ export function computeEconomyImpact(state: GameState): StateImpact {
   }
 
   return {
-    goldDelta: breakdown.net,
+    treasuryDelta: breakdown.net,
     ledgerEntries: entries
   };
 }
 
-/** Process economy at week-end. Adds ledger entries and updates gold. */
+/** Process economy at week-end. Adds ledger entries and updates treasury. */
 export function processEconomy(state: GameState): GameState {
   const impact = computeEconomyImpact(state);
   return {
     ...state,
-    gold: (state.gold ?? 0) + (impact.goldDelta ?? 0),
+    treasury: (state.treasury ?? 0) + (impact.treasuryDelta ?? 0),
     ledger: [...(state.ledger ?? []), ...(impact.ledgerEntries ?? [])],
   };
 }

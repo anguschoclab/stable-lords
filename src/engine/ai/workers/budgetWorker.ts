@@ -9,7 +9,7 @@ export type RiskLevel = "Safe" | "Speculative" | "Reckless";
 export interface BudgetReport {
   isAffordable: boolean;
   riskTier: AIEvent["riskTier"];
-  adjustedGold: number;
+  adjustedTreasury: number;
 }
 
 export function checkBudget(
@@ -32,12 +32,12 @@ export function checkBudget(
   if (personality === "Methodical") tolerance = 0.8;
   if (personality === "Pragmatic") tolerance = 1.0;
 
-  const availableGold = rival.gold - (reserve + burnRate);
-  const isAffordable = cost <= (availableGold * tolerance);
+  const availableTreasury = (rival.treasury || 0) - (reserve + burnRate);
+  const isAffordable = cost <= (availableTreasury * tolerance);
 
   return {
     isAffordable,
     riskTier,
-    adjustedGold: isAffordable ? rival.gold - cost : rival.gold
+    adjustedTreasury: isAffordable ? (rival.treasury || 0) - cost : (rival.treasury || 0)
   };
 }

@@ -16,12 +16,28 @@ const PROTECT_DAMAGE_PENALTY = 1.1;
 
 // Damage constants
 const DAMAGE_BASE_MIN = 4;
-const DAMAGE_HEAD_MULT = 1.5;
-const DAMAGE_CHEST_MULT = 1.2;
-const DAMAGE_ABDOMEN_MULT = 1.1;
-const DAMAGE_LIMB_MULT = 1.0;
 const DAMAGE_VARIANCE_MIN = 0.70;
 const DAMAGE_VARIANCE_MAX = 1.30;
+
+const LOCATION_DAMAGE_MULT: Record<HitLocation, number> = {
+  head: 1.5,
+  chest: 1.2,
+  abdomen: 1.1,
+  "right arm": 1.0,
+  "left arm": 1.0,
+  "right leg": 1.0,
+  "left leg": 1.0,
+};
+
+const LOCATION_KILL_MULT: Record<HitLocation, number> = {
+  head: 6.0,
+  chest: 3.5,
+  abdomen: 3.5,
+  "right arm": 0.1,
+  "left arm": 0.1,
+  "right leg": 0.1,
+  "left leg": 0.1,
+};
 
 export function protectCovers(protect?: string): string[] {
   if (!protect || protect === "Any" || protect === "none_armor" || protect === "none_helm") return [];
@@ -72,16 +88,9 @@ export function applyProtectMod(damage: number, location: HitLocation, protect?:
 
 export function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {
   const base = damageClass + DAMAGE_BASE_MIN;
-  const locMult =
-    location === "head" ? DAMAGE_HEAD_MULT
-    : location === "chest" ? DAMAGE_CHEST_MULT
-    : location === "abdomen" ? DAMAGE_ABDOMEN_MULT
-    : DAMAGE_LIMB_MULT;
+  const locMult = LOCATION_DAMAGE_MULT[location] ?? 1.0;
   const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
-  // Using Math.floor(base * locMult * variance) but with a tweak for variance
-  // so that (12 * 1.0 * 1.15) = 13.8 -> Math.round is 14, but test expected 14.
-  // Wait, Math.floor(13.8) is 13.
-  // Test expected 14 for 13.8. So it's Math.round!
+  // Using Math.max(1, Math.round(base * locMult * variance)) to preserve test expectations
   return Math.max(1, Math.round(base * locMult * variance));
 }
 
@@ -111,12 +120,8 @@ export function calculateKillWindow(
   if (enduranceRatio < 0.3) threshold += 0.020; 
   else if (enduranceRatio < 0.5) threshold += 0.008;
 
-  // Location factor: Vital spots are deadlier (Blood and Sand Shipment Baseline)
-  let locMult = 1.0;
-  if (location === "head") locMult = 6.0;
-  if (location === "chest" || location === "abdomen") locMult = 3.5;
-  if (location === "right leg" || location === "left leg" || location === "right arm" || location === "left arm") locMult = 0.1;
-
+  // Location factor: Vital spots are deadlier
+  const locMult = LOCATION_KILL_MULT[location] ?? 1.0;
   threshold *= locMult;
 
   // Strategic Risk (AL/OE): Aggression fuels lethality

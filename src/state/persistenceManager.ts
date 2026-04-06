@@ -1,5 +1,5 @@
 import { GameState } from "@/types/game";
-import { saveToSlot } from "./saveSlots";
+import { opfsArchive } from "@/engine/storage/opfsArchive";
 
 /**
  * PersistenceManager
@@ -69,11 +69,11 @@ class PersistenceManager {
       // Use requestIdleCallback if available to avoid blocking main thread frames
       if ('requestIdleCallback' in window) {
         window.requestIdleCallback(async () => {
-          await saveToSlot(slotId, stateToSave);
+          await opfsArchive.archiveHotState(slotId, stateToSave);
           this.finalizeSave();
         });
       } else {
-        await saveToSlot(slotId, stateToSave);
+        await opfsArchive.archiveHotState(slotId, stateToSave);
         this.finalizeSave();
       }
     } catch (error) {

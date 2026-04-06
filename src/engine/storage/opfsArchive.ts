@@ -144,7 +144,7 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async retrieveBoutLog(season: number, boutId: string): Promise<import("@/types/game").GameState | null> {
+  async retrieveBoutLog(season: number, boutId: string): Promise<import("@/types/game").FightSummary | null> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return null;
@@ -232,3 +232,5 @@ export class OPFSArchiveService implements ArchiveService {
      }
   }
 }
+
+export const opfsArchive = new OPFSArchiveService();

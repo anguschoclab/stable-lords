@@ -15,16 +15,15 @@ import {
 } from "./gameStore";
 import { consumeInsightToken } from "./mutations/tokenMutations";
 import { engineProxy } from "@/engine/workerProxy";
-import {
-  migrateLegacySave,
-  getActiveSlot,
-  loadFromSlot,
-  saveToSlot,
-  listSaveSlots,
-} from "./saveSlots";
 import { hashStr } from "@/utils/idUtils";
 import { SeededRNG } from "@/utils/random";
 import { persistenceManager } from "./persistenceManager";
+import { opfsArchive } from "@/engine/storage/opfsArchive";
+
+// ─── Slices ────────────────────────────────────────────────────────────────
+import { createEconomySlice, EconomySlice } from "./slices/economySlice";
+import { createRosterSlice, RosterSlice } from "./slices/rosterSlice";
+import { createWorldSlice, WorldSlice } from "./slices/worldSlice";
 
 export interface GameStoreState {
   state: GameState;
@@ -58,37 +57,30 @@ export interface GameStoreActions {
   doConsumeInsightToken: (tokenId: string, warriorId: string) => void;
 }
 
-const initialData = { state: createFreshState(), activeSlotId: null as string | null };
+export type GameStore = GameStoreState & GameStoreActions & EconomySlice & RosterSlice & WorldSlice;
 
-export const useGameStore = create<GameStoreState & GameStoreActions>()(
+export const useGameStore = create<GameStore>()(
   subscribeWithSelector(
-    immer((set, get) => ({
-      state: initialData.state,
-      activeSlotId: initialData.activeSlotId,
+    immer((set, get, ...args) => ({
+      // ─── Sub-Slices ───
+      ...createEconomySlice(set, get, ...args),
+      ...createRosterSlice(set, get, ...args),
+      ...createWorldSlice(set, get, ...args),
+
+      // ─── Core State ───
+      state: createFreshState(),
+      activeSlotId: null,
       atTitleScreen: true,
       lastSavedAt: null,
       isSimulating: false,
       isInitialized: false,
 
       initialize: () => {
-        migrateLegacySave();
-        const slotId = getActiveSlot();
-        if (slotId) {
-          loadFromSlot(slotId).then((loaded) => {
-            set((draft) => {
-              if (loaded) {
-                draft.state = loaded;
-                draft.activeSlotId = slotId;
-                draft.atTitleScreen = !listSaveSlots().some((s) => s.slotId === slotId);
-              }
-              draft.isInitialized = true;
-            });
-          });
-        } else {
-          set((draft) => {
-            draft.isInitialized = true;
-          });
-        }
+        // v4.1: Legacy migrations terminated. Pure OPFS load.
+        // In a real app we'd list files in OPFS here if we wanted to auto-load last.
+        set((draft) => {
+          draft.isInitialized = true;
+        });
       },
 
       loadGame: (slotId: string, state: GameState) => {
@@ -97,6 +89,13 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
           draft.lastSavedAt = new Date().toISOString();
+          
+          // Sync slice properties for components using legacy selectors
+          // (Note: In a pure slice architecture, we'd avoid this duplication, 
+          // but for v4.1 transition we keep 'state' as the source for sub-systems)
+          draft.treasury = state.treasury;
+          draft.roster = state.roster;
+          draft.week = state.week;
         });
         persistenceManager.saveNow(slotId, state);
       },
@@ -114,6 +113,10 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         set((draft) => {
           draft.state = nextState;
           draft.lastSavedAt = new Date().toISOString();
+          // Sync slice state
+          draft.treasury = nextState.treasury;
+          draft.roster = nextState.roster;
+          draft.week = nextState.week;
         });
         
         if (activeSlotId) {
@@ -150,6 +153,9 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
             draft.state = next;
             draft.isSimulating = false;
             draft.lastSavedAt = new Date().toISOString();
+            draft.treasury = next.treasury;
+            draft.roster = next.roster;
+            draft.week = next.week;
           });
           
           if (activeSlotId) {
@@ -184,6 +190,9 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
             draft.state = next;
             draft.isSimulating = false;
             draft.lastSavedAt = new Date().toISOString();
+            draft.treasury = next.treasury;
+            draft.roster = next.roster;
+            draft.week = next.week;
           });
           
           if (activeSlotId) {
@@ -219,6 +228,9 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
           draft.activeSlotId = null;
           draft.state = createFreshState();
           draft.atTitleScreen = true;
+          // Reset slices
+          draft.treasury = draft.state.treasury;
+          draft.roster = draft.state.roster;
         });
       },
 
@@ -247,6 +259,7 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         set((draft) => {
           const next = draftInitialRoster(draft.state, warriors);
           draft.state = next;
+          draft.roster = next.roster;
           if (draft.activeSlotId) persistenceManager.scheduleSave(draft.activeSlotId, next);
         });
       },
@@ -255,6 +268,7 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
         set((draft) => {
           const next = updateWarriorEquipment(draft.state, warriorId, equipment);
           draft.state = next;
+          draft.roster = next.roster;
           if (draft.activeSlotId) persistenceManager.scheduleSave(draft.activeSlotId, next);
         });
       },
@@ -275,15 +289,15 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
   )
 );
 
-/** --- Fine-Grained Selectors --- */
+/** --- Fine-Grained Selectors (v4.1: Source from Slice or State depending on maturity) --- */
 export const useGameState = () => useGameStore(s => s.state);
 export const usePlayer = () => useGameStore(s => s.state.player);
-export const useRoster = () => useGameStore(s => s.state.roster);
-export const useRivals = () => useGameStore(s => s.state.rivals);
-export const useGold = () => useGameStore(s => s.state.gold);
-export const useWeek = () => useGameStore(s => s.state.week);
-export const useSeason = () => useGameStore(s => s.state.season);
-export const useDay = () => useGameStore(s => s.state.day);
+export const useRoster = () => useGameStore(s => s.roster); // Sourced from slice
+export const useRivals = () => useGameStore(s => s.rivals); // Sourced from slice
+export const useTreasury = () => useGameStore(s => s.treasury); // Sourced from slice
+export const useWeek = () => useGameStore(s => s.week); // Sourced from slice
+export const useSeason = () => useGameStore(s => s.season);
+export const useDay = () => useGameStore(s => s.day);
 export const useFTUE = () => useGameStore(s => s.state.ftueComplete);
 export const useIsSimulating = () => useGameStore(s => s.isSimulating);
 

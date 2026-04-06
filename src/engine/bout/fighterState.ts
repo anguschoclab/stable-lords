@@ -5,7 +5,7 @@ import {
   type BaseSkills,
   type Trainer,
 } from "@/types/game";
-import { DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements } from "@/data/equipment";
+import { DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements, getLoadoutWeight, isOverEncumbered } from "@/data/equipment";
 import { getTrainingBonus } from "@/engine/trainers";
 import { getFavoriteWeaponBonus } from "@/engine/favorites";
 import { type FighterState } from "../combat/resolution";
@@ -57,11 +57,15 @@ export function createFighterState(
     { ST: attrs.ST, DF: attrs.DF, SP: attrs.SP }
   );
 
+  const overweight = isOverEncumbered(equip, derived.encumbrance);
+  const encumbranceIniPenalty = overweight ? -2 : 0;
+  const encumbranceEndMult = overweight ? 1.2 : 1.0;
+
   const effSkills: BaseSkills = {
     ATT: skills.ATT + (trainerMods?.attMod ?? 0) + favWeapon + weaponReq.attPenalty + totalShieldAtt,
     PAR: skills.PAR + (trainerMods?.parMod ?? 0) + totalShieldDef,
     DEF: skills.DEF + (trainerMods?.defMod ?? 0) + totalShieldDef,
-    INI: skills.INI + (trainerMods?.iniMod ?? 0),
+    INI: skills.INI + (trainerMods?.iniMod ?? 0) + encumbranceIniPenalty,
     RIP: skills.RIP,
     DEC: skills.DEC + (trainerMods?.decMod ?? 0),
   };
@@ -85,5 +89,6 @@ export function createFighterState(
     legHits: 0,
     favorites: warrior?.favorites,
     totalFights: warrior?.career ? (warrior.career.wins + warrior.career.losses) : 0,
+    encumbrancePenalty: { iniPenalty: encumbranceIniPenalty, enduranceMult: encumbranceEndMult }
   };
 }

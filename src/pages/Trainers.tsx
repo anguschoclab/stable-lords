@@ -34,10 +34,12 @@ import {
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
 import { TrainerCard } from "@/components/stable/TrainerCard";
+import { canTransact } from "@/utils/economyUtils";
 import { toast } from "sonner";
 
 export default function Trainers() {
   const { state, setState } = useGameStore();
+  const treasury = useGameStore(s => s.treasury);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
   const currentTrainers = useMemo(() => state.trainers ?? [], [state.trainers]);
@@ -62,7 +64,7 @@ export default function Trainers() {
   const hireTrainer = useCallback(
     (trainer: Trainer) => {
       const cost = TIER_COST[trainer.tier as TrainerTier] ?? 50;
-      if ((state.gold ?? 0) < cost) {
+      if (!canTransact(treasury, cost)) {
         toast.error(`Insufficient credits. Access to ${trainer.name} requires ${cost}G.`);
         return;
       }
@@ -70,7 +72,7 @@ export default function Trainers() {
         ...prev,
         trainers: [...(prev.trainers ?? []), trainer],
         hiringPool: (prev.hiringPool ?? []).filter((t) => t.id !== trainer.id),
-        gold: (prev.gold ?? 0) - cost,
+        treasury: prev.treasury - cost,
         ledger: [...(prev.ledger ?? []), {
           week: prev.week,
           label: `Acquisition: ${trainer.name}`,
@@ -80,7 +82,7 @@ export default function Trainers() {
       }));
       toast.success(`${trainer.name} has signed with your stable. Personnel synchronized.`);
     },
-    [state.gold, setState]
+    [treasury, setState]
   );
 
   const fireTrainer = useCallback(
@@ -132,7 +134,7 @@ export default function Trainers() {
              <div className="flex flex-col items-center">
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Personnel Budget</span>
                 <span className="font-mono font-black text-arena-gold text-lg flex items-center gap-1.5 leading-none">
-                   {state.gold} <Coins className="h-3.5 w-3.5" />
+                   {treasury} <Coins className="h-3.5 w-3.5" />
                 </span>
              </div>
           </div>
@@ -318,18 +320,18 @@ export default function Trainers() {
                           <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ACQUISITION_CREDITS</TooltipContent>
                        </Tooltip>
                        
-                       <button
-                          disabled={!canHire || (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50)}
+                        <button
+                          disabled={!canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)}
                           onClick={() => hireTrainer(t)}
                           className={cn(
                             "flex items-center gap-2 px-5 py-1.5 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all",
-                            !canHire || (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50)
+                            !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
                               ? "bg-neutral-900 border border-white/5 text-muted-foreground/40 cursor-not-allowed"
                               : "bg-primary text-white border border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95"
                           )}
                        >
                           <UserPlus className="h-4 w-4" />
-                          {!canHire ? "CAPACITY_FULL" : (state.gold ?? 0) < (TIER_COST[t.tier as TrainerTier] ?? 50) ? "FUNDS_LOCKED" : "Secure_Contract"}
+                          {!canHire ? "CAPACITY_FULL" : !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50) ? "FUNDS_LOCKED" : "Secure_Contract"}
                        </button>
                     </div>
                   }

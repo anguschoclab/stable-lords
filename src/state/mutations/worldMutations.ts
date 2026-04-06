@@ -88,7 +88,7 @@ export function initializeStable(state: GameState, name: string, stableName: str
       name,
       stableName,
     },
-    gold: 500, // Starting gold
+    treasury: 500, // Starting treasury
   };
 }
 
