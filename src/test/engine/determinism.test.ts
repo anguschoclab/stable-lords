@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { describe, it, expect, vi } from "vitest";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { createFreshState } from "@/state/gameStore";
