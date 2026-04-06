@@ -1,149 +1,123 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { useShallow } from 'zustand/react/shallow';
-import { motion, AnimatePresence } from "framer-motion";
-import { Info, X, ChevronRight, AlertTriangle, TrendingDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle, ShieldAlert, Coins, History, Zap, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLocation } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
 
-/* ── Coach Logic ────────────────────────────────────────── */
-
-interface Tip {
+interface CoachWarning {
   id: string;
-  title: string;
-  message: string;
-  priority: number; // Higher is more urgent
-  condition: (state: import("@/types/game").GameState) => boolean;
+  type: "CRITICAL" | "WARNING" | "ADVICE";
+  label: string;
+  description: string;
+  icon: any;
+  color: string;
 }
 
-const GLOBAL_TIPS: Tip[] = [
-  {
-    id: "debt-warning",
-    title: "Fiscal Warning",
-    message: "Your treasury is low! Fighting without enough gold for upkeep will lead to stability penalties. Consider a low-risk bout.",
-    priority: 10,
-    condition: (s) => s.gold < 100,
-  },
-  {
-    id: "injury-risk",
-    title: "Medical Advisory",
-    message: "Multiple warriors are carrying injuries. Forcing them to fight now significantly increases the risk of permanent disability.",
-    priority: 8,
-    condition: (s) => s.roster.filter((w: import("@/types/game").Warrior) => w.injuries.length > 0 && w.status === "Active").length >= 2,
-  },
-  {
-    id: "training-cap",
-    title: "Tactical Limit",
-    message: "Some warriors have reached their attribute caps (25 per stat). Further training in these areas is wasted effort.",
-    priority: 5,
-    condition: (s) => s.roster.some((w: import("@/types/game").Warrior) => Object.values(w.attributes).some((v: number) => v >= 25)),
-  },
-  {
-    id: "recruit-debt",
-    title: "Recruitment Strategy",
-    message: "You have fewer than 3 active warriors. Your rotation is vulnerable. Scout the Orphanage for fresh blood.",
-    priority: 9,
-    condition: (s) => s.roster.filter((w: import("@/types/game").Warrior) => w.status === "Active").length < 3,
-  }
-];
-
 export function CoachOverlay() {
-  const location = useLocation();
-  const { state, coachDismissed, setCoachDismissed } = useGameStore(
-    useShallow((s) => ({
-      state: s.state,
-      coachDismissed: s.state.coachDismissed || [],
-      setCoachDismissed: (ids: string[]) => s.setState({ ...s.state, coachDismissed: ids }),
-    }))
-  );
+  const { state } = useGameStore();
 
-  const [minimized, setMinimized] = useState(false);
+  const warnings = useMemo(() => {
+    const list: CoachWarning[] = [];
 
-  // Determine active tip
-  const activeTip = useMemo(() => {
-    const valid = GLOBAL_TIPS.filter(t => !coachDismissed.includes(t.id) && t.condition(state));
-    return valid.sort((a, b) => b.priority - a.priority)[0];
-  }, [state, coachDismissed]);
+    // 💰 Bankruptcy Check
+    const weeklyUpkeep = (state.roster.length * 10) + (state.trainers.length * 50);
+    if (state.treasury < weeklyUpkeep) {
+      list.push({
+        id: "bankruptcy",
+        type: "CRITICAL",
+        label: "Impending Insolvency",
+        description: `Treasury (${state.treasury}g) cannot cover upkeep (${weeklyUpkeep}g). Disband assets or win a bout immediately.`,
+        icon: Coins,
+        color: "text-destructive border-destructive/20 bg-destructive/10"
+      });
+    }
 
-  if (!activeTip) return null;
+    // 🚑 Injury Check (Fighters assigned to bouts with low health)
+    const activeFighters = state.roster.filter(w => state.arenaHistory.some(f => f.fighterA.id === w.id && !f.result));
+    const injuredActive = activeFighters.filter(w => (w.health || 0) < 30);
+    if (injuredActive.length > 0) {
+      list.push({
+        id: "crit_injury",
+        type: "CRITICAL",
+        label: "Critical Condition",
+        description: `${injuredActive[0].name} is entering the arena with <30% health. Mortality risk is extremely high.`,
+        icon: Activity,
+        color: "text-arena-blood border-arena-blood/20 bg-arena-blood/10"
+      });
+    }
+
+    // ⚖️ Encumbrance Check (Heavy gear on fast style)
+    const mismatchedSprints = state.roster.filter(w => {
+      const isFast = ["LungingAttack", "SlashingAttack"].includes(w.style);
+      const isHeavy = (w.attributes.endurance || 0) < (w.loadout?.weight || 0);
+      return isFast && isHeavy;
+    });
+    if (mismatchedSprints.length > 0) {
+      list.push({
+        id: "encumbrance_mismatch",
+        type: "WARNING",
+        label: "Tactical Mismatch",
+        description: `${mismatchedSprints[0].name} loadout exceeds endurance. High fatigue penalties will apply.`,
+        icon: Zap,
+        color: "text-amber-500 border-amber-500/20 bg-amber-500/10"
+      });
+    }
+
+    return list;
+  }, [state]);
+
+  if (warnings.length === 0) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ x: 300, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 300, opacity: 0 }}
-        className={cn(
-          "fixed bottom-24 right-8 z-50 max-w-sm transition-all duration-300",
-          minimized ? "w-12 h-12" : "w-full"
-        )}
-      >
-        {minimized ? (
-          <Button
-            size="icon"
-            onClick={() => setMinimized(false)}
-            className="rounded-full bg-arena-gold text-black shadow-lg hover:bg-arena-gold/90 border-2 border-black/20"
-            title="Show coach tips"
-            aria-label="Show coach tips"
+    <div className="fixed bottom-6 right-6 z-[100] w-80 space-y-3 pointer-events-none">
+      <AnimatePresence>
+        {warnings.map((w) => (
+          <motion.div
+            key={w.id}
+            initial={{ opacity: 0, x: 50, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+            className="pointer-events-auto"
           >
-            <Info className="w-5 h-5" />
-          </Button>
-        ) : (
-          <div className="bg-glass-card border-l-4 border-arena-gold p-4 shadow-2xl overflow-hidden relative group">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-2 text-arena-gold">
-                  <Info className="w-4 h-4" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Coach Directive</span>
+            <Card className={cn(
+              "border-2 backdrop-blur-xl shadow-2xl relative overflow-hidden",
+              w.color
+            )}>
+              <div className="absolute top-0 left-0 w-1 h-full bg-current opacity-60" />
+              <CardContent className="p-4 flex gap-4">
+                <div className="shrink-0 mt-0.5">
+                  <w.icon className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-display font-bold text-foreground">{activeTip.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {activeTip.message}
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <button 
-                  onClick={() => setMinimized(true)}
-                  className="p-1 hover:bg-white/5 rounded transition-colors text-muted-foreground"
-                  aria-label="Minimize coach tip"
-                  title="Minimize tip"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={() => setCoachDismissed([...coachDismissed, activeTip.id])}
-                  className="p-1 hover:bg-destructive/10 rounded transition-colors text-muted-foreground hover:text-destructive"
-                  aria-label="Dismiss coach tip"
-                  title="Dismiss tip"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Stable Lords Management OS</span>
-              <button 
-                onClick={() => setMinimized(true)}
-                className="text-[9px] font-bold text-arena-gold uppercase tracking-tighter hover:underline"
-              >
-                Hide Advice
-              </button>
-            </div>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                      {w.label}
+                    </span>
+                    <Badge variant="outline" className="text-[7px] font-black tracking-widest px-1 py-0 border-current opacity-40">
+                      {w.type}
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] font-medium leading-relaxed opacity-90">
+                    {w.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
 
-            {/* Subtle progress/glow anim */}
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-arena-gold/20">
-               <motion.div 
-                 initial={{ width: "0%" }}
-                 animate={{ width: "100%" }}
-                 transition={{ duration: 10, ease: "linear" }}
-                 className="h-full bg-arena-gold shadow-[0_0_10px_rgba(var(--arena-gold-rgb),0.5)]"
-               />
-            </div>
-          </div>
-        )}
-      </motion.div>
-    </AnimatePresence>
+function Badge({ children, className, variant }: any) {
+  return (
+    <span className={cn(
+      "px-2 py-0.5 rounded text-white text-[10px] font-black",
+      className
+    )}>
+      {children}
+    </span>
   );
 }
