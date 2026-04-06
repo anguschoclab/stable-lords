@@ -14,6 +14,7 @@ describe("pipeline/health", () => {
 
   describe("computeHealthImpact", () => {
     it("should handle warriors with missing, null, or string-only injuries gracefully", () => {
+      vi.spyOn(injuriesModule, "tickInjuries");
       const mockState = {
         week: 5,
         roster: [

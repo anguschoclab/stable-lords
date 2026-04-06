@@ -104,8 +104,21 @@ describe('OPFS Archival System', () => {
     });
 
     it('Test 2.2: archiveBoutLog successfully writes stringified JSON', async () => {
-      const seasonHandle = { getDirectoryHandle: vi.fn() } as unknown as FileSystemDirectoryHandle;
-      const boutsHandle = { getFileHandle: vi.fn() } as unknown as FileSystemFileHandle;
+      const seasonHandle = {
+        kind: 'directory',
+        name: 'season_1',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
+
+      const boutsHandle = {
+        kind: 'directory',
+        name: 'bouts',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
 
       const writeMock = vi.fn();
       const closeMock = vi.fn();
@@ -129,10 +142,21 @@ describe('OPFS Archival System', () => {
     });
 
     it('Test 2.3: Overwrite Protection', async () => {
-      const seasonHandle = { getDirectoryHandle: vi.fn() } as unknown as FileSystemDirectoryHandle;
+      const seasonHandle = {
+        kind: 'directory',
+        name: 'season_1',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
+
       const boutsHandle = {
-        getFileHandle: vi.fn().mockResolvedValue({}) // Resolves meaning file exists
-      } as unknown;
+        kind: 'directory',
+        name: 'bouts',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn().mockResolvedValue({}), // Resolves meaning file exists
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
@@ -214,8 +238,21 @@ describe('OPFS Archival System', () => {
   describe('Suite 5: Fallback & Quota Management', () => {
     it('Test 5.1: Graceful degradation on QuotaExceededError', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const seasonHandle = { getDirectoryHandle: vi.fn() } as unknown as FileSystemDirectoryHandle;
-      const boutsHandle = { getFileHandle: vi.fn() } as unknown as FileSystemFileHandle;
+      const seasonHandle = {
+        kind: 'directory',
+        name: 'season_1',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
+
+      const boutsHandle = {
+        kind: 'directory',
+        name: 'bouts',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
 
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
@@ -237,8 +274,21 @@ describe('OPFS Archival System', () => {
     });
 
     it('Test 5.2: archiveBoutLog throws ArchiveConflictError on NoModificationAllowedError', async () => {
-      const seasonHandle = { getDirectoryHandle: vi.fn() } as unknown as FileSystemDirectoryHandle;
-      const boutsHandle = { getFileHandle: vi.fn() } as unknown as FileSystemFileHandle;
+      const seasonHandle = {
+        kind: 'directory',
+        name: 'season_1',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
+
+      const boutsHandle = {
+        kind: 'directory',
+        name: 'bouts',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
 
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
@@ -258,8 +308,21 @@ describe('OPFS Archival System', () => {
 
     it('Test 5.3: archiveBoutLog fails gracefully on unknown generic errors', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const seasonHandle = { getDirectoryHandle: vi.fn() } as unknown as FileSystemDirectoryHandle;
-      const boutsHandle = { getFileHandle: vi.fn() } as unknown as FileSystemFileHandle;
+      const seasonHandle = {
+        kind: 'directory',
+        name: 'season_1',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
+
+      const boutsHandle = {
+        kind: 'directory',
+        name: 'bouts',
+        getDirectoryHandle: vi.fn(),
+        getFileHandle: vi.fn(),
+        values: vi.fn()
+      } as unknown as FileSystemDirectoryHandle;
 
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({

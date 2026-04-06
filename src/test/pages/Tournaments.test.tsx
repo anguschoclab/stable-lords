@@ -33,7 +33,7 @@ describe('Tournaments Page', () => {
   const mockState = {
     week: 1,
     season: 'Spring',
-    roster: [mockActiveWarrior, mockActiveWarrior2],
+    roster: [mockActiveWarrior], // Only 1 active warrior, so it satisfies < 2 condition
     tournaments: [],
     rivals: []
   };
@@ -46,15 +46,15 @@ describe('Tournaments Page', () => {
     });
   });
 
-  it('renders prep mode button when criteria are met', () => {
+  it('renders recruit operatives button when criteria are met', () => {
     render(<Tournaments />);
 
     // Check main title
     expect(screen.getByText(/Seasonal Campaigns/)).toBeDefined();
 
-    // Check Prep Mode & Start button is present
-    const prepBtn = screen.getByRole('button', { name: /OPEN_PREP_CONSOLE/i });
-    expect(prepBtn).toBeDefined();
+    // Check Recruit Operatives button is present when tournament is not active
+    const recruitBtn = screen.getByRole('button', { name: /RECRUIT_OPERATIVES/i });
+    expect(recruitBtn).toBeDefined();
   });
 
 

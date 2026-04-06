@@ -111,25 +111,11 @@ export class OPFSArchiveService implements ArchiveService {
 
       let fileHandle;
       try {
-        const dirHandle = await this.getDirectory(season, 'bouts');
-        if (!dirHandle) return;
-
-        const fileName = `${boutId}.json`;
-
-        let fileHandle;
-        try {
-          fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
-          if (fileHandle) {
-            throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
-          }
-        } catch (error: any) {
-           if (error instanceof ArchiveConflictError) {
-               throw error;
-           }
-           // File doesn't exist, proceed
-           fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
+        if (fileHandle) {
+          throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
         }
-      } catch (error) {
+      } catch (error: any) {
          if (error instanceof ArchiveConflictError) {
              throw error;
          }
@@ -154,6 +140,7 @@ export class OPFSArchiveService implements ArchiveService {
       if ((error as Error)?.name === 'NoModificationAllowedError') {
         throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
       }
+      console.error('Unknown error during bout log archival', error);
     }
   }
 

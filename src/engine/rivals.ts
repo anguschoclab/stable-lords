@@ -94,6 +94,9 @@ export function generateRivalStables(count: number, seed: number, week: number =
       const attrs = biasedAttrs(rng, tmpl.attrBias, catchupStats);
       
       const wId = `rival_w_${i}_${j}`;
+      // Wrap rng function into a mock SeededRNG object for makeWarrior
+      const rngObj = { next: rng, pick: (arr: any[]) => arr[Math.floor(rng() * arr.length)] } as SeededRNG;
+
       const warrior = makeWarrior(
         wId,
         wName, 
@@ -104,7 +107,7 @@ export function generateRivalStables(count: number, seed: number, week: number =
           popularity: Math.floor(rng() * 5),
           stableId
         },
-        rng
+        rngObj
       );
       
       warriors.push(warrior);
