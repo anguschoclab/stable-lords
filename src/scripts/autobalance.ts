@@ -80,7 +80,7 @@ async function main() {
   // If it's below 2%, buff it slightly.
   const critDamageMatch = constantsContent.match(/export const CRIT_DAMAGE_MULT = ([0-9.]+);/);
   if (critDamageMatch) {
-    let critDamageMult = parseFloat(critDamageMatch[1]);
+    const critDamageMult = parseFloat(critDamageMatch[1]);
     let newCrit = critDamageMult;
 
     if (mortalityRate > 0.10) {

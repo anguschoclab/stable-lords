@@ -433,7 +433,14 @@ export function generateSeasonSummary(
     if (f.winner === "A") styleWins[f.styleA] = (styleWins[f.styleA] ?? 0) + 1;
     if (f.winner === "D") styleWins[f.styleD] = (styleWins[f.styleD] ?? 0) + 1;
   }
-  const topStyle = Object.entries(styleWins).sort(([, a], [, b]) => b - a)[0];
+
+  // ⚡ Bolt: Use a single-pass linear scan to track the maximum value, avoiding O(N log N) operations and unnecessary array allocations.
+  let topStyle: [string, number] | undefined = undefined;
+  for (const [style, wins] of Object.entries(styleWins)) {
+    if (!topStyle || wins > topStyle[1]) {
+      topStyle = [style, wins];
+    }
+  }
 
   const headline = `${season} Season in Review: ${total} Bouts, ${kills} Deaths`;
   const body = [
