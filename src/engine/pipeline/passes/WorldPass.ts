@@ -18,7 +18,8 @@ export function rollWeather(rng: SeededRNG): WeatherType {
   if (roll < 0.85) return "Rainy";
   if (roll < 0.90) return "Scalding";
   if (roll < 0.95) return "Blazing Sun";
-  return "Drafty";
+  if (roll < 0.98) return "Drafty";
+  return "Blood Moon";
 }
 
 export function runWorldPass(state: GameState, rootRng?: SeededRNG): GameState {

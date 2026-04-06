@@ -89,6 +89,12 @@ export function simulateFight(
   const fA = createFighterState("A", planA, warriorA, trainers);
   const fD = createFighterState("D", planD, warriorD, trainers);
 
+  if (weather === "Blood Moon") {
+    // Blood Moon drives fighters to a frenzy
+    fA.plan.killDesire = Math.min(10, (fA.plan.killDesire || 5) + 3);
+    fD.plan.killDesire = Math.min(10, (fD.plan.killDesire || 5) + 3);
+  }
+
   const modsA = trainers ? getTrainerMods(trainers, planA.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
   const modsD = trainers ? getTrainerMods(trainers, planD.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
 

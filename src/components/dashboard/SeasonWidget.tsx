@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim } from "lucide-react";
+import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim, Moon } from "lucide-react";
 import { useGameStore } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Progress } from "@/components/ui/progress";
@@ -42,6 +42,10 @@ export function SeasonWidget() {
     WeatherIcon = Sun;
     weatherColor = "text-orange-500";
     weatherBg = "bg-orange-500/10 border-orange-500/20";
+  } else if (weather === "Blood Moon") {
+    WeatherIcon = Moon;
+    weatherColor = "text-red-600";
+    weatherBg = "bg-red-600/10 border-red-600/30 glow-neon-red";
   } else if (weather === "Overcast") {
     WeatherIcon = Cloud;
     weatherColor = "text-gray-400";
@@ -138,6 +142,7 @@ export function SeasonWidget() {
                    <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-[200px]">
                       {weather === "Blazing Sun" ? "30% more stamina drain in combat." :
                        weather === "Scalding" ? "20% more stamina drain in combat." :
+                       weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality." :
                        weather === "Drafty" ? "10% less stamina drain in combat." :
                        weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
                        "Standard atmospheric conditions."}

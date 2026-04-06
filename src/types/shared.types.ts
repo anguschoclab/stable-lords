@@ -162,7 +162,7 @@ export type ScoutQuality = "Basic" | "Detailed" | "Expert";
 
 // ─── Weather Types ────────────────────────────────────────────────────────
 
-export type WeatherType = "Clear" | "Rainy" | "Scalding" | "Drafty" | "Overcast" | "Blazing Sun";
+export type WeatherType = "Clear" | "Rainy" | "Scalding" | "Drafty" | "Overcast" | "Blazing Sun" | "Blood Moon";
 
 export interface DeathEvent {
   boutId: string;
