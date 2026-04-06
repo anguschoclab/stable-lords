@@ -10,6 +10,7 @@ import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
+import { EditableText } from "@/components/ui/EditableText";
 
 // Extracted Widgets
 import { SeasonWidget } from "@/components/dashboard/SeasonWidget";
@@ -158,7 +159,22 @@ export default function Dashboard() {
     <div className="space-y-12 max-w-7xl mx-auto">
       <PageHeader 
         title="Arena Hub"
-        subtitle={`COMMAND CENTER // ${state.player.stableName} // ${state.player.name}`}
+        subtitle={
+          <div className="flex items-center gap-4 flex-wrap">
+             <span>COMMAND CENTER //</span>
+             <EditableText 
+               value={state.player.stableName} 
+               onSave={(val) => state.renameStable(val)} 
+               label="Stable Name"
+             />
+             <span className="opacity-40">//</span>
+             <EditableText 
+               value={state.player.name} 
+               onSave={(val) => state.renamePlayer(val)} 
+               label="Owner Name"
+             />
+          </div>
+        }
         icon={LayoutDashboard}
         actions={
           <div className="flex flex-col md:flex-row items-center gap-4">
