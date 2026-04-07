@@ -115,7 +115,7 @@ export function ScoutReportDetails({ report, warriorName, gold, onScout }: Scout
                  <Info className="h-4 w-4 text-muted-foreground/40" />
               </button>
            </TooltipTrigger>
-           <TooltipContent className="w-full max-w-xs text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10 uppercase tracking-widest">
+           <TooltipContent className="w-full max-w-60 text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10 uppercase tracking-widest">
               Deep scan report established for the current combat cycle. Intelligence degrades over time.
            </TooltipContent>
         </Tooltip>
