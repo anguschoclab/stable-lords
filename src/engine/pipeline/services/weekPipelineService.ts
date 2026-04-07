@@ -48,16 +48,18 @@ export function advanceWeek(state: GameState): GameState {
 
   const rootRng = new SeededRNG(nextYear * 52 + nextWeek * 7919 + 101);
 
-  // 2. Deterministic Domain Impacts
-  let newState = executeDomainImpacts(state, nextWeek, rootRng);
-
+  // 2. Core Domain Passes (Training, Aging, Health, Economy)
+  let newState = runWarriorPass(state, rootRng);
+  newState = runEconomyPass(newState, rootRng);
+  
   // 3. World & System Transitions
   newState = executeWorldTransitions(newState, rootRng, nextWeek);
 
   // 4. Strategic & AI Activity
   newState = executeRivalActivity(newState, nextWeek, rootRng);
 
-  // 5. Narrative & Historical Archiving
+  // 5. Events & Narrative
+  newState = runEventPass(newState, nextWeek, rootRng); // Use rootRng for consistency
   newState = executeNarrativePass(newState, currentWeek, nextWeek);
 
   // 6. Completion & Persistence
@@ -69,49 +71,10 @@ export function advanceWeek(state: GameState): GameState {
   return archiveWeekLogs(newState);
 }
 
-/** ─── Coordinator Phases ─────────────────────────────────────────────────── */
 
-function executeDomainImpacts(state: GameState, nextWeek: number, rng: SeededRNG): GameState {
-  const trainingImpactRaw = computeTrainingImpact(state);
-  const { impact: trainingImpact, seasonalGrowth, results: trainingResults } = trainingImpactToStateImpact(state, trainingImpactRaw);
-  
-  const economyImpact = computeEconomyImpact(state);
-  const agingImpact = computeAgingImpact(state);
-  const healthImpact = computeHealthImpact(state);
-
-  const impacts: StateImpact[] = [
-    trainingImpact, 
-    economyImpact, 
-    agingImpact, 
-    healthImpact,
-  ];
-
-  const newState = resolveImpacts(state, impacts);
-  newState.seasonalGrowth = seasonalGrowth;
-
-  // Generate Report
-  const report: import("@/types/state.types").SimulationReport = {
-    id: rng.uuid("pro"), // Profile/Report ID
-    week: state.week,
-    treasuryChange: economyImpact.treasuryDelta ?? 0,
-    trainingGains: trainingResults
-      .filter(r => r.attr && r.gain)
-      .map(r => ({
-        warriorId: r.warriorId,
-        warriorName: state.roster.find(w => w.id === r.warriorId)?.name || "Unknown",
-        attr: r.attr!,
-        gain: r.gain!
-      })),
-    agingEvents: agingImpact.newsletterItems?.[0]?.items || [],
-    healthEvents: healthImpact.newsletterItems?.[0]?.items || [],
-  };
-  newState.lastSimulationReport = report;
-
-  return newState;
-}
 
 function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: number): GameState {
-  let newState = runWorldPass(state, rng);
+  let newState = runWorldPass(state, rng, nextWeek);
   const nextSeason = newState.season;
 
   newState = runRankingsPass(newState);
@@ -138,7 +101,7 @@ function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: num
     }];
   }
 
-  newState = runPromoterLifecyclePass(newState);
+  newState = runPromoterLifecyclePass(newState, rng);
   return newState;
 }
 
@@ -187,8 +150,6 @@ function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG
 
 function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: number): GameState {
   let newState = state;
-  newState = runEconomyPass(newState);
-  newState = runEventPass(newState, nextWeek, new SeededRNG(nextWeek * 101));
 
   // Gazette
   const weekFights = getFightsForWeek(newState.arenaHistory, currentWeek);

@@ -18,8 +18,7 @@ import { type StateImpact } from "./impacts";
 import { SeededRNG } from "@/utils/random";
 
 /** Compute the aging impact of the current week. */
-export function computeAgingImpact(state: GameState): StateImpact {
-  const rng = new SeededRNG(state.week * 997 + 3);
+export function computeAgingImpact(state: GameState, rng: SeededRNG): StateImpact {
   const ageEvents: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const toRetire: string[] = [];
@@ -71,13 +70,14 @@ export function computeAgingImpact(state: GameState): StateImpact {
 
   return {
     rosterUpdates,
-    newsletterItems: ageEvents.length > 0 ? [{ week: state.week, title: "Aging Report", items: ageEvents }] : []
+    newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid("led"), week: state.week, title: "Aging Report", items: ageEvents }] : []
   };
 }
 
 /** Process aging for all warriors at week-end. Legacy wrapper. */
 export function processAging(state: GameState): GameState {
-  const impact = computeAgingImpact(state);
+  const rng = new SeededRNG(state.week * 997 + 3);
+  const impact = computeAgingImpact(state, rng);
   let roster = [...state.roster];
   const retired = [...state.retired];
 

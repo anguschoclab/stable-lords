@@ -22,13 +22,9 @@ export function rollWeather(rng: SeededRNG): WeatherType {
   return "Blood Moon";
 }
 
-export function runWorldPass(state: GameState, rootRng?: SeededRNG): GameState {
-  const nextWeek = state.week + 1;
+export function runWorldPass(state: GameState, rng: SeededRNG, nextWeek: number): GameState {
   const nextSeason = computeNextSeason(nextWeek);
-  
-  // Deterministic weather roll - use injected RNG or sub-seed
-  const weatherRng = rootRng?.clone() ?? new SeededRNG(nextWeek * 1337 + 42);
-  const nextWeather = rollWeather(weatherRng);
+  const nextWeather = rollWeather(rng);
 
   return {
     ...state,

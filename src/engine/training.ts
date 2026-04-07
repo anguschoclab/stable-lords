@@ -89,7 +89,8 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
 
 export function processTraining(state: GameState): GameState {
   const impact = computeTrainingImpact(state);
-  const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact);
+  const rng = new SeededRNG(state.week * 555 + 1); // Legacy wrapper seed
+  const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact, rng);
   
   const newState = { ...state, seasonalGrowth, trainingAssignments: [] };
   if (stateImpact.newsletterItems) {
@@ -106,13 +107,25 @@ export function processTraining(state: GameState): GameState {
 /**
  * Convert a TrainingImpact to a generic StateImpact for the pipeline.
  */
-export function trainingImpactToStateImpact(state: GameState, impact: TrainingImpact): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[]; results: TrainingResult[] } {
+export function trainingImpactToStateImpact(
+  state: GameState, 
+  impact: TrainingImpact, 
+  rng: SeededRNG
+): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[]; results: TrainingResult[] } {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   
   impact.updatedRoster.forEach(w => {
     const original = state.roster.find(r => r.id === w.id);
-    if (original !== w) {
-      rosterUpdates.set(w.id, w);
+    if (original && original !== w) {
+      // 🛠️ 1.0 Hardening: Return ONLY changed fields to avoid overwriting Aging/Health passes
+      const delta: Partial<Warrior> = {
+        baseSkills: w.baseSkills,
+        derivedStats: w.derivedStats,
+        fatigue: w.fatigue ?? 0,
+        injuries: w.injuries, // 🩹 Essential fix: include injuries in delta!
+      };
+      
+      rosterUpdates.set(w.id, delta);
     }
   });
 
@@ -124,6 +137,7 @@ export function trainingImpactToStateImpact(state: GameState, impact: TrainingIm
     impact: {
       rosterUpdates,
       newsletterItems: newsItems.length > 0 ? [{
+        id: rng.uuid("nws"), // 🆔 Schema compliance: add ID
         week: state.week,
         title: "Training Report",
         items: newsItems
