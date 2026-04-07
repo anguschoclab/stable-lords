@@ -9,8 +9,8 @@
  * - Roster integrity
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import { createFreshState, advanceWeek } from "@/engine/factories";
-import { FightingStyle, type GameState, type Warrior } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { GameState, Warrior } from "@/types/state.types";
 import { computeWarriorStats } from "@/engine/skillCalc";
 
 function makeWarrior(id: string, name: string, overrides?: Partial<Warrior>): Warrior {

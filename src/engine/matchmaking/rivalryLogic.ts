@@ -1,4 +1,5 @@
-import type { Rivalry, FightSummary } from "@/types/game";
+import type { Rivalry } from "@/types/state.types";
+import type { FightSummary } from "@/types/combat.types";
 import { MatchScoringService, calculateRivalryScore } from "../matchmakingServices";
 import { getStablePairKey } from "@/utils/keyUtils";
 import { SeededRNG } from "@/utils/random";
@@ -39,6 +40,8 @@ export function updateRivalriesFromBouts(
     pairs.set(key, entry);
   }
   
+  const rng = new SeededRNG(seed ?? (week * 7919));
+
   for (const [_, data] of pairs.entries()) {
     const existing = rivalries.find(r =>
       (r.stableIdA === data.a && r.stableIdB === data.b) ||
@@ -55,7 +58,7 @@ export function updateRivalriesFromBouts(
         isRecentStyleMatch: false,
         isChallenged: false,
         isAvoided: false,
-        rng: () => new SeededRNG(seed ?? (week * 7919 + data.a.length + data.dFame)).next()
+        rng: () => rng.next()
     }) > 200 ? 2 : 1;
     
     if (existing) {
@@ -66,6 +69,7 @@ export function updateRivalriesFromBouts(
       }
     } else if (data.bouts >= 1) { // Any clash can start a rivalry
       rivalries.push({
+        id: rng.uuid("rivalry"),
         stableIdA: data.a,
         stableIdB: data.b,
         intensity: Math.min(5, intensityDelta + (rawDelta - 1)),
