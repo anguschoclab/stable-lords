@@ -149,11 +149,11 @@ export function makeWarrior(
     state.rivals = pool.slice(0, 4).map((name, i) => {
       const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
       return {
-        id: generateId(rng, "stb"),
+        id: generateId(rng, "stable"),
         fame: 100,
         treasury: 1500 + Math.floor(rng.next() * 1000),
         owner: {
-          id: generateId(rng, "own"),
+          id: generateId(rng, "owner"),
           name: `Lord ${name.split(" ")[0]}`,
           stableName: name,
           personality: PERSONALITIES[personalityIndex],
@@ -185,7 +185,7 @@ export function makeWarrior(
         WT: attrBase(), WL: attrBase(), SP: attrBase(), DF: attrBase()
       };
       
-      const baseWarrior = makeWarrior(generateId(rng, "war"), `Recruit ${i + 1}`, style, attrs, {}, rng);
+      const baseWarrior = makeWarrior(generateId(rng, "warrior"), `Recruit ${i + 1}`, style, attrs, {}, rng);
       return {
         ...baseWarrior,
         cost: 150 + Math.floor(rng.next() * 150),

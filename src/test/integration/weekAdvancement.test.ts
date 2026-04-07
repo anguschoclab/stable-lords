@@ -9,6 +9,7 @@
  * - Roster integrity
  */
 import { describe, it, expect, beforeEach } from "vitest";
+import { createFreshState, advanceWeek } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
 import type { GameState, Warrior } from "@/types/state.types";
 import { computeWarriorStats } from "@/engine/skillCalc";
