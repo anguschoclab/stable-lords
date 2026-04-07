@@ -324,7 +324,7 @@ function generateHeadline(
 
 function generateBody(
   rng: SeededRNG,
-  tone: any,
+  tone: { adjectives: string[]; opener: string[]; closer: string[] },
   fights: FightSummary[],
   killsCount: number,
   mood: CrowdMoodType,
