@@ -1,13 +1,13 @@
-import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
+import { type FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import { getItemById } from "@/data/equipment";
+import narrativeContent from "@/data/narrativeContent.json";
+
 import {
   HIT_LOC_VARIANTS,
   STYLE_PBP_DESC,
   HELM_DESCS,
-  ATTACK_TEMPLATES,
   INI_FEINT_TEMPLATES,
   EVEN_STATUS,
-  KILL_TEMPLATES,
   STOPPAGE_TEMPLATES,
   EXHAUSTION_TEMPLATES,
   POPULARITY_TEMPLATES,
@@ -24,22 +24,20 @@ import {
   MASTERY_TEMPLATES,
   SUPER_FLASHY_TEMPLATES,
 } from "./narrative/narrativeData";
+
 import {
   pick,
   szToHeight,
   getWeaponDisplayName,
   getWeaponType,
 } from "./narrative/narrativeUtils";
+
 import {
   KO_TEMPLATES,
   ARMOR_INTRO_VERBS,
   WEAPON_INTRO_VERBS,
   BATTLE_OPENERS,
-  PARRY_TEMPLATES,
-  PARRY_SHIELD_TEMPLATES,
-  DODGE_TEMPLATES,
   COUNTERSTRIKE_TEMPLATES,
-  HIT_TEMPLATES,
   PARRY_BREAK_TEMPLATES,
   CROWD_REACTIONS_POSITIVE,
   CROWD_REACTIONS_NEGATIVE,
@@ -50,6 +48,75 @@ import {
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 type RNG = () => number;
+
+interface CombatContext {
+  attacker?: string;
+  defender?: string;
+  weapon?: string;
+  bodyPart?: string;
+}
+
+// ─── Core Narrative Engine (Bard of the Blood Sands) ─────────────────────────
+
+/**
+ * Replaces canonical tokens (%A, %D, %W, %BP) with contextual values.
+ */
+function interpolateTemplate(template: string, ctx: CombatContext): string {
+  return template
+    .replace(/%A/g, ctx.attacker || "The warrior")
+    .replace(/%D/g, ctx.defender || "the opponent")
+    .replace(/%W/g, ctx.weapon || "weapon")
+    .replace(/%BP/g, ctx.bodyPart || "body");
+}
+
+/**
+ * Maps damage/health ratio to mechanical severity categories.
+ */
+/**
+ * Maps damage/health ratio to mechanical severity categories.
+ * Now supports the expanded 6-tier Strike system.
+ */
+function getStrikeSeverity(
+  damage: number, 
+  maxHp: number, 
+  isFatal: boolean, 
+  isCrit: boolean, 
+  isFavorite: boolean,
+  fame: number
+): "glancing" | "solid" | "mastery" | "critical_human" | "critical_supernatural" | "fatal" {
+  if (isFatal) return "fatal";
+  
+  // Crits & Super Flashy (Big Damage > 25% HP)
+  const ratio = damage / maxHp;
+  if (isCrit || ratio >= 0.25) {
+    return fame >= 100 ? "critical_supernatural" : "critical_human";
+  }
+
+  // Flashy (Mastery via Favorite Weapon)
+  if (isFavorite) return "mastery";
+
+  // Standard
+  if (ratio >= 0.10) return "solid";
+  return "glancing";
+}
+
+/**
+ * Safely picks a template from the JSON archive or returns a generic fallback.
+ */
+function getFromArchive(rng: RNG, path: string[]): string {
+  try {
+    let current: any = narrativeContent;
+    for (const key of path) {
+      current = current[key];
+    }
+    if (Array.isArray(current) && current.length > 0) {
+      return pick(rng, current);
+    }
+  } catch (e) {
+    console.error(`Narrative Archive Error: Missing path ${path.join(".")}`);
+  }
+  return "A fierce exchange occurs."; // Ultimate fallback
+}
 
 // ─── Hit Location Display ───────────────────────────────────────────────────
 
@@ -115,46 +182,85 @@ export function battleOpener(rng: RNG): string {
 
 // ─── Attack Narration ───────────────────────────────────────────────────────
 
+/**
+ * Refactored to use narrativeContent.json and dynamic interpolation.
+ */
 export function narrateAttack(rng: RNG, attackerName: string, weaponId?: string, isMastery?: boolean): string {
-  const wType = getWeaponType(weaponId);
   const wName = getWeaponDisplayName(weaponId);
 
-  if (isMastery && MASTERY_TEMPLATES[wType]) {
-    const template = pick(rng, MASTERY_TEMPLATES[wType]);
-    return template.replace(/%N/g, attackerName).replace(/%W/g, wName);
-  }
+  // Use the new architecture for generic attacks/swings (Whiffs)
+  const template = getFromArchive(rng, ["attacks", "whiff"]);
+  return interpolateTemplate(template, {
+    attacker: attackerName,
+    weapon: wName
+  });
+}
 
-  const template = pick(rng, ATTACK_TEMPLATES[wType]);
-  return template.replace(/%N/g, attackerName).replace(/%W/g, wName);
+export function narratePassive(rng: RNG, style: FightingStyle, actorName: string): string {
+  const template = getFromArchive(rng, ["passives", style]);
+  return interpolateTemplate(template, { attacker: actorName });
 }
 
 export function narrateParry(rng: RNG, defenderName: string, weaponId?: string): string {
   const wName = getWeaponDisplayName(weaponId);
   const isShield = weaponId && ["small_shield", "medium_shield", "large_shield"].includes(weaponId);
-  return pick(rng, isShield ? PARRY_SHIELD_TEMPLATES : PARRY_TEMPLATES)
-    .replace(/%D/g, defenderName)
-    .replace(/%W/g, wName);
+  const type = isShield ? "shield" : "weapon";
+
+  const template = getFromArchive(rng, ["defenses", type, "success"]);
+  return interpolateTemplate(template, { defender: defenderName, weapon: wName });
 }
 
 export function narrateDodge(rng: RNG, defenderName: string): string {
-  return pick(rng, DODGE_TEMPLATES).replace(/%D/g, defenderName);
+  const template = getFromArchive(rng, ["defenses", "dodge", "success"]);
+  return interpolateTemplate(template, { defender: defenderName });
 }
 
 export function narrateCounterstrike(rng: RNG, name: string): string {
   return pick(rng, COUNTERSTRIKE_TEMPLATES).replace(/%D/g, name);
 }
 
-export function narrateHit(rng: RNG, defenderName: string, location: string, isMastery?: boolean, isSuperFlashy?: boolean, attackerName?: string, weaponId?: string): string {
+/**
+ * The primary mechanical driver for combat flavor.
+ * Expanded for Tiered Mastery, Supernatural Evolution, and Flashy logic.
+ */
+export function narrateHit(
+  rng: RNG, 
+  defenderName: string, 
+  location: string, 
+  isMastery?: boolean, 
+  isSuperFlashy?: boolean, 
+  attackerName?: string, 
+  weaponId?: string,
+  damage?: number,
+  maxHp?: number,
+  isFatal?: boolean,
+  attackerFame?: number,
+  isFavorite?: boolean
+): string {
   const richLoc = richHitLocation(rng, location);
   const wName = getWeaponDisplayName(weaponId);
+  const wType = getWeaponType(weaponId);
 
-  if (isSuperFlashy) {
-    const template = pick(rng, SUPER_FLASHY_TEMPLATES);
-    return template.replace(/%N/g, attackerName || "The warrior").replace(/%W/g, wName).replace(/%D/g, defenderName).replace(/%L/g, richLoc);
-  }
+  // 1. Determine severity using full metadata
+  const severity = getStrikeSeverity(
+    damage || 0, 
+    maxHp || 100, 
+    isFatal || false, 
+    isSuperFlashy || false, 
+    isFavorite || false,
+    attackerFame || 0
+  );
 
-  const template = pick(rng, HIT_TEMPLATES);
-  return template.replace(/%D/g, defenderName).replace(/%L/g, richLoc);
+  // 2. Fetch from JSON archive
+  const template = getFromArchive(rng, ["strikes", wType, severity]);
+
+  // 3. Interpolate
+  return interpolateTemplate(template, {
+    attacker: attackerName,
+    defender: defenderName,
+    weapon: wName,
+    bodyPart: richLoc
+  });
 }
 
 export function narrateParryBreak(rng: RNG, attackerName: string, weaponId?: string): string {
@@ -205,16 +311,30 @@ export function minuteStatusLine(rng: RNG, minute: number, nameA: string, nameD:
 
 // ─── Post-Bout ──────────────────────────────────────────────────────────────
 
-export function narrateBoutEnd(rng: RNG, by: string, winnerName: string, loserName: string): string[] {
-  let templates: string[];
-  switch (by) {
-    case "Kill": templates = KILL_TEMPLATES; break;
-    case "KO": templates = KO_TEMPLATES; break;
-    case "Stoppage": templates = STOPPAGE_TEMPLATES; break;
-    case "Exhaustion": templates = EXHAUSTION_TEMPLATES; break;
-    default: return [`${winnerName} is the victor of the match!`];
+export function narrateBoutEnd(rng: RNG, by: string, winnerName: string, loserName: string, weaponId?: string): string[] {
+  const wName = getWeaponDisplayName(weaponId);
+  const wType = getWeaponType(weaponId);
+  
+  // Normalized type mapping
+  const categoryMap: Record<string, string> = {
+    "Kill": "Kill",
+    "KO": "KO",
+    "Stoppage": "Stoppage",
+    "Exhaustion": "Exhaustion"
+  };
+
+  const cat = categoryMap[by] || "KO";
+  const conclusionTemplate = getFromArchive(rng, ["conclusions", cat]);
+  const conclusion = interpolateTemplate(conclusionTemplate, { attacker: winnerName, defender: loserName, weapon: wName });
+
+  // KILLER REDUNDANCY: Prepend the fatal blow description if it's a kill
+  if (cat === "Kill") {
+     const fatalBlowTemplate = getFromArchive(rng, ["strikes", wType, "fatal"]);
+     const fatalBlow = interpolateTemplate(fatalBlowTemplate, { attacker: winnerName, defender: loserName, weapon: wName });
+     return [fatalBlow, conclusion];
   }
-  return pick(rng, templates).replace(/%A/g, winnerName).replace(/%D/g, loserName).split("\n");
+  
+  return [conclusion];
 }
 
 export function popularityLine(name: string, popDelta: number): string | null {
@@ -249,12 +369,7 @@ export function pressingLine(rng: RNG, name: string): string {
 }
 
 export function narrateInsightHint(rng: RNG, attribute: string): string | null {
-  if (rng() > 0.4) return null;
-  switch (attribute) {
-    case 'ST': return pick(rng, INSIGHT_ST_HINTS);
-    case 'SP': return pick(rng, INSIGHT_SP_HINTS);
-    case 'DF': return pick(rng, INSIGHT_DF_HINTS);
-    case 'WL': return pick(rng, INSIGHT_WL_HINTS);
-    default: return null;
-  }
+  const template = getFromArchive(rng, ["insights", attribute]);
+  if (!template || template === "A fierce exchange occurs.") return null;
+  return template;
 }

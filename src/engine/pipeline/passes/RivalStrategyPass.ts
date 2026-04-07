@@ -60,11 +60,15 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng
   }
 
   if (globalGazetteItems.length > 0) {
-    currentState.newsletter = [...(currentState.newsletter || []), { 
-      week: nextWeek, 
-      title: "Intelligence & Strategy Report", 
-      items: globalGazetteItems 
-    }];
+    currentState = {
+      ...currentState,
+      newsletter: [...(currentState.newsletter || []), { 
+        id: rng.uuid("newsletter"), // 🆔 Standardized deterministic ID
+        week: nextWeek, 
+        title: "Intelligence & Strategy Report", 
+        items: globalGazetteItems 
+      }]
+    };
   }
 
   return currentState;
@@ -88,11 +92,15 @@ function handleSeasonalTournaments(state: GameState, week: number, rng: SeededRN
     tournamentNews.push(`🏆 ${tour.name} finalized: ${completedTour?.champion || "Undisputed"} crowned champion.`);
   });
   
-  newState.newsletter = [...(newState.newsletter || []), { 
-    week: week, 
-    title: "🎖️ TOURNAMENT ARCHIVE", 
-    items: tournamentNews 
-  }];
+  newState = {
+    ...newState,
+    newsletter: [...(newState.newsletter || []), { 
+      id: rng.uuid("tournament"), // 🆔 Added deterministic ID
+      week: week, 
+      title: "🎖️ TOURNAMENT ARCHIVE", 
+      items: tournamentNews 
+    }]
+  };
   
   return newState;
 }

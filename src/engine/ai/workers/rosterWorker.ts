@@ -1,4 +1,6 @@
-import { type RivalStableData, type Warrior, type Season } from "@/types/game";
+import type { RivalStableData } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { Season } from "@/types/shared.types";
 import { checkBudget } from "./budgetWorker";
 import { computeWarriorStats } from "../../skillCalc";
 import { logAgentAction } from "../agentCore";

@@ -1,4 +1,6 @@
-import { FightingStyle, type Warrior, type GameState, type RivalStableData } from "@/types/game";
+import { FightingStyle } from "@/types/game";
+import type { GameState, RivalStableData } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
 import { isTooInjuredToFight } from "./injuries";
 
 const MATCHUP_MATRIX: Record<FightingStyle, Record<FightingStyle, number>> = {

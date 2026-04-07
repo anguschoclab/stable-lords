@@ -10,7 +10,8 @@
  *
  * Using favorite weapon grants +1 ATT, favorite rhythm grants +1 INI.
  */
-import { FightingStyle, type Warrior, type WarriorFavorites } from "@/types/game";
+import type { Warrior, WarriorFavorites } from "@/types/warrior.types";
+import { FightingStyle } from "@/types/shared.types";
 import { WEAPONS, getAvailableItems, STYLE_CLASSIC_WEAPONS } from "@/data/equipment";
 
 // ─── Generation ─────────────────────────────────────────────────────────

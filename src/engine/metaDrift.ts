@@ -2,8 +2,8 @@
  * Stable Lords — Meta Drift System
  * Styles gain or lose effectiveness based on arena-wide outcomes.
  */
-import { FightingStyle } from "@/types/game";
-import type { FightSummary } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { FightSummary } from "@/types/combat.types";
 
 export type StyleMeta = Record<FightingStyle, number>; // -10 to +10 drift
 

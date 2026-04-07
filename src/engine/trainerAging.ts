@@ -1,4 +1,4 @@
-import { GameState, Trainer } from "@/types/game";
+import type { GameState, Trainer } from "@/types/state.types";
 import { SeededRNG } from "@/utils/random";
 
 /**

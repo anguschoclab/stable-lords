@@ -12,19 +12,19 @@ import { Chronicle } from "@/components/ledger/Chronicle";
 import { HallOfWarriors } from "@/components/ledger/HallOfWarriors";
 
 export default function StableLedger() {
-  const state = useGameStore();
+  const { season, week, treasury } = useGameStore();
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <PageHeader 
         title="Stable Ledger"
-        subtitle={`FISCAL YEAR: 412 AE · SEASON: ${state.season} · Week: ${state.week}`}
+        subtitle={`FISCAL YEAR: 412 AE · SEASON: ${season} · Week: ${week}`}
         icon={BookOpen}
         actions={
           <div className="flex items-center gap-4 px-4 py-2 bg-secondary/20 rounded-lg border border-border/40 backdrop-blur-sm">
             <div className="flex flex-col items-end">
               <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Treasury Reserve</span>
-              <span className="font-mono font-black text-arena-gold">{(state.treasury ?? 0).toLocaleString()}G</span>
+              <span className="font-mono font-black text-arena-gold">{(treasury ?? 0).toLocaleString()}G</span>
             </div>
           </div>
         }

@@ -1,3 +1,6 @@
+import type { Warrior, InjuryData, InjurySeverity } from "@/types/warrior.types";
+import type { GameState } from "@/types/state.types";
+
 export { generatePairings, type BoutPairing } from "./bout/core/pairings";
 export {
   resolveBout,

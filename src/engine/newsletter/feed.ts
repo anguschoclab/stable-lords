@@ -1,7 +1,7 @@
 /**
  * Newsletter feed — collects fight cards per week and generates issues.
  */
-import type { FightSummary } from "@/types/game";
+import type { FightSummary } from "@/types/combat.types";
 
 export interface FightCard {
   summary: FightSummary;

@@ -1,5 +1,5 @@
 import { type GameState } from "@/types/state.types";
-import { advanceWeek } from "@/state/gameStore";
+import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { processWeekBouts } from "@/engine/bout/services/boutProcessorService";
 import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 
@@ -43,7 +43,7 @@ export async function runAutosim(
       const playerWarriorId = offer.warriorIds.find(id => state.roster.some(w => w.id === id))!;
       // Auto-accept logical offers (Hype > 100 or Purse > 200)
       if (offer.hype > 100 || offer.purse > 200) {
-        state = respondToBoutOffer(state, offer.id, playerWarriorId, "Accepted");
+        state = { ...state, ...respondToBoutOffer(state, offer.id, playerWarriorId, "Accepted") };
       }
     });
 

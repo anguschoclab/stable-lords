@@ -1,4 +1,6 @@
-import { FightingStyle, type Warrior, type Owner, type RivalStableData, type Trainer } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES, STYLE_ABBREV, type Attributes, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, ATTRIBUTE_MIN, ATTRIBUTE_MAX, ATTRIBUTE_TOTAL, type BaseSkills, type DerivedStats, type Gear, type FightPlan, type DeathEvent, type Trainer, type TrainerTier, type TrainerFocus } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { Owner, RivalStableData } from "@/types/state.types";
 import { computeWarriorStats } from "./skillCalc";
 import { makeWarrior } from "./factories";
 import { STABLE_TEMPLATES, type StableTemplate } from "@/data/stableTemplates";
@@ -140,7 +142,8 @@ export function generateRivalStables(count: number, seed: number, week: number =
         metaAwareness: {},
         knownRivals: [],
       },
-      actionHistory: []
+      actionHistory: [],
+      fame: iteration > 0 ? 50 + (iteration * 100) : 0 // 🏗️ Initial prestige
     });
   }
   return rivals;

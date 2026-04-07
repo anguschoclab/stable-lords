@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { useShallow } from 'zustand/react/shallow';
-import { STYLE_DISPLAY_NAMES, type Warrior } from "@/types/game";
+import { STYLE_DISPLAY_NAMES, type Warrior, FightingStyle } from "@/types/shared.types";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Badge } from "@/components/ui/badge";
 import { WarriorNameTag } from "@/components/ui/WarriorBadges";
@@ -27,8 +26,8 @@ import { WeatherWidget } from "@/components/widgets/WeatherWidget";
 // ─── Crowd Mood Meter ──────────────────────────────────────────────────────
 
 function CrowdMoodWidget() {
-  const { state } = useGameStore(useShallow(s => ({ state: s.state })));
-  const mood = state.crowdMood as CrowdMood;
+  const { crowdMood } = useGameStore();
+  const mood = crowdMood as CrowdMood;
   const mods = getMoodModifiers(mood);
 
   return (
@@ -83,7 +82,7 @@ function CrowdMoodWidget() {
 // ─── Arena Leaderboard ────────────────────────────────────────────────────
 
 function ArenaLeaderboard() {
-  const { state } = useGameStore(useShallow(s => ({ state: s.state })));
+  const { roster, rivals, player } = useGameStore();
 
   const allWarriors = useMemo(() => {
     type Entry = { warrior: Warrior; stableName: string; isPlayer: boolean };
@@ -106,17 +105,17 @@ function ArenaLeaderboard() {
       }
     };
 
-    const playerStable = state.player.stableName;
-    for (let i = 0; i < state.roster.length; i++) {
-      const w = state.roster[i];
+    const playerStable = player.stableName;
+    for (let i = 0; i < roster.length; i++) {
+      const w = roster[i];
       if (w.status === "Active") {
          insert({ warrior: w, stableName: playerStable, isPlayer: true });
       }
     }
 
-    if (state.rivals) {
-        for (let i = 0; i < state.rivals.length; i++) {
-            const r = state.rivals[i];
+    if (rivals) {
+        for (let i = 0; i < rivals.length; i++) {
+            const r = rivals[i];
             const rivalStable = r.owner.stableName;
             for (let j = 0; j < r.roster.length; j++) {
                 const w = r.roster[j];
@@ -128,7 +127,7 @@ function ArenaLeaderboard() {
     }
 
     return top10;
-  }, [state.roster, state.rivals, state.player.stableName]);
+  }, [roster, rivals, player.stableName]);
 
   return (
     <Surface variant="glass" className="overflow-hidden p-0 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
@@ -187,9 +186,9 @@ function ArenaLeaderboard() {
 // ─── Main Hub Page ────────────────────────────────────────────────────────────
 
 export default function ArenaHub() {
-  const { state } = useGameStore(useShallow(s => ({ state: s.state })));
+  const { roster, player } = useGameStore();
 
-  const lifetimeKills = useMemo(() => state.roster.reduce((s,w)=>s+w.career.kills,0), [state.roster]);
+  const lifetimeKills = useMemo(() => roster.reduce((s,w)=>s+(w.career?.kills || 0),0), [roster]);
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
@@ -200,7 +199,7 @@ export default function ArenaHub() {
         actions={
           <div className="flex gap-3">
              <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black uppercase tracking-widest text-[9px] px-3 py-1">
-               {state.roster.filter(w=>w.status==="Active").length}_UNITS_ACTIVE
+               {roster.filter(w=>w.status==="Active").length}_UNITS_ACTIVE
              </Badge>
              <Badge variant="outline" className="bg-arena-gold/5 text-arena-gold border-arena-gold/20 font-black uppercase tracking-widest text-[9px] px-3 py-1">
                PREMIUM_ACCESS
@@ -238,7 +237,7 @@ export default function ArenaHub() {
               <div className="space-y-4">
                  <div className="flex justify-between items-center group">
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">Stable_Renown</span>
-                    <span className="font-display font-black text-xl text-arena-fame tracking-tighter">{state.player.renown}</span>
+                    <span className="font-display font-black text-xl text-arena-fame tracking-tighter">{player.renown}</span>
                  </div>
                  <div className="flex justify-between items-center group">
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">Lifetime_Kills</span>

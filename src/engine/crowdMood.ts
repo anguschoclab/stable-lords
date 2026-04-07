@@ -2,7 +2,7 @@
  * Stable Lords — Crowd Mood System
  * Arena-wide mood states that affect fame gain, kill probability, and gazette tone.
  */
-import type { FightSummary } from "@/types/game";
+import type { FightSummary } from "@/types/combat.types";
 
 export type CrowdMood = "Calm" | "Bloodthirsty" | "Theatrical" | "Solemn" | "Festive";
 

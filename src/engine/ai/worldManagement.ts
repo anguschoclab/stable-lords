@@ -1,4 +1,5 @@
-import { type GameState, type Warrior, type RivalStableData } from "@/types/game";
+import type { GameState, RivalStableData } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
 import { generateRivalStables } from "@/engine/rivals";
 import { SeededRNG } from "@/utils/random";
 

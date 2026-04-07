@@ -3,9 +3,8 @@
  * Single source of truth for warrior lifecycle checks.
  * Import these instead of checking `.status === "Dead"` manually.
  */
-import type { Warrior, WarriorStatus } from "@/types/game";
+import type { Warrior, WarriorStatus, InjuryData } from "@/types/warrior.types";
 import { isTooInjuredToFight } from "@/engine/injuries";
-import type { InjuryData } from "@/types/game";
 
 /** Whether a warrior is dead (killed in combat) */
 export function isDead(w: Pick<Warrior, "status">): boolean {

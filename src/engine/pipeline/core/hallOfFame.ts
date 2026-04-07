@@ -1,4 +1,5 @@
-import type { GameState, Warrior, AnnualAward, AnnualAwardType } from "@/types/game";
+import type { GameState, AnnualAward } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNG } from "@/utils/random";
 
@@ -17,8 +18,8 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
 
   const collect = (w: Warrior) => {
     const snapshot = w.yearlySnapshots?.[prevYear] || { wins: 0, losses: 0, kills: 0 };
-    const wins = (w.career?.wins || 0) - snapshot.wins;
-    const kills = (w.career?.kills || 0) - snapshot.kills;
+    const wins = (w.career?.wins || 0) - (snapshot.wins || 0);
+    const kills = (w.career?.kills || 0) - (snapshot.kills || 0);
     const fameGain = (w.fame || 0) - (snapshot.fame || 0); 
     eligible.push({ w, wins: Math.max(0, wins), kills: Math.max(0, kills), fame: Math.max(0, fameGain) });
   };
@@ -119,7 +120,7 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
     ...updatedState, 
     newsletter: [
       ...updatedState.newsletter, 
-      { id: rng.uuid("led"), week: 1, title: `Year ${prevYear} Global Accolades`, items: hofNews }
+      { id: rng.uuid("newsletter"), week: 1, title: `Year ${prevYear} Global Accolades`, items: hofNews }
     ] 
   };
 }

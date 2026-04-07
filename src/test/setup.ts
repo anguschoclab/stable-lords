@@ -49,3 +49,26 @@ Object.defineProperty(global.navigator, 'storage', {
   },
   configurable: true
 });
+
+// Mock Worker for Vitest
+global.Worker = class Worker {
+  url: string;
+  onmessage: (event: any) => void = () => {};
+  onerror: (event: any) => void = () => {};
+
+  constructor(stringUrl: string) {
+    this.url = stringUrl;
+  }
+
+  postMessage(msg: any) {
+    // Basic mock: echo back a completion message for common simulation worker patterns
+    setTimeout(() => {
+      this.onmessage({ data: { type: "WORKER_READY" } });
+    }, 0);
+  }
+
+  terminate() {}
+  addEventListener() {}
+  removeEventListener() {}
+  dispatchEvent() { return true; }
+} as any;

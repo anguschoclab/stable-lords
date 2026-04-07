@@ -12,11 +12,11 @@ import { cn } from "@/lib/utils";
 interface ScoutReportDetailsProps {
   report: ScoutReportData | null;
   warriorName: string;
-  gold: number;
+  treasury: number;
   onScout: (quality: ScoutQuality) => void;
 }
 
-export function ScoutReportDetails({ report, warriorName, gold, onScout }: ScoutReportDetailsProps) {
+export function ScoutReportDetails({ report, warriorName, treasury, onScout }: ScoutReportDetailsProps) {
   const QUALITIES: ScoutQuality[] = ["Basic", "Detailed", "Expert"];
 
   if (!report) {
@@ -42,7 +42,7 @@ export function ScoutReportDetails({ report, warriorName, gold, onScout }: Scout
           <div className="grid gap-3 pt-4">
             {QUALITIES.map((q) => {
               const cost = getScoutCost(q);
-              const canAfford = gold >= cost;
+              const canAfford = treasury >= cost;
               return (
                 <button
                   key={q}

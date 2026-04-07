@@ -6,10 +6,9 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useGameStore } from "@/state/useGameStore";
-import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, type Attributes } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, type Attributes } from "@/types/game";
 import { BASE_ROSTER_CAP } from "@/data/constants";
-import { makeWarrior } from "@/state/gameStore";
-import { DAMAGE_LABELS } from "@/engine/skillCalc";
+import { makeWarrior } from "@/engine/factories";
 import {
   generateRecruitPool, fullRefreshPool,
   type PoolWarrior, type RecruitTier,
@@ -23,10 +22,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatBadge } from "@/components/ui/WarriorBadges";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, Coins, Star, UserPlus, RefreshCw, Hammer, Search,
-  Shield, Swords, Heart, Zap, Users, Eye, Clock, Quote
+  Heart, Zap, Users, Eye, Clock, Quote
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -180,151 +178,133 @@ function RecruitCard({
 }
 
 export default function Recruit() {
-  const { state, setState } = useGameStore();
+  const store = useGameStore();
+  const { 
+    roster, graveyard, retired, rivals, treasury, week, rosterBonus, player, 
+    ledger, newsletter, recruitPool, setState 
+  } = store;
+  
   const navigate = useNavigate();
-  const MAX_ROSTER = BASE_ROSTER_CAP + (state.rosterBonus ?? 0);
+  const MAX_ROSTER = BASE_ROSTER_CAP + (rosterBonus ?? 0);
 
   // Gather all used names (roster + graveyard + retired + rivals)
   const usedNames = useMemo(() => {
     const names = new Set<string>();
-    for (const w of state.roster) names.add(w.name);
-    for (const w of state.graveyard) names.add(w.name);
-    for (const w of state.retired) names.add(w.name);
-    for (const r of state.rivals || []) {
+    for (const w of roster) names.add(w.name);
+    for (const w of graveyard) names.add(w.name);
+    for (const w of retired) names.add(w.name);
+    for (const r of rivals || []) {
       for (const w of r.roster) names.add(w.name);
     }
     return names;
-  }, [state.roster, state.graveyard, state.retired, state.rivals]);
+  }, [roster, graveyard, retired, rivals]);
 
-  // Initialize pool from state or generate fresh
-  const [pool, setPool] = useState<PoolWarrior[]>(() => {
-    if ((state as import("@/types/game").GameState).recruitPool?.length > 0) return (state as import("@/types/game").GameState).recruitPool;
-    return generateRecruitPool(5, state.week, usedNames);
-  });
   const [scoutedIds, setScoutedIds] = useState<Set<string>>(new Set());
 
-  const treasury = useGameStore(s => s.treasury);
-  const rosterFull = state.roster.length >= MAX_ROSTER;
+  const rosterFull = roster.length >= MAX_ROSTER;
   const canRefresh = canTransact(treasury, REFRESH_COST);
 
-  // Persist pool to state
-  const persistPool = useCallback((newPool: PoolWarrior[], newState?: typeof state) => {
-    const base = newState ?? state;
-    setState({ ...base, recruitPool: newPool } as import("@/types/game").GameState);
-    setPool(newPool);
-  }, [setState, state]);
-
   const handleRecruit = useCallback((w: PoolWarrior) => {
-    setState((prev) => {
-      if (!canTransact(prev.treasury, w.cost)) {
+    setState((draft: any) => {
+      if (!canTransact(draft.treasury, w.cost)) {
         toast.error(`Not enough funds! Need ${w.cost}g.`);
-        return prev;
+        return;
       }
-      if (prev.roster.length >= MAX_ROSTER) {
+      if (draft.roster.length >= MAX_ROSTER) {
         toast.error("Roster full! Retire or release a warrior first.");
-        return prev;
+        return;
       }
 
+      // 1.0 Deterministic ID: Recruitment uses timestamp + random for uniqueness but logic is engine-fed
       const warrior = makeWarrior(
-        `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}`,
+        `war_rec_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
         w.name, w.style, w.attributes,
         { age: w.age, potential: w.potential }
       );
 
-      const newPool = (prev.recruitPool ?? []).filter(p => p.id !== w.id);
-      setPool(newPool);
-      toast.success(`${w.name} has joined your stable! (-${w.cost}g)`);
+      draft.roster.push(warrior);
+      draft.treasury -= w.cost;
+      draft.recruitPool = (draft.recruitPool ?? []).filter((p: any) => p.id !== w.id);
+      
+      draft.ledger.push({
+        week: draft.week,
+        label: `Recruit: ${w.name} (${w.tier})`,
+        amount: -w.cost,
+        category: "recruit",
+      });
 
-      return {
-        ...prev,
-        roster: [...prev.roster, warrior],
-        treasury: prev.treasury - w.cost,
-        recruitPool: newPool,
-        ledger: [...(prev.ledger ?? []), {
-          week: prev.week,
-          label: `Recruit: ${w.name} (${w.tier})`,
-          amount: -w.cost,
-          category: "recruit" as const,
-        }],
-        newsletter: [...(prev.newsletter ?? []), {
-          week: prev.week,
-          title: "Recruitment",
-          items: [`${prev.player.stableName} signed ${w.name}, a ${w.tier.toLowerCase()} ${STYLE_DISPLAY_NAMES[w.style]}.`],
-        }],
-      };
+      draft.newsletter.push({
+        week: draft.week,
+        title: "Recruitment",
+        items: [`${draft.player.stableName} signed ${w.name}, a ${w.tier.toLowerCase()} ${STYLE_DISPLAY_NAMES[w.style]}.`],
+      });
+
+      toast.success(`${w.name} has joined your stable! (-${w.cost}g)`);
     });
   }, [MAX_ROSTER, setState]);
 
   const handleScout = useCallback((w: PoolWarrior) => {
-    setState((prev) => {
-      if (!canTransact(prev.treasury, 25)) {
+    setState((draft: any) => {
+      if (!canTransact(draft.treasury, 25)) {
         toast.error("Not enough gold to scout potential (need 25g).");
-        return prev;
+        return;
       }
       setScoutedIds(s => new Set(s).add(w.id));
+      draft.treasury -= 25;
+      draft.ledger.push({
+        week: draft.week,
+        label: `Scout Potential: ${w.name}`,
+        amount: -25,
+        category: "other",
+      });
       toast.success(`Scouted potential for ${w.name}! (-25g)`);
-      return {
-        ...prev,
-        treasury: prev.treasury - 25,
-        ledger: [...(prev.ledger ?? []), {
-          week: prev.week,
-          label: `Scout Potential: ${w.name}`,
-          amount: -25,
-          category: "other" as const,
-        }],
-      };
     });
   }, [setState]);
 
   const handleRefresh = useCallback(() => {
-    setState((prev) => {
-      if (!canTransact(prev.treasury, REFRESH_COST)) {
+    setState((draft: any) => {
+      if (!canTransact(draft.treasury, REFRESH_COST)) {
         toast.error(`Not enough gold! Need ${REFRESH_COST}g to refresh.`);
-        return prev;
+        return;
       }
-      const newPool = fullRefreshPool(prev.week, usedNames);
-      setPool(newPool);
+      const newPool = fullRefreshPool(draft.week, usedNames);
+      draft.treasury -= REFRESH_COST;
+      draft.recruitPool = newPool;
+      draft.ledger.push({
+        week: draft.week,
+        label: "Pool refresh",
+        amount: -REFRESH_COST,
+        category: "other",
+      });
       toast.success(`Scout pool refreshed! (-${REFRESH_COST}g)`);
-      return {
-        ...prev,
-        treasury: prev.treasury - REFRESH_COST,
-        recruitPool: newPool,
-        ledger: [...(prev.ledger ?? []), {
-          week: prev.week,
-          label: "Pool refresh",
-          amount: -REFRESH_COST,
-          category: "other" as const,
-        }],
-      };
     });
   }, [usedNames, setState]);
 
   const handleCustomCreate = useCallback(
     (data: { name: string; style: FightingStyle; attributes: Attributes }) => {
-      setState((prev) => {
-        if (!canTransact(prev.treasury, CUSTOM_COST)) {
+      setState((draft: any) => {
+        if (!canTransact(draft.treasury, CUSTOM_COST)) {
           toast.error(`Not enough gold! Need ${CUSTOM_COST}g for custom build.`);
-          return prev;
+          return;
         }
-        if (prev.roster.length >= MAX_ROSTER) {
+        if (draft.roster.length >= MAX_ROSTER) {
           toast.error("Roster full!");
-          return prev;
+          return;
         }
-        const id = `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}`;
+        const id = `war_custom_${Date.now()}`;
         const warrior = makeWarrior(id, data.name, data.style, data.attributes);
+        
+        draft.roster.push(warrior);
+        draft.treasury -= CUSTOM_COST;
+        draft.ledger.push({
+          week: draft.week,
+          label: `Custom Build: ${data.name}`,
+          amount: -CUSTOM_COST,
+          category: "recruit",
+        });
+
         toast.success(`${data.name} has joined your stable! (-${CUSTOM_COST}g)`);
         setTimeout(() => navigate({ to: `/warrior/${id}` }), 0);
-        return {
-          ...prev,
-          roster: [...prev.roster, warrior],
-          treasury: prev.treasury - CUSTOM_COST,
-          ledger: [...(prev.ledger ?? []), {
-            week: prev.week,
-            label: `Custom Build: ${data.name}`,
-            amount: -CUSTOM_COST,
-            category: "recruit" as const,
-          }],
-        };
       });
     },
     [setState, navigate, MAX_ROSTER]
@@ -335,7 +315,7 @@ export default function Recruit() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => history.back()} className="gap-1.5 text-muted-foreground">
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/" })} className="gap-1.5 text-muted-foreground">
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
           <h1 className="text-xl font-display font-bold">Recruit Warriors</h1>
@@ -343,7 +323,7 @@ export default function Recruit() {
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="gap-1.5 font-mono">
             <Users className="h-3 w-3" />
-            {state.roster.length}/{MAX_ROSTER}
+            {roster.length}/{MAX_ROSTER}
           </Badge>
           <Badge variant="outline" className="gap-1.5 font-mono">
             <Coins className="h-3 w-3 text-arena-gold" />
@@ -372,10 +352,9 @@ export default function Recruit() {
 
         {/* Scout Pool Tab */}
         <TabsContent value="scout" className="mt-4 space-y-4">
-          {/* Refresh bar */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {pool.length} warrior{pool.length !== 1 ? "s" : ""} available · Pool refreshes weekly
+              {recruitPool.length} warrior{recruitPool.length !== 1 ? "s" : ""} available · Pool refreshes weekly
             </p>
             <Button
               variant="outline"
@@ -389,7 +368,6 @@ export default function Recruit() {
             </Button>
           </div>
 
-          {/* Tier Legend */}
           <div className="flex flex-wrap gap-2">
             {(["Common", "Promising", "Exceptional", "Prodigy"] as RecruitTier[]).map(tier => (
               <div key={tier} className="flex items-center gap-1 text-[10px] text-muted-foreground">
@@ -399,10 +377,9 @@ export default function Recruit() {
             ))}
           </div>
 
-          {/* Warrior Grid */}
-          {pool.length > 0 ? (
+          {recruitPool.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {pool.map(w => (
+              {recruitPool.map(w => (
                 <RecruitCard
                   key={w.id}
                   warrior={w}
@@ -439,7 +416,7 @@ export default function Recruit() {
           <WarriorBuilder
             onCreateWarrior={handleCustomCreate}
             maxRoster={MAX_ROSTER}
-            currentRosterSize={state.roster.length}
+            currentRosterSize={roster.length}
           />
         </TabsContent>
       </Tabs>

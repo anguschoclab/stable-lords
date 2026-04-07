@@ -1,5 +1,5 @@
 import React from "react";
-import { Trophy } from "lucide-react";
+import { Trophy, Star } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { CareerTimeline } from "@/components/warrior/CareerTimeline";
 import { WarriorFightHistory } from "@/components/warrior/WarriorFightHistory";
@@ -15,6 +15,7 @@ export function ChronicleTab({ warrior, arenaHistory }: ChronicleTabProps) {
     <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="lg:col-span-4 space-y-6">
          <CareerTimeline warrior={warrior} arenaHistory={arenaHistory} />
+         
          <Card className="bg-glass-card border-border/40 border">
             <CardHeader className="bg-secondary/5">
                <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
@@ -36,6 +37,29 @@ export function ChronicleTab({ warrior, arenaHistory }: ChronicleTabProps) {
                </div>
             </CardContent>
          </Card>
+
+         {warrior.awards && warrior.awards.length > 0 && (
+           <Card className="bg-glass-card border-border/40 border">
+              <CardHeader className="bg-primary/5">
+                 <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-arena-gold">
+                   <Star className="h-4 w-4" /> Awards & Accolades
+                 </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 space-y-3">
+                 {warrior.awards.map((award, i) => (
+                    <div key={i} className="space-y-1">
+                       <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-black uppercase text-arena-gold">Year {award.year}</span>
+                          <span className="text-[10px] font-mono font-bold bg-secondary/20 px-1.5 rounded">{award.type.replace(/_/g, " ")}</span>
+                       </div>
+                       <p className="text-[10px] text-muted-foreground leading-relaxed italic border-l border-primary/20 pl-2">
+                          "{award.reason}"
+                       </p>
+                    </div>
+                 ))}
+              </CardContent>
+           </Card>
+         )}
       </div>
 
       <div className="lg:col-span-8">

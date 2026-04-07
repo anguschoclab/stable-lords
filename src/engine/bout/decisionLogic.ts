@@ -1,4 +1,4 @@
-import { type FightOutcome } from "@/types/game";
+import type { FightOutcome } from "@/types/combat.types";
 import { type FighterState, DECISION_HIT_MARGIN } from "../combat/resolution";
 
 /**

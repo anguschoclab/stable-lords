@@ -42,8 +42,8 @@ export type GameStore = GameStoreState & GameStoreActions & EconomySlice & Roste
 /**
  * Reconstructs a full GameState from the modular slices for engine consumption.
  */
-function reconstructGameState(store: GameStore): GameState {
-  const fresh = createFreshState();
+export function reconstructGameState(store: GameStore): GameState {
+  const fresh = createFreshState("reconstruct-default");
   return {
     ...fresh,
     treasury: store.treasury,
@@ -69,6 +69,24 @@ function reconstructGameState(store: GameStore): GameState {
     tournaments: store.tournaments,
     isTournamentWeek: store.isTournamentWeek,
     activeTournamentId: store.activeTournamentId,
+    year: store.year,
+    popularity: store.popularity,
+    fame: store.fame,
+    realmRankings: store.realmRankings,
+    awards: store.awards,
+    trainers: store.trainers,
+    hiringPool: store.hiringPool,
+    trainingAssignments: store.trainingAssignments,
+    seasonalGrowth: store.seasonalGrowth,
+    restStates: store.restStates,
+    crowdMood: store.crowdMood,
+    moodHistory: store.moodHistory,
+    newsletter: store.newsletter,
+    hallOfFame: store.hallOfFame,
+    settings: store.settings,
+    isFTUE: store.isFTUE,
+    ftueStep: store.ftueStep,
+    ftueComplete: store.ftueComplete,
   };
 }
 
@@ -119,6 +137,25 @@ export const useGameStore = create<GameStore>()(
           draft.tournaments = state.tournaments;
           draft.isTournamentWeek = state.isTournamentWeek;
           draft.activeTournamentId = state.activeTournamentId;
+          draft.year = state.year || 1;
+          
+          draft.popularity = state.popularity || 0;
+          draft.fame = state.fame || 0;
+          draft.realmRankings = state.realmRankings || {};
+          draft.awards = state.awards || [];
+          draft.trainers = state.trainers || [];
+          draft.hiringPool = state.hiringPool || [];
+          draft.trainingAssignments = state.trainingAssignments || [];
+          draft.seasonalGrowth = state.seasonalGrowth || [];
+          draft.restStates = state.restStates || [];
+          draft.crowdMood = state.crowdMood || "Neutral";
+          draft.moodHistory = state.moodHistory || [];
+          draft.newsletter = state.newsletter || [];
+          draft.hallOfFame = state.hallOfFame || [];
+          draft.settings = state.settings || { featureFlags: { tournaments: true, scouting: true } };
+          draft.isFTUE = state.isFTUE || false;
+          draft.ftueStep = state.ftueStep;
+          draft.ftueComplete = state.ftueComplete || false;
           
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
@@ -205,7 +242,8 @@ export const useGameStore = create<GameStore>()(
       },
 
       doReset: () => {
-        const fresh = createFreshState();
+        // Deterministic reset: If no seed provided, use a stable one for 1.0 stability
+        const fresh = createFreshState("alpha-prime-10");
         get().loadGame("autosave", fresh);
         set({ atTitleScreen: true });
       },

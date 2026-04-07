@@ -6,15 +6,13 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/scouting";
 import { type ScoutReportData, type RivalStableData, type Warrior } from "@/types/game";
-import { Search, Eye, ArrowLeftRight, UserRoundSearch, Shield, Users, Target, Hexagon } from "lucide-react";
+import { Search, Eye, ArrowLeftRight, UserRoundSearch } from "lucide-react";
 import { SeededRNG } from "@/utils/random";
 import { hashStr } from "@/utils/idUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Surface } from "@/components/ui/Surface";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 // Modular Components
 import { ScoutIntelTab } from "@/components/scouting/ScoutIntelTab";
@@ -22,17 +20,13 @@ import { StableComparison } from "@/components/scouting/StableComparison";
 import { WarriorComparison } from "@/components/scouting/WarriorComparison";
 
 export default function Scouting() {
-  const state = useGameStore();
-  const setState = useGameStore((s) => s.setState);
+  const { treasury, week, rivals, scoutReports, roster, setState } = useGameStore();
   const [selectedRivalId, setSelectedRivalId] = useState<string | null>(null);
   const [selectedWarriorId, setSelectedWarriorId] = useState<string | null>(null);
 
-  const rivals = useMemo(() => state.rivals ?? [], [state.rivals]);
-  const reports = useMemo(() => state.scoutReports ?? [], [state.scoutReports]);
-
   const activeRival = useMemo(
-    () => (state.rivals ?? []).find((r: RivalStableData) => r.owner.id === selectedRivalId),
-    [state.rivals, selectedRivalId]
+    () => (rivals ?? []).find((r: RivalStableData) => r.owner.id === selectedRivalId),
+    [rivals, selectedRivalId]
   );
 
   const activeWarrior = useMemo(
@@ -44,25 +38,25 @@ export default function Scouting() {
     (quality: ScoutQuality) => {
       if (!activeWarrior) return;
       const cost = getScoutCost(quality);
-      if ((state.treasury ?? 0) < cost) {
+      if ((treasury ?? 0) < cost) {
         toast.error(`Insufficient funds! Scouting requires ${cost}g.`);
         return;
       }
 
-      const rng = new SeededRNG(state.week + hashStr(activeWarrior.name));
-      const { report } = generateScoutReport(activeWarrior, quality, state.week, rng);
+      const rng = new SeededRNG(week + hashStr(activeWarrior.name));
+      const { report } = generateScoutReport(activeWarrior, quality, week, rng);
       
       // Ensure we don't have duplicate reports for the same warrior
       const newReports = [
-        ...(state.scoutReports ?? []).filter((r: ScoutReportData) => r.warriorName !== activeWarrior.name),
+        ...(scoutReports ?? []).filter((r: ScoutReportData) => r.warriorName !== activeWarrior.name),
         report as ScoutReportData,
       ];
 
       setState((draft: any) => {
         draft.scoutReports = newReports;
-        draft.treasury = (state.treasury ?? 0) - cost;
+        draft.treasury = (treasury ?? 0) - cost;
         draft.ledger.push({
-          week: state.week,
+          week: week,
           label: `Intelligence: ${activeWarrior.name} (${quality})`,
           amount: -cost,
           category: "other",
@@ -70,7 +64,7 @@ export default function Scouting() {
       });
       toast.success(`Intel established for ${activeWarrior.name}. (-${cost}g)`);
     },
-    [state, setState, activeWarrior]
+    [treasury, week, scoutReports, setState, activeWarrior]
   );
 
   const handleSelectRival = useCallback((id: string) => {
@@ -135,13 +129,13 @@ export default function Scouting() {
 
         <TabsContent value="scout" className="mt-6">
           <ScoutIntelTab
-            rivals={rivals}
-            reports={reports}
+            rivals={rivals ?? []}
+            reports={scoutReports ?? []}
             selectedRivalId={selectedRivalId}
             onSelectRival={handleSelectRival}
             selectedWarriorId={selectedWarriorId}
             onSelectWarrior={handleSelectWarrior}
-            gold={state.treasury ?? 0}
+            treasury={treasury ?? 0}
             onScout={handleScout}
           />
         </TabsContent>
@@ -151,7 +145,7 @@ export default function Scouting() {
         </TabsContent>
 
         <TabsContent value="warriors" className="mt-6">
-          <WarriorComparison rivals={rivals} playerRoster={state.roster} />
+          <WarriorComparison rivals={rivals ?? []} playerRoster={roster} />
         </TabsContent>
       </Tabs>
     </div>

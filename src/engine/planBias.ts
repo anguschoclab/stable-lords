@@ -1,7 +1,7 @@
 /**
  * Plan bias + style-aware auto-tune helpers.
  */
-import type { FightPlan } from "@/types/game";
+import type { FightPlan } from "@/types/combat.types";
 
 export type Bias = "head-hunt" | "hamstring" | "gut" | "guard-break" | "balanced";
 

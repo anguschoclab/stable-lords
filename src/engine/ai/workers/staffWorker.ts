@@ -1,4 +1,5 @@
-import type { RivalStableData, GameState, Trainer, WeatherType } from "@/types/game";
+import type { RivalStableData, GameState, Trainer } from "@/types/state.types";
+import type { WeatherType } from "@/types/shared.types";
 import { type CrowdMood } from "../../crowdMood";
 import { checkBudget } from "./budgetWorker";
 import { logAgentAction } from "../agentCore";

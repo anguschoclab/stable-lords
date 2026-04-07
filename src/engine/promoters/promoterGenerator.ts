@@ -31,7 +31,7 @@ export function generatePromoters(count: number, seed: number): Record<string, P
   ];
 
   for (let i = 0; i < count; i++) {
-    const id = rng.uuid("pro");
+    const id = rng.uuid("promoter");
     const firstName = rng.pick(PROMOTER_FIRST_NAMES);
     const lastName = rng.pick(PROMOTER_LAST_NAMES);
     const tier = tiers[i % tiers.length];

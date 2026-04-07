@@ -1,0 +1,38 @@
+name: Bard of the Blood Sands — Daily Narrative Expansion
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # Run daily at 01:00 UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  expand-narrative:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Bard Daemon
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run bard:daily
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "The Bard"
+          git config --global user.email "bard@blood-sands.sl"
+          git add src/data/narrativeContent.json
+          git add Daily_Bard_Report.md
+          git commit -m "📜 Bardic Expansion: [$(date +'%Y-%m-%d')] — Transcribing more combat lore" || echo "No changes to commit"
+          git push

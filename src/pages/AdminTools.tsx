@@ -2,25 +2,37 @@
  * Stable Lords — Administration & Telemetry Console
  * Strictly typed utility for save management and simulation bypass.
  */
-import React, { useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useGameStore } from '@/state/useGameStore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Download, Upload, Trash2, ShieldAlert, FastForward, Activity, Coins, Trophy, UserPlus, Zap } from 'lucide-react';
+import { Settings, Download, Upload, Trash2, FastForward, Activity, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-import { exportActiveSlot } from '@/state/saveSlots';
-import { advanceWeek } from '@/state/gameStore';
+import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
 import { computeNextSeason } from '@/engine/weekPipeline';
-import type { GameState, RivalStableData } from '@/types/game';
+import type { GameState, RivalStableData } from '@/types/state.types';
+import { ArenaHistory } from '@/engine/history/arenaHistory';
 
 export default function AdminTools() {
-  const { state, setState, doReset } = useGameStore();
+  const allFights = useMemo(() => ArenaHistory.all(), []);
+  const { 
+    setState, doReset, treasury, fame, week, season, roster, player, rivals, tournaments, ftueComplete 
+  } = useGameStore();
 
   const handleExport = useCallback(() => {
-    exportActiveSlot();
-    toast.success('Save persistent data exported.');
-  }, []);
+    // Basic export of current store state
+    const currentState = useGameStore.getState();
+    const data = JSON.stringify({ state: currentState }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stable-lords-export-w${week}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Current session state exported.');
+  }, [week]);
 
   const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,7 +58,7 @@ export default function AdminTools() {
   }, [setState]);
 
   const skipWeek = useCallback(() => {
-    setState((prev) => {
+    setState((prev: GameState) => {
       const next = advanceWeek(prev);
       toast.success(`Advanced to Week ${next.week}`);
       return next;
@@ -54,7 +66,7 @@ export default function AdminTools() {
   }, [setState]);
 
   const skipSeason = useCallback(() => {
-    setState((prev) => {
+    setState((prev: GameState) => {
       let newState = { ...prev };
       for(let i=0; i<13; i++) {
           newState = advanceWeek(newState);
@@ -75,7 +87,7 @@ export default function AdminTools() {
       titles: 0,
     };
 
-    setState((prev) => ({ 
+    setState((prev: GameState) => ({ 
       ...prev, 
       ftueComplete: true, 
       isFTUE: false,
@@ -90,7 +102,7 @@ export default function AdminTools() {
   const resetRivals = useCallback(() => {
     import("@/engine/rivals").then(({ generateRivalStables }) => {
       const newRivals = generateRivalStables(23, Date.now()) as RivalStableData[];
-      setState((prev) => ({ ...prev, rivals: newRivals }));
+      setState((prev: GameState) => ({ ...prev, rivals: newRivals }));
       toast.success('Rival ecosystem regenerated.');
     });
   }, [setState]);
@@ -109,17 +121,17 @@ export default function AdminTools() {
             Advanced system overrides and telemetry management
           </p>
         </div>
-        <Badge variant={state.ftueComplete ? "outline" : "destructive"} className="font-black uppercase text-[10px] tracking-widest h-6 px-4">
-          SYSTEM_{state.ftueComplete ? "UNLOCKED" : "LOCKED"}
+        <Badge variant={ftueComplete ? "outline" : "destructive"} className="font-black uppercase text-[10px] tracking-widest h-6 px-4">
+          SYSTEM_{ftueComplete ? "UNLOCKED" : "LOCKED"}
         </Badge>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="border-primary/20 bg-glass-card shadow-lg hover:border-primary/40 transition-all">
           <CardHeader className="pb-3 border-b border-primary/10 bg-primary/5">
-            <CardTitle className="text-sm font-display flex items-center gap-2 text-primary uppercase">
+            <h3 className="text-sm font-display flex items-center gap-2 text-primary uppercase font-bold">
               <Download className="h-4 w-4" /> Save_Core
-            </CardTitle>
+            </h3>
           </CardHeader>
           <CardContent className="p-6 space-y-3">
             <Button onClick={handleExport} className="w-full h-11 gap-2 font-black uppercase text-[10px] tracking-widest shadow-sm" variant="outline">
@@ -144,9 +156,9 @@ export default function AdminTools() {
 
         <Card className="border-accent/20 bg-glass-card shadow-lg hover:border-accent/40 transition-all">
           <CardHeader className="pb-3 border-b border-accent/10 bg-accent/5">
-            <CardTitle className="text-sm font-display flex items-center gap-2 text-accent uppercase">
+            <h3 className="text-sm font-display flex items-center gap-2 text-accent uppercase font-bold">
               <FastForward className="h-4 w-4" /> temporal_Drift
-            </CardTitle>
+            </h3>
           </CardHeader>
           <CardContent className="p-6 space-y-3">
             <Button onClick={skipWeek} className="w-full h-11 font-black uppercase text-[10px] tracking-widest" variant="secondary">
@@ -155,27 +167,32 @@ export default function AdminTools() {
             <Button onClick={skipSeason} className="w-full h-11 font-black uppercase text-[10px] tracking-widest" variant="secondary">
               Advance Season (13W)
             </Button>
+            <Button onClick={skipFTUE} className="w-full h-11 font-black uppercase text-[10px] tracking-widest" variant="outline">
+              Bypass FTUE
+            </Button>
           </CardContent>
         </Card>
 
         <Card className="border-arena-gold/20 bg-glass-card shadow-lg hover:border-arena-gold/40 transition-all">
           <CardHeader className="pb-3 border-b border-arena-gold/10 bg-arena-gold/5">
-            <CardTitle className="text-sm font-display flex items-center gap-2 text-arena-gold uppercase">
+            <h3 className="text-sm font-display flex items-center gap-2 text-arena-gold uppercase font-bold">
               <Zap className="h-4 w-4 fill-arena-gold" /> Mastery_Toolkit
-            </CardTitle>
+            </h3>
           </CardHeader>
           <CardContent className="p-6 space-y-3">
               <Button 
                 onClick={() => {
-                  setState((prev) => {
-                    const updatedRoster = prev.roster.map(w => ({
-                      ...w,
-                      favorites: w.favorites ? {
-                        ...w.favorites,
-                        discovered: { ...w.favorites.discovered, weapon: true, rhythm: true }
-                      } : w.favorites
-                    }));
-                    return { ...prev, roster: updatedRoster };
+                  setState((draft: GameState) => {
+                    draft.roster.forEach((w) => {
+                      if (w.favorites) {
+                        w.favorites.discovered = { 
+                          weapon: true, 
+                          rhythm: true,
+                          weaponHints: 10,
+                          rhythmHints: 10
+                        };
+                      }
+                    });
                   });
                   toast.success('Omniscient mastery achieved.');
                 }} 
@@ -185,48 +202,30 @@ export default function AdminTools() {
                 Force All Mastery
               </Button>
               <Button 
-                onClick={() => {
-                  setState((prev) => {
-                    const escalatedGrudges = (prev.ownerGrudges ?? []).map(g => ({ ...g, intensity: 5 }));
-                    return { ...prev, ownerGrudges: escalatedGrudges };
-                  });
-                  toast.success('Blood feuds escalated to maximum.');
-                }} 
-                className="w-full h-11 font-black uppercase text-[10px] tracking-widest border-destructive/30 text-destructive" 
-                variant="outline"
-              >
-                Escalate All Grudges
-              </Button>
-              <Button 
-                onClick={() => {
-                  import("@/engine/pipeline/passes/EquipmentPass").then(({ runEquipmentPass }) => {
-                    setState((prev) => runEquipmentPass(prev));
-                    toast.success('AI tactical re-gearing pass complete.');
-                  });
-                }} 
+                onClick={resetRivals} 
                 className="w-full h-11 font-black uppercase text-[10px] tracking-widest border-primary/30 text-primary" 
                 variant="outline"
               >
-                Trigger AI Re-Gear
+                Regenerate Rivals
               </Button>
           </CardContent>
         </Card>
 
         <Card className="border-border/30 bg-glass-card shadow-lg md:col-span-2 lg:col-span-3 overflow-hidden">
           <CardHeader className="pb-3 border-b border-border/10 bg-secondary/10">
-            <CardTitle className="text-xs font-display flex items-center gap-2 text-muted-foreground uppercase tracking-widest">
+            <h3 className="text-xs font-display flex items-center gap-2 text-muted-foreground uppercase tracking-widest font-bold">
               <Activity className="h-4 w-4" /> Telemetry_Output_Stream
-            </CardTitle>
+            </h3>
           </CardHeader>
           <CardContent className="p-0">
              <div className="bg-background/40 p-6 overflow-x-auto max-h-[400px] text-xs font-mono leading-relaxed thin-scrollbar">
                 <pre className="text-primary/70">
                 {JSON.stringify({
-                    temporal: { week: state.week, season: state.season },
-                    inventory: { gold: state.gold, fame: state.fame },
-                    roster: { size: state.roster.length, championCount: state.roster.filter(w=>w.champion).length },
-                    ecosystem: { rivalCount: state.rivals?.length || 0, tournamentCount: state.tournaments.length },
-                    player: state.player
+                    temporal: { week, season },
+                    inventory: { treasury, fame },
+                    roster: { size: roster.length, championCount: roster.filter(w=>w.champion).length },
+                    ecosystem: { rivalCount: rivals?.length || 0, tournamentCount: tournaments.length },
+                    player: player
                 }, null, 4)}
                 </pre>
              </div>
@@ -236,5 +235,3 @@ export default function AdminTools() {
     </div>
   );
 }
-
-import { RefreshCw } from "lucide-react";

@@ -1,4 +1,4 @@
-import type { RestState, MatchRecord } from "@/types/game";
+import type { RestState, MatchRecord } from "@/types/state.types";
 
 /**
  * Adds a mandatory rest period for a warrior (e.g., after a KO).

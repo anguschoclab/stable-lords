@@ -1,4 +1,6 @@
-import { FightingStyle, OffensiveTactic, DefensiveTactic, FightPlan } from "@/types/game";
+import { FightingStyle, type OffensiveTactic, type DefensiveTactic } from "@/types/shared.types";
+import type { FightPlan } from "@/types/combat.types";
+import type { Warrior } from "@/types/warrior.types";
 import { suitabilityMultiplier, getOffensiveSuitability, getDefensiveSuitability } from "../tacticSuitability";
 import { OE_ATT_SCALING, OE_DEF_SCALING, AL_INI_SCALING } from "./combatConstants";
 

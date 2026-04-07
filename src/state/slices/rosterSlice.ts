@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { GameState, Warrior, PoolWarrior, DeathEvent, InsightToken } from "@/types/state.types";
+import { GameState, Warrior, PoolWarrior, DeathEvent, InsightToken, Trainer, TrainingAssignment, SeasonalGrowth, RestState } from "@/types/state.types";
 
 export interface RosterSlice {
   roster: Warrior[];
@@ -7,6 +7,11 @@ export interface RosterSlice {
   retired: Warrior[];
   recruitPool: PoolWarrior[];
   insightTokens: InsightToken[];
+  trainers: Trainer[];
+  hiringPool: Trainer[];
+  trainingAssignments: TrainingAssignment[];
+  seasonalGrowth: SeasonalGrowth[];
+  restStates: RestState[];
   rosterBonus: number;
   unacknowledgedDeaths: string[];
   setRoster: (roster: Warrior[]) => void;
@@ -24,6 +29,11 @@ export const createRosterSlice: StateCreator<any, [], [], RosterSlice> = (set, g
   retired: [],
   recruitPool: [],
   insightTokens: [],
+  trainers: [],
+  hiringPool: [],
+  trainingAssignments: [],
+  seasonalGrowth: [],
+  restStates: [],
   rosterBonus: 0,
   unacknowledgedDeaths: [],
 

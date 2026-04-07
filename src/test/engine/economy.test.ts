@@ -24,7 +24,7 @@ function makeTestWarrior(overrides: Partial<Warrior> = {}): Warrior {
 }
 
 describe("Economy Engine", () => {
-  const baseState = createFreshState();
+  const baseState = createFreshState("test-seed");
   
   describe("computeWeeklyBreakdown", () => {
     it("should calculate zero net when there is no activity and no warriors", () => {

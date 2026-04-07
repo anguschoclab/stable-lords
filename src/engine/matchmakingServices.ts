@@ -1,7 +1,8 @@
 import type { 
   Warrior, RivalStableData, MatchRecord, 
-  Rivalry, FightOutcome 
-} from "@/types/game";
+  Rivalry
+} from "@/types/state.types";
+import type { FightOutcome } from "@/types/combat.types";
 import { getStablePairKey, getWarriorPairKey } from "@/utils/keyUtils";
 import { SeededRNG } from "@/utils/random";
 

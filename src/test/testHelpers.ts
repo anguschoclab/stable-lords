@@ -30,11 +30,12 @@ export function populateTestState(state: GameState, warriorCount: number = 300):
         `Rival ${r} Warrior ${w}`,
         styles[(r + w) % styles.length],
         { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
-        { fame: Math.floor(Math.random() * 200) }
+        { fame: 50 + (r * 10) + (w * 5) }
       ));
     }
     
     newState.rivals.push({
+      id: `rival_stable_${r}`,
       owner: {
         id: `rival_owner_${r}`,
         name: `Rival Owner ${r}`,
@@ -44,8 +45,9 @@ export function populateTestState(state: GameState, warriorCount: number = 300):
         titles: 0,
         personality: "Pragmatic"
       },
+      fame: 100,
       roster: rivalWorkers,
-      gold: 1000,
+      treasury: 1000,
       tier: "Established"
     } as RivalStableData);
   }

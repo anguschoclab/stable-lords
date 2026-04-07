@@ -9,8 +9,7 @@ import { generateDynasticName } from "@/utils/nameLogic";
 
 const PERSONALITIES: PromoterPersonality[] = ["Greedy", "Honorable", "Sadistic", "Flashy", "Corporate"];
 
-export function runPromoterLifecyclePass(state: GameState): GameState {
-  const rng = new SeededRNG(state.week * 761 + 1);
+export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): GameState {
   const newPromoters: Record<string, Promoter> = { ...state.promoters };
   const news: string[] = [];
   const WEEKS_PER_YEAR = 52;
@@ -31,7 +30,7 @@ export function runPromoterLifecyclePass(state: GameState): GameState {
 
       if (rng.next() < finalChance) {
         retired = true;
-        const newId = `promoter_${id}_successor_${state.week}`;
+        const newId = rng.uuid("promoter");
         const successorName = generateDynasticName(p.name, state.week + 123);
         
         // 50% chance to inherit personality
@@ -67,6 +66,6 @@ export function runPromoterLifecyclePass(state: GameState): GameState {
   return {
     ...state,
     promoters: newPromoters,
-    newsletter: news.length > 0 ? [...state.newsletter, { week: state.week, title: "Promoter News", items: news }] : state.newsletter
+    newsletter: news.length > 0 ? [...state.newsletter, { id: rng.uuid("newsletter"), week: state.week, title: "Promoter News", items: news }] : state.newsletter
   };
 }

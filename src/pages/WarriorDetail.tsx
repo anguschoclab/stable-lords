@@ -6,12 +6,11 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "@tanstack/react-router";
 import { obfuscateWarrior } from "@/lib/obfuscation";
 import { useGameStore } from "@/state/useGameStore";
-import { type FightPlan } from "@/types/game";
+import { type FightPlan, type GameState } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Armchair, Target, ScrollText, User } from "lucide-react";
 import { defaultPlanForWarrior } from "@/engine/simulate";
 import { computeStreaks } from "@/engine/gazetteNarrative";
-import { retireWarrior } from "@/state/gameStore";
 import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";
 import { toast } from "sonner";
 import SubNav, { type SubNavTab } from "@/components/SubNav";
@@ -31,65 +30,65 @@ const TABS: SubNavTab[] = [
 export default function WarriorDetail() {
   const { id } = useParams({ strict: false }) as { id: string };
   const navigate = useNavigate();
-  const { state, setState, renameWarrior } = useGameStore();
+  
+  // Use the unified store hook
+  const store = useGameStore();
+  const { roster, graveyard, retired, rivals, arenaHistory, insightTokens, setState, renameWarrior, retireWarrior } = store;
 
   const [activeTab, setActiveTab] = useState("biometrics");
 
   // Find warrior across all possible states
   const warrior = useMemo(() => {
-    let w = state.roster.find((w) => w.id === id) ||
-            state.graveyard.find((w) => w.id === id) ||
-            state.retired.find((w) => w.id === id);
+    let w = roster.find((w) => w.id === id) ||
+            graveyard.find((w) => w.id === id) ||
+            retired.find((w) => w.id === id);
     if (w) return w;
-    for (const rs of state.rivals || []) {
+    for (const rs of rivals || []) {
       w = rs.roster.find((w) => w.id === id);
       if (w) return w;
     }
     return undefined;
-  }, [id, state.roster, state.graveyard, state.retired, state.rivals]);
+  }, [id, roster, graveyard, retired, rivals]);
 
   const isPlayerOwned = useMemo(() => {
     if (!warrior) return false;
-    return !!(state.roster.find((w) => w.id === id) || state.graveyard.find((w) => w.id === id) || state.retired.find((w) => w.id === id));
-  }, [warrior, id, state.roster, state.graveyard, state.retired]);
+    return !!(roster.find((w) => w.id === id) || graveyard.find((w) => w.id === id) || retired.find((w) => w.id === id));
+  }, [warrior, id, roster, graveyard, retired]);
 
   const displayWarrior = useMemo(() => {
     if (!warrior) return null;
-    return obfuscateWarrior(warrior, state.insightTokens, isPlayerOwned);
-  }, [warrior, state.insightTokens, isPlayerOwned]);
+    return obfuscateWarrior(warrior, insightTokens, isPlayerOwned);
+  }, [warrior, insightTokens, isPlayerOwned]);
 
   const handlePlanChange = useCallback(
     (newPlan: FightPlan) => {
       if (!warrior) return;
-      setState((prev) => ({
-        ...prev,
-        roster: prev.roster.map((w) =>
-          w.id === warrior?.id ? { ...w, plan: newPlan } : w
-        ),
-      }));
+      setState((draft: any) => {
+        const index = draft.roster.findIndex((w: any) => w.id === warrior.id);
+        if (index !== -1) {
+          draft.roster[index].plan = newPlan;
+        }
+      });
     },
     [warrior, setState]
   );
 
   const handleRetire = useCallback(() => {
     if (!warrior) return;
-    setState((prev) => {
-      const updated = retireWarrior(prev, warrior!.id);
-      return updated;
-    });
-    toast.success(`${warrior!.name} has been retired with honor.`);
+    retireWarrior(warrior.id);
+    toast.success(`${warrior.name} has been retired with honor.`);
     navigate({ to: "/" });
-  }, [warrior, setState, navigate]);
+  }, [warrior, retireWarrior, navigate]);
 
   const handleEquipmentChange = useCallback(
     (newLoadout: EquipmentLoadout) => {
       if (!warrior) return;
-      setState((prev) => ({
-        ...prev,
-        roster: prev.roster.map((w) =>
-          w.id === warrior?.id ? { ...w, equipment: newLoadout } : w
-        ),
-      }));
+      setState((draft: any) => {
+        const index = draft.roster.findIndex((w: any) => w.id === warrior.id);
+        if (index !== -1) {
+          draft.roster[index].equipment = newLoadout;
+        }
+      });
     },
     [warrior, setState]
   );
@@ -111,7 +110,7 @@ export default function WarriorDetail() {
   const currentLoadout = warrior.equipment ?? DEFAULT_LOADOUT;
   const record = `${displayWarrior.career.wins}W - ${displayWarrior.career.losses}L - ${displayWarrior.career.kills}K`;
 
-  const streakMap = computeStreaks(state.arenaHistory);
+  const streakMap = computeStreaks(arenaHistory);
   const streakVal = streakMap.get(displayWarrior.name) ?? 0;
   const streakLabel = streakVal > 0 ? `🔥 ${streakVal}W streak` : streakVal < 0 ? `${Math.abs(streakVal)}L streak` : null;
 
@@ -151,7 +150,7 @@ export default function WarriorDetail() {
         />
       )}
 
-      {activeTab === "chronicle" && <ChronicleTab warrior={warrior} arenaHistory={state.arenaHistory} />}
+      {activeTab === "chronicle" && <ChronicleTab warrior={warrior} arenaHistory={arenaHistory} />}
     </div>
   );
 }

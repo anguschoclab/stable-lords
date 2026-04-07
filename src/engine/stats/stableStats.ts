@@ -1,4 +1,4 @@
-import type { GameState, Warrior, RivalStableData } from "@/types/game";
+import type { Warrior } from "@/types/warrior.types";
 
 export interface StableStats {
   activeCount: number;

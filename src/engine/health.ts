@@ -1,7 +1,9 @@
-import { type GameState, type Warrior, type InjuryData } from "@/types/game";
+import type { GameState, SeasonalGrowth } from "@/types/state.types";
+import type { Warrior, InjuryData } from "@/types/warrior.types";
 import { tickInjuries } from "@/engine/injuries";
 import { clearExpiredRest } from "@/engine/matchmaking/historyLogic";
 import { type StateImpact } from "./impacts";
+import { SeededRNG } from "@/utils/random";
 
 /**
  * Health Impact calculation — extracted from the legacy pipeline.
@@ -10,6 +12,7 @@ import { type StateImpact } from "./impacts";
 export function computeHealthImpact(state: GameState): StateImpact {
   const injuryNews: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
+  const rng = new SeededRNG(state.week);
 
   for (const w of state.roster) {
     const updates: Partial<Warrior> = {};
@@ -39,7 +42,7 @@ export function computeHealthImpact(state: GameState): StateImpact {
 
   return {
     rosterUpdates,
-    newsletterItems: injuryNews.length > 0 ? [{ week: state.week, title: "Medical Report", items: injuryNews }] : []
+    newsletterItems: injuryNews.length > 0 ? [{ id: new SeededRNG(state.week).uuid("newsletter"), week: state.week, title: "Medical Report", items: injuryNews }] : []
   };
 }
 

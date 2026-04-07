@@ -1,7 +1,6 @@
-/**
- * Trainer types, constants, hiring pool generation, and retired-warrior conversion.
- */
-import { FightingStyle, STYLE_DISPLAY_NAMES, type Warrior, type TrainerTier, type TrainerFocus } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES, type TrainerTier, type TrainerFocus } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { GameState, Trainer } from "@/types/state.types";
 
 export type { TrainerTier, TrainerFocus };
 
@@ -42,20 +41,7 @@ export const TIER_BONUS: Record<TrainerTier, number> = {
   Master: 3,
 };
 
-export interface Trainer {
-  id: string;
-  name: string;
-  tier: TrainerTier;
-  focus: TrainerFocus;
-  fame: number;
-  age: number; // New field for longevity
-  contractWeeksLeft: number; // 0 = expired
-  retiredFromWarrior?: string; // warrior name if converted
-  retiredFromStyle?: FightingStyle;
-  styleBonusStyle?: FightingStyle; // bonus for warriors of this style
-  legacyWins?: number; // Career stats for legend protection
-  legacyKills?: number;
-}
+// Trainer interface is imported from state.types.ts
 
 // ─── Name Generation ──────────────────────────────────────────────────────
 const TRAINER_FIRST_NAMES = [

@@ -13,7 +13,7 @@ interface ScoutIntelTabProps {
   onSelectRival: (id: string) => void;
   selectedWarriorId: string | null;
   onSelectWarrior: (id: string) => void;
-  gold: number;
+  treasury: number;
   onScout: (quality: ScoutQuality) => void;
 }
 
@@ -24,7 +24,7 @@ export function ScoutIntelTab({
   onSelectRival,
   selectedWarriorId,
   onSelectWarrior,
-  gold,
+  treasury,
   onScout
 }: ScoutIntelTabProps) {
   const activeRival = useMemo(
@@ -82,7 +82,7 @@ export function ScoutIntelTab({
           <ScoutReportDetails
             report={existingReport ?? null}
             warriorName={activeWarrior.name}
-            gold={gold}
+            treasury={treasury}
             onScout={onScout}
           />
         ) : (

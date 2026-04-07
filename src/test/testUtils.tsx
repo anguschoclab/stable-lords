@@ -15,13 +15,13 @@ Object.defineProperty(global, 'localStorage', { value: localStorageMock, writabl
 
 // Now import the state modules
 import { useGameStore } from "@/state/useGameStore";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 // A helper to inject a mock state into the Zustand store before rendering
 export function renderWithGameState(ui: React.ReactElement, partialState: Partial<ReturnType<typeof createFreshState>> = {}) {
   // Get a clean base state
-  const baseState = createFreshState();
+  const baseState = createFreshState("test-seed");
 
   // Merge the partial overrides
   const mockState = {

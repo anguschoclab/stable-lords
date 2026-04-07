@@ -5,11 +5,10 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { Button } from "@/components/ui/button";
-import { GripVertical, RotateCcw, LayoutDashboard, Coins, Crown, Activity } from "lucide-react";
+import { GripVertical, RotateCcw, LayoutDashboard } from "lucide-react";
 import { loadUIPrefs, saveUIPrefs } from "@/state/uiPrefs";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Surface } from "@/components/ui/Surface";
 import { EditableText } from "@/components/ui/EditableText";
 
 // Extracted Widgets
@@ -144,7 +143,9 @@ function useDraggableWidgets() {
 // ─── Main Dashboard ────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const { state } = useGameStore();
+  // Destructure top-level properties from useGameStore. No 'state.' prefix.
+  const { treasury, fame, player, renameStable, renamePlayer } = useGameStore();
+
   const {
     widgetOrder, dragIdx, dragOverIdx, isEditing, setIsEditing,
     handleDragStart, handleDragOver, handleDrop, handleDragEnd, resetLayout,
@@ -158,11 +159,11 @@ export default function Dashboard() {
   return (
     <div className="space-y-12 max-w-7xl mx-auto">
       <PageHeader 
-        title={<EditableText value={state.player.stableName} onSave={state.renameStable} className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl font-display uppercase tracking-tighter" />}
+        title={<EditableText value={player.stableName} onSave={renameStable} className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl font-display uppercase tracking-tighter" />}
         subtitle={
           <div className="flex items-center gap-2 text-muted-foreground font-black uppercase text-[10px] tracking-[0.2em] opacity-60">
             <span>By</span>
-            <EditableText value={state.player.name} onSave={state.renamePlayer} className="text-primary/80" />
+            <EditableText value={player.name} onSave={renamePlayer} className="text-primary/80" />
             <span>• Command Center</span>
           </div>
         }
@@ -172,15 +173,11 @@ export default function Dashboard() {
             <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-lg border border-white/5 shrink-0 shadow-inner">
                <div className="flex items-center gap-2 border-r border-white/5 pr-4">
                   <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Gold</span>
-                  <span className="font-mono text-arena-gold font-black">{Math.round(state.gold).toLocaleString()}G</span>
+                  <span className="font-mono text-arena-gold font-black">{Math.round(treasury).toLocaleString()}G</span>
                </div>
                <div className="flex items-center gap-2 border-r border-white/5 pr-4">
                   <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Fame</span>
-                  <span className="font-mono text-arena-fame font-black">{Math.round(state.fame).toLocaleString()}</span>
-               </div>
-               <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Pop</span>
-                  <span className="font-mono text-arena-pop font-black">{Math.round(state.popularity)}%</span>
+                  <span className="font-mono text-arena-fame font-black">{Math.round(fame).toLocaleString()}</span>
                </div>
             </div>
 

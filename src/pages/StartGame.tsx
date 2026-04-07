@@ -4,7 +4,7 @@
  */
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import {
   listSaveSlots,
   loadFromSlot,
@@ -86,7 +86,8 @@ export default function StartGame() {
   }, [deleteTarget, refreshSlots]);
 
   const handleNewGame = useCallback(() => {
-    const fresh = createFreshState();
+    // Deterministic starting state for 1.0 hub stability
+    const fresh = createFreshState("alpha-prime-10");
     fresh.player.name = ownerName.trim();
     fresh.player.stableName = stableName.trim();
     const slotId = newSlotId();

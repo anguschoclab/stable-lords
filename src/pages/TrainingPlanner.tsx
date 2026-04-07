@@ -6,16 +6,16 @@ import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import {
   ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, STYLE_DISPLAY_NAMES,
-  type Warrior, type Attributes,
-} from "@/types/game";
+  type Attributes, type FightingStyle
+} from "@/types/shared.types";
+import type { Warrior } from "@/types/state.types";
 import { computeGainChance } from "@/engine/training";
-import { potentialRating, potentialGrade, diminishingReturnsFactor, canGrow } from "@/engine/potential";
+import { potentialRating, potentialGrade, diminishingReturnsFactor } from "@/engine/potential";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  Dumbbell, AlertTriangle, TrendingUp, Flame, Lock, Star, BarChart3, Target,
+  Dumbbell, AlertTriangle, Lock, Star, BarChart3, Target,
 } from "lucide-react";
 import { WarriorLink } from "@/components/EntityLink";
 
@@ -27,7 +27,7 @@ interface BurnWarning {
   severity: "low" | "medium" | "high";
 }
 
-function assessBurnRisks(warrior: Warrior, trainers: import("@/types/game").Trainer[]): BurnWarning[] {
+function assessBurnRisks(warrior: Warrior, trainers: import("@/types/shared.types").Trainer[]): BurnWarning[] {
   const warnings: BurnWarning[] = [];
   const age = warrior.age ?? 18;
 
@@ -63,7 +63,7 @@ function assessBurnRisks(warrior: Warrior, trainers: import("@/types/game").Trai
 
 /* ── Trainability Score ──────────────────────────────────── */
 
-function computeTrainability(warrior: Warrior, trainers: import("@/types/game").Trainer[]): number {
+function computeTrainability(warrior: Warrior, trainers: import("@/types/shared.types").Trainer[]): number {
   let totalChance = 0;
   let trainable = 0;
   for (const key of ATTRIBUTE_KEYS) {
@@ -181,7 +181,7 @@ function AttributeRow({ attr }: { attr: {
 
 function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
   warrior: Warrior;
-  trainers: import("@/types/game").Trainer[];
+  trainers: import("@/types/shared.types").Trainer[];
   season: string;
   seasonalGains: Partial<Record<keyof Attributes, number>>;
 }) {
@@ -231,14 +231,14 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
               <WarriorLink name={warrior.name} id={warrior.id}>{warrior.name}</WarriorLink>
             </CardTitle>
             <Badge variant="outline" className="text-[10px] font-mono">
-              {STYLE_DISPLAY_NAMES[warrior.style]}
+              {STYLE_DISPLAY_NAMES[warrior.style as FightingStyle]}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
             {potGrade && (
               <TooltipProvider delayDuration={200}>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Badge variant="outline" className={`text-xs font-mono ${gradeColors[potGrade] ?? ""}`}>
                       <Star className="h-3 w-3 mr-0.5" /> {potGrade}
                     </Badge>
@@ -275,28 +275,28 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function TrainingPlanner() {
-  const { state } = useGameStore();
-  const activeWarriors = state.roster.filter(w => w.status === "Active");
-  const trainers = state.trainers ?? [];
+  const { roster, trainers, seasonalGrowth, season } = useGameStore();
+  const activeWarriors = roster.filter(w => w.status === "Active");
+  const currentTrainers = useMemo(() => trainers ?? [], [trainers]);
 
   const seasonalGainsMap = useMemo(() => {
     const map = new Map<string, Partial<Record<keyof Attributes, number>>>();
-    for (const sg of (state.seasonalGrowth ?? [])) {
-      if (sg.season === state.season) {
+    const growth = (seasonalGrowth ?? []) as any[];
+    for (const sg of growth) {
+      if (sg.season === season) {
         map.set(sg.warriorId, sg.gains);
       }
     }
     return map;
-  }, [state.seasonalGrowth, state.season]);
+  }, [seasonalGrowth, season]);
 
   // Overall stable trainability
   const avgTrainability = useMemo(() => {
     if (activeWarriors.length === 0) return 0;
-    const trainers = state.trainers ?? [];
     return Math.round(
-      activeWarriors.reduce((s, w) => s + computeTrainability(w, trainers), 0) / activeWarriors.length
+      activeWarriors.reduce((s, w) => s + computeTrainability(w, currentTrainers), 0) / activeWarriors.length
     );
-  }, [activeWarriors, state.trainers]);
+  }, [activeWarriors, currentTrainers]);
 
   return (
     <div className="space-y-6">
@@ -322,7 +322,7 @@ export default function TrainingPlanner() {
               <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Active Warriors</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-display font-bold text-muted-foreground">{trainers.filter(t => t.contractWeeksLeft > 0).length}</div>
+              <div className="text-2xl font-display font-bold text-muted-foreground">{currentTrainers.filter(t => t.contractWeeksLeft > 0).length}</div>
               <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Active Trainers</div>
             </div>
           </div>
@@ -357,8 +357,8 @@ export default function TrainingPlanner() {
             <WarriorPlannerCard
               key={warrior.id}
               warrior={warrior}
-              trainers={trainers}
-              season={state.season}
+              trainers={currentTrainers}
+              season={season}
               seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
             />
           ))}

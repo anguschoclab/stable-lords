@@ -7,26 +7,26 @@ import { RosterWall } from "@/components/stable/RosterWall";
 import { TrainerTable } from "@/components/stable/TrainerTable";
 
 export default function StableHall() {
-  const { state } = useGameStore();
+  const { player, fame } = useGameStore();
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
       <PageHeader 
-        title={state.player.stableName}
-        subtitle={`REPUTATION // ${state.player.name} // LEGACY OF THE ARENA`}
+        title={player.stableName}
+        subtitle={`REPUTATION // ${player.name} // LEGACY OF THE ARENA`}
         icon={Shield}
         actions={
           <div className="flex flex-col md:flex-row items-center gap-6 bg-neutral-900/40 backdrop-blur-md px-6 py-3 rounded-xl border border-white/5 shadow-inner">
              <div className="flex flex-col items-center border-r border-white/10 pr-6">
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Eminent Fame</span>
                 <span className="font-mono font-black text-arena-gold text-lg flex items-center gap-1.5 leading-none">
-                   {state.fame} <Star className="h-3.5 w-3.5" />
+                   {fame} <Star className="h-3.5 w-3.5" />
                 </span>
              </div>
              <div className="flex flex-col items-center">
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Master Titles</span>
                 <span className="font-mono font-black text-arena-fame text-lg flex items-center gap-1.5 leading-none">
-                   {state.player.titles} <Crown className="h-3.5 w-3.5" />
+                   {player.titles} <Crown className="h-3.5 w-3.5" />
                 </span>
              </div>
           </div>

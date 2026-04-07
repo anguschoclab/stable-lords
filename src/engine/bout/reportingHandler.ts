@@ -1,4 +1,5 @@
-import { Warrior, FightOutcome, FightSummary } from "@/types/game";
+import type { Warrior } from "@/types/state.types";
+import type { FightOutcome, FightSummary } from "@/types/combat.types";
 import { generateId } from "@/utils/idUtils";
 import { SeededRNG } from "@/utils/random";
 import { StyleRollups } from "@/engine/stats/styleRollups";
@@ -23,14 +24,14 @@ export function handleReporting(
   rng?: () => number
 ) {
   const safeRng = rng ? { next: rng } : new SeededRNG(week * 100 + day);
-  const boutId = generateId(safeRng as SeededRNG, "bt");
+  const boutId = generateId(safeRng as SeededRNG, "bout");
   const summary: FightSummary = { 
     id: boutId, week, title: `${wA.name} vs ${wD.name}`, a: wA.name, d: wD.name, 
     warriorIdA: wA.id, warriorIdD: wD.id,
     winner: outcome.winner, by: outcome.by, styleA: wA.style, styleD: wD.style, 
     flashyTags: tags, fameDeltaA: fA, fameDeltaD: fD, fameA: wA.fame, fameD: wD.fame, 
     popularityDeltaA: pA, popularityDeltaD: pD, transcript: outcome.log.map(e => e.text), 
-    isRivalry, createdAt: "2026-01-01T00:00:00Z" 
+    isRivalry, createdAt: new Date().toISOString() 
   };
   
   // Side effects

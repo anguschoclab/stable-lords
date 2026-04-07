@@ -3,8 +3,9 @@
  * Modularized for better maintainability and strict type safety.
  */
 import React, { useState, useMemo, useCallback } from "react";
-import { useGameStore } from "@/state/useGameStore";
-import { advanceWeek } from "@/state/gameStore";
+import { useGameStore, reconstructGameState } from "@/state/useGameStore";
+import { type GameState, type Warrior, type RivalStableData } from "@/types/game";
+
 import { generatePairings } from "@/engine/bout/core/pairings";
 import { isFightReady } from "@/engine/warriorStatus";
 import { processWeekBouts, type BoutResult } from "@/engine/boutProcessor";
@@ -22,15 +23,9 @@ import { AutosimConsole } from "@/components/run-round/AutosimConsole";
 import { RunResults } from "@/components/run-round/RunResults";
 
 export default function RunRound() {
-  const { state, setState, doAdvanceDay, doAdvanceWeek, setSimulating } = useGameStore(
-    useShallow((s) => ({ 
-      state: s.state, 
-      setState: s.setState,
-      doAdvanceDay: s.doAdvanceDay,
-      doAdvanceWeek: s.doAdvanceWeek,
-      setSimulating: s.setSimulating
-    }))
-  );
+  const store = useGameStore();
+  const { setState, doAdvanceDay, doAdvanceWeek, setSimulating } = store;
+  const state = useMemo(() => reconstructGameState(store), [store]);
   const [results, setResults] = useState<BoutResult[]>([]);
   const [running, setRunning] = useState(false);
   const [autosimming, setAutosimming] = useState(false);
@@ -38,12 +33,12 @@ export default function RunRound() {
   const [autosimResult, setAutosimResult] = useState<AutosimResult | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const fightReady = useMemo(() => state.roster.filter(w => isFightReady(w)), [state.roster]);
+  const fightReady = useMemo(() => state.roster.filter((w: Warrior) => isFightReady(w)), [state.roster]);
   const matchCard = useMemo(() => {
     return generatePairings(state).map(p => ({
       playerWarrior: p.a,
       rivalWarrior: p.d,
-      rivalStable: state.rivals.find(r => r.owner.id === p.rivalStableId) || { owner: { id: p.rivalStableId, stableName: p.rivalStable } } as import("@/types/game").RivalStableData,
+      rivalStable: state.rivals.find((r: RivalStableData) => r.owner.id === p.rivalStableId) || { owner: { id: p.rivalStableId, stableName: p.rivalStable } } as RivalStableData,
       isRivalryBout: p.isRivalry
     }));
   }, [state]);
@@ -88,7 +83,9 @@ export default function RunRound() {
       });
 
       setAutosimResult(result);
-      setState(result.finalState);
+      setState((draft: any) => {
+        Object.assign(draft, result.finalState);
+      });
     } catch (err) {
       console.error("Autosim failed", err);
       toast.error("Auto-simulation encountered a temporal rift.");

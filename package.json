@@ -11,11 +11,13 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "oracle:daily": "bun run scripts/daily_oracle.ts"
+    "oracle:daily": "bun run scripts/daily_oracle.ts",
+    "bard:daily": "npx tsx src/scripts/daily_bard.ts"
   },
   "dependencies": {
     "@fontsource/cinzel": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
+    "@google/generative-ai": "^0.24.1",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",

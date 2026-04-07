@@ -4,7 +4,7 @@
  */
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { makeWarrior } from "@/state/gameStore";
+import { makeWarrior } from "@/engine/factories";
 import { simulateFight, defaultPlanForWarrior } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
 import { generateRecruitPool } from "@/engine/recruitment";
@@ -12,6 +12,8 @@ import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, t
 import { computeWarriorStats, DAMAGE_LABELS } from "@/engine/skillCalc";
 import { generatePotential } from "@/engine/potential";
 import { LoreArchive } from "@/lore/LoreArchive";
+import { generateId } from "@/utils/idUtils";
+import { SeededRNG } from "@/utils/random";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +29,8 @@ import { generateOrphanPool } from "@/data/orphanPool";
 const STEP_LABELS = ["Establish Identity", "Choose Warriors", "First Blood", "Your Story Begins"];
 
 export default function Orphanage() {
-  const { state, doInitializeStable, doDraftInitialRoster, setState, returnToTitle } = useGameStore();
+  const state = useGameStore();
+  const { initializeStable, setRoster, setState, returnToTitle } = state;
   
   const initialStep = !state.player.stableName ? 0 : 1;
   const [step, setStep] = useState(initialStep);
@@ -35,21 +38,24 @@ export default function Orphanage() {
   const [ownerInput, setOwnerInput] = useState(state.player.name || "");
   
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [poolSeed, setPoolSeed] = useState(() => Date.now());
+  const [poolSeedValue, setPoolSeedValue] = useState(12345); // Standard starting seed
+  
+  const rng = useMemo(() => new SeededRNG(poolSeedValue), [poolSeedValue]);
+
   const [boutResult, setBoutResult] = useState<{
     a: Warrior; d: Warrior;
     outcome: ReturnType<typeof simulateFight>;
     summary: FightSummary;
   } | null>(null);
 
-  // Dynamic orphan pool
-  const orphanPool = useMemo(() => generateOrphanPool(8, poolSeed), [poolSeed]);
+  // Dynamic orphan pool - use the RNG derived from state or constant seed
+  const orphanPool = useMemo(() => generateOrphanPool(8, poolSeedValue), [poolSeedValue]);
 
   const stableName = state.player.stableName;
   const ownerName = state.player.name;
 
   const rerollPool = useCallback(() => {
-    setPoolSeed(Date.now());
+    setPoolSeedValue(prev => (prev * 1103515245 + 12345) & 0x7fffffff);
     setSelected(new Set());
   }, []);
 
@@ -84,6 +90,8 @@ export default function Orphanage() {
       title: `${wA.name} vs ${wB.name}`,
       a: wA.name,
       d: wB.name,
+      warriorIdA: wA.id,
+      warriorIdD: wB.id,
       winner: outcome.winner,
       by: outcome.by,
       styleA: wA.style,
@@ -99,17 +107,17 @@ export default function Orphanage() {
   }, [selectedWarriors]);
 
   const finishFTUE = useCallback(() => {
-    let seed = Date.now();
-    const rng = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    const finishRng = new SeededRNG(poolSeedValue + 999);
 
     const warriors = selectedWarriors.map((pw) => {
-      const potential = generatePotential(pw.attrs, "Promising", rng);
+      const potential = generatePotential(pw.attrs, "Promising", () => finishRng.next());
       const w = makeWarrior(
-        `w_${Date.now()}_${Math.floor(Math.random() * 1e5)}_${pw.id}`,
+        generateId(finishRng, "war"),
         pw.name,
         pw.style,
         pw.attrs,
-        { potential, age: pw.age }
+        { potential, age: pw.age },
+        finishRng
       );
       if (boutResult) {
         const wasA = pw.name === boutResult.a.name;
@@ -146,32 +154,25 @@ export default function Orphanage() {
         dateOfDeath: `Week 1, ${state.season}`,
       }));
 
-    const rivals = generateRivalStables(23, Date.now());
+    const rivals = generateRivalStables(23, poolSeedValue + 777);
 
     const usedNames = new Set<string>();
     aliveWarriors.forEach(w => usedNames.add(w.name));
     deadWarriors.forEach(w => usedNames.add(w.name));
     rivals.forEach(r => r.roster.forEach(w => usedNames.add(w.name)));
 
-    const recruitPool = generateRecruitPool(100, 1, usedNames, Date.now() + 1);
+    const recruitPool = generateRecruitPool(100, 1, usedNames, poolSeedValue + 888);
 
-    const newState = {
-      ...state,
-      isFTUE: false,
-      ftueComplete: true,
-      roster: aliveWarriors,
-      graveyard: [...state.graveyard, ...deadWarriors],
-      rivals,
-      recruitPool,
-      arenaHistory: boutResult ? [boutResult.summary] : [],
-    };
-
-    if (boutResult) {
-      LoreArchive.signalFight(boutResult.summary);
-    }
-
-    setState(newState);
-  }, [state, setState, selectedWarriors, boutResult]);
+    setState((draft: any) => {
+      draft.isFTUE = false;
+      draft.ftueComplete = true;
+      draft.roster = aliveWarriors;
+      draft.graveyard = [...state.graveyard, ...deadWarriors];
+      draft.rivals = rivals;
+      draft.recruitPool = recruitPool;
+      draft.arenaHistory = boutResult ? [boutResult.summary] : [];
+    });
+  }, [state, setState, selectedWarriors, boutResult, poolSeedValue]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -201,7 +202,7 @@ export default function Orphanage() {
               </div>
               <div className="flex gap-3 pt-2">
                 <Button variant="outline" onClick={returnToTitle} className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
-                <Button disabled={!ownerInput.trim() || !stableInput.trim()} onClick={() => { doInitializeStable(ownerInput.trim(), stableInput.trim()); setStep(1); }} className="flex-1 gap-2">
+                <Button disabled={!ownerInput.trim() || !stableInput.trim()} onClick={() => { initializeStable(ownerInput.trim(), stableInput.trim()); setStep(1); }} className="flex-1 gap-2">
                   Continue <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>

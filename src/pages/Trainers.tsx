@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useMemo, useCallback, useState, useEffect } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import type { Trainer } from "@/types/game";
-import { STYLE_DISPLAY_NAMES } from "@/types/game";
+import type { GameState } from "@/types/state.types";
+import type { Trainer } from "@/types/shared.types";
+import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/shared.types";
 import {
   TRAINER_FOCUSES,
   TRAINER_MAX_PER_STABLE,
@@ -23,8 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import { GraduationCap, UserPlus, RefreshCw, Armchair, Sparkles, Trophy, Zap, Target, Briefcase, Info, Users, Clock, Coins, ChevronRight } from "lucide-react";
+import { GraduationCap, UserPlus, RefreshCw, Armchair, Zap, Users, Coins, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -38,28 +38,36 @@ import { canTransact } from "@/utils/economyUtils";
 import { toast } from "sonner";
 
 export default function Trainers() {
-  const { state, setState } = useGameStore();
-  const treasury = useGameStore(s => s.treasury);
+  // Flat destructuring from 1.0 store
+  const { 
+    trainers, hiringPool, week, retired, treasury, 
+    setState 
+  } = useGameStore();
+
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
-  const currentTrainers = useMemo(() => state.trainers ?? [], [state.trainers]);
-  const hiringPool = useMemo(() => state.hiringPool ?? [], [state.hiringPool]);
-  const canHire = (currentTrainers || []).length < TRAINER_MAX_PER_STABLE;
+  const currentTrainers = useMemo(() => trainers ?? [], [trainers]);
+  const currentHiringPool = useMemo(() => hiringPool ?? [], [hiringPool]);
+  const canHire = currentTrainers.length < TRAINER_MAX_PER_STABLE;
 
   // Auto-populate hiring pool on first visit if empty
-  React.useEffect(() => {
-    if ((state.hiringPool ?? []).length === 0) {
-      const pool = generateHiringPool(4, state.week * 1000 + Date.now());
-      setState((prev) => ({ ...prev, hiringPool: pool }));
+  useEffect(() => {
+    if (currentHiringPool.length === 0) {
+      const pool = generateHiringPool(4, week * 1000 + Date.now());
+      setState((draft: GameState) => {
+        draft.hiringPool = pool;
+      });
     }
-  }, [state.hiringPool, state.week, setState]);
+  }, [currentHiringPool.length, week, setState]);
 
   // Refresh hiring pool
   const refreshPool = useCallback(() => {
-    const pool = generateHiringPool(4, state.week * 1000 + Date.now());
-    setState((prev) => ({ ...prev, hiringPool: pool }));
+    const pool = generateHiringPool(4, week * 1000 + Date.now());
+    setState((draft: GameState) => {
+      draft.hiringPool = pool;
+    });
     toast.success("Personnel registry updated. New candidates available.");
-  }, [state.week, setState]);
+  }, [week, setState]);
 
   const hireTrainer = useCallback(
     (trainer: Trainer) => {
@@ -68,18 +76,18 @@ export default function Trainers() {
         toast.error(`Insufficient credits. Access to ${trainer.name} requires ${cost}G.`);
         return;
       }
-      setState((prev) => ({
-        ...prev,
-        trainers: [...(prev.trainers ?? []), trainer],
-        hiringPool: (prev.hiringPool ?? []).filter((t) => t.id !== trainer.id),
-        treasury: prev.treasury - cost,
-        ledger: [...(prev.ledger ?? []), {
-          week: prev.week,
+      setState((draft: GameState) => {
+        draft.trainers.push(trainer);
+        draft.hiringPool = draft.hiringPool.filter((t) => t.id !== trainer.id);
+        draft.treasury -= cost;
+        draft.ledger.push({
+          id: crypto.randomUUID(),
+          week: draft.week,
           label: `Acquisition: ${trainer.name}`,
           amount: -cost,
-          category: "trainer" as const,
-        }],
-      }));
+          category: "trainer",
+        });
+      });
       toast.success(`${trainer.name} has signed with your stable. Personnel synchronized.`);
     },
     [treasury, setState]
@@ -87,34 +95,32 @@ export default function Trainers() {
 
   const fireTrainer = useCallback(
     (trainerId: string) => {
-      setState((prev) => ({
-        ...prev,
-        trainers: (prev.trainers ?? []).filter((t) => t.id !== trainerId),
-      }));
+      setState((draft: GameState) => {
+        draft.trainers = draft.trainers.filter((t) => t.id !== trainerId);
+      });
     },
     [setState]
   );
 
   const convertableRetired = useMemo(
-    () => state.retired.filter(
-      (w) => !(state.trainers ?? []).some((t) => t.retiredFromWarrior === w.name)
+    () => retired.filter(
+      (w) => !currentTrainers.some((t) => t.retiredFromWarrior === w.name)
     ),
-    [state.retired, state.trainers]
+    [retired, currentTrainers]
   );
 
   const convertWarrior = useCallback(
     (warriorId: string) => {
-      const warrior = state.retired.find((w) => w.id === warriorId);
+      const warrior = retired.find((w) => w.id === warriorId);
       if (!warrior) return;
       const trainer = convertRetiredToTrainer(warrior);
-      setState((prev) => ({
-        ...prev,
-        trainers: [...(prev.trainers ?? []), trainer],
-      }));
+      setState((draft: GameState) => {
+        draft.trainers.push(trainer);
+      });
       toast.success(`${warrior.name} confirmed for the retirement-to-trainer protocol. Tactical specialization: ${trainer.focus}.`);
       setConvertDialogOpen(false);
     },
-    [state.retired, setState]
+    [retired, setState]
   );
 
   return (
@@ -254,8 +260,8 @@ export default function Trainers() {
                             <div>
                                <div className="flex items-center gap-3 mb-2">
                                   <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} useCrown={w.champion} />
-                                  <StatBadge styleName={w.style as import("@/types/game").FightingStyle} />
-                               </div>
+                                  <StatBadge styleName={w.style as FightingStyle} />
+                                </div>
                                <div className="flex items-center gap-2">
                                   <ChevronRight className="h-3 w-3 text-primary" />
                                   <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest border-primary/20 bg-primary/5 text-primary rounded-none">
@@ -289,7 +295,7 @@ export default function Trainers() {
                <div>
                   <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground leading-none mb-1.5">Candidate Database</h3>
                   <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest leading-none">
-                    {hiringPool.length > 0 ? `Confirmed Search Result: ${hiringPool.length} Candidates Located` : "Scanning Personnel Database..."}
+                    {currentHiringPool.length > 0 ? `Confirmed Search Result: ${currentHiringPool.length} Candidates Located` : "Scanning Personnel Database..."}
                   </p>
                </div>
             </div>
@@ -302,9 +308,9 @@ export default function Trainers() {
             </button>
           </div>
 
-          {hiringPool.length > 0 ? (
+          {currentHiringPool.length > 0 ? (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-              {hiringPool.map((t) => (
+              {currentHiringPool.map((t) => (
                 <TrainerCard 
                   key={t.id} 
                   trainer={t} 

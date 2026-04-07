@@ -24,32 +24,31 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
   const { weeks, seed, logFrequency = 1 } = config;
   
   // 1. Initialize State
-  const fresh = createFreshState();
-  let state = populateInitialWorld(fresh, seed);
+  const seedStr = seed.toString();
+  let state = populateInitialWorld(createFreshState(seedStr), seed);
   const pulses: SimPulse[] = [];
 
   // 2. Main Loop
+  console.log(`[Harness] Starting simulation for ${weeks} weeks...`);
+  
   for (let w = 1; w <= weeks; w++) {
-    console.log(`[Sim] Running Week ${w}...`);
-    console.time(`Week ${w} - processBouts`);
-    const processed = processWeekBouts(state);
-    console.timeEnd(`Week ${w} - processBouts`);
-    
-    console.time(`Week ${w} - advanceWeek`);
-    state = advanceWeek(processed.state);
-    console.timeEnd(`Week ${w} - advanceWeek`);
+    // A. Weekly Decision Logic (AI/Player)
+    state.boutOffers = {}; // Clear old offers
+    // ... logic for responding to offers if any ...
+
+    // B. Advance Week
+    state = advanceWeek(state);
     
     let totalWarriors = 0;
     state.rivals.forEach(r => totalWarriors += r.roster.length);
-    console.log(`[Sim] Week ${w} - Rivals: ${state.rivals.length}, Total Warriors: ${totalWarriors}, Pool: ${state.recruitPool.length}`);
-
-    // Collect Data
-    if (w % logFrequency === 0 || w === weeks) {
+    
+    if (w % logFrequency === 0) {
+      console.log(`[Harness] Week ${state.week} | Roster: ${state.roster.length} | Treasury: ${state.treasury}`);
       pulses.push(collectPulse(state));
     }
 
     // Stop Conditions (Optional)
-    if (state.roster.length === 0 && state.gold < 100) {
+    if (state.roster.length === 0 && state.treasury < 100) {
       console.warn(`[Sim] Failure at week ${w}: Stable Bankrupt/Empty.`);
       break;
     }

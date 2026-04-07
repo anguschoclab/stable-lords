@@ -15,10 +15,10 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Graveyard() {
-  const { state } = useGameStore();
+  const { graveyard, player, season } = useGameStore();
 
-  const myFallen = state.graveyard.filter(w => w.stableId === state.player.id);
-  const worldFallen = state.graveyard;
+  const myFallen = graveyard.filter(w => w.stableId === player.id);
+  const worldFallen = graveyard;
 
   return (
     <div className="space-y-8 pb-12">
@@ -57,22 +57,20 @@ export default function Graveyard() {
             <Skull className="h-3.5 w-3.5" /> World Cemetery
           </TabsTrigger>
         </TabsList>
-
+ 
         <TabsContent value="memorial" className="mt-8">
-           <FallenGrid warriors={myFallen} emptyTitle="The Soil is Unbroken" emptyDesc="None of your warriors have fallen... yet." />
+           <FallenGrid warriors={myFallen} season={season} emptyTitle="The Soil is Unbroken" emptyDesc="None of your warriors have fallen... yet." />
         </TabsContent>
 
         <TabsContent value="world" className="mt-8">
-           <FallenGrid warriors={worldFallen} emptyTitle="Sands of Peace" emptyDesc="No blood has been spilled in this realm." />
+           <FallenGrid warriors={worldFallen} season={season} emptyTitle="Sands of Peace" emptyDesc="No blood has been spilled in this realm." />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function FallenGrid({ warriors, emptyTitle, emptyDesc }: { warriors: import("@/types/game").Warrior[], emptyTitle: string, emptyDesc: string }) {
-  const { state } = useGameStore();
-
+function FallenGrid({ warriors, season, emptyTitle, emptyDesc }: { warriors: any[], season: string, emptyTitle: string, emptyDesc: string }) {
   if (warriors.length === 0) {
     return (
       <motion.div 
@@ -128,7 +126,7 @@ function FallenGrid({ warriors, emptyTitle, emptyDesc }: { warriors: import("@/t
                     )}
                  </div>
                  <div className="flex items-center justify-between text-[10px] font-mono font-black text-muted-foreground/40">
-                    <span>WK_{w.deathWeek || '??'} · {state.season?.toUpperCase()}</span>
+                    <span>WK_{w.deathWeek || '??'} · {season?.toUpperCase()}</span>
                     <span className="flex items-center gap-1"><Activity className="h-3 w-3" /> CORPSE_RETRIEVED</span>
                  </div>
               </div>

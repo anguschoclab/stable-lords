@@ -2,7 +2,8 @@
  * Style Strategy Presets — pre-built phase configurations per style.
  * From Strategy Editor Spec v1.0 §5
  */
-import { FightingStyle, type FightPlan, type PhaseStrategy } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { FightPlan, PhaseStrategy } from "@/types/combat.types";
 
 export interface StylePreset {
   name: string;

@@ -1,6 +1,9 @@
 import { 
   type GameState, 
-  type Warrior, 
+  type TrainingAssignment 
+} from "@/types/state.types";
+import { type Warrior } from "@/types/warrior.types";
+import { 
   type Attributes, 
   ATTRIBUTE_KEYS, 
   ATTRIBUTE_MAX,

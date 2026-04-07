@@ -4,8 +4,9 @@
  */
 import { useMemo, useState } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { STYLE_DISPLAY_NAMES } from "@/types/game";
-import type { Warrior, FightSummary, Season } from "@/types/game";
+import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
+import type { Warrior, Season } from "@/types/state.types";
+import type { FightSummary } from "@/types/combat.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -326,36 +327,38 @@ function SeasonSection({ award }: { award: SeasonalAward }) {
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function SeasonalAwards() {
-  const { state } = useGameStore();
+  const { 
+    roster, graveyard, retired, rivals, arenaHistory, player, week 
+  } = useGameStore();
 
   const allWarriors = useMemo(() => [
-    ...state.roster,
-    ...state.graveyard,
-    ...state.retired,
-    ...(state.rivals ?? []).flatMap(r => r.roster),
-  ], [state]);
+    ...roster,
+    ...graveyard,
+    ...retired,
+    ...(rivals ?? []).flatMap(r => r.roster),
+  ], [roster, graveyard, retired, rivals]);
 
   const playerNames = useMemo(() => new Set([
-    ...state.roster.map(w => w.name),
-    ...state.graveyard.map(w => w.name),
-    ...state.retired.map(w => w.name),
-  ]), [state]);
+    ...roster.map(w => w.name),
+    ...graveyard.map(w => w.name),
+    ...retired.map(w => w.name),
+  ]), [roster, graveyard, retired]);
 
   const awards = useMemo(() =>
     computeSeasonalAwards(
-      state.arenaHistory,
+      arenaHistory,
       allWarriors,
       playerNames,
-      state.player.stableName,
-      state.rivals ?? [],
-      state.week,
+      player.stableName,
+      rivals ?? [],
+      week,
     ),
-    [state.arenaHistory, allWarriors, playerNames, state.player.stableName, state.rivals, state.week]
+    [arenaHistory, allWarriors, playerNames, player.stableName, rivals, week]
   );
 
-  const currentSeasonIdx = Math.floor((state.week - 1) / 13) % 4;
+  const currentSeasonIdx = Math.floor((week - 1) / 13) % 4;
   const currentSeason = SEASONS[currentSeasonIdx];
-  const weeksIntoSeason = ((state.week - 1) % 13) + 1;
+  const weeksIntoSeason = ((week - 1) % 13) + 1;
   const weeksRemaining = 13 - weeksIntoSeason;
 
   return (

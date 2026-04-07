@@ -1,4 +1,6 @@
-import { GameState, Season } from "@/types/game";
+import type { GameState } from "@/types/state.types";
+import type { Season } from "@/types/shared.types";
+import type { FightSummary } from "@/types/combat.types";
 import { getRecentFights } from "@/engine/core/historyUtils";
 import { SeededRNG } from "@/utils/random";
 

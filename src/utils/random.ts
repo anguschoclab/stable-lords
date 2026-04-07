@@ -52,7 +52,7 @@ export class SeededRNG {
     for (let i = 0; i < 12; i++) {
       str += chars[Math.floor(this.next() * chars.length)];
     }
-    return prefix ? `${prefix}_${str}` : str;
+    return prefix ? `${prefix}-${str}` : str;
   }
 
   /** Returns a new SeededRNG with the exact same state */
