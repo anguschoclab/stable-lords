@@ -191,7 +191,7 @@ function PlaybackControls({
     <div className="px-6 py-4 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-primary/10 transition-colors" onClick={reset} aria-label="Reset">
+          <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-primary/10 transition-colors" onClick={reset} aria-label="Reset" title="Reset">
             <RotateCcw className="h-5 w-5" />
           </Button>
           <Button
@@ -200,10 +200,11 @@ function PlaybackControls({
             className="h-12 w-12 rounded-full shadow-lg"
             onClick={togglePlay}
             aria-label={isPlaying ? "Pause" : "Play"}
+            title={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-1" />}
           </Button>
-          <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-primary/10 transition-colors" onClick={skipToEnd} aria-label="Skip">
+          <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-primary/10 transition-colors" onClick={skipToEnd} aria-label="Skip" title="Skip">
             <SkipForward className="h-5 w-5" />
           </Button>
         </div>
