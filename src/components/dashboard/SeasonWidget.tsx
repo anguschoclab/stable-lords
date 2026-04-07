@@ -142,7 +142,7 @@ export function SeasonWidget() {
                    <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-[200px]">
                       {weather === "Blazing Sun" ? "30% more stamina drain in combat." :
                        weather === "Scalding" ? "20% more stamina drain in combat." :
-                       weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality." :
+                       weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality. 10% more stamina drain." :
                        weather === "Drafty" ? "10% less stamina drain in combat." :
                        weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
                        "Standard atmospheric conditions."}
