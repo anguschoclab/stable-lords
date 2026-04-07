@@ -1,4 +1,6 @@
-export function respondToBoutOffer(state: any, offerId: string, warriorId: string, response: "Accepted" | "Declined"): any {
+import { GameState } from "@/types/state.types";
+
+export function respondToBoutOffer(state: GameState, offerId: string, warriorId: string, response: "Accepted" | "Declined"): GameState {
   const offer = state.boutOffers[offerId];
   if (!offer) return state;
 
