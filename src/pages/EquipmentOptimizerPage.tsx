@@ -3,7 +3,8 @@
  */
 import React, { useState, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
+import { type FightingStyle, STYLE_DISPLAY_NAMES, type Attributes } from "@/types/shared.types";
+import type { Warrior } from "@/types/state.types";
 import { generateRecommendations, getStyleEquipmentTips } from "@/engine/equipmentOptimizer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +19,8 @@ import { WeaponReqCheck } from "@/data/equipment";
 
 
 export default function EquipmentOptimizerPage() {
-  const { state } = useGameStore();
-  const activeWarriors = state.roster.filter(w => w.status === "Active");
+  const { roster, doUpdateEquipment } = useGameStore();
+  const activeWarriors = roster.filter(w => w.status === "Active");
   const [selectedStyle, setSelectedStyle] = useState<FightingStyle>(
     activeWarriors[0]?.style ?? FightingStyle.StrikingAttack
   );
@@ -98,6 +99,7 @@ export default function EquipmentOptimizerPage() {
             selectedStyle={selectedStyle}
             activeWarriors={activeWarriors}
             carryCap={carryCap}
+            doUpdateEquipment={doUpdateEquipment}
           />
         ))}
       </div>
@@ -105,29 +107,36 @@ export default function EquipmentOptimizerPage() {
   );
 }
 
-function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, carryCap }: { rec: { id: string, name: string, type: string, attributes: import("@/types/game").Attributes, effects: string[] }; isPrimary: boolean; selectedStyle: FightingStyle; activeWarriors: import("@/types/game").Warrior[]; carryCap: number }) {
-  const matchingWarriors = useMemo(() => activeWarriors.filter((w: import("@/types/game").Warrior) => w.style === selectedStyle), [activeWarriors, selectedStyle]);
+function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, carryCap, doUpdateEquipment }: { 
+  rec: any; 
+  isPrimary: boolean; 
+  selectedStyle: FightingStyle; 
+  activeWarriors: Warrior[]; 
+  carryCap: number;
+  doUpdateEquipment: (warriorId: string, equipment: any) => void;
+}) {
+  const matchingWarriors = useMemo(() => activeWarriors.filter((w) => w.style === selectedStyle), [activeWarriors, selectedStyle]);
   const [searchQuery, setSearchQuery] = useState("");
   
   const filteredWarriors = useMemo(() => {
     if (!searchQuery) return matchingWarriors;
-    return matchingWarriors.filter((w: import("@/types/game").Warrior) => w.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchingWarriors.filter((w) => w.name.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [matchingWarriors, searchQuery]);
 
   const [targetWarriorId, setTargetWarriorId] = useState<string>(matchingWarriors[0]?.id ?? "");
-  const targetWarrior = useMemo(() => matchingWarriors.find((w: import("@/types/game").Warrior) => w.id === targetWarriorId), [matchingWarriors, targetWarriorId]);
+  const targetWarrior = useMemo(() => matchingWarriors.find((w) => w.id === targetWarriorId), [matchingWarriors, targetWarriorId]);
   const reqCheck = useMemo(() => {
     if (!targetWarrior || !rec.loadout.weapon) return null;
     return checkWeaponRequirements(rec.loadout.weapon, targetWarrior.attributes);
   }, [targetWarrior, rec.loadout.weapon]);
 
-  const { doUpdateEquipment } = useGameStore();
+  }, [targetWarrior, rec.loadout.weapon]);
 
   const handleApply = () => {
     if (!targetWarriorId) return;
     doUpdateEquipment(targetWarriorId, rec.loadout);
     import("sonner").then(({ toast }) => {
-       const w = matchingWarriors.find((mw: import("@/types/game").Warrior) => mw.id === targetWarriorId);
+       const w = matchingWarriors.find((mw) => mw.id === targetWarriorId);
        toast.success(`Applied ${rec.label} to ${w?.name}`);
     });
   };
@@ -235,7 +244,7 @@ function RecommendationCard({ rec, isPrimary, selectedStyle, activeWarriors, car
                             <SelectValue placeholder="Select warrior..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {filteredWarriors.map((w: import("@/types/game").Warrior) => (
+                            {filteredWarriors.map((w) => (
                               <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
                             ))}
                             {filteredWarriors.length === 0 && (
