@@ -1,4 +1,4 @@
-import { type FightSummary } from "@/types/game";
+import type { FightSummary } from "@/types/combat.types";
 import type { GameState } from "@/types/state.types";
 
 /**

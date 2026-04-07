@@ -1,9 +1,14 @@
-import {
-  FightingStyle,
-  CombatEvent,
-  OffensiveTactic,
-  DefensiveTactic
-} from "@/types/game";
+import { 
+  FightingStyle, 
+  type Attributes, 
+  type BaseSkills, 
+  type DerivedStats,
+  type OffensiveTactic,
+  type DefensiveTactic
+} from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { CombatEvent } from "@/types/combat.types";
+import type { Trainer } from "@/types/state.types";
 import { skillCheck, contestCheck } from "../combatMath";
 import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "../combatDamage";
 import { enduranceCost, fatiguePenalty } from "../combatFatigue";

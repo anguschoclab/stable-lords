@@ -66,7 +66,7 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveHotState(slotId: string, stateData: import("@/types/game").GameState): Promise<void> {
+  async archiveHotState(slotId: string, stateData: GameState): Promise<void> {
     try {
       const dirHandle = await this.getHotStateDirectory();
       if (!dirHandle) return;
@@ -84,7 +84,7 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async retrieveHotState(slotId: string): Promise<import("@/types/game").GameState | null> {
+  async retrieveHotState(slotId: string): Promise<GameState | null> {
     try {
       const dirHandle = await this.getHotStateDirectory();
       if (!dirHandle) return null;
@@ -147,7 +147,7 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async retrieveBoutLog(season: number, boutId: string): Promise<import("@/types/game").FightSummary | null> {
+  async retrieveBoutLog(season: number, boutId: string): Promise<string[] | null> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return null;

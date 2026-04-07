@@ -71,33 +71,8 @@ const NAME_POOL = [
   "FORGE", "GLINT", "HAVOK", "KREEL", "LANCE", "MAUL", "RASP", "SCALD",
 ];
 
-// ─── Lore Templates ───────────────────────────────────────────────────────
-
-const STYLE_BLURBS: Partial<Record<FightingStyle, string[]>> = {
-  [FightingStyle.AimedBlow]: ["Precise and calculating.", "Every strike finds its mark."],
-  [FightingStyle.BashingAttack]: ["Raw power incarnate.", "Swings first, asks never."],
-  [FightingStyle.LungingAttack]: ["A blur of speed and steel.", "Dashes in without fear."],
-  [FightingStyle.ParryLunge]: ["Patience followed by explosion.", "Waits, then strikes like a viper."],
-  [FightingStyle.ParryRiposte]: ["A master of counter-fighting.", "Punishes every mistake."],
-  [FightingStyle.ParryStrike]: ["Efficient and deadly.", "Economy of motion, maximum damage."],
-  [FightingStyle.SlashingAttack]: ["Arcs of steel fill the air.", "Wide, sweeping cuts that never stop."],
-  [FightingStyle.StrikingAttack]: ["Clean, direct, devastating.", "No wasted motion."],
-  [FightingStyle.TotalParry]: ["An immovable fortress.", "Impossible to put down."],
-  [FightingStyle.WallOfSteel]: ["Constant blade motion.", "A whirling wall of defense and attack."],
-};
-
-const ORIGIN_TEMPLATES = [
-  "Found fighting for scraps in the pit districts.",
-  "Orphaned at twelve, trained in the yards.",
-  "A former soldier seeking glory.",
-  "Quiet, watchful, and dangerous.",
-  "Born in the arena's shadow.",
-  "Escaped the mines with nothing but fury.",
-  "Raised by pit-fighters since childhood.",
-  "A street brawler with untapped potential.",
-  "Sold to the arena by a desperate family.",
-  "Survived the border wars. Now fights for coin.",
-];
+// Lore for recruitment is now entirely data-driven via narrativeContent.json
+import narrativeContent from "@/data/narrativeContent.json";
 
 // Removed manual seededRng implementation in favor of utils/random
 
@@ -127,8 +102,9 @@ function distributeAttributes(rng: SeededRNG, total: number): Attributes {
 }
 
 function generateLore(rng: SeededRNG, style: FightingStyle): string {
-  const origin = rng.pick(ORIGIN_TEMPLATES);
-  const blurbs = STYLE_BLURBS[style] || ["A fighter with something to prove."];
+  const recruitment = narrativeContent.recruitment;
+  const origin = rng.pick(recruitment.origin);
+  const blurbs = (recruitment as any).style_blurbs?.[style] || ["A fighter with something to prove."];
   const blurb = rng.pick(blurbs);
   return `${origin} ${blurb}`;
 }

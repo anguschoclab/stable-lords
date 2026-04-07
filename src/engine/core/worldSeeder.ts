@@ -1,10 +1,18 @@
-import { type GameState, type Warrior } from "@/types/game";
+import { 
+  FightingStyle, 
+  type Attributes, 
+  ATTRIBUTE_KEYS, 
+  ATTRIBUTE_MAX 
+} from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { CombatEvent } from "@/types/combat.types";
+import type { Trainer } from "@/types/state.types";
+import { type GameState } from "@/types/state.types";
 import { createFreshState, makeWarrior } from "@/engine/factories";
 import { generateRivalStables } from "@/engine/rivals";
 import { generateRecruitPool } from "@/engine/recruitment";
 import { generateHiringPool } from "@/engine/trainers";
 import { SeededRNG } from "@/utils/random";
-import { FightingStyle } from "@/types/shared.types";
 
 import { generatePromoters } from "@/engine/promoters/promoterGenerator";
 

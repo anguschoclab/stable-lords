@@ -2,9 +2,13 @@
  * A lightweight Event Bus to decouple the engine from reporting and narrative side-effects.
  */
 
+import type { GameState } from "@/types/state.types";
+import type { FightSummary } from "@/types/combat.types";
+
 export type EngineEvent = 
-  | { type: 'BOUT_COMPLETED'; payload: { summary: import("@/types/game").FightSummary; transcript?: string[] } }
-  | { type: 'WARRIOR_KILLED'; payload: { warriorId: string; killerName: string; narrative: string } }
+  | { type: 'WEEK_ADVANCED'; payload: { week: number; state: GameState } }
+  | { type: 'BOUT_COMPLETED'; payload: { summary: FightSummary; transcript?: string[] } }
+  | { type: 'WARRIOR_DEATH'; payload: { warriorId: string; name: string } }
   | { type: 'WARRIOR_TRAINED'; payload: { warriorId: string; message: string; isGain: boolean } }
   | { type: 'RIVALRY_ESCALATED'; payload: { stableA: string; stableB: string; reason: string } }
   | { type: 'SEASON_CHANGED'; payload: { prevSeason: string; newSeason: string; year: number } };

@@ -173,7 +173,7 @@ function generateStableTrainers(rng: () => number, stableId: string, philosophy:
   for (let i = 0; i < count; i++) {
     const firstName = TRAINER_FIRST_NAMES[Math.floor(rng() * TRAINER_FIRST_NAMES.length)];
     const focus = focusPool[Math.floor(rng() * focusPool.length)];
-    const trainerTier: import("@/types/game").TrainerTier = tier === "Legendary" ? (rng() < 0.3 ? "Master" : "Seasoned") : (rng() < 0.1 ? "Master" : "Novice");
+    const trainerTier: TrainerTier = tier === "Legendary" ? (rng() < 0.3 ? "Master" : "Seasoned") : (rng() < 0.1 ? "Master" : "Novice");
     trainers.push({
       id: `trainer_${stableId}_${i}`,
       name: `${firstName}`,

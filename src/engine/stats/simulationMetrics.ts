@@ -1,4 +1,4 @@
-import { type GameState } from "@/types/game";
+import type { GameState } from "@/types/state.types";
 
 export interface SimPulse {
   week: number;

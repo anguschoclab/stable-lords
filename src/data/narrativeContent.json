@@ -1,4 +1,26 @@
 {
+  "MOOD_TONE": {
+    "Calm": {
+      "adjectives": ["measured", "technical", "efficient", "precise"],
+      "opener": ["The arena is quiet today, the air heavy with expectation."],
+      "closer": ["A professional display by the arena's finest."]
+    },
+    "Rowdy": {
+      "adjectives": ["wild", "chaotic", "unruly", "frenzied"],
+      "opener": ["The crowd is roaring, their shouts echoing against the stone walls!"],
+      "closer": ["The sand is stained deep red, and the crowd loves it."]
+    },
+    "Bloodthirsty": {
+      "adjectives": ["visceral", "savage", "brutal", "unforgiving"],
+      "opener": ["They want blood, and the arena delivers!"],
+      "closer": ["No mercy was found today in the circle of truth."]
+    },
+    "Theatrical": {
+      "adjectives": ["stunning", "operatic", "magnificent", "dramatic"],
+      "opener": ["A drama unfolds on the sands today!"],
+      "closer": ["A performance for the ages, etched in the memories of all who watched."]
+    }
+  },
   "strikes": {
     "slashing": {
       "glancing": [
@@ -178,6 +200,65 @@
       ]
     }
   },
+  "gazette": {
+    "fights": {
+      "Kill": [
+        "In a {{adj}} display of combat, {{winner}} ({{styleW}}) struck down {{loser}} with a killing blow. The {{styleL}} fighter will be missed — but not mourned for long in this arena.",
+        "{{winner}} delivered a {{adj}} execution of {{loser}}! The crowd gasped as the finishing strike landed. Another warrior returns to the dust.",
+        "Death claimed {{loser}} at the hands of {{winner}}. A {{adj}} end to what was a hard-fought bout."
+      ],
+      "KO": [
+        "{{winner}} battered {{loser}} into unconsciousness with {{adj}} efficiency. The {{styleW}}'s power was on full display.",
+        "A {{adj}} knockout! {{winner}} overwhelmed {{loser}}'s defenses and left them crumpled on the sand."
+      ],
+      "Stoppage": [
+        "{{winner}} ground {{loser}} down in a {{adj}} bout of attrition. The Arenamaster called the stoppage to merciful applause."
+      ],
+      "Exhaustion": {
+        "victory": ["Both fighters pushed to total exhaustion in a {{adj}} endurance contest. {{winner}} was awarded the bout by the narrowest of margins."],
+        "draw": ["A {{adj}} bout ended in mutual exhaustion — neither warrior could claim victory."]
+      },
+      "Draw": [
+        "The bout between {{a}} and {{d}} ended in a {{adj}} draw. Neither fighter could gain the decisive advantage."
+      ],
+      "Default": [
+        "{{winner}} defeated {{loser}} in a {{adj}} contest."
+      ]
+    },
+    "headlines": {
+      "LegendaryStreak": "Week {{week}}: UNSTOPPABLE! {{name}} Extends Legendary {{streak}}-Win Streak!",
+      "HotStreak": "Week {{week}}: {{name}} Is On Fire — {{streak}} Consecutive Victories!",
+      "Streak": "Week {{week}}: {{name}} Rides a {{streak}}-Win Streak Into Glory!",
+      "LegacyRivalry": "Week {{week}}: RIVALRY ERUPTS! {{a}} vs {{b}} — Chapter {{count}}!",
+      "Rivalry": "Week {{week}}: Old Foes Meet Again — {{a}} vs {{b}} (Bout {{count}})",
+      "RisingStar": "Week {{week}}: RISING STAR! {{name}} Opens Career with a Perfect 3-0!",
+      "Upset": "Week {{week}}: UPSET! {{winner}} Topples the Mighty {{loser}}!",
+      "MultipleKills": "Week {{week}}: Blood Runs Deep — {{count}} Warriors Fall!",
+      "Kill": "Week {{week}}: {{killer}} Claims a Life in the Arena",
+      "MultipleKOs": "Week {{week}}: {{adj}} Knockouts Rock the Arena",
+      "Standard": "Week {{week}}: A {{adj}} Week in the Coliseum",
+      "Empty": "Week {{week}}: Silence in the Arena"
+    },
+    "featured": {
+      "LegendaryStreak": "The arena trembles before {{name}}, who has now won an astonishing {{streak}} bouts in a row! Legends speak of such dominance only in whispers.",
+      "HotStreak": "{{name}} continues an incredible run of form with {{streak}} consecutive victories. Can anyone stop this warrior?",
+      "Streak": "{{name}} is building momentum with {{streak}} wins in a row — a warrior to watch closely.",
+      "LegacyRivalry": "The bitter feud between {{a}} and {{b}} continues to captivate the arena! This marks their {{count}}th meeting — a rivalry for the ages.",
+      "Rivalry": "{{a}} and {{b}} crossed blades for the {{count}}{{suffix}} time. The crowd senses a budding rivalry.",
+      "RisingStar": "All eyes turn to {{name}}, who has burst onto the scene with three consecutive victories to open their career. A rising star — or a flash in the pan? Only the arena will tell.",
+      "Upset": "In a stunning upset, {{winner}} (fame: {{fameW}}) defeated the celebrated {{loser}} (fame: {{fameL}})! The crowd roared in disbelief as the underdog proved that fame means nothing once steel is drawn.",
+      "Graveyard": "The Hall of Warriors receives {{count}} new name{{plural}} this week. Their sacrifice is not forgotten."
+    },
+    "season_summary": {
+      "headline": "{{season}} Season in Review: {{total}} Bouts, {{kills}} Deaths",
+      "body": [
+        "The {{season}} season concludes with {{total}} bouts fought and a {{killRate}}% fatality rate.",
+        "{{style}} dominated the meta with {{wins}} victories.",
+        "It was a particularly deadly season — many promising careers cut short.",
+        "The arena turns its gaze to the next season. What legends will emerge?"
+      ]
+    }
+  },
   "media": {
     "headline": [
       "BLOOD ON THE SANDS: THE RISE OF %S",
@@ -185,16 +266,149 @@
     ]
   },
   "persona": {
-    "Quick": [
-      "%A moves like a desert wind, never static, always shifting.",
-      "The eyes can barely track %A's subtle adjustments."
-    ]
+    "good": {
+      "initiative": {
+        "high": [
+          { "min": 34, "text": "Summons a storm of steel that leaves no room to breathe" },
+          { "min": 33, "text": "A terrifying maestro of battle tempo, dictating every bloody exchange" },
+          { "min": 32, "text": "Bends the chaos of the pit to his will, forcing foes to fight on his terms" },
+          { "min": 31, "text": "Drowns his opponent in a relentless tide of crushing aggression" },
+          { "min": 30, "text": "Forces a suffocating, lethal rhythm onto the blood-soaked sands" },
+          { "min": 15, "text": "Steals the center of the pit and refuses to yield a single step" },
+          { "min": 0, "text": "Has learned how to keep his foe in trouble" }
+        ],
+        "low": [
+          { "min": 27, "text": "Lunges from the shadows before the opponent is ready" },
+          { "min": 26, "text": "Fights with a hungry, restless aggression" },
+          { "min": 15, "text": "With a very aggressive and clever fighting style" },
+          { "min": 0, "text": "Has learned how to be decisive and quick" }
+        ]
+      },
+      "riposte": {
+        "high": [
+          { "min": 26, "text": "Baits their opponent into a fatal trap of their own making" },
+          { "min": 25, "text": "Turns the opponent's strength into their execution" },
+          { "min": 15, "text": "Makes the most of his enemy's mistakes" },
+          { "min": 0, "text": "Makes good dueling decisions" }
+        ],
+        "low": [
+          { "min": 23, "text": "Twists an enemy's assault into a sudden, bloody end" },
+          { "min": 15, "text": "Does a lot of little things well" },
+          { "min": 0, "text": "Cleverly controls his foe's actions" }
+        ]
+      },
+      "attack": {
+        "high": [
+          { "min": 37, "text": "Obliterates opponents with god-like, merciless precision" },
+          { "min": 30, "text": "Hunts for the vital organs with terrifying precision" },
+          { "min": 15, "text": "Makes very clever attacks" },
+          { "min": 0, "text": "He lands blows on less protected areas" }
+        ],
+        "low": [
+          { "min": 26, "text": "Transforms every meager opening into a harrowing bloodbath" },
+          { "min": 15, "text": "Has an unusual fighting style that confuses many opponents" },
+          { "min": 0, "text": "Makes clever attacks" }
+        ]
+      },
+      "parry": {
+        "high": [
+          { "min": 25, "text": "An impenetrable wall of iron, turning aside the deadliest steel" },
+          { "min": 15, "text": "Parrys very intelligently" },
+          { "min": 0, "text": "Is gifted at parrying" }
+        ],
+        "low": [
+          { "min": 23, "text": "Denies the killing stroke with grim, practiced resolve" },
+          { "min": 15, "text": "Rarely makes mistakes" },
+          { "min": 0, "text": "Parrys intelligently" }
+        ]
+      },
+      "defense": {
+        "high": [
+          { "min": 32, "text": "Displays a chilling level of situational dominance" },
+          { "min": 15, "text": "Is always thinking ahead" },
+          { "min": 0, "text": "Is gifted at avoiding a blow" }
+        ],
+        "low": [
+          { "min": 23, "text": "Weaves through the carnage with grim efficiency" },
+          { "min": 15, "text": "Avoids blows well" },
+          { "min": 0, "text": "Makes few mistakes" }
+        ]
+      },
+      "endurance": {
+        "high": [
+          { "min": 26, "text": "A tireless engine of destruction, grinding foes to bloody paste" },
+          { "min": 15, "text": "Rarely wastes his endurance needlessly" },
+          { "min": 0, "text": "Can conserve his endurance past what might normally be expected" }
+        ],
+        "low": [
+          { "min": 24, "text": "Refuses to empty his lungs until the slaughter is completely finished" },
+          { "min": 15, "text": "He plans out every move he makes, seldom wasting any effort" },
+          { "min": 0, "text": "Seldom wastes his endurance needlessly" }
+        ]
+      }
+    },
+    "bad": {
+      "initiative": {
+        "high": [
+          { "min": 18, "text": "Surrenders the momentum to the butcher immediately, standing completely helpless" },
+          { "min": 0, "text": "He needs time to think things through before he can act" }
+        ],
+        "low": [
+          { "min": 26, "text": "Moves with the urgency of a stone sinking in mud" },
+          { "min": 0, "text": "He stands around slack-jawed" }
+        ]
+      },
+      "attack": {
+        "high": [
+          { "min": 18, "text": "Telegraphs every swing so heavily it practically invites his own death" },
+          { "min": 0, "text": "He makes a lot of mistakes" }
+        ],
+        "low": [
+          { "min": 28, "text": "Telegraphs every swing like a lumbering ox" },
+          { "min": 0, "text": "He makes stupid feints that fool no one" }
+        ]
+      }
+    },
+    "descriptors": {
+      "coordination": {
+        "Marvel of Fighting Coordination": "Is a marvel of fighting coordination",
+        "Very Highly Coordinated": "Is very highly coordinated",
+        "Highly Coordinated": "Is highly coordinated",
+        "Normal": "",
+        "Slightly Uncoordinated": "Is slightly uncoordinated",
+        "Clumsy": "Is clumsy"
+      },
+      "activity": {
+        "Normal": "",
+        "Default": "Is {{rating}}"
+      }
+    }
   },
   "recruitment": {
     "origin": [
-      "Born in the sun-baked salt mines, %A knows nothing but labor and survival.",
-      "A disgraced soldier seeking redemption in the only way that still pays."
-    ]
+      "Found fighting for scraps in the pit districts.",
+      "Orphaned at twelve, trained in the yards.",
+      "A former soldier seeking glory.",
+      "Quiet, watchful, and dangerous.",
+      "Born in the arena's shadow.",
+      "Escaped the mines with nothing but fury.",
+      "Raised by pit-fighters since childhood.",
+      "A street brawler with untapped potential.",
+      "Sold to the arena by a desperate family.",
+      "Survived the border wars. Now fights for coin."
+    ],
+    "style_blurbs": {
+      "Aimed Blow": ["Precise and calculating.", "Every strike finds its mark."],
+      "Bashing Attack": ["Raw power incarnate.", "Swings first, asks never."],
+      "Lunging Attack": ["A blur of speed and steel.", "Dashes in without fear."],
+      "Parry Lunge": ["Patience followed by explosion.", "Waits, then strikes like a viper."],
+      "Parry Riposte": ["A master of counter-fighting.", "Punishes every mistake."],
+      "Parry Strike": ["Efficient and deadly.", "Economy of motion, maximum damage."],
+      "Slashing Attack": ["Arcs of steel fill the air.", "Wide, sweeping cuts that never stop."],
+      "Striking Attack": ["Clean, direct, devastating.", "No wasted motion."],
+      "Total Parry": ["An immovable fortress.", "Impossible to put down."],
+      "Wall of Steel": ["Constant blade motion.", "A whirling wall of defense and attack."]
+    }
   },
   "memorials": {
     "epigraph": [
@@ -209,9 +423,31 @@
     ]
   },
   "meta": {
-    "tooltip": [
-      "The edge of death is where legends are born.",
-      "Steel meets soul in the circle of truth."
-    ]
+    "flair": {
+      "Flashy": "Crowd favorite — earns +2 Popularity per flashy fight. Theatrical crowd moods amplify this further.",
+      "Comeback": "Survived near-death to win — earns +1 Fame and +1 Popularity when triggered.",
+      "RiposteChain": "Master counter-fighter — earned by landing 3+ ripostes in a single bout. +1 Fame.",
+      "Dominance": "Overwhelming victor — earned by landing 5+ hits in a winning bout. +1 Fame.",
+      "Giant Killer": "Slayer of legends — earned by winning 3+ upset victories against far more famous opponents."
+    },
+    "title": {
+      "Tournament Champion": "Won a seasonal tournament. A mark of elite combat prowess.",
+      "Champion": "Reigning arena champion — commands respect and higher Fame gains."
+    },
+    "injury": {
+      "Broken Arm": "Reduces Attack and Parry effectiveness until healed.",
+      "Cracked Ribs": "Lowers Endurance and increases vulnerability to body shots.",
+      "Concussion": "Reduces Initiative and Wit-based skills temporarily.",
+      "Torn Muscle": "Strength penalty — lower damage output until recovered.",
+      "Sprained Ankle": "Speed and Defense are penalized until healed.",
+      "Deep Laceration": "Ongoing HP loss risk in future bouts until healed.",
+      "Fractured Skull": "Severe — major penalties to all skills. May end a career.",
+      "Dislocated Shoulder": "Reduces Attack and weapon handling until healed."
+    },
+    "status": {
+      "Active": "Ready for combat — can be assigned to bouts and tournaments.",
+      "Dead": "Fallen in the arena. Their legacy lives on in the Graveyard.",
+      "Retired": "Honorably withdrawn from combat. May become a trainer."
+    }
   }
 }
