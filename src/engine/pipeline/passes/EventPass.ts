@@ -50,7 +50,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
       nextState.roster = updateEntityInList(nextState.roster, chosen.id, (w) => ({
         ...w,
         fame: (w.fame || 0) + 15,
-        experience: (w.experience || 0) + 2
+        xp: (w.xp || 0) + 2
       }));
 
       nextState.newsletter = [...(nextState.newsletter || []), {
