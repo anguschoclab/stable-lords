@@ -39,5 +39,27 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
     }
   }
 
+
+  // ☄️ Star-crossed Blessing Event
+  if (brawlRng.next() < 0.03 && nextState.roster.length > 0) {
+    const youngWarriors = nextState.roster.filter(w => w.status === "Active" && w.age <= 25);
+    if (youngWarriors.length > 0) {
+      const chosenIndex = Math.floor(brawlRng.next() * youngWarriors.length);
+      const chosen = youngWarriors[chosenIndex];
+
+      nextState.roster = updateEntityInList(nextState.roster, chosen.id, (w) => ({
+        ...w,
+        fame: (w.fame || 0) + 15,
+        experience: (w.experience || 0) + 2
+      }));
+
+      nextState.newsletter = [...(nextState.newsletter || []), {
+        week: nextWeek,
+        title: "A Sign from the Gods!",
+        items: [`A shooting star was seen over the arena exactly as ${chosen.name} was training. The crowd sees them as chosen! (+15 Fame, +2 XP)`]
+      }];
+    }
+  }
+
   return nextState;
 }
