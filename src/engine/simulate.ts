@@ -91,8 +91,8 @@ export function simulateFight(
 
   if (weather === "Blood Moon") {
     // Blood Moon drives fighters to a frenzy
-    fA.plan.killDesire = Math.min(10, (fA.plan.killDesire || 5) + 3);
-    fD.plan.killDesire = Math.min(10, (fD.plan.killDesire || 5) + 3);
+    fA.plan = { ...fA.plan, killDesire: Math.min(10, (fA.plan.killDesire ?? 5) + 3) };
+    fD.plan = { ...fD.plan, killDesire: Math.min(10, (fD.plan.killDesire ?? 5) + 3) };
   }
 
   const modsA = trainers ? getTrainerMods(trainers, planA.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
