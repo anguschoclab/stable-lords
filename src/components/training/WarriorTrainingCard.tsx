@@ -161,7 +161,7 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
                       )}
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-neutral-950 border-white/10 p-3 space-y-2 w-full max-w-[220px]">
+                  <TooltipContent side="right" className="bg-neutral-950 border-white/10 p-3 space-y-2 w-full max-w-56">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-[0.2em]">{ATTRIBUTE_LABELS[key]}</span>
                       {chance > 0 && <Badge variant="outline" className="h-4 text-[8px] font-mono bg-primary/10 border-primary/20 text-primary">{chance}% CHANCE</Badge>}

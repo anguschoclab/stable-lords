@@ -129,7 +129,7 @@ export function ContractManager() {
                       <TableCell className="py-5">
                         <Tooltip>
                            <TooltipTrigger asChild>
-                              <div className="flex flex-col items-center gap-2 mx-auto w-full max-w-[120px]">
+                              <div className="flex flex-col items-center gap-2 mx-auto w-full max-w-32">
                                  <div className="flex items-center gap-2 w-full">
                                     <div className="h-1.5 flex-1 bg-black rounded-full overflow-hidden border border-white/5 relative">
                                        <div 

@@ -47,7 +47,7 @@ export function ReputationSliders() {
                    <TooltipTrigger asChild>
                       <Info className="h-3 w-3 text-muted-foreground/30 hover:text-muted-foreground transition-colors cursor-help" />
                    </TooltipTrigger>
-                   <TooltipContent className="w-full max-w-[200px] text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10">
+                   <TooltipContent className="w-full max-w-xs text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10">
                       {desc}
                    </TooltipContent>
                 </Tooltip>

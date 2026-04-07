@@ -21,7 +21,7 @@ export function AttrBar({ label, value, potential, max = 25 }: { label: string; 
                     {growth.label}
                   </span>
                 </TooltipTrigger>
-                <TooltipContent side="left" className="w-full max-w-[200px] text-xs">
+                <TooltipContent side="left" className="w-full max-w-xs text-xs">
                   {growth.tooltip}
                 </TooltipContent>
               </Tooltip>

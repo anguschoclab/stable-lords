@@ -71,7 +71,7 @@ export function WeatherWidget() {
          <Icon className={cn("h-10 w-10 drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)]", meta.color)} />
          <div className="text-right">
            <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Atmospheric_Data</div>
-           <p className="text-[10px] text-muted-foreground italic leading-tight w-full max-w-[140px] border-r-2 border-primary/20 pr-3">
+           <p className="text-[10px] text-muted-foreground italic leading-tight w-full max-w-36 border-r-2 border-primary/20 pr-3">
              {meta.description}
            </p>
          </div>
@@ -86,7 +86,7 @@ export function WeatherWidget() {
                 <Info className="h-3 w-3 text-muted-foreground/40" />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-black/90 border-white/10 p-3 w-full max-w-[200px]">
+            <TooltipContent className="bg-black/90 border-white/10 p-3 w-full max-w-xs">
               <p className="text-[10px] font-mono leading-relaxed text-primary/80 uppercase tracking-wider">
                 {meta.stats}
               </p>

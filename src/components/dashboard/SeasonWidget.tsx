@@ -125,7 +125,7 @@ export function SeasonWidget() {
                       </span>
                    </div>
                 </TooltipTrigger>
-                <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-[200px]">
+                <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-52">
                    {phaseDesc}
                 </TooltipContent>
              </Tooltip>
@@ -139,7 +139,7 @@ export function SeasonWidget() {
                          {weather}
                       </Badge>
                    </TooltipTrigger>
-                   <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-[200px]">
+                   <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-xs">
                       {weather === "Blazing Sun" ? "30% more stamina drain in combat." :
                        weather === "Scalding" ? "20% more stamina drain in combat." :
                        weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality. 10% more stamina drain." :

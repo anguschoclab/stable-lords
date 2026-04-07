@@ -57,10 +57,10 @@ export function EditableText({ value, onSave, className, inputClassName, label }
           )}
         />
         <div className="flex items-center gap-1">
-           <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10" onClick={handleSave} aria-label="Save" title="Save">
+           <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10" onClick={handleSave} aria-label="Save">
               <Check className="h-4 w-4" />
            </Button>
-           <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive/80 hover:bg-destructive/10" onClick={handleCancel} aria-label="Cancel" title="Cancel">
+           <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive/80 hover:bg-destructive/10" onClick={handleCancel} aria-label="Cancel">
               <X className="h-4 w-4" />
            </Button>
         </div>

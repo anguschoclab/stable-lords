@@ -199,7 +199,7 @@ export default function WarriorBuilder({
                       {ATTRIBUTE_LABELS[key]}
                       <span className="text-xs text-muted-foreground">({key})</span>
                     </Label>
-                    <Badge variant="outline" className="font-mono text-sm min-w-[2rem] justify-center">
+                    <Badge variant="outline" className="font-mono text-sm min-w-8 justify-center">
                       {attrs[key]}
                     </Badge>
                   </div>
