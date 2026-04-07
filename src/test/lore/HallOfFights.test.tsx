@@ -16,7 +16,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, within, fireEvent, waitFor } from "@testing-library/react";
 import { HallOfFights } from "@/lore/HallOfFights";
 import { renderWithGameState } from "../testUtils";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import { FightingStyle } from "@/types/game";
 import type { GameState, FightSummary } from "@/types/game";
 import "../setup";
@@ -66,7 +66,7 @@ describe("HallOfFights Component", () => {
   };
 
   beforeEach(() => {
-    mockState = createFreshState();
+    mockState = createFreshState("test-seed");
     mockState.arenaHistory = [fight1, fight2, fight3];
 
     // Setup LoreArchive mock for hall entries

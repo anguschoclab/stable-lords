@@ -12,8 +12,10 @@ import {
 import { FightSummary } from "@/types/combat.types";
 import { truncateArray } from "@/utils/stateUtils";
 import { updatePromoterHistory as engineUpdatePromoterHistory } from "@/engine/promoters";
+import { respondToBoutOffer as engineRespondToBoutOffer } from "@/state/mutations/contractMutations";
 
 export interface WorldSlice {
+  year: number;
   week: number;
   day: number;
   season: Season;
@@ -39,6 +41,7 @@ export interface WorldSlice {
 }
 
 export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get) => ({
+  year: 1,
   week: 1,
   day: 0,
   season: "Spring" as Season,
@@ -94,36 +97,7 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   },
 
   respondToBoutOffer: (offerId, warriorId, response) => {
-    set((state: any) => {
-      const offer = state.boutOffers[offerId];
-      if (!offer) return state;
-
-      const newResponses = {
-        ...offer.responses,
-        [warriorId]: response,
-      };
-
-      // Check if all parties have responded
-      let newStatus = offer.status;
-      const allParticipatingWarriors = offer.warriorIds;
-      const allResponded = allParticipatingWarriors.every((wid: string) => newResponses[wid] && newResponses[wid] !== "Pending");
-      
-      if (allResponded) {
-        const anyDeclined = allParticipatingWarriors.some((wid: string) => newResponses[wid] === "Declined");
-        newStatus = anyDeclined ? "Rejected" : "Signed";
-      }
-
-      return {
-        boutOffers: {
-          ...state.boutOffers,
-          [offerId]: {
-            ...offer,
-            responses: newResponses,
-            status: newStatus,
-          },
-        },
-      };
-    });
+    set((state: any) => engineRespondToBoutOffer(state, offerId, warriorId, response));
   },
 
   clearExpiredOffers: () => {

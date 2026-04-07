@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { advanceWeek } from "@/engine/weekPipeline";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import * as Training from "@/engine/training";
 import * as Economy from "@/engine/economy";
 import * as Aging from "@/engine/aging";
@@ -49,7 +49,7 @@ describe("advanceWeek pipeline orchestration", () => {
   });
 
   it("calls all impact computation functions", () => {
-    const state = createFreshState();
+    const state = createFreshState("test-seed-week");
     advanceWeek(state);
 
     expect(Training.computeTrainingImpact).toHaveBeenCalled();
@@ -59,14 +59,14 @@ describe("advanceWeek pipeline orchestration", () => {
   });
 
   it("resolves collected impacts using resolveImpacts", () => {
-    const state = createFreshState();
+    const state = createFreshState("test-seed-week");
     advanceWeek(state);
 
     expect(Impacts.resolveImpacts).toHaveBeenCalled();
   });
 
   it("advances the week counter and returns a new state", () => {
-    const state = createFreshState();
+    const state = createFreshState("test-seed");
     const originalWeek = state.week;
     
     // We mock resolveImpacts to return the state it received

@@ -186,7 +186,8 @@ function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG
 }
 
 function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: number): GameState {
-  let newState = runEconomyPass(state);
+  let newState = state;
+  newState = runEconomyPass(newState);
   newState = runEventPass(newState, nextWeek, new SeededRNG(nextWeek * 101));
 
   // Gazette

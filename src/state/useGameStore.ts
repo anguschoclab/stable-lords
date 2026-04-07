@@ -43,7 +43,7 @@ export type GameStore = GameStoreState & GameStoreActions & EconomySlice & Roste
  * Reconstructs a full GameState from the modular slices for engine consumption.
  */
 function reconstructGameState(store: GameStore): GameState {
-  const fresh = createFreshState();
+  const fresh = createFreshState("reconstruct-default");
   return {
     ...fresh,
     treasury: store.treasury,
@@ -69,6 +69,7 @@ function reconstructGameState(store: GameStore): GameState {
     tournaments: store.tournaments,
     isTournamentWeek: store.isTournamentWeek,
     activeTournamentId: store.activeTournamentId,
+    year: store.year,
   };
 }
 
@@ -119,6 +120,7 @@ export const useGameStore = create<GameStore>()(
           draft.tournaments = state.tournaments;
           draft.isTournamentWeek = state.isTournamentWeek;
           draft.activeTournamentId = state.activeTournamentId;
+          draft.year = state.year || 1;
           
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
@@ -205,7 +207,8 @@ export const useGameStore = create<GameStore>()(
       },
 
       doReset: () => {
-        const fresh = createFreshState();
+        // Deterministic reset: If no seed provided, use a stable one for 1.0 stability
+        const fresh = createFreshState("alpha-prime-10");
         get().loadGame("autosave", fresh);
         set({ atTitleScreen: true });
       },

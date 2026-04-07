@@ -7,7 +7,7 @@ describe("Promoter Succession", () => {
   let state: GameState;
 
   beforeEach(() => {
-    state = createFreshState();
+    state = createFreshState("test-seed");
     state = populateTestState(state);
   });
 

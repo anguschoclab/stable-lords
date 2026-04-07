@@ -1,27 +1,23 @@
 /**
  * Stable Lords — Hall of Fame Page
- * Shows yearly inductees with career stats and greatest fights.
+ * shows yearly accolades and global legends.
  */
 import { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
-import type { Warrior, FightSummary, NewsletterItem } from "@/types/game";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Warrior, AnnualAward } from "@/types/game";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Crown, Skull, Star, Shield, Flame, Swords, Trophy, Activity } from "lucide-react";
+import { Crown, Star, Shield, Flame, Trophy, Users } from "lucide-react";
 import { InducteeCard } from "./HallOfFame/InducteeCard";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-
-/* ── Main Page ───────────────────────────────────────────── */
+import { motion } from "framer-motion";
 
 export default function HallOfFame() {
   const { state } = useGameStore();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const allFights = useMemo(() => ArenaHistory.all(), [state.week]);
 
-  // Collect all warriors (active, dead, retired)
+  // Aggregate all warriors for lookup
   const allWarriors = useMemo(() => {
     const list: Warrior[] = [
       ...state.roster,
@@ -32,56 +28,36 @@ export default function HallOfFame() {
     return list;
   }, [state]);
 
-  // Parse yearly induction newsletters
-  const yearlyInductions = useMemo(() => {
-    const years: { year: number; items: string[]; warriors: { warrior: Warrior; title: string; icon: React.ReactNode }[] }[] = [];
-    
-    for (const nl of state.newsletter) {
-      if (!nl.title.includes("Hall of Fame")) continue;
-      const yearMatch = nl.title.match(/Year (\d+)/);
-      const year = yearMatch ? parseInt(yearMatch[1]) : 0;
-
-      const inductees: { warrior: Warrior; title: string; icon: React.ReactNode }[] = [];
-
-      for (const item of nl.items) {
-        // Extract warrior name from structured messages
-        if (item.includes("HALL OF FAME:")) {
-          const nameMatch = item.match(/HALL OF FAME: (.+?) \(/);
-          if (nameMatch) {
-            const w = allWarriors.find(w => w.name === nameMatch[1]);
-            if (w) inductees.push({ warrior: w, title: "Greatest Warrior", icon: <Crown className="h-4 w-4 text-arena-gold" /> });
-          }
-        } else if (item.includes("DEADLIEST BLADE:")) {
-          const nameMatch = item.match(/DEADLIEST BLADE: (.+?) earns/);
-          if (nameMatch) {
-            const w = allWarriors.find(w => w.name === nameMatch[1]);
-            if (w) inductees.push({ warrior: w, title: "Deadliest Blade", icon: <Skull className="h-4 w-4 text-arena-blood" /> });
-          }
-        } else if (item.includes("IRON CHAMPION:")) {
-          const nameMatch = item.match(/IRON CHAMPION: (.+?) recorded/);
-          if (nameMatch) {
-            const w = allWarriors.find(w => w.name === nameMatch[1]);
-            if (w) inductees.push({ warrior: w, title: "Iron Champion", icon: <Shield className="h-4 w-4 text-primary" /> });
-          }
-        }
-      }
-
-      years.push({ year, items: nl.items, warriors: inductees });
+  // Categorize awards from the official source (state.awards)
+  const yearlyAwards = useMemo(() => {
+    const groups: Record<number, AnnualAward[]> = {};
+    for (const award of state.awards || []) {
+      if (!groups[award.year]) groups[award.year] = [];
+      groups[award.year].push(award);
     }
+    return Object.entries(groups)
+      .map(([year, awards]) => ({ year: parseInt(year), awards }))
+      .sort((a, b) => b.year - a.year);
+  }, [state.awards]);
 
-    return years.sort((a, b) => b.year - a.year);
-  }, [state.newsletter, allWarriors]);
-
-  // All-time greats (if no yearly data yet, show current top warriors)
+  // All-time greats (Top Fame)
   const allTimeGreats = useMemo(() => {
-    const sorted = [...allWarriors]
+    return [...allWarriors]
       .filter(w => w.career.wins + w.career.losses > 0)
       .sort((a, b) => (b.fame ?? 0) - (a.fame ?? 0))
       .slice(0, 6);
-    return sorted;
   }, [allWarriors]);
 
-  const currentYear = Math.floor(state.week / 52);
+  const awardIcon = (type: string) => {
+    switch (type) {
+      case "WARRIOR_OF_YEAR": return <Crown className="h-4 w-4 text-arena-gold" />;
+      case "KILLER_OF_YEAR": return <Shield className="h-4 w-4 text-arena-blood" />;
+      case "STABLE_OF_YEAR": return <Trophy className="h-4 w-4 text-primary" />;
+      default: return <Star className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
+
+  const currentYear = state.year;
 
   return (
     <div className="space-y-8">
@@ -91,7 +67,7 @@ export default function HallOfFame() {
         <div className="flex items-center justify-center gap-4 relative z-10">
           <Separator className="w-16 bg-arena-gold/20" />
           <div className="p-3 rounded-full bg-arena-gold/10 border border-arena-gold/20 shadow-[0_0_20px_rgba(var(--arena-gold-rgb),0.2)]">
-            <Crown className="h-8 w-8 text-arena-gold" />
+            <Trophy className="h-8 w-8 text-arena-gold" />
           </div>
           <Separator className="w-16 bg-arena-gold/20" />
         </div>
@@ -105,7 +81,7 @@ export default function HallOfFame() {
         </div>
         <div className="flex items-center justify-center gap-3 relative z-10">
           <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-arena-gold/20 bg-arena-gold/5 text-arena-gold">
-            YEAR {currentYear + 1}
+            YEAR {currentYear}
           </Badge>
           <Separator orientation="vertical" className="h-4 bg-border/20" />
           <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-primary/20 bg-primary/5 text-primary">
@@ -114,70 +90,101 @@ export default function HallOfFame() {
         </div>
       </div>
 
-      {/* Yearly Inductions */}
-      {yearlyInductions.length > 0 ? (
-        yearlyInductions.map(({ year, items, warriors }) => (
-          <article key={year} className="space-y-4">
+      {/* Yearly Awards Section */}
+      {yearlyAwards.length > 0 ? (
+        yearlyAwards.map(({ year, awards }) => (
+          <article key={year} className="space-y-6">
             <div className="flex items-end gap-3 border-b-2 border-accent/30 pb-2">
-              <h2 className="font-display text-xl text-foreground leading-none flex items-center gap-2">
-                <Star className="h-5 w-5 text-arena-gold" /> Year {year} Inductees
+              <h2 className="font-display text-xl text-foreground leading-none flex items-center gap-2 uppercase tracking-tighter">
+                <Star className="h-5 w-5 text-arena-gold" /> Year {year} Accolades
               </h2>
             </div>
 
-            {warriors.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {warriors.map((entry, i) => (
-                  <InducteeCard key={i} warrior={entry.warrior} title={entry.title} icon={entry.icon} fights={allFights} />
-                ))}
-              </div>
-            ) : (
-              /* Fallback: show raw newsletter items */
-              <Card>
-                <CardContent className="py-4 space-y-1.5">
-                  {items.map((item, i) => (
-                    <p key={i} className="text-xs text-foreground">{item}</p>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {awards.map((award, i) => {
+                if (award.type === "STABLE_OF_YEAR") {
+                  return (
+                    <motion.div key={i} whileHover={{ y: -5 }}>
+                      <Card className="bg-glass-card border border-primary/40 overflow-hidden relative group h-full">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary opacity-40" />
+                        <CardContent className="p-6 space-y-4">
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-lg border bg-primary/10 border-primary/30">
+                                  <Users className="h-4 w-4 text-primary" />
+                                </div>
+                                <span className="font-display font-black text-xl uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors">
+                                  {award.stableName}
+                                </span>
+                              </div>
+                              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                                LEADER: {state.player.stableName === award.stableName ? state.player.name : "RIVAL_OWNER"}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="text-[9px] font-black tracking-widest uppercase text-primary border-primary/20 py-1 px-2">
+                              STABLE_OF_YEAR
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground italic border-l-2 border-primary/20 pl-3 py-1">
+                            "{award.reason}"
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                }
 
-            <Separator className="mt-4" />
+                const warrior = allWarriors.find(w => w.id === award.warriorId);
+                if (!warrior) return null;
+
+                return (
+                  <InducteeCard
+                    key={i}
+                    warrior={warrior}
+                    title={award.type.replace(/_/g, " ")}
+                    icon={awardIcon(award.type)}
+                    fights={allFights}
+                  />
+                );
+              })}
+            </div>
           </article>
         ))
       ) : (
-        /* No yearly inductions yet — show all-time greats */
-        <>
+        /* No awards yet - show all-time greats */
+        <div className="space-y-6">
           <div className="flex items-end gap-3 border-b-2 border-accent/30 pb-2">
             <h2 className="font-display text-xl text-foreground leading-none flex items-center gap-2">
               <Flame className="h-5 w-5 text-arena-gold" /> All-Time Greats
             </h2>
-            <span className="text-[10px] text-muted-foreground font-mono mb-0.5">
-              First inductions at Week 52
+            <span className="text-[10px] text-muted-foreground font-mono mb-0.5 uppercase">
+              First Annual Inductions at Week 52
             </span>
           </div>
 
-          {allTimeGreats.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allTimeGreats.map((w, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {allTimeGreats.length > 0 ? (
+              allTimeGreats.map((w, i) => (
                 <InducteeCard
                   key={w.id}
                   warrior={w}
-                  title={i === 0 ? "Top Fame" : i === 1 ? "Runner-Up" : `#${i + 1}`}
+                  title={i === 0 ? "RANK #1" : `RANK #${i + 1}`}
                   icon={i === 0 ? <Crown className="h-4 w-4 text-arena-gold" /> : <Star className="h-4 w-4 text-muted-foreground" />}
                   fights={allFights}
                 />
-              ))}
-            </div>
-          ) : (
-            <Card className="border-dashed">
-              <CardContent className="py-12 text-center">
-                <Crown className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
-                <p className="text-muted-foreground text-sm">No warriors have fought yet.</p>
-                <p className="text-muted-foreground text-xs mt-1">Run rounds to build legends!</p>
-              </CardContent>
-            </Card>
-          )}
-        </>
+              ))
+            ) : (
+              <Card className="border-dashed col-span-full">
+                <CardContent className="py-12 text-center">
+                  <Crown className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+                  <p className="text-muted-foreground text-sm uppercase font-black tracking-widest">Awaiting First Legends...</p>
+                  <p className="text-muted-foreground text-[10px] mt-1">THE SANDS REMEMBER NO ONE YET.</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,11 +1,14 @@
 import { 
   type GameState, type Warrior, type PoolWarrior, FightingStyle, 
-  ATTRIBUTE_KEYS, ATTRIBUTE_MAX 
+  ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type OwnerPersonality 
 } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { generateFavorites } from "@/engine/favorites";
 import { generateId } from "@/utils/idUtils";
 import { SeededRNG } from "@/utils/random";
+import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
+
+export { advanceWeek };
 
 /**
  * Warrior Factory - creates a new warrior with calculated stats and favorites.
@@ -52,8 +55,7 @@ export function makeWarrior(
   /**
    * Creates the initial, deterministic game state for a new game.
    */
-  export function createFreshState(seed: string = "stable-lords-1.0", createdAt: string = new Date().toISOString()): GameState {
-    // Simple numeric hash for the string seed
+  export function createFreshState(seed: string, createdAt: string = new Date().toISOString()): GameState {
     const numericSeed = seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const rng = new SeededRNG(numericSeed);
     
@@ -77,7 +79,7 @@ export function makeWarrior(
       },
       fame: 0,
       popularity: 0,
-      treasury: 1000, // Balanced starting capital
+      treasury: 1000, 
       ledger: [],
       week: 1,
       year: 1,
@@ -126,27 +128,43 @@ export function makeWarrior(
       awards: [],
     };
 
-    // 2. Generate Initial Rivals (4 Stables)
-    const rivalNames = ["Iron Crown", "Shadow Blades", "Golden Lions", "Silent Storm"];
-    state.rivals = rivalNames.map((name, i) => ({
-      id: `stb_rival_${i + 1}`,
-      fame: 100,
-      treasury: 2000,
-      owner: {
-        id: `own_rival_${i + 1}`,
-        name: `Lord ${name.split(" ")[0]}`,
-        stableName: name,
-        personality: "Aggressive",
-        philosophy: "Winning at all costs",
-        fame: 100,
-        renown: 10,
-        titles: 0,
-      },
-      roster: [],
-      ledger: [],
-    }));
+    // 2. Generate Initial Rivals (4 Stables) - Seeded selection
+    const RIVAL_NAMES = [
+      "Iron Crown", "Shadow Blades", "Golden Lions", "Silent Storm", 
+      "Vanguard", "Nightfall", "Ebon Hand", "Gilded Fang",
+      "Azure Rose", "Crimson Guard", "Onyx Shield"
+    ];
+    const PERSONALITIES: OwnerPersonality[] = ["Aggressive", "Methodical", "Showman", "Pragmatic", "Tactician"];
+    
+    // Shuffle and pick 4
+    const pool = [...RIVAL_NAMES];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rng.next() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
 
-    // 3. Generate Initial Recruitment Pool (6 warriors)
+    state.rivals = pool.slice(0, 4).map((name, i) => {
+      const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
+      return {
+        id: generateId(rng, "stb"),
+        fame: 100,
+        treasury: 1500 + Math.floor(rng.next() * 1000),
+        owner: {
+          id: generateId(rng, "own"),
+          name: `Lord ${name.split(" ")[0]}`,
+          stableName: name,
+          personality: PERSONALITIES[personalityIndex],
+          philosophy: "Winning at all costs",
+          fame: 100,
+          renown: 10,
+          titles: 0,
+        },
+        roster: [],
+        ledger: [],
+      };
+    });
+
+    // 3. Generate Initial Recruitment Pool (6 warriors) - Seeded stats
     const initialStyles = [
       FightingStyle.AimedBlow, 
       FightingStyle.BashingAttack, 
@@ -155,14 +173,19 @@ export function makeWarrior(
       FightingStyle.StrikingAttack, 
       FightingStyle.WallOfSteel
     ];
+    
     state.recruitPool = initialStyles.map((style, i) => {
-      const baseWarrior = makeWarrior(`war_init_${i + 1}`, `Recruit ${i + 1}`, style, { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, {}, rng);
+      // Use rng for initial attributes (10 +/- 3)
+      const attrBase = () => 7 + Math.floor(rng.next() * 7);
+      const attrs = {
+        ST: attrBase(), CN: attrBase(), SZ: attrBase(), 
+        WT: attrBase(), WL: attrBase(), SP: attrBase(), DF: attrBase()
+      };
+      
+      const baseWarrior = makeWarrior(generateId(rng, "war"), `Recruit ${i + 1}`, style, attrs, {}, rng);
       return {
         ...baseWarrior,
-        baseSkills: baseWarrior.baseSkills!,
-        derivedStats: baseWarrior.derivedStats!,
-        favorites: baseWarrior.favorites!,
-        cost: 200,
+        cost: 150 + Math.floor(rng.next() * 150),
         tier: "Common",
         lore: "A wanderer seeking glory.",
         addedWeek: 1,

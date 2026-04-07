@@ -6,7 +6,7 @@ import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 describe("Stable Lords 1.0 Simulation Hardening Audit", () => {
   it("runs a 104-week high-stakes career simulation", () => {
     const seed = 12345;
-    let state = populateInitialWorld(createFreshState(), seed);
+    let state = populateInitialWorld(createFreshState("test-seed"), seed);
     
     const initialWarriorCount = (state.rivals || []).reduce((acc, r) => acc + r.roster.length, 0) + state.roster.length;
     console.log(`Initial World Population: ${initialWarriorCount} warriors across ${state.rivals?.length} stables.`);

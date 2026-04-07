@@ -9,7 +9,7 @@ describe("NCAA-style Tournament Selection Committee", () => {
   let state: GameState;
 
   beforeEach(() => {
-    state = createFreshState();
+    state = createFreshState("test-seed");
     state = populateTestState(state);
     // Committee depends on rankings cache
     state = runRankingsPass(state);

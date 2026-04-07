@@ -11,7 +11,7 @@ describe("Contract System Cycle", () => {
   let state: GameState;
 
   beforeEach(() => {
-    state = createFreshState();
+    state = createFreshState("test-seed");
     state = populateTestState(state);
     // Pre-initialize rankings cache
     state = runRankingsPass(state);

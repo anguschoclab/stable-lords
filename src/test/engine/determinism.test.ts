@@ -19,7 +19,7 @@ describe("Simulation Determinism", () => {
   it("should produce identical results from a fresh state over 5 weeks", () => {
     // 1. Setup two identical states
     // Note: createFreshState uses the root seed and should be stable.
-    const stateA = createFreshState();
+    const stateA = createFreshState("test-seed-1");
     const stateB = JSON.parse(JSON.stringify(stateA)); // Deep copy
 
     // 2. Advance both states 5 weeks
@@ -63,8 +63,8 @@ describe("Simulation Determinism", () => {
   });
 
   it("should produce different results for different seeds", () => {
-    const stateA = createFreshState();
-    const stateB = createFreshState();
+    const stateA = createFreshState("seed-a");
+    const stateB = createFreshState("seed-b");
     
     // Manually skew one state's week or a seed-relevant property if needed,
     // but here we just verify that they are deterministic based on the week index.

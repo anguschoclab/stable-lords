@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import WorldOverview from "@/pages/WorldOverview";
 import { renderWithGameState } from "../testUtils";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import { FightingStyle } from "@/types/game";
 import type { Warrior, GameState } from "@/types/game";
 import "../setup";
@@ -59,7 +59,7 @@ describe("WorldOverview Component", () => {
   let mockState: GameState;
 
   beforeEach(() => {
-    mockState = createFreshState();
+    mockState = createFreshState("test-seed");
 
     // Setup player stable
     mockState.player = {

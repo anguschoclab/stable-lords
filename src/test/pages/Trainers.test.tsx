@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import Trainers from "@/pages/Trainers";
 import { renderWithGameState } from "../testUtils";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import type { GameState, TrainerData } from "@/types/game";
 import "../setup";
 import { useGameStore } from "@/state/useGameStore";
@@ -58,7 +58,7 @@ describe("Trainers Component", () => {
   };
 
   beforeEach(() => {
-    mockState = createFreshState();
+    mockState = createFreshState("test-seed");
     mockState.gold = 500;
 
     // Seed trainers

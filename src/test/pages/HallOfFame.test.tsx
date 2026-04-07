@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import HallOfFame from "@/pages/HallOfFame";
 import { renderWithGameState } from "../testUtils";
-import { createFreshState } from "@/state/gameStore";
+import { createFreshState } from "@/engine/factories";
 import { FightingStyle } from "@/types/game";
 import type { GameState, FightSummary, NewsletterItem, Warrior } from "@/types/game";
 import "../setup";
@@ -79,7 +79,7 @@ describe("HallOfFame Component", () => {
   };
 
   beforeEach(() => {
-    mockState = createFreshState();
+    mockState = createFreshState("test-seed");
     mockState.week = 53; // ensure it's past week 52 for year calculation
     mockState.newsletter = [mockNewsletter];
 

@@ -5,8 +5,8 @@ import { FightingStyle, type FightSummary } from '@/types/game';
 describe('getRecentFightsForWarrior', () => {
   const createMockFight = (overrides: Partial<FightSummary>): FightSummary => ({
     id: 'mock-id',
-    a: 'Attacker',
-    d: 'Defender',
+    warriorIdA: 'Attacker',
+    warriorIdD: 'Defender',
     winner: 'A',
     by: "KO",
     styleA: FightingStyle.StrikingAttack,
@@ -24,8 +24,8 @@ describe('getRecentFightsForWarrior', () => {
 
   it('returns empty array when warrior is not in history', () => {
     const history: FightSummary[] = [
-      createMockFight({ a: 'Alpha', d: 'Beta' }),
-      createMockFight({ a: 'Gamma', d: 'Delta' }),
+      createMockFight({ warriorIdA: 'Alpha', warriorIdD: 'Beta' }),
+      createMockFight({ warriorIdA: 'Gamma', warriorIdD: 'Delta' }),
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toEqual([]);
@@ -33,9 +33,9 @@ describe('getRecentFightsForWarrior', () => {
 
   it('finds fights where warrior is attacker', () => {
     const history: FightSummary[] = [
-      createMockFight({ a: 'Hero', d: 'Beta', week: 1 }),
-      createMockFight({ a: 'Gamma', d: 'Delta', week: 2 }),
-      createMockFight({ a: 'Hero', d: 'Epsilon', week: 3 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'Beta', week: 1 }),
+      createMockFight({ warriorIdA: 'Gamma', warriorIdD: 'Delta', week: 2 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'Epsilon', week: 3 }),
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toHaveLength(2);
@@ -44,9 +44,9 @@ describe('getRecentFightsForWarrior', () => {
 
   it('finds fights where warrior is defender', () => {
     const history: FightSummary[] = [
-      createMockFight({ a: 'Alpha', d: 'Hero', week: 1 }),
-      createMockFight({ a: 'Gamma', d: 'Delta', week: 2 }),
-      createMockFight({ a: 'Epsilon', d: 'Hero', week: 3 }),
+      createMockFight({ warriorIdA: 'Alpha', warriorIdD: 'Hero', week: 1 }),
+      createMockFight({ warriorIdA: 'Gamma', warriorIdD: 'Delta', week: 2 }),
+      createMockFight({ warriorIdA: 'Epsilon', warriorIdD: 'Hero', week: 3 }),
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toHaveLength(2);
@@ -55,9 +55,9 @@ describe('getRecentFightsForWarrior', () => {
 
   it('finds fights where warrior is both attacker and defender across different fights', () => {
     const history: FightSummary[] = [
-      createMockFight({ a: 'Hero', d: 'Alpha', week: 1 }),
-      createMockFight({ a: 'Beta', d: 'Hero', week: 2 }),
-      createMockFight({ a: 'Gamma', d: 'Delta', week: 3 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'Alpha', week: 1 }),
+      createMockFight({ warriorIdA: 'Beta', warriorIdD: 'Hero', week: 2 }),
+      createMockFight({ warriorIdA: 'Gamma', warriorIdD: 'Delta', week: 3 }),
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toHaveLength(2);
@@ -66,11 +66,11 @@ describe('getRecentFightsForWarrior', () => {
 
   it('limits the results and returns the most recent fights chronologically', () => {
     const history: FightSummary[] = [
-      createMockFight({ a: 'Hero', d: 'A', week: 1 }),
-      createMockFight({ a: 'Hero', d: 'B', week: 2 }),
-      createMockFight({ a: 'Hero', d: 'C', week: 3 }),
-      createMockFight({ a: 'Hero', d: 'D', week: 4 }),
-      createMockFight({ a: 'Hero', d: 'E', week: 5 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'A', week: 1 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'B', week: 2 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'C', week: 3 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'D', week: 4 }),
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: 'E', week: 5 }),
     ];
 
     // Default limit is 10, passing an explicit limit of 3
@@ -83,7 +83,7 @@ describe('getRecentFightsForWarrior', () => {
 
   it('uses the default limit of 10', () => {
     const history: FightSummary[] = Array.from({ length: 15 }).map((_, i) =>
-      createMockFight({ a: 'Hero', d: `Opponent${i}`, week: i + 1 })
+      createMockFight({ warriorIdA: 'Hero', warriorIdD: `Opponent${i}`, week: i + 1 })
     );
 
     const result = getRecentFightsForWarrior(history, 'Hero');

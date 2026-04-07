@@ -5,24 +5,23 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags, aiPlanForWarrior } from "@/engine";
-import { killWarrior } from "@/state/gameStore";
+import { type TournamentEntry, type TournamentBout, type FightSummary, type Warrior, FightingStyle } from "@/types/game";
+import { generateId, hashStr } from "@/utils/idUtils";
+import { SeededRNG } from "@/utils/random";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { StyleRollups } from "@/engine/stats/styleRollups";
-import { type TournamentEntry, type TournamentBout, type FightSummary, type Warrior, FightingStyle } from "@/types/game";
-import { BASE_ROSTER_CAP } from "@/data/constants";
 import { getFightsForTournament } from "@/engine/core/historyUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Play, UserPlus, FastForward, Shield } from "lucide-react";
+import { Trophy, Play, UserPlus, FastForward } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 // Modular Components
 import { TournamentBracket } from "@/components/tournaments/TournamentBracket";
-import { TournamentPrepDialog } from "@/components/tournaments/TournamentPrepDialog";
 import { TournamentHistory } from "@/components/tournaments/TournamentHistory";
 
 const SEASON_NAMES: Record<string, string> = {
@@ -40,8 +39,8 @@ const SEASON_ICONS: Record<string, string> = {
 };
 
 export default function Tournaments() {
-  const { state, setState } = useGameStore();
-  const [prepModeOpen, setPrepModeOpen] = useState(false);
+  const state = useGameStore();
+  const { setState } = state;
   const [expandedBout, setExpandedBout] = useState<string | null>(null);
 
   const currentTournament = useMemo(
@@ -58,219 +57,50 @@ export default function Tournaments() {
 
   const runNextRound = useCallback(() => {
     if (!currentTournament) return;
-    const bracket = [...currentTournament.bracket];
+    
+    // 1. Identify the current round to resolve
+    const unresolved = currentTournament.bracket.filter(b => b.winner === undefined);
+    if (unresolved.length === 0) return;
+    
+    const currentRoundNum = Math.min(...unresolved.map(b => b.round));
+    const roundBoutsToProcess = unresolved.filter(b => b.round === currentRoundNum);
 
-    let currentRound = Infinity;
-    let roundBouts: typeof bracket = [];
-
-    for (let i = 0; i < bracket.length; i++) {
-      const b = bracket[i];
-      if (b.winner === undefined) {
-        if (b.round < currentRound) {
-          currentRound = b.round;
-          roundBouts = [b];
-        } else if (b.round === currentRound) {
-          roundBouts.push(b);
-        }
-      }
-    }
-
-    if (roundBouts.length === 0) return;
-
-    let updatedState = { ...state };
-    const winners: string[] = [];
-
-    const findWarrior = (name: string) => {
-      const player = updatedState.roster.find((w) => w.name === name);
-      if (player) return player;
-      for (const rival of (updatedState.rivals ?? [])) {
-        const rw = rival.roster.find((w) => w.name === name);
-        if (rw) return rw;
-      }
-      return undefined;
-    };
-
-    for (const bout of roundBouts) {
-      if (bout.d === "(bye)") {
-        bout.winner = "A";
-        winners.push(bout.a);
-        continue;
-      }
-      const wA = findWarrior(bout.a);
-      const wD = findWarrior(bout.d);
-      if (!wA || !wD) {
-        bout.winner = wA ? "A" : "D";
-        winners.push(wA?.name ?? wD?.name ?? "");
-        continue;
-      }
-
-      const findRivalByWarrior = (name: string) => {
-        return (updatedState.rivals ?? []).find(r => r.roster.some(w => w.name === name));
-      };
-
-      const getAIPlan = (w: Warrior) => {
-        const rival = findRivalByWarrior(w.name);
-        if (!rival) return defaultPlanForWarrior(w);
-        return aiPlanForWarrior(w, rival.owner.personality || "Pragmatic", rival.philosophy || "Opportunist", undefined, rival.strategy?.intent);
-      };
-
-      const planA = wA.plan ?? (state.roster.some(w => w.name === bout.a) ? defaultPlanForWarrior(wA) : getAIPlan(wA));
-      const planD = wD.plan ?? (state.roster.some(w => w.name === bout.d) ? defaultPlanForWarrior(wD) : getAIPlan(wD));
-      const outcome = simulateFight(planA, planD, wA, wD, undefined, updatedState.trainers, state.weather);
-
-      bout.winner = outcome.winner;
-      bout.by = outcome.by;
-      bout.fightId = `tf_${Date.now()}_${bout.matchIndex}`;
-      
-      const winnerName = outcome.winner === "A" ? bout.a : outcome.winner === "D" ? bout.d : null;
-      if (winnerName) winners.push(winnerName);
-
-      if (outcome.by === "Kill") {
-        const deadId = outcome.winner === "A" ? wD.id : wA.id;
-        const killerName = outcome.winner === "A" ? wA.name : wD.name;
-        updatedState = killWarrior(updatedState, deadId, killerName, `Killed in ${currentTournament.name}`);
-      }
-
-      const summary: FightSummary = {
-        id: bout.fightId,
-        week: state.week,
-        phase: "resolution",
-        tournamentId: currentTournament.id,
-        title: `${bout.a} vs ${bout.d}`,
-        a: bout.a,
-        d: bout.d,
-        winner: outcome.winner,
-        by: outcome.by,
-        styleA: wA.style,
-        styleD: wD.style,
-        flashyTags: outcome.post?.tags ?? [],
-        transcript: outcome.log.map((e) => e.text),
-        createdAt: new Date().toISOString(),
-      };
-      updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
-      ArenaHistory.append(summary);
-      LoreArchive.signalFight(summary);
-      StyleRollups.addFight({ 
-        week: state.week, 
-        styleA: wA.style, 
-        styleD: wD.style, 
-        winner: outcome.winner, 
-        by: outcome.by,
-        isTournament: currentTournament.id 
-      });
-      NewsletterFeed.appendFightResult({ summary, transcript: outcome.log.map((e) => e.text) });
-
-      if (outcome.winner) {
-        const fameData = fameFromTags(outcome.post?.tags ?? []);
-        updatedState.fame = (updatedState.fame ?? 0) + fameData.fame;
-      }
-
-      updatedState = {
-        ...updatedState,
-        roster: updatedState.roster.map((w) => {
-          if (w.id === wA.id || w.id === wD.id) {
-            const isWinner = (w.id === wA.id && outcome.winner === "A") || (w.id === wD.id && outcome.winner === "D");
-            const isLoser = (w.id === wA.id && outcome.winner === "D") || (w.id === wD.id && outcome.winner === "A");
-            const didKill = (w.id === wA.id && outcome.winner === "A" && outcome.by === "Kill") || (w.id === wD.id && outcome.winner === "D" && outcome.by === "Kill");
-            return {
-              ...w,
-              career: {
-                ...w.career,
-                wins: w.career.wins + (isWinner ? 1 : 0),
-                losses: w.career.losses + (isLoser ? 1 : 0),
-                kills: w.career.kills + (didKill ? 1 : 0),
-              },
-            };
-          }
-          return w;
-        }),
-      };
-    }
-
-    if (winners.length > 1) {
-      const nextRound = currentRound + 1;
-      for (let i = 0; i < winners.length; i += 2) {
-        if (i + 1 < winners.length) {
-          bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: winners[i + 1] });
-        } else {
-          bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: "(bye)", winner: "A" });
-        }
-      }
-    }
-
-    const isComplete = bracket.filter((b) => b.winner === undefined).length === 0 && winners.length <= 1;
-    const champion = winners.length === 1 ? winners[0] : undefined;
-
-    const updatedTournament: TournamentEntry = {
-      ...currentTournament,
-      bracket,
-      completed: isComplete,
-      champion,
-    };
-
-    updatedState.tournaments = updatedState.tournaments.map((t) =>
-      t.id === currentTournament.id ? updatedTournament : t
-    );
-
-    if (isComplete && champion) {
-      const isPlayerChampion = updatedState.roster.some((w) => w.name === champion);
-      if (isPlayerChampion) {
-        updatedState.roster = updatedState.roster.map((w) =>
-          w.name === champion ? { ...w, champion: true, fame: w.fame + 5, popularity: w.popularity + 3, titles: [...w.titles, updatedTournament.name] } : w
-        );
-        updatedState.rosterBonus = (updatedState.rosterBonus ?? 0) + 1;
-        updatedState.fame = (updatedState.fame ?? 0) + 10;
-        toast.success(`🏆 ${champion} has won the ${updatedTournament.name}!`);
-      }
-    } else {
-      toast.success(`Round ${currentRound} complete.`);
-    }
-
-    setState(updatedState);
-  }, [currentTournament, state, setState]);
-
-  const skipToMyBouts = useCallback(() => {
-    if (!currentTournament) return;
-    const playerNames = new Set(state.roster.map(w => w.name));
-    let updatedState = { ...state };
-    const bracket = [...currentTournament.bracket];
-    let roundsSkipped = 0;
-
-    const findWarrior = (name: string) => {
-      const player = updatedState.roster.find(w => w.name === name);
-      if (player) return player;
-      for (const rival of (updatedState.rivals ?? [])) {
-        const rw = rival.roster.find(w => w.name === name);
-        if (rw) return rw;
-      }
-      return undefined;
-    };
-
-    for (let safety = 0; safety < 20; safety++) {
-      const unresolved = bracket.filter(b => b.winner === undefined);
-      if (unresolved.length === 0) break;
-      const currentRound = Math.min(...unresolved.map(b => b.round));
-      const roundBouts = unresolved.filter(b => b.round === currentRound);
-
-      if (roundBouts.some(b => playerNames.has(b.a) || playerNames.has(b.d))) break;
-
+    setState((draft) => {
       const winners: string[] = [];
-      for (const bout of roundBouts) {
-        if (bout.d === "(bye)") {
-          bout.winner = "A";
-          winners.push(bout.a);
+
+      const findWarrior = (name: string) => {
+        const player = draft.roster.find((w: any) => w.name === name);
+        if (player) return player;
+        for (const rival of (draft.rivals ?? [])) {
+          const rw = rival.roster.find((w: any) => w.name === name);
+          if (rw) return rw;
+        }
+        return undefined;
+      };
+
+      const tournament = draft.tournaments.find((t: any) => t.id === currentTournament.id);
+      if (!tournament) return;
+
+      for (const boutData of roundBoutsToProcess) {
+        const draftBout = tournament.bracket.find((b: any) => b.round === boutData.round && b.matchIndex === boutData.matchIndex);
+        if (!draftBout) continue;
+
+        if (draftBout.d === "(bye)") {
+          draftBout.winner = "A";
+          winners.push(draftBout.a);
           continue;
         }
-        const wA = findWarrior(bout.a);
-        const wD = findWarrior(bout.d);
+
+        const wA = findWarrior(draftBout.a);
+        const wD = findWarrior(draftBout.d);
         if (!wA || !wD) {
-          bout.winner = wA ? "A" : "D";
+          draftBout.winner = wA ? "A" : "D";
           winners.push(wA?.name ?? wD?.name ?? "");
           continue;
         }
 
         const findRivalByWarrior = (name: string) => {
-          return (updatedState.rivals ?? []).find(r => r.roster.some(w => w.name === name));
+          return (draft.rivals ?? []).find((r: any) => r.roster.some((w: any) => w.name === name));
         };
 
         const getAIPlan = (w: Warrior) => {
@@ -279,58 +109,254 @@ export default function Tournaments() {
           return aiPlanForWarrior(w, rival.owner.personality || "Pragmatic", rival.philosophy || "Opportunist", undefined, rival.strategy?.intent);
         };
 
-        const planA = wA.plan ?? getAIPlan(wA);
-        const planD = wD.plan ?? getAIPlan(wD);
-        const outcome = simulateFight(planA, planD, wA, wD, undefined, updatedState.trainers, state.weather);
+        const planA = wA.plan ?? (draft.roster.some((w: any) => w.name === draftBout.a) ? defaultPlanForWarrior(wA) : getAIPlan(wA));
+        const planD = wD.plan ?? (draft.roster.some((w: any) => w.name === draftBout.d) ? defaultPlanForWarrior(wD) : getAIPlan(wD));
+        
+        const boutRng = new SeededRNG(hashStr(`${tournament.id}-${draftBout.round}-${draftBout.matchIndex}`));
+        const outcome = simulateFight(planA, planD, wA, wD, () => boutRng.next(), draft.trainers, draft.weather);
 
-        bout.winner = outcome.winner;
-        bout.by = outcome.by;
-        bout.fightId = `tf_${Date.now()}_${bout.matchIndex}_${safety}`;
+        draftBout.winner = outcome.winner;
+        draftBout.by = outcome.by;
+        draftBout.fightId = generateId(boutRng, "tf");
+        draftBout.warriorIdA = wA.id;
+        draftBout.warriorIdD = wD.id;
 
-        if (outcome.winner === "A") winners.push(bout.a);
-        else if (outcome.winner === "D") winners.push(bout.d);
+        const winnerName = outcome.winner === "A" ? draftBout.a : outcome.winner === "D" ? draftBout.d : null;
+        if (winnerName) winners.push(winnerName);
 
         if (outcome.by === "Kill") {
           const deadId = outcome.winner === "A" ? wD.id : wA.id;
           const killerName = outcome.winner === "A" ? wA.name : wD.name;
-          updatedState = killWarrior(updatedState, deadId, killerName, `Killed manually in ${currentTournament.name}`);
+          
+          const victim = draft.roster.find((w: any) => w.id === deadId);
+          if (victim) {
+            victim.status = "Dead";
+            victim.isDead = true;
+            victim.deathWeek = draft.week;
+            victim.killedBy = killerName;
+            draft.graveyard.push({ ...victim });
+            draft.roster = draft.roster.filter((w: any) => w.id !== deadId);
+          } else {
+             for (const rival of draft.rivals) {
+               const rvIndex = rival.roster.findIndex((w: any) => w.id === deadId);
+               if (rvIndex !== -1) {
+                 rival.roster.splice(rvIndex, 1);
+                 break;
+               }
+             }
+          }
         }
-        
+
         const summary: FightSummary = {
-          id: bout.fightId,
-          week: state.week,
+          id: draftBout.fightId,
+          week: draft.week,
           phase: "resolution",
-          tournamentId: currentTournament.id,
-          title: `${bout.a} vs ${bout.d}`,
-          a: bout.a,
-          d: bout.d,
+          tournamentId: tournament.id,
+          title: `${draftBout.a} vs ${draftBout.d}`,
+          a: draftBout.a,
+          d: draftBout.d,
+          warriorIdA: wA.id,
+          warriorIdD: wD.id,
           winner: outcome.winner,
           by: outcome.by,
           styleA: wA.style,
           styleD: wD.style,
-          transcript: outcome.log.map(e => e.text),
-          createdAt: new Date().toISOString(),
+          flashyTags: outcome.post?.tags ?? [],
+          transcript: outcome.log.map((e: any) => e.text),
+          createdAt: "Year " + draft.year + " Week " + draft.week,
         };
-        updatedState.arenaHistory = [...updatedState.arenaHistory, summary];
+        draft.arenaHistory.push(summary);
         ArenaHistory.append(summary);
+        LoreArchive.signalFight(summary);
+        StyleRollups.addFight({
+          week: draft.week,
+          styleA: wA.style,
+          styleD: wD.style,
+          winner: outcome.winner,
+          by: outcome.by,
+          isTournament: tournament.id
+        });
+        NewsletterFeed.appendFightResult({ summary, transcript: outcome.log.map((e: any) => e.text) });
+
+        if (outcome.winner) {
+          const fameData = fameFromTags(outcome.post?.tags ?? []);
+          const isPlayerSide = draft.roster.some((w: any) => w.id === wA.id || w.id === wD.id);
+          if (isPlayerSide) {
+             draft.player.fame = (draft.player.fame ?? 0) + fameData.fame;
+          }
+        }
+
+        const updateCareer = (w: any) => {
+           if (w.id === wA.id || w.id === wD.id) {
+            const isWinner = (w.id === wA.id && outcome.winner === "A") || (w.id === wD.id && outcome.winner === "D");
+            const isLoser = (w.id === wA.id && outcome.winner === "D") || (w.id === wD.id && outcome.winner === "A");
+            const didKill = (w.id === wA.id && outcome.winner === "A" && outcome.by === "Kill") || (w.id === wD.id && outcome.winner === "D" && outcome.by === "Kill");
+            w.career.wins += (isWinner ? 1 : 0);
+            w.career.losses += (isLoser ? 1 : 0);
+            w.career.kills += (didKill ? 1 : 0);
+          }
+        };
+        draft.roster.forEach(updateCareer);
+        draft.rivals.forEach((r: any) => r.roster.forEach(updateCareer));
       }
 
       if (winners.length > 1) {
-        const nextRound = currentRound + 1;
+        const nextRound = currentRoundNum + 1;
         for (let i = 0; i < winners.length; i += 2) {
-          if (i + 1 < winners.length) bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: winners[i + 1] });
-          else bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: "(bye)", winner: "A" });
+          if (i + 1 < winners.length) {
+            tournament.bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: winners[i + 1], warriorIdA: "", warriorIdD: "" });
+          } else {
+            tournament.bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: "(bye)", winner: "A", warriorIdA: "", warriorIdD: "" });
+          }
         }
       }
-      roundsSkipped++;
-    }
 
-    if (roundsSkipped > 0) {
-      updatedState.tournaments = updatedState.tournaments.map(t => t.id === currentTournament.id ? { ...currentTournament, bracket } : t);
-      setState(updatedState);
-      toast.success(`Skipped ${roundsSkipped} AI-only rounds.`);
-    }
-  }, [currentTournament, state, setState]);
+      const isComplete = tournament.bracket.filter((b: any) => b.winner === undefined).length === 0 && winners.length <= 1;
+      const champion = winners.length === 1 ? winners[0] : undefined;
+      tournament.completed = isComplete;
+      tournament.champion = champion;
+
+      if (isComplete && champion) {
+        const champWarrior = draft.roster.find((w: any) => w.name === champion);
+        if (champWarrior) {
+          champWarrior.champion = true;
+          champWarrior.fame = (champWarrior.fame || 0) + 5;
+          champWarrior.popularity = (champWarrior.popularity || 0) + 3;
+          champWarrior.titles = [...(champWarrior.titles || []), tournament.name];
+          draft.rosterBonus = (draft.rosterBonus ?? 0) + 1;
+          draft.player.fame = (draft.player.fame ?? 0) + 10;
+          toast.success(`🏆 ${champion} has won the ${tournament.name}!`);
+        }
+      } else {
+        toast.success(`Round ${currentRoundNum} complete.`);
+      }
+    });
+  }, [currentTournament, setState]);
+
+  const skipToMyBouts = useCallback(() => {
+    if (!currentTournament) return;
+    const playerNames = new Set(state.roster.map(w => w.name));
+
+    setState((draft) => {
+      const tournament = draft.tournaments.find((t: any) => t.id === currentTournament.id);
+      if (!tournament) return;
+
+      const findWarriorAtDraft = (name: string) => {
+        const player = draft.roster.find((w: any) => w.name === name);
+        if (player) return player;
+        for (const rival of (draft.rivals ?? [])) {
+          const rw = rival.roster.find((w: any) => w.name === name);
+          if (rw) return rw;
+        }
+        return undefined;
+      };
+
+      let roundsSkipped = 0;
+      for (let safety = 0; safety < 20; safety++) {
+        const unresolved = tournament.bracket.filter((b: any) => b.winner === undefined);
+        if (unresolved.length === 0) break;
+        const currentRound = Math.min(...unresolved.map((b: any) => b.round));
+        const roundBouts = unresolved.filter((b: any) => b.round === currentRound);
+
+        if (roundBouts.some((b: any) => playerNames.has(b.a) || playerNames.has(b.d))) break;
+
+        const winners: string[] = [];
+        for (const bout of roundBouts) {
+          if (bout.d === "(bye)") {
+            bout.winner = "A";
+            winners.push(bout.a);
+            continue;
+          }
+          const wA = findWarriorAtDraft(bout.a);
+          const wD = findWarriorAtDraft(bout.d);
+          if (!wA || !wD) {
+            bout.winner = wA ? "A" : "D";
+            winners.push(wA?.name ?? wD?.name ?? "");
+            continue;
+          }
+
+          const findRivalByWarrior = (name: string) => {
+            return (draft.rivals ?? []).find((r: any) => r.roster.some((w: any) => w.name === name));
+          };
+
+          const getAIPlan = (w: Warrior) => {
+            const rival = findRivalByWarrior(w.name);
+            if (!rival) return defaultPlanForWarrior(w);
+            return aiPlanForWarrior(w, rival.owner.personality || "Pragmatic", rival.philosophy || "Opportunist", undefined, rival.strategy?.intent);
+          };
+
+          const planA = wA.plan ?? getAIPlan(wA);
+          const planD = wD.plan ?? getAIPlan(wD);
+          const boutRng = new SeededRNG(hashStr(`${tournament.id}-${safety}-${bout.round}-${bout.matchIndex}`));
+          const outcome = simulateFight(planA, planD, wA, wD, () => boutRng.next(), draft.trainers, draft.weather);
+
+          bout.winner = outcome.winner;
+          bout.by = outcome.by;
+          bout.fightId = generateId(boutRng, "tf");
+          bout.warriorIdA = wA.id;
+          bout.warriorIdD = wD.id;
+
+          if (outcome.winner === "A") winners.push(bout.a);
+          else if (outcome.winner === "D") winners.push(bout.d);
+
+          if (outcome.by === "Kill") {
+            const deadId = outcome.winner === "A" ? wD.id : wA.id;
+            const killerName = outcome.winner === "A" ? wA.name : wD.name;
+            const victim = draft.roster.find((w: any) => w.id === deadId);
+            if (victim) {
+              victim.status = "Dead";
+              victim.isDead = true;
+              victim.deathWeek = draft.week;
+              victim.killedBy = killerName;
+              draft.graveyard.push({ ...victim });
+              draft.roster = draft.roster.filter((w: any) => w.id !== deadId);
+            } else {
+               for (const rival of draft.rivals) {
+                 const rvIndex = rival.roster.findIndex((w: any) => w.id === deadId);
+                 if (rvIndex !== -1) {
+                   rival.roster.splice(rvIndex, 1);
+                   break;
+                 }
+               }
+            }
+          }
+          
+          const summary: FightSummary = {
+            id: bout.fightId,
+            week: draft.week,
+            phase: "resolution",
+            tournamentId: tournament.id,
+            title: `${bout.a} vs ${bout.d}`,
+            a: bout.a,
+            d: bout.d,
+            warriorIdA: wA.id,
+            warriorIdD: wD.id,
+            winner: outcome.winner,
+            by: outcome.by,
+            styleA: wA.style,
+            styleD: wD.style,
+            transcript: outcome.log.map((e: any) => e.text),
+            createdAt: "Year " + draft.year + " Week " + draft.week,
+          };
+          draft.arenaHistory.push(summary);
+          ArenaHistory.append(summary);
+        }
+
+        if (winners.length > 1) {
+          const nextRound = currentRound + 1;
+          for (let i = 0; i < winners.length; i += 2) {
+            if (i + 1 < winners.length) tournament.bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: winners[i + 1], warriorIdA: "", warriorIdD: "" });
+            else tournament.bracket.push({ round: nextRound, matchIndex: Math.floor(i / 2), a: winners[i], d: "(bye)", winner: "A", warriorIdA: "", warriorIdD: "" });
+          }
+        }
+        roundsSkipped++;
+      }
+
+      if (roundsSkipped > 0) {
+        toast.success(`Skipped ${roundsSkipped} AI-only rounds.`);
+      }
+    });
+  }, [currentTournament, state.roster, setState]);
 
   return (
     <div className="space-y-6 pb-20">
@@ -341,7 +367,7 @@ export default function Tournaments() {
               <Trophy className="h-6 w-6 text-accent shadow-glow" />
             </div>
             Seasonal Campaigns
-          </h1>
+           </h1>
           <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-60">
             Legendary tournaments for glory and absolute roster expansion
           </p>
