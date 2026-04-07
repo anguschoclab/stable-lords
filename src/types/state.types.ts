@@ -26,6 +26,7 @@ export type {
   ScoutQuality
 };
 import { type FightSummary, type FightOutcomeBy } from "./combat.types";
+export type { FightSummary, FightOutcomeBy };
 import type { PoolWarrior } from "@/engine/recruitment";
 export type { PoolWarrior };
 

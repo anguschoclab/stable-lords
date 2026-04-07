@@ -7,22 +7,29 @@ import {
   executeHit,
   applyEnduranceCosts
 } from "./core/exchangeHelpers";
-import {
-  FightingStyle,
-  type CombatEvent,
-  type BaseSkills,
-  type Attributes,
-  type DerivedStats,
-  type OffensiveTactic,
-  type DefensiveTactic,
-  type FightPlan,
-  type WeatherType,
-  type WarriorFavorites,
-} from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { Warrior, WarriorFavorites } from "@/types/warrior.types";
+import type { FightPlan, FightSummary, CombatEvent } from "@/types/combat.types";
+import type { 
+  BaseSkills, 
+  Attributes, 
+  DerivedStats, 
+  WeatherType,
+  OffensiveTactic, 
+  DefensiveTactic 
+} from "@/types/shared.types";
 import { skillCheck, contestCheck } from "./combatMath";
 import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "./combatDamage";
 import { enduranceCost, fatiguePenalty } from "./combatFatigue";
-import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, type Phase as StylePhase } from "../stylePassives";
+import { 
+  getTempoBonus, 
+  getEnduranceMult, 
+  getStylePassive, 
+  getKillMechanic, 
+  getStyleAntiSynergy, 
+  type Phase as StylePhase,
+  type MasteryTier
+} from "../stylePassives";
 import { getFavoriteRhythmBonus } from "../favorites";
 import { 
   GLOBAL_ATT_BONUS, 
@@ -136,8 +143,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   if (passD.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "D", result: passD.narrative });
 
   // 2. Initiative Phase
-  const masteryIniA = fA.favorites ? getFavoriteRhythmBonus(fA as unknown as import("@/types/game").Warrior, OE_A, AL_A) : 0;
-  const masteryIniD = fD.favorites ? getFavoriteRhythmBonus(fD as unknown as import("@/types/game").Warrior, OE_D, AL_D) : 0;
+  const masteryIniA = fA.favorites ? getFavoriteRhythmBonus(fA as unknown as Warrior, OE_A, AL_A) : 0;
+  const masteryIniD = fD.favorites ? getFavoriteRhythmBonus(fD as unknown as Warrior, OE_D, AL_D) : 0;
 
   const iniA = fA.skills.INI + alIniMod(AL_A) + ctx.matchupA + fatA + defModsA.iniBonus + getTempoBonus(fA.style, stylePhase) + passA.iniBonus + masteryIniA - fA.legHits;
   const iniD = fD.skills.INI + alIniMod(AL_D) + ctx.matchupD + fatD + defModsD.iniBonus + getTempoBonus(fD.style, stylePhase) + passD.iniBonus + masteryIniD - fD.legHits;

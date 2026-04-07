@@ -7,7 +7,9 @@
  *
  * Now uses canonical Terrablood lookup charts for derived stats.
  */
-import { FightingStyle, type Attributes, type BaseSkills, type DerivedStats } from "@/types/game";
+import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes } from "@/types/shared.types";
+import type { Warrior, AttributePotential } from "@/types/warrior.types";
+import { FightingStyle, type BaseSkills, type DerivedStats } from "@/types/game";
 import {
   computeHP as canonicalHP,
   computeDamageClass,

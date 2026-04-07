@@ -2,7 +2,7 @@
  * Equipment Optimizer — recommends optimal gear by fighting style.
  * Analyzes encumbrance tradeoffs and style synergy.
  */
-import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
+import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import {
   WEAPONS, ARMORS, SHIELDS, HELMS,
   type EquipmentItem, type EquipmentLoadout,

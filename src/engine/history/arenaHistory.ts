@@ -1,7 +1,7 @@
 /**
  * Arena history — persists fight summaries to localStorage.
  */
-import type { FightSummary } from "@/types/game";
+import type { FightSummary } from "@/types/combat.types";
 
 const KEY = "sl.arenaHistory";
 

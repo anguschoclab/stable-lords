@@ -1,0 +1,217 @@
+{
+  "strikes": {
+    "slashing": {
+      "glancing": [
+        "%A's %W skips harmlessly off %D's %BP.",
+        "%A's %W hits the %BP, but the angle is poor and the blade slides off.",
+        "%A slashes with his %W, but the strike is a glancing blow only."
+      ],
+      "solid": [
+        "%A unleashes a blinding flurry of cuts with his %W, biting into the %BP!",
+        "%A steps deep inside the guard, whipping his %W into a vicious arc across the %BP!",
+        "%A's %W lunges with awesome cutting power, rending the %BP!"
+      ],
+      "mastery": [
+        "In a blur of practiced rhythm, %A's %W flows through %D's guard to find the %BP.",
+        "%A's %W seems to vanish and reappear, bitingly deep into the %BP with effortless grace.",
+        "The %W moves like an extension of %A's own soul, carving a perfect line across the %BP."
+      ],
+      "critical_human": [
+        "A horrifying display of speed as %A carves a deep path through %D's %BP with his %W!",
+        "%A's %W flashes as he takes a sudden vicious slash, nearly severing the %BP!",
+        "%A feints low, catching %D off guard before ripping his %W across the %BP in a spray of crimson!"
+      ],
+      "critical_supernatural": [
+        "The air shudders as %A's %W hums with a spectral light, cleaving through %D's %BP and the very air itself.",
+        "%A's eyes glow with an inner fire as their %W leaves a trail of silver light, shredding the %BP in a mythic display.",
+        "Aetheric pressure precedes the blow; %A's %W strikes with the weight of stars, obliterating the %BP."
+      ],
+      "fatal": [
+        "%A feints low, catching %D off guard before severing their %BP at the joint.",
+        "A fountain of gore erupts as %A's final strike decapitates %D!",
+        "%A steps past a fading guard and ends %D's life with a chilling, masterful execution!"
+      ]
+    },
+    "bashing": {
+      "glancing": [
+        "%A's %W bounces off the %BP with a hollow clang.",
+        "%A heaves his %W, but the weight carries it wide, only grazing the %BP."
+      ],
+      "solid": [
+        "%A roars, bringing the %W down like an executioner's maul on the %BP!",
+        "%A steps into the strike, letting the massive weight of the %W hammer the %BP!"
+      ],
+      "mastery": [
+        "%A catches %D in a perfect orbit of weight, hammering the %BP with crushing precision.",
+        "The %W strikes with a focused vibration, %A's mastery turning raw weight into surgical impact on the %BP.",
+        "With terrifying economy of motion, %A drops the %W directly onto the %BP."
+      ],
+      "critical_human": [
+        "The arena trembles as %A unleashes a terrifying overhead smash, crushing the %BP!",
+        "%A winds up and unleashes a thunderous swing, the %W shattering %D's %BP!"
+      ],
+      "critical_supernatural": [
+        "Gravity itself seems to bow to %A's %W, as the impact on the %BP creates a localized shockwave of force.",
+        "A boom like thunder echoes as %A's %W connects, the strike wreathed in a faint, destructive static.",
+        "%A strikes with the force of a collapsing mountain, the %W glowing with a dull, menacing heat."
+      ],
+      "fatal": [
+        "%A shows no mercy, delivering a horrifying, skull-crushing execution!",
+        "The match concludes in horrific fashion as %D's %BP is pulverized by %A's %W!"
+      ]
+    },
+    "piercing": {
+      "glancing": [
+        "%A's %W skips off the %BP, barely scratching the surface.",
+        "%A thrusts with his %W, but the point catches only air and armor."
+      ],
+      "solid": [
+        "%A drops his center and drives a blinding lunge with his %W into the %BP!",
+        "%A's %W strikes like a coiled viper, piercing the %BP!"
+      ],
+      "mastery": [
+        "%A's %W finds the microscopic gap in %D's defense, sliding effortlessly into the %BP.",
+        "With a dancer's poise, %A threads the needle, burying the %W deep into the %BP.",
+        "The %W moves in a straight, undeniable line, %A's focus total as it punctures the %BP."
+      ],
+      "critical_human": [
+        "%A extends fully, every ounce of reach behind his %W as it sinks deep into the %BP!",
+        "%A launches a controlled, perfectly balanced lunge, the %W finding a gap in the %BP!"
+      ],
+      "critical_supernatural": [
+        "Percentage of the void follows the tip of %A's %W as it pierces the %BP with impossible geometry.",
+        "The %W hums a low, deathly note, its point glowing with a cold light as it bypasses reality to hit the %BP.",
+        "%A's thrust is a streak of pure energy, the %W leaving a hollowed-out path through the %BP."
+      ],
+      "fatal": [
+        "%A drops into a low crouch and rockets his %W upward, ending %D's life in a spray of crimson!",
+        "%A executes %D with a chilling, masterful strike of the %W through the %BP!"
+      ]
+    },
+    "fist": {
+      "glancing": [
+        "%A throws a PUNCH, but it merely grazes %D's %BP."
+      ],
+      "solid": [
+        "%A steps inside the guard and unleashes a horrific combination on the %BP!"
+      ],
+      "mastery": [
+        "%A's limbs are a blur of technical perfection, striking the %BP with rhythmic violence.",
+        "Every joint in %A's body snaps in sequence, delivering a masterwork of force to the %BP."
+      ],
+      "critical_human": [
+        "%A throws a rock-fisted PUNCH of incredible felling power into the %BP!"
+      ],
+      "critical_supernatural": [
+        "%A's fist glows with an internal aura, the impact on the %BP shattering the air in a localized burst.",
+        "A golden light follows %A's strike, the sound of a bell ringing as the %BP is struck by 'The Enlightened Hand'."
+      ],
+      "fatal": [
+        "%A grabs his opponent and drives a sickening KNEE into their midsection. %D collapses dead."
+      ]
+    }
+  },
+  "defenses": {
+    "dodge": {
+      "success": [
+        "%D twists his body with surprising grace, allowing the attack to pass harmlessly by.",
+        "%D rolls beneath the blow, rising instantly with his weapon ready."
+      ],
+      "stumbling": [
+        "%D barely avoids the blow, stumbling awkwardly into the sand."
+      ]
+    },
+    "parry": {
+      "success": [
+        "%D catches the strike on the edge of his weapon, turning it aside with ease.",
+        "A sharp ring of steel as %D parries the blow with practiced ease."
+      ],
+      "stumbling": [
+        "%D barely manages to bring his guard up in time, the impact nearly rattling his weapon free."
+      ]
+    }
+  },
+  "attacks": {
+    "whiff": [
+      "%A's %W whistles through empty air as %D slips the blow.",
+      "A desperate swing by %A finds only dust and shadows."
+    ],
+    "initiative": [
+      "%A takes the center of the sands, %W held in a low, menacing guard.",
+      "With a sudden burst of speed, %A seizes the opening!",
+      "The arena goes silent as %A dictates the pace of the exchange."
+    ]
+  },
+  "passives": {
+    "AimedBlow": [
+      "%A studies the opponent's rhythm, waiting for the perfect opening."
+    ],
+    "BashingAttack": [
+      "%A hammers through the defensive stance — raw power overwhelms technique!"
+    ]
+  },
+  "conclusions": {
+    "KO": [
+      "%D collapses into the dust, consciousness fleeing as %A's %W delivers the final blow. KNOCKED OUT!"
+    ],
+    "Kill": [
+      "finds the fatal gap in the helm with surgical precision — a KILLING BLOW to the skull!",
+      "places the blade with lethal accuracy — a precise KILLING STRIKE!"
+    ]
+  },
+  "insights": {
+    "ST": [
+      "You notice a primal strength in %A's posture."
+    ]
+  },
+  "promoters": {
+    "Sadistic": {
+      "pitch": [
+        "The crowd is hungry for real suffering, %S. This match promises to paint the sands red.",
+        "There's a certain... finality... in the air for this one. Don't disappoint the blood-gods."
+      ]
+    },
+    "Flashy": {
+      "pitch": [
+        "The spotlight is yours, %S! Give 'em a show they'll be talking about for years.",
+        "A clash of stars! Everyone who's anyone is coming to see if your legacy is real."
+      ]
+    }
+  },
+  "media": {
+    "headline": [
+      "BLOOD ON THE SANDS: THE RISE OF %S",
+      "ARENA FEVER: %S CLIMBS THE RANKINGS"
+    ]
+  },
+  "persona": {
+    "Quick": [
+      "%A moves like a desert wind, never static, always shifting.",
+      "The eyes can barely track %A's subtle adjustments."
+    ]
+  },
+  "recruitment": {
+    "origin": [
+      "Born in the sun-baked salt mines, %A knows nothing but labor and survival.",
+      "A disgraced soldier seeking redemption in the only way that still pays."
+    ]
+  },
+  "memorials": {
+    "epigraph": [
+      "The sands have claimed what the steel could not. Rest in the dust.",
+      "A life of violence ends in a moment of silence."
+    ]
+  },
+  "fanfare": {
+    "victory": [
+      "To the victor, the spoils! %A stands tall as the champion of the circle.",
+      "Let the wine flow for %A tonight, for tomorrow the sands demand more."
+    ]
+  },
+  "meta": {
+    "tooltip": [
+      "The edge of death is where legends are born.",
+      "Steel meets soul in the circle of truth."
+    ]
+  }
+}

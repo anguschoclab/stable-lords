@@ -1,4 +1,4 @@
-import { GameState } from "@/types/game";
+import type { GameState } from "@/types/state.types";
 import { SeededRNG } from "@/utils/random";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { generateId } from "@/utils/idUtils";
@@ -22,7 +22,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
         ...w,
         fame: (w.fame || 0) + 5,
         injuries: [...(w.injuries || []), {
-          id: generateId(brawlRng),
+          id: generateId(brawlRng, "injury"),
           name: "Bruised knuckles (Tavern Brawl)",
           description: "Got into a scrap at the local tavern. The crowd loved it, but the hands took a beating.",
           severity: "Minor",
@@ -32,6 +32,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
       }));
 
       nextState.newsletter = [...(nextState.newsletter || []), {
+        id: generateId(brawlRng, "newsletter"),
         week: nextWeek,
         title: "Tavern Brawl!",
         items: [`${brawler.name} got into a wild tavern brawl last night! They gained +5 Fame but suffered a minor injury.`]

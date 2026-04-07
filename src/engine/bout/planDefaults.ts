@@ -1,4 +1,6 @@
-import { FightingStyle, type Warrior, type FightPlan } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightPlan } from "@/types/combat.types";
 
 /**
  * Returns a sane default plan for a warrior based on their fighting style.

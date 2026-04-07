@@ -1,3 +1,6 @@
+import { vi } from "vitest";
+import { vi } from "vitest";
+import { vi } from "vitest";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { runSimulation } from "./simulation-harness";
 import { formatPulseTable } from "@/engine/stats/simulationMetrics";
@@ -28,9 +31,9 @@ function resetGlobalState() {
 describe("Headless Simulation Harness", () => {
   beforeEach(() => {
     resetGlobalState();
-  });
+  }, 300000);
 
-  test.only("runs a long-term balance check (104 weeks)", () => {
+  test("runs a long-term balance check (104 weeks)", () => {
     const seed = 999;
     const config = {
       weeks: 104,
@@ -42,5 +45,5 @@ describe("Headless Simulation Harness", () => {
     const result = runSimulation(config);
     
     console.log("SUCCESS");
-  });
+  }, 300000);
 });

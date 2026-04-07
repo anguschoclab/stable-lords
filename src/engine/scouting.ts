@@ -8,8 +8,9 @@
  * - Known injuries
  * - Suspected fight plan tendencies
  */
-import type { Warrior, InsightToken, InsightTokenType } from "@/types/game";
-import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
+import type { InsightToken, InsightTokenType } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/shared.types";
 import { generateId } from "@/utils/idUtils";
 
 export type ScoutQuality = "Basic" | "Detailed" | "Expert";
@@ -115,7 +116,7 @@ export function generateScoutReport(
 
   // Basic scouting reveals Style
   newInsights.push({
-    id: generateId(rng, "ins"),
+    id: generateId(rng, "insight"),
     type: "Style",
     warriorId: warrior.id,
     warriorName: warrior.name,
@@ -128,7 +129,7 @@ export function generateScoutReport(
     const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - rng.next()).slice(0, quality === "Expert" ? 4 : 2);
     attrsToReveal.forEach(attr => {
       newInsights.push({
-        id: generateId(rng, "ins"),
+        id: generateId(rng, "insight"),
         type: "Attribute",
         warriorId: warrior.id,
         warriorName: warrior.name,
@@ -142,7 +143,7 @@ export function generateScoutReport(
   // Expert scouting reveals Tactics
   if (quality === "Expert" && warrior.plan) {
     newInsights.push({
-      id: generateId(rng, "ins"),
+      id: generateId(rng, "insight"),
       type: "Tactic",
       warriorId: warrior.id,
       warriorName: warrior.name,
@@ -153,7 +154,7 @@ export function generateScoutReport(
 
   return {
     report: {
-      id: generateId(rng, "sco"),
+      id: generateId(rng, "scout"),
       warriorName: warrior.name,
       style: warrior.style,
       quality,

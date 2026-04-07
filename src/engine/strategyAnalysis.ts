@@ -1,4 +1,5 @@
-import { FightPlan, Warrior } from "@/types/game";
+import type { FightPlan } from "@/types/combat.types";
+import type { Warrior } from "@/types/warrior.types";
 import { getTempoBonus } from "@/engine/stylePassives";
 import { getOffensiveSuitability, getDefensiveSuitability } from "@/engine/tacticSuitability";
 

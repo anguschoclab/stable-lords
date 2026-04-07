@@ -1,4 +1,4 @@
-import { GameState } from "@/types/game";
+import type { GameState } from "@/types/state.types";
 import { opfsArchive } from "@/engine/storage/opfsArchive";
 
 export interface SaveSlotMeta {

@@ -1,12 +1,7 @@
-import {
-  FightingStyle,
-  Warrior,
-  FightPlan,
-  Trainer,
-  WeatherType,
-  FightOutcome,
-  DeathCauseBucket
-} from "@/types/game";
+import { FightingStyle, type WeatherType } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightPlan, FightOutcome, DeathCauseBucket } from "@/types/combat.types";
+import type { Trainer } from "@/types/state.types";
 import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
 import { getMatchupBonus, ResolutionContext, FighterState } from "@/engine/combat/resolution";
 import { SeededRNG } from "@/utils/random";

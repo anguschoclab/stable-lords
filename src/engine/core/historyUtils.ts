@@ -1,4 +1,5 @@
 import { type FightSummary } from "@/types/game";
+import type { GameState } from "@/types/state.types";
 
 /**
  * Extracts fights from a specific week using an optimized backward loop.

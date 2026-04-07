@@ -63,7 +63,7 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng
     currentState = {
       ...currentState,
       newsletter: [...(currentState.newsletter || []), { 
-        id: rng.uuid("led"), // 🆔 Added deterministic ID
+        id: rng.uuid("newsletter"), // 🆔 Standardized deterministic ID
         week: nextWeek, 
         title: "Intelligence & Strategy Report", 
         items: globalGazetteItems 
@@ -95,7 +95,7 @@ function handleSeasonalTournaments(state: GameState, week: number, rng: SeededRN
   newState = {
     ...newState,
     newsletter: [...(newState.newsletter || []), { 
-      id: rng.uuid("led"), // 🆔 Added deterministic ID
+      id: rng.uuid("tournament"), // 🆔 Added deterministic ID
       week: week, 
       title: "🎖️ TOURNAMENT ARCHIVE", 
       items: tournamentNews 

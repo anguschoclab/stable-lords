@@ -1,4 +1,6 @@
-import { GameState, Warrior, LedgerEntry, PoolWarrior, NewsletterItem } from "@/types/game";
+import type { GameState, LedgerEntry, NewsletterItem } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { PoolWarrior } from "@/engine/recruitment";
 import { updateEntityInList } from "@/utils/stateUtils";
 
 export interface StateImpact { treasuryDelta?: number; fameDelta?: number; rosterUpdates?: Map<string, Partial<Warrior>>; newsletterItems?: NewsletterItem[]; ledgerEntries?: LedgerEntry[]; newPoolRecruits?: PoolWarrior[]; }

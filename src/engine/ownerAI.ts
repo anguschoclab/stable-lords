@@ -1,5 +1,7 @@
-import { FightingStyle, type AIIntent } from "@/types/game";
-import type { Warrior, FightPlan, OwnerPersonality } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightPlan } from "@/types/combat.types";
+import type { OwnerPersonality, AIIntent } from "@/types/state.types";
 import { defaultPlanForWarrior } from "./simulate";
 import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from "@/data/ownerData";
 

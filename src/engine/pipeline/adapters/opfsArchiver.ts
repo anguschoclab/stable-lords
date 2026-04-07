@@ -1,4 +1,5 @@
 import type { GameState, Season } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
 import { OPFSArchiveService } from "@/engine/storage/opfsArchive";
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];

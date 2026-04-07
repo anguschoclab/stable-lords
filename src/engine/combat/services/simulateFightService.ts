@@ -1,12 +1,12 @@
-import {
-  FightPlan,
-  Warrior,
-  Trainer,
-  WeatherType,
-  FightOutcome,
-  MinuteEvent,
-  DeathCauseBucket
-} from "@/types/game";
+import type { FightingStyle, WeatherType } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { Trainer } from "@/types/state.types";
+import type { 
+  FightPlan, 
+  FightOutcome, 
+  MinuteEvent, 
+  DeathCauseBucket 
+} from "@/types/combat.types";
 import { DEFAULT_LOADOUT } from "@/data/equipment";
 import { getPhase as getCombatPhase } from "@/engine/combat/combatMath";
 import { generateWarriorIntro, battleOpener, conservingLine, minuteStatusLine, narrateBoutEnd } from "@/engine/narrativePBP";
@@ -72,7 +72,23 @@ export function simulateFight(
     }
 
     const events = resolveExchange(resCtx, fA, fD);
-    const narCtx: NarrationContext = { rng, nameA, nameD, weaponA, weaponD, styleA: fA.style, styleD: fD.style, maxHpA: fA.maxHp, maxHpD: fD.maxHp, prevHpRatioA, prevHpRatioD };
+    const narCtx: NarrationContext = { 
+      rng, 
+      nameA, 
+      nameD, 
+      weaponA, 
+      weaponD, 
+      styleA: fA.style, 
+      styleD: fD.style, 
+      maxHpA: fA.maxHp, 
+      maxHpD: fD.maxHp, 
+      prevHpRatioA, 
+      prevHpRatioD,
+      fameA: warriorA?.fame ?? 0,
+      fameD: warriorD?.fame ?? 0,
+      isFavoriteA: warriorA?.favorites?.weaponId === weaponA,
+      isFavoriteD: warriorD?.favorites?.weaponId === weaponD
+    };
     const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
     log.push(...newLines);
     prevHpRatioA = lastHpRatioA; prevHpRatioD = lastHpRatioD;

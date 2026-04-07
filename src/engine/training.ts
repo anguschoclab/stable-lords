@@ -1,4 +1,5 @@
-import type { GameState, SeasonalGrowth, Warrior, InjuryData } from "@/types/game";
+import type { GameState, SeasonalGrowth } from "@/types/state.types";
+import type { Warrior, InjuryData } from "@/types/warrior.types";
 import { SeededRNG } from "@/utils/random";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { type StateImpact } from "./impacts";
@@ -137,7 +138,7 @@ export function trainingImpactToStateImpact(
     impact: {
       rosterUpdates,
       newsletterItems: newsItems.length > 0 ? [{
-        id: rng.uuid("nws"), // 🆔 Schema compliance: add ID
+        id: rng.uuid("newsletter"), // 🆔 Schema compliance: add ID
         week: state.week,
         title: "Training Report",
         items: newsItems

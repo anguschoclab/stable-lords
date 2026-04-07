@@ -1,4 +1,4 @@
-import { GameState } from "@/types/state.types";
+import type { GameState } from "@/types/state.types";
 import { advanceWeek as runWeeklyPipeline } from "@/engine/pipeline/services/weekPipelineService";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 import { SeededRNG } from "@/utils/random";
@@ -23,7 +23,9 @@ export function advanceDay(state: GameState): GameState {
     
     // Add round summary to newsletter or history
     if (roundResults.length > 0) {
+      const dayRng = new SeededRNG((state.week * 100) + nextDay);
       updatedState.newsletter = [...(updatedState.newsletter || []), {
+        id: dayRng.uuid("newsletter"),
         week: state.week,
         title: `Empire Day ${nextDay}: Tournament Results`,
         items: roundResults

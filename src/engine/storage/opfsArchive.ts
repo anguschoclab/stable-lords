@@ -1,17 +1,20 @@
+import type { GameState } from "@/types/state.types";
+import type { FightSummary } from "@/types/combat.types";
+
 export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (season: number, boutId: string, logData: import("@/types/game").FightSummary) => Promise<void>;
-  retrieveBoutLog: (season: number, boutId: string) => Promise<import("@/types/game").FightSummary | null>;
+  archiveBoutLog: (season: number, boutId: string, logData: string[]) => Promise<void>;
+  retrieveBoutLog: (season: number, boutId: string) => Promise<string[] | null>;
 
   // Gazettes (Markdown)
   archiveGazette: (season: number, week: number, markdown: string) => Promise<void>;
   retrieveGazette: (season: number, week: number) => Promise<string | null>;
 
   // Hot State Save/Load (JSON)
-  archiveHotState: (slotId: string, stateData: import("@/types/game").GameState) => Promise<void>;
-  retrieveHotState: (slotId: string) => Promise<import("@/types/game").GameState | null>;
+  archiveHotState: (slotId: string, stateData: GameState) => Promise<void>;
+  retrieveHotState: (slotId: string) => Promise<GameState | null>;
 
   // Utility
   getArchivedBoutIdsForSeason: (season: number) => Promise<string[]>;
@@ -102,7 +105,7 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(season: number, boutId: string, logData: import("@/types/game").FightSummary): Promise<void> {
+  async archiveBoutLog(season: number, boutId: string, logData: string[]): Promise<void> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return;

@@ -9,6 +9,10 @@
  * See: Docs/Stable_Lords_Warrior_Potential_Spec_v1.0.md
  */
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes, type AttributePotential } from "@/types/game";
+import type { GameState } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightSummary } from "@/types/combat.types";
+import { FightingStyle } from "@/types/shared.types";
 import type { RecruitTier } from "./recruitment";
 
 // ─── Potential Range by Tier ──────────────────────────────────────────────

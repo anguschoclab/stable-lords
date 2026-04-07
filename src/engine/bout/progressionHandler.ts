@@ -1,8 +1,11 @@
-import { GameState, Warrior, FightOutcome } from "@/types/game";
+import type { GameState } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightOutcome } from "@/types/combat.types";
 import { calculateXP, applyXP } from "@/engine/progression";
 import { checkDiscovery } from "@/engine/favorites";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { SeededRNG } from "@/utils/random";
+import { generateId } from "@/utils/idUtils";
 
 export function handleProgressions(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, tags: string[], week: number, rivalStableId?: string, seed?: number): GameState {
   // XP
@@ -23,7 +26,7 @@ export function handleProgressions(s: GameState, wA: Warrior, wD: Warrior, outco
     if (disc.updated) {
       s.roster = updateEntityInList(s.roster, w.id, rw => ({ ...rw, favorites: w.favorites }));
       if (disc.hints.length > 0) {
-        s.newsletter = [...(s.newsletter || []), { week, title: "Training Insight", items: disc.hints }];
+        s.newsletter = [...(s.newsletter || []), { id: generateId(discRng, "newsletter"), week, title: "Training Insight", items: disc.hints }];
       }
     }
   });

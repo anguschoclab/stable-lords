@@ -1,4 +1,6 @@
-import { GameState, InsightToken, InsightTokenType, Warrior, Attributes } from "@/types/game";
+import type { GameState, InsightToken, InsightTokenType } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { Attributes } from "@/types/shared.types";
 import { generateId } from "@/utils/idUtils";
 import { SeededRNG } from "@/utils/random";
 
@@ -26,7 +28,7 @@ export const InsightTokenService = {
       newsletter: [
         ...(state.newsletter || []),
         {
-          id: generateId(rng, "news"),
+          id: generateId(rng, "newsletter"),
           week: state.week,
           title: "Tournament Reward",
           items: [`The stable has earned a ${type} Insight Token from ${source}.`]
@@ -86,7 +88,7 @@ export const InsightTokenService = {
       newsletter: [
         ...(state.newsletter || []),
         {
-          id: (rng as SeededRNG)?.uuid("news") || generateId(undefined, "news"),
+          id: (rng as SeededRNG)?.uuid("newsletter") || generateId(undefined, "newsletter"),
           week: state.week,
           title: "Insight Gained",
           items: [`${warrior.name} has internalized the ${token.type} insight tokens from the stable archives.`]

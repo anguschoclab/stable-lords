@@ -15,17 +15,10 @@ import {
 } from "./narrativePBP";
 import { narrateEvents, NarrationContext } from "./combat/narrator";
 import { SeededRNG } from "@/utils/random";
-import type { 
-  GameState, 
-  Warrior, 
-  Trainer, 
-  FightPlan, 
-  FightOutcome, 
-  WeatherType,
-  MinuteEvent,
-  DeathCauseBucket,
-  FightingStyle
-} from "@/types/game";
+import type { GameState, Trainer, FightOutcomeBy } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket } from "@/types/combat.types";
+import type { WeatherType, FightingStyle } from "@/types/shared.types";
 
 // ─── Exports from sub-modules for backward compatibility ───
 export { createFighterState, resolveDecision, defaultPlanForWarrior };
@@ -191,7 +184,7 @@ export function simulateFight(
     const boutEnd = events.find(e => e.type === "BOUT_END");
     if (boutEnd) {
       winner = boutEnd.actor === "A" ? "A" : "D";
-      by = boutEnd.result as import("@/types/game").FightOutcomeBy;
+      by = boutEnd.result as FightOutcomeBy;
       fatalHitLocation = boutEnd.metadata?.location as string;
       fatalExchangeIndex = ex;
       causeBucket = boutEnd.metadata?.cause as DeathCauseBucket;

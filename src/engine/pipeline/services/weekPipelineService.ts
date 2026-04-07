@@ -1,4 +1,4 @@
-import type { GameState } from "@/types/game";
+import type { GameState, Trainer } from "@/types/state.types";
 import { archiveWeekLogs } from "../adapters/opfsArchiver";
 import { processHallOfFame } from "../core/hallOfFame";
 import { processTierProgression } from "../core/tierProgression";
@@ -60,7 +60,7 @@ export function advanceWeek(state: GameState): GameState {
 
   // 5. Events & Narrative
   newState = runEventPass(newState, nextWeek, rootRng); // Use rootRng for consistency
-  newState = executeNarrativePass(newState, currentWeek, nextWeek);
+  newState = executeNarrativePass(newState, currentWeek, nextWeek, rootRng);
 
   // 6. Completion & Persistence
   newState = finalizeWeek(newState, nextWeek, nextYear, rootRng);
@@ -94,7 +94,7 @@ function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: num
   newState.hiringPool = updatedHiringPool;
   if (news.length > 0) {
     newState.newsletter = [...(newState.newsletter || []), { 
-      id: rng.uuid("led"), 
+      id: rng.uuid("newsletter"), 
       week: nextWeek, 
       title: "Trainer Career Updates", 
       items: news 
@@ -123,7 +123,7 @@ function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG
       newState = {
         ...newState,
         newsletter: [...(newState.newsletter || []), { 
-          id: seasonSeed.toString(), 
+          id: rng.uuid("newsletter"), 
           week: nextWeek, 
           title: `${state.season} Season Summary`, 
           items: combinedNews 
@@ -153,7 +153,7 @@ function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG
   return newState;
 }
 
-function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: number): GameState {
+function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: number, rng: SeededRNG): GameState {
   let newState = { ...state };
 
   // Gazette
@@ -171,7 +171,7 @@ function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: n
     newState = {
       ...newState,
       newsletter: [...(newState.newsletter || []), { 
-        id: nextWeek.toString() + "_grudge", 
+        id: rng.uuid("newsletter"), 
         week: nextWeek, 
         title: "Stable Rivalries & Grudges", 
         items: gazetteItems 

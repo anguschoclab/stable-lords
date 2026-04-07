@@ -1,9 +1,6 @@
-import { 
-  type GameState, 
-  type Warrior, 
-  type Attributes, 
-  type TrainerFocus 
-} from "@/types/game";
+import type { GameState } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import { type Attributes, type TrainerFocus } from "@/types/shared.types";
 import { TIER_BONUS } from "@/engine/trainers";
 
 const FOCUS_ATTR_MAP: Record<TrainerFocus, (keyof Attributes)[]> = {

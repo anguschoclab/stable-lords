@@ -30,7 +30,7 @@ export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): Game
 
       if (rng.next() < finalChance) {
         retired = true;
-        const newId = `promoter_${id}_successor_${state.week}`;
+        const newId = rng.uuid("promoter");
         const successorName = generateDynasticName(p.name, state.week + 123);
         
         // 50% chance to inherit personality
@@ -66,6 +66,6 @@ export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): Game
   return {
     ...state,
     promoters: newPromoters,
-    newsletter: news.length > 0 ? [...state.newsletter, { id: rng.uuid("led"), week: state.week, title: "Promoter News", items: news }] : state.newsletter
+    newsletter: news.length > 0 ? [...state.newsletter, { id: rng.uuid("newsletter"), week: state.week, title: "Promoter News", items: news }] : state.newsletter
   };
 }

@@ -1,10 +1,10 @@
 import {
   FightingStyle,
-  type Warrior,
-  type FightPlan,
   type BaseSkills,
-  type Trainer,
-} from "@/types/game";
+} from "@/types/shared.types";
+import { type Warrior } from "@/types/warrior.types";
+import { type FightPlan } from "@/types/combat.types";
+import { type Trainer } from "@/types/state.types";
 import { DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements, getLoadoutWeight, isOverEncumbered } from "@/data/equipment";
 import { getTrainingBonus } from "@/engine/trainers";
 import { getFavoriteWeaponBonus } from "@/engine/favorites";

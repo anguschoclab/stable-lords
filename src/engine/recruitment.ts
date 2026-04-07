@@ -1,4 +1,5 @@
-import { FightingStyle, type Attributes, type AttributePotential, type BaseSkills, type DerivedStats, type WarriorFavorites } from "@/types/game";
+import { FightingStyle, type Attributes, type BaseSkills, type DerivedStats } from "@/types/shared.types";
+import { type AttributePotential, type WarriorFavorites } from "@/types/warrior.types";
 import { computeWarriorStats } from "./skillCalc";
 import { generatePotential } from "./potential";
 import { generateFavorites } from "./favorites";
@@ -160,7 +161,7 @@ export function generateRecruit(
   const favorites = generateFavorites(style, () => rng.next());
 
   return {
-    id: generateId(rng, "war"),
+    id: generateId(rng, "warrior"),
     name,
     style,
     attributes,

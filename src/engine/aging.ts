@@ -6,7 +6,8 @@
  * - At age 40, forced retirement is guaranteed
  * - Aging penalties apply to SP and DF after age 28
  */
-import { GameState, Warrior, WarriorStatus } from "@/types/game";
+import type { GameState } from "@/types/state.types";
+import type { Warrior, WarriorStatus } from "@/types/warrior.types";
 import { computeWarriorStats } from "./skillCalc";
 
 const WEEKS_PER_YEAR = 52;
@@ -70,7 +71,7 @@ export function computeAgingImpact(state: GameState, rng: SeededRNG): StateImpac
 
   return {
     rosterUpdates,
-    newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid("led"), week: state.week, title: "Aging Report", items: ageEvents }] : []
+    newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid("newsletter"), week: state.week, title: "Aging Report", items: ageEvents }] : []
   };
 }
 
@@ -88,7 +89,7 @@ export function processAging(state: GameState): GameState {
          const updated = { ...w, ...update };
          if (updated.status === "Retired") {
             roster = roster.filter(r => r.id !== id);
-            retired.push({ ...updated, retiredWeek: state.week } as import("@/types/game").Warrior);
+            retired.push({ ...updated, retiredWeek: state.week });
          } else {
             roster = roster.map(r => r.id === id ? updated : r);
          }

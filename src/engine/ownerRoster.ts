@@ -1,5 +1,6 @@
-import type { GameState, Warrior, RivalStableData, OwnerPersonality, MetaAdaptation } from "@/types/game";
-import { FightingStyle } from "@/types/game";
+import type { GameState, RivalStableData, OwnerPersonality, MetaAdaptation, TrainerTier } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import { FightingStyle } from "@/types/shared.types";
 import { computeMetaDrift, type StyleMeta } from "./metaDrift";
 import { computeWarriorStats } from "./skillCalc";
 import { getRecentFightsForWarrior } from "@/engine/core/historyUtils";
@@ -70,6 +71,9 @@ export function processAIRosterManagement(
     // 2) Recruitment Logic
     const currentActive = r.roster.filter(w => w.status === "Active").length;
     const minRoster = personality === "Aggressive" ? 8 : personality === "Showman" ? 7 : 6;
+    const tier = r.tier ?? "Minor";
+    const trainerTier: TrainerTier = tier === "Legendary" ? (rngSnapshot.next() < 0.3 ? "Master" : "Seasoned") : (rngSnapshot.next() < 0.1 ? "Master" : "Novice");
+    
     const recruitChance = personality === "Aggressive" ? 0.4 : personality === "Pragmatic" ? 0.25 : 0.15;
     
     // Treasury Awareness: Recruitment costs 100g (signing fee)

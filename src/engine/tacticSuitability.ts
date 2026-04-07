@@ -3,7 +3,8 @@
  * WS = Well Suited (1.0), S = Suited (0.6), U = Unsuited (0.3)
  * From Fighting Styles Compendium v0.3 & Strategy Editor Spec v1.0
  */
-import { FightingStyle, type OffensiveTactic, type DefensiveTactic } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { OffensiveTactic, DefensiveTactic } from "@/types/combat.types";
 
 export type SuitabilityRating = "WS" | "S" | "U";
 

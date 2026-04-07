@@ -1,4 +1,4 @@
-import { GameState } from "@/types/game";
+import type { GameState, Season } from "@/types/state.types";
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeAgingImpact } from "@/engine/aging";
 import { computeHealthImpact } from "@/engine/health";

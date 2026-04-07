@@ -11,7 +11,7 @@
  *  - Trainer salaries: 35g per active trainer per week
  *  - Training costs: 15g per warrior in training
  */
-import type { GameState, LedgerEntry, Warrior } from "@/types/game";
+import type { GameState, LedgerEntry, Warrior } from "@/types/state.types";
 import { generateId } from "@/utils/idUtils";
 import { SeededRNG } from "@/utils/random";
 import { 
@@ -95,10 +95,10 @@ export function computeEconomyImpact(state: GameState): StateImpact {
   const rng = new SeededRNG(state.week * 31);
 
   for (const i of breakdown.income) {
-    entries.push({ id: generateId(rng, "led"), week: state.week, label: i.label, amount: i.amount, category: "fight" });
+    entries.push({ id: generateId(rng, "ledger"), week: state.week, label: i.label, amount: i.amount, category: "fight" });
   }
   for (const e of breakdown.expenses) {
-    entries.push({ id: generateId(rng, "led"), week: state.week, label: e.label, amount: -e.amount, category: "upkeep" });
+    entries.push({ id: generateId(rng, "ledger"), week: state.week, label: e.label, amount: -e.amount, category: "upkeep" });
   }
 
   return {

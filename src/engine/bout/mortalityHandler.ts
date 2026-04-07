@@ -1,4 +1,6 @@
-import { GameState, Warrior, FightOutcome, FightSummary, RivalStableData } from "@/types/game";
+import type { GameState, RivalStableData } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightOutcome, FightSummary } from "@/types/combat.types";
 import { generateId } from "@/utils/idUtils";
 import { generateFightNarrative } from "@/engine/gazetteNarrative";
 import { engineEventBus } from "@/engine/core/EventBus";
@@ -19,7 +21,7 @@ export function handleDeath(
   const victim = outcome.winner === "A" ? wD : wA;
   const isPlayerVictim = (outcome.winner === "A" && !!rivalStableId) ? false : (outcome.winner !== "A");
   
-  const boutId = generateId(rng, "bt");
+  const boutId = generateId(rng, "bout");
   const narrative = generateFightNarrative({ 
     id: boutId, week, a: wA.name, d: wD.name, 
     warriorIdA: wA.id, warriorIdD: wD.id,
@@ -62,7 +64,7 @@ export function handleDeath(
   };
   
   nextS.arenaHistory = [...nextS.arenaHistory, deathSummary];
-  nextS.newsletter = [...(nextS.newsletter || []), { id: generateId(rng, "news"), week, title: "Arena Obituary", items: [narrative] }];
+  nextS.newsletter = [...(nextS.newsletter || []), { id: generateId(rng, "newsletter"), week, title: "Arena Obituary", items: [narrative] }];
   
   // Decoupled notification
   engineEventBus.emit({ 

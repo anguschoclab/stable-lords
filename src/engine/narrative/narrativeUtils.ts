@@ -30,13 +30,13 @@ export function getWeaponDisplayName(equipId?: string): string {
 export function getWeaponType(weaponId?: string): WeaponType {
   if (!weaponId || weaponId === "fists" || weaponId === "none") return "fist";
   
-  const slashWeapons = ["scimitar", "broadsword", "greatsword", "longsword", "short_sword", "hatchet", "battle_axe", "great_axe"];
-  const bashWeapons = ["mace", "war_hammer", "morning_star", "maul", "war_flail"];
-  const thrustWeapons = ["epee", "dagger", "short_spear", "long_spear", "halberd", "quarterstaff"];
+  const slashing = ["scimitar", "broadsword", "greatsword", "longsword", "short_sword", "hatchet", "battle_axe", "great_axe"];
+  const bashing = ["mace", "war_hammer", "morning_star", "maul", "war_flail", "large_shield", "medium_shield", "small_shield"];
+  const piercing = ["epee", "dagger", "short_spear", "long_spear", "halberd", "quarterstaff"];
   
-  if (slashWeapons.includes(weaponId)) return "slash";
-  if (bashWeapons.includes(weaponId)) return "bash";
-  if (thrustWeapons.includes(weaponId)) return "thrust";
+  if (slashing.includes(weaponId)) return "slashing" as any;
+  if (bashing.includes(weaponId)) return "bashing" as any;
+  if (piercing.includes(weaponId)) return "piercing" as any;
   
-  return "generic";
+  return "fist" as any;
 }

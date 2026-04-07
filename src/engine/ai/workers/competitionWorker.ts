@@ -2,7 +2,7 @@ import { type GameState, type Warrior, type RivalStableData, type BoutOffer, typ
 import { type CrowdMood } from "../../crowdMood";
 import { FightingStyle } from "@/types/shared.types";
 import { logAgentAction } from "../agentCore";
-import { respondToBoutOffer } from "@/state/mutations/contractMutations";
+import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 
 /**
  * CompetitionWorker: Handles boutique reasoning, tournament entry, and matchmaking bids.

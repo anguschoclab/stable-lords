@@ -1,116 +1,19 @@
+import narrativeContent from "@/data/narrativeContent.json";
 /**
  * Gazette Narrative Engine — generates crowd-mood-toned prose from simulation events.
  * Synthesizes weekly fight data into procedural stories.
  */
-import type { FightSummary, CrowdMoodType, Warrior, GazetteStory } from "@/types/game";
+import type { FightSummary } from "@/types/combat.types";
+import type { CrowdMoodType, Season } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { GazetteStory } from "@/types/state.types";
 import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import { SeededRNG } from "@/utils/random";
 import { generateId } from "@/utils/idUtils";
 
 
 
-const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[]; closer: string[] }> = {
-  Calm: {
-    adjectives: ["measured", "disciplined", "calculated", "precise"],
-    opener: [
-      "The arena operated with quiet efficiency this week.",
-      "A week of steady competition unfolded in the coliseum.",
-      "The crowds watched with studied attention as the week's bouts concluded.",
-    ],
-    closer: [
-      "The arena sleeps peacefully tonight.",
-      "Order reigns in the halls of combat.",
-      "Another measured week draws to a close.",
-    ],
-  },
-  Bloodthirsty: {
-    adjectives: ["savage", "brutal", "merciless", "vicious", "gruesome", "blood-drenched"],
-    opener: [
-      "Gore choked the drains this week as the arena reached new heights of depravity!",
-      "A horrifying festival of dismemberment thrilled the crowds!",
-      "The screams of the dying echoed for miles in a blood-soaked week!",
-      "Gore soaked the arena floor as an unprecedented wave of violence swept the week's bouts!",
-      "The crowd's hunger for death was finally satiated by a horrifying display of brutality!",
-      "Blood painted the sands this week as the arena demanded sacrifice!",
-      "The crowd bayed for blood — and the fighters delivered!",
-      "Violence ruled the coliseum in a week of savage combat!",
-      "A horrifying symphony of steel and slaughter opened this week's bouts!",
-      "No mercy was shown, and none was asked for in a week of absolute carnage!",
-      "The sands ran thick with gore as fighters were mercilessly butchered this week!",
-      "A terrifying festival of slaughter unfolded in the coliseum!",
-      "The stench of fresh blood and terror defined a grueling week in the coliseum!",
-      "Gore rained upon the sands as the warriors delivered an unprecedented display of savagery!"
-    ],
-    closer: [
-      "The sand is stained a permanent, terrifying crimson.",
-      "Carts full of the fallen were wheeled out late into the night.",
-      "The cleaners will be scrubbing blood from the stones for weeks.",
-      "A haunting silence falls over the blood-soaked pit until next week.",
-      "The sands drink deep tonight.",
-      "The crowd's thirst is satisfied — for now.",
-      "Death stalks the arena, and the people love it.",
-      "A trail of shattered bones and ruined armor litters the coliseum.",
-      "The arena echoes with the dying screams of the defeated.",
-      "The crows feast well upon the shattered remains tonight.",
-      "A thick stench of blood and death permanently stains the coliseum.",
-      "The undertakers will be working overtime tonight.",
-      "The ravenous crowd departs, faces spattered with the crimson proof of this week's carnage."
-    ],
-  },
-  Theatrical: {
-    adjectives: ["dramatic", "spectacular", "breathtaking", "legendary", "mythic", "awe-inspiring"],
-    opener: [
-      "What a spectacle! The arena delivered drama worthy of the old legends!",
-      "The poets will write songs about this week's extraordinary bouts!",
-      "Pure theater! Every bout was a performance for the ages!",
-      "A breathtaking showcase of martial prowess captivated the roaring stands!",
-      "From the first strike to the last fall, the arena was a stage for demigods!",
-      "A breathtaking opera of violence and valor commanded the arena this week!",
-      "Epic rivalries and glorious final stands painted a masterpiece on the sands!",
-      "A tapestry of valor and violence was woven on the sands this week!"
-    ],
-    closer: [
-      "The bards already compose their verses.",
-      "What stories will be told of this week!",
-      "The crowd departs buzzing with tales of glory.",
-      "Legends were forged in blood and steel today.",
-      "The crowd leaves exhausted, their voices hoarse from cheering this epic drama.",
-      "The tale of this week's battles will be sung for generations.",
-      "A breathtaking finale to a week of mythical combat.",
-      "The echo of clashing steel and legendary deeds will linger in the air for ages."
-    ],
-  },
-  Solemn: {
-    adjectives: ["somber", "grave", "reverent", "heavy"],
-    opener: [
-      "A heavy silence hung over the arena this week.",
-      "The weight of loss and sacrifice defined the week's combat.",
-      "The coliseum bore witness to solemn displays of warrior resolve.",
-      "With grim determination, the fighters took to the sands to face their destiny.",
-      "A somber mood prevailed as steel met steel in a test of pure survival."
-    ],
-    closer: [
-      "The fallen are remembered. The living carry on.",
-      "Torches burn low in the hall of warriors tonight.",
-      "In silence, the arena honors those who gave everything.",
-      "A heavy toll was exacted upon the brave souls of the coliseum.",
-      "The sands conceal the final rest of those who fought to the bitter end."
-    ],
-  },
-  Festive: {
-    adjectives: ["jubilant", "electrifying", "glorious", "triumphant"],
-    opener: [
-      "What a celebration! The arena erupted with joy this week!",
-      "Festive energy crackled through every bout this week!",
-      "The crowd was on its feet from first bout to last!",
-    ],
-    closer: [
-      "The celebrations continue long into the night!",
-      "Glory to the victors — and drinks for all!",
-      "A week to remember, a festival of steel and valor!",
-    ],
-  },
-};
+const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[]; closer: string[] }> = narrativeContent.MOOD_TONE as any;
 
 function pick(rng: SeededRNG, arr: string[]): string {
   return rng.pick(arr);

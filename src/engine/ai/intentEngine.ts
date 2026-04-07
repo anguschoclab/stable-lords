@@ -1,4 +1,4 @@
-import type { GameState, RivalStableData, AIIntent, AIStrategy } from "@/types/game";
+import type { GameState, RivalStableData, AIIntent, AIStrategy } from "@/types/state.types";
 import { PERSONALITY_CLASH } from "@/data/ownerData";
 
 import { computeMetaDrift } from "../metaDrift";

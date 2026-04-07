@@ -1,4 +1,6 @@
-import { GameState, Warrior, FightOutcome, RivalStableData } from "@/types/game";
+import type { GameState, RivalStableData } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightOutcome } from "@/types/combat.types";
 import { rollForInjury } from "@/engine/injuries";
 import { addRestState } from "@/engine/matchmaking/historyLogic";
 import { updateEntityInList } from "@/utils/stateUtils";

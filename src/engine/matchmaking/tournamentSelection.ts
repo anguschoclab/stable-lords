@@ -428,8 +428,8 @@ export const TournamentSelectionService = {
     const winnerSide = outcome.winner;
     const updatedState = { ...state };
 
-    const summary: import("@/types/game").FightSummary = {
-      id: rng.uuid("bt"),
+    const summary: import("@/types/state.types").FightSummary = {
+      id: rng.uuid("bout"),
       week: state.week,
       phase: "resolution" as const,
       tournamentId: tId,

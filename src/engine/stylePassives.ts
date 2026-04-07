@@ -4,7 +4,9 @@
  * This module uses a Strategy Pattern to define style-specific behaviors,
  * eliminating massive switch statements and improving extensibility.
  */
-import { FightingStyle } from "@/types/game";
+import { FightingStyle } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import type { FightPlan } from "@/types/combat.types";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -19,13 +21,13 @@ export interface StylePassiveResult {
   critChance: number;
   iniBonus: number;
   mastery: MasteryTier;
+  hasPassiveNarrative?: boolean;
   narrative?: string;
 }
 
 export interface KillMechanic {
   killBonus: number;
   decBonus: number;
-  killNarrative: string;
   extendedKillWindow: boolean;
   killWindowHpMult: number;
 }
@@ -112,13 +114,12 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         mastery: m.tier,
         attBonus: scale(targeted ? 1 : 0, m),
         critChance: targeted ? 0.05 + (ctx.exchange > 8 ? 0.03 : 0) : 0,
-        narrative: targeted && ctx.exchange > 5 ? `[${m.tier}] studies the opponent's rhythm, waiting for the perfect opening` : undefined,
+        hasPassiveNarrative: !!(targeted && ctx.exchange > 5),
       };
     },
     getKillMechanic: (ctx) => ({
       killBonus: ctx.hitLocation === "head" ? 0.15 : (ctx.targetedLocation !== "Any" ? 0.05 : 0),
       decBonus: ctx.targetedLocation !== "Any" ? 3 : 0,
-      killNarrative: ctx.hitLocation === "head" ? "finds the fatal gap in the helm with surgical precision — a KILLING BLOW to the skull!" : "places the blade with lethal accuracy — a precise KILLING STRIKE!",
       extendedKillWindow: ctx.hitLocation === "head",
       killWindowHpMult: 0.80,
     }),
@@ -141,7 +142,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         mastery: m.tier,
         dmgBonus: scale(momentumDmg, m) + (vsTP ? 1 : 0),
         attBonus: scale(ctx.consecutiveHits >= 2 ? 2 : 1, m) + (vsTP ? 2 : 0),
-        narrative: vsTP && ctx.consecutiveHits >= 2 ? `[${m.tier}] hammers through the defensive stance — raw power overwhelms technique!` : (ctx.consecutiveHits >= 3 ? `[${m.tier}] builds devastating momentum, each blow harder than the last!` : undefined),
+        hasPassiveNarrative: (vsTP && ctx.consecutiveHits >= 2) || (ctx.consecutiveHits >= 3),
       };
     },
     getKillMechanic: (ctx) => {
@@ -149,7 +150,6 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       return {
         killBonus: momentum * 0.04,
         decBonus: momentum,
-        killNarrative: "drives a CRUSHING blow that shatters bone and sinew — KILLED by overwhelming force!",
         extendedKillWindow: ctx.consecutiveHits >= 3,
         killWindowHpMult: ctx.consecutiveHits >= 3 ? 0.4 : 0.3,
       };
@@ -173,13 +173,12 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         mastery: m.tier,
         iniBonus: scale(earlyBonus, m) + (ctx.exchange === 0 ? m.bonus : 0),
         attBonus: ctx.exchange === 0 ? 1 : 0,
-        narrative: ctx.exchange === 0 ? `[${m.tier}] explodes forward with a devastating opening lunge!` : undefined,
+        hasPassiveNarrative: ctx.exchange === 0,
       };
     },
     getKillMechanic: (ctx) => ({
       killBonus: ctx.phase === "OPENING" ? 0.08 : 0,
       decBonus: ctx.phase === "OPENING" ? 2 : 0,
-      killNarrative: "drives a full-extension lunge clean through — IMPALED!",
       extendedKillWindow: false,
       killWindowHpMult: 0.3,
     }),
@@ -200,11 +199,11 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         mastery: m.tier,
         attBonus: scale(counterReady ? 1 : 0, m) + (counterReady ? m.bonus : 0),
         iniBonus: counterReady ? 1 : 0,
-        narrative: counterReady ? `[${m.tier}] absorbs the blow, coiling for a devastating counter-lunge` : undefined,
+        hasPassiveNarrative: counterReady,
       };
     },
     getKillMechanic: () => ({
-      killBonus: 0, decBonus: 0, killNarrative: "delivers a KILLING BLOW!", extendedKillWindow: false, killWindowHpMult: 0.3,
+      killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
     }),
     getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
   },
@@ -216,12 +215,11 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       mastery: m.tier,
       attBonus: -1,
       ripBonus: ctx.ripostes >= 2 ? 1 : 0,
-      narrative: ctx.ripostes >= 3 ? `[${m.tier}] has found the rhythm — each counter deadlier than the last!` : undefined,
+      hasPassiveNarrative: ctx.ripostes >= 3,
     }),
     getKillMechanic: () => ({
       killBonus: 0.03,
       decBonus: 2,
-      killNarrative: "turns the parry into a lethal counter — the riposte finds the heart! KILLED!",
       extendedKillWindow: false,
       killWindowHpMult: 0.25,
     }),
@@ -243,7 +241,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       attBonus: ctx.hitsTaken > ctx.hitsLanded ? 1 : 0,
     }),
     getKillMechanic: () => ({
-      killBonus: 0, decBonus: 0, killNarrative: "delivers a KILLING BLOW!", extendedKillWindow: false, killWindowHpMult: 0.3,
+      killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
     }),
     getAntiSynergy: (off) => ({ offMult: off === "Bash" ? 0.6 : 1, defMult: 1 })
   },
@@ -257,13 +255,12 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         mastery: m.tier,
         attBonus: scale(ctx.phase === "LATE" ? 0 : 1, m) + (ctx.phase === "OPENING" ? m.bonus : 0),
         dmgBonus: 1 + flurryDmg,
-        narrative: ctx.hitsLanded >= 3 ? `[${m.tier}] unleashes a whirlwind of slashes, each cut deeper than the last!` : undefined,
+        hasPassiveNarrative: ctx.hitsLanded >= 3,
       };
     },
     getKillMechanic: (ctx) => ({
       killBonus: ctx.hitsLanded >= 4 ? 0.06 : 0,
       decBonus: 0,
-      killNarrative: "opens a grievous wound with a vicious slash — BLED OUT on the arena sand!",
       extendedKillWindow: ctx.hitsLanded >= 5,
       killWindowHpMult: ctx.hitsLanded >= 5 ? 0.35 : 0.3,
     }),
@@ -284,11 +281,10 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       dmgBonus: 1,
     }),
     getKillMechanic: () => ({
-      killBonus: 0.03,
-      decBonus: 1,
-      killNarrative: "delivers a single, devastating downward STRIKE — KILLING BLOW!",
-      extendedKillWindow: false,
-      killWindowHpMult: 0.3,
+      killBonus: 0.1,
+      decBonus: 2,
+      extendedKillWindow: true,
+      killWindowHpMult: 0.25,
     }),
     getAntiSynergy: (off, def) => ({ offMult: 1, defMult: def === "Riposte" ? 0.6 : 1 })
   },
@@ -299,16 +295,15 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       ...EMPTY_PASSIVE,
       mastery: m.tier,
       attBonus: -2,
-      parBonus: 4 + m.bonus, // Increased from 3
-      iniBonus: 2, // Increased from 1
-      narrative: ctx.phase === "LATE" && ctx.endRatio > 0.5 ? `[${m.tier}] stands fresh as the opponent gasps for breath!` : undefined,
+      parBonus: 4 + m.bonus,
+      iniBonus: 2,
+      hasPassiveNarrative: ctx.phase === "LATE" && ctx.endRatio > 0.5,
     }),
     getKillMechanic: () => ({
-      killBonus: -0.05, // Buffed from -0.1
-      decBonus: -1, // Buffed from -2
-      killNarrative: "finds a rare opening and delivers a measured KILLING thrust!",
+      killBonus: -0.05,
+      decBonus: -1,
       extendedKillWindow: false,
-      killWindowHpMult: 0.25, // Buffed from 0.2
+      killWindowHpMult: 0.25,
     }),
     getAntiSynergy: (off) => {
       let offMult = 1, warning;
@@ -327,18 +322,17 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        defBonus: scale(wallBonus, m) + 2, // Buffed from +1
+        defBonus: scale(wallBonus, m) + 2,
         parBonus: 1,
-        iniBonus: scale(wallBonus + 1, m) + 1, // Scaled with wallBonus
-        narrative: wallBonus >= 1 ? `[${m.tier}] the constant blade motion becomes an impenetrable wall!` : undefined,
+        iniBonus: scale(wallBonus + 1, m) + 1,
+        hasPassiveNarrative: wallBonus >= 1,
       };
     },
     getKillMechanic: () => ({
-      killBonus: -0.03, // Buffed from -0.05
+      killBonus: -0.03,
       decBonus: 0,
-      killNarrative: "the constant blade arc catches a vital point — KILLING BLOW from the steel wall!",
       extendedKillWindow: false,
-      killWindowHpMult: 0.28, // Buffed from 0.25
+      killWindowHpMult: 0.28,
     }),
     getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
   },
@@ -372,7 +366,7 @@ export function getKillMechanic(
 ): KillMechanic {
   const strategy = STYLES[attackerStyle];
   if (!strategy) return {
-    killBonus: 0, decBonus: 0, killNarrative: "delivers a KILLING BLOW!", extendedKillWindow: false, killWindowHpMult: 0.3,
+    killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
   };
   return strategy.getKillMechanic(context);
 }
