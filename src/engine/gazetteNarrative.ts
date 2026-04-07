@@ -26,6 +26,9 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
   Bloodthirsty: {
     adjectives: ["savage", "brutal", "merciless", "vicious", "gruesome", "blood-drenched"],
     opener: [
+      "Gore choked the drains this week as the arena reached new heights of depravity!",
+      "A horrifying festival of dismemberment thrilled the crowds!",
+      "The screams of the dying echoed for miles in a blood-soaked week!",
       "Gore soaked the arena floor as an unprecedented wave of violence swept the week's bouts!",
       "The crowd's hunger for death was finally satiated by a horrifying display of brutality!",
       "Blood painted the sands this week as the arena demanded sacrifice!",
@@ -39,6 +42,8 @@ const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[];
       "Gore rained upon the sands as the warriors delivered an unprecedented display of savagery!"
     ],
     closer: [
+      "The sand is stained a permanent, terrifying crimson.",
+      "Carts full of the fallen were wheeled out late into the night.",
       "The cleaners will be scrubbing blood from the stones for weeks.",
       "A haunting silence falls over the blood-soaked pit until next week.",
       "The sands drink deep tonight.",

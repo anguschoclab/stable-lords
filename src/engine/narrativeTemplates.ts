@@ -42,6 +42,9 @@ export const WEAPON_INTRO_VERBS = [
 // ─── Battle Openers ──────────────────────────────────────────────────────────
 
 export const BATTLE_OPENERS = [
+  "The stench of old blood rises as the fighters step onto the sand.",
+  "The crowd bays for blood as the combatants lock eyes.",
+  "Steel is drawn, and the roar of the coliseum becomes deafening!",
   "The battle begins amid the crowd's approval.",
   "Those in the stands shift their attention to the warriors.",
   "The audience falls silent as the dueling begins.",
@@ -159,6 +162,11 @@ export const INI_WIN_TEMPLATES = [
 // ─── Hits ────────────────────────────────────────────────────────────────────
 
 export const HIT_TEMPLATES = [
+  "tears a ghastly gouge across %D's %L",
+  "leaves a sickening, pulsing wound on %D's %L",
+  "shatters armor and bone alike, devastating %D's %L",
+  "impacts with the sickening sound of snapping bone on %D's %L",
+  "carves a spray of crimson from %D's %L",
   "a solid strike connects with",
   "lands a heavy blow to",
   "strikes cleanly against",

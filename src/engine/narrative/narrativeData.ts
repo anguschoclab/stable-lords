@@ -38,6 +38,10 @@ export type WeaponType = "slash" | "bash" | "thrust" | "fist" | "generic";
 
 export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
   slash: [
+    "%N unleashes a blinding flurry of cuts with his %W!",
+    "%N steps deep inside the guard, whipping his %W in a vicious arc!",
+    "%N snaps his wrist, sending the %W blurring towards the neck!",
+    "A horrifying display of speed as %N carves a path with his %W!",
     "%N slashes with his %W!",
     "%N slashes an arcing attack with his %W!",
     "%N whips his %W blade back and forth as if to slash his foe to ribbons!",
@@ -72,6 +76,10 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N steps off the centerline, unleashing a horrifying diagonal slash with his %W!",
   ],
   bash: [
+    "%N heaves the %W with bone-shattering intent!",
+    "%N roars, bringing the %W down like an executioner's maul!",
+    "%N steps into the strike, letting the massive weight of the %W do the work!",
+    "The arena trembles as %N unleashes a terrifying overhead smash with his %W!",
     "%N bashes with his %W!",
     "%N smashes downward with his %W!",
     "%N takes a swipe with his %W!",
@@ -100,6 +108,9 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N brings his %W around in a terrifying, skull-crushing arc!",
   ],
   thrust: [
+    "%N drops his center and drives a blinding lunge with his %W!",
+    "%N's %W strikes like a coiled viper!",
+    "%N turns his body completely side-on, extending his %W to its absolute limit!",
     "%N lunges wielding an %W!",
     "%N thrusts with his %W!",
     "%N lunges forward with his %W!",
@@ -131,6 +142,8 @@ export const ATTACK_TEMPLATES: Record<WeaponType, string[]> = {
     "%N rockets forward, turning his %W into a blurring needle of death!",
   ],
   fist: [
+    "%N steps inside the guard and unleashes a horrific combination!",
+    "%N grabs his opponent and drives a sickening KNEE into their midsection!",
     "%N PUNCHES from the waist with unbelievable quickness!",
     "%N throws a rock-fisted PUNCH of incredible felling power!",
     "%N hammers down with a ferocious FOREARM smash!",
@@ -297,6 +310,12 @@ export const EVEN_STATUS = [
 ];
 
 export const KILL_TEMPLATES = [
+  "%A feints low, catching %D off guard before severing their sword-arm at the elbow. The crowd erupts!",
+  "A fountain of gore erupts as %A's final strike decapitates %D!",
+  "%D looks down at the ruin of their own chest before collapsing dead into the sand. %A is the victor!",
+  "The crowd goes wild as %A twists the weapon, ending %D's life in a spray of crimson!",
+  "%A shows no mercy, stepping over %D's body to deliver a horrifying, skull-crushing execution!",
+  "A final, gurgling breath escapes %D as %A reclaims his weapon from the corpse.",
   "%D falls to their knees, their life spilling onto the sands. %A stands victorious!",
   "The match concludes in horrific fashion as %D is butchered by %A!",
   "With no mercy shown, %A ends %D's misery in a spray of crimson!",

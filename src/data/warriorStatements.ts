@@ -149,6 +149,8 @@ const GOOD_RIP_LOW: StatementEntry[] = [
 
 // GOOD WIT: ATTACK (3rd statement)
 const GOOD_ATT_HIGH: StatementEntry[] = [
+  { minBase: 37, text: "Obliterates opponents with god-like, merciless precision" },
+  { minBase: 36, text: "Mutilates his targets with an awe-inspiring thirst for blood" },
   { minBase: 35, text: "Strikes with the devastating certainty of an executioner" },
   { minBase: 34, text: "Every swing carries the promise of shattered bone and ruined flesh" },
   { minBase: 33, text: "Turns his weapon into a blurring arc of pure malice" },
