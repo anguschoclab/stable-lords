@@ -72,7 +72,23 @@ export function simulateFight(
     }
 
     const events = resolveExchange(resCtx, fA, fD);
-    const narCtx: NarrationContext = { rng, nameA, nameD, weaponA, weaponD, styleA: fA.style, styleD: fD.style, maxHpA: fA.maxHp, maxHpD: fD.maxHp, prevHpRatioA, prevHpRatioD };
+    const narCtx: NarrationContext = { 
+      rng, 
+      nameA, 
+      nameD, 
+      weaponA, 
+      weaponD, 
+      styleA: fA.style, 
+      styleD: fD.style, 
+      maxHpA: fA.maxHp, 
+      maxHpD: fD.maxHp, 
+      prevHpRatioA, 
+      prevHpRatioD,
+      fameA: warriorA?.fame ?? 0,
+      fameD: warriorD?.fame ?? 0,
+      isFavoriteA: warriorA?.favorites?.weaponId === weaponA,
+      isFavoriteD: warriorD?.favorites?.weaponId === weaponD
+    };
     const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
     log.push(...newLines);
     prevHpRatioA = lastHpRatioA; prevHpRatioD = lastHpRatioD;
