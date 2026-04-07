@@ -106,7 +106,7 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
       value: bestStable[1].wins,
       reason: `Winningest stable of Year ${prevYear} with ${bestStable[1].wins} total victories.`
     };
-    updatedState.awards = [...(updatedState.awards || []), award];
+    updatedState = applyAward(updatedState, award, 50);
     hofNews.push(`🏟️ STABLE OF THE YEAR: ${bestStable[1].name} dominated the arenas of Year ${prevYear}.`);
   }
 
