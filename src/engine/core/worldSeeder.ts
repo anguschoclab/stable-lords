@@ -60,7 +60,8 @@ export function populateInitialWorld(state: GameState, seed: number): GameState 
     roster: playerRoster,
     isFTUE: false,
     ftueComplete: true,
-    gold: 500,
+    treasury: 500,
     week: 1,
+    year: 1,
   };
 }

@@ -26,12 +26,12 @@ export function aiDraftFromPool(
   
   // 🐍 Snake Draft Priority: Sort rivals by "Need"
   // Priority 1: Fewest active warriors
-  // Priority 2: Lowest gold
+  // Priority 2: Lowest treasury
   const sortedRivals = [...rivals].sort((a, b) => {
     const aActive = a.roster.filter(w => w.status === "Active").length;
     const bActive = b.roster.filter(w => w.status === "Active").length;
     if (aActive !== bActive) return aActive - bActive;
-    return a.gold - b.gold;
+    return a.treasury - b.treasury;
   });
 
   const draftResults: Record<string, RivalStableData> = {};

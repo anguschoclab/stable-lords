@@ -67,8 +67,8 @@ export async function runAutosim(
     }
 
     // Stop conditions
-    if (state.gold < -500) {
-      return { finalState: state, weeksSimmed, stopReason: "bankrupt", stopDetail: "Stable ran out of gold", weekSummaries };
+    if (state.treasury < -500) {
+      return { finalState: state, weeksSimmed, stopReason: "bankrupt", stopDetail: "Stable ran out of treasury", weekSummaries };
     }
     
     if (state.roster.length === 0) {

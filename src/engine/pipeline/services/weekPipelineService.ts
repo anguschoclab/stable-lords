@@ -38,11 +38,18 @@ import { partialRefreshPool } from "@/engine/recruitment";
 export function advanceWeek(state: GameState): GameState {
   // 1. Preparation
   const currentWeek = state.week;
-  const nextWeek = currentWeek + 1;
-  const rootRng = new SeededRNG(nextWeek * 7919 + 101);
+  let nextWeek = currentWeek + 1;
+  let nextYear = state.year || 1;
+
+  if (nextWeek > 52) {
+    nextWeek = 1;
+    nextYear++;
+  }
+
+  const rootRng = new SeededRNG(nextYear * 52 + nextWeek * 7919 + 101);
 
   // 2. Deterministic Domain Impacts
-  let newState = executeDomainImpacts(state, nextWeek);
+  let newState = executeDomainImpacts(state, nextWeek, rootRng);
 
   // 3. World & System Transitions
   newState = executeWorldTransitions(newState, rootRng, nextWeek);
@@ -54,7 +61,7 @@ export function advanceWeek(state: GameState): GameState {
   newState = executeNarrativePass(newState, currentWeek, nextWeek);
 
   // 6. Completion & Persistence
-  newState = finalizeWeek(newState);
+  newState = finalizeWeek(newState, nextWeek, nextYear, rootRng);
 
   // Surface Simulation Math
   newState.lastSimulationReport = state.lastSimulationReport; // Carry over if needed, but we replace it below
@@ -64,7 +71,7 @@ export function advanceWeek(state: GameState): GameState {
 
 /** ─── Coordinator Phases ─────────────────────────────────────────────────── */
 
-function executeDomainImpacts(state: GameState, nextWeek: number): GameState {
+function executeDomainImpacts(state: GameState, nextWeek: number, rng: SeededRNG): GameState {
   const trainingImpactRaw = computeTrainingImpact(state);
   const { impact: trainingImpact, seasonalGrowth, results: trainingResults } = trainingImpactToStateImpact(state, trainingImpactRaw);
   
@@ -84,10 +91,11 @@ function executeDomainImpacts(state: GameState, nextWeek: number): GameState {
 
   // Generate Report
   const report: import("@/types/state.types").SimulationReport = {
+    id: rng.uuid("pro"), // Profile/Report ID
     week: state.week,
     treasuryChange: economyImpact.treasuryDelta ?? 0,
     trainingGains: trainingResults
-      .filter(r => r.type === "gain" && r.attr && r.gain)
+      .filter(r => r.attr && r.gain)
       .map(r => ({
         warriorId: r.warriorId,
         warriorName: state.roster.find(w => w.id === r.warriorId)?.name || "Unknown",
@@ -122,7 +130,12 @@ function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: num
   newState.trainers = updatedTrainers;
   newState.hiringPool = updatedHiringPool;
   if (news.length > 0) {
-    newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: "Trainer Career Updates", items: news }];
+    newState.newsletter = [...(newState.newsletter || []), { 
+      id: rng.uuid("led"), 
+      week: nextWeek, 
+      title: "Trainer Career Updates", 
+      items: news 
+    }];
   }
 
   newState = runPromoterLifecyclePass(newState);
@@ -144,7 +157,12 @@ function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG
     const narrGazette = generateOwnerNarratives(newState, newState.season, seasonSeed + 1);
     const combinedNews = [...news, ...gazetteItems, ...narrGazette];
     if (combinedNews.length > 0) {
-      newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: `${state.season} Season Summary`, items: combinedNews }];
+      newState.newsletter = [...(newState.newsletter || []), { 
+        id: seasonSeed.toString(), 
+        week: nextWeek, 
+        title: `${state.season} Season Summary`, 
+        items: combinedNews 
+      }];
     }
   }
 
@@ -180,15 +198,22 @@ function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: n
   const { grudges, gazetteItems } = processOwnerGrudges(newState, newState.ownerGrudges || []);
   newState.ownerGrudges = grudges;
   if (gazetteItems.length > 0) {
-    newState.newsletter = [...(newState.newsletter || []), { week: nextWeek, title: "Stable Rivalries & Grudges", items: gazetteItems }];
+    newState.newsletter = [...(newState.newsletter || []), { 
+      id: nextWeek.toString() + "_grudge", 
+      week: nextWeek, 
+      title: "Stable Rivalries & Grudges", 
+      items: gazetteItems 
+    }];
   }
 
   return newState;
 }
 
-function finalizeWeek(state: GameState): GameState {
+function finalizeWeek(state: GameState, nextWeek: number, nextYear: number, rng: SeededRNG): GameState {
   return {
     ...state,
+    week: nextWeek,
+    year: nextYear,
     trainingAssignments: [],
   };
 }

@@ -75,12 +75,12 @@ export function processAIStable(
 
   weeklyExpenses += (updatedRival.trainers || []).reduce((sum, t) => sum + (TRAINER_WEEKLY_SALARY[t.tier] || 10), 0);
 
-  // 5. Update Gold & Check Bankruptcy (Risk Control)
-  const goldDelta = weeklyIncome - weeklyExpenses;
-  const newGold = updatedRival.gold + goldDelta;
-  const isBankrupt = newGold <= 0;
+  // 5. Update Treasury & Check Bankruptcy (Risk Control)
+  const treasuryDelta = weeklyIncome - weeklyExpenses;
+  const newTreasury = updatedRival.treasury + treasuryDelta;
+  const isBankrupt = newTreasury <= 0;
   
-  updatedRival.gold = newGold;
+  updatedRival.treasury = newTreasury;
 
   if (isBankrupt) {
     gazetteItems.push(`📉 BANKRUPTCY: ${updatedRival.owner.stableName} has collapsed under its debts.`);

@@ -63,6 +63,7 @@ function reconstructGameState(store: GameStore): GameState {
     boutOffers: store.boutOffers,
     rivals: store.rivals,
     gazettes: store.gazettes,
+    scoutReports: store.scoutReports,
     unacknowledgedDeaths: store.unacknowledgedDeaths,
     rosterBonus: store.rosterBonus,
     tournaments: store.tournaments,
@@ -112,6 +113,7 @@ export const useGameStore = create<GameStore>()(
           draft.boutOffers = state.boutOffers;
           draft.rivals = state.rivals;
           draft.gazettes = state.gazettes;
+          draft.scoutReports = state.scoutReports || [];
           draft.unacknowledgedDeaths = state.unacknowledgedDeaths;
           draft.rosterBonus = state.rosterBonus;
           draft.tournaments = state.tournaments;

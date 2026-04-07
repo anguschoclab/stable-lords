@@ -46,6 +46,7 @@ export interface CareerRecord {
   wins: number;
   losses: number;
   kills: number;
+  fame?: number; // 📸 Snapshot fame at year start
   medals?: {
     gold: number;
     silver: number;
@@ -133,6 +134,8 @@ export interface Warrior {
   isDead?: boolean;
   dateOfDeath?: string;
   causeOfDeath?: string;
+  yearlySnapshots?: Record<number, CareerRecord>; // 📸 Snapshot at Year Start
+  awards?: import("./state.types").AnnualAward[]; // 🏗️ Prestige Persistence
 }
 
 // Re-exports for convenience

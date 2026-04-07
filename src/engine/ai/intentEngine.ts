@@ -34,7 +34,7 @@ export function pickWeeklyIntent(
   }
 
   // 1. RECOVERY: High priority if stable is in crisis
-  if (rival.gold < 200 || (activeRoster.length > 0 && injuryCount / activeRoster.length >= 0.4) || (metaIsHostile && personality === "Methodical")) {
+  if (rival.treasury < 200 || (activeRoster.length > 0 && injuryCount / activeRoster.length >= 0.4) || (metaIsHostile && personality === "Methodical")) {
     return "RECOVERY";
   }
 
@@ -50,7 +50,7 @@ export function pickWeeklyIntent(
 
   // 3. EXPANSION: If roster is thin
   const minSize = personality === "Aggressive" ? 8 : personality === "Methodical" ? 5 : 6;
-  if (activeRoster.length < minSize && rival.gold > 300) {
+  if (activeRoster.length < minSize && rival.treasury > 300) {
     return "EXPANSION";
   }
 
@@ -72,7 +72,7 @@ export function verifyIntentSkepticism(
   const personality = rival.owner.personality ?? "Pragmatic";
   
   // Skepticism Tier 1: Financial Crisis
-  if (strategy.intent !== "RECOVERY" && rival.gold < 150) return true;
+  if (strategy.intent !== "RECOVERY" && rival.treasury < 150) return true;
 
   // Skepticism Tier 2: Roster Depletion
   const activeCount = rival.roster.filter(w => w.status === "Active").length;

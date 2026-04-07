@@ -285,6 +285,7 @@ export const TournamentSelectionService = {
       const isPlayer = w.stableId === updatedState.player.id;
       const purseMult = place === 1 ? 1.0 : place === 2 ? 0.5 : 0.25;
       const prizeGold = Math.floor(basePurse * purseMult);
+      const prizeFame = place === 1 ? 100 : place === 2 ? 50 : 25;
 
       // 1. Update Carrier Medals
       updatedState = this.modifyWarrior(updatedState, w.id, (draft) => {
@@ -292,6 +293,7 @@ export const TournamentSelectionService = {
         if (place === 1) draft.career.medals.gold++;
         if (place === 2) draft.career.medals.silver++;
         if (place === 3) draft.career.medals.bronze++;
+        draft.fame = (draft.fame || 0) + prizeFame;
       });
 
       // 2. Financials & Specific Rewards
@@ -304,6 +306,8 @@ export const TournamentSelectionService = {
           amount: prizeGold, 
           category: "prize" 
         });
+        updatedState.fame = (updatedState.fame || 0) + prizeFame;
+        updatedState.player = { ...updatedState.player, fame: (updatedState.player.fame || 0) + prizeFame };
 
         if (place === 1) {
           updatedState.rosterBonus = (updatedState.rosterBonus || 0) + 1;
@@ -331,7 +335,7 @@ export const TournamentSelectionService = {
       } else {
         // Rival reward logic
         updatedState.rivals = updatedState.rivals.map(r => 
-          r.owner.id === w.stableId ? { ...r, treasury: r.treasury + prizeGold } : r
+          r.owner.id === w.stableId ? { ...r, treasury: r.treasury + prizeGold, fame: (r.fame || 0) + prizeFame } : r
         );
       }
     };

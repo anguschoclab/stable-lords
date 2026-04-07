@@ -6,10 +6,12 @@ import {
   BoutOffer, 
   RivalStableData,
   GazetteStory,
-  Owner
+  Owner,
+  ScoutReportData
 } from "@/types/state.types";
 import { FightSummary } from "@/types/combat.types";
 import { truncateArray } from "@/utils/stateUtils";
+import { updatePromoterHistory as engineUpdatePromoterHistory } from "@/engine/promoters";
 
 export interface WorldSlice {
   week: number;
@@ -20,6 +22,7 @@ export interface WorldSlice {
   boutOffers: Record<string, BoutOffer>;
   rivals: RivalStableData[];
   gazettes: GazetteStory[];
+  scoutReports: ScoutReportData[];
   arenaHistory: FightSummary[];
   player: Owner;
   setWeek: (week: number) => void;
@@ -44,6 +47,7 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   boutOffers: {},
   rivals: [],
   gazettes: [],
+  scoutReports: [],
   arenaHistory: [],
   player: { id: "p1", name: "Rookie", stableName: "Fresh Stable", fame: 0, renown: 0, titles: 0 },
 
@@ -140,24 +144,7 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   },
 
   updatePromoterHistory: (promoterId, purse, boutId) => {
-    set((state: any) => {
-      const promoter = state.promoters[promoterId];
-      if (!promoter) return state;
-
-      return {
-        promoters: {
-          ...state.promoters,
-          [promoterId]: {
-            ...promoter,
-            history: {
-              ...promoter.history,
-              totalPursePaid: promoter.history.totalPursePaid + purse,
-              notableBouts: [...promoter.history.notableBouts.slice(-9), boutId], // Keep last 10
-            },
-          },
-        },
-      };
-    });
+    set((state: any) => engineUpdatePromoterHistory(state, promoterId, purse, boutId));
   },
 
   replacePromoter: (oldId, newPromoter) => {

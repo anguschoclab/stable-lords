@@ -5,8 +5,10 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/scouting";
-import type { ScoutReportData } from "@/types/game";
+import { type ScoutReportData, type RivalStableData, type Warrior } from "@/types/game";
 import { Search, Eye, ArrowLeftRight, UserRoundSearch, Shield, Users, Target, Hexagon } from "lucide-react";
+import { SeededRNG } from "@/utils/random";
+import { hashStr } from "@/utils/idUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -20,7 +22,8 @@ import { StableComparison } from "@/components/scouting/StableComparison";
 import { WarriorComparison } from "@/components/scouting/WarriorComparison";
 
 export default function Scouting() {
-  const { state, setState } = useGameStore();
+  const state = useGameStore();
+  const setState = useGameStore((s) => s.setState);
   const [selectedRivalId, setSelectedRivalId] = useState<string | null>(null);
   const [selectedWarriorId, setSelectedWarriorId] = useState<string | null>(null);
 
@@ -28,12 +31,12 @@ export default function Scouting() {
   const reports = useMemo(() => state.scoutReports ?? [], [state.scoutReports]);
 
   const activeRival = useMemo(
-    () => (state.rivals ?? []).find((r) => r.owner.id === selectedRivalId),
+    () => (state.rivals ?? []).find((r: RivalStableData) => r.owner.id === selectedRivalId),
     [state.rivals, selectedRivalId]
   );
 
   const activeWarrior = useMemo(
-    () => activeRival?.roster.find((w) => w.id === selectedWarriorId),
+    () => activeRival?.roster.find((w: Warrior) => w.id === selectedWarriorId),
     [activeRival, selectedWarriorId]
   );
 
@@ -41,29 +44,29 @@ export default function Scouting() {
     (quality: ScoutQuality) => {
       if (!activeWarrior) return;
       const cost = getScoutCost(quality);
-      if ((state.gold ?? 0) < cost) {
+      if ((state.treasury ?? 0) < cost) {
         toast.error(`Insufficient funds! Scouting requires ${cost}g.`);
         return;
       }
 
-      const { report } = generateScoutReport(activeWarrior, quality, state.week);
+      const rng = new SeededRNG(state.week + hashStr(activeWarrior.name));
+      const { report } = generateScoutReport(activeWarrior, quality, state.week, rng);
       
       // Ensure we don't have duplicate reports for the same warrior
       const newReports = [
-        ...(state.scoutReports ?? []).filter((r) => r.warriorName !== activeWarrior.name),
+        ...(state.scoutReports ?? []).filter((r: ScoutReportData) => r.warriorName !== activeWarrior.name),
         report as ScoutReportData,
       ];
 
-      setState({
-        ...state,
-        scoutReports: newReports,
-        gold: (state.gold ?? 0) - cost,
-        ledger: [...(state.ledger ?? []), {
+      setState((draft: any) => {
+        draft.scoutReports = newReports;
+        draft.treasury = (state.treasury ?? 0) - cost;
+        draft.ledger.push({
           week: state.week,
           label: `Intelligence: ${activeWarrior.name} (${quality})`,
           amount: -cost,
           category: "other",
-        }],
+        });
       });
       toast.success(`Intel established for ${activeWarrior.name}. (-${cost}g)`);
     },
@@ -138,7 +141,7 @@ export default function Scouting() {
             onSelectRival={handleSelectRival}
             selectedWarriorId={selectedWarriorId}
             onSelectWarrior={handleSelectWarrior}
-            gold={state.gold ?? 0}
+            gold={state.treasury ?? 0}
             onScout={handleScout}
           />
         </TabsContent>

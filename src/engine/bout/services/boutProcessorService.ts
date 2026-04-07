@@ -7,7 +7,7 @@ import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
 import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { engineEventBus } from "@/engine/core/EventBus";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
-import { updatePromoterHistory } from "@/state/mutations/promoterMutations";
+import { updatePromoterHistory } from "@/engine/promoters";
 
 import { applyRecords } from "../recordHandler";
 import { handleDeath } from "../mortalityHandler";
@@ -36,7 +36,20 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   const currentW = warriorMap?.get(warrior?.id);
   const currentO = warriorMap?.get(opponent?.id);
 
-  if (!currentW || currentW.status !== "Active" || !currentO) return { state, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as import("@/engine/boutProcessor").BoutResult, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
+  if (!currentW || currentW.status !== "Active" || !currentO) {
+    return { 
+      state, 
+      result: { 
+        a: warrior, 
+        d: opponent, 
+        outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as FightOutcome, 
+        isRivalry, 
+        rivalStable, 
+        contractId: contract?.id 
+      }, 
+      stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } 
+    };
+  }
 
   // 🛡️ Determinism: Generate a unique seed for this specific bout
   const boutSeed = hashStr(`${week}|${currentW.id}|${currentO.id}`);
@@ -60,21 +73,21 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
 
     // Winner gets full purse, Loser gets show fee
     if (winnerId === currentW.id) {
-       s.gold += purse;
+       s.treasury += purse;
        // If D is a rival, give them show fee
        if (rivalStableId) {
-         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, gold: r.gold + showFee } : r);
+         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, treasury: r.treasury + showFee } : r);
        }
     } else if (winnerId === currentO.id) {
        if (rivalStableId) {
-         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, gold: r.gold + purse } : r);
+         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, treasury: r.treasury + purse } : r);
        }
-       s.gold += showFee;
+       s.treasury += showFee;
     } else {
        // Draw: both get show fee
-       s.gold += showFee;
+       s.treasury += showFee;
        if (rivalStableId) {
-         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, gold: r.gold + showFee } : r);
+         s.rivals = s.rivals.map(r => r.owner.id === rivalStableId ? { ...r, treasury: r.treasury + showFee } : r);
        }
     }
     
@@ -147,9 +160,10 @@ function accumulateWeekStats(summary: WeekBoutSummary, res: BoutImpact) {
 }
 
 function finalizeWeekSideEffects(s: GameState, results: BoutResult[]) {
-  const playerFameGain = results.filter(r => r.outcome.winner === "A").length;
+  const playerFameGain = results.filter(r => r.outcome.winner === "A" && !r.rivalStable).length;
+  // Unified fame tracking: player.fame is the authority
   s.player = { ...s.player, fame: (s.player.fame || 0) + playerFameGain };
-  s.fame = (s.fame || 0) + playerFameGain;
+  s.fame = s.player.fame; 
   s.crowdMood = computeCrowdMood(s.arenaHistory);
   s.moodHistory = [...(s.moodHistory || []).slice(-19), { week: s.week, mood: s.crowdMood }];
 

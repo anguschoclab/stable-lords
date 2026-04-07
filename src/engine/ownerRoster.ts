@@ -72,9 +72,9 @@ export function processAIRosterManagement(
     const minRoster = personality === "Aggressive" ? 8 : personality === "Showman" ? 7 : 6;
     const recruitChance = personality === "Aggressive" ? 0.4 : personality === "Pragmatic" ? 0.25 : 0.15;
     
-    // Gold Awareness: Recruitment costs 100g (signing fee)
+    // Treasury Awareness: Recruitment costs 100g (signing fee)
     const RECRUIT_COST = 100;
-    const canAfford = r.gold >= RECRUIT_COST + 200; // Keep a buffer
+    const canAfford = r.treasury >= RECRUIT_COST + 200; // Keep a buffer
     const intent = r.strategy?.intent ?? "CONSOLIDATION";
 
     if (currentActive < minRoster && rngSnapshot.next() < recruitChance && canAfford && intent !== "RECOVERY") {
@@ -95,7 +95,7 @@ export function processAIRosterManagement(
 
       const newWarrior = generateAIRecruit(r, state.week, customMeta);
       if (newWarrior) {
-        r.gold -= RECRUIT_COST;
+        r.treasury -= RECRUIT_COST;
         r.roster.push(newWarrior);
         const adaptQuote = META_RECRUIT_QUOTES[adaptation] ?? "\"A new warrior joins.\"";
         gazetteItems.push(`📢 ${r.owner.stableName} recruits ${newWarrior.name} (${newWarrior.style}) — ${adaptQuote}`);

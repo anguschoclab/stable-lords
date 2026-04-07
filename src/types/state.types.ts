@@ -165,6 +165,7 @@ export interface AIAgentMemory {
 export interface RivalStableData {
   id: string;
   owner: Owner;
+  fame: number; // 🏗️ Prestige Persistence
   roster: Warrior[];
   trainers?: Trainer[];
   treasury: number;
@@ -250,6 +251,8 @@ export interface HallEntry {
   fightId: string;
 }
 
+// ─── Simulation & Awards ────────────────────────────────────────────────────
+
 export interface SimulationReport {
   id: string;
   week: number;
@@ -257,6 +260,20 @@ export interface SimulationReport {
   trainingGains: { warriorId: string; warriorName: string; attr: string; gain: number }[];
   agingEvents: string[];
   healthEvents: string[];
+}
+
+export type AnnualAwardType = "WARRIOR_OF_YEAR" | "KILLER_OF_YEAR" | "STABLE_OF_YEAR" | "CLASS_MVP" | "TOURNAMENT_RANK";
+
+export interface AnnualAward {
+  year: number;
+  type: AnnualAwardType;
+  warriorId?: string;
+  warriorName?: string;
+  stableId?: string;
+  stableName?: string;
+  style?: FightingStyle;
+  value: number; // e.g. 15 wins, 5 kills
+  reason: string;
 }
 
 export interface GameState {
@@ -281,6 +298,7 @@ export interface GameState {
   treasury: number;
   ledger: LedgerEntry[];
   week: number;
+  year: number; // 🌩️ Calendar Authority (v1.0)
   phase: "planning" | "resolution";
   season: Season;
   weather: WeatherType;
@@ -325,6 +343,7 @@ export interface GameState {
   promoters: Record<string, Promoter>;
   boutOffers: Record<string, BoutOffer>;
   realmRankings: Record<string, RankingEntry>;
+  awards: AnnualAward[]; // 🏗️ Prestige Persistence
   lastSimulationReport?: SimulationReport;
 }
 

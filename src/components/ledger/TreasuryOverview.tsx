@@ -6,18 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Coins, FileText, TrendingUp, Skull, Swords, Activity, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, History } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
+import { 
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { type Warrior, type LedgerEntry } from "@/types/game";
 
 export function TreasuryOverview() {
-  const { state } = useGameStore();
+  const state = useGameStore();
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
-  const gold = state.gold ?? 0;
+  const gold = state.treasury ?? 0;
   
-  const activeWarriors = (state.roster ?? []).filter(w => w.status === "Active");
+  const activeWarriors = (state.roster ?? []).filter((w: Warrior) => w.status === "Active");
 
   // ⚡ Bolt: Fast accumulation without allocating objects per iteration
   let totalWins = 0;

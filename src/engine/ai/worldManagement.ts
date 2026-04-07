@@ -45,9 +45,9 @@ export const WorldManagementService = {
       });
     });
 
-    // 2. Process Bankruptcy (Risk: <100g and no wins in 13 weeks)
+    // 2. Process Bankruptcy (Risk: <100 treasury and no wins in 13 weeks)
     const survivors = updatedRivals.filter(r => {
-      if (r.gold < 100 && r.agentMemory?.burnRate && r.agentMemory.burnRate > 0) {
+      if (r.treasury < 100 && r.agentMemory?.burnRate && r.agentMemory.burnRate > 0) {
           // Check recent performance (simplified for now: 10% chance to fail if poor)
           if (rng.next() < 0.2) {
             news.push(`📉 COLLAPSE: ${r.owner.stableName} has shuttered its doors due to financial insolvency.`);

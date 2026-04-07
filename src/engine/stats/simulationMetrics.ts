@@ -2,12 +2,12 @@ import { type GameState } from "@/types/game";
 
 export interface SimPulse {
   week: number;
-  playerGold: number;
+  playerTreasury: number;
   rosterSize: number;
   deadCount: number;
   retiredCount: number;
   rivalCount: number;
-  avgRivalGold: number;
+  avgRivalTreasury: number;
   totalBouts: number;
 }
 
@@ -16,18 +16,18 @@ export interface SimPulse {
  */
 export function collectPulse(state: GameState): SimPulse {
   const activeRivals = state.rivals || [];
-  const avgRivalGold = activeRivals.length > 0 
-    ? activeRivals.reduce((sum, r) => sum + r.gold, 0) / activeRivals.length 
+  const avgRivalTreasury = activeRivals.length > 0 
+    ? activeRivals.reduce((sum, r) => sum + r.treasury, 0) / activeRivals.length 
     : 0;
 
   return {
     week: state.week,
-    playerGold: state.gold,
+    playerTreasury: state.treasury,
     rosterSize: state.roster.length,
     deadCount: state.graveyard.length,
     retiredCount: state.retired.length,
     rivalCount: activeRivals.length,
-    avgRivalGold: Math.round(avgRivalGold),
+    avgRivalTreasury: Math.round(avgRivalTreasury),
     totalBouts: state.arenaHistory.length,
   };
 }
@@ -38,10 +38,10 @@ export function collectPulse(state: GameState): SimPulse {
 export function formatPulseTable(pulses: SimPulse[]): string {
   if (pulses.length === 0) return "No data";
   
-  const header = "Week | Gold | Roster | Dead | Rivals | Avg Rival Gold";
-  const divider = "---- | ---- | ------ | ---- | ------ | --------------";
+  const header = "Week | Treasury | Roster | Dead | Rivals | Avg Rival Treas";
+  const divider = "---- | -------- | ------ | ---- | ------ | --------------";
   const rows = pulses.map(p => 
-    `${p.week.toString().padEnd(4)} | ${p.playerGold.toString().padEnd(4)} | ${p.rosterSize.toString().padEnd(6)} | ${p.deadCount.toString().padEnd(4)} | ${p.rivalCount.toString().padEnd(6)} | ${p.avgRivalGold}`
+    `${p.week.toString().padEnd(4)} | ${p.playerTreasury.toString().padEnd(8)} | ${p.rosterSize.toString().padEnd(6)} | ${p.deadCount.toString().padEnd(4)} | ${p.rivalCount.toString().padEnd(6)} | ${p.avgRivalTreasury}`
   );
 
   return [header, divider, ...rows].join("\n");
