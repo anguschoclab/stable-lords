@@ -1,7 +1,7 @@
 import { type GameState } from "@/types/state.types";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { processWeekBouts } from "@/engine/bout/services/boutProcessorService";
-import { respondToBoutOffer } from "@/state/mutations/contractMutations";
+import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 
 export interface AutosimWeekSummary {
   week: number;

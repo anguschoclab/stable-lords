@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { respondToBoutOffer } from "@/state/mutations/contractMutations";
+import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
