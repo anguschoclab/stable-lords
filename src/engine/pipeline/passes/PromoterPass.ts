@@ -91,7 +91,7 @@ export function runPromoterPass(state: GameState): GameState {
       });
 
       if (opponentB) {
-        const offerId = `offer_${promoter.id}_${state.week}_${generated}`;
+        const offerId = rng.uuid("offer");
         const hype = calculateHype(warriorA.w, opponentB.w, promoter);
         const basePurse = FIGHT_PURSE * TIER_MULTIPLIERS[promoter.tier];
         const finalPurse = Math.floor(basePurse * (hype / 100));

@@ -11,6 +11,7 @@ import { type WarriorStatus } from "@/types/warrior.types";
 import { makeWarrior } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNG } from "@/utils/random";
+import { InsightTokenService } from "@/engine/tokens/insightTokenService";
 import { simulateFight, aiPlanForWarrior, defaultPlanForWarrior } from "@/engine";
 import { generateId } from "@/utils/idUtils";
 import type { FightOutcome } from "@/types/combat.types";
@@ -320,26 +321,11 @@ export const TournamentSelectionService = {
 
         if (place === 1) {
           updatedState.rosterBonus = (updatedState.rosterBonus || 0) + 1;
+          updatedState = InsightTokenService.awardToken(updatedState, "Style", `${tournament.name} (🥇)`, awardRng);
         } else if (place === 2) {
-          // Add Weapon Token
-          updatedState.insightTokens = [...(updatedState.insightTokens || []), {
-            id: awardRng.uuid("insight"),
-            type: "Weapon",
-            warriorId: "",
-            warriorName: "Unassigned",
-            detail: `Earned from ${tournament.name} (🥈)`,
-            discoveredWeek: updatedState.week
-          }];
+          updatedState = InsightTokenService.awardToken(updatedState, "Weapon", `${tournament.name} (🥈)`, awardRng);
         } else if (place === 3) {
-          // Add Rhythm Token
-          updatedState.insightTokens = [...(updatedState.insightTokens || []), {
-            id: awardRng.uuid("insight"),
-            type: "Rhythm",
-            warriorId: "",
-            warriorName: "Unassigned",
-            detail: `Earned from ${tournament.name} (🥉)`,
-            discoveredWeek: updatedState.week
-          }];
+          updatedState = InsightTokenService.awardToken(updatedState, "Rhythm", `${tournament.name} (🥉)`, awardRng);
         }
       } else {
         // Rival reward logic

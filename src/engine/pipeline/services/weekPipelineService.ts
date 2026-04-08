@@ -18,9 +18,10 @@ import { runEquipmentPass } from "../passes/EquipmentPass";
 import { runWorldPass } from "../passes/WorldPass";
 import { runRivalStrategyPass } from "../passes/RivalStrategyPass";
 import { runEventPass } from "../passes/EventPass";
-import { runRankingsPass } from "../passes/RankingsPass";
 import { runPromoterPass } from "../passes/PromoterPass";
 import { runPromoterLifecyclePass } from "../passes/PromoterLifecyclePass";
+import { runRankingsPass } from "../passes/RankingsPass";
+import { processWeekBouts } from "@/engine/boutProcessor";
 
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeEconomyImpact } from "@/engine/economy";
@@ -48,8 +49,12 @@ export function advanceWeek(state: GameState): GameState {
 
   const rootRng = new SeededRNG(nextYear * 52 + nextWeek * 7919 + 101);
 
-  // 2. Core Domain Passes (Training, Aging, Health, Economy)
-  let newState = runWarriorPass(state, rootRng);
+  // 2. Core Simulation (Bouts, Training, Health, Economy)
+  // Bouts happen for the week that is just ending
+  const boutResults = processWeekBouts(state);
+  let newState = boutResults.state;
+
+  newState = runWarriorPass(newState, rootRng);
   newState = runEconomyPass(newState, rootRng);
   
   // 3. World & System Transitions
@@ -81,7 +86,7 @@ function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: num
   newState = runPromoterPass(newState);
   
   // Recruitment
-  const usedNames = new Set(newState.roster.map(w => w.name));
+  const usedNames = new Set<string>(newState.roster.map((w: any) => w.name));
   newState.recruitPool = partialRefreshPool(newState.recruitPool || [], newState.week, usedNames);
 
   // Tier Progression

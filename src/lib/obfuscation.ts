@@ -1,7 +1,7 @@
 import { Warrior, InsightToken, FightingStyle, Attributes, FightPlan } from "@/types/game";
 
 // Obfuscated representation of a warrior for the UI
-export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attributes" | "defaultPlan"> {
+export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attributes" | "plan" | "equipment"> {
   style: FightingStyle | "UNKNOWN";
   attributes: {
     ST: number | string;
@@ -12,7 +12,8 @@ export interface ObfuscatedWarrior extends Omit<Warrior, "style" | "attributes" 
     SP: number | string;
     DF: number | string;
   };
-  defaultPlan?: FightPlan | undefined; // Hidden unless known
+  equipment: Warrior["equipment"] | "HIDDEN";
+  plan?: FightPlan | "HIDDEN"; // Hidden unless known
   isFullyRevealed: boolean;
 }
 
@@ -25,13 +26,19 @@ export function obfuscateWarrior(
   isOwnedByPlayer: boolean
 ): ObfuscatedWarrior {
   if (isOwnedByPlayer) {
-    return { ...warrior, isFullyRevealed: true };
+    return { 
+      ...warrior, 
+      isFullyRevealed: true,
+      equipment: warrior.equipment || ("HIDDEN" as any), // Fallback for type safety
+    } as ObfuscatedWarrior;
   }
 
   const warriorInsights = insights.filter((i) => i.warriorId === warrior.id);
 
-  // Has style insight?
+  // Checks for specific insights
   const knowsStyle = warriorInsights.some((i) => i.type === "Style");
+  const knowsWeapon = warriorInsights.some((i) => i.type === "Weapon");
+  const knowsRhythm = warriorInsights.some((i) => i.type === "Rhythm");
 
   // Map known attributes
   const knownAttrs = warriorInsights
@@ -43,7 +50,6 @@ export function obfuscateWarrior(
     if (knownAttrs.includes(key)) {
       return warrior.attributes[key];
     }
-    // Return a qualitative band instead of the exact number
     const val = warrior.attributes[key];
     if (val >= 21) return "Monstrous";
     if (val >= 17) return "Exceptional";
@@ -55,7 +61,7 @@ export function obfuscateWarrior(
 
   return {
     ...warrior,
-    style: knowsStyle ? warrior.style : "UNKNOWN" as import("@/types/game").FightingStyle,
+    style: knowsStyle ? warrior.style : ("UNKNOWN" as any),
     attributes: {
       ST: getAttr("ST"),
       CN: getAttr("CN"),
@@ -65,8 +71,8 @@ export function obfuscateWarrior(
       SP: getAttr("SP"),
       DF: getAttr("DF"),
     },
-    // Hide the actual fight plan completely
-    defaultPlan: undefined,
+    equipment: knowsWeapon ? warrior.equipment : "HIDDEN",
+    plan: knowsRhythm ? warrior.plan : "HIDDEN",
     isFullyRevealed: false,
   };
 }

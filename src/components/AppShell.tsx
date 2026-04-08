@@ -14,7 +14,6 @@ import {
 import { audioManager } from "@/lib/AudioManager";
 import { Button } from "@/components/ui/button";
 import { useGameStore } from "@/state/useGameStore";
-import { selectActiveWarriors } from "@/state/selectors";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MOOD_ICONS } from "@/engine/crowdMood";
@@ -90,6 +89,15 @@ const NAV_SECTIONS = [
       { to: "/legacy/awards", label: "Trophy Room", icon: Trophy },
       { to: "/legacy/analytics", label: "Kill Stats", icon: Target },
     ]
+  },
+  {
+    id: "dev",
+    label: "Diagnostics",
+    items: [
+      { to: "/dev/equipment", label: "Gear Optimizer", icon: Shield },
+      { to: "/dev/physicals", label: "Body Simulator", icon: Activity },
+      { to: "/dev/admin", label: "Control Tower", icon: Settings },
+    ]
   }
 ];
 
@@ -105,14 +113,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     doReset, returnToTitle, lastSavedAt, doAdvanceWeek, doAdvanceDay,
     isSimulating, isInitialized
   } = useGameStore(
-    useShallow((s) => ({
-      week: s.state.week,
-      day: s.state.day,
-      isTournamentWeek: s.state.isTournamentWeek,
-      treasury: s.state.treasury,
-      fame: s.state.fame,
-      crowdMood: s.state.crowdMood,
-      roster: s.state.roster,
+    useShallow((s: any) => ({
+      week: s.week,
+      day: s.day,
+      isTournamentWeek: s.isTournamentWeek,
+      treasury: s.treasury,
+      fame: s.fame,
+      crowdMood: s.crowdMood,
+      roster: s.roster,
       doReset: s.doReset,
       returnToTitle: s.returnToTitle,
       lastSavedAt: s.lastSavedAt,
@@ -146,7 +154,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     // Only check for "Orphan" status if we are in the main game loops
     if (activePath === "/welcome") return;
 
-    const activeWarriors = roster.filter(w => w.status === "Active");
+    const activeWarriors = roster.filter((w: any) => w.status === "Active");
     if (activeWarriors.length < 3) {
       console.warn("Personnel deficit detected. Redirecting to recruitment protocol.");
       navigate({ to: "/welcome" });

@@ -84,7 +84,7 @@ export default function Scouting() {
         icon={Search}
         actions={
           <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.34em] text-muted-foreground opacity-60">
-             <span>Active Protocols: {reports.length}</span>
+             <span>Active Protocols: {scoutReports?.length || 0}</span>
              <div className="h-4 w-px bg-border/40" />
              <span className="text-primary italic animate-pulse">Scanning Data Packets...</span>
           </div>

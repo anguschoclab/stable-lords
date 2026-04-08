@@ -9,6 +9,8 @@ import { useGameStore } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, type Attributes } from "@/types/game";
 import { BASE_ROSTER_CAP } from "@/data/constants";
 import { makeWarrior } from "@/engine/factories";
+import { SeededRNG } from "@/utils/random";
+import { hashStr } from "@/utils/idUtils";
 import {
   generateRecruitPool, fullRefreshPool,
   type PoolWarrior, type RecruitTier,
@@ -215,9 +217,10 @@ export default function Recruit() {
         return;
       }
 
-      // 1.0 Deterministic ID: Recruitment uses timestamp + random for uniqueness but logic is engine-fed
+      // 1.0 Deterministic ID: Recruitment uses hash-based seed for bit-identity
+      const recruitRng = new SeededRNG(draft.week + hashStr(w.name));
       const warrior = makeWarrior(
-        `war_rec_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        recruitRng.uuid("warrior"),
         w.name, w.style, w.attributes,
         { age: w.age, potential: w.potential }
       );
@@ -291,7 +294,8 @@ export default function Recruit() {
           toast.error("Roster full!");
           return;
         }
-        const id = `war_custom_${Date.now()}`;
+        const rng = new SeededRNG(draft.week + hashStr(data.name));
+        const id = rng.uuid("warrior");
         const warrior = makeWarrior(id, data.name, data.style, data.attributes);
         
         draft.roster.push(warrior);
