@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { runSimulation } from "./simulation-harness";
 
-const WEEKS_TO_SIMULATE = 52;
+const WEEKS_TO_SIMULATE = 1000;
 const CONSTANTS_FILE = path.join(process.cwd(), "src/engine/combat/combatConstants.ts");
 const REPORT_FILE = path.join(process.cwd(), "Autobalance_Report.md");
 
@@ -101,11 +101,82 @@ async function main() {
     }
   }
 
+  // Adjust style winrates
+  for (const [style, rate] of Object.entries(styleWinRates)) {
+    if (rate > 0.65) {
+      const enumStyle = style.split(/[\s-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
+      const match = constantsContent.match(new RegExp(`\\[FightingStyle\\.${enumStyle}\\]: ([-0-9.]+),`));
+      if (match) {
+        const currentVal = parseFloat(match[1]);
+        const newVal = currentVal - 1; // Nerf by 1
+        constantsContent = constantsContent.replace(
+          `[FightingStyle.${enumStyle}]: ${currentVal},`,
+          `[FightingStyle.${enumStyle}]: ${newVal},`
+        );
+        commitMessage += `- ${style} winrate is too high (${(rate * 100).toFixed(2)}%). Reduced base bonus from ${currentVal} to ${newVal}.\n`;
+        changed = true;
+      }
+    } else if (rate < 0.35) {
+      const enumStyle = style.split(/[\s-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
+      const match = constantsContent.match(new RegExp(`\\[FightingStyle\\.${enumStyle}\\]: ([-0-9.]+),`));
+      if (match) {
+        const currentVal = parseFloat(match[1]);
+        const newVal = currentVal + 1; // Buff by 1
+        constantsContent = constantsContent.replace(
+          `[FightingStyle.${enumStyle}]: ${currentVal},`,
+          `[FightingStyle.${enumStyle}]: ${newVal},`
+        );
+        commitMessage += `- ${style} winrate is too low (${(rate * 100).toFixed(2)}%). Increased base bonus from ${currentVal} to ${newVal}.\n`;
+        changed = true;
+      }
+    }
+  }
+
+  // Check economy
+  if (avgEconomy < -50000) {
+      const ecoFile = require('path').join(process.cwd(), "src/data/economyConstants.ts");
+      if (fs.existsSync(ecoFile)) {
+         let ecoContent = fs.readFileSync(ecoFile, "utf-8");
+         const fightPurseMatch = ecoContent.match(/export const FIGHT_PURSE = ([0-9.]+);/);
+         if (fightPurseMatch) {
+             const val = parseFloat(fightPurseMatch[1]);
+             const newVal = val + 20;
+             ecoContent = ecoContent.replace(`export const FIGHT_PURSE = ${val};`, `export const FIGHT_PURSE = ${newVal};`);
+             fs.writeFileSync(ecoFile, ecoContent);
+             commitMessage += `- Average economy is negative (${avgEconomy.toFixed(0)} gold). Increased FIGHT_PURSE from ${val} to ${newVal}.\n`;
+             changed = true;
+         }
+      }
+  } else if (avgEconomy > 50000) {
+      const ecoFile = require('path').join(process.cwd(), "src/data/economyConstants.ts");
+      if (fs.existsSync(ecoFile)) {
+         let ecoContent = fs.readFileSync(ecoFile, "utf-8");
+         const fightPurseMatch = ecoContent.match(/export const FIGHT_PURSE = ([0-9.]+);/);
+         if (fightPurseMatch) {
+             const val = parseFloat(fightPurseMatch[1]);
+             const newVal = Math.max(10, val - 20);
+             ecoContent = ecoContent.replace(`export const FIGHT_PURSE = ${val};`, `export const FIGHT_PURSE = ${newVal};`);
+             fs.writeFileSync(ecoFile, ecoContent);
+             commitMessage += `- Average economy is too high (${avgEconomy.toFixed(0)} gold). Decreased FIGHT_PURSE from ${val} to ${newVal}.\n`;
+             changed = true;
+         }
+      }
+  }
+
   if (changed) {
     fs.writeFileSync(CONSTANTS_FILE, constantsContent);
     console.log("\nApplied autonomous balance tweaks.");
     console.log("Commit Message:\n");
     console.log(commitMessage);
+
+    try {
+        const { execSync } = require("child_process");
+        execSync("git add src/engine/combat/combatConstants.ts src/data/economyConstants.ts Autobalance_Report.md || true");
+        execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
+        console.log("Committed to git successfully.");
+    } catch (e) {
+        console.error("Git commit failed:", e.message);
+    }
   } else {
     console.log("\nNo autonomous balance tweaks required. Meta is stable.");
     commitMessage = "chore(balance): autonomous engine found meta stable.\n\nNo tweaks required.\n";

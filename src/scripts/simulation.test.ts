@@ -1,6 +1,3 @@
-import { vi } from "vitest";
-import { vi } from "vitest";
-import { vi } from "vitest";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { runSimulation } from "./simulation-harness";
 import { formatPulseTable } from "@/engine/stats/simulationMetrics";
