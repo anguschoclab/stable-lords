@@ -232,7 +232,8 @@ export function generateWeeklyGazette(
   const gh = narrativeContent.gazette.headlines;
   let headline: string;
   if (hotStreakers.length > 0) {
-    const top = hotStreakers.sort((a, b) => b.streak - a.streak)[0];
+    // ⚡ Bolt: Reduced O(N log N) sort to O(N) single-pass reduce to find the max streak.
+    const top = hotStreakers.reduce((max, curr) => curr.streak > max.streak ? curr : max, hotStreakers[0]);
     if (top.streak >= 10) {
       headline = t(gh.LegendaryStreak, { week, name: top.name, streak: top.streak });
     } else if (top.streak >= 7) {

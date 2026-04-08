@@ -30,7 +30,8 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
   if (eligible.length === 0) return state;
 
   // 1. Warrior of the Year (Most Wins delta)
-  const woty = [...eligible].sort((a, b) => b.wins - a.wins || b.fame - a.fame)[0];
+  // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to track max wins.
+  const woty = eligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max, eligible[0]);
   if (woty && woty.wins > 0) {
     const award: AnnualAward = {
       year: prevYear,
@@ -46,7 +47,8 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
   }
 
   // 2. Killer of the Year (Most Kills delta)
-  const koty = [...eligible].sort((a, b) => b.kills - a.kills || b.wins - a.wins)[0];
+  // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to track max kills.
+  const koty = eligible.reduce((max, curr) => (curr.kills > max.kills || (curr.kills === max.kills && curr.wins > max.wins)) ? curr : max, eligible[0]);
   if (koty && koty.kills > 0) {
     const award: AnnualAward = {
       year: prevYear,
@@ -64,7 +66,8 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
   // 3. Class MVPs (10 Styles)
   Object.values(FightingStyle).forEach(style => {
     const styleEligible = eligible.filter(e => e.w.style === style);
-    const mvp = styleEligible.sort((a, b) => b.wins - a.wins || b.fame - a.fame)[0];
+    // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to prevent intermediate GC pressure.
+    const mvp = styleEligible.length > 0 ? styleEligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max) : undefined;
     if (mvp && mvp.wins > 0) {
       const award: AnnualAward = {
         year: prevYear,
@@ -97,7 +100,13 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
     }
   });
 
-  const bestStable = [...stableStats.entries()].sort((a, b) => b[1].wins - a[1].wins || b[1].fame - a[1].fame)[0];
+  // ⚡ Bolt: Replaced [...stableStats.entries()].sort()[0] with O(N) iteration, saving array allocations.
+  let bestStable: [string, { name: string; wins: number; fame: number }] | undefined;
+  for (const entry of stableStats.entries()) {
+    if (!bestStable || entry[1].wins > bestStable[1].wins || (entry[1].wins === bestStable[1].wins && entry[1].fame > bestStable[1].fame)) {
+      bestStable = entry;
+    }
+  }
   if (bestStable && bestStable[1].wins > 0) {
     const award: AnnualAward = {
       year: prevYear,
