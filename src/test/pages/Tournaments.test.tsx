@@ -30,7 +30,7 @@ describe('Tournaments Page', () => {
 
   const mockState = {
     week: 1,
-    season: 'Spring',
+    season: 'Spring' as const, // Force Literal type
     roster: [mockActiveWarrior], // Only 1 active warrior, so it satisfies < 2 condition
     tournaments: [],
     rivals: []
@@ -42,13 +42,13 @@ describe('Tournaments Page', () => {
   });
 
   it('renders recruit operatives button when criteria are met', () => {
-    renderWithGameState(<Tournaments />, mockState);
+    const { getByText, getByRole } = renderWithGameState(<Tournaments />, mockState as any);
 
     // Check main title
-    expect(screen.getByText(/Seasonal Campaigns/)).toBeDefined();
+    expect(getByText(/Seasonal Campaigns/)).toBeDefined();
 
     // Check Recruit Operatives button is present when tournament is not active
-    const recruitBtn = screen.getByRole('button', { name: /RECRUIT_OPERATIVES/i });
+    const recruitBtn = getByRole('button', { name: /RECRUIT_OPERATIVES/i });
     expect(recruitBtn).toBeDefined();
   });
 

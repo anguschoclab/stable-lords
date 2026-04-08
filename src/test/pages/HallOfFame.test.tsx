@@ -1,14 +1,4 @@
-// Mock localStorage FIRST
-const localStorageMock = (function() {
-  let store: Record<string, string> = {};
-  return {
-    getItem: function(key: string) { return store[key] || null; },
-    setItem: function(key: string, value: string) { store[key] = value.toString(); },
-    removeItem: function(key: string) { delete store[key]; },
-    clear: function() { store = {}; }
-  };
-})();
-Object.defineProperty(global, 'localStorage', { value: localStorageMock, writable: true });
+// Test utilities
 
 import "../setup";
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -101,23 +91,23 @@ describe("HallOfFame Component", () => {
   });
 
   it("renders the inductees correctly", async () => {
-    renderWithGameState(<HallOfFame />, mockState);
+    const { container } = renderWithGameState(<HallOfFame />, mockState);
 
     // Check that we're showing the correct year section
-    expect(await screen.findByText(/Year 1 Accolades/i)).toBeInTheDocument();
+    expect(within(container).getByText(/Year 1 Accolades/i)).toBeInTheDocument();
 
     // Check for the warriors
-    expect((await screen.findAllByText("Gladiator")).length).toBeGreaterThan(0);
-    expect((await screen.findAllByText("Reaper")).length).toBeGreaterThan(0);
-    expect((await screen.findAllByText("The Mountain")).length).toBeGreaterThan(0);
+    expect(within(container).getAllByText("Gladiator").length).toBeGreaterThan(0);
+    expect(within(container).getAllByText("Reaper").length).toBeGreaterThan(0);
+    expect(within(container).getAllByText("The Mountain").length).toBeGreaterThan(0);
   });
 
   it("identifies and displays the best fight correctly", async () => {
-    renderWithGameState(<HallOfFame />, mockState);
+    const { getAllByText } = renderWithGameState(<HallOfFame />, mockState);
 
     // Find the 'Reaper' card directly
-    const reaperElement = await screen.findByText("Reaper");
-    const reaperCard = (reaperElement as HTMLElement).closest("[data-testid='inductee-card']")!;
+    const reaperElements = getAllByText("Reaper");
+    const reaperCard = (reaperElements[0] as HTMLElement).closest("[data-testid='inductee-card']")!;
     expect(reaperCard).not.toBeNull();
 
     // Within the card, look for the 'Greatest Fight' section block

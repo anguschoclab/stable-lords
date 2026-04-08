@@ -1,12 +1,7 @@
 import { describe, it, expect, vi, beforeEach , Mock} from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AdminTools from '../../pages/AdminTools';
-import { useGameStore } from '@/state/useGameStore';
-
-// Mock the context hook
-vi.mock('@/state/useGameStore', () => ({
-  useGameStore: vi.fn()
-}));
+import { renderWithGameState } from '../testUtils';
 
 describe('AdminTools Page', () => {
   const mockSetState = vi.fn();
@@ -34,15 +29,10 @@ describe('AdminTools Page', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useGameStore as unknown as Mock).mockReturnValue({
-      ...mockState,
-      setState: mockSetState,
-      doReset: mockDoReset
-    });
   });
 
   it('renders all administrative panels', () => {
-    render(<AdminTools />);
+    renderWithGameState(<AdminTools />, { ...mockState, setState: mockSetState, doReset: mockDoReset } as any);
 
     // Check main title
     expect(screen.getByText('Admin_Interface')).toBeDefined();
@@ -54,7 +44,7 @@ describe('AdminTools Page', () => {
   });
 
   it('provides buttons for time skipping', () => {
-    render(<AdminTools />);
+    renderWithGameState(<AdminTools />, { ...mockState, setState: mockSetState, doReset: mockDoReset } as any);
 
     const skipWeekBtn = screen.getByRole('button', { name: /Advance 1 Week/i });
     expect(skipWeekBtn).toBeDefined();
@@ -68,7 +58,7 @@ describe('AdminTools Page', () => {
   });
 
   it('provides button for hard reset', () => {
-    render(<AdminTools />);
+    renderWithGameState(<AdminTools />, { ...mockState, setState: mockSetState, doReset: mockDoReset } as any);
 
     const resetBtn = screen.getByRole('button', { name: /Wipe_All_Data/i });
     expect(resetBtn).toBeDefined();
@@ -79,7 +69,7 @@ describe('AdminTools Page', () => {
   });
 
   it('provides button to skip FTUE', () => {
-    render(<AdminTools />);
+    renderWithGameState(<AdminTools />, { ...mockState, setState: mockSetState, doReset: mockDoReset } as any);
     const skipFtueBtn = screen.getByRole('button', { name: /Bypass FTUE/i });
     expect(skipFtueBtn).toBeDefined();
 
@@ -94,7 +84,7 @@ describe('AdminTools Page', () => {
   });
 
   it('renders a JSON state dump', () => {
-    render(<AdminTools />);
+    renderWithGameState(<AdminTools />, { ...mockState, setState: mockSetState, doReset: mockDoReset } as any);
     expect(screen.getByText(/"week": 1/)).toBeDefined();
     expect(screen.getByText(/"treasury": 500/)).toBeDefined();
   });
