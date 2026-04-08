@@ -200,8 +200,8 @@ describe("Autosim Integration", () => {
       expect(result.finalState.ledger.length).toBeGreaterThan(0);
 
       // Gold should be a valid number
-      expect(typeof result.finalState.gold).toBe("number");
-      expect(isFinite(result.finalState.gold)).toBe(true);
+      expect(typeof result.finalState.treasury).toBe("number");
+      expect(isFinite(result.finalState.treasury)).toBe(true);
     });
   });
 

@@ -128,7 +128,7 @@ function generateAIRecruit(rival: RivalStableData, week: number, meta?: StyleMet
   const name = `${rng.pick(prefixes)}${rng.pick(suffixes)}`;
 
   return {
-    id: rng.uuid("war"),
+    id: rng.uuid("warrior"),
     name,
     style,
     attributes: attrs,

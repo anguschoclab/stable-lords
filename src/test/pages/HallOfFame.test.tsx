@@ -10,6 +10,7 @@ const localStorageMock = (function() {
 })();
 Object.defineProperty(global, 'localStorage', { value: localStorageMock, writable: true });
 
+import "../setup";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import HallOfFame from "@/pages/HallOfFame";
@@ -17,7 +18,6 @@ import { renderWithGameState } from "../testUtils";
 import { createFreshState } from "@/engine/factories";
 import { FightingStyle } from "@/types/game";
 import type { GameState, FightSummary, NewsletterItem, Warrior } from "@/types/game";
-import "../setup";
 
 // Must mock the module before importing it inside components
 vi.mock("@/engine/history/arenaHistory", () => {
@@ -40,7 +40,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 
 // Utility to create a dummy warrior
-function createDummyWarrior(name: string, status: Warrior["status"], wins: number, losses: number, fame: number): Warrior {
+function createDummyWarrior(name: string, status: Warrior["status"], wins: number, losses: number, fame: number, overrides?: Partial<Warrior>): Warrior {
   return {
     id: name,
     name,
@@ -55,13 +55,15 @@ function createDummyWarrior(name: string, status: Warrior["status"], wins: numbe
     injuries: [],
     flair: [],
     champion: false,
-  } as unknown;
+    ...overrides,
+  } as Warrior;
 }
 
 describe("HallOfFame Component", () => {
   let mockState: GameState;
 
   const mockNewsletter: NewsletterItem = {
+    id: "news-1",
     week: 52,
     title: "Year 1 Hall of Fame", // Must include "Hall of Fame"
     items: [
@@ -72,10 +74,10 @@ describe("HallOfFame Component", () => {
   };
 
   const fight1: FightSummary = {
-    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
+    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", warriorIdA: "Reaper", warriorIdD: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
   const fight2: FightSummary = {
-    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
+    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", warriorIdA: "Reaper", warriorIdD: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
   };
 
   beforeEach(() => {
@@ -83,11 +85,15 @@ describe("HallOfFame Component", () => {
     mockState.week = 53; // ensure it's past week 52 for year calculation
     mockState.newsletter = [mockNewsletter];
 
-    // Add warriors to roster so they can be matched
     mockState.roster = [
       createDummyWarrior("Gladiator", "Active", 30, 5, 150),
       createDummyWarrior("Reaper", "Active", 20, 5, 120),
       createDummyWarrior("The Mountain", "Active", 15, 0, 90),
+    ];
+
+    mockState.awards = [
+      { year: 1, type: "WARRIOR_OF_YEAR", warriorId: "Gladiator", reason: "Dominance", value: 100 },
+      { year: 1, type: "KILLER_OF_YEAR", warriorId: "Reaper", reason: "Lethality", value: 50 }
     ];
 
     // Setup ArenaHistory mock
@@ -98,7 +104,7 @@ describe("HallOfFame Component", () => {
     renderWithGameState(<HallOfFame />, mockState);
 
     // Check that we're showing the correct year section
-    expect(await screen.findByText("Year 1 Inductees")).toBeInTheDocument();
+    expect(await screen.findByText(/Year 1 Accolades/i)).toBeInTheDocument();
 
     // Check for the warriors
     expect((await screen.findAllByText("Gladiator")).length).toBeGreaterThan(0);
@@ -109,11 +115,9 @@ describe("HallOfFame Component", () => {
   it("identifies and displays the best fight correctly", async () => {
     renderWithGameState(<HallOfFame />, mockState);
 
-    // The Reaper card should show their best fight: "Reaper vs Victim" (kill) instead of "Reaper vs Victim2" (KO)
-    // Find all 'Reaper' text instances and look for the one in a header/card context
-    const reaperElements = await screen.findAllByText("Reaper");
-    const reaperElement = reaperElements.find(el => el.tagName === 'SPAN' || el.tagName === 'H3' || el.closest(".rounded-lg"))!;
-    const reaperCard = reaperElement.closest(".rounded-lg")!;
+    // Find the 'Reaper' card directly
+    const reaperElement = await screen.findByText("Reaper");
+    const reaperCard = (reaperElement as HTMLElement).closest("[data-testid='inductee-card']")!;
     expect(reaperCard).not.toBeNull();
 
     // Within the card, look for the 'Greatest Fight' section block

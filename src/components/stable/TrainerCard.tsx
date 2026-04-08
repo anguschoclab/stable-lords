@@ -4,8 +4,8 @@ import { Surface } from "@/components/ui/Surface";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { GraduationCap, UserMinus, Sparkles, Clock, Target, Trophy, ChevronRight, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { TrainerData, TrainerFocus, TrainerTier } from "@/types/game";
-import { STYLE_DISPLAY_NAMES } from "@/types/game";
+import type { Trainer as TrainerData, TrainerFocus, TrainerTier } from "@/types/state.types";
+import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import { FOCUS_ICONS, FOCUS_DESCRIPTIONS, TIER_BONUS } from "@/engine/trainers";
 
 const TIER_ACCENTS: Record<string, string> = {
@@ -36,6 +36,7 @@ export function TrainerCard({
     <Surface
       variant={trainer.tier === "Master" ? "paper" : "glass"}
       padding="none"
+      data-testid="trainer-card"
       className={cn(
         "transition-all duration-300 group overflow-hidden border",
         trainer.tier === "Master" ? "border-arena-gold/40 shadow-[0_0_30px_rgba(255,215,0,0.05)]" : "border-white/5 hover:border-white/20"

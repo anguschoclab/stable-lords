@@ -86,7 +86,7 @@ export function processRecruitment(
       remainingPool.splice(bestIdx, 1);
 
       const newWarrior: Warrior = {
-        id: generateId(rng, "war"),
+        id: generateId(rng, "warrior"),
         name: recruit.name,
         style: recruit.style,
         attributes: { ...recruit.attributes },

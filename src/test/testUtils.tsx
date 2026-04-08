@@ -29,8 +29,12 @@ export function renderWithGameState(ui: React.ReactElement, partialState: Partia
     ...partialState,
   };
 
-  // Set the state in the store directly
-  useGameStore.setState({ state: mockState, atTitleScreen: false } as any);
+  // Set the state in the store directly (Zustand is now a flat modular store)
+  useGameStore.setState({ 
+    ...mockState, 
+    atTitleScreen: false,
+    isInitialized: true 
+  } as any);
 
   return render(
     <TooltipProvider>

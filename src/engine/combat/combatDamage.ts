@@ -110,7 +110,7 @@ export function calculateKillWindow(
 ): number {
   // Base threshold (lethal hits are rare but possible)
   // Target: ~10% overall mortality across the league (Unified 1.0 Gold Baseline)
-  let threshold = 0.012; 
+  let threshold = 0.065; 
 
   // HP factor: higher chance if HP is low (below 30%)
   if (hpRatio < 0.3) threshold += 0.012;

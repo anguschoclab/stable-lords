@@ -14,7 +14,7 @@ export function archiveWeekLogs(state: GameState): GameState {
     if (summary.transcript && summary.transcript.length > 0) {
       stateModified = true;
       const seasonNum = seasonToNumber(state.season);
-      opfs.archiveBoutLog(seasonNum, summary.id, summary.transcript).catch(err => {
+      opfs.archiveBoutLog(seasonNum, summary.id, summary.transcript, true).catch(err => {
         console.error(`Failed to background archive bout ${summary.id}:`, err);
       });
       return { ...summary, transcript: undefined };

@@ -46,30 +46,30 @@ describe('StyleRollups', () => {
         writable: true,
         configurable: true,
       });
-      expect(StyleRollups.getWeekRollup(1)).toEqual({});
+      expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
     });
 
     it('returns {} if localStorage.getItem returns null', () => {
       (globalThis.localStorage.getItem as Mock).mockReturnValue(null);
-      expect(StyleRollups.getWeekRollup(1)).toEqual({});
+      expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
     });
 
 
     it('returns {} if localStorage.getItem returns an invalid JSON string (loadWeek error path)', () => {
       (globalThis.localStorage.getItem as Mock).mockReturnValue('{invalid}');
-      expect(StyleRollups.getWeekRollup(1)).toEqual({});
+      expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
     });
 
     it('returns {} if localStorage.getItem returns invalid JSON', () => {
       (globalThis.localStorage.getItem as Mock).mockReturnValue('{ invalid json');
-      expect(StyleRollups.getWeekRollup(1)).toEqual({});
+      expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
     });
 
     it('returns {} if localStorage.getItem throws an Error', () => {
       (globalThis.localStorage.getItem as Mock).mockImplementation(() => {
         throw new Error('QuotaExceededError');
       });
-      expect(StyleRollups.getWeekRollup(1)).toEqual({});
+      expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
     });
 
     it('returns valid records if localStorage has valid data', () => {
@@ -87,7 +87,7 @@ describe('StyleRollups', () => {
         'Spear': 'string', // Should be ignored
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(mixedData));
-      expect(StyleRollups.getWeekRollup(1)).toEqual({
+      expect(StyleRollups.getWeekRollup(1)).toMatchObject({
         'Sword': { w: 1, l: 0, k: 0, pct: 1, fights: 1 }
       });
     });

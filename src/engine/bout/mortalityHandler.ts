@@ -21,7 +21,7 @@ export function handleDeath(
   const victim = outcome.winner === "A" ? wD : wA;
   const isPlayerVictim = (outcome.winner === "A" && !!rivalStableId) ? false : (outcome.winner !== "A");
   
-  const boutId = generateId(rng, "bout-");
+  const boutId = generateId(rng, "bout");
   const narrative = generateFightNarrative({ 
     id: boutId, week, a: wA.name, d: wD.name, 
     warriorIdA: wA.id, warriorIdD: wD.id,
@@ -63,8 +63,7 @@ export function handleDeath(
     title: `DEATH: ${victim.name} in the Arena`, phase: "resolution"
   };
   
-  nextS.arenaHistory = [...nextS.arenaHistory, deathSummary];
-  nextS.newsletter = [...(nextS.newsletter || []), { id: generateId(rng, "news-"), week, title: "Arena Obituary", items: [narrative] }];
+  nextS.newsletter = [...(nextS.newsletter || []), { id: generateId(rng, "newsletter"), week, title: "Arena Obituary", items: [narrative] }];
   
   // Decoupled notification
   engineEventBus.emit({ 

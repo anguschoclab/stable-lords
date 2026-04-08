@@ -229,7 +229,7 @@ describe("Week Advancement Integration", () => {
       expect(state.ledger.length).toBeGreaterThan(initialLedgerLength);
     });
 
-    it("should maintain gold balance over time", () => {
+    it("should maintain treasury balance over time", () => {
       let state = initialState;
       
       for (let i = 0; i < 20; i++) {

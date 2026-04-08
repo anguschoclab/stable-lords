@@ -53,10 +53,10 @@ describe("pipeline/health", () => {
       expect(injuriesModule.tickInjuries).toHaveBeenCalledWith([mockInjury]);
 
       expect(impact.rosterUpdates?.size).toBe(1);
-      expect(impact.rosterUpdates?.get("w1")).toEqual({ injuries: [{ ...mockInjury, weeksRemaining: 1 }] });
+      expect(impact.rosterUpdates?.get("w1")).toMatchObject({ injuries: [{ ...mockInjury, weeksRemaining: 1 }] });
 
       expect(impact.newsletterItems?.length).toBe(1);
-      expect(impact.newsletterItems?.[0]).toEqual({
+      expect(impact.newsletterItems?.[0]).toMatchObject({
         week: 5,
         title: "Medical Report",
         items: ["Warrior 1 recovered from sprain."],

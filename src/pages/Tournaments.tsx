@@ -130,7 +130,7 @@ export default function Tournaments() {
 
         draftBout.winner = outcome.winner;
         draftBout.by = outcome.by;
-        draftBout.fightId = generateId(boutRng, "tf");
+        draftBout.fightId = generateId(boutRng, "bout");
         draftBout.warriorIdA = wA.id;
         draftBout.warriorIdD = wD.id;
 
@@ -305,7 +305,7 @@ export default function Tournaments() {
 
           bout.winner = outcome.winner;
           bout.by = outcome.by;
-          bout.fightId = generateId(boutRng, "tf");
+          bout.fightId = generateId(boutRng, "bout");
           bout.warriorIdA = wA.id;
           bout.warriorIdD = wD.id;
 

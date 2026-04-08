@@ -156,38 +156,38 @@ describe("combatDamage engine", () => {
   describe("computeHitDamage", () => {
     it("applies head multiplier", () => {
       const rng = vi.fn().mockReturnValue(0.5); // average variance (0.85 + 0.5 * 0.3 = 1.0)
-      // base = 10 + 2 = 12
+      // base = 10 + 4 = 14
       // locMult = 1.5 (head)
-      // damage = 12 * 1.5 * 1.0 = 18
+      // damage = 14 * 1.5 * 1.0 = 21
       const result = computeHitDamage(rng, 10, "head");
-      expect(result).toBe(18);
+      expect(result).toBe(21);
     });
 
     it("applies chest multiplier", () => {
       const rng = vi.fn().mockReturnValue(0.5);
-      // base = 10 + 2 = 12
+      // base = 14
       // locMult = 1.2 (chest)
-      // damage = 12 * 1.2 * 1.0 = 14.4 -> 14
+      // damage = 14 * 1.2 * 1.0 = 16.8 -> 17
       const result = computeHitDamage(rng, 10, "chest");
-      expect(result).toBe(14);
+      expect(result).toBe(17);
     });
 
     it("applies abdomen multiplier", () => {
       const rng = vi.fn().mockReturnValue(0.5);
-      // base = 10 + 2 = 12
+      // base = 14
       // locMult = 1.1 (abdomen)
-      // damage = 12 * 1.1 * 1.0 = 13.2 -> 13
+      // damage = 14 * 1.1 * 1.0 = 15.4 -> 15
       const result = computeHitDamage(rng, 10, "abdomen");
-      expect(result).toBe(13);
+      expect(result).toBe(15);
     });
 
     it("applies limb multiplier", () => {
       const rng = vi.fn().mockReturnValue(0.5);
-      // base = 10 + 2 = 12
+      // base = 14
       // locMult = 1.0 (limb)
-      // damage = 12 * 1.0 * 1.0 = 12
+      // damage = 14 * 1.0 * 1.0 = 14
       const result = computeHitDamage(rng, 10, "right arm");
-      expect(result).toBe(12);
+      expect(result).toBe(14);
     });
 
     it("respects variance range", () => {
@@ -196,13 +196,13 @@ describe("combatDamage engine", () => {
 
       const rngMin = vi.fn().mockReturnValue(0);
       const resMin = computeHitDamage(rngMin, baseClass, "right arm");
-      // 12 * 1.0 * 0.70 = 8.4 -> 8
-      expect(resMin).toBe(8);
+      // 14 * 1.0 * 0.70 = 9.8 -> 10
+      expect(resMin).toBe(10);
 
       const rngMax = vi.fn().mockReturnValue(0.9999);
       const resMax = computeHitDamage(rngMax, baseClass, "right arm");
-      // 12 * 1.0 * 1.30 = 15.6 -> 16
-      expect(resMax).toBe(16);
+      // 14 * 1.0 * 1.30 = 18.2 -> 18
+      expect(resMax).toBe(18);
     });
 
     it("minimum damage is 1", () => {

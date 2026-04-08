@@ -32,7 +32,7 @@ export const TournamentSelectionService = {
   /**
    * Generates all 4 seasonal tournaments using the committee selection logic.
    */
-  generateSeasonalTiers(state: GameState, week: number, season: string, seed: number): TournamentEntry[] {
+  generateSeasonalTiers(state: GameState, week: number, season: Season, seed: number): TournamentEntry[] {
     const rng = new SeededRNG(seed);
     const tournaments: TournamentEntry[] = [];
     const lockedWarriorIds = new Set<string>();
@@ -126,7 +126,7 @@ export const TournamentSelectionService = {
   },
 
   buildTournament(tierId: string, tierName: string, warriors: Warrior[], week: number, season: Season, rng: SeededRNG): TournamentEntry {
-    const id = `t-${tierId.toLowerCase()}-${season.id}-${week}`;
+    const id = `t-${tierId.toLowerCase()}-${season.toLowerCase()}-${week}`;
     const shuffled = rng.shuffle([...warriors]);
     const bracket: TournamentBout[] = [];
     
@@ -198,7 +198,7 @@ export const TournamentSelectionService = {
       
       bout.winner = outcome.winner;
       bout.by = outcome.by;
-      bout.fightId = rng.uuid("bout-");
+      bout.fightId = rng.uuid("bout");
       
       winners.push(outcome.winner === "A" ? { id: wA.id, name: wA.name, stableId: wA.stableId } : { id: wD.id, name: wD.name, stableId: wD.stableId });
       losers.push(outcome.winner === "A" ? { id: wD.id, name: wD.name, stableId: wD.stableId } : { id: wA.id, name: wA.name, stableId: wA.stableId });
@@ -309,7 +309,7 @@ export const TournamentSelectionService = {
       if (isPlayer) {
         updatedState.treasury += prizeGold;
         updatedState.ledger.push({ 
-          id: awardRng.uuid("ledger-"),
+          id: awardRng.uuid("ledger"),
           week: updatedState.week, 
           label: `${tournament.name} (${place}${place === 1 ? 'st' : place === 2 ? 'nd' : 'rd'})`, 
           amount: prizeGold, 
@@ -323,7 +323,7 @@ export const TournamentSelectionService = {
         } else if (place === 2) {
           // Add Weapon Token
           updatedState.insightTokens = [...(updatedState.insightTokens || []), {
-            id: awardRng.uuid("insight-"),
+            id: awardRng.uuid("insight"),
             type: "Weapon",
             warriorId: "",
             warriorName: "Unassigned",
@@ -333,7 +333,7 @@ export const TournamentSelectionService = {
         } else if (place === 3) {
           // Add Rhythm Token
           updatedState.insightTokens = [...(updatedState.insightTokens || []), {
-            id: awardRng.uuid("insight-"),
+            id: awardRng.uuid("insight"),
             type: "Rhythm",
             warriorId: "",
             warriorName: "Unassigned",
@@ -349,9 +349,9 @@ export const TournamentSelectionService = {
       }
     };
 
-    award(first, 1, rng);
-    award(second, 2, rng);
-    if (third) award(third, 3, rng);
+    award(first, 1, awardRng);
+    award(second, 2, awardRng);
+    if (third) award(third, 3, awardRng);
 
     return updatedState;
   },
@@ -438,7 +438,7 @@ export const TournamentSelectionService = {
     const updatedState = { ...state };
 
     const summary: import("@/types/state.types").FightSummary = {
-      id: rng.uuid("bout-"),
+      id: rng.uuid("bout"),
       week: state.week,
       phase: "resolution" as const,
       tournamentId: tId,

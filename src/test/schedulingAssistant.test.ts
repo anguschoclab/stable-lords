@@ -26,7 +26,7 @@ describe("Scheduling Assistant Engine", () => {
         const rivalData: RivalStableData[] = [{
             owner: { id: "rival1", name: "Rival Owner", stableName: "Rival Stable", fame: 0, renown: 0, titles: 0 },
             roster: rivalWarriors,
-            gold: 1000
+            treasury: 1000
         }];
 
         return {
@@ -36,7 +36,7 @@ describe("Scheduling Assistant Engine", () => {
             player: { id: "p1", name: "Player", stableName: "Player Stable", fame: 0, renown: 0, titles: 0 },
             fame: 0,
             popularity: 0,
-            gold: 0,
+            treasury: 0,
             ledger: [],
             week: 1,
             phase: "planning",

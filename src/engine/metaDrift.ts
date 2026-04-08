@@ -59,7 +59,7 @@ export function getMetaLabel(drift: number): string {
 }
 
 export function getMetaColor(drift: number): string {
-  if (drift >= 5) return "text-arena-gold";
+  if (drift >= 5) return "text-arena-treasury";
   if (drift >= 2) return "text-arena-pop";
   if (drift <= -5) return "text-destructive";
   if (drift <= -2) return "text-arena-fame";

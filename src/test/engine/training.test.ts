@@ -43,7 +43,7 @@ function makeState(overrides?: Partial<GameState>): GameState {
     player: { id: "p1", name: "Player", stableName: "Test Stable", fame: 0, renown: 0, titles: 0 },
     fame: 0,
     popularity: 0,
-    gold: 500,
+    treasury: 500,
     ledger: [],
     week: 1,
     season: "Spring",

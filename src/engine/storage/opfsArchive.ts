@@ -5,7 +5,7 @@ export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (season: number, boutId: string, logData: string[]) => Promise<void>;
+  archiveBoutLog: (season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
   retrieveBoutLog: (season: number, boutId: string) => Promise<string[] | null>;
 
   // Gazettes (Markdown)
@@ -105,7 +105,7 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(season: number, boutId: string, logData: string[]): Promise<void> {
+  async archiveBoutLog(season: number, boutId: string, logData: string[], overwrite = false): Promise<void> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return;
@@ -115,7 +115,7 @@ export class OPFSArchiveService implements ArchiveService {
       let fileHandle;
       try {
         fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
-        if (fileHandle) {
+        if (fileHandle && !overwrite) {
           throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
         }
       } catch (error: any) {

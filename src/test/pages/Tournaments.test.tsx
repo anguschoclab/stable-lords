@@ -9,10 +9,7 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
 }));
 
-// Mock useGameStore
-vi.mock('@/state/useGameStore', () => ({
-  useGameStore: vi.fn()
-}));
+// Mock context hook removed - using actual store + renderWithGameState
 
 
 describe('Tournaments Page', () => {
@@ -40,10 +37,7 @@ describe('Tournaments Page', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useGameStore as unknown as Mock).mockReturnValue({
-      state: mockState,
-      setState: mockSetState
-    });
+    // No mockReturnValue needed - renderWithGameState handles it
   });
 
   it('renders recruit operatives button when criteria are met', () => {

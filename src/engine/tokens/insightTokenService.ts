@@ -14,7 +14,7 @@ export const InsightTokenService = {
    */
   awardToken(state: GameState, type: InsightTokenType, source: string, rng?: SeededRNG): GameState {
     const newToken: InsightToken = {
-      id: generateId(rng, "ins"),
+      id: generateId(rng, "insight"),
       type,
       warriorId: "", // Initially unassigned
       warriorName: "Unassigned",

@@ -22,7 +22,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
     rivals: [
       {
         owner: { id: "r1", name: "Rival 1", stableName: "Stable 1", personality: "Aggressive" },
-        gold: 1000,
+        treasury: 1000,
         strategy: { intent: "EXPANSION", planWeeksRemaining: 4 },
         philosophy: "Brute Force",
         roster: [
@@ -48,7 +48,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
     const { updatedRivals, gazetteItems } = processAIRosterManagement(mockState as GameState);
     
     expect(updatedRivals[0].roster.length).toBe(2);
-    expect(updatedRivals[0].gold).toBe(900); 
+    expect(updatedRivals[0].treasury).toBe(900); 
     expect(gazetteItems.some(i => i.includes("recruits"))).toBe(true);
     
     vi.restoreAllMocks();
@@ -60,7 +60,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
       rivals: [
         {
           owner: { id: "r1", name: "M", stableName: "S", personality: "Methodical" },
-          gold: 200, // Lowered to prevent accidental recruitment from obscuring test results
+          treasury: 200, // Lowered to prevent accidental recruitment from obscuring test results
           strategy: { intent: "CONSOLIDATION", planWeeksRemaining: 4 },
           philosophy: "Iron Defense",
           roster: [
@@ -78,7 +78,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
     };
     
     // SeededRNG is used in the implementation, so Math.random mock may not be enough
-    // but we lowered gold to ensure no recruitment happens.
+    // but we lowered treasury to ensure no recruitment happens.
     const { updatedRivals, gazetteItems } = processAIRosterManagement(poorPerformer);
     
     expect(updatedRivals[0].roster.filter(w => w.status === "Active").length).toBe(0);
@@ -94,7 +94,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
         {
           ...mockState.rivals[0],
           strategy: { intent: "RECOVERY", planWeeksRemaining: 4 },
-          gold: 500
+          treasury: 500
         }
       ]
     };
@@ -104,7 +104,7 @@ describe("ownerRoster - processAIRosterManagement", () => {
     const { updatedRivals } = processAIRosterManagement(recoveryState);
     
     expect(updatedRivals[0].roster.length).toBe(1); // No recruitment
-    expect(updatedRivals[0].gold).toBe(500);
+    expect(updatedRivals[0].treasury).toBe(500);
     
     vi.restoreAllMocks();
   });

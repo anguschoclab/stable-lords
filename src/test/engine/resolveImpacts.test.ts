@@ -25,7 +25,7 @@ function makeWarrior(id: string, name: string): Warrior {
 
 function makeInitialState(): GameState {
   return {
-    gold: 1000,
+    treasury: 1000,
     fame: 50,
     week: 1,
     roster: [makeWarrior("w1", "Alice"), makeWarrior("w2", "Bob")],
@@ -36,16 +36,16 @@ function makeInitialState(): GameState {
 }
 
 describe("resolveImpacts", () => {
-  it("applies gold and fame deltas correctly", () => {
+  it("applies treasury and fame deltas correctly", () => {
     const state = makeInitialState();
     const impact: StateImpact = {
-      goldDelta: 500,
+      treasuryDelta: 500,
       fameDelta: -10
     };
 
     const newState = resolveImpacts(state, [impact]);
 
-    expect(newState.gold).toBe(1500);
+    expect(newState.treasury).toBe(1500);
     expect(newState.fame).toBe(40);
   });
 
@@ -83,11 +83,11 @@ describe("resolveImpacts", () => {
 
   it("handles multiple impacts correctly", () => {
     const state = makeInitialState();
-    const impact1: StateImpact = { goldDelta: 100 };
-    const impact2: StateImpact = { goldDelta: 200 };
+    const impact1: StateImpact = { treasuryDelta: 100 };
+    const impact2: StateImpact = { treasuryDelta: 200 };
 
     const newState = resolveImpacts(state, [impact1, impact2]);
 
-    expect(newState.gold).toBe(1300);
+    expect(newState.treasury).toBe(1300);
   });
 });

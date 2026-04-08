@@ -112,7 +112,7 @@ export default function Orphanage() {
     const warriors = selectedWarriors.map((pw) => {
       const potential = generatePotential(pw.attrs, "Promising", () => finishRng.next());
       const w = makeWarrior(
-        generateId(finishRng, "war"),
+        generateId(finishRng, "warrior"),
         pw.name,
         pw.style,
         pw.attrs,

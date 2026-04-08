@@ -38,7 +38,10 @@ export function InducteeCard({ warrior, title, icon, fights }: { warrior: Warrio
       whileHover={{ y: -5 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <Card className="bg-glass-card border border-border/40 hover:border-arena-gold/40 transition-all duration-500 overflow-hidden relative group">
+      <Card 
+        data-testid="inductee-card"
+        className="bg-glass-card border border-border/40 hover:border-arena-gold/40 transition-all duration-500 overflow-hidden relative group"
+      >
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-arena-gold/60 via-arena-gold/20 to-transparent opacity-40 group-hover:opacity-100 transition-opacity" />
         
         <CardContent className="p-6 space-y-5">

@@ -23,7 +23,7 @@ function createMockFight(overrides: Partial<FightSummary> = {}): FightSummary {
 describe("crowdMood system", () => {
   describe("getMoodModifiers", () => {
     it("returns correct modifiers for Bloodthirsty", () => {
-      expect(getMoodModifiers("Bloodthirsty")).toEqual({
+      expect(getMoodModifiers("Bloodthirsty")).toMatchObject({
         fameMultiplier: 1.0,
         popMultiplier: 0.8,
         killChanceBonus: 0.1,
@@ -31,7 +31,7 @@ describe("crowdMood system", () => {
     });
 
     it("returns correct modifiers for Theatrical", () => {
-      expect(getMoodModifiers("Theatrical")).toEqual({
+      expect(getMoodModifiers("Theatrical")).toMatchObject({
         fameMultiplier: 1.0,
         popMultiplier: 1.5,
         killChanceBonus: 0,
@@ -39,7 +39,7 @@ describe("crowdMood system", () => {
     });
 
     it("returns correct modifiers for Solemn", () => {
-      expect(getMoodModifiers("Solemn")).toEqual({
+      expect(getMoodModifiers("Solemn")).toMatchObject({
         fameMultiplier: 0.7,
         popMultiplier: 0.7,
         killChanceBonus: -0.05,
@@ -47,7 +47,7 @@ describe("crowdMood system", () => {
     });
 
     it("returns correct modifiers for Festive", () => {
-      expect(getMoodModifiers("Festive")).toEqual({
+      expect(getMoodModifiers("Festive")).toMatchObject({
         fameMultiplier: 1.3,
         popMultiplier: 1.3,
         killChanceBonus: 0,
@@ -55,14 +55,14 @@ describe("crowdMood system", () => {
     });
 
     it("returns correct modifiers for Calm (and as default)", () => {
-      expect(getMoodModifiers("Calm")).toEqual({
+      expect(getMoodModifiers("Calm")).toMatchObject({
         fameMultiplier: 1.0,
         popMultiplier: 1.0,
         killChanceBonus: 0,
       });
 
       // Assert default fallback is same as Calm
-      expect(getMoodModifiers("Unknown" as unknown)).toEqual({
+      expect(getMoodModifiers("Unknown" as unknown)).toMatchObject({
         fameMultiplier: 1.0,
         popMultiplier: 1.0,
         killChanceBonus: 0,

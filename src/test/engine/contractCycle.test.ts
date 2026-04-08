@@ -47,7 +47,7 @@ describe("Contract System Cycle", () => {
     if (!offer) return; // Skip if no player offer generated in this seed
 
     const playerWarriorId = s.roster.find(w => offer.warriorIds.includes(w.id))!.id;
-    const initialGold = s.gold;
+    const initialGold = s.treasury;
 
     // Sign the first offer for the player
     s = respondToBoutOffer(s, offer.id, playerWarriorId, "Accepted");
@@ -65,7 +65,7 @@ describe("Contract System Cycle", () => {
     expect(ourBout).toBeDefined();
 
     // Gold should have increased (either by purse or show fee)
-    expect(processed.state.gold).toBeGreaterThan(initialGold);
+    expect(processed.state.treasury).toBeGreaterThan(initialGold);
     
     // Contract should be cleared
     expect(processed.state.boutOffers[offer.id]).toBeUndefined();

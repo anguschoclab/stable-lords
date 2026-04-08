@@ -30,8 +30,8 @@ async function main() {
   const styleLosses: Record<string, number> = {};
 
   finalState.arenaHistory.forEach((bout) => {
-    const aStyle = bout.aStyle || "Unknown";
-    const dStyle = bout.dStyle || "Unknown";
+    const aStyle = bout.styleA || "Unknown";
+    const dStyle = bout.styleD || "Unknown";
 
     if (!styleWins[aStyle]) styleWins[aStyle] = 0;
     if (!styleLosses[aStyle]) styleLosses[aStyle] = 0;
@@ -61,7 +61,7 @@ async function main() {
   const bouts = finalState.arenaHistory.length;
   const mortalityRate = bouts > 0 ? deaths / bouts : 0;
 
-  const avgEconomy = pulses.length > 0 ? pulses.reduce((sum, p) => sum + p.playerGold, 0) / pulses.length : 0;
+  const avgEconomy = pulses.length > 0 ? pulses.reduce((sum, p) => sum + p.playerTreasury, 0) / pulses.length : 0;
 
   console.log("=== Autobalance Engine Metrics ===");
   console.log(`Mortality Rate: ${(mortalityRate * 100).toFixed(2)}%`);

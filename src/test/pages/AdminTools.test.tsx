@@ -22,18 +22,20 @@ describe('AdminTools Page', () => {
     season: 'Spring',
     year: 1,
     roster: [],
-    gold: 500,
+    treasury: 500,
     tournaments: [],
     rivals: [],
     arenaHistory: [],
     trainers: [],
     trainingAssignments: [],
+    fame: 0,
+    player: { id: "p1", name: "Player", stableName: "Dragon's Hearth", fame: 0, renown: 0, titles: 0 },
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
     (useGameStore as unknown as Mock).mockReturnValue({
-      state: mockState,
+      ...mockState,
       setState: mockSetState,
       doReset: mockDoReset
     });
@@ -78,16 +80,22 @@ describe('AdminTools Page', () => {
 
   it('provides button to skip FTUE', () => {
     render(<AdminTools />);
-    const skipFtueBtn = screen.getByRole('button', { name: /Bypass_FTUE_Gate/i });
+    const skipFtueBtn = screen.getByRole('button', { name: /Bypass FTUE/i });
     expect(skipFtueBtn).toBeDefined();
 
     fireEvent.click(skipFtueBtn);
-    expect(mockSetState).toHaveBeenCalledWith(expect.objectContaining({ ftueComplete: true }));
+    expect(mockSetState).toHaveBeenCalled();
+    
+    // AdminTools uses a functional update: draft => { ... }
+    const draft = { ...mockState, ftueComplete: false };
+    const updater = mockSetState.mock.calls[0][0];
+    updater(draft); 
+    expect(draft.ftueComplete).toBe(true);
   });
 
   it('renders a JSON state dump', () => {
     render(<AdminTools />);
     expect(screen.getByText(/"week": 1/)).toBeDefined();
-    expect(screen.getByText(/"gold": 500/)).toBeDefined();
+    expect(screen.getByText(/"treasury": 500/)).toBeDefined();
   });
 });

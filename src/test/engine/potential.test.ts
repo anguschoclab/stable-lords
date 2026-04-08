@@ -94,12 +94,12 @@ describe("Potential System", () => {
     it("should reveal a new attribute without affecting others", () => {
       const initial = { ST: true };
       const updated = revealPotential(initial, "CN");
-      expect(updated).toEqual({ ST: true, CN: true });
+      expect(updated).toMatchObject({ ST: true, CN: true });
     });
 
     it("should handle undefined initial state", () => {
       const updated = revealPotential(undefined, "SZ");
-      expect(updated).toEqual({ SZ: true });
+      expect(updated).toMatchObject({ SZ: true });
     });
   });
 

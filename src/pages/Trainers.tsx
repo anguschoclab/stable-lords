@@ -35,6 +35,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
 import { TrainerCard } from "@/components/stable/TrainerCard";
 import { canTransact } from "@/utils/economyUtils";
+import { generateId } from "@/utils/idUtils";
+import { SeededRNG } from "@/utils/random";
 import { toast } from "sonner";
 
 export default function Trainers() {
@@ -81,7 +83,7 @@ export default function Trainers() {
         draft.hiringPool = draft.hiringPool.filter((t) => t.id !== trainer.id);
         draft.treasury -= cost;
         draft.ledger.push({
-          id: crypto.randomUUID(),
+          id: generateId(new SeededRNG(Date.now()), "ledger"),
           week: draft.week,
           label: `Acquisition: ${trainer.name}`,
           amount: -cost,

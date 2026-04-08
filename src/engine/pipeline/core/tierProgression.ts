@@ -57,7 +57,7 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
     s.newsletter = [
       ...s.newsletter, 
       { 
-        id: generateId(rng, "news-"),
+        id: generateId(rng, "newsletter"),
         week: newWeek, 
         title: "Stable Rankings Update", 
         items: promotionNews 

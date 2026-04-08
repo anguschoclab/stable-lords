@@ -15,10 +15,7 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import Trainers from "@/pages/Trainers";
 import { renderWithGameState } from "../testUtils";
 import { createFreshState } from "@/engine/factories";
-import type { GameState, TrainerData } from "@/types/game";
-import "../setup";
-import { useGameStore } from "@/state/useGameStore";
-
+import type { GameState, Trainer as TrainerData } from "@/types/state.types";
 // Mock the router components
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
@@ -44,6 +41,7 @@ describe("Trainers Component", () => {
     name: "Master Splinter",
     tier: "Master",
     focus: "Aggression",
+    age: 45,
     fame: 10,
     contractWeeksLeft: 8,
   };
@@ -53,13 +51,14 @@ describe("Trainers Component", () => {
     name: "Coach Rocky",
     tier: "Seasoned",
     focus: "Defense",
+    age: 38,
     fame: 5,
     contractWeeksLeft: 12,
   };
 
   beforeEach(() => {
     mockState = createFreshState("test-seed");
-    mockState.gold = 500;
+    mockState.treasury = 500;
 
     // Seed trainers
     mockState.trainers = [dummyTrainer];
@@ -91,8 +90,7 @@ describe("Trainers Component", () => {
     renderWithGameState(<Trainers />, mockState);
 
     // Find the current trainer card
-    const staffElement = (await screen.findAllByText("Master Splinter"))[0];
-    const trainerCard = staffElement.closest(".rounded-xl")!;
+    const trainerCard = (await screen.findAllByTestId("trainer-card")).find(el => el.textContent?.includes("Master Splinter"))!;
 
     // The fire button now uses aria-label="Release Trainer"
     const fireBtn = within(trainerCard as HTMLElement).getByLabelText(/release trainer/i);
@@ -105,16 +103,20 @@ describe("Trainers Component", () => {
   it("allows hiring a trainer", async () => {
     renderWithGameState(<Trainers />, mockState);
 
-    // Find the hiring pool trainer container
-    const poolElement = (await screen.findAllByText("Coach Rocky"))[0];
-    const poolRow = poolElement.closest(".flex-1")!; // Container for the card content
+    // Find the tab content for hire
+    const hireTab = screen.getByTestId("tab-content-hire");
+    
+    // Find the trainer card within that tab
+    const rockies = within(hireTab).getAllByText("Coach Rocky");
+    const trainerCard = rockies[0].closest("[data-testid='trainer-card']")!;
+    expect(trainerCard).not.toBeNull();
 
     // Find and click the Secure Contract button.
-    const hireBtn = within(poolRow.parentElement as HTMLElement).getByRole("button", { name: /Secure_Contract/i });
+    const hireBtn = within(trainerCard as HTMLElement).getByText(/Secure_Contract/i);
     fireEvent.click(hireBtn);
 
-    // Test that the button within the pool row is gone
-    expect(within(poolRow.parentElement as HTMLElement).queryByRole("button", { name: /Secure_Contract/i })).not.toBeInTheDocument();
+    // Test that the card is moved (it should be removed from the hire tab)
+    expect(within(hireTab).queryByText("Coach Rocky")).not.toBeInTheDocument();
   });
 
 });

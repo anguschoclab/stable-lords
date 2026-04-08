@@ -1,6 +1,7 @@
 import { GameState, Warrior, BoutOffer } from "@/types/state.types";
 import { type FightOutcome } from "@/types/combat.types";
-import { simulateFight, defaultPlanForWarrior, fameFromTags } from "@/engine";
+import { simulateFight, defaultPlanForWarrior } from "@/engine/simulate";
+import { fameFromTags } from "@/engine/fame";
 import { computeCrowdMood, getMoodModifiers } from "@/engine/crowdMood";
 import { updateRivalriesFromBouts } from "@/engine/matchmaking/rivalryLogic";
 import { generateWeeklyGazette } from "@/engine/gazetteNarrative";

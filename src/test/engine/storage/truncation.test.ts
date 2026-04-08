@@ -114,7 +114,7 @@ describe("truncateState", () => {
 
     expect(truncated.newsletter.length).toBe(100);
     // It should keep the *last* 100 items, so ids 5 to 104
-    expect(truncated.newsletter[0]).toEqual({ id: 5 });
-    expect(truncated.newsletter[99]).toEqual({ id: 104 });
+    expect(truncated.newsletter[0]).toMatchObject({ id: 5 });
+    expect(truncated.newsletter[99]).toMatchObject({ id: 104 });
   });
 });

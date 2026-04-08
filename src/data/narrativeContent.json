@@ -8,11 +8,6 @@
         "opener": ["The arena is quiet today, the air heavy with expectation."],
         "closer": ["A professional display by the arena's finest."]
       },
-      "Rowdy": {
-        "adjectives": ["wild", "chaotic", "unruly", "frenzied"],
-        "opener": ["The crowd is roaring, their shouts echoing against the stone walls!"],
-        "closer": ["The sand is stained deep red, and the crowd loves it."]
-      },
       "Bloodthirsty": {
         "adjectives": ["visceral", "savage", "brutal", "unforgiving"],
         "opener": ["They want blood, and the arena delivers!"],
@@ -22,6 +17,16 @@
         "adjectives": ["stunning", "operatic", "magnificent", "dramatic"],
         "opener": ["A drama unfolds on the sands today!"],
         "closer": ["A performance for the ages, etched in the memories of all who watched."]
+      },
+      "Solemn": {
+        "adjectives": ["heavy", "shadowed", "somber", "mournful"],
+        "opener": ["A heavy silence hangs over the arena walls."],
+        "closer": ["The games continue, though the air remains thick with memory."]
+      },
+      "Festive": {
+        "adjectives": ["vibrant", "energetic", "celebratory", "boisterous"],
+        "opener": ["Music and laughter fill the air as the festive games begin!"],
+        "closer": ["A day of celebration ends with hearts full and wine flowing."]
       }
     }
   },

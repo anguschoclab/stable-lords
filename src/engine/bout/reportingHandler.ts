@@ -24,7 +24,7 @@ export function handleReporting(
   rng?: () => number
 ) {
   const safeRng = rng ? { next: rng } : new SeededRNG(week * 100 + day);
-  const boutId = generateId(safeRng as SeededRNG, "bout-");
+  const boutId = generateId(safeRng as SeededRNG, "bout");
   const summary: FightSummary = { 
     id: boutId, week, title: `${wA.name} vs ${wD.name}`, a: wA.name, d: wD.name, 
     warriorIdA: wA.id, warriorIdD: wD.id,

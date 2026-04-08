@@ -109,7 +109,7 @@ describe("Meta Drift", () => {
 
   describe("getMetaColor", () => {
     it("should return correct color classes for various drift values", () => {
-      expect(getMetaColor(5)).toBe("text-arena-gold");
+      expect(getMetaColor(5)).toBe("text-arena-treasury");
       expect(getMetaColor(2)).toBe("text-arena-pop");
       expect(getMetaColor(0)).toBe("text-muted-foreground");
       expect(getMetaColor(-2)).toBe("text-arena-fame");

@@ -29,8 +29,9 @@ function t(template: string, data: Record<string, any>): string {
 
 export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType, rng?: SeededRNG): string {
   const safeRng = rng ?? new SeededRNG(fight.week * 42);
-  const tone = MOOD_TONE[mood];
-  const adj = safeRng.pick(tone.adjectives);
+  const toneResource = MOOD_TONE[mood] || MOOD_TONE["Calm"];
+  if (!MOOD_TONE[mood]) console.error(`Missing mood tone logic for: ${mood}`);
+  const adj = safeRng.pick(toneResource.adjectives);
   const winner = fight.winner === "A" ? fight.a : fight.winner === "D" ? fight.d : null;
   const loser = fight.winner === "A" ? fight.d : fight.winner === "D" ? fight.a : null;
   const g = (narrativeContent.gazette as any).fights;
@@ -147,7 +148,7 @@ export function generateWeeklyGazette(
   seed?: number
 ): GazetteStory {
   const rng = new SeededRNG(seed ?? (week * 7919 + 55));
-  const storyId = rng.uuid("gaz");
+  const storyId = rng.uuid("gazette");
   const moodKey = mood && MOOD_TONE[mood] ? mood : "Calm";
   const tone = MOOD_TONE[moodKey];
   const kills = fights.filter(f => f.by === "Kill");

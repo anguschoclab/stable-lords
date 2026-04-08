@@ -26,7 +26,7 @@ export function handleProgressions(s: GameState, wA: Warrior, wD: Warrior, outco
     if (disc.updated) {
       s.roster = updateEntityInList(s.roster, w.id, rw => ({ ...rw, favorites: w.favorites }));
       if (disc.hints.length > 0) {
-        s.newsletter = [...(s.newsletter || []), { id: generateId(discRng, "news-"), week, title: "Training Insight", items: disc.hints }];
+        s.newsletter = [...(s.newsletter || []), { id: generateId(discRng, "newsletter"), week, title: "Training Insight", items: disc.hints }];
       }
     }
   });

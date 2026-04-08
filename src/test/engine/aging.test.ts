@@ -42,7 +42,7 @@ function makeGameState(week: number, roster: Warrior[]): GameState {
     player: { id: "p1", name: "Player", stableName: "Stable", fame: 0, renown: 0, titles: 0 },
     fame: 0,
     popularity: 0,
-    gold: 0,
+    treasury: 0,
     ledger: [],
     week,
     season: "Spring",

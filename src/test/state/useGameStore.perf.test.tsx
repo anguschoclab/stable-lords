@@ -22,14 +22,15 @@ describe("useGameStore Optimization (Epic 4)", () => {
 
   it("re-renders when selected state changes", async () => {
     const onRender = vi.fn();
-    const selector = (s: any) => s.state.gold;
+    const selector = (s: any) => s.treasury;
     
     render(<RenderTracker selector={selector} onRender={onRender} />);
     expect(onRender).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      const currentState = useGameStore.getState().state;
-      useGameStore.getState().setState({ ...currentState, gold: currentState.gold + 10 });
+      useGameStore.getState().setState((draft: any) => {
+        draft.treasury += 10;
+      });
     });
 
     expect(onRender).toHaveBeenCalledTimes(2);
@@ -37,15 +38,15 @@ describe("useGameStore Optimization (Epic 4)", () => {
 
   it("does NOT re-render when unrelated state changes (with precise selector)", async () => {
     const onRender = vi.fn();
-    const selector = (s: any) => s.state.gold;
+    const selector = (s: any) => s.treasury;
     
     render(<RenderTracker selector={selector} onRender={onRender} />);
     expect(onRender).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      const currentState = useGameStore.getState().state;
-      // Change roster, but NOT gold
-      useGameStore.getState().setState({ ...currentState, week: currentState.week + 1 });
+      useGameStore.getState().setState((draft: any) => {
+        draft.week += 1;
+      });
     });
 
     // Zustand with precise selector (returning primitive) should NOT re-render
@@ -55,18 +56,18 @@ describe("useGameStore Optimization (Epic 4)", () => {
   it.skip("requires useShallow for object-returning selectors to avoid extra renders", async () => {
     const onRenderWithShallow = vi.fn();
     const onRenderWithoutShallow = vi.fn();
-    const selector = (s: any) => ({ gold: s.state.gold, week: s.state.week });
+    const selector = (s: any) => ({ treasury: s.treasury, week: s.week });
 
     const WithShallow = () => {
       const val = useGameStore(useShallow(selector));
       onRenderWithShallow();
-      return <div>{val.gold}</div>;
+      return <div>{val.treasury}</div>;
     };
 
     const WithoutShallow = () => {
       const val = useGameStore(selector);
       onRenderWithoutShallow();
-      return <div>{val.gold}</div>;
+      return <div>{val.treasury}</div>;
     };
 
     render(
@@ -80,9 +81,9 @@ describe("useGameStore Optimization (Epic 4)", () => {
     expect(onRenderWithoutShallow).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      const currentState = useGameStore.getState().state;
-      // Change something UNRELATED to both gold and week
-      useGameStore.getState().setState({ ...currentState, crowdMood: "Bloodthirsty" });
+      useGameStore.getState().setState((draft: any) => {
+        draft.crowdMood = "Bloodthirsty";
+      });
     });
 
     // WithShallow should NOT re-render because the returned object is shallowly equal

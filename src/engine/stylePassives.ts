@@ -30,6 +30,7 @@ export interface KillMechanic {
   decBonus: number;
   extendedKillWindow: boolean;
   killWindowHpMult: number;
+  killNarrative: string;
 }
 
 export interface StyleStrategy {
@@ -122,6 +123,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: ctx.targetedLocation !== "Any" ? 3 : 0,
       extendedKillWindow: ctx.hitLocation === "head",
       killWindowHpMult: 0.80,
+      killNarrative: "delivers a precise, clinical strike to a vital point!",
     }),
     getAntiSynergy: (off, def) => {
       let offMult = 1, warning;
@@ -152,6 +154,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         decBonus: momentum,
         extendedKillWindow: ctx.consecutiveHits >= 3,
         killWindowHpMult: ctx.consecutiveHits >= 3 ? 0.4 : 0.3,
+        killNarrative: "unleashes the full weight of their momentum in a crushing final blow!",
       };
     },
     getAntiSynergy: (off, def) => {
@@ -181,6 +184,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: ctx.phase === "OPENING" ? 2 : 0,
       extendedKillWindow: false,
       killWindowHpMult: 0.3,
+      killNarrative: "springs forward with a sudden, lethal thrust!",
     }),
     getAntiSynergy: (off, def) => {
       let offMult = 1, defMult = 1, warning;
@@ -204,6 +208,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
     },
     getKillMechanic: () => ({
       killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
+      killNarrative: "exploits a gap in the defense to strike home!",
     }),
     getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
   },
@@ -222,6 +227,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 2,
       extendedKillWindow: false,
       killWindowHpMult: 0.25,
+      killNarrative: "pivots around the attack and delivers a stinging riposte!",
     }),
     getAntiSynergy: (off) => {
       let offMult = 1, warning;
@@ -242,6 +248,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
     }),
     getKillMechanic: () => ({
       killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
+      killNarrative: "blocks and strikes in a single fluid motion!",
     }),
     getAntiSynergy: (off) => ({ offMult: off === "Bash" ? 0.6 : 1, defMult: 1 })
   },
@@ -263,6 +270,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 0,
       extendedKillWindow: ctx.hitsLanded >= 5,
       killWindowHpMult: ctx.hitsLanded >= 5 ? 0.35 : 0.3,
+      killNarrative: "overwhelms their foe with a flurry of precise cuts!",
     }),
     getAntiSynergy: (off, def) => {
       let offMult = 1, defMult = 1, warning;
@@ -285,6 +293,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 2,
       extendedKillWindow: true,
       killWindowHpMult: 0.25,
+      killNarrative: "lands a devastating, direct strike!",
     }),
     getAntiSynergy: (off, def) => ({ offMult: 1, defMult: def === "Riposte" ? 0.6 : 1 })
   },
@@ -304,6 +313,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: -1,
       extendedKillWindow: false,
       killWindowHpMult: 0.25,
+      killNarrative: "finds a momentary opening in their own defensive shell!",
     }),
     getAntiSynergy: (off) => {
       let offMult = 1, warning;
@@ -333,6 +343,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 0,
       extendedKillWindow: false,
       killWindowHpMult: 0.28,
+      killNarrative: "shifts their weight and drives through the defense!",
     }),
     getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
   },
@@ -367,6 +378,7 @@ export function getKillMechanic(
   const strategy = STYLES[attackerStyle];
   if (!strategy) return {
     killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
+    killNarrative: "strikes home!",
   };
   return strategy.getKillMechanic(context);
 }
