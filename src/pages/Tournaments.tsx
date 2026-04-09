@@ -23,6 +23,7 @@ import { toast } from "sonner";
 // Modular Components
 import { TournamentBracket } from "@/components/tournaments/TournamentBracket";
 import { TournamentHistory } from "@/components/tournaments/TournamentHistory";
+import { TournamentPrepDialog } from "@/components/tournaments/TournamentPrepDialog";
 
 const SEASON_NAMES: Record<string, string> = {
   Spring: "Spring Classic",
@@ -55,6 +56,8 @@ export default function Tournaments() {
   } = useGameStore();
 
   const [expandedBout, setExpandedBout] = useState<string | null>(null);
+  const [isPrepOpen, setIsPrepOpen] = useState(false);
+  const [hasShownPrep, setHasShownPrep] = useState(false);
 
   const currentTournament = useMemo(
     () => tournaments.find((t) => t.season === season && !t.completed),
@@ -67,6 +70,20 @@ export default function Tournaments() {
     () => tournaments.filter((t) => t.completed).reverse(),
     [tournaments]
   );
+  
+  // 🌩️ Protocol Sync: Auto-open prep dialog if tournament is ready but not started
+  const isTournamentReadyToStart = useMemo(() => {
+    if (!currentTournament) return false;
+    return currentTournament.bracket.every(b => b.winner === undefined);
+  }, [currentTournament]);
+
+  React.useEffect(() => {
+    const hasAlreadyStarted = currentTournament?.bracket.some(b => b.winner !== undefined);
+    if (isTournamentReadyToStart && !hasShownPrep && !hasAlreadyStarted) {
+      setIsPrepOpen(true);
+      setHasShownPrep(true);
+    }
+  }, [isTournamentReadyToStart, hasShownPrep, currentTournament]);
 
   const runNextRound = useCallback(() => {
     if (!currentTournament) return;

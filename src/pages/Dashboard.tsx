@@ -25,6 +25,7 @@ import { StableComparisonWidget } from "@/components/dashboard/StableComparisonW
 import { CrowdMoodWidget } from "@/components/widgets/CrowdMoodWidget";
 import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
 import { IntelligenceHubWidget } from "@/components/dashboard/IntelligenceHubWidget";
+import BubbleWatchWidget from "@/components/widgets/BubbleWatchWidget";
 
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ const MemoCrowdMoodWidget = React.memo(CrowdMoodWidget);
 const MemoStableComparisonWidget = React.memo(StableComparisonWidget);
 const MemoMedicalAuditWidget = React.memo(MedicalAuditWidget);
 const MemoIntelligenceHubWidget = React.memo(IntelligenceHubWidget);
+const MemoBubbleWatchWidget = React.memo(BubbleWatchWidget);
 
 const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
@@ -58,6 +60,7 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "training", label: "Training Status",    component: MemoTrainingWidget },
   { id: "rivals",    label: "Rival Stables",      component: MemoRivalsWidget },
   { id: "stableCompare", label: "Stable Comparison", component: MemoStableComparisonWidget, wide: true },
+  { id: "bubbleWatch", label: "Tournament Bubble Watch", component: MemoBubbleWatchWidget },
   { id: "rivalries", label: "Rivalries",          component: MemoRivalryWidget, wide: true },
   { id: "rankings", label: "Warrior Rankings",   component: MemoRankingsWidget, wide: true },
   { id: "intel",    label: "Intelligence Hub",   component: MemoIntelligenceHubWidget, wide: true },

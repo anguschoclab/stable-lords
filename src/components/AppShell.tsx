@@ -86,6 +86,7 @@ const NAV_SECTIONS = [
       { to: "/legacy", label: "Graveyard", icon: Skull },
       { to: "/legacy/hall-of-fame", label: "Hall of Fame", icon: Crown },
       { to: "/world/history", label: "Chronicle", icon: ScrollText },
+      { to: "/legacy/tournament-awards", label: "Tournament Awards", icon: Trophy },
       { to: "/legacy/awards", label: "Trophy Room", icon: Trophy },
       { to: "/legacy/analytics", label: "Kill Stats", icon: Target },
     ]

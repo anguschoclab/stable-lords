@@ -21,7 +21,7 @@ import { runEventPass } from "../passes/EventPass";
 import { runPromoterPass } from "../passes/PromoterPass";
 import { runPromoterLifecyclePass } from "../passes/PromoterLifecyclePass";
 import { runRankingsPass } from "../passes/RankingsPass";
-import { processWeekBouts } from "@/engine/boutProcessor";
+import { runBoutSimulationPass } from "../passes/BoutSimulationPass";
 
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeEconomyImpact } from "@/engine/economy";
@@ -51,11 +51,11 @@ export function advanceWeek(state: GameState): GameState {
 
   // 2. Core Simulation (Bouts, Training, Health, Economy)
   // Bouts happen for the week that is just ending
-  const boutResults = processWeekBouts(state);
-  let newState = boutResults.state;
+  newState = runBoutSimulationPass(newState, rootRng);
 
   newState = runWarriorPass(newState, rootRng);
   newState = runEconomyPass(newState, rootRng);
+  newState = runEquipmentPass(newState, rootRng);
   
   // 3. World & System Transitions
   newState = executeWorldTransitions(newState, rootRng, nextWeek);
