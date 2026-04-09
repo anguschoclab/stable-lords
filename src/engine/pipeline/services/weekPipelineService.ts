@@ -6,7 +6,7 @@ import { computeTrainerAging } from "@/engine/trainerAging";
 import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
 import { generateOwnerNarratives } from "@/engine/ownerNarrative";
 import { WorldManagementService } from "@/engine/ai/worldManagement";
-import { InsightTokenService } from "@/engine/tokens/insightTokenService";
+import { PatronTokenService } from "@/engine/tokens/patronTokenService";
 import { SeededRNG } from "@/utils/random";
 import { processOwnerGrudges } from "@/engine/ownerGrudges";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";

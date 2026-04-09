@@ -56,11 +56,20 @@ export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
   if (winCount > 0) income.push({ label: `Win bonuses (${winCount})`, amount: winCount * WIN_BONUS });
   if (state.fame > 0) income.push({ label: "Fame dividends", amount: Math.round(state.fame * FAME_DIVIDEND) });
 
+  // 🏛️ 1.0 Hardening: Noble Patronage (High-fame warriors attract wealthy sponsors)
+  const patronageIncome = state.roster.reduce((sum, w) => {
+    if ((w.fame || 0) > 40) {
+      return sum + Math.floor(((w.fame || 0) - 40) / 10) * 25;
+    }
+    return sum;
+  }, 0);
+  if (patronageIncome > 0) income.push({ label: "Noble Patronage Contribution", amount: patronageIncome });
+
   const expenses: { label: string; amount: number }[] = [];
   if (state.roster.length > 0) {
-    // 🏛️ Unification: Fame-bracketed upkeep (High fame = High pay)
+    // 🏛️ 1.0 Hardening: Elite Maintenance (Legendary warriors demand luxury overhead)
     const rosterUpkeep = state.roster.reduce((sum, w) => {
-      const famePremium = Math.floor((w.fame || 0) / 10) * 10;
+      const famePremium = Math.floor((w.fame || 0) / 10) * 15; // Increased from 10 to 15 for 1.0 balance
       return sum + WARRIOR_UPKEEP_BASE + famePremium;
     }, 0);
     expenses.push({ label: `Warrior upkeep (${state.roster.length})`, amount: rosterUpkeep });

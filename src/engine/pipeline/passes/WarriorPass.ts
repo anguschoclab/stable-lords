@@ -4,7 +4,7 @@ import { computeAgingImpact } from "@/engine/aging";
 import { computeHealthImpact } from "@/engine/health";
 import { resolveImpacts, StateImpact } from "@/engine/impacts";
 import { SeededRNG } from "@/utils/random";
-import { InsightTokenService } from "@/engine/tokens/insightTokenService";
+import { PatronTokenService } from "@/engine/tokens/patronTokenService";
 
 /**
  * Stable Lords — Warrior Pipeline Pass
@@ -27,7 +27,7 @@ export function runWarriorPass(state: GameState, rng: SeededRNG): GameState {
   if (results.some(r => r.type === "success") && rng.roll(0, 100) < 5) {
     const tokenOptions = ["Style", "Weapon", "Rhythm"] as const;
     const type = tokenOptions[rng.roll(0, tokenOptions.length - 1)];
-    nextState = InsightTokenService.awardToken(nextState, type, "Exceptional Training", rng);
+    nextState = PatronTokenService.awardToken(nextState, type, "Exceptional Training", rng);
   }
 
   // Correctly merge the seasonal growth arrays

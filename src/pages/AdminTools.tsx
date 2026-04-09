@@ -202,6 +202,13 @@ export default function AdminTools() {
                 Force All Mastery
               </Button>
               <Button 
+              variant="outline" 
+              onClick={skipFTUE} 
+              className="w-full h-11 font-black uppercase text-[10px] tracking-widest gap-2 bg-accent/5 border-accent/20"
+            >
+              <FastForward className="h-4 w-4" /> Bypass FTUE Gate
+            </Button>
+              <Button 
                 onClick={resetRivals} 
                 className="w-full h-11 font-black uppercase text-[10px] tracking-widest border-primary/30 text-primary" 
                 variant="outline"

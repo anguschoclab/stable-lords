@@ -110,7 +110,7 @@ export class OPFSArchiveService implements ArchiveService {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return;
 
-      const fileName = `${boutId}.json`;
+      const fileName = `${season}_${boutId}.json`;
 
       let fileHandle;
       try {

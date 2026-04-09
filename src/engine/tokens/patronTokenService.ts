@@ -5,10 +5,10 @@ import { generateId } from "@/utils/idUtils";
 import { SeededRNG } from "@/utils/random";
 
 /**
- * InsightTokenService — Manages Tournament Reward Tokens.
+ * PatronTokenService — Manages Tournament Reward Favors.
  * These are awarded for placing in the top 3 of a tournament.
  */
-export const InsightTokenService = {
+export const PatronTokenService = {
   /**
    * Awards a token to the stable's pool.
    */
@@ -30,8 +30,8 @@ export const InsightTokenService = {
         {
           id: generateId(rng, "newsletter"),
           week: state.week,
-          title: "Tournament Reward",
-          items: [`The stable has earned a ${type} Insight Token from ${source}.`]
+          title: "Patronage Awarded",
+          items: [`The stable has earned a ${type} Patron's Favor from ${source}.`]
         }
       ]
     };
@@ -90,8 +90,8 @@ export const InsightTokenService = {
         {
           id: rng?.uuid("newsletter") || generateId(undefined, "newsletter"),
           week: state.week,
-          title: "Insight Gained",
-          items: [`${warrior.name} has internalized the ${token.type} insight tokens from the stable archives.`]
+          title: "Patronage Internalized",
+          items: [`${warrior.name} has internalized the ${token.type} Patron's Favor from the stable archives.`]
         }
       ]
     };

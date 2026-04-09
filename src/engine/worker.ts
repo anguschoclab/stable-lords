@@ -1,7 +1,7 @@
 import * as Comlink from "comlink";
 import { advanceWeek } from "./pipeline/services/weekPipelineService";
 import { advanceDay } from "./dayPipeline";
-import { InsightTokenService } from "./tokens/insightTokenService";
+import { PatronTokenService } from "./tokens/patronTokenService";
 import { 
   createFreshState
 } from "./factories";
@@ -15,6 +15,8 @@ import {
   updateWarriorAfterFight
 } from "@/state/mutations/worldMutations";
 
+import { TournamentSelectionService } from "./matchmaking/tournamentSelection";
+
 /**
  * Stable Lords — Engine Worker
  * Offloads heavy simulation and logic processing to a background thread.
@@ -22,7 +24,8 @@ import {
 const engine = {
   advanceWeek,
   advanceDay,
-  assignToken: InsightTokenService.assignToken,
+  assignToken: PatronTokenService.assignToken,
+  resolveTournamentRound: TournamentSelectionService.resolveRound.bind(TournamentSelectionService),
   createFreshState,
   initializeStable,
   draftInitialRoster,

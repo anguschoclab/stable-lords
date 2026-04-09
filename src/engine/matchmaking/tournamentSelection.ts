@@ -11,7 +11,7 @@ import { type WarriorStatus } from "@/types/warrior.types";
 import { makeWarrior } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNG } from "@/utils/random";
-import { InsightTokenService } from "@/engine/tokens/insightTokenService";
+import { PatronTokenService } from "@/engine/tokens/patronTokenService";
 import { simulateFight, aiPlanForWarrior, defaultPlanForWarrior } from "@/engine";
 import { generateId } from "@/utils/idUtils";
 import type { FightOutcome } from "@/types/combat.types";
@@ -284,7 +284,8 @@ export const TournamentSelectionService = {
     const third = bronze ? (bronze.winner === "A" ? bronze.warriorIdA : bronze.warriorIdD) : undefined;
 
     let updatedState = { ...state };
-    const tier = tournament.tierId.toUpperCase(); // "GOLD", "SILVER", etc.
+    const tierRaw = (tournament.tierId || tournament.id.split('-')[1] || "Iron").toUpperCase();
+    const tier = tierRaw.includes("GOLD") ? "GOLD" : tierRaw.includes("SILVER") ? "SILVER" : tierRaw.includes("BRONZE") ? "BRONZE" : "IRON";
     const basePurse = tier === "GOLD" ? 5000 : tier === "SILVER" ? 2500 : tier === "BRONZE" ? 1200 : 600;
     const awardRng = new SeededRNG(Date.now());
 
@@ -321,11 +322,11 @@ export const TournamentSelectionService = {
 
         if (place === 1) {
           updatedState.rosterBonus = (updatedState.rosterBonus || 0) + 1;
-          updatedState = InsightTokenService.awardToken(updatedState, "Style", `${tournament.name} (🥇)`, awardRng);
+          updatedState = PatronTokenService.awardToken(updatedState, "Style", `${tournament.name} (🥇)`, awardRng);
         } else if (place === 2) {
-          updatedState = InsightTokenService.awardToken(updatedState, "Weapon", `${tournament.name} (🥈)`, awardRng);
+          updatedState = PatronTokenService.awardToken(updatedState, "Weapon", `${tournament.name} (🥈)`, awardRng);
         } else if (place === 3) {
-          updatedState = InsightTokenService.awardToken(updatedState, "Rhythm", `${tournament.name} (🥉)`, awardRng);
+          updatedState = PatronTokenService.awardToken(updatedState, "Rhythm", `${tournament.name} (🥉)`, awardRng);
         }
       } else {
         // Rival reward logic
@@ -393,6 +394,7 @@ export const TournamentSelectionService = {
 
      let grudgeIntensity = 0;
      if (opponentOwnerId) {
+       // 🛡️ 1.0 Hardening: Correctly identify grudge between owner and opponent
        const grudge = state.ownerGrudges?.find(g => 
          (g.ownerIdA === rival.owner.id && g.ownerIdB === opponentOwnerId) || 
          (g.ownerIdB === rival.owner.id && g.ownerIdA === opponentOwnerId)
@@ -403,7 +405,7 @@ export const TournamentSelectionService = {
      return aiPlanForWarrior(
        w, 
        rival.owner.personality || "Pragmatic", 
-       rival.owner.personality || "Opportunist", // Assuming personality maps to philosophy for AI
+       rival.philosophy || "Opportunist", 
        opponentStyle, 
        rival.strategy?.intent,
        grudgeIntensity
