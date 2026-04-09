@@ -50,22 +50,21 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
       }
     }
     
-    const result = [];
+    // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan with bounded insertion sort (Top 5)
+    const result: { name: string; w: number; l: number; k: number; fame: number; style: string; rate: number }[] = [];
     for (const [name, data] of registry.entries()) {
-      result.push({
-        name,
-        w: data.w,
-        l: data.l,
-        k: data.k,
-        fame: data.fame,
-        style: data.style,
-        rate: data.w / (data.w + data.l || 1)
-      });
+      const rate = data.w / (data.w + data.l || 1);
+      const entry = { name, w: data.w, l: data.l, k: data.k, fame: data.fame, style: data.style, rate };
+
+      let i = result.length - 1;
+      while (i >= 0 && (entry.w > result[i].w || (entry.w === result[i].w && entry.rate > result[i].rate))) {
+        i--;
+      }
+      result.splice(i + 1, 0, entry);
+      if (result.length > 5) result.pop();
     }
 
-    return result
-      .sort((a, b) => b.w - a.w || b.rate - a.rate)
-      .slice(0, 5);
+    return result;
   }, [allFights]);
 
   return (
@@ -235,21 +234,21 @@ export function RisingStars({ allFights, currentWeek }: LeaderboardProps & { cur
       else if (f.winner === "D") dData.wins++;
     }
 
-    const result = [];
+    // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan with bounded insertion sort (Top 3)
+    const result: { name: string; wins: number; matches: number; firstWeek: number }[] = [];
     for (const [name, data] of history.entries()) {
       if (data.matches <= 5 && data.wins >= 3) {
-        result.push({
-          name,
-          wins: data.wins,
-          matches: data.matches,
-          firstWeek: data.firstWeek
-        });
+        const entry = { name, wins: data.wins, matches: data.matches, firstWeek: data.firstWeek };
+        let i = result.length - 1;
+        while (i >= 0 && entry.wins > result[i].wins) {
+          i--;
+        }
+        result.splice(i + 1, 0, entry);
+        if (result.length > 3) result.pop();
       }
     }
 
-    return result
-      .sort((a, b) => b.wins - a.wins)
-      .slice(0, 3);
+    return result;
   }, [allFights]);
 
   return (
