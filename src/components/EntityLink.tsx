@@ -47,6 +47,7 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
         <Sheet>
           <SheetTrigger asChild>
             <button
+              aria-label={`Open details for ${type === "warrior" ? "warrior" : "stable"} ${name}`}
               className={cn(
                 "text-primary hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold",
                 className
@@ -127,6 +128,7 @@ export function StableLink({ name, className, children }: StableLinkProps) {
         <Sheet>
           <SheetTrigger asChild>
             <button
+              aria-label={`Open details for ${type === "warrior" ? "warrior" : "stable"} ${name}`}
               className={cn(
                 "text-arena-gold hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold",
                 className

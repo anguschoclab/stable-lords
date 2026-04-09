@@ -255,6 +255,7 @@ export default function BoutViewer({ nameA, nameD, styleA, styleD, log, winner, 
                   {[1, 2, 3].map((s) => (
                     <button
                       key={s}
+                      aria-label={`Set speed to ${s}x`}
                       onClick={() => setSpeed(s as 1 | 2 | 3)}
                       className={cn(
                         "px-4 py-1.5 rounded-lg text-[10px] font-mono font-black transition-all",

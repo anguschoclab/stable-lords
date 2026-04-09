@@ -65,6 +65,7 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
                 <Tooltip key={w.id}>
                   <TooltipTrigger asChild>
                     <button
+                      aria-label={`Select ${w.name} as ${label}`}
                       onClick={() => setSel(w.id === sel ? null : w.id)}
                       disabled={w.id === other}
                       className={cn(

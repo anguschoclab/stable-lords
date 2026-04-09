@@ -46,6 +46,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
               return (
                 <button
                   key={q}
+                  aria-label={`Purchase ${q} Scout Report`}
                   disabled={!canAfford}
                   onClick={() => onScout(q)}
                   className={cn(
@@ -222,6 +223,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
 
         {report.quality !== "Expert" && (
           <button
+            aria-label={`Upgrade to ${report.quality === "Basic" ? "Detailed" : "Expert"} Scout Report`}
             className="w-full h-12 bg-primary/10 border border-primary/20 rounded-xl hover:bg-primary hover:text-white transition-all group/expand"
             onClick={() => onScout(report.quality === "Basic" ? "Detailed" : "Expert")}
           >

@@ -28,7 +28,9 @@ export function TrainerTable() {
           </div>
         </div>
         <Link to="/stable/trainers">
-          <button className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded transition-all border border-primary/20">
+          <button
+            aria-label="View Full Registry"
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded transition-all border border-primary/20">
              Manage Staff
           </button>
         </Link>

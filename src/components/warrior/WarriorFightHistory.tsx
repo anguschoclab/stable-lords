@@ -58,6 +58,7 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
         return (
           <div key={f.id}>
             <button
+              aria-label={`${isExpanded ? "Collapse" : "Expand"} bout details`}
               className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg border transition-colors text-left ${
                 isExpanded ? "border-primary/40 bg-primary/5" : "border-border hover:bg-secondary/50"
               }`}
