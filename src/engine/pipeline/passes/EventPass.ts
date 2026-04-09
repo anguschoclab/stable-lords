@@ -74,5 +74,28 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
     }
   }
 
+  // 🏺 Lost Relic Discovery Event
+  if (brawlRng.next() < 0.04 && nextState.roster.length > 0) {
+    const activeWarriors = nextState.roster.filter(w => w.status === "Active");
+    if (activeWarriors.length > 0) {
+      const chosenIndex = Math.floor(brawlRng.next() * activeWarriors.length);
+      const chosen = activeWarriors[chosenIndex];
+      const e = narrativeContent.events.lost_relic;
+
+      nextState.roster = updateEntityInList(nextState.roster, chosen.id, (w) => ({
+        ...w,
+        fame: (w.fame || 0) + 10,
+        xp: (w.xp || 0) + 5
+      }));
+
+      nextState.newsletter = [...(nextState.newsletter || []), {
+        id: generateId(brawlRng, "newsletter"),
+        week: nextWeek,
+        title: e.title,
+        items: [t(brawlRng.pick(e.newsletter), { name: chosen.name, fame: 10, xp: 5 })]
+      }];
+    }
+  }
+
   return nextState;
 }

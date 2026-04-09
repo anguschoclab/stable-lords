@@ -52,6 +52,8 @@ export function weatherStaminaModifier(weather?: string): number {
       return 1.2; // 20% more stamina drain
     case "Blood Moon":
       return 1.1; // 10% more stamina drain
+    case "Gale":
+      return 1.15; // 15% more stamina drain
     case "Drafty":
       return 0.9; // 10% less stamina drain
     case "Overcast":

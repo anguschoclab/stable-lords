@@ -31,6 +31,14 @@ const WEATHER_METADATA = {
     description: "Driving rain. Significant penalties to precision and initiative. Footing is uncertain.",
     stats: "PRECISION_PENALTY_15% // INITIATIVE_-10"
   },
+  Gale: {
+    icon: Wind,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    description: "Fierce winds. Substantial penalty to stamina.",
+    stats: "STAMINA_DRAIN_115%"
+  },
   Scalding: {
     icon: ThermometerSun,
     color: "text-orange-500",

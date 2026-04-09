@@ -20,6 +20,7 @@ export function rollWeather(rng: SeededRNG): WeatherType {
   if (roll < 0.90) return "Scalding";
   if (roll < 0.95) return "Blazing Sun";
   if (roll < 0.98) return "Drafty";
+  if (roll < 0.99) return "Gale";
   return "Blood Moon";
 }
 

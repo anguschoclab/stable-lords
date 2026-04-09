@@ -50,6 +50,10 @@ export function SeasonWidget() {
     WeatherIcon = Cloud;
     weatherColor = "text-gray-400";
     weatherBg = "bg-gray-400/10 border-gray-400/20";
+  } else if (weather === "Gale") {
+    WeatherIcon = Wind;
+    weatherColor = "text-emerald-500";
+    weatherBg = "bg-emerald-500/10 border-emerald-500/20";
   } else if (weather === "Drafty") {
     WeatherIcon = Wind;
     weatherColor = "text-cyan-400";
@@ -143,6 +147,7 @@ export function SeasonWidget() {
                       {weather === "Blazing Sun" ? "30% more stamina drain in combat." :
                        weather === "Scalding" ? "20% more stamina drain in combat." :
                        weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality. 10% more stamina drain." :
+                       weather === "Gale" ? "Fierce winds. 15% more stamina drain in combat." :
                        weather === "Drafty" ? "10% less stamina drain in combat." :
                        weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
                        "Standard atmospheric conditions."}
