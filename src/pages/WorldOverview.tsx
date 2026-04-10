@@ -91,8 +91,24 @@ export default function WorldOverview() {
     });
   }, [state, stableSort, templates]);
 
-  const warriorRows = useMemo(() => {
-    const mapWarrior = (w: Warrior, stableName: string, stableId: string, isPlayer: boolean) => {
+  interface WarriorRow {
+    id: string;
+    name: string;
+    stableName: string;
+    stableId: string;
+    fame: number;
+    wins: number;
+    losses: number;
+    kills: number;
+    winRate: number;
+    style: string;
+    isPlayer: boolean;
+    officialRank: number;
+    compositeScore: number;
+  }
+
+  const warriorRows = useMemo<WarriorRow[]>(() => {
+    const mapWarrior = (w: Warrior, stableName: string, stableId: string, isPlayer: boolean): WarriorRow => {
       const total = w.career.wins + w.career.losses;
       const ranking = state.realmRankings?.[w.id];
       return {
@@ -112,7 +128,7 @@ export default function WorldOverview() {
       };
     };
 
-    const rows = state.roster.reduce((acc: any[], w: any) => {
+    const rows: WarriorRow[] = state.roster.reduce((acc: WarriorRow[], w: Warrior) => {
       if (w.status === "Active") {
         acc.push(mapWarrior(w, state.player.stableName, state.player.id, true));
       }
@@ -145,11 +161,11 @@ export default function WorldOverview() {
       }
 
       if (f === "name" || f === "stable" || f === "style") {
-        const va = f === "stable" ? a.stableName : a[f];
-        const vb = f === "stable" ? b.stableName : b[f];
+        const va = f === "stable" ? a.stableName : (a as any)[f];
+        const vb = f === "stable" ? b.stableName : (b as any)[f];
         return String(va).localeCompare(String(vb)) * dir;
       }
-      return ((a[f] as number) - (b[f] as number)) * dir;
+      return (((a as any)[f] as number) - ((b as any)[f] as number)) * dir;
     });
   }, [state, warriorSort]);
 

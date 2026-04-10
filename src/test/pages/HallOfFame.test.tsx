@@ -83,7 +83,8 @@ describe("HallOfFame Component", () => {
 
     mockState.awards = [
       { year: 1, type: "WARRIOR_OF_YEAR", warriorId: "Gladiator", reason: "Dominance", value: 100 },
-      { year: 1, type: "KILLER_OF_YEAR", warriorId: "Reaper", reason: "Lethality", value: 50 }
+      { year: 1, type: "KILLER_OF_YEAR", warriorId: "Reaper", reason: "Lethality", value: 50 },
+      { year: 1, type: "DEFENDER_OF_YEAR", warriorId: "The Mountain", reason: "Immovable", value: 75 }
     ];
 
     // Setup ArenaHistory mock

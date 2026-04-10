@@ -40,17 +40,11 @@ export interface GameStoreActions {
 
 export type GameStore = GameStoreState & GameStoreActions & EconomySlice & RosterSlice & WorldSlice & TournamentSlice;
 
-/**
- * Reconstructs a full GameState from the modular slices for engine consumption.
- * v1.0 Hardening: Ensures all schema properties are mapped.
- */
+let lastResult: GameState | null = null;
+let lastStoreValues: any = null;
+
 export function reconstructGameState(store: GameStore): GameState {
-  return {
-    meta: {
-      gameName: "Stable Lords",
-      version: "2.1.0-hardened",
-      createdAt: store.lastSavedAt || new Date().toISOString(),
-    },
+  const currentValues = {
     treasury: store.treasury,
     ledger: store.ledger,
     roster: store.roster,
@@ -92,6 +86,33 @@ export function reconstructGameState(store: GameStore): GameState {
     isFTUE: store.isFTUE,
     ftueStep: store.ftueStep,
     ftueComplete: store.ftueComplete,
+    coachDismissed: store.coachDismissed,
+    rivalries: store.rivalries,
+    matchHistory: store.matchHistory,
+    ownerGrudges: store.ownerGrudges,
+    phase: store.phase,
+    playerChallenges: store.playerChallenges,
+    playerAvoids: store.playerAvoids,
+  };
+
+  if (lastResult && lastStoreValues) {
+    let changed = false;
+    for (const key of Object.keys(currentValues)) {
+      if ((currentValues as any)[key] !== lastStoreValues[key]) {
+        changed = true;
+        break;
+      }
+    }
+    if (!changed) return lastResult;
+  }
+
+  const result: GameState = {
+    meta: {
+      gameName: "Stable Lords",
+      version: "2.1.0-hardened",
+      createdAt: store.lastSavedAt || new Date().toISOString(),
+    },
+    ...currentValues,
     coachDismissed: store.coachDismissed || [],
     rivalries: store.rivalries || [],
     matchHistory: store.matchHistory || [],
@@ -100,6 +121,10 @@ export function reconstructGameState(store: GameStore): GameState {
     playerChallenges: store.playerChallenges || [],
     playerAvoids: store.playerAvoids || [],
   };
+
+  lastResult = result;
+  lastStoreValues = currentValues;
+  return result;
 }
 
 export const useGameStore = create<GameStore>()(

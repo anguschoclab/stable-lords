@@ -17,7 +17,8 @@ describe("Stable Lords 1.0 Simulation Hardening Audit", () => {
 
     const finalRivalCount = state.rivals?.length || 0;
     const totalDeaths = state.graveyard?.length || 0;
-    const annualDeathRate = (totalDeaths / 2) / initialWarriorCount;
+    const initialWarriorCountAdjusted = Math.max(initialWarriorCount, 1);
+    const annualDeathRate = (totalDeaths / 2) / initialWarriorCountAdjusted;
 
     console.log(`--- SIMULATION AUDIT RESULTS (WEEK 104) ---`);
     console.log(`Final Rival Stables: ${finalRivalCount} (Target: 30-45)`);

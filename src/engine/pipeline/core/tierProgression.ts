@@ -51,7 +51,8 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
     return r;
   });
 
-  const rng = new SeededRNG(hashStr(state.meta.createdAt) + state.week);
+  const createdAt = state.meta?.createdAt || new Date(0).toISOString();
+  const rng = new SeededRNG(hashStr(createdAt) + state.week);
   const s = { ...state, rivals: updatedRivals, recruitPool: [] as PoolWarrior[] };
   if (promotionNews.length > 0) {
     s.newsletter = [

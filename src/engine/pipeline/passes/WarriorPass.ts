@@ -24,7 +24,7 @@ export function runWarriorPass(state: GameState, rng: SeededRNG): GameState {
   
   // 🌩️ New System Integration: Insight Token Awards
   // Low chance (5%) to earn an Insight Token during any successful training week
-  if (results.some(r => r.type === "gain" || r.type === "recovery") && rng.roll(0, 100) < 5) {
+  if (results && results.some(r => r.type === "gain" || r.type === "recovery") && rng.roll(0, 100) < 5) {
     const tokenOptions = ["Style", "Weapon", "Rhythm"] as const;
     const type = tokenOptions[rng.roll(0, tokenOptions.length - 1)];
     nextState = PatronTokenService.awardToken(nextState, type, "Exceptional Training", rng);
