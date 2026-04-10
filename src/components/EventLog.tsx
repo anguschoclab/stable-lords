@@ -278,7 +278,7 @@ export default function EventLog() {
                   const Icon = event.icon;
                   return (
                     <button
-                      aria-label={`View event details: ${event.title}`}
+                      aria-label={`View event details: ${event.title}${event.subtitle ? `. ${event.subtitle}` : ''}`}
                       key={event.id}
                       onClick={() => navigate({ to: event.linkTo })}
                       className={cn(
