@@ -7,3 +7,6 @@
 **Learning:** When developing accessible React components in `src/components`, a common issue is `<button>` elements missing an `aria-label` attribute, particularly when they contain icons or text with vague context (e.g. "Engagement Log" toggles, insight toggles, or icon-only actions). Using custom `<button>` components rather than an accessible wrapper component (like `<Button size="icon">` from `src/components/ui`) bypasses accessibility defaults.
 
 **Action:** Consistently search for bare `<button>` implementations and explicitly apply `aria-label` attributes to ensure screen readers provide sufficient context, avoiding regression of accessibility features inside generic mapping functions.
+## 2024-03-24 - Progress Bar Standardization
+**Learning:** Hardcoded pixel widths and inline styles like `style={{ width: \`\${val}%\` }}` clutter UI code and hinder responsive scaling.
+**Action:** Always leverage the generic `StatBattery` component (`src/components/ui/StatBattery.tsx`) instead of raw `div` styles or `<Progress>` bars for displaying stats or condition progress bars to ensure consistent styling and logic.
