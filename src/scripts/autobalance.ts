@@ -174,7 +174,7 @@ async function main() {
         execSync("git add src/engine/combat/combatConstants.ts src/data/economyConstants.ts Autobalance_Report.md || true");
         execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
         console.log("Committed to git successfully.");
-    } catch (e) {
+    } catch (e: any) {
         console.error("Git commit failed:", e.message);
     }
   } else {

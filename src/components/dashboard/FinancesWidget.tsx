@@ -13,7 +13,7 @@ import {
 export function FinancesWidget() {
   const state = useWorldState();
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
-  const gold = state.gold ?? 0;
+  const treasury = state.treasury ?? 0;
 
   return (
     <Surface variant="glass" className="h-full border-border/10 group overflow-hidden relative">
@@ -35,8 +35,8 @@ export function FinancesWidget() {
         <div className="flex flex-col items-center justify-center py-4 bg-black/20 rounded-xl border border-white/5 shadow-inner">
            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 mb-1">TOTAL_RESERVE</span>
            <div className="flex items-center gap-2">
-              <span className="text-3xl font-display font-black text-white selection:bg-arena-gold/30 drop-shadow-[0_0_15px_rgba(255,215,0,0.1)]">
-                 {Math.round(gold).toLocaleString()}
+               <span className="text-3xl font-display font-black text-white selection:bg-arena-gold/30 drop-shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+                 {Math.round(treasury).toLocaleString()}
               </span>
               <span className="text-xs font-black text-arena-gold opacity-60">G</span>
            </div>

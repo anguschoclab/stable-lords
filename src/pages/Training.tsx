@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { useShallow } from 'zustand/react/shallow';
 import {
   ATTRIBUTE_LABELS,
@@ -14,9 +14,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
 
 export default function Training() {
-  const { state, setState } = useGameStore(
-    useShallow((s) => ({ state: s.state, setState: s.setState }))
-  );
+  const state = useWorldState();
+  const { setState } = useGameStore();
 
   const assignmentMap = useMemo(() => {
     const map = new Map<string, TrainingAssignment>();
@@ -38,43 +37,40 @@ export default function Training() {
 
   const handleAssign = (warriorId: string, attribute: keyof Attributes) => {
     if (attribute === "SZ") return;
-    const warrior = state.roster.find(w => w.id === warriorId);
-    setState((prev) => ({
-      ...prev,
-      trainingAssignments: [
-        ...(prev.trainingAssignments ?? []).filter(a => a.warriorId !== warriorId),
+    const warrior = state.roster.find((w: any) => w.id === warriorId);
+    setState((s: any) => {
+      s.trainingAssignments = [
+        ...(s.trainingAssignments ?? []).filter((a: any) => a.warriorId !== warriorId),
         { warriorId, type: "attribute", attribute },
-      ],
-    }));
+      ];
+    });
     toast.success(`${warrior?.name} assigned to train ${ATTRIBUTE_LABELS[attribute]}`);
   };
 
   const handleAssignRecovery = (warriorId: string) => {
-    const warrior = state.roster.find(w => w.id === warriorId);
-    setState((prev) => ({
-      ...prev,
-      trainingAssignments: [
-        ...(prev.trainingAssignments ?? []).filter(a => a.warriorId !== warriorId),
+    const warrior = state.roster.find((w: any) => w.id === warriorId);
+    setState((s: any) => {
+      s.trainingAssignments = [
+        ...(s.trainingAssignments ?? []).filter((a: any) => a.warriorId !== warriorId),
         { warriorId, type: "recovery" },
-      ],
-    }));
+      ];
+    });
     toast.success(`${warrior?.name} assigned to active recovery`);
   };
 
   const handleClear = (warriorId: string) => {
-    setState((prev) => ({
-      ...prev,
-      trainingAssignments: (prev.trainingAssignments ?? []).filter(a => a.warriorId !== warriorId),
-    }));
+    setState((s: any) => {
+      s.trainingAssignments = (s.trainingAssignments ?? []).filter((a: any) => a.warriorId !== warriorId);
+    });
   };
 
   const handleClearAll = () => {
-    setState((prev) => ({ ...prev, trainingAssignments: [] }));
+    setState((s: any) => { s.trainingAssignments = []; });
     toast("All training assignments cleared.");
   };
 
   const assignedCount = assignments.length;
-  const recoveryCount = assignments.filter(a => a.type === "recovery").length;
+  const recoveryCount = assignments.filter((a: any) => a.type === "recovery").length;
   const trainingCount = assignedCount - recoveryCount;
 
   return (
@@ -148,7 +144,7 @@ export default function Training() {
         </Surface>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {state.roster.filter(w => w.status === "Active").map(warrior => (
+          {state.roster.filter((w: any) => w.status === "Active").map((warrior: any) => (
             <WarriorTrainingCard
               key={warrior.id}
               warrior={warrior}

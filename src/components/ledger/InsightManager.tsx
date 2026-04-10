@@ -18,7 +18,7 @@ import { FightingStyle } from "@/types/shared.types";
 
 export function InsightManager() {
   const state = useWorldState();
-  const { doConsumeInsightToken } = useGameStore();
+  const { consumeInsightToken } = useGameStore();
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
   const [selectedWarriorId, setSelectedWarriorId] = useState<string | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -53,7 +53,7 @@ export function InsightManager() {
         result: result
       });
 
-      doConsumeInsightToken(selectedToken.id, selectedWarrior.id);
+      consumeInsightToken(selectedToken.id, selectedWarrior.id);
       setIsRevealing(false);
       setSelectedTokenId(null);
       setSelectedWarriorId(null);

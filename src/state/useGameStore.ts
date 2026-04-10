@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as Comlink from "comlink";
+import { shallow } from "zustand/shallow";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import type { FightSummary } from "@/types/combat.types";
@@ -95,6 +96,9 @@ export function reconstructGameState(store: GameStore): GameState {
     rivalries: store.rivalries || [],
     matchHistory: store.matchHistory || [],
     ownerGrudges: store.ownerGrudges || [],
+    phase: store.phase || "planning",
+    playerChallenges: store.playerChallenges || [],
+    playerAvoids: store.playerAvoids || [],
   };
 }
 
@@ -168,6 +172,9 @@ export const useGameStore = create<GameStore>()(
           draft.rivalries = state.rivalries || [];
           draft.matchHistory = state.matchHistory || [];
           draft.ownerGrudges = state.ownerGrudges || [];
+          draft.phase = state.phase || "planning";
+          draft.playerChallenges = state.playerChallenges || [];
+          draft.playerAvoids = state.playerAvoids || [];
           
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
@@ -276,7 +283,7 @@ export const useGameStore = create<GameStore>()(
 );
 
 /** --- Fine-Grained Selectors (v4.1: Source from Slice only) --- */
-export const useWorldState = () => useGameStore(reconstructGameState);
+export const useWorldState = () => useGameStore(reconstructGameState, shallow);
 export const usePlayer = () => useGameStore(s => s.player);
 export const useRoster = () => useGameStore(s => s.roster);
 export const useRivals = () => useGameStore(s => s.rivals);

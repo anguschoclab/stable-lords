@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { Suspense, lazy } from "react";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 
 const ResolutionReveal = lazy(() => import("@/components/ResolutionReveal"));
 const StartGame = lazy(() => import("@/pages/StartGame"));
@@ -24,7 +24,8 @@ declare module "@tanstack/react-router" {
 const queryClient = new QueryClient();
 
 function GameRoutes() {
-  const { state, atTitleScreen } = useGameStore();
+  const state = useWorldState();
+  const { atTitleScreen } = useGameStore();
 
   // No active game → show title / start screen
   if (atTitleScreen) {

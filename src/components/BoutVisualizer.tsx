@@ -20,7 +20,7 @@ import {
   Flame,
   Target
 } from "lucide-react";
-import { motion, AnimatePresence, useAnimation, type AnimationControls } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { classifyEvent } from "@/lib/boutUtils";
 import { useBoutPlayback } from "@/hooks/useBoutPlayback";
 
@@ -114,7 +114,7 @@ function BoutHeader({ nameA, nameD, styleA, styleD, winner, isComplete, isPlayin
 
 
 interface ImpactStageProps {
-  stageControls: AnimationControls;
+  stageControls: ReturnType<typeof useAnimation>;
   currentEvent: MinuteEvent | null;
   visibleCount: number;
   eventType: ReturnType<typeof classifyEvent>;

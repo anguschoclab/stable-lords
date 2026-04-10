@@ -66,7 +66,7 @@ export default function StartGame() {
 
   // ── Continue: load the most recent save ──────────────────────────────────
   const mostRecent = useMemo(
-    () => (slots.length > 0 ? [...slots].sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime())[0] : null),
+    () => (slots.length > 0 ? [...slots].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0] : null),
     [slots]
   );
 
@@ -80,7 +80,7 @@ export default function StartGame() {
 
   const handleDelete = useCallback(() => {
     if (!deleteTarget) return;
-    deleteSlot(deleteTarget.slotId);
+    deleteSlot(deleteTarget.id);
     refreshSlots();
     setDeleteTarget(null);
   }, [deleteTarget, refreshSlots]);
@@ -91,7 +91,7 @@ export default function StartGame() {
     fresh.player.name = ownerName.trim();
     fresh.player.stableName = stableName.trim();
     const slotId = newSlotId();
-    saveToSlot(slotId, fresh);
+    saveToSlot(slotId, fresh.player.stableName, fresh);
     loadGame(slotId, fresh);
   }, [ownerName, stableName, loadGame]);
 
@@ -102,7 +102,8 @@ export default function StartGame() {
     reader.onload = async (ev) => {
       try {
         const json = ev.target?.result as string;
-        const slotId = importSaveToNewSlot(json);
+        const slotId = await importSaveToNewSlot(json);
+        if (!slotId) throw new Error("Import failed");
         refreshSlots();
         toast.success("Save imported! Loading now…");
         // Auto-load the imported save
@@ -225,15 +226,14 @@ export default function StartGame() {
 
         {/* Actions */}
         <div className="space-y-3">
-          {/* Continue — most recent save */}
-          {mostRecent && mostRecent.ftueComplete && (
+          {mostRecent && (
             <Button
-              onClick={() => loadSlot(mostRecent.slotId)}
+              onClick={() => loadSlot(mostRecent.id)}
               className="w-full gap-2 h-14 text-base"
               size="lg"
             >
               <Play className="h-5 w-5" />
-              Continue — {mostRecent.stableName}
+              Continue — {mostRecent.name}
             </Button>
           )}
 
@@ -277,33 +277,24 @@ export default function StartGame() {
               Saved Games
             </h3>
             {slots
-              .sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime())
+              .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
               .map((slot) => (
                 <Card
-                  key={slot.slotId}
+                  key={slot.id}
                   className="cursor-pointer transition-all hover:border-primary/40"
-                  onClick={() => loadSlot(slot.slotId)}
+                  onClick={() => loadSlot(slot.id)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-accent" />
-                          <span className="font-display font-bold">{slot.stableName}</span>
-                          {!slot.ftueComplete && (
-                            <Badge variant="secondary" className="text-[10px]">New</Badge>
-                          )}
+                          <span className="font-display font-bold">{slot.name}</span>
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span>Wk {slot.week} · Yr {slot.year}</span>
                           <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" /> {slot.rosterSize} warriors
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Flame className="h-3 w-3" /> {slot.fame} fame
-                          </span>
-                          <span>Wk {slot.week} · {slot.season}</span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" /> {formatDate(slot.savedAt)}
+                            <Clock className="h-3 w-3" /> {formatDate(slot.timestamp)}
                           </span>
                         </div>
                       </div>
@@ -314,11 +305,11 @@ export default function StartGame() {
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           onClick={(e) => {
                             e.stopPropagation();
-                            exportSlot(slot.slotId);
+                            exportSlot(slot.id);
                             toast.success("Save exported!");
                           }}
                           title="Export save"
-                          aria-label={`Export save for ${slot.stableName}`}
+                          aria-label={`Export save for ${slot.name}`}
                         >
                           <Download className="h-3.5 w-3.5" />
                         </Button>
@@ -331,7 +322,7 @@ export default function StartGame() {
                             setDeleteTarget(slot);
                           }}
                           title="Delete save"
-                          aria-label={`Delete save for ${slot.stableName}`}
+                          aria-label={`Delete save for ${slot.name}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -355,7 +346,7 @@ export default function StartGame() {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-display">Delete Save?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the save for <strong>{deleteTarget?.stableName}</strong> ({deleteTarget?.ownerName}).
+              This will permanently delete the save for <strong>{deleteTarget?.name}</strong>.
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

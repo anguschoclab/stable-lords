@@ -13,7 +13,7 @@ import * as Impacts from "@/engine/impacts";
 // Mock engine modules
 vi.mock("@/engine/training", () => ({
   computeTrainingImpact: vi.fn(() => ({ updatedRoster: [], updatedSeasonalGrowth: [], results: [] })),
-  trainingImpactToStateImpact: vi.fn(() => ({ impact: {}, seasonalGrowth: [] }))
+  trainingImpactToStateImpact: vi.fn(() => ({ impact: {}, seasonalGrowth: [], results: [] }))
 }));
 
 vi.mock("@/engine/economy", () => ({ 

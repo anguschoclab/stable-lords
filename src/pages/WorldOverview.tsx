@@ -21,7 +21,7 @@ export default function WorldOverview() {
   const templates = useMemo(() => getStableTemplates(), []);
 
   const stableRows = useMemo(() => {
-    const rows: { id: string, name: string, fame: number, rank: number, isPlayer: boolean, wins: number, losses: number, killCount: number, titles: number }[] = [];
+    const rows: any[] = [];
     let pWins = 0;
     let pLosses = 0;
     let pKills = 0;
@@ -112,7 +112,7 @@ export default function WorldOverview() {
       };
     };
 
-    const rows = state.roster.reduce((acc: { id: string, name: string, style: string, fame: number, isPlayer: boolean, stableId: string, stableName: string, wins: number, losses: number, killCount: number }[], w: import("@/types/game").Warrior) => {
+    const rows = state.roster.reduce((acc: any[], w: any) => {
       if (w.status === "Active") {
         acc.push(mapWarrior(w, state.player.stableName, state.player.id, true));
       }
@@ -154,7 +154,7 @@ export default function WorldOverview() {
   }, [state, warriorSort]);
 
   const totalWarriors = stableRows.reduce((s, r) => s + r.roster, 0);
-  const totalKills = stableRows.reduce((s, r) => s + r.kills, 0);
+  const totalKills = stableRows.reduce((s, r) => s + (r.kills || 0), 0);
   const topStable = stableRows[0]?.name ?? "—";
 
   return (
@@ -200,7 +200,7 @@ export default function WorldOverview() {
           <StableRankings 
             rows={stableRows} 
             sort={stableSort} 
-            onSort={(field) => setStableSort(prev => ({ field, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
+            onSort={(field: any) => setStableSort(prev => ({ field: field as SortField, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
           />
         </TabsContent>
 
@@ -212,7 +212,7 @@ export default function WorldOverview() {
           <WarriorLeaderboard 
             rows={warriorRows} 
             sort={warriorSort} 
-            onSort={(field) => setWarriorSort(prev => ({ field, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
+            onSort={(field: any) => setWarriorSort(prev => ({ field: field as WarriorSortField, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
           />
         </TabsContent>
 

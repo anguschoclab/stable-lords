@@ -3,7 +3,7 @@
  * Post-tournament recap: MVP, deadliest, biggest upsets per completed tournament.
  */
 import { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import AwardCard from "@/components/awards/AwardCard";
 import UpsetsList from "@/components/awards/UpsetsList";
 import FightsList from "@/components/awards/FightsList";
@@ -214,17 +214,16 @@ function TournamentSection({ award }: { award: TournamentAward }) {
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function TournamentAwards() {
-  const { state } = useGameStore();
-
+  const state = useWorldState();
   const playerNames = useMemo(() => new Set([
-    ...state.roster.map(w => w.name),
-    ...state.graveyard.map(w => w.name),
-    ...state.retired.map(w => w.name),
+    ...state.roster.map((w: any) => w.name),
+    ...state.graveyard.map((w: any) => w.name),
+    ...state.retired.map((w: any) => w.name),
   ]), [state]);
 
   const awards = useMemo(() => {
-    const completed = state.tournaments.filter(t => t.completed).reverse();
-    return completed.map(t => computeTournamentAwards(t, state.arenaHistory, playerNames));
+    const completed = state.tournaments.filter((t: any) => t.completed).reverse();
+    return completed.map((t: any) => computeTournamentAwards(t, state.arenaHistory, playerNames));
   }, [state.tournaments, state.arenaHistory, playerNames]);
 
   return (

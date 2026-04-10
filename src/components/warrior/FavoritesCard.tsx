@@ -129,9 +129,8 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
 
   const handleInsight = (type: "weapon" | "rhythm") => {
     const msg = applyInsightToken(warrior, type);
-    setState({
-      ...state,
-      roster: state.roster.map((w: any) => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w),
+    setState((s: any) => {
+      s.roster = s.roster.map((w: any) => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w);
     });
     toast.success(msg);
     onUpdate();
