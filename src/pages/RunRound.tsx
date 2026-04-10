@@ -135,12 +135,18 @@ export default function RunRound() {
                 <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Active_Combat_Manifest</h3>
                 <div className="h-px flex-1 bg-border/20" />
               </div>
-              {matchCard.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3">
                   {matchCard.map((p, i) => (
-                    <MatchCard key={i} pairing={p} crowdMood={state.crowdMood} />
+                    <MatchCard 
+                      key={i} 
+                      pairing={{
+                        a: p.playerWarrior,
+                        d: p.rivalWarrior,
+                        rivalStable: p.rivalStable?.name || "Rival Stable",
+                        isRivalry: p.isRivalryBout
+                      }} 
+                      crowdMood={state.crowdMood} 
+                    />
                   ))}
-                </div>
               ) : (
                 <Card className="border-dashed bg-glass-card border-border/40">
                   <CardContent className="py-20 text-center text-muted-foreground/30">

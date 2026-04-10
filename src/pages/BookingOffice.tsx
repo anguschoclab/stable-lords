@@ -34,8 +34,13 @@ export default function BookingOffice() {
   }, [boutOffers, roster]);
 
   const handleResponse = (offerId: string, warriorId: string, response: "Accepted" | "Declined") => {
-    const newState = respondToBoutOffer(state, offerId, warriorId, response);
-    setState(newState);
+    setState((s: any) => {
+      // respondToBoutOffer utility expects full world state
+      const next = respondToBoutOffer(state, offerId, warriorId, response);
+      // Synchronize back to slices
+      s.boutOffers = next.boutOffers;
+      s.roster = next.roster;
+    });
     toast.success(`Offer ${response === "Accepted" ? "accepted" : "declined"}.`);
   };
 

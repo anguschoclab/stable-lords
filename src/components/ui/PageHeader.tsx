@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { motion } from "framer-motion";
 
 interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  title: string;
+  title: React.ReactNode;
   subtitle?: React.ReactNode;
   actions?: React.ReactNode;
   icon?: React.ElementType;

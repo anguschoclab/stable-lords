@@ -81,7 +81,7 @@ function useDraggableWidgets() {
   const validIds = new Set(DEFAULT_ORDER);
   const savedOrderSet = new Set(savedOrder);
   const order = [
-    ...savedOrder.filter(id => validIds.has(id)),
+    ...savedOrder.filter((id: string) => validIds.has(id)),
     ...DEFAULT_ORDER.filter(id => !savedOrderSet.has(id)),
   ];
 

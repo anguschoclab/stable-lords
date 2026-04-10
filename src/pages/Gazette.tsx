@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { Newspaper, Info, Terminal, Search, BarChart3, Radio, History, ChevronDown, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,11 +19,8 @@ import {
 } from "@/components/ui/tooltip";
 
 export default function Gazette() {
-  const { week, season, gazettes } = useGameStore(useShallow((s) => ({
-    week: s.state.week,
-    season: s.state.season,
-    gazettes: s.state.gazettes
-  })));
+  const state = useWorldState();
+  const { week, season, gazettes } = state;
 
   const allFights = useMemo(() => ArenaHistory.all(), []);
 
@@ -139,7 +136,7 @@ export default function Gazette() {
           <div className="space-y-24">
             <AnimatePresence mode="popLayout">
               {visibleIssues.map((issue, idx) => {
-                const paragraphs = issue.body.split("\n\n").filter(p => p.trim().length > 0);
+                const paragraphs = issue.body.split("\n\n").filter((p: string) => p.trim().length > 0);
                 const mappedIssue = {
                   week: issue.week,
                   mainHeadline: issue.headline,
