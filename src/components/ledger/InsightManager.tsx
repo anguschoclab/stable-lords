@@ -85,6 +85,7 @@ export function InsightManager() {
             <div className="space-y-2">
               {tokens.map((token: any) => (
                 <button
+                  aria-label={`Select ${token.type} Insight Token, discovered week ${token.discoveredWeek}`}
                   key={token.id}
                   onClick={() => setSelectedTokenId(token.id)}
                   className={`w-full text-left p-4 rounded-xl border transition-all relative overflow-hidden group ${
@@ -126,6 +127,7 @@ export function InsightManager() {
 
                     return (
                       <button
+                        aria-label={`Select warrior ${w.name} for insight`}
                         key={w.id}
                         disabled={isRevealed || isRevealing}
                         onClick={() => setSelectedWarriorId(w.id)}

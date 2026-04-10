@@ -103,6 +103,7 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
 
                     {hasTranscript && (
                       <button
+                        aria-label={isExpanded ? "Collapse Engagement Log" : "Expand Engagement Log"}
                         onClick={() => onToggleExpand(isExpanded ? null : boutKey)}
                         className="w-full py-1.5 px-3 border-t border-border/10 flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-colors group"
                       >
