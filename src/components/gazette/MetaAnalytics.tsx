@@ -18,8 +18,12 @@ export function TacticalStyleAnalysis({ allFights }: MetaAnalyticsProps) {
   const styles = ["Brawler", "Technician", "High-Flyer", "Powerhouse", "Grappler"];
   
   const stats = styles.map(style => {
-    const styleFights = allFights.filter(f => f.winnerStyle === style || f.loserStyle === style);
-    const wins = allFights.filter(f => f.winnerStyle === style).length;
+    const styleFights = allFights.filter(f => f.styleA === style || f.styleD === style);
+    const wins = allFights.filter(f => {
+      if (f.winner === "A") return f.styleA === style;
+      if (f.winner === "D") return f.styleD === style;
+      return false;
+    }).length;
     const rate = styleFights.length > 0 ? (wins / styleFights.length) * 100 : 0;
     return { style, wins, total: styleFights.length, rate };
   }).sort((a, b) => b.rate - a.rate);
@@ -129,10 +133,14 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
                 </td>
                 {styles.map(colStyle => {
                   const matches = allFights.filter(f => 
-                    (f.winnerStyle === rowStyle && f.loserStyle === colStyle) || 
-                    (f.winnerStyle === colStyle && f.loserStyle === rowStyle)
+                    (f.styleA === rowStyle && f.styleD === colStyle) || 
+                    (f.styleA === colStyle && f.styleD === rowStyle)
                   );
-                  const wins = allFights.filter(f => f.winnerStyle === rowStyle && f.loserStyle === colStyle).length;
+                  const wins = allFights.filter(f => {
+                    if (f.winner === "A") return f.styleA === rowStyle && f.styleD === colStyle;
+                    if (f.winner === "D") return f.styleD === rowStyle && f.styleA === colStyle;
+                    return false;
+                  }).length;
                   const rate = matches.length > 0 ? (wins / matches.length) * 100 : 50;
                   const isNeutral = matches.length === 0;
 

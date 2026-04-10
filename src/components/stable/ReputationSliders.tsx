@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { computeStableReputation } from "@/engine/stableReputation";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ const REP_LABELS: { key: keyof ReturnType<typeof computeStableReputation>; label
 ];
 
 export function ReputationSliders() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const rep = useMemo(() => computeStableReputation(state), [state]);
 
   return (

@@ -5,8 +5,8 @@ export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
-  retrieveBoutLog: (season: number, boutId: string) => Promise<string[] | null>;
+  archiveBoutLog: (year: number, season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
+  retrieveBoutLog: (year: number, season: number, boutId: string) => Promise<string[] | null>;
 
   // Gazettes (Markdown)
   archiveGazette: (season: number, week: number, markdown: string) => Promise<void>;
@@ -105,12 +105,12 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(season: number, boutId: string, logData: string[], overwrite = false): Promise<void> {
+  async archiveBoutLog(year: number, season: number, boutId: string, logData: string[], overwrite = false): Promise<void> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return;
 
-      const fileName = `${season}_${boutId}.json`;
+      const fileName = `${year}_${boutId}.json`;
 
       let fileHandle;
       try {
@@ -147,12 +147,12 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async retrieveBoutLog(season: number, boutId: string): Promise<string[] | null> {
+  async retrieveBoutLog(year: number, season: number, boutId: string): Promise<string[] | null> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return null;
 
-      const fileName = `${boutId}.json`;
+      const fileName = `${year}_${boutId}.json`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
       const file = await fileHandle.getFile();
 

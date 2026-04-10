@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Dumbbell, ChevronRight, Activity, Zap, Target, TrendingUp, AlertCircle, Sparkles } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function TrainingWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   
   // Map warrior IDs to warriors for display
   const trainingWarriors = useMemo(() => {

@@ -5,6 +5,7 @@ import type {
   AIAgentMemory,
   AIIntent
 } from "@/types/state.types";
+import { generateId } from "../../utils/idUtils";
 import { computeMetaDrift } from "../metaDrift";
 
 /**
@@ -48,7 +49,7 @@ export function logAgentAction(
   riskTier: AIEvent["riskTier"],
   week: number
 ): RivalStableData {
-  const newEvent: AIEvent = { week, type, description, riskTier };
+  const newEvent: AIEvent = { id: generateId(undefined, "event"), week, type, description, riskTier };
   const actionHistory = [newEvent, ...(rival.actionHistory || [])].slice(0, 20); 
   
   // ⚡ Intent Recognition: Infer intent from action type

@@ -51,11 +51,11 @@ export function advanceWeek(state: GameState): GameState {
 
   // 2. Core Simulation (Bouts, Training, Health, Economy)
   // Bouts happen for the week that is just ending
-  newState = runBoutSimulationPass(newState, rootRng);
+  let newState = runBoutSimulationPass(state, rootRng);
 
   newState = runWarriorPass(newState, rootRng);
   newState = runEconomyPass(newState, rootRng);
-  newState = runEquipmentPass(newState, rootRng);
+  newState = runEquipmentPass(newState);
   
   // 3. World & System Transitions
   newState = executeWorldTransitions(newState, rootRng, nextWeek);

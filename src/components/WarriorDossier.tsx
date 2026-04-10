@@ -1,5 +1,5 @@
-import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import React, { useMemo } from "react";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,9 +20,10 @@ interface WarriorDossierProps {
 }
 
 export const WarriorDossier = React.memo(function WarriorDossier({ warriorId }: WarriorDossierProps) {
+  const state = useWorldState();
+  
   // Use fine-grained selector to find the warrior
-  const warrior = useGameStore((s) => {
-    const state = s.state;
+  const warrior = useMemo(() => {
     let w = state.roster.find((w) => w.id === warriorId) ||
             state.graveyard.find((w) => w.id === warriorId) ||
             state.retired.find((w) => w.id === warriorId);
@@ -32,10 +33,10 @@ export const WarriorDossier = React.memo(function WarriorDossier({ warriorId }: 
       if (w) return w;
     }
     return undefined;
-  });
+  }, [state, warriorId]);
 
   // Also select rankings separately
-  const rankings = useGameStore((s) => s.state.realmRankings?.[warriorId]);
+  const rankings = state.realmRankings?.[warriorId];
 
   if (!warrior) return <div className="p-8 text-center text-muted-foreground">Warrior not found.</div>;
 
@@ -192,7 +193,7 @@ export const WarriorDossier = React.memo(function WarriorDossier({ warriorId }: 
               <Activity className="h-3 w-3 text-destructive" /> Medical Report
             </h3>
             <div className="grid gap-2">
-              {warrior.injuries.map((inj, i) => {
+              {warrior.injuries.map((inj: any, i: number) => {
                 const name = typeof inj === "string" ? inj : inj.name;
                 const severity = typeof inj === "string" ? "Minor" : inj.severity;
                 return (

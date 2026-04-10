@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { TRAINER_WEEKLY_SALARY } from "@/engine/trainers";
 import { Surface } from "@/components/ui/Surface";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ContractManager() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const trainers = state.trainers ?? [];
   const activeTrainers = trainers.filter(t => t.contractWeeksLeft > 0);
 

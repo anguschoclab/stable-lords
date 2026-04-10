@@ -3,7 +3,7 @@
  * Modularized for better maintainability and strict type safety.
  */
 import React, { useState, useCallback, useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, reconstructGameState } from "@/state/useGameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags, aiPlanForWarrior } from "@/engine";
 import { type TournamentEntry, type TournamentBout, type FightSummary, type Warrior, FightingStyle } from "@/types/game";
 import { generateId, hashStr } from "@/utils/idUtils";
@@ -54,7 +54,10 @@ export default function Tournaments() {
     arenaHistory,
     player,
     rosterBonus,
-    setState
+    setState,
+    activeSlotId,
+    loadGame,
+    setSimulating
   } = useGameStore();
 
   const [expandedBout, setExpandedBout] = useState<string | null>(null);

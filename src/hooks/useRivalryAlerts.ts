@@ -3,7 +3,7 @@
  * Blood Feud level (4-5) triggers screen shake + impact SFX via Web Audio API.
  */
 import { useEffect, useRef, useMemo, useCallback } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { toast } from "@/hooks/use-toast";
 
 interface RivalrySnapshot {
@@ -99,7 +99,7 @@ function triggerScreenShake(intensity: number) {
 }
 
 export function useRivalryAlerts() {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const rosterNames = useMemo(
     () => new Set(

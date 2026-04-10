@@ -3,7 +3,7 @@
  * Uses the main game state arenaHistory and LoreArchive for hall entries.
  */
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { LoreArchive } from "./LoreArchive";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { WarriorLink } from "@/components/EntityLink";
 
 export const HallOfFights: React.FC = () => {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   // Hall entries from LoreArchive
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -405,6 +405,9 @@
     "flair": {
       "Flashy": "Crowd favorite — earns +2 Popularity per flashy fight."
     },
+    "title": {
+      "Champion": "Arena title holder. Earns passive fame each week."
+    },
     "injury": {
       "Broken Arm": "Reduces Attack and Parry effectiveness until healed."
     },

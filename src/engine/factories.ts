@@ -1,7 +1,7 @@
 import { 
   type GameState, 
   type Warrior, 
-  type OwnerPersonality 
+  type OwnerPersonality, type FightSummary 
 } from "@/types/state.types";
 import { type PoolWarrior } from "@/engine/recruitment";
 import narrativeContent from "@/data/narrativeContent.json";
@@ -194,4 +194,21 @@ export function makeWarrior(
     });
 
     return state;
-  }
+  }export function makeFightSummary(overrides: Partial<FightSummary> = {}): FightSummary {
+  return {
+    id: `fight-${Math.random().toString(36).substr(2, 9)}`,
+    week: 1,
+    a: "Attacker",
+    d: "Defender",
+    warriorIdA: "warrior-a",
+    warriorIdD: "warrior-d",
+    styleA: "Brawler" as any,
+    styleD: "Balanced" as any,
+    winner: "A",
+    by: "KO",
+    title: "Practice Match",
+    transcript: [],
+    createdAt: new Date().toISOString(),
+    ...overrides,
+  };
+}

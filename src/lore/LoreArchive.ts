@@ -47,18 +47,20 @@ export const LoreArchive = {
   },
 
   markFightOfWeek(week: number, fightId: string) {
+    const label = "Fight of the Week";
     const hall = LoreArchive.allHall().filter(
-      (h) => !(h.label === "Fight of the Week" && h.week === week)
+      (h) => !(h.label === label && h.week === week)
     );
-    hall.push({ week, label: "Fight of the Week", fightId });
+    hall.push({ id: `hall-${week}-${label.replace(/ /g, "-")}`, week, label, fightId });
     saveArray(KEY_HALL, hall);
   },
 
   markFightOfTournament(week: number, fightId: string) {
+    const label = "Fight of the Tournament";
     const hall = LoreArchive.allHall().filter(
-      (h) => !(h.label === "Fight of the Tournament" && h.week === week)
+      (h) => !(h.label === label && h.week === week)
     );
-    hall.push({ week, label: "Fight of the Tournament", fightId });
+    hall.push({ id: `hall-${week}-${label.replace(/ /g, "-")}`, week, label, fightId });
     saveArray(KEY_HALL, hall);
   },
 };

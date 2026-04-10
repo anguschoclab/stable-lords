@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { TrendingUp, Activity, Zap, ArrowUpRight, ArrowDownLeft, Target, Globe } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Surface } from "@/components/ui/Surface";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function MetaPulseWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const metaDrift = useMemo(
     () => computeMetaDrift(state.arenaHistory),
     [state.arenaHistory]

@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Cloud, Sun, CloudRain, ThermometerSun, Wind, Info } from "lucide-react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +50,7 @@ const WEATHER_METADATA = {
 };
 
 export function WeatherWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const weather = state.weather || "Clear";
   const meta = WEATHER_METADATA[weather as keyof typeof WEATHER_METADATA] || WEATHER_METADATA.Clear;
   const Icon = meta.icon;

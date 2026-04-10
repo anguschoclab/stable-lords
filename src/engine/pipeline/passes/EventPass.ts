@@ -26,7 +26,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
     if (activeWarriors.length > 0) {
       const brawlerIndex = Math.floor(brawlRng.next() * activeWarriors.length);
       const brawler = activeWarriors[brawlerIndex];
-      const e = narrativeContent.events.tavern_brawl;
+      const e = (narrativeContent.events as any).tavern_brawl;
       
       nextState.roster = updateEntityInList(nextState.roster, brawler.id, (w) => ({
         ...w,
@@ -57,7 +57,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
     if (youngWarriors.length > 0) {
       const chosenIndex = Math.floor(brawlRng.next() * youngWarriors.length);
       const chosen = youngWarriors[chosenIndex];
-      const e = narrativeContent.events.celestial_blessing;
+      const e = (narrativeContent.events as any).celestial_blessing;
 
       nextState.roster = updateEntityInList(nextState.roster, chosen.id, (w) => ({
         ...w,

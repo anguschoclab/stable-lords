@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,13 +21,14 @@ import { toast } from "sonner";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 
 export default function BookingOffice() {
-  const { state, setState } = useGameStore();
+  const state = useWorldState();
+  const { setState } = useGameStore();
   const { promoters, boutOffers, roster, week } = state;
 
   // Filter offers involving the player's warriors
   const playerOffers = useMemo(() => {
-    return Object.values(boutOffers).filter(offer => 
-      offer.warriorIds.some(wId => roster.some(playerW => playerW.id === wId)) &&
+    return Object.values(boutOffers).filter((offer: any) => 
+      offer.warriorIds.some((wId: string) => roster.some((playerW: any) => playerW.id === wId)) &&
       offer.status === "Proposed"
     );
   }, [boutOffers, roster]);

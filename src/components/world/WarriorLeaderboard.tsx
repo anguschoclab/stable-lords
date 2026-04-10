@@ -119,12 +119,22 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                   </div>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  <Link
-                    to={row.isPlayer ? "/stable/hall" : "/stable/$id"} params={row.isPlayer ? {} : { id: row.stableId! }}
-                    className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
-                  >
-                    <span className="text-[10px] opacity-20">PATRON:</span> {row.stableName}
-                  </Link>
+                  {row.isPlayer ? (
+                    <Link
+                      to="/stable"
+                      className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                    >
+                      <span className="text-[10px] opacity-20">PATRON:</span> {row.stableName}
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/stable/$id"
+                      params={{ id: row.stableId! }}
+                      className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                    >
+                      <span className="text-[10px] opacity-20">PATRON:</span> {row.stableName}
+                    </Link>
+                  )}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{row.style}</TableCell>
                 <TableCell className="text-right font-mono font-black text-xs text-primary">{Math.round(row.compositeScore)}</TableCell>

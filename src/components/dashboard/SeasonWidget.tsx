@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim, Moon } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function SeasonWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const week = ((state.week - 1) % 13) + 1;
   const season = state.season;
   

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Coins, ArrowUpRight, ArrowDownRight, Wallet, Activity, TrendingUp, BarChart3 } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { Surface } from "@/components/ui/Surface";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function FinancesWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
   const gold = state.gold ?? 0;
 

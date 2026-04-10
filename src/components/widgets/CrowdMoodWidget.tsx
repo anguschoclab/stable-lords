@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useGameStore } from '@/state/useGameStore';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
 import { CrowdMood, getMoodModifiers, MOOD_ICONS, MOOD_DESCRIPTIONS } from '@/engine/crowdMood';
@@ -14,7 +14,7 @@ const MOOD_ANGLE: Record<CrowdMood, number> = {
 };
 
 export function CrowdMoodWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const mood = state.crowdMood as CrowdMood;
   const moodHistory = state.moodHistory || [];
   const mods = useMemo(() => getMoodModifiers(mood), [mood]);

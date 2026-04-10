@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { HeartPulse, Activity, Skull, AlertCircle, Thermometer, ShieldAlert, ChevronRight } from "lucide-react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { WarriorLink } from "@/components/EntityLink";
 
 export function MedicalAuditWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const atRisk = useMemo(() => {
     return state.roster.filter(w => {

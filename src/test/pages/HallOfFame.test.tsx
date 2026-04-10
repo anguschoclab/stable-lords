@@ -64,10 +64,10 @@ describe("HallOfFame Component", () => {
   };
 
   const fight1: FightSummary = {
-    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", warriorIdA: "Reaper", warriorIdD: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
+    id: "f1", week: 10, title: "Reaper vs Victim", a: "Reaper", d: "Victim", warriorIdA: "Reaper", warriorIdD: "Victim", winner: "A", by: "Kill", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString(), transcript: []
   };
   const fight2: FightSummary = {
-    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", warriorIdA: "Reaper", warriorIdD: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString()
+    id: "f2", week: 20, title: "Reaper vs Victim2", a: "Reaper", d: "Victim2", warriorIdA: "Reaper", warriorIdD: "Victim2", winner: "A", by: "KO", styleA: FightingStyle.LungingAttack, styleD: FightingStyle.AimedBlow, createdAt: new Date().toISOString(), transcript: []
   };
 
   beforeEach(() => {

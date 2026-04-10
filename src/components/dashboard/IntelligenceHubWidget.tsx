@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Newspaper, Bell, Quote, ChevronRight, Info, Zap, TrendingUp, Target, Activity, Send } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Surface } from "@/components/ui/Surface";
@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentReasoningWidget } from "./AgentReasoningWidget";
 
 export function IntelligenceHubWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const recentGazettes = useMemo(() => {
     return (state.gazettes || []).slice(-5).reverse();

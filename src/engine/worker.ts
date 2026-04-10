@@ -5,16 +5,6 @@ import { PatronTokenService } from "./tokens/patronTokenService";
 import { 
   createFreshState
 } from "./factories";
-import {
-  updateWarriorEquipment
-} from "@/state/mutations/rosterMutations";
-import {
-  initializeStable,
-  draftInitialRoster,
-  appendFightToHistory,
-  updateWarriorAfterFight
-} from "@/state/mutations/worldMutations";
-
 import { TournamentSelectionService } from "./matchmaking/tournamentSelection";
 
 /**
@@ -24,14 +14,8 @@ import { TournamentSelectionService } from "./matchmaking/tournamentSelection";
 const engine = {
   advanceWeek,
   advanceDay,
-  assignToken: PatronTokenService.assignToken,
   resolveTournamentRound: TournamentSelectionService.resolveRound.bind(TournamentSelectionService),
-  createFreshState,
-  initializeStable,
-  draftInitialRoster,
-  updateWarriorAfterFight,
-  appendFightToHistory,
-  updateWarriorEquipment
+  createFreshState
 };
 
 export type EngineWorker = typeof engine;

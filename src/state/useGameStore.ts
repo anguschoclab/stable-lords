@@ -41,11 +41,15 @@ export type GameStore = GameStoreState & GameStoreActions & EconomySlice & Roste
 
 /**
  * Reconstructs a full GameState from the modular slices for engine consumption.
+ * v1.0 Hardening: Ensures all schema properties are mapped.
  */
 export function reconstructGameState(store: GameStore): GameState {
-  const fresh = createFreshState("reconstruct-default");
   return {
-    ...fresh,
+    meta: {
+      gameName: "Stable Lords",
+      version: "2.1.0-hardened",
+      createdAt: store.lastSavedAt || new Date().toISOString(),
+    },
     treasury: store.treasury,
     ledger: store.ledger,
     roster: store.roster,
@@ -87,6 +91,10 @@ export function reconstructGameState(store: GameStore): GameState {
     isFTUE: store.isFTUE,
     ftueStep: store.ftueStep,
     ftueComplete: store.ftueComplete,
+    coachDismissed: store.coachDismissed || [],
+    rivalries: store.rivalries || [],
+    matchHistory: store.matchHistory || [],
+    ownerGrudges: store.ownerGrudges || [],
   };
 }
 
@@ -127,15 +135,15 @@ export const useGameStore = create<GameStore>()(
           draft.day = state.day;
           draft.season = state.season;
           draft.weather = state.weather;
-          draft.promoters = state.promoters;
-          draft.boutOffers = state.boutOffers;
+          draft.promoters = state.promoters || {};
+          draft.boutOffers = state.boutOffers || {};
           draft.rivals = state.rivals;
           draft.gazettes = state.gazettes;
           draft.scoutReports = state.scoutReports || [];
-          draft.unacknowledgedDeaths = state.unacknowledgedDeaths;
-          draft.rosterBonus = state.rosterBonus;
-          draft.tournaments = state.tournaments;
-          draft.isTournamentWeek = state.isTournamentWeek;
+          draft.unacknowledgedDeaths = state.unacknowledgedDeaths || [];
+          draft.rosterBonus = state.rosterBonus || 0;
+          draft.tournaments = state.tournaments || [];
+          draft.isTournamentWeek = state.isTournamentWeek || false;
           draft.activeTournamentId = state.activeTournamentId;
           draft.year = state.year || 1;
           
@@ -154,8 +162,12 @@ export const useGameStore = create<GameStore>()(
           draft.hallOfFame = state.hallOfFame || [];
           draft.settings = state.settings || { featureFlags: { tournaments: true, scouting: true } };
           draft.isFTUE = state.isFTUE || false;
-          draft.ftueStep = state.ftueStep;
+          draft.ftueStep = state.ftueStep || 0;
           draft.ftueComplete = state.ftueComplete || false;
+          draft.coachDismissed = state.coachDismissed || [];
+          draft.rivalries = state.rivalries || [];
+          draft.matchHistory = state.matchHistory || [];
+          draft.ownerGrudges = state.ownerGrudges || [];
           
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
@@ -264,6 +276,7 @@ export const useGameStore = create<GameStore>()(
 );
 
 /** --- Fine-Grained Selectors (v4.1: Source from Slice only) --- */
+export const useWorldState = () => useGameStore(reconstructGameState);
 export const usePlayer = () => useGameStore(s => s.player);
 export const useRoster = () => useGameStore(s => s.roster);
 export const useRivals = () => useGameStore(s => s.rivals);

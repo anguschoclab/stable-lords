@@ -4,7 +4,7 @@
  * Entity names are rendered as clickable links via WarriorLink.
  */
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
@@ -95,7 +95,7 @@ function LinkifiedText({ text, names }: { text: string; names: string[] }) {
 }
 
 export default function EventLog() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const navigate = useNavigate();
 
   // Collect all known warrior names for linkification

@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { TRAINER_WEEKLY_SALARY } from "@/engine/trainers";
@@ -10,7 +10,7 @@ import { GraduationCap, ChevronRight, Target, Coins, Activity, Zap } from "lucid
 import { cn } from "@/lib/utils";
 
 export function TrainerTable() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const trainers = (state.trainers ?? []).filter(t => t.contractWeeksLeft > 0);
 
   return (

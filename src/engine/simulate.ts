@@ -173,7 +173,11 @@ export function simulateFight(
       rng, nameA, nameD, weaponA, weaponD,
       styleA: fA.style, styleD: fD.style,
       maxHpA: fA.maxHp, maxHpD: fD.maxHp,
-      prevHpRatioA, prevHpRatioD
+      prevHpRatioA, prevHpRatioD,
+      fameA: warriorA?.fame ?? 0,
+      fameD: warriorD?.fame ?? 0,
+      isFavoriteA: !!(warriorA?.favorites?.discovered?.weapon),
+      isFavoriteD: !!(warriorD?.favorites?.discovered?.weapon)
     };
     const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
     log.push(...newLines);

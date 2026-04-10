@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "@tanstack/react-router";
 import { Shield, UserPlus, Users, Activity, Heart, Swords, Star, AlertCircle } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { selectActiveWarriors } from "@/state/selectors";
 import { Surface } from "@/components/ui/Surface";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function StableWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const activeWarriors = selectActiveWarriors(state);
   const rosterCap = BASE_ROSTER_CAP + (state.rosterBonus || 0);
   const topWarriors = [...activeWarriors].sort((a, b) => b.fame - a.fame).slice(0, 4);

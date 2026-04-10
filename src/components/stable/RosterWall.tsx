@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Surface } from "@/components/ui/Surface";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function RosterWall() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const navigate = useNavigate();
 
   const sortedRoster = useMemo(

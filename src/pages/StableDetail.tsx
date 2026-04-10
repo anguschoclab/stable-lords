@@ -3,7 +3,7 @@
  */
 import React, { useMemo } from "react";
 import { useParams, Link } from "@tanstack/react-router";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { isActive, isDead } from "@/engine/warriorStatus";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +29,7 @@ const TIER_CONFIG: Record<string, { label: string; color: string; icon: React.El
 
 export default function StableDetail() {
   const { id } = useParams({ strict: false }) as { id: string };
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const rival = useMemo(
     () => (state.rivals ?? []).find(r => r.owner.id === id),

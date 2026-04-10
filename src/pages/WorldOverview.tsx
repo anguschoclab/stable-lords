@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Globe, Trophy, Swords, Skull, Crown, Activity, Brain } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -14,7 +14,7 @@ type SortField = "rank" | "name" | "fame" | "wins" | "losses" | "kills" | "winRa
 type WarriorSortField = "name" | "stable" | "fame" | "wins" | "losses" | "kills" | "winRate" | "style";
 
 export default function WorldOverview() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const [stableSort, setStableSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({ field: "fame", dir: "desc" });
   const [warriorSort, setWarriorSort] = useState<{ field: WarriorSortField; dir: "asc" | "desc" }>({ field: "fame", dir: "desc" });
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -7,7 +7,7 @@ import { Trophy, HelpCircle, AlertCircle, TrendingUp } from "lucide-react";
 import { TOURNAMENT_TIERS } from "@/engine/matchmaking/tournamentSelection";
 
 export default function BubbleWatchWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const { realmRankings, roster } = state;
 
   if (!realmRankings || Object.keys(realmRankings).length === 0) {

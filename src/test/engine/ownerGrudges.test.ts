@@ -7,7 +7,7 @@ describe("ownerGrudges - processOwnerGrudges", () => {
   const mockState: any = {
     week: 10,
     arenaHistory: [
-      { id: "f1", week: 9, a: "W1", d: "W2", winner: "A", by: "Kill" }
+      { id: "f1", week: 9, a: "W1", d: "W2", warriorIdA: "w1", warriorIdD: "w2", styleA: "Brawler", styleD: "Brawler", winner: "A", by: "Kill" }
     ],
     rivals: [
       {

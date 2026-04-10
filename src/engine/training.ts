@@ -45,7 +45,7 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
       const { updatedInjuries, message } = processRecovery(warrior, healingBonus);
       currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({ 
         ...w, 
-        injuries: updatedInjuries as (string | InjuryData)[] 
+        injuries: updatedInjuries as InjuryData[] 
       }));
       results.push({ type: "recovery", warriorId: warrior.id, message });
       continue;
@@ -79,7 +79,7 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
     if (injury && injuryResult) {
       currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({ 
         ...w, 
-        injuries: [...w.injuries, injury] as (string | InjuryData)[] 
+        injuries: [...w.injuries, injury] as InjuryData[] 
       }));
       results.push(injuryResult);
     }
