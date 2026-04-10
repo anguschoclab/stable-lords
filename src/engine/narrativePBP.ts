@@ -33,12 +33,28 @@ export interface CombatContext {
  */
 export function interpolateTemplate(template: string, ctx: CombatContext): string {
   if (!template) return "No description available.";
-  return template
+  let result = template
     .replace(/%A/g, ctx.attacker || ctx.name || "The warrior")
     .replace(/%D/g, ctx.defender || "the opponent")
     .replace(/%W/g, ctx.weapon || "weapon")
     .replace(/%BP/g, ctx.bodyPart || "body")
     .replace(/%H/g, String(ctx.hits || ""));
+
+  // Also support Handlebars-style placeholders
+  for (const [key, value] of Object.entries(ctx)) {
+    if (value !== undefined) {
+      result = result.replace(new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, "g"), String(value));
+    }
+  }
+
+  // Fallbacks for specific templates that use {{name}} but only pass attacker/defender
+  if (ctx.attacker && !ctx.name) {
+    result = result.replace(/\{\{\s*name\s*\}\}/g, String(ctx.attacker));
+  } else if (ctx.name && !ctx.attacker) {
+    result = result.replace(/\{\{\s*attacker\s*\}\}/g, String(ctx.name));
+  }
+
+  return result;
 }
 
 /**
