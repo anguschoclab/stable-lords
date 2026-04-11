@@ -5,7 +5,7 @@ import { simulateFight, defaultPlanForWarrior } from "@/engine/simulate";
 import { aiPlanForWarrior } from "@/engine/ownerAI";
 import { FightingStyle } from "@/types/shared.types";
 import { findWarriorById, modifyWarrior } from "./tournamentStateMutator";
-import { StateImpact, mergeImpacts, resolveImpacts } from "@/engine/impacts";
+import { StateImpact, mergeImpacts } from "@/engine/impacts";
 
 export interface RoundResolutionResult {
   impact: StateImpact;
@@ -127,14 +127,12 @@ export function resolveRound(state: GameState, tournamentId: string, seed: numbe
  */
 export function resolveCompleteTournament(state: GameState, tournamentId: string, seed: number): StateImpact {
   const impacts: StateImpact[] = [];
-  let currentState = state;
   let safety = 0;
   while (safety < 10) {
-    const tour = (currentState.tournaments || []).find(t => t.id === tournamentId);
+    const tour = (state.tournaments || []).find(t => t.id === tournamentId);
     if (!tour || tour.completed) break;
-    const result = resolveRound(currentState, tournamentId, seed + safety);
+    const result = resolveRound(state, tournamentId, seed + safety);
     impacts.push(result.impact);
-    currentState = resolveImpacts(currentState, [result.impact]);
     safety++;
   }
   return mergeImpacts(impacts);
