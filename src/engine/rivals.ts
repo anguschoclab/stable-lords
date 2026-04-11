@@ -5,8 +5,8 @@ import { computeWarriorStats } from "./skillCalc";
 import { makeWarrior } from "./factories";
 import { STABLE_TEMPLATES, type StableTemplate } from "@/data/stableTemplates";
 import type { GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 /**
  * AI Rival Stables — maintains the 23 AI stables that populate the world.
  */

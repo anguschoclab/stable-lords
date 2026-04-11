@@ -14,8 +14,8 @@ import {
   conservingLine
 } from "./narrativePBP";
 import { narrateEvents, NarrationContext } from "./combat/narrator";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import type { GameState, Trainer, FightOutcomeBy } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket } from "@/types/combat.types";

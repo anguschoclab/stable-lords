@@ -4,7 +4,7 @@ import type { FightOutcome, FightSummary } from "@/types/combat.types";
 import { generateId } from "@/utils/idUtils";
 import { generateFightNarrative } from "@/engine/gazetteNarrative";
 import { engineEventBus } from "@/engine/core/EventBus";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 export function handleDeath(
   s: GameState, 

@@ -2,8 +2,8 @@ import type { GameState, RivalStableData, AIIntent, AIStrategy } from "@/types/s
 import { PERSONALITY_CLASH } from "@/data/ownerData";
 
 import { computeMetaDrift } from "../metaDrift";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /**
  * Determines the weekly strategic intent for an AI owner.

@@ -1,10 +1,9 @@
 /**
- * RNG Service Module
- * Exports all RNG-related interfaces and implementations.
+ * RNG Service Module — Type Exports Only
+ * To avoid circular dependencies during simulation, always import 
+ * implementations directly from their respective files.
  */
 
 export type { IRNGService } from "./IRNGService";
-export { SeededRNGService } from "./SeededRNGService";
 export type { IRNGContext } from "./IRNGContext";
-export { RNGContext } from "./RNGContext";
-export { TestRNGService } from "./TestRNGService";
+// implementations must be imported directly to avoid circularity

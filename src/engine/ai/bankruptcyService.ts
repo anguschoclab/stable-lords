@@ -1,4 +1,5 @@
 import type { GameState, RivalStableData } from "@/types/state.types";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * BankruptcyService - Handles bankruptcy detection and processing.

@@ -1,6 +1,6 @@
 import { type RivalStableData, type PoolWarrior, type GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { processRecruitment } from "./ai/workers/recruitmentWorker";
 import { computeMetaDrift } from "./metaDrift";
 

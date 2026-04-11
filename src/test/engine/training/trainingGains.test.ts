@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import {
   computeGainChance,
   processAttributeTraining,

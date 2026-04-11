@@ -1,7 +1,7 @@
 import type { GameState, SeasonalGrowth } from "@/types/state.types";
 import type { Warrior, InjuryData } from "@/types/warrior.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { type StateImpact } from "./impacts";
 import { 

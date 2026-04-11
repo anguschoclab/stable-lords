@@ -1,9 +1,9 @@
 import type { GameState, Season, RivalStableData } from "@/types/state.types";
 import type { FightSummary } from "@/types/combat.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { getRecentFights } from "@/engine/core/historyUtils";
 import { PHILOSOPHY_DRIFT } from "@/data/ownerData";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /**
  * Evolve stable philosophies based on season results.

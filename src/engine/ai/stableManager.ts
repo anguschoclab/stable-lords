@@ -62,7 +62,7 @@ export function processAIStable(
 
   // B) RosterWorker (Training/Gear)
   const rosterSeed = state.week * 8123 + (updatedRival.owner.id.length * 101);
-  updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed, context);
+  updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed, undefined, context);
 
   // 4. Calculate Final Expenses
   let weeklyExpenses = 0; // Removed 20g hidden tax for parity

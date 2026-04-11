@@ -1,6 +1,6 @@
 import type { Warrior } from "@/types/state.types";
 import type { FightOutcome, FightSummary } from "@/types/combat.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { generateId } from "@/utils/idUtils";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import { ArenaHistory } from "@/engine/history/arenaHistory";

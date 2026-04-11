@@ -8,7 +8,7 @@ import { computeWarriorStats } from "@/engine/skillCalc";
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { vi } from "vitest";
 import { SeededRNG } from "@/utils/random";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 function makeWarrior(attrs: any, overrides?: Partial<Warrior>): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, FightingStyle.StrikingAttack);

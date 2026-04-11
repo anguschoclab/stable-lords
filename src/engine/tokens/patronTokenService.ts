@@ -2,7 +2,7 @@ import type { GameState, InsightToken, InsightTokenType } from "@/types/state.ty
 import type { Warrior } from "@/types/warrior.types";
 import type { Attributes } from "@/types/shared.types";
 import { generateId } from "@/utils/idUtils";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * PatronTokenService — Manages Tournament Reward Favors.

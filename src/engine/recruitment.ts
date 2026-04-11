@@ -3,8 +3,8 @@ import { type AttributePotential, type WarriorFavorites } from "@/types/warrior.
 import { computeWarriorStats } from "./skillCalc";
 import { generatePotential } from "./potential";
 import { generateFavorites } from "./favorites";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { generateId } from "@/utils/idUtils";
 
 // ─── Types ────────────────────────────────────────────────────────────────

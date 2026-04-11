@@ -7,9 +7,9 @@ import type { FightSummary } from "@/types/combat.types";
 import type { CrowdMoodType, Season } from "@/types/shared.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { GazetteStory } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { generateId } from "@/utils/idUtils";
 
 

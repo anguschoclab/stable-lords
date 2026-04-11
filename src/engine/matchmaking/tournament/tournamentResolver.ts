@@ -1,7 +1,8 @@
 import type { GameState, Warrior, TournamentEntry, FightSummary } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
-import { simulateFight, aiPlanForWarrior, defaultPlanForWarrior } from "@/engine";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import { simulateFight, defaultPlanForWarrior } from "@/engine/simulate";
+import { aiPlanForWarrior } from "@/engine/ownerAI";
 import { FightingStyle } from "@/types/shared.types";
 import { findWarriorById, modifyWarrior } from "./tournamentStateMutator";
 

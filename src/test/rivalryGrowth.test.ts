@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { updateRivalriesFromBouts } from "@/engine/matchmaking/rivalryLogic";
 import { FightSummary, Rivalry } from "@/types/game";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
   it("verifies that rivalry intensity scales correctly with fame outcomes", () => {

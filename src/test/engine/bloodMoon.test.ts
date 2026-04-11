@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { weatherStaminaModifier } from "@/engine/combat/combatMath";
 import { rollWeather } from "@/engine/pipeline/passes/WorldPass";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe("Blood Moon Feature", () => {
   it("should return a 1.1 multiplier for Blood Moon stamina drain", () => {

@@ -5,7 +5,7 @@ import { describe, it, expect } from "vitest";
 import { generateScoutReport, getScoutCost, type ScoutQuality, getAttributeDescription } from "@/engine/scouting";
 import { FightingStyle, type Warrior } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 const TEST_RNG = new SeededRNGService(42);
 

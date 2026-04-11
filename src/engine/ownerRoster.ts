@@ -1,12 +1,12 @@
 import type { GameState, RivalStableData, OwnerPersonality, MetaAdaptation, TrainerTier } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { FightingStyle } from "@/types/shared.types";
 import { computeMetaDrift, type StyleMeta } from "./metaDrift";
 import { computeWarriorStats } from "./skillCalc";
 import { getRecentFightsForWarrior } from "@/engine/core/historyUtils";
 import { META_RECRUIT_QUOTES, getPhilosophyStyles } from "@/data/ownerData";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /**
  * Manages the roster of AI owners by evaluating current warriors, recruiting talent,

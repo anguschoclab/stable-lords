@@ -1,5 +1,5 @@
 import type { GameState } from "@/types/state.types";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { advanceWeek as runWeeklyPipeline } from "@/engine/pipeline/services/weekPipelineService";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 import { resolveImpacts, StateImpact } from "@/engine/impacts";

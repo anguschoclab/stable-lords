@@ -11,8 +11,8 @@ import { createFreshState, makeWarrior } from "@/engine/factories";
 import { generateRivalStables } from "@/engine/rivals";
 import { generateRecruitPool } from "@/engine/recruitment";
 import { generateHiringPool } from "@/engine/trainers";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 import { generatePromoters } from "@/engine/promoters/promoterGenerator";
 

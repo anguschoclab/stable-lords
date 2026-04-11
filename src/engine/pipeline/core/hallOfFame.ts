@@ -2,8 +2,8 @@ import type { GameState, AnnualAward } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle } from "@/types/shared.types";
 
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGService): GameState {
   const rngService = rng || new SeededRNGService(state.year * 777);
   // Only process at the transition from Week 52 -> Week 1 (Year rollover)

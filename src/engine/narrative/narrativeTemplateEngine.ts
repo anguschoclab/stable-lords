@@ -1,6 +1,6 @@
 import narrativeContent from "@/data/narrativeContent.json";
 import { pick } from "./narrativeUtils";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 export interface CombatContext {
   attacker?: string;

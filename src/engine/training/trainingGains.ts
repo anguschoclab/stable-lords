@@ -11,7 +11,7 @@ import {
 import { type SeasonalGrowth } from "@/types/state.types";
 import { canGrow, diminishingReturnsFactor } from "@/engine/potential";
 import { computeWarriorStats } from "@/engine/skillCalc";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { generateId } from "@/utils/idUtils";
 import { computeTrainerBonus } from "./coachLogic";
 import { getSeasonalGains, updateSeasonalGains } from "./facilityUpkeep";

@@ -1,9 +1,9 @@
 import type { GameState } from "@/types/state.types";
 import type { Season } from "@/types/shared.types";
 import type { FightSummary } from "@/types/combat.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { getRecentFights } from "@/engine/core/historyUtils";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /**
  * Generate personality-driven gazette events based on recent performance.

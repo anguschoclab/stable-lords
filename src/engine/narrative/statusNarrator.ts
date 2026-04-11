@@ -1,5 +1,5 @@
 import { NarrativeTemplateEngine } from "./narrativeTemplateEngine";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * StatusNarrator - Damage, fatigue, state change, and crowd reaction narration.

@@ -1,6 +1,6 @@
 import type { Rivalry } from "@/types/state.types";
 import type { FightSummary } from "@/types/combat.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { MatchScoringService } from "../matchmakingServices";
 import { calculateRivalryScore } from "../ownerGrudges";
 import { getStablePairKey } from "@/utils/keyUtils";

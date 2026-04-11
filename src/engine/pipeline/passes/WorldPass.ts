@@ -1,5 +1,5 @@
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import type { GameState, WeatherType, Season } from "@/types/state.types";
 import { generateWeather, advanceSeason } from "@/engine/weather";
 

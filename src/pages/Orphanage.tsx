@@ -13,7 +13,7 @@ import { computeWarriorStats, DAMAGE_LABELS } from "@/engine/skillCalc";
 import { generatePotential } from "@/engine/potential";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { generateId } from "@/utils/idUtils";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

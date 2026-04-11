@@ -4,7 +4,7 @@ import type {
 } from "@/types/state.types";
 import type { FightOutcome } from "@/types/combat.types";
 import { getStablePairKey, getWarriorPairKey } from "@/utils/keyUtils";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * Matchmaking Scoring Service - handles the weights and logic for pairing warriors.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { NarrativeTemplateEngine } from "@/engine/narrative/narrativeTemplateEngine";
 import { blurb, commentatorFor, recapLine } from "@/lore/AnnouncerAI";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";

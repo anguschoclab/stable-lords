@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { BoutNarrator } from "@/engine/narrative/boutNarrator";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe("BoutNarrator", () => {
   const rng = new SeededRNGService(12345);

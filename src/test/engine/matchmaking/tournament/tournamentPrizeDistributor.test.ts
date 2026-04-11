@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createFreshState } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { buildTournament } from "@/engine/matchmaking/tournament/tournamentBracketBuilder";
 import { resolveCompleteTournament } from "@/engine/matchmaking/tournament/tournamentResolver";
 import { awardTournamentPrizes, awardRunnerUpPrizes } from "@/engine/matchmaking/tournament/tournamentPrizeDistributor";

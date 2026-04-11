@@ -15,8 +15,8 @@
  */
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from "@/types/shared.types";
 import { computeWarriorStats } from "./skillCalc";
 import { canGrow, diminishingReturnsFactor, revealPotential } from "./potential";

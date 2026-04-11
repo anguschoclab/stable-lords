@@ -16,8 +16,8 @@ const FORCED_RETIRE_MIN = 30;
 const FORCED_RETIRE_MAX = 40;
 
 import { type StateImpact } from "./impacts";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /** Compute the aging impact of the current week. */
 export function computeAgingImpact(state: GameState, rng: IRNGService): StateImpact {

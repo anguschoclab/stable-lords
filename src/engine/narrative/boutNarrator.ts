@@ -1,6 +1,6 @@
 import { CombatNarrator } from "./combatNarrator";
 import { StatusNarrator } from "./statusNarrator";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * BoutNarrator - Intro, opener, and conclusion narration.

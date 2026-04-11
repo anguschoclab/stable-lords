@@ -1,5 +1,5 @@
 import type { GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { processWeekBouts } from "@/engine/bout/services/boutProcessorService";
 import { generateId } from "@/utils/idUtils";
 

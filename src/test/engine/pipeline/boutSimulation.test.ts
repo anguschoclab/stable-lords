@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { GameState, Warrior, BoutOffer, Promoter } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe.skip("Bout Simulation Integration - getFromArchive function issue", () => {
   it("should simulate a signed bout and update state accordingly", async () => {

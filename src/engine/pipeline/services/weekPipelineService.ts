@@ -2,7 +2,7 @@ import type { GameState } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import { archiveWeekLogs } from "../adapters/opfsArchiver";
 import { computeMetaDrift } from "@/engine/metaDrift";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { resolveImpacts, StateImpact } from "@/engine/impacts";
 
 // 🌩️ Modular Pipeline Passes

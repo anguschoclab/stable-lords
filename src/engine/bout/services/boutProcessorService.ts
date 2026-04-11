@@ -9,7 +9,7 @@ import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { engineEventBus } from "@/engine/core/EventBus";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { updatePromoterHistory } from "@/engine/promoters";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 import { applyRecords } from "../recordHandler";
 import { handleDeath } from "../mortalityHandler";

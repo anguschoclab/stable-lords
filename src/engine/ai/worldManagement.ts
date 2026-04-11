@@ -1,5 +1,6 @@
 import type { GameState, RivalStableData } from "@/types/state.types";
-import type { IRNGService, IRNGContext } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import type { IRNGContext } from "@/engine/core/rng/IRNGContext";
 
 // Import extracted modules
 import { SeasonalRetirementService } from "./seasonalRetirementService";

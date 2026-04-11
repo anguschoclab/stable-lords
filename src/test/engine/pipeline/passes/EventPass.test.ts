@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { runEventPass } from "@/engine/pipeline/passes/EventPass";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import type { GameState } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 

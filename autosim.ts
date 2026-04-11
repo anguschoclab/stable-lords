@@ -6,6 +6,10 @@ async function runAutosim(weeks: number) {
   console.log(`🚀 Starting ${weeks}-week stability check...`);
   let state = createFreshState("autosim-seed");
   
+  // Seed the player stable with 3 starters to run the sim
+  state.roster = state.recruitPool.slice(0, 3).map(r => ({ ...r, status: "Active" }));
+  state.recruitPool = state.recruitPool.slice(3);
+  
   try {
     for (let i = 1; i <= weeks; i++) {
       // simulate 6 days of daily stepping then 1 week jump
@@ -27,8 +31,9 @@ async function runAutosim(weeks: number) {
       }
     }
     console.log(`✨ Stability check PASSED: Simulated ${weeks} weeks without a crash.`);
-  } catch (e) {
+  } catch (e: any) {
     console.error(`💥 Stability check FAILED: ${e.message}`);
+    if (e.stack) console.error(e.stack);
     process.exit(1);
   }
 }

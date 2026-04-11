@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { partialRefreshPool, generateRecruitPool, DEFAULT_POOL_SIZE, PoolWarrior } from "@/engine/recruitment";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe("partialRefreshPool", () => {
   it("returns a newly generated pool of DEFAULT_POOL_SIZE if given an empty pool", () => {

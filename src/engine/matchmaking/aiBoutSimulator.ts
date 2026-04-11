@@ -6,7 +6,7 @@ import { computeMetaDrift } from "../metaDrift";
 import { AIBoutService } from "../matchmakingServices";
 import { getStablePairKey } from "@/utils/keyUtils";
 import { AIPoolWarrior } from "./aiPoolCollector";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 export interface AIBoutResult {
   stableA: string;

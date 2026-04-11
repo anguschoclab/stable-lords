@@ -1,7 +1,7 @@
 import { GameState, BoutOffer, Promoter, Warrior, RankingEntry } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { FIGHT_PURSE } from "@/data/economyConstants";
 import { generateId } from "@/utils/idUtils";
 

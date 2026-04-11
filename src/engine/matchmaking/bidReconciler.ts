@@ -1,6 +1,6 @@
 import type { GameState, RivalStableData } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { logAgentAction } from "../ai/agentCore";
 import { generateBoutBids, verifyBoutAcceptance, BoutBid } from "../ai/workers/competitionWorker";
 import { AIPoolWarrior } from "./aiPoolCollector";

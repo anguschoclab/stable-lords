@@ -3,8 +3,8 @@ import type { Warrior, InjuryData } from "@/types/warrior.types";
 import { tickInjuries } from "@/engine/injuries";
 import { clearExpiredRest } from "@/engine/matchmaking/historyLogic";
 import type { StateImpact } from "./impacts";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /**
  * Health Impact calculation — extracted from the legacy pipeline.

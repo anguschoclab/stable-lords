@@ -1,7 +1,7 @@
 import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle } from "@/types/shared.types";
 import { makeWarrior } from "@/engine/factories";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * Generates a freelancer warrior for tournament filler.

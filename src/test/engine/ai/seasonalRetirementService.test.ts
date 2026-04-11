@@ -4,7 +4,7 @@ import { FightingStyle } from "@/types/shared.types";
 import { SeasonalRetirementService } from "@/engine/ai/seasonalRetirementService";
 import { makeWarrior } from "@/engine/factories";
 import type { GameState, IRNGService } from "@/types/state.types";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe("SeasonalRetirementService", () => {
   let state: GameState;

@@ -1,5 +1,5 @@
 import { GameState, RivalStableData } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { updateAIStrategy } from "@/engine/ai/intentEngine";
 import { processAIStable } from "@/engine/ai/stableManager";
 import { generateRivalStables } from "@/engine/rivals";
@@ -7,7 +7,7 @@ import { aiDraftFromPool } from "@/engine/draftService";
 import { processAIRosterManagement } from "@/engine/ownerRoster";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 import { processAllRivalsBoutOffers } from "@/engine/ai/workers/competitionWorker";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
  */

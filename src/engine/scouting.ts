@@ -66,7 +66,7 @@ export function getAttributeRangeDescription(low: number, high: number): string 
   return `${lowDesc} to ${highDesc}`;
 }
 
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /** Generate a scout report for a warrior */
 export function generateScoutReport(

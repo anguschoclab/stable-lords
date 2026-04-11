@@ -9,7 +9,7 @@ import { useGameStore } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, type Attributes } from "@/types/game";
 import { BASE_ROSTER_CAP } from "@/data/constants";
 import { makeWarrior } from "@/engine/factories";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { hashStr } from "@/utils/idUtils";
 import {
   generateRecruitPool, fullRefreshPool,

@@ -3,8 +3,8 @@ import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/tra
 import { computeAgingImpact } from "@/engine/aging";
 import { computeHealthImpact } from "@/engine/health";
 import { resolveImpacts, StateImpact } from "@/engine/impacts";
-import type { IRNGService } from "@/engine/core/rng";
-import { SeededRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { PatronTokenService } from "@/engine/tokens/patronTokenService";
 
 /**

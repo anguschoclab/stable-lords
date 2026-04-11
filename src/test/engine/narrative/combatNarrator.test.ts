@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CombatNarrator } from "@/engine/narrative/combatNarrator";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { FightingStyle } from "@/types/shared.types";
 
 describe("CombatNarrator", () => {

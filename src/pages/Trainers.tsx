@@ -36,7 +36,7 @@ import { Surface } from "@/components/ui/Surface";
 import { TrainerCard } from "@/components/stable/TrainerCard";
 import { canTransact } from "@/utils/economyUtils";
 import { generateId } from "@/utils/idUtils";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { toast } from "sonner";
 
 export default function Trainers() {

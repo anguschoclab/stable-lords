@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { SeededRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { createFreshState } from "@/engine/factories";
 import { SeededRNG } from "@/utils/random";

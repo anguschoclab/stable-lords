@@ -1,5 +1,5 @@
 import type { GameState, RivalStableData } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * SeasonalRetirementService - Handles retirement and legacy founder system.
