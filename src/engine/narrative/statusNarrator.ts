@@ -189,4 +189,3 @@ export const tauntLine = StatusNarrator.tauntLine.bind(StatusNarrator);
 export const conservingLine = StatusNarrator.conservingLine.bind(StatusNarrator);
 export const pressingLine = StatusNarrator.pressingLine.bind(StatusNarrator);
 export const narrateInsightHint = StatusNarrator.narrateInsightHint.bind(StatusNarrator);
-export const narrateInsightHint = StatusNarrator.narrateInsightHint.bind(StatusNarrator);
