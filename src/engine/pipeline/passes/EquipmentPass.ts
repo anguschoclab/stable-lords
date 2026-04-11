@@ -3,8 +3,17 @@ import type { Warrior } from "@/types/warrior.types";
 import { checkWeaponRequirements, DEFAULT_LOADOUT } from "@/data/equipment";
 
 /**
- * Stable Lords — AI Equipment Pass
- * Handles automated gear optimization for rival stables.
+ * Stable Lords — Equipment Pipeline Pass
+ * Handles AI equipment optimization for rival stables.
+ */
+export const PASS_METADATA = {
+  name: "EquipmentPass",
+  dependencies: ["WarriorPass"] // Depends on warrior roster updates
+};
+
+/**
+ * Stable Lords — Equipment Pipeline Pass
+ * Handles AI equipment optimization for rival stables.
  * AI will prioritize equipping 'discovered' favorite weapons and 
  * rhythms, provided they meet the attribute requirements.
  */

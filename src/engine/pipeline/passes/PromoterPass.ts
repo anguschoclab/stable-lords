@@ -9,6 +9,16 @@ import { generateId } from "@/utils/idUtils";
  * Phase 2: Promoters scan the world and dispatch bout offers.
  * Logic incorporates Hype Matrix, Rank Requirements, and Personality biases.
  */
+export const PASS_METADATA = {
+  name: "PromoterPass",
+  dependencies: ["RankingsPass"] // Depends on rankings for matchmaking
+};
+
+/**
+ * Stable Lords — Promoter Pass
+ * Phase 2: Promoters scan the world and dispatch bout offers.
+ * Logic incorporates Hype Matrix, Rank Requirements, and Personality biases.
+ */
 
 const TIER_MULTIPLIERS = {
   Local: 1.0,
@@ -38,18 +48,7 @@ export function runPromoterPass(state: GameState): GameState {
     }
   }
   
-  // 1. Gather all active, available warriors
-  // Available = No SIGNED bout for Week+2 or Week+3
-  const targetWeek = state.week + 2; // Forward booking
-  const unavailableWarriorIds = new Set<string>();
-  Object.values(newOffers).forEach(o => {
-    if (o.status === "Signed" && (o.boutWeek === targetWeek || o.boutWeek === targetWeek + 1)) {
-      o.warriorIds.forEach(id => unavailableWarriorIds.add(id));
-    }
-  });
-
-  const getAvailability = (wId: string) => !unavailableWarriorIds.has(wId);
-
+  // 1. Gather all active warriors
   const allWarriors: { w: Warrior; stableId: string }[] = [];
   state.roster.forEach(w => {
     if (w.status === "Active") allWarriors.push({ w, stableId: state.player.id });
@@ -60,18 +59,28 @@ export function runPromoterPass(state: GameState): GameState {
     });
   });
 
+  // ⚡ Bolt: Pre-compute available warriors to avoid repeated availability checks
+  // Available = No SIGNED bout for Week+2 or Week+3
+  const targetWeek = state.week + 2; // Forward booking
+  const unavailableWarriorIds = new Set<string>();
+  Object.values(newOffers).forEach(o => {
+    if (o.status === "Signed" && (o.boutWeek === targetWeek || o.boutWeek === targetWeek + 1)) {
+      o.warriorIds.forEach(id => unavailableWarriorIds.add(id));
+    }
+  });
+
+  const availableWarriors = allWarriors.filter(entry => !unavailableWarriorIds.has(entry.w.id));
+
   // 2. Iterate through Promoters
   Object.values(state.promoters).forEach(promoter => {
     const capacity = promoter.capacity;
     let generated = 0;
-    
+
     // Attempt to fill capacity
-    const targetWeek = state.week + 2; // Forward booking
-    const shuffledWarriors = rng.shuffle(allWarriors);
+    const shuffledWarriors = rng.shuffle(availableWarriors);
 
     for (const warriorA of shuffledWarriors) {
       if (generated >= capacity) break;
-      if (!getAvailability(warriorA.w.id)) continue;
 
       const rankA = rankings[warriorA.w.id]?.overallRank || 999;
       if (rankA > RANK_REQUIREMENTS[promoter.tier]) continue;
@@ -79,12 +88,11 @@ export function runPromoterPass(state: GameState): GameState {
       // Find an opponent B
       const opponentB = shuffledWarriors.find(candidate => {
         if (candidate.w.id === warriorA.w.id) return false;
-        if (!getAvailability(candidate.w.id)) return false;
-        
+
         const rankB = rankings[candidate.w.id]?.overallRank || 999;
         const scoreA = rankings[warriorA.w.id]?.compositeScore || 0;
         const scoreB = rankings[candidate.w.id]?.compositeScore || 0;
-        
+
         // Qualification & Score Proximity (25% gap max)
         const gap = Math.abs(scoreA - scoreB) / Math.max(1, scoreA);
         return rankB <= RANK_REQUIREMENTS[promoter.tier] && gap <= 0.25;

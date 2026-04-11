@@ -22,8 +22,8 @@ export function pickWeeklyIntent(
   const isRainy = state.weather === "Rainy";
   const isSummer = state.season === "Summer";
   
-  // ⚡ Continuous Alignment: Meta-Drift Awareness
-  const meta = computeMetaDrift(state.arenaHistory || []);
+  // ⚡ Continuous Alignment: Meta-Drift Awareness (use cached if available)
+  const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory || []);
   const favoredStyles = rival.owner.favoredStyles || [];
   const metaIsHostile = favoredStyles.some(s => (meta[s] || 0) < -2);
 
@@ -80,7 +80,7 @@ export function verifyIntentSkepticism(
 
   // Skepticism Tier 3: Meta Hostility (Methodical/Tactician agents only)
   if (personality === "Methodical" || personality === "Tactician") {
-    const meta = computeMetaDrift(state.arenaHistory || []);
+    const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory || []);
     const favored = rival.owner.favoredStyles || [];
     if (favored.some(s => (meta[s] || 0) < -4)) return true;
   }

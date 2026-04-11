@@ -1,10 +1,15 @@
 import { SeededRNG } from "@/utils/random";
-import type { GameState } from "@/types/state.types";
-import { type Season, type WeatherType } from "@/types/shared.types";
+import type { GameState, WeatherType, Season } from "@/types/state.types";
+import { generateWeather, advanceSeason } from "@/engine/weather";
 
 /**
  * Stable Lords — World Pipeline Pass
+ * Handles seasonal transitions and weather changes.
  */
+export const PASS_METADATA = {
+  name: "WorldPass",
+  dependencies: ["EquipmentPass"] // Depends on equipment pass completing
+};
 
 const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
 

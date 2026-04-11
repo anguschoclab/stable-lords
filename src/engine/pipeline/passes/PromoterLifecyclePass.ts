@@ -7,6 +7,11 @@ import { generateDynasticName } from "@/utils/nameLogic";
  * Phase 3: Handles aging and retirement for recruiters and promoters.
  */
 
+export const PASS_METADATA = {
+  name: "PromoterLifecyclePass",
+  dependencies: ["PromoterPass"] // Depends on promoter pass completing
+};
+
 const PERSONALITIES: PromoterPersonality[] = ["Greedy", "Honorable", "Sadistic", "Flashy", "Corporate"];
 
 export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): GameState {

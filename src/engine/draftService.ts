@@ -22,7 +22,7 @@ export function aiDraftFromPool(
   const updatedRivals: RivalStableData[] = [];
   const globalGazetteItems: string[] = [];
 
-  const meta = computeMetaDrift(state.arenaHistory || []);
+  const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory || []);
   
   // 🐍 Snake Draft Priority: Sort rivals by "Need"
   // Priority 1: Fewest active warriors

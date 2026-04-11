@@ -1,4 +1,5 @@
 import type { GameState, Trainer } from "@/types/state.types";
+import type { Warrior } from "@/types/warrior.types";
 import { archiveWeekLogs } from "../adapters/opfsArchiver";
 import { processHallOfFame } from "../core/hallOfFame";
 import { processTierProgression } from "../core/tierProgression";
@@ -10,6 +11,7 @@ import { PatronTokenService } from "@/engine/tokens/patronTokenService";
 import { SeededRNG } from "@/utils/random";
 import { processOwnerGrudges } from "@/engine/ownerGrudges";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
+import { computeMetaDrift } from "@/engine/metaDrift";
 
 // 🌩️ New Modular Passes
 import { runEconomyPass } from "../passes/EconomyPass";
@@ -49,14 +51,30 @@ export function advanceWeek(state: GameState): GameState {
 
   const rootRng = new SeededRNG(nextYear * 52 + nextWeek * 7919 + 101);
 
+  // ⚡ Bolt: Compute and cache meta drift weekly for AI components
+  const metaDrift = computeMetaDrift(state.arenaHistory || []);
+
   // 2. Core Simulation (Bouts, Training, Health, Economy)
   // Bouts happen for the week that is just ending
   let newState = runBoutSimulationPass(state, rootRng);
+  newState = { ...newState, cachedMetaDrift: metaDrift };
+
+  // ⚡ Bolt: Build and cache warrior map weekly for bout processing
+  const warriorMap = new Map<string, Warrior>();
+  newState.roster.forEach(w => warriorMap.set(w.id, w));
+  (newState.rivals || []).forEach(r => r.roster.forEach(w => warriorMap.set(w.id, w)));
+  newState = { ...newState, warriorMap };
 
   newState = runWarriorPass(newState, rootRng);
   newState = runEconomyPass(newState, rootRng);
   newState = runEquipmentPass(newState);
-  
+
+  // ⚡ Bolt: Early exit on bankruptcy condition
+  if (newState.treasury < -500) {
+    newState = finalizeWeek(newState, nextWeek, nextYear, rootRng);
+    return archiveWeekLogs(newState);
+  }
+
   // 3. World & System Transitions
   newState = executeWorldTransitions(newState, rootRng, nextWeek);
 

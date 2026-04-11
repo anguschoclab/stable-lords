@@ -12,13 +12,16 @@ export interface BoutPairing {
 export function generatePairings(state: GameState): BoutPairing[] {
   const currentWeek = state.week;
   const pairings: BoutPairing[] = [];
-  const warriorMap = new Map<string, Warrior>();
 
-  // 1. Build a fast lookup map for all active warriors
-  state.roster.forEach(w => warriorMap.set(w.id, w));
-  (state.rivals || []).forEach(r => {
-    r.roster.forEach(w => warriorMap.set(w.id, w));
-  });
+  // ⚡ Bolt: Use cached warriorMap if available, otherwise build it
+  const warriorMap = state.warriorMap || (() => {
+    const map = new Map<string, Warrior>();
+    state.roster.forEach(w => map.set(w.id, w));
+    (state.rivals || []).forEach(r => {
+      r.roster.forEach(w => map.set(w.id, w));
+    });
+    return map;
+  })();
 
   // 2. Derive pairings from Signed Contracts for this week
   const currentOffers = Object.values(state.boutOffers || {}).filter(

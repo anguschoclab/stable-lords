@@ -10,6 +10,15 @@ import { PatronTokenService } from "@/engine/tokens/patronTokenService";
  * Stable Lords — Warrior Pipeline Pass
  * Handles weekly training, aging, and recovery using the established impact pattern.
  */
+export const PASS_METADATA = {
+  name: "WarriorPass",
+  dependencies: ["BoutSimulationPass"] // Depends on bout simulation completing
+};
+
+/**
+ * Stable Lords — Warrior Pipeline Pass
+ * Handles weekly training, aging, and recovery using the established impact pattern.
+ */
 export function runWarriorPass(state: GameState, rng: SeededRNG): GameState {
   const trainingImpactRaw = computeTrainingImpact(state);
   const { impact: trainingImpact, seasonalGrowth, results } = trainingImpactToStateImpact(state, trainingImpactRaw, rng);

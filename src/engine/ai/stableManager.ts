@@ -53,16 +53,16 @@ export function processAIStable(
   weeklyIncome = weeklyIncomeFromFights + fameDividend;
 
   // 3. Delegate to Workers (Hierarchical Delegation)
-  
+
   // A) StaffWorker (Hiring/Firing)
-  const staffResult = processStaff(updatedRival, state, currentHiringPool);
+  const staffResult = processStaff(updatedRival, state, currentHiringPool, context);
   updatedRival = staffResult.updatedRival;
   currentHiringPool = staffResult.updatedHiringPool;
   gazetteItems.push(...staffResult.gazetteItems);
 
   // B) RosterWorker (Training/Gear)
-  const rosterSeed = state.week * 8123 + (updatedRival.owner.id.length * 101); 
-  updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed);
+  const rosterSeed = state.week * 8123 + (updatedRival.owner.id.length * 101);
+  updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed, context);
 
   // 4. Calculate Final Expenses
   let weeklyExpenses = 0; // Removed 20g hidden tax for parity

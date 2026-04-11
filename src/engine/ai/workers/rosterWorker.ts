@@ -3,7 +3,7 @@ import type { Warrior } from "@/types/warrior.types";
 import type { Season } from "@/types/shared.types";
 import { checkBudget } from "./budgetWorker";
 import { computeWarriorStats } from "../../skillCalc";
-import { logAgentAction } from "../agentCore";
+import { logAgentAction, type AgentContext } from "../agentCore";
 import { SeededRNG } from "@/utils/random";
 
 /**
@@ -14,7 +14,8 @@ export function processRoster(
   rival: RivalStableData,
   currentWeek: number,
   season?: Season,
-  seed?: number
+  seed?: number,
+  context?: AgentContext
 ): RivalStableData {
   const rng = new SeededRNG(seed ?? (currentWeek * 7919 + 101));
   let updatedRival = { ...rival };

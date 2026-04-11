@@ -5,6 +5,15 @@ import { generateId } from "@/utils/idUtils";
 import narrativeContent from "@/data/narrativeContent.json";
 
 /**
+ * Stable Lords — Event Pipeline Pass
+ * Generates random events that can impact the game state.
+ */
+export const PASS_METADATA = {
+  name: "EventPass",
+  dependencies: ["RivalStrategyPass"] // Depends on AI strategy completing
+};
+
+/**
  * Stable Lords — Random Event Pipeline Pass
  */
 

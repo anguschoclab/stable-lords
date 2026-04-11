@@ -114,9 +114,13 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
 }
 
 export function processWeekBouts(state: GameState): { state: GameState; results: BoutResult[]; summary: WeekBoutSummary } {
-  const warriorMap = new Map<string, Warrior>();
-  state.roster.forEach(w => warriorMap.set(w.id, w));
-  (state.rivals || []).forEach(r => r.roster.forEach(w => warriorMap.set(w.id, w)));
+  // ⚡ Bolt: Use cached warriorMap if available, otherwise build it
+  const warriorMap = state.warriorMap || (() => {
+    const map = new Map<string, Warrior>();
+    state.roster.forEach(w => map.set(w.id, w));
+    (state.rivals || []).forEach(r => r.roster.forEach(w => map.set(w.id, w)));
+    return map;
+  })();
 
   const pairings = generatePairings(state);
   const moodMods = getMoodModifiers(state.crowdMood);

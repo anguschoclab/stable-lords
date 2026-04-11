@@ -11,6 +11,14 @@ import { processAllRivalsBoutOffers } from "@/engine/ai/workers/competitionWorke
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
  */
+export const PASS_METADATA = {
+  name: "RivalStrategyPass",
+  dependencies: ["WorldPass"] // Depends on world transitions
+};
+
+/**
+ * Stable Lords — Rival Strategy Pipeline Pass
+ */
 
 export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng?: SeededRNG): GameState {
   const rng = rootRng?.clone() ?? new SeededRNG(nextWeek * 7919 + 13);

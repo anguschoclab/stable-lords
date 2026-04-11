@@ -16,7 +16,7 @@ export function processAIRosterManagement(
   seed?: number
 ): { updatedRivals: RivalStableData[]; gazetteItems: string[] } {
   const rngSnapshot = new SeededRNG(seed ?? (state.week * 7919 + 101));
-  const meta = computeMetaDrift(state.arenaHistory, 20);
+  const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory, 20);
   const gazetteItems: string[] = [];
   const updatedRivals = (state.rivals || []).map(rival => {
     const r = {
