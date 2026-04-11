@@ -2,17 +2,18 @@ import type { GameState, SeasonalGrowth } from "@/types/state.types";
 import type { Warrior, InjuryData } from "@/types/warrior.types";
 import { tickInjuries } from "@/engine/injuries";
 import { clearExpiredRest } from "@/engine/matchmaking/historyLogic";
-import { type StateImpact } from "./impacts";
-import { SeededRNG } from "@/utils/random";
+import type { StateImpact } from "./impacts";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Health Impact calculation — extracted from the legacy pipeline.
  * Processes injury ticks and recovers rested status.
  */
-export function computeHealthImpact(state: GameState): StateImpact {
+export function computeHealthImpact(state: GameState, rngService?: IRNGService): StateImpact {
   const injuryNews: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const rng = new SeededRNG(state.week);
+  const rng = rngService || new SeededRNGService(state.week);
 
   for (const w of state.roster) {
     const updates: Partial<Warrior> = {};
@@ -42,12 +43,12 @@ export function computeHealthImpact(state: GameState): StateImpact {
 
   return {
     rosterUpdates,
-    newsletterItems: injuryNews.length > 0 ? [{ id: new SeededRNG(state.week).uuid("newsletter"), week: state.week, title: "Medical Report", items: injuryNews }] : []
+    newsletterItems: injuryNews.length > 0 ? [{ id: rng.uuid(), week: state.week, title: "Medical Report", items: injuryNews }] : []
   };
 }
 
-export const applyHealthUpdates: (state: GameState) => GameState = (state) => {
-  const impact = computeHealthImpact(state);
+export const applyHealthUpdates: (state: GameState, rng?: IRNGService) => GameState = (state, rng) => {
+  const impact = computeHealthImpact(state, rng);
   let roster = [...state.roster];
   
   if (impact.rosterUpdates) {

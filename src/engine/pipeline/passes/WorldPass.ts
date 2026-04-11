@@ -1,4 +1,5 @@
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import type { GameState, WeatherType, Season } from "@/types/state.types";
 import { generateWeather, advanceSeason } from "@/engine/weather";
 
@@ -17,7 +18,7 @@ export function computeNextSeason(newWeek: number): Season {
   return SEASONS[Math.floor((newWeek - 1) / 13) % 4];
 }
 
-export function rollWeather(rng: SeededRNG): WeatherType {
+export function rollWeather(rng: IRNGService): WeatherType {
   const roll = rng.next();
   if (roll < 0.6) return "Clear";
   if (roll < 0.75) return "Overcast";
@@ -29,9 +30,10 @@ export function rollWeather(rng: SeededRNG): WeatherType {
   return "Blood Moon";
 }
 
-export function runWorldPass(state: GameState, rng: SeededRNG, nextWeek: number): GameState {
+export function runWorldPass(state: GameState, rng?: IRNGService, nextWeek: number): GameState {
+  const rngService = rng || new SeededRNGService(nextWeek * 13);
   const nextSeason = computeNextSeason(nextWeek);
-  const nextWeather = rollWeather(rng);
+  const nextWeather = rollWeather(rngService);
 
   return {
     ...state,

@@ -4,7 +4,9 @@ import type {
   Season
 } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
+import { makeWarrior } from "@/engine/factories";
 
 /**
  * Tournament Selection Committee
@@ -30,12 +32,13 @@ export interface CommitteeSelectionResult {
  * 3. Bubble Watch: Random selection from next 30 eligible ranks.
  */
 export function committeeSelection(
-  state: GameState, 
-  tier: string, 
-  seed: number, 
-  lockedIds: Set<string>
+  state: GameState,
+  tier: string,
+  seed: number,
+  lockedIds: Set<string>,
+  rng?: IRNGService
 ): CommitteeSelectionResult {
-  const rng = new SeededRNG(seed);
+  const rngService = rng || new SeededRNGService(seed);
   const rankings = state.realmRankings || {};
   const qualified: Warrior[] = [];
   const newLocks = new Set<string>();
@@ -90,7 +93,7 @@ export function committeeSelection(
   if (qualified.length < 64) {
     const fillersNeeded = 64 - qualified.length;
     for (let i = 0; i < fillersNeeded; i++) {
-      const freelancer = generateFreelancer(tier, i, rng);
+      const freelancer = generateFreelancer(tier, i, rngService!);
       qualified.push(freelancer);
     }
   }
@@ -102,7 +105,7 @@ export function committeeSelection(
  * Generate a freelancer warrior for tournament filler.
  * This is a simple placeholder that will be replaced by TournamentFreelancerGenerator.
  */
-function generateFreelancer(tier: string, index: number, rng: SeededRNG): Warrior {
+function generateFreelancer(tier: string, index: number, rng: IRNGService): Warrior {
   // Temporary implementation - will be moved to TournamentFreelancerGenerator
   const styles = Object.values(FightingStyle);
   const style = rng.pick(styles);
@@ -114,8 +117,6 @@ function generateFreelancer(tier: string, index: number, rng: SeededRNG): Warrio
     const key = rng.pick(keys);
     if (attrs[key] < 25) { attrs[key]++; remaining--; }
   }
-  
-  // Import makeWarrior to avoid circular dependency
-  const { makeWarrior } = require("../../../factories");
+
   return makeWarrior(undefined, `Freelancer ${rng.pick(["Thrax", "Murmillo", "Kaeso"])} #${index}`, style, attrs, {}, rng);
 }

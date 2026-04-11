@@ -1,16 +1,17 @@
 import type { GameState, AnnualAward } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
 
-export function processHallOfFame(state: GameState, newWeek: number): GameState {
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
+export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGService): GameState {
+  const rngService = rng || new SeededRNGService(state.year * 777);
   // Only process at the transition from Week 52 -> Week 1 (Year rollover)
   // Since advanceWeek already updated week/year, we check if we are at Week 1 and Year > 1
   if (state.week !== 1 || state.year === 1) return state;
 
   const prevYear = state.year - 1;
   const hofNews: string[] = [];
-  const rng = new SeededRNG(state.year * 777);
   let updatedState = { ...state };
 
   interface WarriorStats { w: Warrior; wins: number; kills: number; fame: number; }
@@ -129,7 +130,7 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
     ...updatedState, 
     newsletter: [
       ...updatedState.newsletter, 
-      { id: rng.uuid("newsletter"), week: 1, title: `Year ${prevYear} Global Accolades`, items: hofNews }
+      { id: rngService!.uuid(), week: 1, title: `Year ${prevYear} Global Accolades`, items: hofNews }
     ] 
   };
 }

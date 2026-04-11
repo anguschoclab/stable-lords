@@ -1,16 +1,18 @@
 import type { GameState } from "@/types/state.types";
+import type { IRNGService } from "@/engine/core/rng";
 import { advanceWeek as runWeeklyPipeline } from "@/engine/pipeline/services/weekPipelineService";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Stable Lords — Daily Progression Pipeline
  * Orchestrates tournament rounds and world ticks during campaign weeks.
  */
-export function advanceDay(state: GameState): GameState {
+export function advanceDay(state: GameState, rng?: IRNGService): GameState {
   let nextState = { ...state };
   const currentDay = state.day || 0;
   const nextDay = currentDay + 1;
+  const rngService = rng || new SeededRNGService((state.week * 100) + nextDay);
 
   // 1. Check if we have an active tournament to resolve
   if (state.isTournamentWeek && state.activeTournamentId) {
@@ -23,9 +25,8 @@ export function advanceDay(state: GameState): GameState {
     
     // Add round summary to newsletter or history
     if (roundResults.length > 0) {
-      const dayRng = new SeededRNG((state.week * 100) + nextDay);
       updatedState.newsletter = [...(updatedState.newsletter || []), {
-        id: dayRng.uuid("newsletter"),
+        id: rngService.uuid(),
         week: state.week,
         title: `Empire Day ${nextDay}: Tournament Results`,
         items: roundResults

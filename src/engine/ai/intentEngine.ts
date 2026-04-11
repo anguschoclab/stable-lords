@@ -2,7 +2,8 @@ import type { GameState, RivalStableData, AIIntent, AIStrategy } from "@/types/s
 import { PERSONALITY_CLASH } from "@/data/ownerData";
 
 import { computeMetaDrift } from "../metaDrift";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Determines the weekly strategic intent for an AI owner.
@@ -11,9 +12,10 @@ import { SeededRNG } from "@/utils/random";
 export function pickWeeklyIntent(
   rival: RivalStableData,
   state: GameState,
-  seed?: number
+  seed?: number,
+  rng?: IRNGService
 ): AIIntent {
-  const rng = new SeededRNG(seed ?? (state.week * 131 + rival.owner.id.length));
+  const rngService = rng || new SeededRNGService(seed ?? (state.week * 131 + rival.owner.id.length));
   const personality = rival.owner.personality ?? "Pragmatic";
   const activeRoster = rival.roster.filter(w => w.status === "Active");
   const injuryCount = activeRoster.filter(w => w.injuries && w.injuries.length > 0).length;
@@ -44,7 +46,7 @@ export function pickWeeklyIntent(
   );
   
   const vendettaChance = personality === "Aggressive" ? 0.4 : personality === "Showman" ? 0.2 : 0.1;
-  if (hasGrudge && rng.next() < vendettaChance) {
+  if (hasGrudge && rngService.next() < vendettaChance) {
     return "VENDETTA";
   }
 
@@ -112,7 +114,8 @@ export function updateAIStrategy(
   // If no strategy, plan expired, or plan is disproved, pick a new one
   if (!current || current.planWeeksRemaining <= 0 || planDisproved) {
     const s = seed ?? (state.week * 7919 + rival.owner.id.length * 13);
-    const intent = pickWeeklyIntent(rival, state, s);
+    const rng = new SeededRNGService(s);
+    const intent = pickWeeklyIntent(rival, state, s, rng);
     
     // Determine the duration of this intent
     const duration = intent === "RECOVERY" ? 2 : 

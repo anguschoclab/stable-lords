@@ -1,6 +1,7 @@
 import { GameState, BoutOffer, Promoter, Warrior, RankingEntry } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { FIGHT_PURSE } from "@/data/economyConstants";
 import { generateId } from "@/utils/idUtils";
 
@@ -34,8 +35,8 @@ const RANK_REQUIREMENTS = {
   Legendary: 20
 };
 
-export function runPromoterPass(state: GameState): GameState {
-  const rng = new SeededRNG(state.week * 881 + 17);
+export function runPromoterPass(state: GameState, rng?: IRNGService): GameState {
+  const rngService = rng || new SeededRNGService(state.week * 881 + 17);
   const newOffers: Record<string, BoutOffer> = { ...state.boutOffers };
   const rankings = state.realmRankings || {};
   
@@ -77,7 +78,7 @@ export function runPromoterPass(state: GameState): GameState {
     let generated = 0;
 
     // Attempt to fill capacity
-    const shuffledWarriors = rng.shuffle(availableWarriors);
+    const shuffledWarriors = rngService.shuffle(availableWarriors);
 
     for (const warriorA of shuffledWarriors) {
       if (generated >= capacity) break;
@@ -99,7 +100,7 @@ export function runPromoterPass(state: GameState): GameState {
       });
 
       if (opponentB) {
-        const offerId = rng.uuid("offer");
+        const offerId = rngService.uuid();
         const hype = calculateHype(warriorA.w, opponentB.w, promoter);
         const basePurse = FIGHT_PURSE * TIER_MULTIPLIERS[promoter.tier];
         const finalPurse = Math.floor(basePurse * (hype / 100));

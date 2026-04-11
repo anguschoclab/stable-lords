@@ -1,5 +1,6 @@
 import type { GameState, Warrior, TournamentEntry, FightSummary } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { simulateFight, aiPlanForWarrior, defaultPlanForWarrior } from "@/engine";
 import { FightingStyle } from "@/types/shared.types";
 import { findWarriorById, modifyWarrior } from "./tournamentStateMutator";
@@ -13,8 +14,8 @@ export interface RoundResolutionResult {
  * Resolves a single round of a tournament.
  * Processes all unresolved bouts for the current round and advances the bracket.
  */
-export function resolveRound(state: GameState, tournamentId: string, seed: number): RoundResolutionResult {
-  const rng = new SeededRNG(seed);
+export function resolveRound(state: GameState, tournamentId: string, seed: number, rng?: IRNGService): RoundResolutionResult {
+  const rngService = rng || new SeededRNGService(seed);
   let updatedState = { ...state };
   const tournament = (updatedState.tournaments || []).find(t => t.id === tournamentId);
   if (!tournament || tournament.completed) return { updatedState, roundResults: [] };
@@ -48,15 +49,15 @@ export function resolveRound(state: GameState, tournamentId: string, seed: numbe
     const planA = wA.plan || getAIPlan(updatedState, wA, wD.style, wD.stableId);
     const planD = wD.plan || getAIPlan(updatedState, wD, wA.style, wA.stableId);
     
-    const outcome = simulateFight(planA, planD, wA, wD, rng.roll(0, 1000000), updatedState.trainers, updatedState.weather);
-    
+    const outcome = simulateFight(planA, planD, wA, wD, Math.floor(rngService.next() * 1000000), updatedState.trainers, updatedState.weather);
+
     bout.winner = outcome.winner;
     bout.by = outcome.by;
-    bout.fightId = rng.uuid("bout");
-    
+    bout.fightId = rngService.uuid();
+
     winners.push(outcome.winner === "A" ? { id: wA.id, name: wA.name, stableId: wA.stableId } : { id: wD.id, name: wD.name, stableId: wD.stableId });
     losers.push(outcome.winner === "A" ? { id: wD.id, name: wD.name, stableId: wD.stableId } : { id: wA.id, name: wA.name, stableId: wA.stableId });
-    updatedState = applyBoutResults(updatedState, wA, wD, outcome, tournament.id, tournament.name, rng);
+    updatedState = applyBoutResults(updatedState, wA, wD, outcome, tournament.id, tournament.name, rngService);
   }
 
   // Generate next round pairings
@@ -158,20 +159,20 @@ function getAIPlan(state: GameState, w: Warrior, opponentStyle?: FightingStyle, 
 }
 
 function applyBoutResults(
-  state: GameState, 
-  wA: Warrior, 
-  wD: Warrior, 
-  outcome: any, 
-  tId: string, 
+  state: GameState,
+  wA: Warrior,
+  wD: Warrior,
+  outcome: any,
+  tId: string,
   tName: string,
-  rng: SeededRNG
+  rng: IRNGService
 ): GameState {
   const isKill = outcome.by === "Kill";
   const winnerSide = outcome.winner;
   const updatedState = { ...state };
 
   const summary: FightSummary = {
-    id: rng.uuid("bout"),
+    id: rng.uuid(),
     week: state.week,
     phase: "resolution" as const,
     tournamentId: tId,

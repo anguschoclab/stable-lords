@@ -4,9 +4,14 @@ import type { FightPlan, FightOutcome, DeathCauseBucket } from "@/types/combat.t
 import type { Trainer } from "@/types/state.types";
 import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
 import { getMatchupBonus, ResolutionContext, FighterState } from "@/engine/combat/resolution";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { createFighterState } from "@/engine/bout/fighterState";
 import { getTrainingBonus } from "@/engine/trainers";
+
+export function createRNGForContext(seed: number, rng?: IRNGService): IRNGService {
+  return rng || new SeededRNGService(seed);
+}
 
 export function setupRng(providedRng?: (() => number) | number): () => number {
   if (typeof providedRng === "function") {
@@ -15,7 +20,7 @@ export function setupRng(providedRng?: (() => number) | number): () => number {
   const seed = typeof providedRng === "number"
     ? providedRng
     : crypto.getRandomValues(new Uint32Array(1))[0];
-  const sRng = new SeededRNG(seed);
+  const sRng = new SeededRNGService(seed);
   return () => sRng.next();
 }
 

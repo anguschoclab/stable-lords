@@ -2,15 +2,10 @@ import type {
   GameState, 
   Warrior, 
   TournamentEntry, 
-  TournamentBout,
   Season
 } from "@/types/state.types";
-import { type WarriorStatus } from "@/types/warrior.types";
-import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
-import { PatronTokenService } from "@/engine/tokens/patronTokenService";
-import { simulateFight, aiPlanForWarrior, defaultPlanForWarrior } from "@/engine";
-import type { FightOutcome } from "@/types/combat.types";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 // Import extracted modules
 import { committeeSelection, TOURNAMENT_TIERS } from "./tournament/tournamentSelectionCommittee";
@@ -28,23 +23,23 @@ export const TournamentSelectionService = {
    * Generates all 4 seasonal tournaments using the committee selection logic.
    */
   generateSeasonalTiers(state: GameState, week: number, season: Season, seed: number): TournamentEntry[] {
-    const rng = new SeededRNG(seed);
+    const rng = new SeededRNGService(seed);
     const tournaments: TournamentEntry[] = [];
     const lockedWarriorIds = new Set<string>();
 
     TOURNAMENT_TIERS.forEach((tierConfig, idx) => {
-      const { warriors, updatedLockedIds } = committeeSelection(state, tierConfig.id, seed + idx, lockedWarriorIds);
+      const { warriors, updatedLockedIds } = committeeSelection(state, tierConfig.id, seed + idx, lockedWarriorIds, rng);
       
       // Update locked IDs for the next tier
       updatedLockedIds.forEach(id => lockedWarriorIds.add(id));
 
       const tournament = buildTournament({
+        warriors,
         tierId: tierConfig.id,
         tierName: tierConfig.name,
-        warriors,
         week,
         season,
-        rng
+        rng: rng
       });
       tournaments.push(tournament);
     });

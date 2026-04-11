@@ -1,7 +1,7 @@
 import type { GameState } from "@/types/state.types";
+import type { IRNGService } from "@/engine/core/rng";
 import { computeEconomyImpact } from "@/engine/economy";
 import { resolveImpacts } from "@/engine/impacts";
-import { SeededRNG } from "@/utils/random";
 
 /**
  * Stable Lords — Economy Pipeline Pass
@@ -16,7 +16,7 @@ export const PASS_METADATA = {
  * Stable Lords — Economy Pipeline Pass
  * Uses the established impact-resolution pattern for financial simulation.
  */
-export function runEconomyPass(state: GameState, _rng: SeededRNG): GameState {
+export function runEconomyPass(state: GameState, _rng: IRNGService): GameState {
   const impact = computeEconomyImpact(state);
   return resolveImpacts(state, [impact]);
 }

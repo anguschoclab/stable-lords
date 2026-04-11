@@ -1,5 +1,6 @@
 import type { GameState, Trainer } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Trainer Aging System
@@ -8,8 +9,8 @@ import { SeededRNG } from "@/utils/random";
  * - Legend Protection: High fame and retired warriors stay longer.
  * - Base retirement chance starts at age 65.
  */
-export function computeTrainerAging(state: GameState): { updatedTrainers: Trainer[]; news: string[]; updatedHiringPool: Trainer[] } {
-  const rng = new SeededRNG(state.week * 1337 + 7);
+export function computeTrainerAging(state: GameState, rng?: IRNGService): { updatedTrainers: Trainer[]; news: string[]; updatedHiringPool: Trainer[] } {
+  const rngService = rng || new SeededRNGService(state.week * 1337 + 7);
   const news: string[] = [];
   const WEEKS_PER_YEAR = 52;
   const isAgingWeek = state.week % WEEKS_PER_YEAR === 0;
@@ -34,7 +35,7 @@ export function computeTrainerAging(state: GameState): { updatedTrainers: Traine
 
         const finalChance = Math.max(0.01, baseChance - fameDiscount - legacyDiscount);
 
-        if (rng.next() < finalChance) {
+        if (rngService.next() < finalChance) {
           retired = true;
           const verb = currentAge > 80 ? "passed away peacefully" : "retired to the countryside";
           news.push(`🏠 LEGACY: ${t.name} (${t.focus} Trainer) has ${verb} at age ${currentAge}.`);

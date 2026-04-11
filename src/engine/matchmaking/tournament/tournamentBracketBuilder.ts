@@ -3,7 +3,7 @@ import type {
   TournamentEntry,
   Season
 } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
 
 export interface TournamentBracketConfig {
   tierId: string;
@@ -11,7 +11,7 @@ export interface TournamentBracketConfig {
   warriors: Warrior[];
   week: number;
   season: Season;
-  rng: SeededRNG;
+  rng: IRNGService;
 }
 
 /**

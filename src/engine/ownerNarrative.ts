@@ -1,8 +1,9 @@
 import type { GameState } from "@/types/state.types";
 import type { Season } from "@/types/shared.types";
 import type { FightSummary } from "@/types/combat.types";
+import type { IRNGService } from "@/engine/core/rng";
 import { getRecentFights } from "@/engine/core/historyUtils";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Generate personality-driven gazette events based on recent performance.
@@ -11,9 +12,9 @@ import { SeededRNG } from "@/utils/random";
 export function generateOwnerNarratives(
   state: GameState,
   newSeason: Season,
-  seed?: number
+  rng?: IRNGService
 ): string[] {
-  const rng = new SeededRNG(seed ?? (state.week * 7919 + 7));
+  const rngService = rng || new SeededRNGService(state.week * 7919 + 7);
   if (newSeason === state.season) return [];
 
   const gazetteItems: string[] = [];
@@ -37,7 +38,7 @@ export function generateOwnerNarratives(
         `🔥 ${rival.owner.name} fires ${rival.owner.stableName}'s head trainer after a dismal ${state.season}!`,
         `⚔️ ${rival.owner.name} declares: "Next season, we fight with fury or not at all!"`,
       ];
-      gazetteItems.push(rng.pick(templates));
+      gazetteItems.push(rngService.pick(templates));
     }
 
     // Methodical owner on a winning streak
@@ -86,14 +87,14 @@ export function generateOwnerNarratives(
       (rv.stableIdB === state.player.id && rv.stableIdA === rival.owner.id)
     );
 
-    if (rivalry && rivalry.intensity >= 4 && rng.next() < 0.25) {
+    if (rivalry && rivalry.intensity >= 4 && rngService.next() < 0.25) {
         const tauntTemplates = [
             `🗣️ "${state.player.stableName} is a disgrace to the sands. I will see them bleed," vows ${rival.owner.name} (${rival.owner.stableName}).`,
             `🗣️ ${rival.owner.name} (${rival.owner.stableName}) issues a public challenge: "My warriors will hunt down the dogs of ${state.player.stableName}."`,
             `🗣️ "The feud with ${state.player.stableName} ends when their stable is ash," declares ${rival.owner.name}.`,
             `🗣️ Public Grudge: ${rival.owner.name} (${rival.owner.stableName}) was heard mocking the recent performances of ${state.player.stableName}.`
         ];
-        gazetteItems.push(rng.pick(tauntTemplates));
+        gazetteItems.push(rngService.pick(tauntTemplates));
     }
   }
 

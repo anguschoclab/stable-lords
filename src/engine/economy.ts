@@ -12,8 +12,8 @@
  *  - Training costs: 15g per warrior in training
  */
 import type { GameState, LedgerEntry, Warrior } from "@/types/state.types";
-import { generateId } from "@/utils/idUtils";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { 
   FIGHT_PURSE, 
   WIN_BONUS, 
@@ -97,17 +97,17 @@ export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
 import { type StateImpact } from "./impacts";
 
 /** Compute the economic impact of the current week. */
-export function computeEconomyImpact(state: GameState): StateImpact {
+export function computeEconomyImpact(state: GameState, rng?: IRNGService): StateImpact {
   const breakdown = computeWeeklyBreakdown(state);
   const entries: LedgerEntry[] = [];
 
-  const rng = new SeededRNG(state.week * 31);
+  const rngService = rng || new SeededRNGService(state.week * 31);
 
   for (const i of breakdown.income) {
-    entries.push({ id: generateId(rng, "ledger"), week: state.week, label: i.label, amount: i.amount, category: "fight" });
+    entries.push({ id: rngService.uuid(), week: state.week, label: i.label, amount: i.amount, category: "fight" });
   }
   for (const e of breakdown.expenses) {
-    entries.push({ id: generateId(rng, "ledger"), week: state.week, label: e.label, amount: -e.amount, category: "upkeep" });
+    entries.push({ id: rngService.uuid(), week: state.week, label: e.label, amount: -e.amount, category: "upkeep" });
   }
 
   return {

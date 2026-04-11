@@ -3,7 +3,8 @@ import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/tra
 import { computeAgingImpact } from "@/engine/aging";
 import { computeHealthImpact } from "@/engine/health";
 import { resolveImpacts, StateImpact } from "@/engine/impacts";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { PatronTokenService } from "@/engine/tokens/patronTokenService";
 
 /**
@@ -19,23 +20,23 @@ export const PASS_METADATA = {
  * Stable Lords — Warrior Pipeline Pass
  * Handles weekly training, aging, and recovery using the established impact pattern.
  */
-export function runWarriorPass(state: GameState, rng: SeededRNG): GameState {
+export function runWarriorPass(state: GameState, rng: IRNGService): GameState {
   const trainingImpactRaw = computeTrainingImpact(state);
   const { impact: trainingImpact, seasonalGrowth, results } = trainingImpactToStateImpact(state, trainingImpactRaw, rng);
-  
+
   const impacts: StateImpact[] = [
-    trainingImpact, 
-    computeAgingImpact(state, rng), 
-    computeHealthImpact(state),
+    trainingImpact,
+    computeAgingImpact(state, rng),
+    computeHealthImpact(state, rng),
   ];
 
   let nextState = resolveImpacts(state, impacts);
   
   // 🌩️ New System Integration: Insight Token Awards
   // Low chance (5%) to earn an Insight Token during any successful training week
-  if (results && results.some(r => r.type === "gain" || r.type === "recovery") && rng.roll(0, 100) < 5) {
+  if (results && results.some(r => r.type === "gain" || r.type === "recovery") && rng.next() < 0.05) {
     const tokenOptions = ["Style", "Weapon", "Rhythm"] as const;
-    const type = tokenOptions[rng.roll(0, tokenOptions.length - 1)];
+    const type = tokenOptions[Math.floor(rng.next() * tokenOptions.length)];
     nextState = PatronTokenService.awardToken(nextState, type, "Exceptional Training", rng);
   }
 

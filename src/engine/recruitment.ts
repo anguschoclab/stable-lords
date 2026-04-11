@@ -3,7 +3,8 @@ import { type AttributePotential, type WarriorFavorites } from "@/types/warrior.
 import { computeWarriorStats } from "./skillCalc";
 import { generatePotential } from "./potential";
 import { generateFavorites } from "./favorites";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { generateId } from "@/utils/idUtils";
 
 // ─── Types ────────────────────────────────────────────────────────────────
@@ -61,14 +62,14 @@ import narrativeContent from "@/data/narrativeContent.json";
 
 // ─── Generation ───────────────────────────────────────────────────────────
 
-function rollTier(rng: SeededRNG): RecruitTier {
-  if (rng.chance(0.05)) return "Prodigy";
-  if (rng.chance(0.20)) return "Exceptional";
-  if (rng.chance(0.50)) return "Promising";
+function rollTier(rng: IRNGService): RecruitTier {
+  if (rng.next() < 0.05) return "Prodigy";
+  if (rng.next() < 0.20) return "Exceptional";
+  if (rng.next() < 0.50) return "Promising";
   return "Common";
 }
 
-function distributeAttributes(rng: SeededRNG, total: number): Attributes {
+function distributeAttributes(rng: IRNGService, total: number): Attributes {
   const attrs: Attributes = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };
   let pool = total - 21; // 21 is base (7 × 3)
   const keys: (keyof Attributes)[] = ["ST", "CN", "SZ", "WT", "WL", "SP", "DF"];
@@ -77,14 +78,14 @@ function distributeAttributes(rng: SeededRNG, total: number): Attributes {
     const key = rng.pick(keys);
     const max = Math.min(pool, 21 - attrs[key]); // recruit cap is 21
     if (max <= 0) continue;
-    const add = Math.min(max, rng.roll(1, 3));
+    const add = Math.min(max, Math.floor(rng.next() * 3) + 1);
     attrs[key] += add;
     pool -= add;
   }
   return attrs;
 }
 
-function generateLore(rng: SeededRNG, style: FightingStyle): string {
+function generateLore(rng: IRNGService, style: FightingStyle): string {
   const recruitment = narrativeContent.recruitment;
   const origin = rng.pick(recruitment.origin);
   const blurbs = (recruitment as any).style_blurbs?.[style] || ["A fighter with something to prove."];
@@ -93,7 +94,7 @@ function generateLore(rng: SeededRNG, style: FightingStyle): string {
 }
 
 export function generateRecruit(
-  rng: SeededRNG,
+  rng: IRNGService,
   usedNames: Set<string>,
   week: number,
   forceTier?: RecruitTier
@@ -101,7 +102,7 @@ export function generateRecruit(
   const tier = forceTier ?? rollTier(rng);
   const tierData = getTierData(tier);
   const [minPts, maxPts] = tierData.points;
-  const total = rng.roll(minPts, maxPts);
+  const total = Math.floor(Math.random() * (maxPts - minPts + 1)) + minPts;
   const attributes = distributeAttributes(rng, total);
 
   const styles = Object.values(FightingStyle);
@@ -121,7 +122,7 @@ export function generateRecruit(
   const favorites = generateFavorites(style, () => rng.next());
 
   return {
-    id: generateId(rng, "warrior"),
+    id: rng.uuid(),
     name,
     style,
     attributes,
@@ -130,7 +131,7 @@ export function generateRecruit(
     derivedStats,
     tier,
     cost: TIER_COST[tier],
-    age: 16 + rng.roll(0, 5),
+    age: 16 + Math.floor(rng.next() * 6),
     lore: generateLore(rng, style),
     addedWeek: week,
     favorites,
@@ -143,17 +144,17 @@ export function generateRecruitPool(
   count: number = DEFAULT_POOL_SIZE,
   week: number,
   usedNames: Set<string>,
-  seed?: number
+  rng?: IRNGService
 ): PoolWarrior[] {
-  const rng = new SeededRNG(seed ?? (week * 9973 + 42));
+  const rngService = rng || new SeededRNGService(week * 9973 + 42);
   const pool: PoolWarrior[] = [];
 
   // Guarantee at least two Promising+ warriors in a larger pool
-  pool.push(generateRecruit(rng, usedNames, week, rng.chance(0.3) ? "Exceptional" : "Promising"));
-  pool.push(generateRecruit(rng, usedNames, week, rng.chance(0.1) ? "Prodigy" : "Promising"));
+  pool.push(generateRecruit(rngService, usedNames, week, rngService.next() < 0.3 ? "Exceptional" : "Promising"));
+  pool.push(generateRecruit(rngService, usedNames, week, rngService.next() < 0.1 ? "Prodigy" : "Promising"));
 
   while (pool.length < count) {
-    pool.push(generateRecruit(rng, usedNames, week));
+    pool.push(generateRecruit(rngService, usedNames, week));
   }
 
   return pool;
@@ -163,9 +164,10 @@ export function generateRecruitPool(
 export function partialRefreshPool(
   pool: PoolWarrior[],
   week: number,
-  usedNames: Set<string>
+  usedNames: Set<string>,
+  rng?: IRNGService
 ): PoolWarrior[] {
-  if (pool.length === 0) return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames);
+  if (pool.length === 0) return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames, rng);
 
   const sorted = [...pool].sort((a, b) => a.addedWeek - b.addedWeek);
   const removeCount = Math.min(4, Math.max(2, Math.floor(pool.length * 0.3)));
@@ -175,16 +177,16 @@ export function partialRefreshPool(
   const remainingNames = new Set(remaining.map(w => w.name));
   const allUsed = new Set([...usedNames, ...remainingNames]);
 
-  const rng = new SeededRNG(week * 7919 + 31);
+  const rngService = rng || new SeededRNGService(week * 7919 + 31);
   const newWarriors: PoolWarrior[] = [];
   for (let i = 0; i < removeCount; i++) {
-    newWarriors.push(generateRecruit(rng, allUsed, week));
+    newWarriors.push(generateRecruit(rngService, allUsed, week));
   }
 
   // Ensure pool stays at size
   const result = [...remaining, ...newWarriors];
   while (result.length < DEFAULT_POOL_SIZE) {
-    result.push(generateRecruit(rng, allUsed, week));
+    result.push(generateRecruit(rngService, allUsed, week));
   }
 
   return result;
@@ -193,10 +195,11 @@ export function partialRefreshPool(
 /** Full manual refresh (costs gold) */
 export function fullRefreshPool(
   week: number,
-  usedNames: Set<string>
+  usedNames: Set<string>,
+  rng?: IRNGService
 ): PoolWarrior[] {
-  const seed = week * 1337 + 7;
-  return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames, seed);
+  const rngService = rng || new SeededRNGService(week * 1337 + 7);
+  return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames, rngService);
 }
 
 // AI Draft behavior has been moved to src/engine/draftService.ts

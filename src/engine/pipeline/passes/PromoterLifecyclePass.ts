@@ -1,5 +1,6 @@
 import { GameState, Promoter, PromoterPersonality } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { generateDynasticName } from "@/utils/nameLogic";
 
 /**
@@ -14,7 +15,8 @@ export const PASS_METADATA = {
 
 const PERSONALITIES: PromoterPersonality[] = ["Greedy", "Honorable", "Sadistic", "Flashy", "Corporate"];
 
-export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): GameState {
+export function runPromoterLifecyclePass(state: GameState, rng?: IRNGService): GameState {
+  const rngService = rng || new SeededRNGService(state.week * 777 + 1);
   const newPromoters: Record<string, Promoter> = { ...state.promoters };
   const news: string[] = [];
   const WEEKS_PER_YEAR = 52;
@@ -33,18 +35,18 @@ export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): Game
       const legacyBonus = Math.min(0.10, p.history.totalPursePaid / 10000);
       const finalChance = Math.max(0.01, baseChance - legacyBonus);
 
-      if (rng.next() < finalChance) {
+      if (rngService.next() < finalChance) {
         retired = true;
-        const newId = rng.uuid("promoter");
+        const newId = rngService.uuid();
         const successorName = generateDynasticName(p.name, state.week + 123);
         
         // 50% chance to inherit personality
-        const personality = rng.chance(0.5) ? p.personality : rng.pick(PERSONALITIES);
+        const personality = rngService.next() < 0.5 ? p.personality : rngService.pick(PERSONALITIES);
 
         const successor: Promoter = {
           id: newId,
           name: successorName,
-          age: 25 + rng.roll(0, 10),
+          age: 25 + rngService.roll(0, 10),
           personality,
           tier: p.tier,
           capacity: p.capacity,
@@ -71,6 +73,6 @@ export function runPromoterLifecyclePass(state: GameState, rng: SeededRNG): Game
   return {
     ...state,
     promoters: newPromoters,
-    newsletter: news.length > 0 ? [...state.newsletter, { id: rng.uuid("newsletter"), week: state.week, title: "Promoter News", items: news }] : state.newsletter
+    newsletter: news.length > 0 ? [...state.newsletter, { id: rngService.uuid(), week: state.week, title: "Promoter News", items: news }] : state.newsletter
   };
 }

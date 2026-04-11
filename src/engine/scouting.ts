@@ -66,14 +66,14 @@ export function getAttributeRangeDescription(low: number, high: number): string 
   return `${lowDesc} to ${highDesc}`;
 }
 
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
 
 /** Generate a scout report for a warrior */
 export function generateScoutReport(
   warrior: Warrior,
   quality: ScoutQuality,
   week: number,
-  rng: SeededRNG
+  rng: IRNGService
 ): { report: ScoutReport; newInsights: InsightToken[] } {
   const fuzz = QUALITY_FUZZ[quality];
 
@@ -116,7 +116,7 @@ export function generateScoutReport(
 
   // Basic scouting reveals Style
   newInsights.push({
-    id: generateId(rng, "insight"),
+    id: rng.uuid(),
     type: "Style",
     warriorId: warrior.id,
     warriorName: warrior.name,
@@ -129,7 +129,7 @@ export function generateScoutReport(
     const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - rng.next()).slice(0, quality === "Expert" ? 4 : 2);
     attrsToReveal.forEach(attr => {
       newInsights.push({
-        id: generateId(rng, "insight"),
+        id: rng.uuid(),
         type: "Attribute",
         warriorId: warrior.id,
         warriorName: warrior.name,
@@ -143,7 +143,7 @@ export function generateScoutReport(
   // Expert scouting reveals Tactics
   if (quality === "Expert" && warrior.plan) {
     newInsights.push({
-      id: generateId(rng, "insight"),
+      id: rng.uuid(),
       type: "Tactic",
       warriorId: warrior.id,
       warriorName: warrior.name,
@@ -154,7 +154,7 @@ export function generateScoutReport(
 
   return {
     report: {
-      id: generateId(rng, "scout"),
+      id: rng.uuid(),
       warriorName: warrior.name,
       style: warrior.style,
       quality,

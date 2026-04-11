@@ -14,7 +14,8 @@ import {
   conservingLine
 } from "./narrativePBP";
 import { narrateEvents, NarrationContext } from "./combat/narrator";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import type { GameState, Trainer, FightOutcomeBy } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket } from "@/types/combat.types";
@@ -70,7 +71,7 @@ export function simulateFight(
     const seed = typeof providedRng === "number" 
       ? providedRng 
       : crypto.getRandomValues(new Uint32Array(1))[0];
-    const sRng = new SeededRNG(seed);
+    const sRng = new SeededRNGService(seed);
     rng = () => sRng.next();
   }
 

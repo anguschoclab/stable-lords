@@ -1,11 +1,12 @@
 import type { GameState, RivalStableData, OwnerPersonality, MetaAdaptation, TrainerTier } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
+import type { IRNGService } from "@/engine/core/rng";
 import { FightingStyle } from "@/types/shared.types";
 import { computeMetaDrift, type StyleMeta } from "./metaDrift";
 import { computeWarriorStats } from "./skillCalc";
 import { getRecentFightsForWarrior } from "@/engine/core/historyUtils";
 import { META_RECRUIT_QUOTES, getPhilosophyStyles } from "@/data/ownerData";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Manages the roster of AI owners by evaluating current warriors, recruiting talent,
@@ -13,9 +14,9 @@ import { SeededRNG } from "@/utils/random";
  */
 export function processAIRosterManagement(
   state: GameState,
-  seed?: number
+  rng?: IRNGService
 ): { updatedRivals: RivalStableData[]; gazetteItems: string[] } {
-  const rngSnapshot = new SeededRNG(seed ?? (state.week * 7919 + 101));
+  const rngSnapshot = rng || new SeededRNGService(state.week * 7919 + 101);
   const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory, 20);
   const gazetteItems: string[] = [];
   const updatedRivals = (state.rivals || []).map(rival => {
@@ -114,7 +115,7 @@ export function processAIRosterManagement(
 }
 
 function generateAIRecruit(rival: RivalStableData, week: number, meta?: StyleMeta, seed?: number): Warrior | null {
-  const rng = new SeededRNG(seed ?? (week * 42 + rival.owner.id.length));
+  const rng = new SeededRNGService(seed ?? (week * 42 + rival.owner.id.length));
   const philosophy = rival.philosophy ?? "Balanced";
   const adaptation = rival.owner.metaAdaptation ?? "Opportunist";
   const favoredStyles = rival.owner.favoredStyles ?? [];
@@ -152,7 +153,7 @@ function pickRecruitStyle(
   philosophy: string,
   favoredStyles: FightingStyle[],
   meta: StyleMeta | undefined,
-  rng: SeededRNG
+  rng: IRNGService
 ): FightingStyle {
   const philosophyStyles = getPhilosophyStyles(philosophy);
   const allStyles = Object.values(FightingStyle);
@@ -189,7 +190,7 @@ function pickRecruitStyle(
   }
 }
 
-function generateRecruitAttrs(philosophy: string, rng: SeededRNG): { ST: number; CN: number; SZ: number; WT: number; WL: number; SP: number; DF: number } {
+function generateRecruitAttrs(philosophy: string, rng: IRNGService): { ST: number; CN: number; SZ: number; WT: number; WL: number; SP: number; DF: number } {
   const biasMap: Record<string, Partial<Record<string, number>>> = {
     "Brute Force": { ST: 3, CN: 2, SZ: 2 },
     "Speed Kills": { SP: 3, DF: 2, WL: 1 },
@@ -214,10 +215,10 @@ function generateRecruitAttrs(philosophy: string, rng: SeededRNG): { ST: number;
   let attempts = 0;
   while (pool > 0 && attempts < 500) {
     attempts++;
-    const key = rng.pick(weighted);
+    const key = rng.pick(weighted) as keyof typeof attrs;
     const current = attrs[key];
     if (current >= 25) continue;
-    
+
     const maxAdd = Math.min(pool, 25 - current);
     const add = Math.min(maxAdd, Math.floor(rng.next() * 4) + 1);
     attrs[key] += add;

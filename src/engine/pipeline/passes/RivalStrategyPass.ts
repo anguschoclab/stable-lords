@@ -1,5 +1,5 @@
 import { GameState, RivalStableData } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
 import { updateAIStrategy } from "@/engine/ai/intentEngine";
 import { processAIStable } from "@/engine/ai/stableManager";
 import { generateRivalStables } from "@/engine/rivals";
@@ -7,7 +7,7 @@ import { aiDraftFromPool } from "@/engine/draftService";
 import { processAIRosterManagement } from "@/engine/ownerRoster";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 import { processAllRivalsBoutOffers } from "@/engine/ai/workers/competitionWorker";
-
+import { SeededRNGService } from "@/engine/core/rng";
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
  */
@@ -19,9 +19,8 @@ export const PASS_METADATA = {
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
  */
-
-export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng?: SeededRNG): GameState {
-  const rng = rootRng?.clone() ?? new SeededRNG(nextWeek * 7919 + 13);
+export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng?: IRNGService): GameState {
+  const rng = rootRng || new SeededRNGService(nextWeek * 7919 + 13);
   let currentState = state;
   const globalGazetteItems: string[] = [];
 
@@ -52,10 +51,11 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng
 
   // 3. AI Roster Management (Recruitment/Retirement)
   const rosterSeed = nextWeek * 13 + 7;
+  const rosterRng = new SeededRNGService(rosterSeed);
   const { updatedRivals: finalizedRivals, gazetteItems: rosterGazette } = processAIRosterManagement({
     ...currentState,
     week: nextWeek
-  }, rosterSeed);
+  }, rosterRng);
   globalGazetteItems.push(...rosterGazette);
   currentState.rivals = finalizedRivals;
 
@@ -71,7 +71,7 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng
     currentState = {
       ...currentState,
       newsletter: [...(currentState.newsletter || []), { 
-        id: rng.uuid("newsletter"), // 🆔 Standardized deterministic ID
+        id: rng.uuid(),
         week: nextWeek, 
         title: "Intelligence & Strategy Report", 
         items: globalGazetteItems 
@@ -82,7 +82,7 @@ export function runRivalStrategyPass(state: GameState, nextWeek: number, rootRng
   return currentState;
 }
 
-function handleSeasonalTournaments(state: GameState, week: number, rng: SeededRNG): GameState {
+function handleSeasonalTournaments(state: GameState, week: number, rng: IRNGService): GameState {
   let newState = { ...state };
   
   // 🏆 4-Tier Selection Committee Logic: Generates and resolves all tiers
@@ -102,8 +102,8 @@ function handleSeasonalTournaments(state: GameState, week: number, rng: SeededRN
   
   newState = {
     ...newState,
-    newsletter: [...(newState.newsletter || []), { 
-      id: rng.uuid("tournament"), // 🆔 Added deterministic ID
+    newsletter: [...newState.newsletter, {
+      id: rng.uuid(),
       week: week, 
       title: "🎖️ TOURNAMENT ARCHIVE", 
       items: tournamentNews 

@@ -1,5 +1,6 @@
 import type { GameState, Trainer } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
+import { RNGContext } from "@/engine/core/rng";
 import { archiveWeekLogs } from "../adapters/opfsArchiver";
 import { processHallOfFame } from "../core/hallOfFame";
 import { processTierProgression } from "../core/tierProgression";
@@ -8,7 +9,8 @@ import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
 import { generateOwnerNarratives } from "@/engine/ownerNarrative";
 import { WorldManagementService } from "@/engine/ai/worldManagement";
 import { PatronTokenService } from "@/engine/tokens/patronTokenService";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { processOwnerGrudges } from "@/engine/ownerGrudges";
 import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
 import { computeMetaDrift } from "@/engine/metaDrift";
@@ -49,7 +51,7 @@ export function advanceWeek(state: GameState): GameState {
     nextYear++;
   }
 
-  const rootRng = new SeededRNG(nextYear * 52 + nextWeek * 7919 + 101);
+  const rootRng = new SeededRNGService(nextYear * 52 + nextWeek * 7919 + 101);
 
   // ⚡ Bolt: Compute and cache meta drift weekly for AI components
   const metaDrift = computeMetaDrift(state.arenaHistory || []);
@@ -96,7 +98,7 @@ export function advanceWeek(state: GameState): GameState {
 
 
 
-function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: number): GameState {
+function executeWorldTransitions(state: GameState, rng: IRNGService, nextWeek: number): GameState {
   let newState = runWorldPass(state, rng, nextWeek);
   const nextSeason = newState.season;
 
@@ -128,19 +130,20 @@ function executeWorldTransitions(state: GameState, rng: SeededRNG, nextWeek: num
   return newState;
 }
 
-function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG): GameState {
+function executeRivalActivity(state: GameState, nextWeek: number, rng: IRNGService): GameState {
   let newState = { ...state };
 
   // Seasonal Churn & Philosophy Evolution
   if (newState.season !== state.season) {
     const seasonSeed = nextWeek * 133;
-    const { updatedRivals, news } = WorldManagementService.processSeasonalChurn(newState, seasonSeed + 55);
+    const rngContext = new RNGContext(seasonSeed + 55);
+    const { updatedRivals, news } = WorldManagementService.processSeasonalChurn(newState, rngContext);
     newState = { ...newState, rivals: updatedRivals };
     
-    const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(newState, newState.season, seasonSeed);
+    const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(newState, newState.season, rngContext.getRNG());
     newState = { ...newState, rivals: philRivals };
     
-    const narrGazette = generateOwnerNarratives(newState, newState.season, seasonSeed + 1);
+    const narrGazette = generateOwnerNarratives(newState, newState.season, rngContext.getRNG());
     const combinedNews = [...news, ...gazetteItems, ...narrGazette];
     if (combinedNews.length > 0) {
       newState = {
@@ -176,12 +179,13 @@ function executeRivalActivity(state: GameState, nextWeek: number, rng: SeededRNG
   return newState;
 }
 
-function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: number, rng: SeededRNG): GameState {
+function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: number, rng: IRNGService): GameState {
   let newState = { ...state };
 
   // Gazette
   const weekFights = getFightsForWeek(newState.arenaHistory, currentWeek);
-  const story = generateWeeklyGazette(weekFights, newState.crowdMood, currentWeek, newState.graveyard, newState.arenaHistory, currentWeek * 9973 + 456);
+  const gazetteRng = new SeededRNGService(currentWeek * 9973 + 456);
+  const story = generateWeeklyGazette(weekFights, newState.crowdMood, currentWeek, newState.graveyard, newState.arenaHistory, gazetteRng);
   newState = {
     ...newState,
     gazettes: [...(newState.gazettes || []), { ...story, week: currentWeek }].slice(-50)
@@ -205,7 +209,7 @@ function executeNarrativePass(state: GameState, currentWeek: number, nextWeek: n
   return newState;
 }
 
-function finalizeWeek(state: GameState, nextWeek: number, nextYear: number, rng: SeededRNG): GameState {
+function finalizeWeek(state: GameState, nextWeek: number, nextYear: number, rng: IRNGService): GameState {
   return {
     ...state,
     week: nextWeek,

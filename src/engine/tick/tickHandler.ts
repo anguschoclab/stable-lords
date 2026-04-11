@@ -1,5 +1,5 @@
 import type { GameState } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
 import { StateImpact } from "@/engine/impacts";
 
 /**
@@ -12,7 +12,7 @@ export interface TickHandler {
   name: string;
 
   /** Compute the impact of this tick on the game state */
-  computeImpact(state: GameState, rng: SeededRNG): StateImpact;
+  computeImpact(state: GameState, rng: IRNGService): StateImpact;
 
   /** Determine if this tick should run for the current state (e.g., aging only on year boundary) */
   canTick(state: GameState): boolean;

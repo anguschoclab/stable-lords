@@ -4,7 +4,8 @@ import type { Season } from "@/types/shared.types";
 import { checkBudget } from "./budgetWorker";
 import { computeWarriorStats } from "../../skillCalc";
 import { logAgentAction, type AgentContext } from "../agentCore";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * RosterWorker: Handles training and equipment.
@@ -15,9 +16,10 @@ export function processRoster(
   currentWeek: number,
   season?: Season,
   seed?: number,
+  rng?: IRNGService,
   context?: AgentContext
 ): RivalStableData {
-  const rng = new SeededRNG(seed ?? (currentWeek * 7919 + 101));
+  const rngService = rng || new SeededRNGService(seed ?? (currentWeek * 7919 + 101));
   let updatedRival = { ...rival };
   const activeRoster = updatedRival.roster.filter(w => w.status === "Active");
   const intent = updatedRival.strategy?.intent ?? "CONSOLIDATION";
@@ -48,11 +50,11 @@ export function processRoster(
       // ⚡ TSA: Role-Based Gearing (Prioritize Champion or the 'Muddy' Basher for rain insurance)
       const gearCandidate = activeRoster.find(w => w.champion) || 
                           activeRoster.find(w => w.style === "BASHING ATTACK") ||
-                          rng.pick(activeRoster);
+                          rngService.pick(activeRoster);
 
       if (gearCandidate) {
         updatedRival.treasury -= gearCost;
-        updatedRival.roster = updatedRival.roster.map(w => w.id === gearCandidate.id ? applyGearUpgrade(w, rng) : w);
+        updatedRival.roster = updatedRival.roster.map(w => w.id === gearCandidate.id ? applyGearUpgrade(w, rngService) : w);
         updatedRival = logAgentAction(updatedRival, "ROSTER", `Invested 150g in gear for ${gearCandidate.name}.`, budgetReport.riskTier, currentWeek);
       }
     }
@@ -61,7 +63,7 @@ export function processRoster(
   return updatedRival;
 }
 
-function applyGearUpgrade(w: Warrior, rng: SeededRNG): Warrior {
+function applyGearUpgrade(w: Warrior, rng: IRNGService): Warrior {
   const keys = (Object.keys(w.attributes) as (keyof typeof w.attributes)[]).filter(k => k !== "SZ");
   const newAttrs = { ...w.attributes };
   for (let i = 0; i < 2; i++) {

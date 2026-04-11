@@ -1,5 +1,6 @@
 import type { GameState } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { generateId } from "@/utils/idUtils";
 import narrativeContent from "@/data/narrativeContent.json";
@@ -25,9 +26,9 @@ function t(template: string, data: Record<string, any>): string {
   return result;
 }
 
-export function runEventPass(state: GameState, nextWeek: number, rootRng?: SeededRNG): GameState {
+export function runEventPass(state: GameState, nextWeek: number, rootRng?: IRNGService): GameState {
   const nextState = { ...state };
-  const brawlRng = rootRng?.clone() ?? new SeededRNG(nextWeek * 999 + 1);
+  const brawlRng = rootRng || new SeededRNGService(nextWeek * 999 + 1);
   
   // 🍺 Tavern Brawl Event
   if (brawlRng.next() < 0.05 && nextState.roster.length > 0) {
@@ -41,7 +42,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: Seede
         ...w,
         fame: (w.fame || 0) + 5,
         injuries: [...(w.injuries || []), {
-          id: generateId(brawlRng, "injury"),
+          id: brawlRng.uuid(),
           name: e.injury_name,
           description: e.injury_desc,
           severity: "Minor",

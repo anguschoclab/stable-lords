@@ -1,6 +1,7 @@
 import { Promoter, PromoterPersonality } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { generateId } from "@/utils/idUtils";
 
 const PROMOTER_FIRST_NAMES = [
@@ -19,9 +20,9 @@ const PROMOTER_LAST_NAMES = [
 
 const PERSONALITIES: PromoterPersonality[] = ["Greedy", "Honorable", "Sadistic", "Flashy", "Corporate"];
 
-export function generatePromoters(count: number, seed: number): Record<string, Promoter> {
-  const rng = new SeededRNG(seed);
-  const promoters: Record<string, Promoter> = {};
+export function generatePromoters(count: number, seed: number, week: number = 0): Promoter[] {
+  const rngService = new SeededRNGService(seed);
+  const promoters: Promoter[] = [];
 
   const tiers: ("Local" | "Regional" | "National" | "Legendary")[] = [
     ...Array(15).fill("Local"),
@@ -31,19 +32,19 @@ export function generatePromoters(count: number, seed: number): Record<string, P
   ];
 
   for (let i = 0; i < count; i++) {
-    const id = rng.uuid("promoter");
-    const firstName = rng.pick(PROMOTER_FIRST_NAMES);
-    const lastName = rng.pick(PROMOTER_LAST_NAMES);
+    const id = rngService.uuid();
+    const firstName = rngService.pick(PROMOTER_FIRST_NAMES);
+    const lastName = rngService.pick(PROMOTER_LAST_NAMES);
     const tier = tiers[i % tiers.length];
 
     promoters[id] = {
       id,
       name: `${firstName} ${lastName}`,
-      age: 35 + rng.roll(0, 30),
-      personality: rng.pick(PERSONALITIES),
+      age: 35 + Math.floor(rngService.next() * 31),
+      personality: rngService.pick(PERSONALITIES),
       tier,
       capacity: tier === "Legendary" ? 2 : tier === "National" ? 4 : tier === "Regional" ? 6 : 10,
-      biases: rng.shuffle(Object.values(FightingStyle)).slice(0, 2),
+      biases: rngService.shuffle(Object.values(FightingStyle)).slice(0, 2),
       history: {
         totalPursePaid: 0,
         notableBouts: [],

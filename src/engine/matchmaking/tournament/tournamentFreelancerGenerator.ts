@@ -1,13 +1,13 @@
 import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle } from "@/types/shared.types";
 import { makeWarrior } from "@/engine/factories";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
 
 /**
  * Generates a freelancer warrior for tournament filler.
  * Used when world population is decimated and not enough warriors are available.
  */
-export function generateFreelancer(tier: string, index: number, rng: SeededRNG): Warrior {
+export function generateFreelancer(tier: string, index: number, rng: IRNGService): Warrior {
   const styles = Object.values(FightingStyle);
   const style = rng.pick(styles);
   const pool = tier === "Gold" ? 120 : tier === "Silver" ? 100 : tier === "Bronze" ? 85 : 70;

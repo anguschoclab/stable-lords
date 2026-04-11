@@ -1,6 +1,7 @@
 import type { GameState, RivalStableData } from "@/types/state.types";
 import { type Season } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 import { generateId, hashStr } from "@/utils/idUtils";
 import type { PoolWarrior } from "@/engine/recruitment";
 
@@ -26,8 +27,11 @@ const tierRules: Record<NonNullable<RivalStableData["tier"]>, TierRule[]> = {
   Legendary: []
 };
 
-export function processTierProgression(state: GameState, newSeason: Season, newWeek: number): GameState {
+export function processTierProgression(state: GameState, newSeason: Season, newWeek: number, rng?: IRNGService): GameState {
   if (newSeason === state.season) return state;
+
+  const createdAt = state.meta?.createdAt || new Date(0).toISOString();
+  const rngService = rng || new SeededRNGService(hashStr(createdAt) + state.week);
 
   const promotionNews: string[] = [];
   const updatedRivals = (state.rivals || []).map(r => {
@@ -51,14 +55,12 @@ export function processTierProgression(state: GameState, newSeason: Season, newW
     return r;
   });
 
-  const createdAt = state.meta?.createdAt || new Date(0).toISOString();
-  const rng = new SeededRNG(hashStr(createdAt) + state.week);
   const s = { ...state, rivals: updatedRivals, recruitPool: [] as PoolWarrior[] };
   if (promotionNews.length > 0) {
     s.newsletter = [
       ...s.newsletter, 
       { 
-        id: generateId(rng, "newsletter"),
+        id: rngService.uuid(),
         week: newWeek, 
         title: "Stable Rankings Update", 
         items: promotionNews 

@@ -1,5 +1,6 @@
 import type { GameState, TournamentEntry, Warrior } from "@/types/state.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 export interface PrizeDistributionResult {
   updatedState: GameState;
@@ -12,9 +13,10 @@ export interface PrizeDistributionResult {
 export function awardTournamentPrizes(
   state: GameState, 
   tournamentId: string, 
-  seed: number
+  seed: number,
+  rng?: IRNGService
 ): PrizeDistributionResult {
-  const rng = new SeededRNG(seed);
+  const rngService = rng || new SeededRNGService(seed);
   const tournament = (state.tournaments || []).find(t => t.id === tournamentId);
   if (!tournament || !tournament.completed) return { updatedState: state, prizeNews: [] };
 

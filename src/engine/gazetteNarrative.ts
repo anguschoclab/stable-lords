@@ -7,8 +7,9 @@ import type { FightSummary } from "@/types/combat.types";
 import type { CrowdMoodType, Season } from "@/types/shared.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { GazetteStory } from "@/types/state.types";
+import type { IRNGService } from "@/engine/core/rng";
 import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng";
 import { generateId } from "@/utils/idUtils";
 
 
@@ -27,8 +28,8 @@ function t(template: string, data: Record<string, any>): string {
   return result;
 }
 
-export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType, rng?: SeededRNG): string {
-  const safeRng = rng ?? new SeededRNG(fight.week * 42);
+export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType, rng?: IRNGService): string {
+  const safeRng = rng || new SeededRNGService(fight.week * 42);
   const toneResource = MOOD_TONE[mood] || MOOD_TONE["Calm"];
   if (!MOOD_TONE[mood]) console.error(`Missing mood tone logic for: ${mood}`);
   const adj = safeRng.pick(toneResource.adjectives);
@@ -145,10 +146,10 @@ export function generateWeeklyGazette(
   week: number,
   graveyard: Warrior[],
   allFights?: FightSummary[],
-  seed?: number
+  rng?: IRNGService
 ): GazetteStory {
-  const rng = new SeededRNG(seed ?? (week * 7919 + 55));
-  const storyId = rng.uuid("gazette");
+  const rngService = rng || new SeededRNGService(week * 7919 + 55);
+  const storyId = rngService.uuid();
   const moodKey = mood && MOOD_TONE[mood] ? mood : "Calm";
   const tone = MOOD_TONE[moodKey];
   const kills = fights.filter(f => f.by === "Kill");
@@ -255,15 +256,15 @@ export function generateWeeklyGazette(
   } else if (kills.length === 1) {
     headline = t(gh.Kill, { week, killer: kills[0].winner === "A" ? kills[0].a : kills[0].d });
   } else if (knockouts.length >= 2) {
-    headline = t(gh.MultipleKOs, { week, adj: rng.pick(tone.adjectives) });
+    headline = t(gh.MultipleKOs, { week, adj: rngService.pick(tone.adjectives) });
   } else if (fights.length > 0) {
-    headline = t(gh.Standard, { week, adj: rng.pick(tone.adjectives) });
+    headline = t(gh.Standard, { week, adj: rngService.pick(tone.adjectives) });
   } else {
     headline = t(gh.Empty, { week });
   }
 
   // Body
-  const paragraphs: string[] = [rng.pick(tone.opener)];
+  const paragraphs: string[] = [rngService.pick(tone.opener)];
   const gf = (narrativeContent.gazette as any).featured;
 
   // Summary stats
@@ -320,7 +321,7 @@ export function generateWeeklyGazette(
     }
   }
 
-  paragraphs.push(rng.pick(tone.closer));
+  paragraphs.push(rngService.pick(tone.closer));
 
   return {
     id: storyId,

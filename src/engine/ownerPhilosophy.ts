@@ -1,8 +1,9 @@
 import type { GameState, Season, RivalStableData } from "@/types/state.types";
 import type { FightSummary } from "@/types/combat.types";
+import type { IRNGService } from "@/engine/core/rng";
 import { getRecentFights } from "@/engine/core/historyUtils";
 import { PHILOSOPHY_DRIFT } from "@/data/ownerData";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Evolve stable philosophies based on season results.
@@ -12,9 +13,9 @@ import { SeededRNG } from "@/utils/random";
 export function evolvePhilosophies(
   state: GameState,
   newSeason: Season,
-  seed?: number
+  rng?: IRNGService
 ): { updatedRivals: RivalStableData[]; gazetteItems: string[] } {
-  const rng = new SeededRNG(seed ?? (state.week * 131 + 42));
+  const rngService = rng || new SeededRNGService(state.week * 131 + 42);
   if (newSeason === state.season) return { updatedRivals: state.rivals || [], gazetteItems: [] };
 
   const gazetteItems: string[] = [];
@@ -41,7 +42,7 @@ export function evolvePhilosophies(
     // Failing stables (winRate < 40%) drift to a new philosophy
     if (winRate < 0.4) {
       const driftOptions = PHILOSOPHY_DRIFT[currentPhilosophy] ?? ["Balanced"];
-      const nextPhilosophy = rng.pick(driftOptions);
+      const nextPhilosophy = rngService.pick(driftOptions);
       
       if (nextPhilosophy !== currentPhilosophy) {
         gazetteItems.push(

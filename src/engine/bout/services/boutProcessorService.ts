@@ -9,6 +9,7 @@ import { getFightsForWeek } from "@/engine/core/historyUtils";
 import { engineEventBus } from "@/engine/core/EventBus";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { updatePromoterHistory } from "@/engine/promoters";
+import { SeededRNGService } from "@/engine/core/rng";
 
 import { applyRecords } from "../recordHandler";
 import { handleDeath } from "../mortalityHandler";
@@ -104,9 +105,9 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   s = deathRes.s;
   const injuryRes = handleInjuries(s, currentW, currentO, outcome, week, rivalStableId, boutSeed);
   s = injuryRes.s;
-  s = handleProgressions(s, currentW, currentO, outcome, tags, week, rivalStableId, boutSeed);
+  s = handleProgressions(s, currentW, currentO, outcome, tags, week, rivalStableId, new SeededRNGService(boutSeed));
 
-  const { summary, announcement } = handleReporting(currentW, currentO, outcome, tags, fameA, popA, fameD, popD, week, rivalStableId, isRivalry);
+  const { summary, announcement } = handleReporting(currentW, currentO, outcome, tags, fameA, popA, fameD, popD, week, rivalStableId, isRivalry, 0, new SeededRNGService(boutSeed));
   s.arenaHistory = [...s.arenaHistory, summary];
   engineEventBus.emit({ type: 'BOUT_COMPLETED', payload: { summary, transcript: summary.transcript } });
 
@@ -174,7 +175,9 @@ function finalizeWeekSideEffects(s: GameState, results: BoutResult[]) {
 
   const weekFights = getFightsForWeek(s.arenaHistory, s.week);
   const gazetteSeed = s.week * 9973 + 123;
-  s.gazettes = [...(s.gazettes || []), generateWeeklyGazette(weekFights, s.crowdMood, s.week, s.graveyard, s.arenaHistory, gazetteSeed)];
-  s.rivalries = updateRivalriesFromBouts(s.rivalries || [], weekFights, s.week, s.week * 13);
+  const gazetteRng = new SeededRNGService(gazetteSeed);
+  s.gazettes = [...(s.gazettes || []), generateWeeklyGazette(weekFights, s.crowdMood, s.week, s.graveyard, s.arenaHistory, gazetteRng)];
+  const rng = new SeededRNGService(s.week * 13);
+  s.rivalries = updateRivalriesFromBouts(s.rivalries || [], weekFights, s.week, rng);
   NewsletterFeed.closeWeekToIssue(s.week);
 }

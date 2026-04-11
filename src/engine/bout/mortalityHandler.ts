@@ -4,7 +4,7 @@ import type { FightOutcome, FightSummary } from "@/types/combat.types";
 import { generateId } from "@/utils/idUtils";
 import { generateFightNarrative } from "@/engine/gazetteNarrative";
 import { engineEventBus } from "@/engine/core/EventBus";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng";
 
 export function handleDeath(
   s: GameState, 
@@ -14,14 +14,14 @@ export function handleDeath(
   week: number, 
   tags: string[], 
   rivalStableId?: string,
-  rng?: SeededRNG
+  rng?: IRNGService
 ) {
   if (outcome.by !== "Kill") return { s, death: false, playerDeath: false, deathNames: [] };
   
   const victim = outcome.winner === "A" ? wD : wA;
   const isPlayerVictim = (outcome.winner === "A" && !!rivalStableId) ? false : (outcome.winner !== "A");
   
-  const boutId = generateId(rng, "bout");
+  const boutId = rng.uuid();
   const narrative = generateFightNarrative({ 
     id: boutId, week, a: wA.name, d: wD.name, 
     warriorIdA: wA.id, warriorIdD: wD.id,
@@ -63,7 +63,7 @@ export function handleDeath(
     title: `DEATH: ${victim.name} in the Arena`, phase: "resolution"
   };
   
-  nextS.newsletter = [...(nextS.newsletter || []), { id: generateId(rng, "newsletter"), week, title: "Arena Obituary", items: [narrative] }];
+  nextS.newsletter = [...(nextS.newsletter || []), { id: rng!.uuid(), week, title: "Arena Obituary", items: [narrative] }];
   
   // Decoupled notification
   engineEventBus.emit({ 

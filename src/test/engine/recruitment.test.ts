@@ -1,17 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { partialRefreshPool, generateRecruitPool, DEFAULT_POOL_SIZE, PoolWarrior } from "@/engine/recruitment";
+import { SeededRNGService } from "@/engine/core/rng";
 
 describe("partialRefreshPool", () => {
   it("returns a newly generated pool of DEFAULT_POOL_SIZE if given an empty pool", () => {
     const usedNames = new Set<string>();
-    const pool = partialRefreshPool([], 1, usedNames);
+    const rng = new SeededRNGService(12345);
+    const pool = partialRefreshPool([], 1, usedNames, rng);
     expect(pool.length).toBe(DEFAULT_POOL_SIZE);
     expect(pool.every((w) => w.addedWeek === 1)).toBe(true);
   });
 
   it("removes the oldest warriors and replaces them, ensuring DEFAULT_POOL_SIZE", () => {
     const usedNames = new Set<string>();
-    const week1Pool = generateRecruitPool(DEFAULT_POOL_SIZE, 1, usedNames);
+    const rng = new SeededRNGService(12345);
+    const week1Pool = generateRecruitPool(DEFAULT_POOL_SIZE, 1, usedNames, rng);
 
     // Simulate some time passing and an older pool. Let's make 2 of them older.
     const pool = [...week1Pool];
@@ -58,7 +61,7 @@ describe("partialRefreshPool", () => {
     expect(addedInWeek2.length).toBe(9);
 
     // Test maximum removal: array size 20 -> floor(6) -> min(4, 6) = 4
-    const largePool = generateRecruitPool(20, 1, usedNames);
+    let largePool = generateRecruitPool(20, 1, usedNames);
     const refreshedLarge = partialRefreshPool(largePool, 2, usedNames);
     // Doesn't truncate down to DEFAULT_POOL_SIZE if it was larger, only expands up to it.
     // wait, does it? The code says:
@@ -72,7 +75,8 @@ describe("partialRefreshPool", () => {
 
   it("avoids reusing names that are in the remaining pool or previously used", () => {
     const usedNames = new Set<string>();
-    const pool = generateRecruitPool(10, 1, usedNames);
+    const rng = new SeededRNGService(12345);
+    const pool = generateRecruitPool(10, 1, usedNames, rng);
 
     // Add all names from pool to usedNames, except maybe the ones being removed?
     // Actually generateRecruitPool already adds them to usedNames.
@@ -80,7 +84,7 @@ describe("partialRefreshPool", () => {
     // We add an external name to usedNames
     usedNames.add("EXTERNAL_NAME");
 
-    const refreshedPool = partialRefreshPool(pool, 2, usedNames);
+    const refreshedPool = partialRefreshPool(pool, 2, usedNames, rng);
 
     // Make sure EXTERNAL_NAME is not in the refreshed pool unless it was somehow already there
     // But NAME_POOL doesn't have "EXTERNAL_NAME", so this is just to verify it works without error.

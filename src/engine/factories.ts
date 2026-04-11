@@ -9,10 +9,8 @@ import { FightingStyle, ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from "@/types/shared.typ
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { generateFavorites } from "@/engine/favorites";
 import { generateId } from "@/utils/idUtils";
-import { SeededRNG } from "@/utils/random";
-import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
-
-export { advanceWeek };
+import type { IRNGService } from "@/engine/core/rng";
+import { SeededRNGService } from "@/engine/core/rng";
 
 /**
  * Warrior Factory - creates a new warrior with calculated stats and favorites.
@@ -30,13 +28,13 @@ export function makeWarrior(
   style: FightingStyle,
   attrs: { ST: number; CN: number; SZ: number; WT: number; WL: number; SP: number; DF: number },
   overrides?: Partial<Warrior>,
-  rng?: SeededRNG
+  rng?: IRNGService
 ): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
   const favorites = generateFavorites(style, rng ? () => rng.next() : () => 0.5);
-  
+    
   return {
-    id: id ?? generateId(rng, "warrior"),
+    id: id ?? (rng ? rng.uuid() : generateId(undefined, "warrior")),
     name,
     style,
     attributes: attrs,
@@ -61,7 +59,7 @@ export function makeWarrior(
    */
   export function createFreshState(seed: string, createdAt: string = new Date().toISOString()): GameState {
     const numericSeed = seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const rng = new SeededRNG(numericSeed);
+    const rng = new SeededRNGService(numericSeed);
     
     // 1. Core State
     const state: GameState = {
@@ -146,11 +144,11 @@ export function makeWarrior(
     state.rivals = pool.slice(0, 4).map((name, i) => {
       const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
       return {
-        id: generateId(rng, "stable"),
+        id: rng.uuid(),
         fame: 100,
         treasury: 1500 + Math.floor(rng.next() * 1000),
         owner: {
-          id: generateId(rng, "owner"),
+          id: rng.uuid(),
           name: `Lord ${name.split(" ")[0]}`,
           stableName: name,
           personality: PERSONALITIES[personalityIndex],
@@ -182,7 +180,7 @@ export function makeWarrior(
         WT: attrBase(), WL: attrBase(), SP: attrBase(), DF: attrBase()
       };
       
-      const baseWarrior = makeWarrior(generateId(rng, "warrior"), `Recruit ${i + 1}`, style, attrs, {}, rng);
+      const baseWarrior = makeWarrior(rng.uuid(), `Recruit ${i + 1}`, style, attrs, {}, rng);
       return {
         ...baseWarrior,
         cost: 150 + Math.floor(rng.next() * 150),
