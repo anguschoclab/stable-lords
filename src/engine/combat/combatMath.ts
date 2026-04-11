@@ -1,3 +1,4 @@
+/**
  * Combat Math — RNG, phase detection, skill/contest checks.
  * Single source of truth for combat math utilities used by simulate.ts.
  */

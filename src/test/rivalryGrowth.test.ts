@@ -28,7 +28,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
       },
     ];
 
-    const rivalriesAfter1 = updateRivalriesFromBouts(existingRivalries, highFameFights, week);
+    const rng = new SeededRNGService(12345);
+    const rivalriesAfter1 = updateRivalriesFromBouts(existingRivalries, highFameFights, week, rng);
     const feud = rivalriesAfter1.find(r => r.stableIdA === "PlayerStable" && r.stableIdB === "RivalStable");
     
     expect(feud).toBeDefined();

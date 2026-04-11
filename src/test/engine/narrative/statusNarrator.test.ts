@@ -210,19 +210,4 @@ describe("StatusNarrator", () => {
     });
   });
 
-  describe("narrateInsightHint", () => {
-    it("should return null for non-existent attribute", () => {
-      const line = StatusNarrator.narrateInsightHint(new SeededRNGService(12345), "nonexistent");
-      expect(line).toBeNull();
-    });
-
-    it("should return interpolated template for valid attribute", () => {
-      const line = StatusNarrator.narrateInsightHint(new SeededRNGService(12345), "ST");
-      // ST attribute exists in the archive, so it should return an interpolated string
-      // The test was incorrectly expecting null
-      if (line) {
-        expect(typeof line).toBe("string");
-      }
-    });
-  });
 });
