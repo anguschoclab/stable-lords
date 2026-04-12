@@ -11,6 +11,8 @@ import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { updatePromoterHistory } from "@/engine/promoters";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { StateImpact, mergeImpacts } from "@/engine/impacts";
+import { validateBoutCombatants, calculateBoutFame, processContractPayouts, getWinnerId, getDefaultPlan } from "../core/resolveHelpers";
+
 
 import { applyRecords } from "../recordHandler";
 import { handleDeath } from "../mortalityHandler";
@@ -36,100 +38,32 @@ function hashStr(s: string): number {
 
 export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   const { warrior, opponent, isRivalry, rivalStable, rivalStableId, moodMods, week, warriorMap, contract } = ctx;
-  const currentW = warriorMap?.get(warrior?.id);
-  const currentO = warriorMap?.get(opponent?.id);
+  const cW = warriorMap?.get(warrior?.id);
+  const cO = warriorMap?.get(opponent?.id);
 
-  if (!currentW || currentW.status !== "Active" || !currentO) {
-    return { 
-      impact: {},
-      result: { 
-        a: warrior, 
-        d: opponent, 
-        outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as FightOutcome, 
-        isRivalry, 
-        rivalStable, 
-        contractId: contract?.id 
-      }, 
-      stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } 
-    };
+  if (!validateBoutCombatants(cW, cO)) {
+    return { impact: {}, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as FightOutcome, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
   }
 
-  // 🛡️ Determinism: Generate a unique seed for this specific bout
-  const boutSeed = hashStr(`${week}|${currentW.id}|${currentO.id}`);
-  const outcome = simulateFight(currentW.plan ?? defaultPlanForWarrior(currentW), currentO.plan ?? defaultPlanForWarrior(currentO), currentW, currentO, boutSeed, state.trainers, state.weather);
+  const boutSeed = hashStr(`${week}|${cW!.id}|${cO!.id}`);
+  const rng = new SeededRNGService(boutSeed);
+  const outcome = simulateFight(getDefaultPlan(cW!, defaultPlanForWarrior), getDefaultPlan(cO!, defaultPlanForWarrior), cW!, cO!, boutSeed, state.trainers, state.weather);
   const tags = outcome.post?.tags ?? [];
-  const rawFameA = fameFromTags(outcome.winner === "A" ? tags : []);
-  const rawFameD = fameFromTags(outcome.winner === "D" ? tags : []);
-
-  const fameA = Math.round(rawFameA.fame * moodMods.fameMultiplier * (isRivalry ? 2 : 1));
-  const popA = Math.round(rawFameA.pop * moodMods.popMultiplier);
-  const fameD = Math.round(rawFameD.fame * moodMods.fameMultiplier);
-  const popD = Math.round(rawFameD.pop * moodMods.popMultiplier);
-
-  const impacts: StateImpact[] = [];
-  const rivalsUpdates = new Map<string, any>();
   
-  // 💰 Apply Contract Payouts
-  if (contract) {
-    const winnerId = outcome.winner === "A" ? currentW.id : outcome.winner === "D" ? currentO.id : null;
-    const purse = contract.purse;
-    const showFee = Math.floor(purse * 0.2);
+  const { fameA, popA, fameD, popD } = calculateBoutFame(outcome, tags, moodMods, isRivalry);
 
-    // Winner gets full purse, Loser gets show fee
-    if (winnerId === currentW.id) {
-       impacts.push({ treasuryDelta: purse });
-       // If D is a rival, give them show fee
-       if (rivalStableId) {
-         const existing = rivalsUpdates.get(rivalStableId) || { treasury: 0 };
-         rivalsUpdates.set(rivalStableId, { treasury: existing.treasury + showFee });
-       }
-    } else if (winnerId === currentO.id) {
-       if (rivalStableId) {
-         const existing = rivalsUpdates.get(rivalStableId) || { treasury: 0 };
-         rivalsUpdates.set(rivalStableId, { treasury: existing.treasury + purse });
-       }
-       impacts.push({ treasuryDelta: showFee });
-    } else {
-       // Draw: both get show fee
-       impacts.push({ treasuryDelta: showFee });
-       if (rivalStableId) {
-         const existing = rivalsUpdates.get(rivalStableId) || { treasury: 0 };
-         rivalsUpdates.set(rivalStableId, { treasury: existing.treasury + showFee });
-       }
-    }
-    
-    // Update Promoter History - this mutates state, need to convert
-    const promoterImpact = updatePromoterHistoryToImpact(state, contract.promoterId, purse, `bout_${week}_${currentW.id}_vs_${currentO.id}`);
-    impacts.push(promoterImpact);
-    
-    // Close the contract
-    const boutOffers = { ...state.boutOffers };
-    delete boutOffers[contract.id];
-    impacts.push({ boutOffers });
-  }
+  const impacts: StateImpact[] = processContractPayouts(state, contract, getWinnerId(outcome, cW!.id, cO!.id), cW!.id, cO!.id, rivalStableId);
+  impacts.push(applyRecords(state, cW!, cO!, outcome, tags, fameA, popA, fameD, popD, rivalStableId));
   
-  if (rivalsUpdates.size > 0) {
-    impacts.push({ rivalsUpdates });
-  }
+  const deathRes = handleDeath(state, cW!, cO!, outcome, week, tags, rivalStableId, rng);
+  const injuryRes = handleInjuries(state, cW!, cO!, outcome, week, rivalStableId, boutSeed);
+  impacts.push(deathRes.impact, injuryRes.impact, handleProgressions(state, cW!, cO!, outcome, tags, week, rivalStableId, rng));
 
-  const recordsImpact = applyRecords(state, currentW, currentO, outcome, tags, fameA, popA, fameD, popD, rivalStableId);
-  impacts.push(recordsImpact);
-  
-  const deathRes = handleDeath(state, currentW, currentO, outcome, week, tags, rivalStableId, new SeededRNGService(boutSeed));
-  impacts.push(deathRes.impact);
-  
-  const injuryRes = handleInjuries(state, currentW, currentO, outcome, week, rivalStableId, boutSeed);
-  impacts.push(injuryRes.impact);
-  
-  const progImpact = handleProgressions(state, currentW, currentO, outcome, tags, week, rivalStableId, new SeededRNGService(boutSeed));
-  impacts.push(progImpact);
-
-  const { summary, announcement } = handleReporting(currentW, currentO, outcome, tags, fameA, popA, fameD, popD, week, rivalStableId, isRivalry, 0, new SeededRNGService(boutSeed));
+  const { summary, announcement } = handleReporting(cW!, cO!, outcome, tags, fameA, popA, fameD, popD, week, rivalStableId, isRivalry, 0, rng);
   impacts.push({ arenaHistory: [summary] });
   engineEventBus.emit({ type: 'BOUT_COMPLETED', payload: { summary, transcript: summary.transcript } });
 
-  const mergedImpact = mergeImpacts(impacts);
-  return { impact: mergedImpact, result: { a: warrior, d: opponent, outcome, announcement, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: deathRes.death, playerDeath: deathRes.playerDeath, injured: injuryRes.injured, deathNames: deathRes.deathNames, injuredNames: injuryRes.injuredNames } };
+  return { impact: mergeImpacts(impacts), result: { a: warrior, d: opponent, outcome, announcement, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: deathRes.death, playerDeath: deathRes.playerDeath, injured: injuryRes.injured, deathNames: deathRes.deathNames, injuredNames: injuryRes.injuredNames } };
 }
 
 export function processWeekBouts(state: GameState): { impact: StateImpact; results: BoutResult[]; summary: WeekBoutSummary } {
