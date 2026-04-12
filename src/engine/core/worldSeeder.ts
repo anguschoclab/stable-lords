@@ -34,7 +34,7 @@ export function populateInitialWorld(state: GameState, seed: number, rng?: IRNGS
   promotersArray.forEach(p => promoters[p.id] = p);
 
   // 2. Generate Initial Recruit Pool
-  const recruitPool = generateRecruitPool(12, 1, usedNames, seed + 2);
+  const recruitPool = generateRecruitPool(12, 1, usedNames, new SeededRNGService(seed + 2));
 
   // 3. Generate Player Roster (4 balanced warriors)
   const styles = [

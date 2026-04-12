@@ -2,7 +2,7 @@
  * advanceWeek pipeline tests — verifies orchestration of the weekly pipeline
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { advanceWeek } from "@/engine/weekPipeline";
+import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { createFreshState } from "@/engine/factories";
 import * as Training from "@/engine/training";
 import * as Economy from "@/engine/economy";
@@ -30,7 +30,8 @@ vi.mock("@/engine/health", () => ({
 }));
 
 vi.mock("@/engine/impacts", () => ({
-  resolveImpacts: vi.fn((state) => ({ ...state }))
+  resolveImpacts: vi.fn((state) => ({ ...state })),
+  mergeImpacts: vi.fn((impacts) => impacts)
 }));
 
 // Mock procedural steps

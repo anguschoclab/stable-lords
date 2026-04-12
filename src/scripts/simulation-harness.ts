@@ -1,5 +1,5 @@
 import { type GameState } from "@/types/state.types";
-import { advanceWeek } from "@/engine/weekPipeline";
+import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { processWeekBouts } from "@/engine/boutProcessor";
 import { populateInitialWorld } from "@/engine/core/worldSeeder";
 import { createFreshState } from "@/engine/factories";
