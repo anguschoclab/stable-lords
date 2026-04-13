@@ -91,7 +91,25 @@ function loadWeek(week: number): Record<string, Bucket> {
 
 function saveWeek(week: number, m: Record<string, Bucket>) {
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(`${KEY_WEEK}_${week}`, JSON.stringify(m));
+    try {
+      localStorage.setItem(`${KEY_WEEK}_${week}`, JSON.stringify(m));
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+        console.error(`localStorage quota exceeded when saving week ${week} style rollups`, error);
+        // Attempt to clear older weeks to free up space
+        try {
+          for (let i = week - 10; i >= 1; i--) {
+            localStorage.removeItem(`${KEY_WEEK}_${i}`);
+          }
+          // Retry saving
+          localStorage.setItem(`${KEY_WEEK}_${week}`, JSON.stringify(m));
+        } catch (retryError) {
+          console.error(`Failed to recover from localStorage quota error for week ${week}`, retryError);
+        }
+      } else {
+        console.error(`Failed to save week ${week} style rollups`, error);
+      }
+    }
   }
 }
 
@@ -115,7 +133,16 @@ function loadRolling(): Record<string, RollingBucket[]> {
 }
 function saveRolling(m: Record<string, RollingBucket[]>) {
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(KEY_ROLLING, JSON.stringify(m));
+    try {
+      localStorage.setItem(KEY_ROLLING, JSON.stringify(m));
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+        console.error('localStorage quota exceeded when saving rolling style metrics', error);
+        // Rolling metrics are ephemeral, can be recalculated, so just log and continue
+      } else {
+        console.error('Failed to save rolling style metrics', error);
+      }
+    }
   }
 }
 
@@ -132,7 +159,16 @@ function loadTour(): Record<string, Record<string, RollingBucket>> {
 }
 function saveTour(m: Record<string, Record<string, RollingBucket>>) {
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(KEY_TOUR, JSON.stringify(m));
+    try {
+      localStorage.setItem(KEY_TOUR, JSON.stringify(m));
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+        console.error('localStorage quota exceeded when saving tournament style metrics', error);
+        // Tournament metrics are ephemeral, can be recalculated, so just log and continue
+      } else {
+        console.error('Failed to save tournament style metrics', error);
+      }
+    }
   }
 }
 
@@ -184,9 +220,9 @@ export const StyleRollups = {
     const rolling = loadRolling();
     const kill = opts.by === "Kill";
     const addRolling = (s: string, win: boolean, killed: boolean) => {
-      rolling[s] = rolling[s] || [];
-      rolling[s].push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
-      while (rolling[s].length > 10) rolling[s].shift();
+      if (!rolling[s]) rolling[s] = [];
+      rolling[s]!.push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
+      while (rolling[s]!.length > 10) rolling[s]!.shift();
     };
     addRolling(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
     addRolling(opts.styleD, opts.winner === "D", kill && opts.winner === "D");
@@ -199,7 +235,7 @@ export const StyleRollups = {
       tour[tid] = tour[tid] || {};
       const bump = (s: string, win: boolean, killed: boolean) => {
         tour[tid][s] = tour[tid][s] || { W: 0, L: 0, K: 0, fights: 0 };
-        const b = tour[tid][s];
+        const b = tour[tid][s]!;
         b.W += win ? 1 : 0;
         b.L += win ? 0 : 1;
         b.K += killed ? 1 : 0;

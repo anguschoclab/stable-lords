@@ -27,6 +27,11 @@ export function saveUIPrefs(prefs: UIPrefs): void {
     const current = loadUIPrefs();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...prefs }));
   } catch (err) {
-    console.error("Failed to save UI prefs:", err);
+    if ((err as Error)?.name === 'QuotaExceededError') {
+      console.error('localStorage quota exceeded when saving UI preferences', err);
+      // UI prefs are not critical, just log and continue
+    } else {
+      console.error("Failed to save UI prefs:", err);
+    }
   }
 }

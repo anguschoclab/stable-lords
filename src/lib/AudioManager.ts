@@ -10,7 +10,6 @@ export type SfxType = "ui_click" | "hit" | "crit" | "clash" | "death" | "recover
 class AudioManager {
   private static instance: AudioManager;
   private sfx: Map<SfxType, Howl> = new Map();
-  private amibent: Howl | null = null;
   private muted: boolean = false;
 
   private constructor() {
@@ -50,7 +49,18 @@ class AudioManager {
 
   public setMuted(muted: boolean) {
     this.muted = muted;
-    if (typeof localStorage !== "undefined") localStorage.setItem("sl_muted", String(muted));
+    if (typeof localStorage !== "undefined") {
+      try {
+        localStorage.setItem("sl_muted", String(muted));
+      } catch (error) {
+        if ((error as Error)?.name === 'QuotaExceededError') {
+          console.error('localStorage quota exceeded when saving mute state', error);
+          // Mute state is not critical, just log and continue
+        } else {
+          console.error('Failed to save mute state', error);
+        }
+      }
+    }
   }
 
   public isMuted() {

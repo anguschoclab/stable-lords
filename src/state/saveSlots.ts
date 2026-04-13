@@ -26,7 +26,26 @@ function getStoredMeta(): SaveSlotMeta[] {
 }
 
 function setStoredMeta(meta: SaveSlotMeta[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(meta));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(meta));
+  } catch (error) {
+    if ((error as Error)?.name === 'QuotaExceededError') {
+      console.error('localStorage quota exceeded when saving save slot metadata', error);
+      // Attempt to clear old save slots to free up space
+      try {
+        const existing = getStoredMeta();
+        if (existing.length > 0) {
+          // Keep only the most recent save slot
+          const mostRecent = existing.slice(-1);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(mostRecent));
+        }
+      } catch (retryError) {
+        console.error('Failed to recover from localStorage quota error', retryError);
+      }
+    } else {
+      console.error('Failed to save save slot metadata', error);
+    }
+  }
 }
 
 export function listSaveSlots(): SaveSlotMeta[] {

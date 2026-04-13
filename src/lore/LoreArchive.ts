@@ -16,7 +16,25 @@ function loadArray<T>(key: string): T[] {
 }
 function saveArray<T>(key: string, arr: T[]) {
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(key, JSON.stringify(arr));
+    try {
+      localStorage.setItem(key, JSON.stringify(arr));
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+        console.error(`localStorage quota exceeded when saving ${key}`, error);
+        // Lore data is capped at 500 entries, attempt to clear older entries
+        try {
+          const existing = loadArray<T>(key);
+          if (existing.length > 100) {
+            const trimmed = existing.slice(-100);
+            localStorage.setItem(key, JSON.stringify(trimmed));
+          }
+        } catch (retryError) {
+          console.error(`Failed to recover from localStorage quota error for ${key}`, retryError);
+        }
+      } else {
+        console.error(`Failed to save ${key}`, error);
+      }
+    }
   }
 }
 
