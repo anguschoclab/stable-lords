@@ -251,6 +251,8 @@ export function generateWeeklyGazette(
     headline = t(gh.RisingStar, { week, name: risingStars[0] });
   } else if (upsets.length > 0) {
     headline = t(gh.Upset, { week, winner: upsets[0].winner, loser: upsets[0].loser });
+  } else if (kills.length >= 3) {
+    headline = t(gh.BloodDrunk, { week });
   } else if (kills.length >= 2) {
     headline = t(gh.MultipleKills, { week, count: kills.length });
   } else if (kills.length === 1) {
@@ -258,9 +260,9 @@ export function generateWeeklyGazette(
   } else if (knockouts.length >= 2) {
     headline = t(gh.MultipleKOs, { week, adj: rngService.pick(tone.adjectives) });
   } else if (fights.length > 0) {
-    headline = t(gh.Standard, { week, adj: rngService.pick(tone.adjectives) });
+    headline = t(rngService.pick([gh.Standard, gh.NewLegends]), { week, adj: rngService.pick(tone.adjectives) });
   } else {
-    headline = t(gh.Empty, { week });
+    headline = t(rngService.pick([gh.Empty, gh.QuietDespair]), { week });
   }
 
   // Body
