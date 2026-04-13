@@ -25,9 +25,9 @@ const WEATHER_METADATA = {
   },
   Rainy: {
     icon: CloudRain,
-    color: "text-blue-400",
-    bg: "bg-blue-400/10",
-    border: "border-blue-400/20",
+    color: "text-stone-400",
+    bg: "bg-stone-400/10",
+    border: "border-stone-400/20",
     description: "Driving rain. Significant penalties to precision and initiative. Footing is uncertain.",
     stats: "PRECISION_PENALTY_15% // INITIATIVE_-10"
   },
@@ -49,9 +49,9 @@ const WEATHER_METADATA = {
   },
   Drafty: {
     icon: Wind,
-    color: "text-cyan-400",
-    bg: "bg-cyan-400/10",
-    border: "border-cyan-400/20",
+    color: "text-stone-300",
+    bg: "bg-stone-300/10",
+    border: "border-stone-300/20",
     description: "Strong shifting winds. Erratic initiative modifiers and slight energy drain.",
     stats: "INITIATIVE_FLUX // STAMINA_DRAIN_120%"
   }

@@ -185,7 +185,7 @@ export default function Dashboard() {
         icon={LayoutDashboard}
         actions={
           <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-lg border border-white/5 shrink-0 shadow-inner">
+            <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-none border border-white/5 shrink-0 shadow-inner">
                <div className="flex items-center gap-2 border-r border-white/5 pr-4">
                   <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Gold</span>
                   <span className="font-mono text-arena-gold font-black">{Math.round(treasury).toLocaleString()}G</span>
@@ -242,7 +242,7 @@ export default function Dashboard() {
                 def.wide && "md:col-span-2",
                 isEditing && "cursor-grab active:cursor-grabbing",
                 isDragging && "opacity-40 scale-[0.97]",
-                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-xl",
+                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-none",
               )}
             >
               {isEditing && (

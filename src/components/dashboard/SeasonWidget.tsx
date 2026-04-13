@@ -32,8 +32,8 @@ export function SeasonWidget() {
 
   if (weather === "Rainy") {
     WeatherIcon = CloudRain;
-    weatherColor = "text-blue-500";
-    weatherBg = "bg-blue-500/10 border-blue-500/20";
+    weatherColor = "text-stone-400";
+    weatherBg = "bg-stone-400/10 border-stone-400/20";
   } else if (weather === "Blazing Sun") {
     WeatherIcon = Sun;
     weatherColor = "text-red-500";
@@ -56,8 +56,8 @@ export function SeasonWidget() {
     weatherBg = "bg-emerald-500/10 border-emerald-500/20";
   } else if (weather === "Drafty") {
     WeatherIcon = Wind;
-    weatherColor = "text-cyan-400";
-    weatherBg = "bg-cyan-400/10 border-cyan-400/20";
+    weatherColor = "text-stone-300";
+    weatherBg = "bg-stone-300/10 border-stone-300/20";
   }
 
   return (

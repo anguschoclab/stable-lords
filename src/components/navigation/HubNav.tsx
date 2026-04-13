@@ -44,7 +44,7 @@ export function HubNav({ className }: HubNavProps) {
             key={hub.id}
             to={hub.to}
             className={cn(
-              "relative flex items-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-200",
+              "relative flex items-center gap-2 px-6 py-2.5 rounded-none transition-all duration-200",
               "text-sm font-black uppercase tracking-wider",
               isActive
                 ? "text-primary bg-primary/10"
@@ -54,7 +54,7 @@ export function HubNav({ className }: HubNavProps) {
             {isActive && (
               <motion.div
                 layoutId="hub-indicator"
-                className="absolute inset-0 bg-primary/10 rounded-lg"
+                className="absolute inset-0 bg-primary/10 rounded-none"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}

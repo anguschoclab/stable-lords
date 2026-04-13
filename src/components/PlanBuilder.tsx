@@ -354,9 +354,9 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                         <Badge className={cn(
                           "rounded-none border-none font-black text-[9px] uppercase px-2 py-0.5",
                           ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 50 ? "bg-arena-gold text-black" :
-                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 30 ? "bg-purple-500/20 text-purple-400" :
-                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 20 ? "bg-blue-500/20 text-blue-400" :
-                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 10 ? "bg-green-500/20 text-green-400" :
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 30 ? "bg-arena-fame/20 text-arena-fame" :
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 20 ? "bg-stone-500/20 text-stone-400" :
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 10 ? "bg-arena-pop/20 text-arena-pop" :
                           "bg-white/10 text-muted-foreground"
                         )}>
                           {getMastery((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)).tier}

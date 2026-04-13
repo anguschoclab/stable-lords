@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "electron:dev": "concurrently \"bun run dev\" \"wait-on http://localhost:8080 && electron .\"",
+    "electron:dev": "bun run dev & sleep 5 && electron .",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "electron:build": "bun run build && electron-builder",

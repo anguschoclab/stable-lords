@@ -35,9 +35,9 @@ const CUSTOM_COST = 200;
 
 const TIER_ACCENTS: Record<RecruitTier, string> = {
   Common: "border-border/40 text-muted-foreground",
-  Promising: "border-blue-500/30 text-blue-400 bg-blue-500/10",
-  Exceptional: "border-purple-500/50 text-purple-400 bg-purple-500/10 shadow-[0_0_15px_-3px_rgba(168,85,247,0.3)]",
-  Prodigy: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_20px_-5px_rgba(255,215,0,0.4)]",
+  Promising: "border-stone-500/30 text-stone-300 bg-stone-500/10",
+  Exceptional: "border-arena-fame/50 text-arena-fame bg-arena-fame/10 shadow-[0_0_15px_-3px_rgba(139,95,196,0.3)]",
+  Prodigy: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_20px_-5px_rgba(201,151,42,0.4)]",
 };
 
 function TierBadge({ tier }: { tier: RecruitTier }) {
@@ -106,7 +106,7 @@ function RecruitCard({
       
       <CardContent className="px-5 pb-5 space-y-4">
         {/* Attributes Grid */}
-        <div className="space-y-1.5 bg-background/20 p-3 rounded-xl border border-border/20">
+        <div className="space-y-1.5 bg-background/20 p-3 rounded-none border border-border/20">
           {ATTRIBUTE_KEYS.map(key => (
             <StatBar key={key} label={key} value={warrior.attributes[key]} />
           ))}
@@ -114,14 +114,14 @@ function RecruitCard({
 
         {/* Derived Stats Mini-Grid */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/10 border border-border/10">
+          <div className="flex items-center gap-2 p-2 rounded-none bg-secondary/10 border border-border/10">
             <Heart className="h-3.5 w-3.5 text-destructive" />
             <div className="flex-1">
               <p className="text-[9px] text-muted-foreground font-black uppercase">HIT POINTS</p>
               <p className="text-xs font-mono font-bold">{warrior.derivedStats.hp}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/10 border border-border/10">
+          <div className="flex items-center gap-2 p-2 rounded-none bg-secondary/10 border border-border/10">
             <Zap className="h-3.5 w-3.5 text-arena-fame" />
             <div className="flex-1">
               <p className="text-[9px] text-muted-foreground font-black uppercase">ENDURANCE</p>
@@ -337,7 +337,7 @@ export default function Recruit() {
       </div>
 
       {rosterFull && (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="rounded-none border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
           Roster full! Retire or release a warrior before recruiting.
         </div>
       )}
@@ -408,7 +408,7 @@ export default function Recruit() {
 
         {/* Custom Build Tab */}
         <TabsContent value="custom" className="mt-4 space-y-4">
-          <div className="rounded-lg border border-border bg-secondary/30 p-3 text-sm text-muted-foreground">
+          <div className="rounded-none border border-border bg-secondary/30 p-3 text-sm text-muted-foreground">
             <Hammer className="h-4 w-4 inline mr-1.5" />
             Custom warriors cost <span className="font-semibold text-foreground">{CUSTOM_COST}g</span> and start with 66 total attribute points. You choose the distribution.
             {!canTransact(treasury, CUSTOM_COST) && (

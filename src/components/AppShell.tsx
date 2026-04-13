@@ -108,7 +108,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Link to="/" className="flex items-center gap-3 group active:scale-95 transition-transform">
             <motion.div 
               whileHover={{ rotate: 15 }}
-              className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
+              className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
               <Swords className="h-5 w-5 text-white" />
             </motion.div>
@@ -157,7 +157,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-white/5 transition-colors"
+                className="h-9 w-9 rounded-none hover:bg-white/5 transition-colors"
                 onClick={toggleMute}
                 title={isMuted ? "Unmute audio" : "Mute audio"}
                 aria-label={isMuted ? "Unmute audio" : "Mute audio"}
@@ -177,7 +177,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-9 w-9 rounded-lg transition-all",
+                  "h-9 w-9 rounded-none transition-all",
                   saveFlash ? "bg-primary/20 text-primary scale-110" : "hover:bg-white/5"
                 )}
                 title="Save status"
@@ -196,7 +196,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
+                className="h-9 w-9 rounded-none hover:bg-destructive/10 hover:text-destructive transition-colors"
                 onClick={() => setResetOpen(true)}
                 title="Reset game"
                 aria-label="Reset game"
@@ -216,7 +216,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30"
+                className="h-9 w-9 rounded-none hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30"
                 onClick={returnToTitle}
                 disabled={isSimulating}
                 title="Exit to title"
@@ -270,7 +270,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 z-50 bg-[#050506] flex items-center justify-center flex-col gap-4"
               >
-                <div className="w-12 h-12 rounded-xl border-2 border-primary/20 border-t-primary animate-spin" />
+                <div className="w-12 h-12 rounded-none border-2 border-primary/20 border-t-primary animate-spin" />
                 <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 animate-pulse">
                   Restoring_Temporal_Sync...
                 </div>

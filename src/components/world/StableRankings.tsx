@@ -27,7 +27,7 @@ interface StableRow {
 const TIER_ACCENTS: Record<string, string> = {
   Legendary: "bg-arena-gold text-black border-arena-gold/30",
   Major: "bg-primary/20 text-primary border-primary/30",
-  Established: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Established: "bg-stone-500/10 text-stone-400 border-stone-500/20",
   Minor: "bg-neutral-900/40 text-muted-foreground border-white/5",
   Player: "bg-primary text-primary-foreground border-primary",
 };

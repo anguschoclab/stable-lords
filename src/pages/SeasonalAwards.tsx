@@ -71,7 +71,7 @@ const SEASON_GRADIENTS: Record<Season, string> = {
   Spring: "from-emerald-500/10 to-teal-500/10",
   Summer: "from-amber-500/10 to-orange-500/10",
   Fall: "from-orange-500/10 to-red-500/10",
-  Winter: "from-blue-500/10 to-indigo-500/10",
+  Winter: "from-stone-500/10 to-stone-400/10",
 };
 
 function computeSeasonalAwards(

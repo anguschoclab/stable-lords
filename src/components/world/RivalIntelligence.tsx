@@ -65,7 +65,7 @@ export function RivalIntelligence({ rivals }: RivalIntelligenceProps) {
                               <Badge className={cn(
                                 "text-[9px] font-black border-none uppercase tracking-widest px-2 py-0.5",
                                 rival.strategy?.intent === "VENDETTA" ? "bg-red-500/20 text-red-400" :
-                                rival.strategy?.intent === "EXPANSION" ? "bg-blue-500/20 text-blue-400" :
+                                rival.strategy?.intent === "EXPANSION" ? "bg-stone-500/20 text-stone-400" :
                                 rival.strategy?.intent === "RECOVERY" ? "bg-orange-500/20 text-orange-400" :
                                 "bg-emerald-500/20 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
                               )}>

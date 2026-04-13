@@ -184,7 +184,7 @@ export function TacticalBar() {
                       className={cn(
                         "flex items-center justify-between p-3 rounded-lg border",
                         alert.type === "warning" && "bg-amber-500/10 border-amber-500/20",
-                        alert.type === "info" && "bg-blue-500/10 border-blue-500/20",
+                        alert.type === "info" && "bg-stone-500/10 border-stone-500/20",
                         alert.type === "urgent" && "bg-red-500/10 border-red-500/20",
                         alert.type === "success" && "bg-emerald-500/10 border-emerald-500/20"
                       )}
@@ -194,7 +194,7 @@ export function TacticalBar() {
                           className={cn(
                             "h-4 w-4",
                             alert.type === "warning" && "text-amber-500",
-                            alert.type === "info" && "text-blue-500",
+                            alert.type === "info" && "text-stone-400",
                             alert.type === "urgent" && "text-red-500",
                             alert.type === "success" && "text-emerald-500"
                           )}
@@ -210,7 +210,7 @@ export function TacticalBar() {
                             className={cn(
                               "h-7 text-[10px] font-black uppercase tracking-wider",
                               alert.type === "warning" && "border-amber-500/30 hover:bg-amber-500/20",
-                              alert.type === "info" && "border-blue-500/30 hover:bg-blue-500/20",
+                              alert.type === "info" && "border-stone-500/30 hover:bg-stone-500/20",
                               alert.type === "urgent" && "border-red-500/30 hover:bg-red-500/20",
                               alert.type === "success" && "border-emerald-500/30 hover:bg-emerald-500/20"
                             )}
