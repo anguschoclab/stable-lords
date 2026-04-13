@@ -29,7 +29,7 @@ interface Props {
   style: FightingStyle;
   carryCap: number;
   /** Warrior attributes for weapon requirement checks */
-  warriorAttrs?: { ST: number; DF: number; SP: number };
+  warriorAttrs?: { ST: number; SZ: number; WT: number; DF: number };
   onChange: (loadout: Loadout) => void;
 }
 
@@ -101,7 +101,7 @@ function SlotSelector({
   selectedId: string;
   style: FightingStyle;
   disabled: boolean;
-  warriorAttrs?: { ST: number; DF: number; SP: number };
+  warriorAttrs?: { ST: number; SZ: number; WT: number; DF: number };
   onChange: (id: string) => void;
 }) {
   const items = getAvailableItems(slot, style);
@@ -151,7 +151,7 @@ function SlotSelector({
                   {/* Show requirement hints in dropdown */}
                   {slot === "weapon" && item.reqST && (
                     <span className="text-muted-foreground text-[9px] font-mono">
-                      {item.reqST}/{item.reqDF}/{item.reqSP}
+                      ST{item.reqST}{item.reqSZ ? `/SZ${item.reqSZ}` : ""}{item.reqWT ? `/WT${item.reqWT}` : ""}{item.reqDF ? `/DF${item.reqDF}` : ""}
                     </span>
                   )}
                   <span className="text-muted-foreground text-xs ml-auto">wt {item.weight}</span>
@@ -176,7 +176,7 @@ function SlotSelector({
           {reqResult.failures.map((f) => (
             <p key={f.stat} className="text-[11px] text-destructive flex items-center gap-1">
               <AlertTriangle className="h-3 w-3" />
-              {f.label} {f.current}/{f.required} — penalty: {f.stat === "ST" ? `${reqResult.attPenalty} ATT` : "endurance +10%"}
+              {f.label} {f.current}/{f.required} — −2 ATT, +10% END
             </p>
           ))}
         </div>
@@ -217,7 +217,7 @@ export default function EquipmentLoadoutUI({ loadout, style, carryCap, warriorAt
           <div className="flex items-center gap-2">
             {warriorAttrs && (
               <Badge variant="outline" className="text-[10px] font-mono">
-                ST{warriorAttrs.ST} DF{warriorAttrs.DF} SP{warriorAttrs.SP}
+                ST{warriorAttrs.ST} SZ{warriorAttrs.SZ} WT{warriorAttrs.WT} DF{warriorAttrs.DF}
               </Badge>
             )}
             <Badge variant="outline" className="text-xs">

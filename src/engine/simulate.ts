@@ -82,8 +82,8 @@ export function simulateFight(
   const modsA = trainers ? getTrainerMods(trainers, planA.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
   const modsD = trainers ? getTrainerMods(trainers, planD.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
 
-  const weaponReqA = checkWeaponRequirements(weaponA, warriorA?.attributes ?? { ST: 10, DF: 10, SP: 10 });
-  const weaponReqD = checkWeaponRequirements(weaponD, warriorD?.attributes ?? { ST: 10, DF: 10, SP: 10 });
+  const weaponReqA = checkWeaponRequirements(weaponA, warriorA?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
+  const weaponReqD = checkWeaponRequirements(weaponD, warriorD?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
 
   const resCtx: ResolutionContext = {
     rng,

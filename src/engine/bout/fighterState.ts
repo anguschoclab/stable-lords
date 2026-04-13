@@ -54,7 +54,7 @@ export function createFighterState(
 
   const weaponReq = checkWeaponRequirements(
     equip.weapon,
-    { ST: attrs.ST, DF: attrs.DF, SP: attrs.SP }
+    { ST: attrs.ST, SZ: attrs.SZ, WT: attrs.WT, DF: attrs.DF }
   );
 
   const overweight = isOverEncumbered(equip, derived.encumbrance);
