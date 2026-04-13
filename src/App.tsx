@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import { createRouter, RouterProvider, useLocation } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
@@ -13,8 +13,14 @@ const ResolutionReveal = lazy(() => import("@/components/ResolutionReveal"));
 const StartGame = lazy(() => import("@/pages/StartGame"));
 const Orphanage = lazy(() => import("@/pages/Orphanage"));
 
-// Create the router instance
-const router = createRouter({ routeTree });
+// Create the router instance with context
+const router = createRouter({
+  routeTree,
+  context: {
+    isServer: false,
+  },
+  defaultPreload: 'intent',
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
