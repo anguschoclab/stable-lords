@@ -12,7 +12,10 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('scripts',{}\\)\\)\")",
       "Bash(~/.bun/bin/bun run:*)",
       "Bash(command -v bun)",
-      "Bash(bun --version)"
+      "Bash(bun --version)",
+      "Bash(./node_modules/.bin/vite build:*)",
+      "Bash(node_modules/.bin/tsc.cmd --noEmit)",
+      "Bash(/c/Users/amauricia/.bun/bin/bun run:*)"
     ]
   }
 }
