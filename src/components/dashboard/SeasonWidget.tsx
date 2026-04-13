@@ -58,6 +58,10 @@ export function SeasonWidget() {
     WeatherIcon = Wind;
     weatherColor = "text-stone-300";
     weatherBg = "bg-stone-300/10 border-stone-300/20";
+  } else if (weather === "Eclipse") {
+    WeatherIcon = Moon;
+    weatherColor = "text-purple-500";
+    weatherBg = "bg-purple-500/10 border-purple-500/20";
   }
 
   return (
@@ -149,6 +153,7 @@ export function SeasonWidget() {
                        weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality. 10% more stamina drain." :
                        weather === "Gale" ? "Fierce winds. 15% more stamina drain in combat." :
                        weather === "Drafty" ? "10% less stamina drain in combat." :
+                       weather === "Eclipse" ? "20% less stamina drain in combat. Fights are slow and methodical." :
                        weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
                        "Standard atmospheric conditions."}
                    </TooltipContent>

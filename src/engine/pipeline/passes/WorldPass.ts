@@ -26,8 +26,9 @@ export function rollWeather(rng: IRNGService): WeatherType {
   if (roll < 0.90) return "Scalding";
   if (roll < 0.95) return "Blazing Sun";
   if (roll < 0.98) return "Drafty";
-  if (roll < 0.99) return "Gale";
-  return "Blood Moon";
+  if (roll < 0.985) return "Gale";
+  if (roll < 0.995) return "Blood Moon";
+  return "Eclipse";
 }
 
 export function runWorldPass(state: GameState, nextWeek: number, rng?: IRNGService): StateImpact {
