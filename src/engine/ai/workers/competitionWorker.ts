@@ -198,7 +198,6 @@ export function verifyBoutAcceptance(
  * Incorporates strategy (EXPANSION/CONSOLIDATION) and warrior health.
  */
 export function evaluateBoutOffer(
-  state: GameState,
   offer: BoutOffer,
   rival: RivalStableData,
   warrior: Warrior
@@ -238,7 +237,7 @@ export function processAllRivalsBoutOffers(state: GameState, rivals: RivalStable
 
       const rivalWarrior = owningRival.roster.find(w => w.id === wId);
       if (rivalWarrior && offer.responses[wId] === "Pending") {
-        const response = evaluateBoutOffer(state, offer, owningRival, rivalWarrior);
+        const response = evaluateBoutOffer(offer, owningRival, rivalWarrior);
         const impact = respondToBoutOffer(state, offer.id, rivalWarrior.id, response);
         impacts.push(impact);
       }
