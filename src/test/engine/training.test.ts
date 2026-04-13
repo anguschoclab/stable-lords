@@ -374,6 +374,9 @@ describe("Training System", () => {
       const impact = computeTrainingImpact(state as any, rng as any);
 
       expect(impact.results.filter(r => r.type === "injury")).toHaveLength(0);
+      expect(impact.updatedRoster[0].injuries).toHaveLength(0);
+      spy.mockRestore();
+    });
       spy.mockRestore();
     });
 
