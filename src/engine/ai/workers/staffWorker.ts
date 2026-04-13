@@ -30,7 +30,10 @@ export function processStaff(
   if (intent !== "RECOVERY" && currentTrainers.length < 2 && currentPool.length > 0) {
     const affordable = currentPool.filter(t => HIRE_COST[t.tier] < (currentTreasury - 300));
     if (affordable.length > 0) {
-      const best = affordable.sort((a, b) => HIRE_COST[b.tier] - HIRE_COST[a.tier])[0];
+      // ⚡ Bolt: Reduced O(N log N) sort to O(N) reduction to find the highest cost trainer
+      const best = affordable.reduce((max, current) =>
+        HIRE_COST[current.tier] > HIRE_COST[max.tier] ? current : max
+      , affordable[0]);
       const budgetReport = checkBudget(updatedRival, HIRE_COST[best.tier], "STAFF");
 
       if (budgetReport.isAffordable) {

@@ -168,29 +168,51 @@ function computeSeasonalAwards(
 
     const allStats = [...stats.values()];
 
-    // MVP: highest (wins * 2 + kills * 3 + fameGained)
-    const mvpSorted = [...allStats].sort((a, b) =>
-      (b.wins * 2 + b.kills * 3 + b.fameGained) - (a.wins * 2 + a.kills * 3 + a.fameGained)
-    );
+    // ⚡ Bolt: Reduced O(N log N) sorts to O(N) linear scans for single max value lookups
+    let bestMvp = null;
+    let bestMvpScore = -Infinity;
+    let bestKill = null;
+    let bestKillScore = 0;
+    let bestIron = null;
+    let bestIronRate = -Infinity;
+    let bestIronWins = -Infinity;
 
-    // Deadliest: most kills
-    const killSorted = [...allStats].filter(s => s.kills > 0).sort((a, b) => b.kills - a.kills);
+    for (const s of allStats) {
+      // MVP: highest (wins * 2 + kills * 3 + fameGained)
+      const mvpScore = s.wins * 2 + s.kills * 3 + s.fameGained;
+      if (mvpScore > bestMvpScore) {
+        bestMvpScore = mvpScore;
+        bestMvp = s;
+      }
 
-    // Iron Will: best win rate with 3+ fights
-    const ironSorted = [...allStats]
-      .filter(s => s.wins + s.losses >= 3)
-      .sort((a, b) => {
-        const rateA = a.wins / (a.wins + a.losses);
-        const rateB = b.wins / (b.wins + b.losses);
-        return rateB - rateA || b.wins - a.wins;
-      });
+      // Deadliest: most kills
+      if (s.kills > bestKillScore) {
+        bestKillScore = s.kills;
+        bestKill = s;
+      }
+
+      // Iron Will: best win rate with 3+ fights
+      if (s.wins + s.losses >= 3) {
+        const rate = s.wins / (s.wins + s.losses);
+        if (rate > bestIronRate || (rate === bestIronRate && s.wins > bestIronWins)) {
+          bestIronRate = rate;
+          bestIronWins = s.wins;
+          bestIron = s;
+        }
+      }
+    }
 
     // Rising Stars: biggest fame gain (exclude MVP)
-    const mvpName = mvpSorted[0]?.name;
-    const risingSorted = [...allStats]
-      .filter(s => s.name !== mvpName && s.fameGained > 0)
-      .sort((a, b) => b.fameGained - a.fameGained)
-      .slice(0, 3);
+    // ⚡ Bolt: O(N) bounded insertion sort for top 3
+    const mvpName = bestMvp?.name;
+    const risingSorted: typeof allStats = [];
+    for (const s of allStats) {
+      if (s.name !== mvpName && s.fameGained > 0) {
+        risingSorted.push(s);
+        risingSorted.sort((a, b) => b.fameGained - a.fameGained);
+        if (risingSorted.length > 3) risingSorted.pop();
+      }
+    }
 
     // Upsets: winner had much less fame than loser
     const upsets: UpsetEntry[] = [];
@@ -218,9 +240,9 @@ function computeSeasonalAwards(
       seasonIndex,
       weekStart,
       weekEnd,
-      mvp: mvpSorted[0] ? toEntry(mvpSorted[0]) : null,
-      deadliest: killSorted[0] ? toEntry(killSorted[0]) : null,
-      ironWill: ironSorted[0] ? toEntry(ironSorted[0]) : null,
+      mvp: bestMvp ? toEntry(bestMvp) : null,
+      deadliest: bestKill ? toEntry(bestKill) : null,
+      ironWill: bestIron ? toEntry(bestIron) : null,
       risingStars: risingSorted.map(toEntry),
       upsets: upsets.slice(0, 5),
       totalBouts: seasonFights.length,

@@ -66,7 +66,10 @@ export default function StartGame() {
 
   // ── Continue: load the most recent save ──────────────────────────────────
   const mostRecent = useMemo(
-    () => (slots.length > 0 ? [...slots].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0] : null),
+    // ⚡ Bolt: Reduced O(N log N) sort + spread to O(N) linear reduction for single max value
+    () => (slots.length > 0 ? slots.reduce((latest, current) =>
+      new Date(current.timestamp).getTime() > new Date(latest.timestamp).getTime() ? current : latest
+    , slots[0]) : null),
     [slots]
   );
 
