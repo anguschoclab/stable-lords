@@ -86,8 +86,8 @@ const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);
 // ─── Drag & Drop Hook ─────────────────────────────────────────────────────
 
 function useDraggableWidgets() {
-  const prefs = loadUIPrefs();
-  const savedOrder = prefs.dashboardLayout ?? DEFAULT_ORDER;
+  const prefs = loadUIPrefs() as any;
+  const savedOrder = prefs?.dashboardLayout ?? DEFAULT_ORDER;
   
   // Ensure all widgets are present
   const validIds = new Set(DEFAULT_ORDER);
@@ -198,20 +198,16 @@ export default function Dashboard() {
 
             <div className="flex items-center gap-2 shrink-0">
               {isEditing && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-[10px] font-black uppercase tracking-widest gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all" 
+                <Button
+                  className="text-[10px] font-black uppercase tracking-widest gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all h-9 px-3 text-xs"
                   onClick={resetLayout}
                 >
                   <RotateCcw className="h-3 w-3" /> Reset
                 </Button>
               )}
               <Button
-                variant={isEditing ? "default" : "secondary"}
-                size="sm"
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-lg", 
+                  "text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-lg h-9 px-3 text-xs",
                   isEditing ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" : "bg-neutral-900/60 border border-white/5"
                 )}
                 onClick={() => setIsEditing(v => !v)}

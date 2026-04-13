@@ -19,13 +19,13 @@ export const PASS_METADATA = {
  * Handles weekly training, aging, and recovery using the established impact pattern.
  */
 export function runWarriorPass(state: GameState, rng: IRNGService): StateImpact {
-  const trainingImpactRaw = computeTrainingImpact(state);
+  const trainingImpactRaw = computeTrainingImpact(state, rng);
   const { impact: trainingImpact, seasonalGrowth } = trainingImpactToStateImpact(state, trainingImpactRaw, rng);
 
   const impacts: StateImpact[] = [
     trainingImpact,
     computeAgingImpact(state, rng),
-    computeHealthImpact(state, rng),
+    computeHealthImpact(state),
   ];
 
   const mergedImpact = mergeImpacts(impacts);

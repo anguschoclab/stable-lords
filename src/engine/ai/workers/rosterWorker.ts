@@ -3,11 +3,10 @@ import type { Warrior } from "@/types/warrior.types";
 import type { Season } from "@/types/shared.types";
 import { checkBudget } from "./budgetWorker";
 import { computeWarriorStats } from "../../skillCalc";
-import { logAgentAction, type AgentContext } from "../agentCore";
+import { logAgentAction } from "../agentCore";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { generateRecommendations } from "@/engine/equipmentOptimizer";
-import { FightingStyle } from "@/types/shared.types";
 
 /**
  * RosterWorker: Handles training and equipment.
@@ -18,8 +17,7 @@ export function processRoster(
   currentWeek: number,
   season?: Season,
   seed?: number,
-  rng?: IRNGService,
-  context?: AgentContext
+  rng?: IRNGService
 ): RivalStableData {
   const rngService = rng || new SeededRNGService(seed ?? (currentWeek * 7919 + 101));
   let updatedRival = { ...rival };
