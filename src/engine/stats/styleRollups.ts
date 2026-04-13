@@ -256,8 +256,10 @@ export const StyleRollups = {
     const rolling = loadRolling();
     const rows: StyleRecord[] = [];
     Object.keys(rolling).forEach((s) => {
-      const agg = rolling[s].reduce(
-        (a, b) => ({ W: a.W + b.W, L: a.L + b.L, K: a.K + b.K, fights: a.fights + b.fights }),
+      const styleData = rolling[s];
+      if (!styleData) return;
+      const agg = styleData.reduce(
+        (a: RollingBucket, b: RollingBucket) => ({ W: a.W + b.W, L: a.L + b.L, K: a.K + b.K, fights: a.fights + b.fights }),
         { W: 0, L: 0, K: 0, fights: 0 }
       );
       rows.push({
