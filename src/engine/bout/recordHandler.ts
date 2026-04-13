@@ -1,4 +1,4 @@
-import type { GameState } from "@/types/state.types";
+import type { GameState, RivalStableData } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
 import { updateEntityInList } from "@/utils/stateUtils";
@@ -18,7 +18,7 @@ export function applyRecords(
   rivalStableId?: string
 ): StateImpact {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const rivalsUpdates = new Map<string, any>();
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
   
   const updateW = (w: Warrior, f: number, p: number, win: boolean, kill: boolean) => ({
     ...w, 

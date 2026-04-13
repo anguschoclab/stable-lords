@@ -5,14 +5,20 @@ import type { IRNGService } from "@/engine/core/rng/IRNGService";
  * SeasonalRetirementService - Handles retirement and legacy founder system.
  * Manages seasonal retirement for all rivals and legacy founders.
  */
+
+interface LegacyCandidate {
+  name: string;
+  stableName: string;
+}
+
 export class SeasonalRetirementService {
   /**
    * Processes seasonal retirement for all rival stables.
    * Handles legacy founders (retired warriors becoming owners).
    */
-  static processSeasonalRetirement(state: GameState, rng: IRNGService): { updatedState: GameState; legacyCandidates: any[] } {
+  static processSeasonalRetirement(state: GameState, rng: IRNGService): { updatedState: GameState; legacyCandidates: LegacyCandidate[] } {
     const updatedState = { ...state };
-    const legacyCandidates: any[] = [];
+    const legacyCandidates: LegacyCandidate[] = [];
 
     updatedState.rivals = (updatedState.rivals || []).map(rival => {
       // Retirement logic for warriors

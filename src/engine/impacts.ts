@@ -1,5 +1,6 @@
-import type { GameState, LedgerEntry, NewsletterItem, RivalStableData, RankingEntry, Season, WeatherType, BoutOffer, Promoter, Trainer, OwnerGrudge, Rivalry, CrowdMoodType, AnnualAward } from "@/types/state.types";
+import type { GameState, LedgerEntry, NewsletterItem, RivalStableData, RankingEntry, Season, WeatherType, BoutOffer, Promoter, Trainer, OwnerGrudge, Rivalry, CrowdMoodType, AnnualAward, SeasonalGrowth, TrainingAssignment, SimulationReport, GazetteStory, HallEntry, MatchRecord, RestState, ScoutReportData, InsightToken, TournamentEntry } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
+import type { FightSummary } from "@/types/combat.types";
 import type { PoolWarrior } from "@/engine/recruitment";
 
 export interface StateImpact { 
@@ -9,14 +10,14 @@ export interface StateImpact {
   rivalsUpdates?: Map<string, Partial<RivalStableData>>; 
   newsletterItems?: NewsletterItem[]; 
   ledgerEntries?: LedgerEntry[]; 
-  seasonalGrowth?: any[]; 
+  seasonalGrowth?: SeasonalGrowth[]; 
   newPoolRecruits?: PoolWarrior[]; 
   recruitPool?: PoolWarrior[];
-  tournaments?: any[];
+  tournaments?: TournamentEntry[];
   isTournamentWeek?: boolean;
   activeTournamentId?: string;
   day?: number;
-  graveyard?: any[];
+  graveyard?: Warrior[];
   week?: number; 
   season?: Season; 
   weather?: WeatherType; 
@@ -25,23 +26,23 @@ export interface StateImpact {
   promoters?: Record<string, Promoter>;
   trainers?: Trainer[];
   hiringPool?: Trainer[];
-  gazettes?: any[];
+  gazettes?: GazetteStory[];
   ownerGrudges?: OwnerGrudge[];
   rivalries?: Rivalry[];
-  trainingAssignments?: any[];
-  lastSimulationReport?: any;
-  arenaHistory?: any[];
-  hallOfFame?: any[];
-  matchHistory?: any[];
-  moodHistory?: any[];
-  retired?: any[];
-  scoutReports?: any[];
-  insightTokens?: any[];
-  playerChallenges?: any[];
-  playerAvoids?: any[];
-  coachDismissed?: any[];
-  restStates?: any[];
-  unacknowledgedDeaths?: any[];
+  trainingAssignments?: TrainingAssignment[];
+  lastSimulationReport?: SimulationReport;
+  arenaHistory?: FightSummary[];
+  hallOfFame?: HallEntry[];
+  matchHistory?: MatchRecord[];
+  moodHistory?: { week: number; mood: CrowdMoodType }[];
+  retired?: Warrior[];
+  scoutReports?: ScoutReportData[];
+  insightTokens?: InsightToken[];
+  playerChallenges?: string[];
+  playerAvoids?: string[];
+  coachDismissed?: string[];
+  restStates?: RestState[];
+  unacknowledgedDeaths?: string[];
   crowdMood?: CrowdMoodType;
   awards?: AnnualAward[];
 }
@@ -114,7 +115,7 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
   rivalries: (state, value) => { state.rivalries = value; },
   trainingAssignments: (state, value) => { state.trainingAssignments = value; },
   lastSimulationReport: (state, value) => { state.lastSimulationReport = value; },
-  newPoolRecruits: () => { }
+  newPoolRecruits: (state, value) => { state.recruitPool = value; }
 };
 
 export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameState {

@@ -1,4 +1,4 @@
-import { GameState, Warrior, BoutOffer } from "@/types/state.types";
+import { GameState, Warrior, BoutOffer, RivalStableData } from "@/types/state.types";
 import { type FightOutcome } from "@/types/combat.types";
 import { simulateFight, defaultPlanForWarrior } from "@/engine/simulate";
 import { fameFromTags } from "@/engine/fame";
@@ -67,7 +67,7 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
   const popD = Math.round(rawFameD.pop * moodMods.popMultiplier);
 
   const impacts: StateImpact[] = [];
-  const rivalsUpdates = new Map<string, any>();
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
   
   // 💰 Apply Contract Payouts
   if (contract) {

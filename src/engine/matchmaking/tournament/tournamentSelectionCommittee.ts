@@ -105,7 +105,7 @@ export function committeeSelection(
 
 /**
  * Generate a freelancer warrior for tournament filler.
- * This is a simple placeholder that will be replaced by TournamentFreelancerGenerator.
+ * Creates tier-appropriate warriors with randomized attributes.
  */
 function generateFreelancer(tier: string, index: number, rng: IRNGService): Warrior {
   // Temporary implementation - will be moved to TournamentFreelancerGenerator

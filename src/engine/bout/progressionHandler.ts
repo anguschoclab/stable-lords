@@ -1,4 +1,4 @@
-import type { GameState } from "@/types/state.types";
+import type { GameState, NewsletterItem } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
@@ -10,7 +10,7 @@ import { StateImpact } from "@/engine/impacts";
 
 export function handleProgressions(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, tags: string[], week: number, rivalStableId?: string, rng?: IRNGService): StateImpact {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const newsletterItems: any[] = [];
+  const newsletterItems: NewsletterItem[] = [];
   
   // XP
   const updatedA = applyXP(wA, calculateXP(outcome, "A", tags), rng).warrior;

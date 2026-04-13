@@ -1,4 +1,4 @@
-import type { GameState, RivalStableData } from "@/types/state.types";
+import type { GameState, RivalStableData, RestState } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
 import { rollForInjury } from "@/engine/injuries";
@@ -10,8 +10,8 @@ export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: 
   let injured = false;
   const names: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const rivalsUpdates = new Map<string, any>();
-  const restStates: any[] = [...(s.restStates || [])];
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  const restStates: RestState[] = [...(s.restStates || [])];
   
   if (outcome.by === "KO") {
     const victimId = outcome.winner === "A" ? wD.id : wA.id;

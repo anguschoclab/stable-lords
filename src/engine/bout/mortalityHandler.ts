@@ -1,4 +1,4 @@
-import type { GameState, RivalStableData } from "@/types/state.types";
+import type { GameState, RivalStableData, NewsletterItem } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome, FightSummary } from "@/types/combat.types";
 import { generateId } from "@/utils/idUtils";
@@ -46,16 +46,16 @@ export function handleDeath(
   };
 
   const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const rivalsUpdates = new Map<string, any>();
-  const newsletterItems: any[] = [];
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  const newsletterItems: NewsletterItem[] = [];
   
   // Remove victim from roster
   if (s.roster.some(w => w.id === victim.id)) {
-    rosterUpdates.set(victim.id, { status: "Dead" as any });
+    rosterUpdates.set(victim.id, { status: "Dead" });
   }
   
   if (isPlayerVictim) {
-    newsletterItems.push({ type: "fameDelta", amount: 5 });
+    newsletterItems.push({ id: rng!.uuid(), week, title: "Fame Gained", items: ["Your stable gained 5 fame from this death."] });
   }
   
   const deathSummary: FightSummary = { 
