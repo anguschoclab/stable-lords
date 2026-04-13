@@ -1,6 +1,6 @@
 import { GameState, RivalStableData } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
 import { checkWeaponRequirements, DEFAULT_LOADOUT } from "@/data/equipment";
+import { StateImpact } from "@/engine/impacts";
 
 /**
  * Stable Lords — Equipment Pipeline Pass
@@ -10,10 +10,6 @@ export const PASS_METADATA = {
   name: "EquipmentPass",
   dependencies: ["WarriorPass"] // Depends on warrior roster updates
 };
-
-import { GameState, RivalStableData } from "@/types/state.types";
-import { StateImpact } from "@/engine/impacts";
-import { checkWeaponRequirements, DEFAULT_LOADOUT } from "@/data/equipment";
 
 /**
  * Stable Lords — Equipment Pipeline Pass
