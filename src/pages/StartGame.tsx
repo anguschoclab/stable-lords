@@ -68,8 +68,8 @@ export default function StartGame() {
   const mostRecent = useMemo(
     // ⚡ Bolt: Reduced O(N log N) sort + spread to O(N) linear reduction for single max value
     () => (slots.length > 0 ? slots.reduce((latest, current) =>
-      new Date(current.timestamp).getTime() > new Date(latest.timestamp).getTime() ? current : latest
-    , slots[0]) : null),
+      current.timestamp > latest.timestamp ? current : latest
+    ) : null),
     [slots]
   );
 
