@@ -26,6 +26,9 @@ import { CrowdMoodWidget } from "@/components/widgets/CrowdMoodWidget";
 import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
 import { IntelligenceHubWidget } from "@/components/dashboard/IntelligenceHubWidget";
 import BubbleWatchWidget from "@/components/widgets/BubbleWatchWidget";
+import EventLog from "@/components/EventLog";
+import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
+import { WeatherWidget } from "@/components/widgets/WeatherWidget";
 
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
@@ -51,6 +54,9 @@ const MemoStableComparisonWidget = React.memo(StableComparisonWidget);
 const MemoMedicalAuditWidget = React.memo(MedicalAuditWidget);
 const MemoIntelligenceHubWidget = React.memo(IntelligenceHubWidget);
 const MemoBubbleWatchWidget = React.memo(BubbleWatchWidget);
+const MemoEventLog = React.memo(EventLog);
+const MemoNextBoutWidget = React.memo(NextBoutWidget);
+const MemoWeatherWidget = React.memo(WeatherWidget);
 
 const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
@@ -67,6 +73,9 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "medical",   label: "Medical Audit",     component: MemoMedicalAuditWidget },
   { id: "meta",     label: "Meta Pulse",         component: MemoMetaPulseWidget },
   { id: "bouts",    label: "Recent Bouts",       component: MemoRecentBoutsWidget, wide: true },
+  { id: "eventLog", label: "Event Log",          component: MemoEventLog, wide: true },
+  { id: "nextBout", label: "Next Bout",          component: MemoNextBoutWidget },
+  { id: "weather",  label: "Weather",            component: MemoWeatherWidget },
 ];
 
 const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);
