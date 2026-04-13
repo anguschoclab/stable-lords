@@ -1,12 +1,11 @@
 import { useState, useMemo } from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { DragDropContext, DropResult, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Swords, Shield, Flame, Timer, Zap, Clock, Activity, GripVertical, Target, BookOpen, Heart, Gauge } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { FightPlan, OffensiveTactic, DefensiveTactic, Warrior } from "@/types/game";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
@@ -32,12 +31,11 @@ const TACTIC_BANK = [
 interface PlanBuilderProps {
   plan: FightPlan;
   onPlanChange: (plan: FightPlan) => void;
-  warriorName?: string;
   warrior?: Warrior;
   rivalStyle?: FightingStyle;
 }
 
-export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, rivalStyle }: PlanBuilderProps) {
+export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }: PlanBuilderProps) {
   const [phaseMode, setPhaseMode] = useState<boolean>(!!plan.phases);
   const [showStylePassives, setShowStylePassives] = useState<boolean>(false);
   
@@ -49,7 +47,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
   const score = useMemo(() => computeStrategyScore(plan, warrior), [plan, warrior]);
 
   const onDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
+    const { destination, draggableId } = result;
     if (!destination) return;
 
     const tactic = TACTIC_BANK.find(t => t.id === draggableId);
@@ -130,15 +128,15 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                 <span className="text-[10px] font-black uppercase tracking-widest">Tactic Bank</span>
               </div>
               <Droppable droppableId="bank">
-                {(provided) => (
+                {(provided: any) => (
                   <div 
                     {...provided.droppableProps} 
                     ref={provided.innerRef}
                     className="flex flex-col gap-2 p-2 bg-black/40 border border-white/5 rounded-none"
                   >
-                    {TACTIC_BANK.map((t, index) => (
-                      <Draggable key={t.id} draggableId={t.id} index={index}>
-                        {(provided, snapshot) => (
+                    {TACTIC_BANK.map((t, idx) => (
+                      <Draggable key={t.id} draggableId={t.id} index={idx}>
+                        {(provided: any, snapshot: any) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
@@ -182,10 +180,10 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                       <Label className="text-[10px] font-black uppercase tracking-widest text-arena-fame">Activity Level</Label>
                       <span className="text-sm font-mono font-bold text-arena-fame">{plan.AL}</span>
                     </div>
-                    <Slider 
-                      value={[plan.AL]} 
-                      onValueChange={([v]) => onPlanChange({ ...plan, AL: v })} 
-                      min={1} max={10} step={1} 
+                    <Slider
+                      value={[plan.AL || 5]}
+                      onValueChange={([v]) => onPlanChange({ ...plan, AL: v })}
+                      min={1} max={10} step={1}
                     />
                   </div>
                 </div>
@@ -194,7 +192,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Label className="text-[10px] font-black uppercase tracking-widest text-destructive">Kill Desire</Label>
-                      <span className="text-sm font-mono font-bold text-destructive">{plan.killDesire || 5}</span>
+                      <span className="text-sm font-mono font-bold text-destructive">{plan.killDesire ?? 5}</span>
                     </div>
                     <Slider 
                       value={[plan.killDesire || 5]} 
@@ -203,7 +201,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                     />
                   </div>
                   <Droppable droppableId="base">
-                    {(provided, snapshot) => (
+                    {(provided: any, snapshot: any) => (
                       <div 
                         {...provided.droppableProps} 
                         ref={provided.innerRef}
@@ -243,17 +241,11 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                   <Switch checked={phaseMode} onCheckedChange={setPhaseMode} />
                 </div>
 
-                <AnimatePresence>
-                  {phaseMode && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                    >
+                {phaseMode && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(["opening", "mid", "late"] as const).map(p => (
                         <Droppable key={p} droppableId={p}>
-                          {(provided, snapshot) => (
+                          {(provided: any, snapshot: any) => (
                             <div
                               {...provided.droppableProps}
                               ref={provided.innerRef}
@@ -309,9 +301,8 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                           )}
                         </Droppable>
                       ))}
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
               </div>
 
               {/* Style Passives */}

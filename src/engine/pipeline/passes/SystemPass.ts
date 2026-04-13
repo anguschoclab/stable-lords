@@ -48,7 +48,7 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
   if (prevSeason !== currentSeason) {
     const seasonSeed = nextWeek * 133;
     const rngContext = new RNGContext(seasonSeed + 55);
-    const { updatedRivals, news } = WorldManagementService.processSeasonalChurn(state, rngContext);
+    const { news } = WorldManagementService.processSeasonalChurn(state, rngContext);
 
     const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(state, state.season, rngContext.getRNG());
     const narrGazette = generateOwnerNarratives(state, state.season, rngContext.getRNG());

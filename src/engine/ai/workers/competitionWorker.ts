@@ -1,7 +1,6 @@
 import { type GameState, type Warrior, type RivalStableData, type BoutOffer, type WeatherType } from "@/types/state.types";
 import { type CrowdMood } from "../../crowdMood";
 import { FightingStyle } from "@/types/shared.types";
-import { logAgentAction } from "../agentCore";
 import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 import { StateImpact, mergeImpacts } from "@/engine/impacts";
 import { scoreMatchup } from "@/engine/schedulingAssistant";
@@ -29,7 +28,6 @@ export function generateBoutBids(
 ): { bids: BoutBid[]; updatedRival: RivalStableData } {
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
   const activeRoster = rival.roster.filter(w => w.status === "Active");
-  const news: string[] = [];
   const bids: BoutBid[] = [];
 
   // Build a mock state for matchup scoring
@@ -159,7 +157,6 @@ export function verifyBoutAcceptance(
   rival: RivalStableData,
   warrior: Warrior,
   opponent: Warrior,
-  opponentStable: RivalStableData,
   weather: WeatherType = "Clear"
 ): { accepted: boolean; reason?: string } {
   const intent = rival.strategy?.intent ?? "CONSOLIDATION";
