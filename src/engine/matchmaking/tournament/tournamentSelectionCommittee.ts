@@ -95,7 +95,10 @@ export function committeeSelection(
   if (qualified.length < 64) {
     const fillersNeeded = 64 - qualified.length;
     for (let i = 0; i < fillersNeeded; i++) {
-      const freelancer = generateFreelancer(tier!.id, i, rngService!);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const tierId = tier!.id;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const freelancer = generateFreelancer(tierId, i, rngService!);
       qualified.push(freelancer);
     }
   }

@@ -40,8 +40,8 @@ export async function runAutosim(
     );
 
     playerOffers.forEach(offer => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const playerWarriorId = offer.warriorIds.find(id => state.roster.some(w => w.id === id))!;
+      const playerWarriorId = offer.warriorIds.find(id => state.roster.some(w => w.id === id));
+      if (!playerWarriorId) return;
       // Auto-accept logical offers (Hype > 100 or Purse > 200)
       if (offer.hype > 100 || offer.purse > 200) {
         state = { ...state, ...respondToBoutOffer(state, offer.id, playerWarriorId, "Accepted") };
@@ -49,10 +49,11 @@ export async function runAutosim(
     });
 
     // 3. Process Weekly Bouts (Actually runs the fights)
-    const { state: nextState, results, summary } = processWeekBouts(state);
-    state = nextState;
-    
-    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: state };
+    const boutResult = processWeekBouts(state);
+    state = boutResult.state;
+    const { results, summary } = boutResult;
+
+    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: null as any, weekSummaries };
 
     weekSummaries.push({
       week: state.week || 1,
@@ -73,7 +74,7 @@ export async function runAutosim(
     if (state.treasury < -500) {
       return { finalState: state, weeksSimmed, stopReason: "bankrupt", stopDetail: "Stable ran out of treasury", weekSummaries };
     }
-    
+
     if (state.roster.length === 0) {
       return { finalState: state, weeksSimmed, stopReason: "no_pairings", stopDetail: "No warriors left to fight", weekSummaries };
     }
@@ -84,8 +85,7 @@ export async function runAutosim(
   }
 
   return {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    finalState: state!,
+    finalState: state,
     weeksSimmed,
     stopReason: "max_weeks",
     stopDetail: "Reached maximum simulation weeks",

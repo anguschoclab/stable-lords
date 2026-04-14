@@ -31,6 +31,7 @@ export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGS
 
   if (eligible.length === 0) return {};
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const woty = eligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max, eligible[0]!);
   if (woty && woty.wins > 0) {
     const award: AnnualAward = {
@@ -57,6 +58,7 @@ export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGS
     hofNews.push(`🏛️ WARRIOR OF THE YEAR: ${woty.w.name} is the champion of Year ${prevYear} with ${woty.wins} wins!`);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const koty = eligible.reduce((max, curr) => (curr.kills > max.kills || (curr.kills === max.kills && curr.wins > max.wins)) ? curr : max, eligible[0]!);
   if (koty && koty.kills > 0) {
     const award: AnnualAward = {

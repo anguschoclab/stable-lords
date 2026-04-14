@@ -275,13 +275,11 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                               <div className="flex flex-wrap gap-1">
                                 {plan.phases?.[p]?.offensiveTactic && (
                                   <Badge className="bg-arena-blood/20 text-arena-blood border border-arena-blood/30 text-[9px] uppercase font-black px-1.5 py-0.5">
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     {plan.phases[p]!.offensiveTactic}
                                   </Badge>
                                 )}
                                 {plan.phases?.[p]?.defensiveTactic && (
                                   <Badge className="bg-arena-gold/20 text-arena-gold border border-arena-gold/30 text-[9px] uppercase font-black px-1.5 py-0.5">
-                                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                                     {plan.phases[p]!.defensiveTactic}
                                   </Badge>
                                 )}
@@ -425,7 +423,6 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                     <span className="text-[10px] font-black uppercase tracking-widest text-arena-pop">Contingency Plans</span>
                     {(plan.conditions?.length ?? 0) > 0 && (
                       <Badge className="rounded-none border-none bg-arena-pop/20 text-arena-pop text-[9px] font-black px-1.5 py-0.5">
-                        {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
                         {plan.conditions!.length}
                       </Badge>
                     )}

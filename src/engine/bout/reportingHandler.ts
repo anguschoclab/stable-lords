@@ -7,6 +7,7 @@ import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { LoreArchive } from "@/lore/LoreArchive";
 import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { commentatorFor, blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 export function handleReporting(
   wA: Warrior,
@@ -42,25 +43,23 @@ export function handleReporting(
 
   const tone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") ? "hype" : "neutral");
   // Create a simple RNG wrapper if not provided
+  const seededFallback = new SeededRNGService(week * 12345 + 67890);
   const fallbackRng: IRNGService = {
-    // eslint-disable-next-line no-restricted-properties
-    next: () => Math.random(),
+    next: () => seededFallback.next(),
     pick: (arr) => {
-      // eslint-disable-next-line no-restricted-properties
-      const idx = Math.floor(Math.random() * arr.length);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (arr.length === 0) throw new Error("Cannot pick from empty array");
+      const idx = Math.floor(seededFallback.next() * arr.length);
       return arr[idx]!;
     },
     uuid: (prefix) => generateId(undefined, prefix || "uuid"),
-    // eslint-disable-next-line no-restricted-properties
-    roll: (min, max) => Math.floor(Math.random() * (max - min)) + min,
+    roll: (min, max) => Math.floor(seededFallback.next() * (max - min)) + min,
     shuffle: (arr) => {
       const result = [...arr];
       for (let i = result.length - 1; i > 0; i--) {
-        // eslint-disable-next-line no-restricted-properties
-        const j = Math.floor(Math.random() * (i + 1));
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        [result[i]!, result[j]!] = [result[j]!, result[i]!];
+        const j = Math.floor(seededFallback.next() * (i + 1));
+        const temp = result[i]!;
+        result[i] = result[j]!;
+        result[j] = temp;
       }
       return result;
     }

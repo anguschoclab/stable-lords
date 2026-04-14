@@ -22,7 +22,7 @@ function styleName(style: string): string {
 
 function t(template: string | string[], data: Record<string, any>, rng?: IRNGService): string {
   let result = Array.isArray(template)
-    ? (rng ? rng.pick(template) : /* eslint-disable-next-line no-restricted-properties */ template[Math.floor(Math.random() * template.length)]!)
+    ? (rng ? rng.pick(template) : template[Math.floor(new SeededRNGService(Date.now()).next() * template.length)]!)
     : template;
   if (!result) return "";
   for (const [key, value] of Object.entries(data)) {
@@ -127,6 +127,7 @@ function detectRivalryMatchup(
     if (names.has(f.a) && names.has(f.d)) {
       const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
       if (pairCounts.has(key)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         pairCounts.set(key, pairCounts.get(key)! + 1);
       }
     }
@@ -200,11 +201,13 @@ export function generateWeeklyGazette(
     for (let i = 0; i < allFights.length; i++) {
       const af = allFights[i];
       if (candidates.has(af.a)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const s = stats.get(af.a)!;
         s.total++;
         if (af.winner === "A") s.wins++;
       }
       if (candidates.has(af.d)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const s = stats.get(af.d)!;
         s.total++;
         if (af.winner === "D") s.wins++;
@@ -212,6 +215,7 @@ export function generateWeeklyGazette(
     }
 
     for (const c of candidates) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const s = stats.get(c)!;
       if (s.total === 3 && s.wins === 3) {
         risingStars.push(c);

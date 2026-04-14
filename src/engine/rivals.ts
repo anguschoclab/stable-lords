@@ -98,7 +98,10 @@ export function generateRivalStables(count: number, seed: number, week: number =
       // Create a wrapper object compatible with SeededRNG for makeWarrior
       const rngWrapper = {
         next: () => rng.next(),
-        pick: <T,>(arr: T[]): T => { /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */ return arr[Math.floor(rng.next() * arr.length)]!; },
+        pick: <T,>(arr: T[]): T => {
+          if (arr.length === 0) throw new Error("Cannot pick from empty array");
+          return arr[Math.floor(rng.next() * arr.length)]!;
+        },
         roll: (min: number, max: number) => Math.floor(rng.next() * (max - min + 1)) + min,
         uuid: () => crypto.randomUUID(),
         chance: (p: number) => rng.next() < p,
@@ -106,7 +109,9 @@ export function generateRivalStables(count: number, seed: number, week: number =
           const shuffled = [...arr];
           for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(rng.next() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            const temp = shuffled[i]!;
+            shuffled[i] = shuffled[j]!;
+            shuffled[j] = temp;
           }
           return shuffled;
         }

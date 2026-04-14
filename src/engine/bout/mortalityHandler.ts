@@ -1,10 +1,10 @@
 import type { GameState, RivalStableData, NewsletterItem } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome, FightSummary } from "@/types/combat.types";
-import { generateId } from "@/utils/idUtils";
 import { generateFightNarrative } from "@/engine/gazetteNarrative";
 import { engineEventBus } from "@/engine/core/EventBus";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { StateImpact } from "@/engine/impacts";
 
 export function handleDeath(
@@ -15,13 +15,13 @@ export function handleDeath(
   week: number, 
   tags: string[], 
   rivalStableId?: string,
-  rng?: IRNGService
+  rng: IRNGService = new SeededRNGService(week * 9973 + 123)
 ) {
   if (outcome.by !== "Kill") return { impact: {}, death: false, playerDeath: false, deathNames: [] };
   
   const victim = outcome.winner === "A" ? wD : wA;
   const isPlayerVictim = (outcome.winner === "A" && !!rivalStableId) ? false : (outcome.winner !== "A");
-  
+
   const boutId = rng.uuid();
   const narrative = generateFightNarrative({ 
     id: boutId, week, a: wA.name, d: wD.name, 
@@ -55,17 +55,10 @@ export function handleDeath(
   }
   
   if (isPlayerVictim) {
-    newsletterItems.push({ id: rng!.uuid(), week, title: "Fame Gained", items: ["Your stable gained 5 fame from this death."] });
+    newsletterItems.push({ id: rng.uuid(), week, title: "Fame Gained", items: ["Your stable gained 5 fame from this death."] });
   }
-  
-  const deathSummary: FightSummary = { 
-    id: boutId, week, winner: outcome.winner, by: outcome.by, a: wA.name, d: wD.name, 
-    warriorIdA: wA.id, warriorIdD: wD.id,
-    styleA: wA.style, styleD: wD.style, isDeathEvent: true, deathEventData: event, createdAt: "2026-01-01T00:00:00Z",
-    title: `DEATH: ${victim.name} in the Arena`, phase: "resolution"
-  };
-  
-  newsletterItems.push({ id: rng!.uuid(), week, title: "Arena Obituary", items: [narrative] });
+
+  newsletterItems.push({ id: rng.uuid(), week, title: "Arena Obituary", items: [narrative] });
   
   // Decoupled notification
   engineEventBus.emit({ 
