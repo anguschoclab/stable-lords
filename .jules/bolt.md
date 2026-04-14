@@ -13,3 +13,7 @@
 ## 2025-04-09 - O(N) Insertion Sort over O(N log N) Native Sort for Bounded Top-K React UseMemo Lists
 **Learning:** Native `Array.prototype.sort()` over massive simulation outputs (like thousands of raw fight entries passed via `useMemo` into `allFights`) will spike Garbage Collection usage during map/sort cycles. When we only need the top K items (e.g. `slice(0, 5)` in Leaderboards), using a single-pass `for...of` loop with a bounded insertion sort array prevents intermediate allocations entirely.
 **Action:** When computing 'top-K' list displays in heavily aggregated UI components, replace `.sort().slice(0, K)` with O(N) linear scans that maintain a max size-K array.
+
+## 2024-06-25 - React Performance Anti-Pattern: O(N^2) Array Methods Inside Render
+**Learning:** Found a critical React performance anti-pattern specific to large simulation datasets in this app: executing nested `Array.prototype.filter()` operations across thousands of historical combat records directly inside the render loop. This caused blocking O(S^2 * N) main thread operations during component updates. Mirror matches also caused mathematically inaccurate 100% win-rates under the old logic.
+**Action:** Always replace chained/nested array scans over large engine history datasets with single-pass `Record<string, ...>` aggregators wrapped in `useMemo`. This prevents frame drops in the analytics dashboards and naturally resolves mirror match math inconsistencies.
