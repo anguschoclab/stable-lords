@@ -24,7 +24,7 @@ export function resolveWarriorName(
   if (w) return w.name;
 
   // Search graveyard
-  const dead = state.graveyard.find((w: { id: string; name: string }) => w.id === warriorId);
+  const dead = state.graveyard.find(w => w.id === warriorId);
   if (dead) return dead.name;
 
   // Search retired
