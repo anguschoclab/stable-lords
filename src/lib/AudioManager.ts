@@ -22,7 +22,7 @@ class AudioManager {
 
   private constructor() {
     // Initialize HowlerGlobal for Electron environment
-    if (typeof (window as any).HowlerGlobal === 'undefined') {
+    if (typeof window !== 'undefined' && typeof (window as any).HowlerGlobal === 'undefined') {
       (window as any).HowlerGlobal = {};
     }
     this.loadMuteState();
