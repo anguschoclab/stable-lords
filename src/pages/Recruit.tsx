@@ -5,7 +5,7 @@
  */
 import React, { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, type GameStore } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, type Attributes } from "@/types/game";
 import { BASE_ROSTER_CAP } from "@/data/constants";
 import { makeWarrior } from "@/engine/factories";
@@ -189,18 +189,6 @@ export default function Recruit() {
   const navigate = useNavigate();
   const MAX_ROSTER = BASE_ROSTER_CAP + (rosterBonus ?? 0);
 
-  // Gather all used names (roster + graveyard + retired + rivals)
-  const usedNames = useMemo(() => {
-    const names = new Set<string>();
-    for (const w of roster) names.add(w.name);
-    for (const w of graveyard) names.add(w.name);
-    for (const w of retired) names.add(w.name);
-    for (const r of rivals || []) {
-      for (const w of r.roster) names.add(w.name);
-    }
-    return names;
-  }, [roster, graveyard, retired, rivals]);
-
   const [scoutedIds, setScoutedIds] = useState<Set<string>>(new Set());
 
   const rosterFull = roster.length >= MAX_ROSTER;
@@ -265,11 +253,20 @@ export default function Recruit() {
   }, [setState]);
 
   const handleRefresh = useCallback(() => {
-    setState((draft: any) => {
+    setState((draft: GameStore) => {
       if (!canTransact(draft.treasury, REFRESH_COST)) {
         toast.error(`Not enough gold! Need ${REFRESH_COST}g to refresh.`);
         return;
       }
+
+      // ⚡ Bolt: Moving name collection inside the callback to avoid per-render overhead.
+      // We use a single-pass loop approach to avoid intermediate array allocations (O(N) vs O(N*M)).
+      const usedNames = new Set<string>();
+      draft.roster.forEach(w => usedNames.add(w.name));
+      draft.graveyard.forEach(w => usedNames.add(w.name));
+      draft.retired.forEach(w => usedNames.add(w.name));
+      (draft.rivals ?? []).forEach(r => r.roster.forEach(w => usedNames.add(w.name)));
+
       const newPool = fullRefreshPool(draft.week, usedNames);
       draft.treasury -= REFRESH_COST;
       draft.recruitPool = newPool;
@@ -281,7 +278,7 @@ export default function Recruit() {
       });
       toast.success(`Scout pool refreshed! (-${REFRESH_COST}g)`);
     });
-  }, [usedNames, setState]);
+  }, [setState]);
 
   const handleCustomCreate = useCallback(
     (data: { name: string; style: FightingStyle; attributes: Attributes }) => {
