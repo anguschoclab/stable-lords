@@ -136,7 +136,7 @@ export interface Warrior {
   dateOfDeath?: string;
   causeOfDeath?: string;
   yearlySnapshots?: Record<number, CareerRecord>; // 📸 Snapshot at Year Start
-  awards?: AnnualAward[];
+  awards?: import("./state.types").AnnualAward[];
 }
 
 // Re-exports for convenience

@@ -262,7 +262,7 @@ export interface SimulationReport {
   trainingGains: { warriorId: string; warriorName: string; attr: string; gain: number }[];
   agingEvents: string[];
   healthEvents: string[];
-  bouts?: import("@/engine/boutProcessor").BoutResult[]; // TODO: Replace with proper BoutResult[] type from boutProcessor
+  bouts?: import("@/types/combat.types").FightSummary[];
 }
 
 export type AnnualAwardType = "WARRIOR_OF_YEAR" | "KILLER_OF_YEAR" | "STABLE_OF_YEAR" | "CLASS_MVP" | "TOURNAMENT_RANK";
