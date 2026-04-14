@@ -156,7 +156,7 @@ export default function StableEquipment() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-3">
-                      <GearItem icon={Swords} name={rec.breakdown.weapon.item.name} weight={rec.breakdown.weapon.item.weight} error={reqCheck && !reqCheck.met} />
+                      <GearItem icon={Swords} name={rec.breakdown.weapon.item.name} weight={rec.breakdown.weapon.item.weight} error={!!(reqCheck && !reqCheck.met)} />
                       <GearItem icon={Shirt} name={rec.breakdown.armor.item.name} weight={rec.breakdown.armor.item.weight} />
                       <GearItem 
                         icon={Shield} 

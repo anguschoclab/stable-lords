@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { createFreshState } from "@/engine/factories";
 import { SeededRNG } from "@/utils/random";
@@ -53,12 +54,12 @@ describe("Simulation Determinism", () => {
     expect(strA).toBe(strB);
   });
 
-  it("should remain deterministic even when branching (cloning RNG)", () => {
-    const rng = new SeededRNG(12345);
-    const clone = rng.clone();
+  it("should remain deterministic even when branching (recreating RNG)", () => {
+    const rng1 = new SeededRNGService(12345);
+    const rng2 = new SeededRNGService(12345);
 
     for (let i = 0; i < 100; i++) {
-        expect(rng.next()).toBe(clone.next());
+        expect(rng1.next()).toBe(rng2.next());
     }
   });
 

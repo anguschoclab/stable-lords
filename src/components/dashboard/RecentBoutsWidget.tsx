@@ -119,7 +119,7 @@ export function RecentBoutsWidget() {
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
          <Link 
-            to="/world/history"
+            to="/world/chronicle"
             className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
          >
             Sync_Engagement_Chronicle <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />

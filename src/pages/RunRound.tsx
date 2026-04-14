@@ -138,7 +138,16 @@ export default function RunRound() {
               {matchCard.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3">
                   {matchCard.map((p, i) => (
-                    <MatchCard key={i} pairing={p} crowdMood={state.crowdMood} />
+                    <MatchCard 
+                      key={i} 
+                      pairing={{
+                        a: p.playerWarrior,
+                        d: p.rivalWarrior,
+                        rivalStable: p.rivalStable?.owner?.stableName || "Rival Stable",
+                        isRivalry: p.isRivalryBout
+                      }} 
+                      crowdMood={state.crowdMood} 
+                    />
                   ))}
                 </div>
               ) : (

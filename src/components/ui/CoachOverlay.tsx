@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, ShieldAlert, Coins, History, Zap, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,7 @@ interface CoachWarning {
 }
 
 export function CoachOverlay() {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const warnings = useMemo(() => {
     const list: CoachWarning[] = [];

@@ -43,8 +43,6 @@ import {
   getMatchupBonus as rawMatchupBonus 
 } from "./combatConstants"; 
 
-export const MAX_EXCHANGES = 250;
-export const EXCHANGES_PER_MINUTE = 25;
 export const DECISION_HIT_MARGIN = 3;
 
 export function getMatchupBonus(styleA: FightingStyle, styleD: FightingStyle): number {

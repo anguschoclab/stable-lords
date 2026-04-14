@@ -21,6 +21,7 @@ export interface RosterSlice {
   consumeInsightToken: (tokenId: string, warriorId: string) => void;
   updateWarriorEquipment: (warriorId: string, equipment: { weapon: string; armor: string; shield: string; helm: string }) => void;
   renameWarrior: (warriorId: string, newName: string) => void;
+  acknowledgeDeath: (warriorId: string) => void;
 }
 
 export const createRosterSlice: StateCreator<any, [], [], RosterSlice> = (set, get) => ({
@@ -147,5 +148,11 @@ export const createRosterSlice: StateCreator<any, [], [], RosterSlice> = (set, g
         retired: updateList(state.retired),
       };
     });
+  },
+  
+  acknowledgeDeath: (warriorId) => {
+    set((state: any) => ({
+      unacknowledgedDeaths: (state.unacknowledgedDeaths || []).filter((id: string) => id !== warriorId)
+    }));
   },
 });

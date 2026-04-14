@@ -11,7 +11,7 @@ import {
 import { type SeasonalGrowth } from "@/types/state.types";
 import { canGrow, diminishingReturnsFactor } from "@/engine/potential";
 import { computeWarriorStats } from "@/engine/skillCalc";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { generateId } from "@/utils/idUtils";
 import { computeTrainerBonus } from "./coachLogic";
 import { getSeasonalGains, updateSeasonalGains } from "./facilityUpkeep";
@@ -67,7 +67,7 @@ export function processAttributeTraining(
   attr: keyof Attributes,
   state: GameState,
   seasonalGrowth: SeasonalGrowth[],
-  rng: SeededRNG
+  rng: IRNGService
 ): { updatedWarrior: Warrior | null, updatedSeasonalGrowth: SeasonalGrowth[] | null, result: TrainingResult, hardCapped?: boolean } {
   // SZ cannot be trained
   if (attr === "SZ") {
@@ -100,7 +100,7 @@ export function processAttributeTraining(
   const gainChance = computeGainChance(warrior, attr, state.trainers ?? []);
 
   // Roll for gain
-  if (rng.chance(gainChance)) {
+  if (rng.next() < gainChance) {
     const newAttrs = { ...warrior.attributes, [attr]: currentVal + 1 };
     const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, warrior.style);
 
@@ -132,7 +132,7 @@ export function processAttributeTraining(
   } else {
     // Failed to gain, but might still reveal potential from hard work!
     const isRevealed = warrior.potentialRevealed?.[attr];
-    if (!isRevealed && rng.chance(0.20)) {
+    if (!isRevealed && rng.next() < 0.20) {
       const newRevealed = { ...(warrior.potentialRevealed || {}), [attr]: true };
       return {
         updatedWarrior: { ...warrior, potentialRevealed: newRevealed },
@@ -149,7 +149,7 @@ export function processAttributeTraining(
   return { updatedWarrior: null, updatedSeasonalGrowth: null, result: { type: "blocked", warriorId: warrior.id, message: "" } };
 }
 
-export function rollForTrainingInjury(warrior: Warrior, healingBonus: number, rng: SeededRNG): { injury: InjuryData | null, result: TrainingResult | null } {
+export function rollForTrainingInjury(warrior: Warrior, healingBonus: number, rng: IRNGService): { injury: InjuryData | null, result: TrainingResult | null } {
   const age = warrior.age ?? 18;
   const agePenalty = age > 30 ? (age - 30) * 0.005 : 0;
   const healReduce = healingBonus * 0.01;
@@ -157,12 +157,12 @@ export function rollForTrainingInjury(warrior: Warrior, healingBonus: number, rn
     BASE_TRAINING_INJURY_CHANCE + agePenalty - healReduce
   ));
 
-  if (rng.chance(injuryChance)) {
+  if (rng.next() < injuryChance) {
     const template = rng.pick(TRAINING_INJURIES);
     const [minW, maxW] = template.weeksRange;
-    const weeks = rng.roll(minW, maxW);
+    const weeks = Math.floor(Math.random() * (maxW - minW + 1)) + minW;
     const injury: InjuryData = {
-      id: generateId(rng, "injury"),
+      id: generateId(),
       name: template.name,
       description: template.description,
       severity: "Minor",

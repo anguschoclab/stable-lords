@@ -1,8 +1,18 @@
-import { GameState, BoutOffer, Promoter, Warrior, RankingEntry } from "@/types/state.types";
+import { GameState, BoutOffer, Promoter, Warrior } from "@/types/state.types";
+import { StateImpact } from "@/engine/impacts";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { FIGHT_PURSE } from "@/data/economyConstants";
-import { generateId } from "@/utils/idUtils";
+/**
+ * Stable Lords — Promoter Pass
+ * Phase 2: Promoters scan the world and dispatch bout offers.
+ * Logic incorporates Hype Matrix, Rank Requirements, and Personality biases.
+ */
+export const PASS_METADATA = {
+  name: "PromoterPass",
+  dependencies: ["RankingsPass"] // Depends on rankings for matchmaking
+};
 
 /**
  * Stable Lords — Promoter Pass
@@ -24,8 +34,8 @@ const RANK_REQUIREMENTS = {
   Legendary: 20
 };
 
-export function runPromoterPass(state: GameState): GameState {
-  const rng = new SeededRNG(state.week * 881 + 17);
+export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpact {
+  const rngService = rng || new SeededRNGService(state.week * 881 + 17);
   const newOffers: Record<string, BoutOffer> = { ...state.boutOffers };
   const rankings = state.realmRankings || {};
   
@@ -38,7 +48,18 @@ export function runPromoterPass(state: GameState): GameState {
     }
   }
   
-  // 1. Gather all active, available warriors
+  // 1. Gather all active warriors
+  const allWarriors: { w: Warrior; stableId: string }[] = [];
+  (state.roster || []).forEach(w => {
+    if (w.status === "Active") allWarriors.push({ w, stableId: state.player.id });
+  });
+  (state.rivals || []).forEach(r => {
+    r.roster.forEach(w => {
+      if (w.status === "Active") allWarriors.push({ w, stableId: r.owner.id });
+    });
+  });
+
+  // ⚡ Bolt: Pre-compute available warriors to avoid repeated availability checks
   // Available = No SIGNED bout for Week+2 or Week+3
   const targetWeek = state.week + 2; // Forward booking
   const unavailableWarriorIds = new Set<string>();
@@ -48,30 +69,18 @@ export function runPromoterPass(state: GameState): GameState {
     }
   });
 
-  const getAvailability = (wId: string) => !unavailableWarriorIds.has(wId);
-
-  const allWarriors: { w: Warrior; stableId: string }[] = [];
-  state.roster.forEach(w => {
-    if (w.status === "Active") allWarriors.push({ w, stableId: state.player.id });
-  });
-  (state.rivals || []).forEach(r => {
-    r.roster.forEach(w => {
-      if (w.status === "Active") allWarriors.push({ w, stableId: r.owner.id });
-    });
-  });
+  const availableWarriors = allWarriors.filter(entry => !unavailableWarriorIds.has(entry.w.id));
 
   // 2. Iterate through Promoters
-  Object.values(state.promoters).forEach(promoter => {
+  Object.values(state.promoters || []).forEach(promoter => {
     const capacity = promoter.capacity;
     let generated = 0;
-    
+
     // Attempt to fill capacity
-    const targetWeek = state.week + 2; // Forward booking
-    const shuffledWarriors = rng.shuffle(allWarriors);
+    const shuffledWarriors = rngService.shuffle(availableWarriors);
 
     for (const warriorA of shuffledWarriors) {
       if (generated >= capacity) break;
-      if (!getAvailability(warriorA.w.id)) continue;
 
       const rankA = rankings[warriorA.w.id]?.overallRank || 999;
       if (rankA > RANK_REQUIREMENTS[promoter.tier]) continue;
@@ -79,19 +88,18 @@ export function runPromoterPass(state: GameState): GameState {
       // Find an opponent B
       const opponentB = shuffledWarriors.find(candidate => {
         if (candidate.w.id === warriorA.w.id) return false;
-        if (!getAvailability(candidate.w.id)) return false;
-        
+
         const rankB = rankings[candidate.w.id]?.overallRank || 999;
         const scoreA = rankings[warriorA.w.id]?.compositeScore || 0;
         const scoreB = rankings[candidate.w.id]?.compositeScore || 0;
-        
+
         // Qualification & Score Proximity (25% gap max)
         const gap = Math.abs(scoreA - scoreB) / Math.max(1, scoreA);
         return rankB <= RANK_REQUIREMENTS[promoter.tier] && gap <= 0.25;
       });
 
       if (opponentB) {
-        const offerId = rng.uuid("offer");
+        const offerId = rngService.uuid();
         const hype = calculateHype(warriorA.w, opponentB.w, promoter);
         const basePurse = FIGHT_PURSE * TIER_MULTIPLIERS[promoter.tier];
         const finalPurse = Math.floor(basePurse * (hype / 100));
@@ -116,7 +124,6 @@ export function runPromoterPass(state: GameState): GameState {
   });
 
   return {
-    ...state,
     boutOffers: newOffers
   };
 }

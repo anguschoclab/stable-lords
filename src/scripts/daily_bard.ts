@@ -6,7 +6,7 @@ import { z } from "zod";
 const NARRATIVE_FILE = path.join(process.cwd(), "src/data/narrativeContent.json");
 const REPORT_FILE = path.join(process.cwd(), "Daily_Bard_Report.md");
 
-const VALID_VARIABLES = ["%A", "%D", "%W", "%BP"];
+const VALID_VARIABLES = ["%A", "%D", "%W", "%BP", "%H"];
 
 /**
  * Strict Zod Schema for Narrative Templates.
@@ -48,6 +48,9 @@ export const NarrativeSchema = z.object({
   memorials: z.record(z.string(), z.array(templateStringSchema)), // memorials.[epigraph]
   fanfare: z.record(z.string(), z.array(templateStringSchema)), // fanfare.[victory]
   meta: z.record(z.string(), z.array(templateStringSchema)), // meta.[tooltip]
+  recap: z.array(templateStringSchema), // Generic recap templates
+  commentary: z.record(z.string(), z.array(templateStringSchema)), // commentary.[KO/Kill/Flashy/Upset]
+  blurbs: z.record(z.string(), z.array(templateStringSchema)), // blurbs.[neutral/hype/grim]
 });
 
 type ValidatedJSON = z.infer<typeof NarrativeSchema>;

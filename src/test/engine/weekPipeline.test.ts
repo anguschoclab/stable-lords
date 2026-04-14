@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { processTierProgression } from "../../engine/weekPipeline";
+import { processTierProgression } from "../../engine/pipeline/core/tierProgression";
 import { GameState, RivalStableData } from "../../types/game";
 
 describe("processTierProgression", () => {
@@ -9,7 +9,7 @@ describe("processTierProgression", () => {
     meta: { createdAt: "mock-date" },
     rivals: [
       {
-        owner: { stableName: "Rival 1" },
+        owner: { id: "rival-1", stableName: "Rival 1" },
         tier: "Minor",
         roster: Array(5).fill({
           status: "Active",
@@ -17,21 +17,37 @@ describe("processTierProgression", () => {
         })
       }
     ],
+    meta: { createdAt: new Date().toISOString(), gameName: "Stable Lords", version: "1.0" },
     newsletter: [],
     recruitPool: [{ id: 'old' }]
   } as unknown as GameState;
 
-  it("should promote a stable and clear recruit pool", () => {
-    const newState = processTierProgression(mockState, "Summer", 14);
+  it("should return StateImpact with tier promotion when season changes", () => {
+    const impact = processTierProgression(mockState, "Summer", 14);
 
-    expect(newState.rivals[0].tier).toBe("Established");
-    expect(newState.recruitPool).toEqual([]);
-    expect(newState.newsletter.length).toBeGreaterThan(0);
-    expect(newState.newsletter[0].title).toBe("Stable Rankings Update");
+    // Should return StateImpact object
+    expect(impact).toBeDefined();
+    expect(impact.rivalsUpdates).toBeDefined();
+    expect(impact.rivalsUpdates).toBeInstanceOf(Map);
+
+    // Should promote rival from Minor to Established
+    const rivalUpdate = impact.rivalsUpdates?.get("rival-1");
+    expect(rivalUpdate).toBeDefined();
+    expect(rivalUpdate?.tier).toBe("Established");
+
+    // Should clear recruit pool
+    expect(impact.recruitPool).toEqual([]);
+
+    // Should add newsletter items
+    expect(impact.newsletterItems).toBeDefined();
+    expect(impact.newsletterItems?.length).toBeGreaterThan(0);
+    expect(impact.newsletterItems?.[0].title).toBe("Stable Rankings Update");
   });
 
-  it("should return original state if season hasn't changed", () => {
-    const newState = processTierProgression(mockState, "Spring", 2);
-    expect(newState).toBe(mockState);
+  it("should return empty StateImpact if season hasn't changed", () => {
+    const impact = processTierProgression(mockState, "Spring", 2);
+
+    // Should return empty object when season hasn't changed
+    expect(impact).toEqual({});
   });
 });

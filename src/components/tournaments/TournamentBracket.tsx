@@ -67,7 +67,7 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                     <div className="px-3 py-1 border-b border-border/20 flex items-center justify-between bg-secondary/20">
                       <span className="text-[8px] font-black text-muted-foreground/60 tracking-widest uppercase">MATCH {bIdx + 1}</span>
                       {isPending ? (
-                        <Badge className="h-3 px-1.5 text-[7px] bg-blue-500/20 text-blue-400 border-none">PENDING</Badge>
+                        <Badge className="h-3 px-1.5 text-[7px] bg-stone-500/20 text-stone-400 border-none">PENDING</Badge>
                       ) : (
                         <Badge className="h-3 px-1.5 text-[7px] bg-primary/20 text-primary border-none">RESOLVED</Badge>
                       )}
@@ -103,6 +103,7 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
 
                     {hasTranscript && (
                       <button
+                        aria-label={isExpanded ? "Collapse Engagement Log" : "Expand Engagement Log"}
                         onClick={() => onToggleExpand(isExpanded ? null : boutKey)}
                         className="w-full py-1.5 px-3 border-t border-border/10 flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-colors group"
                       >

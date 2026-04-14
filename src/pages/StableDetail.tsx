@@ -3,7 +3,7 @@
  */
 import React, { useMemo } from "react";
 import { useParams, Link } from "@tanstack/react-router";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { isActive, isDead } from "@/engine/warriorStatus";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +29,7 @@ const TIER_CONFIG: Record<string, { label: string; color: string; icon: React.El
 
 export default function StableDetail() {
   const { id } = useParams({ strict: false }) as { id: string };
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const rival = useMemo(
     () => (state.rivals ?? []).find(r => r.owner.id === id),
@@ -41,7 +41,7 @@ export default function StableDetail() {
       <div className="space-y-4 py-8 text-center">
         <Shield className="h-12 w-12 mx-auto text-muted-foreground/30" />
         <p className="text-muted-foreground">Stable not found.</p>
-        <Button variant="outline" asChild><Link to="/world/scouting">Back to Scouting</Link></Button>
+        <Button variant="outline" asChild><Link to="/world/intelligence">Back to Intelligence</Link></Button>
       </div>
     );
   }
@@ -74,8 +74,8 @@ export default function StableDetail() {
       {/* Header */}
       <div>
         <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">
-          <Link to="/world/scouting" className="flex items-center gap-1 text-muted-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to Scouting
+          <Link to="/world/intelligence" className="flex items-center gap-1 text-muted-foreground">
+            <ArrowLeft className="h-4 w-4" /> Back to Intelligence
           </Link>
         </Button>
 

@@ -2,7 +2,7 @@ import type { RivalStableData, GameState, Trainer } from "@/types/state.types";
 import type { WeatherType } from "@/types/shared.types";
 import { type CrowdMood } from "../../crowdMood";
 import { checkBudget } from "./budgetWorker";
-import { logAgentAction } from "../agentCore";
+import { logAgentAction, type AgentContext } from "../agentCore";
 
 const SALARY: Record<string, number> = { Novice: 10, Seasoned: 25, Master: 75 };
 const HIRE_COST: Record<string, number> = { Novice: 50, Seasoned: 100, Master: 200 };
@@ -14,7 +14,8 @@ const HIRE_COST: Record<string, number> = { Novice: 50, Seasoned: 100, Master: 2
 export function processStaff(
   rival: RivalStableData,
   state: GameState,
-  hiringPool: Trainer[]
+  hiringPool: Trainer[],
+  context?: AgentContext
 ): { updatedRival: RivalStableData; gazetteItems: string[]; updatedHiringPool: Trainer[] } {
   let updatedRival = { ...rival };
   const currentTrainers = [...(updatedRival.trainers || [])];
@@ -29,7 +30,10 @@ export function processStaff(
   if (intent !== "RECOVERY" && currentTrainers.length < 2 && currentPool.length > 0) {
     const affordable = currentPool.filter(t => HIRE_COST[t.tier] < (currentTreasury - 300));
     if (affordable.length > 0) {
-      const best = affordable.sort((a, b) => HIRE_COST[b.tier] - HIRE_COST[a.tier])[0];
+      // ⚡ Bolt: Reduced O(N log N) sort to O(N) reduction to find the highest cost trainer
+      const best = affordable.reduce((max, current) =>
+        HIRE_COST[current.tier] > HIRE_COST[max.tier] ? current : max
+      , affordable[0]);
       const budgetReport = checkBudget(updatedRival, HIRE_COST[best.tier], "STAFF");
 
       if (budgetReport.isAffordable) {

@@ -5,9 +5,9 @@ import { describe, it, expect } from "vitest";
 import { generateScoutReport, getScoutCost, type ScoutQuality, getAttributeDescription } from "@/engine/scouting";
 import { FightingStyle, type Warrior } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
-const TEST_RNG = new SeededRNG(42);
+const TEST_RNG = new SeededRNGService(42);
 
 function makeWarrior(overrides?: Partial<Warrior>): Warrior {
   const attrs = { ST: 15, CN: 12, SZ: 10, WT: 14, WL: 13, SP: 16, DF: 11 };
@@ -179,8 +179,8 @@ describe("Scouting System", () => {
 
     it("should generate unique report IDs", () => {
       const warrior = makeWarrior();
-      const { report: report1 } = generateScoutReport(warrior, "Basic", 1, new SeededRNG(1));
-      const { report: report2 } = generateScoutReport(warrior, "Basic", 1, new SeededRNG(2));
+      const { report: report1 } = generateScoutReport(warrior, "Basic", 1, new SeededRNGService(1));
+      const { report: report2 } = generateScoutReport(warrior, "Basic", 1, new SeededRNGService(2));
       
       expect(report1.id).not.toBe(report2.id);
     });

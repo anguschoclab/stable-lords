@@ -96,11 +96,11 @@ describe('OPFS Archival System', () => {
       boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
 
       const service = new OPFSArchiveService();
-      await service.archiveBoutLog(1, 'b-123', []);
+      await service.archiveBoutLog(1, 1, 'b-123', []);
 
       expect(rootHandle.getDirectoryHandle).toHaveBeenCalledWith('season_1', { create: true });
       expect(seasonHandle.getDirectoryHandle).toHaveBeenCalledWith('bouts', { create: true });
-      expect(boutsHandle.getFileHandle).toHaveBeenCalledWith('b-123.json', { create: true });
+      expect(boutsHandle.getFileHandle).toHaveBeenCalledWith('1_b-123.json', { create: true });
     });
 
     it('Test 2.2: archiveBoutLog successfully writes stringified JSON', async () => {
@@ -135,7 +135,7 @@ describe('OPFS Archival System', () => {
 
       const service = new OPFSArchiveService();
       const payload = [{ action: 'slash', damage: 15 }];
-      await service.archiveBoutLog(2, 'b-999', payload);
+      await service.archiveBoutLog(1, 2, 'b-999', payload);
 
       expect(writeMock).toHaveBeenCalledWith(JSON.stringify(payload));
       expect(closeMock).toHaveBeenCalled();
@@ -163,7 +163,7 @@ describe('OPFS Archival System', () => {
 
       const service = new OPFSArchiveService();
 
-      await expect(service.archiveBoutLog(1, 'b-123', [])).rejects.toThrow(ArchiveConflictError);
+      await expect(service.archiveBoutLog(1, 1, 'b-123', [])).rejects.toThrow(ArchiveConflictError);
     });
   });
 
@@ -184,7 +184,7 @@ describe('OPFS Archival System', () => {
       boutsHandle.getFileHandle.mockResolvedValueOnce(fileHandle);
 
       const service = new OPFSArchiveService();
-      const result = await service.retrieveBoutLog(1, 'b-123');
+      const result = await service.retrieveBoutLog(1, 1, 'b-123');
 
       expect(result).toEqual(mockData);
     });
@@ -199,7 +199,7 @@ describe('OPFS Archival System', () => {
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
 
       const service = new OPFSArchiveService();
-      const result = await service.retrieveBoutLog(1, 'missing-bout');
+      const result = await service.retrieveBoutLog(1, 1, 'missing-bout');
 
       expect(result).toBeNull();
     });
@@ -269,7 +269,7 @@ describe('OPFS Archival System', () => {
       const service = new OPFSArchiveService();
 
       // We expect it to catch the error, possibly dispatch to Zustand, and return safely
-      await expect(service.archiveBoutLog(1, 'b-123', [])).resolves.toBeUndefined();
+      await expect(service.archiveBoutLog(1, 1, 'b-123', [])).resolves.toBeUndefined();
       errorSpy.mockRestore();
     });
 
@@ -303,7 +303,7 @@ describe('OPFS Archival System', () => {
 
       const service = new OPFSArchiveService();
 
-      await expect(service.archiveBoutLog(1, 'b-123', [])).rejects.toThrow(ArchiveConflictError);
+      await expect(service.archiveBoutLog(1, 1, 'b-123', [])).rejects.toThrow(ArchiveConflictError);
     });
 
     it('Test 5.3: archiveBoutLog fails gracefully on unknown generic errors', async () => {
@@ -338,7 +338,7 @@ describe('OPFS Archival System', () => {
       const service = new OPFSArchiveService();
 
       // Ensure it fails gracefully (resolves to undefined) instead of throwing
-      await expect(service.archiveBoutLog(1, 'b-123', [])).resolves.toBeUndefined();
+      await expect(service.archiveBoutLog(1, 1, 'b-123', [])).resolves.toBeUndefined();
 
       expect(errorSpy).toHaveBeenCalled();
       errorSpy.mockRestore();

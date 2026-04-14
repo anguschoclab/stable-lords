@@ -27,7 +27,7 @@ interface StableRow {
 const TIER_ACCENTS: Record<string, string> = {
   Legendary: "bg-arena-gold text-black border-arena-gold/30",
   Major: "bg-primary/20 text-primary border-primary/30",
-  Established: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Established: "bg-stone-500/10 text-stone-400 border-stone-500/20",
   Minor: "bg-neutral-900/40 text-muted-foreground border-white/5",
   Player: "bg-primary text-primary-foreground border-primary",
 };
@@ -107,15 +107,22 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>
-                           <Link
-                             to={row.isPlayer ? "/stable/hall" : "/stable/$id"} params={row.isPlayer ? {} : { id: row.id }}
-                             className={cn(
-                                "font-display font-black uppercase text-xs tracking-tight transition-all",
-                                row.isPlayer ? "text-primary hover:text-white" : "text-foreground hover:text-primary"
-                             )}
-                           >
-                             {row.name}
-                           </Link>
+                           {row.isPlayer ? (
+                             <Link
+                               to="/command/roster"
+                               className="font-display font-black uppercase text-xs tracking-tight transition-all text-primary hover:text-white"
+                             >
+                               {row.name}
+                             </Link>
+                           ) : (
+                             <Link
+                               to="/world/stable/$id"
+                               params={{ id: row.id }}
+                               className="font-display font-black uppercase text-xs tracking-tight transition-all text-foreground hover:text-primary"
+                             >
+                               {row.name}
+                             </Link>
+                           )}
                            <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[9px] font-black text-muted-foreground uppercase opacity-40 leading-none">Commanded by {row.ownerName}</span>
                               {row.isPlayer && <Badge variant="outline" className="text-[8px] font-black border-primary/20 bg-primary/10 text-primary py-0 px-1 leading-none h-3">ACTIVE_PLAYER</Badge>}

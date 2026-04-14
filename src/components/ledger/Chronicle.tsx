@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { ScrollText, BookOpen, Clock, ChevronRight, History, Activity, Zap, ShieldCheck, Terminal } from "lucide-react";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function Chronicle() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   
   const news = useMemo(
     () => [...(state.newsletter || [])].reverse().slice(0, 50),

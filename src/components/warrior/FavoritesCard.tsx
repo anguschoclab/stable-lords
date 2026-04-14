@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Eye, Lightbulb, Swords, Zap, Activity } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { type Warrior } from "@/types/game";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -114,7 +114,8 @@ function DiscoveryProgressBar({
 }
 
 export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdate: () => void }) {
-  const { setState, state } = useGameStore();
+  const state = useWorldState();
+  const setState = useGameStore((s) => s.setState);
   const favDisplay = getFavoritesDisplay(warrior);
   
   const isWeaponDiscovered = !!warrior.favorites?.discovered.weapon;
@@ -128,9 +129,8 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
 
   const handleInsight = (type: "weapon" | "rhythm") => {
     const msg = applyInsightToken(warrior, type);
-    setState({
-      ...state,
-      roster: state.roster.map(w => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w),
+    setState((s: any) => {
+      s.roster = s.roster.map((w: any) => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w);
     });
     toast.success(msg);
     onUpdate();

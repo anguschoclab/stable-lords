@@ -16,10 +16,11 @@ const FORCED_RETIRE_MIN = 30;
 const FORCED_RETIRE_MAX = 40;
 
 import { type StateImpact } from "./impacts";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /** Compute the aging impact of the current week. */
-export function computeAgingImpact(state: GameState, rng: SeededRNG): StateImpact {
+export function computeAgingImpact(state: GameState, rng: IRNGService): StateImpact {
   const ageEvents: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const toRetire: string[] = [];
@@ -54,7 +55,7 @@ export function computeAgingImpact(state: GameState, rng: SeededRNG): StateImpac
       ageEvents.push(`${w.name} (age ${age}) has been forced to retire — too old to fight.`);
     } else if (age >= FORCED_RETIRE_MIN) {
       const retireChance = (age - FORCED_RETIRE_MIN) / (FORCED_RETIRE_MAX - FORCED_RETIRE_MIN) * 0.15;
-      if (rng.roll(0, 1) < retireChance) {
+      if (rng.next() < retireChance) {
         toRetire.push(w.id);
         ageEvents.push(`${w.name} (age ${age}) has decided to hang up the blade.`);
       }
@@ -71,13 +72,13 @@ export function computeAgingImpact(state: GameState, rng: SeededRNG): StateImpac
 
   return {
     rosterUpdates,
-    newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid("newsletter"), week: state.week, title: "Aging Report", items: ageEvents }] : []
+    newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid(), week: state.week, title: "Aging Report", items: ageEvents }] : []
   };
 }
 
-/** Process aging for all warriors at week-end. Legacy wrapper. */
+/** @deprecated Use computeAgingImpact and resolveImpacts instead. Process aging for all warriors at week-end. Legacy wrapper. */
 export function processAging(state: GameState): GameState {
-  const rng = new SeededRNG(state.week * 997 + 3);
+  const rng = new SeededRNGService(state.week * 997 + 3);
   const impact = computeAgingImpact(state, rng);
   let roster = [...state.roster];
   const retired = [...state.retired];

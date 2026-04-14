@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function MetaDriftWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   
   const meta = useMemo(() => 
     computeMetaDrift(state.arenaHistory || []), 

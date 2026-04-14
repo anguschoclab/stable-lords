@@ -43,6 +43,13 @@ export interface WorldSlice {
   ftueStep?: number;
   ftueComplete: boolean;
   player: Owner;
+  coachDismissed: string[];
+  rivalries: any[];
+  matchHistory: any[];
+  playerChallenges: string[];
+  playerAvoids: string[];
+  ownerGrudges: any[];
+  phase: "planning" | "resolution";
   setWeek: (week: number) => void;
   initializeStable: (name: string, stableName: string) => void;
   appendFight: (summary: FightSummary) => void;
@@ -81,6 +88,13 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   isFTUE: false,
   ftueComplete: false,
   player: { id: "p1", name: "Rookie", stableName: "Fresh Stable", fame: 0, renown: 0, titles: 0 },
+  coachDismissed: [],
+  rivalries: [],
+  matchHistory: [],
+  playerChallenges: [],
+  playerAvoids: [],
+  ownerGrudges: [],
+  phase: "planning",
 
   setWeek: (week) => set({ week }),
 

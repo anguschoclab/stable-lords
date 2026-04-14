@@ -43,6 +43,7 @@ function StableSelector({
             <Tooltip key={r.owner.id}>
               <TooltipTrigger asChild>
                 <button
+                  aria-label={`Select ${r.owner.stableName} as Asset Alpha`}
                   onClick={() => setIdA(r.owner.id === idA ? null : r.owner.id)}
                   disabled={r.owner.id === idB}
                   className={cn(
@@ -89,6 +90,7 @@ function StableSelector({
             <Tooltip key={r.owner.id}>
               <TooltipTrigger asChild>
                 <button
+                  aria-label={`Select ${r.owner.stableName} as Asset Beta`}
                   onClick={() => setIdB(r.owner.id === idB ? null : r.owner.id)}
                   disabled={r.owner.id === idA}
                   className={cn(

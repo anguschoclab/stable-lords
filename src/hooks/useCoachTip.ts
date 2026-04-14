@@ -4,7 +4,7 @@
  * Supports exact routes and pattern-matched dynamic routes.
  */
 import { useEffect } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { toast } from "sonner";
 import type { GameState, Warrior } from "@/types/game";
 
@@ -52,9 +52,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Run Round ──────────────────────────────────────────────────────────
+  // ── Combat ──────────────────────────────────────────────────────────
   {
-    pattern: "/run-round",
+    pattern: "/command/combat",
     tips: [
       {
         id: "round-first",
@@ -68,9 +68,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Recruit ────────────────────────────────────────────────────────────
+  // ── Personnel ────────────────────────────────────────────────────────────
   {
-    pattern: "/recruit",
+    pattern: "/ops/personnel",
     tips: [
       {
         id: "recruit-tip",
@@ -87,9 +87,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Trainers ──────────────────────────────────────────────────────────
+  // ── Personnel (Trainers tab) ──────────────────────────────────────────────────────────
   {
-    pattern: "/trainers",
+    pattern: "/ops/personnel",
     tips: [
       {
         id: "trainers-first",
@@ -105,7 +105,7 @@ const COACH_ROUTES: RouteEntry[] = [
 
   // ── Tournaments ────────────────────────────────────────────────────────
   {
-    pattern: "/tournaments",
+    pattern: "/world/tournaments",
     tips: [
       {
         id: "tournament-tip",
@@ -117,7 +117,7 @@ const COACH_ROUTES: RouteEntry[] = [
 
   // ── Chronicle ─────────────────────────────────────────────────────────
   {
-    pattern: "/hall-of-fights",
+    pattern: "/world/chronicle",
     tips: [
       {
         id: "chronicle-tip",
@@ -126,9 +126,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Graveyard ─────────────────────────────────────────────────────────
+  // ── Chronicle (Graveyard tab) ─────────────────────────────────────────────────────────
   {
-    pattern: "/graveyard",
+    pattern: "/world/chronicle",
     tips: [
       {
         id: "graveyard-first-death",
@@ -200,7 +200,8 @@ function matchRoute(pathname: string): RouteEntry | undefined {
  * Tips dismissed permanently via game state.
  */
 export function useCoachTip(pathname: string) {
-  const { state, setState } = useGameStore();
+  const state = useWorldState();
+  const { setState } = useGameStore();
   const ftueComplete = state.ftueComplete;
 
   useEffect(() => {
@@ -217,7 +218,7 @@ export function useCoachTip(pathname: string) {
     const context: CoachContext = {};
     const warriorMatch = pathname.match(/^\/warrior\/(.+)/);
     if (warriorMatch) {
-      context.warrior = state.roster.find((w) => w.id === warriorMatch[1]);
+      context.warrior = state.roster.find((w: any) => w.id === warriorMatch[1]);
     }
 
     const tip = entry.tips.find(

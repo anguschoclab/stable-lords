@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,7 +15,7 @@ interface StableDossierProps {
 }
 
 export function StableDossier({ stableId, stableName }: StableDossierProps) {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const stable = useMemo(() => {
     if (stableId === "player" || stableName === state.player.stableName) {

@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import HallOfFights from "@/lore/HallOfFights";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/world/history")({
-  component: HallOfFights,
+  component: () => <Navigate to="/world/chronicle" search={{ tab: "history" }} />,
 });

@@ -10,8 +10,8 @@ import { FOCUS_ICONS, FOCUS_DESCRIPTIONS, TIER_BONUS } from "@/engine/trainers";
 
 const TIER_ACCENTS: Record<string, string> = {
   Novice: "border-border/40 text-muted-foreground",
-  Seasoned: "border-blue-500/40 text-blue-400 bg-blue-500/10",
-  Master: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_15px_rgba(255,215,0,0.1)]",
+  Seasoned: "border-stone-500/40 text-stone-300 bg-stone-500/10",
+  Master: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_15px_rgba(201,151,42,0.15)]",
 };
 
 interface TrainerCardProps {
@@ -46,8 +46,8 @@ export function TrainerCard({
         {/* Tier Indicator Strip */}
         <div className={cn(
           "w-1.5 shrink-0",
-          trainer.tier === "Master" ? "bg-arena-gold" : 
-          trainer.tier === "Seasoned" ? "bg-blue-500" : "bg-neutral-800"
+          trainer.tier === "Master" ? "bg-arena-gold" :
+          trainer.tier === "Seasoned" ? "bg-stone-500" : "bg-neutral-800"
         )} />
 
         <div className="p-6 flex-1 flex flex-col justify-between">

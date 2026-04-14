@@ -9,29 +9,29 @@ import type { OffensiveTactic, DefensiveTactic } from "@/types/combat.types";
 export type SuitabilityRating = "WS" | "S" | "U";
 
 const OFFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>> = {
-  [FightingStyle.AimedBlow]:      { Lunge: "S",  Slash: "U",  Bash: "U",  Decisiveness: "WS" },
-  [FightingStyle.BashingAttack]:  { Lunge: "U",  Slash: "S",  Bash: "WS", Decisiveness: "S"  },
-  [FightingStyle.LungingAttack]:  { Lunge: "WS", Slash: "S",  Bash: "U",  Decisiveness: "S"  },
-  [FightingStyle.ParryLunge]:     { Lunge: "WS", Slash: "U",  Bash: "U",  Decisiveness: "S"  },
-  [FightingStyle.ParryRiposte]:   { Lunge: "S",  Slash: "U",  Bash: "U",  Decisiveness: "S"  },
-  [FightingStyle.ParryStrike]:    { Lunge: "S",  Slash: "S",  Bash: "U",  Decisiveness: "WS" },
-  [FightingStyle.SlashingAttack]: { Lunge: "S",  Slash: "WS", Bash: "U",  Decisiveness: "S"  },
-  [FightingStyle.StrikingAttack]: { Lunge: "S",  Slash: "S",  Bash: "S",  Decisiveness: "WS" },
+  [FightingStyle.AimedBlow]:      { Lunge: "WS", Slash: "WS", Bash: "WS", Decisiveness: "U"  },
+  [FightingStyle.BashingAttack]:  { Lunge: "U",  Slash: "U",  Bash: "WS", Decisiveness: "WS" },
+  [FightingStyle.LungingAttack]:  { Lunge: "WS", Slash: "U",  Bash: "U",  Decisiveness: "S"  },
+  [FightingStyle.ParryLunge]:     { Lunge: "WS", Slash: "U",  Bash: "U",  Decisiveness: "U"  },
+  [FightingStyle.ParryRiposte]:   { Lunge: "WS", Slash: "U",  Bash: "U",  Decisiveness: "U"  },
+  [FightingStyle.ParryStrike]:    { Lunge: "U",  Slash: "U",  Bash: "U",  Decisiveness: "WS" },
+  [FightingStyle.SlashingAttack]: { Lunge: "U",  Slash: "WS", Bash: "U",  Decisiveness: "S"  },
+  [FightingStyle.StrikingAttack]: { Lunge: "WS", Slash: "WS", Bash: "WS", Decisiveness: "WS" },
   [FightingStyle.TotalParry]:     { Lunge: "U",  Slash: "U",  Bash: "U",  Decisiveness: "U"  },
-  [FightingStyle.WallOfSteel]:    { Lunge: "S",  Slash: "S",  Bash: "S",  Decisiveness: "S"  },
+  [FightingStyle.WallOfSteel]:    { Lunge: "U",  Slash: "WS", Bash: "WS", Decisiveness: "U"  },
 };
 
 const DEFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>> = {
-  [FightingStyle.AimedBlow]:      { Dodge: "WS", Parry: "S",  Riposte: "S",  Responsiveness: "S"  },
-  [FightingStyle.BashingAttack]:  { Dodge: "U",  Parry: "S",  Riposte: "U",  Responsiveness: "S"  },
-  [FightingStyle.LungingAttack]:  { Dodge: "WS", Parry: "U",  Riposte: "S",  Responsiveness: "S"  },
-  [FightingStyle.ParryLunge]:     { Dodge: "S",  Parry: "WS", Riposte: "S",  Responsiveness: "S"  },
-  [FightingStyle.ParryRiposte]:   { Dodge: "S",  Parry: "WS", Riposte: "WS", Responsiveness: "WS" },
-  [FightingStyle.ParryStrike]:    { Dodge: "S",  Parry: "WS", Riposte: "S",  Responsiveness: "S"  },
-  [FightingStyle.SlashingAttack]: { Dodge: "S",  Parry: "U",  Riposte: "S",  Responsiveness: "S"  },
-  [FightingStyle.StrikingAttack]: { Dodge: "S",  Parry: "S",  Riposte: "U",  Responsiveness: "S"  },
-  [FightingStyle.TotalParry]:     { Dodge: "S",  Parry: "WS", Riposte: "S",  Responsiveness: "S"  },
-  [FightingStyle.WallOfSteel]:    { Dodge: "S",  Parry: "S",  Riposte: "S",  Responsiveness: "WS" },
+  [FightingStyle.AimedBlow]:      { Dodge: "WS", Parry: "U",  Riposte: "WS", Responsiveness: "U"  },
+  [FightingStyle.BashingAttack]:  { Dodge: "U",  Parry: "U",  Riposte: "U",  Responsiveness: "U"  },
+  [FightingStyle.LungingAttack]:  { Dodge: "WS", Parry: "U",  Riposte: "WS", Responsiveness: "U"  },
+  [FightingStyle.ParryLunge]:     { Dodge: "WS", Parry: "WS", Riposte: "S",  Responsiveness: "U"  },
+  [FightingStyle.ParryRiposte]:   { Dodge: "U",  Parry: "WS", Riposte: "WS", Responsiveness: "U"  },
+  [FightingStyle.ParryStrike]:    { Dodge: "WS", Parry: "WS", Riposte: "WS", Responsiveness: "WS" },
+  [FightingStyle.SlashingAttack]: { Dodge: "U",  Parry: "U",  Riposte: "U",  Responsiveness: "U"  },
+  [FightingStyle.StrikingAttack]: { Dodge: "U",  Parry: "U",  Riposte: "S",  Responsiveness: "WS" },
+  [FightingStyle.TotalParry]:     { Dodge: "WS", Parry: "WS", Riposte: "WS", Responsiveness: "WS" },
+  [FightingStyle.WallOfSteel]:    { Dodge: "U",  Parry: "WS", Riposte: "WS", Responsiveness: "U"  },
 };
 
 export function getOffensiveSuitability(style: FightingStyle, tactic: OffensiveTactic): SuitabilityRating {
@@ -65,29 +65,3 @@ export const SUITABILITY_LABELS: Record<SuitabilityRating, string> = {
   U: "Unsuited",
 };
 
-/**
- * ⚡ Style Matchup Matrix — Rock-Paper-Scissors Logic
- * Defines natural advantages/disadvantages between styles.
- */
-export const STYLE_MATCHUP_MATRIX: Partial<Record<FightingStyle, Partial<Record<FightingStyle, number>>>> = {
-  [FightingStyle.LungingAttack]: {
-    [FightingStyle.AimedBlow]: 1.15, // Lunging beats Focused
-    [FightingStyle.ParryRiposte]: 0.85, // Parry-heavy beats Lunging
-  },
-  [FightingStyle.BashingAttack]: {
-    [FightingStyle.WallOfSteel]: 1.10, // Bash breaks Steel
-    [FightingStyle.SlashingAttack]: 0.90, // Slash evades Bash
-  },
-  [FightingStyle.AimedBlow]: {
-    [FightingStyle.SlashingAttack]: 1.12, // Focused hits Slashers
-    [FightingStyle.LungingAttack]: 0.88, // Lunge interrupts Aim
-  },
-  [FightingStyle.TotalParry]: {
-    [FightingStyle.BashingAttack]: 0.85, // Bash breaks Parry
-    [FightingStyle.SlashingAttack]: 1.15, // Parry catches Slashes
-  },
-};
-
-export function getStyleMatchupAdvantage(styleA: FightingStyle, styleD: FightingStyle): number {
-  return STYLE_MATCHUP_MATRIX[styleA]?.[styleD] ?? 1.0;
-}

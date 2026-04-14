@@ -1,23 +1,25 @@
 import type { GameState, AnnualAward } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import { StateImpact } from "@/engine/impacts";
 
-export function processHallOfFame(state: GameState, newWeek: number): GameState {
-  // Only process at the transition from Week 52 -> Week 1 (Year rollover)
-  // Since advanceWeek already updated week/year, we check if we are at Week 1 and Year > 1
-  if (state.week !== 1 || state.year === 1) return state;
+export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGService): StateImpact {
+  const rngService = rng || new SeededRNGService(state.year * 777);
+  if (state.week !== 1 || state.year === 1) return {};
 
   const prevYear = state.year - 1;
   const hofNews: string[] = [];
-  const rng = new SeededRNG(state.year * 777);
-  let updatedState = { ...state };
+  const rosterUpdates = new Map<string, Partial<Warrior>>();
+  const rivalsUpdates = new Map<string, any>();
+  const awards: AnnualAward[] = [];
 
   interface WarriorStats { w: Warrior; wins: number; kills: number; fame: number; }
   const eligible: WarriorStats[] = [];
 
   const collect = (w: Warrior) => {
-    const snapshot = w.yearlySnapshots?.[prevYear] || { wins: 0, losses: 0, kills: 0 };
+    const snapshot = w.yearlySnapshots?.[prevYear] || { wins: 0, losses: 0, kills: 0, fame: 0 };
     const wins = (w.career?.wins || 0) - (snapshot.wins || 0);
     const kills = (w.career?.kills || 0) - (snapshot.kills || 0);
     const fameGain = (w.fame || 0) - (snapshot.fame || 0); 
@@ -27,11 +29,9 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
   state.roster.forEach(collect);
   state.rivals.forEach(r => r.roster.forEach(collect));
 
-  if (eligible.length === 0) return state;
+  if (eligible.length === 0) return {};
 
-  // 1. Warrior of the Year (Most Wins delta)
-  // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to track max wins.
-  const woty = eligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max, eligible[0]);
+  const woty = eligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max, eligible[0]!);
   if (woty && woty.wins > 0) {
     const award: AnnualAward = {
       year: prevYear,
@@ -42,13 +42,22 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
       value: woty.wins,
       reason: `Recorded ${woty.wins} victories in Year ${prevYear}`
     };
-    updatedState = applyAward(updatedState, award, 50);
+    const { updatedWarrior } = applyAward(woty.w, award, 50);
+    if (woty.w.stableId === state.player.id) {
+      rosterUpdates.set(woty.w.id, updatedWarrior);
+    } else if (woty.w.stableId) {
+      const existingRoster = rivalsUpdates.get(woty.w.stableId)?.roster || [];
+      const updatedRoster = existingRoster.map((w: Warrior) => w.id === woty.w.id ? updatedWarrior : w);
+      if (!existingRoster.find((w: Warrior) => w.id === woty.w.id)) {
+        updatedRoster.push(updatedWarrior);
+      }
+      rivalsUpdates.set(woty.w.stableId, { roster: updatedRoster });
+    }
+    awards.push(award);
     hofNews.push(`🏛️ WARRIOR OF THE YEAR: ${woty.w.name} is the champion of Year ${prevYear} with ${woty.wins} wins!`);
   }
 
-  // 2. Killer of the Year (Most Kills delta)
-  // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to track max kills.
-  const koty = eligible.reduce((max, curr) => (curr.kills > max.kills || (curr.kills === max.kills && curr.wins > max.wins)) ? curr : max, eligible[0]);
+  const koty = eligible.reduce((max, curr) => (curr.kills > max.kills || (curr.kills === max.kills && curr.wins > max.wins)) ? curr : max, eligible[0]!);
   if (koty && koty.kills > 0) {
     const award: AnnualAward = {
       year: prevYear,
@@ -59,14 +68,23 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
       value: koty.kills,
       reason: `Claimed ${koty.kills} lives in Year ${prevYear}`
     };
-    updatedState = applyAward(updatedState, award, 50);
+    const { updatedWarrior } = applyAward(koty.w, award, 50);
+    if (koty.w.stableId === state.player.id) {
+      rosterUpdates.set(koty.w.id, updatedWarrior);
+    } else if (koty.w.stableId) {
+      const existingRoster = rivalsUpdates.get(koty.w.stableId)?.roster || [];
+      const updatedRoster = existingRoster.map(w => w.id === koty.w.id ? updatedWarrior : w);
+      if (!existingRoster.find(w => w.id === koty.w.id)) {
+        updatedRoster.push(updatedWarrior);
+      }
+      rivalsUpdates.set(koty.w.stableId, { roster: updatedRoster });
+    }
+    awards.push(award);
     hofNews.push(`💀 KILLER OF THE YEAR: ${koty.w.name} earned the 'Reaper's Gaze' with ${koty.kills} kills.`);
   }
 
-  // 3. Class MVPs (10 Styles)
   Object.values(FightingStyle).forEach(style => {
     const styleEligible = eligible.filter(e => e.w.style === style);
-    // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to prevent intermediate GC pressure.
     const mvp = styleEligible.length > 0 ? styleEligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max) : undefined;
     if (mvp && mvp.wins > 0) {
       const award: AnnualAward = {
@@ -79,114 +97,78 @@ export function processHallOfFame(state: GameState, newWeek: number): GameState 
         value: mvp.wins,
         reason: `Leading ${style} specialist in Year ${prevYear}`
       };
-      updatedState = applyAward(updatedState, award, 20);
+      const { updatedWarrior } = applyAward(mvp.w, award, 20);
+      if (mvp.w.stableId === state.player.id) {
+        rosterUpdates.set(mvp.w.id, updatedWarrior);
+      } else if (mvp.w.stableId) {
+        const existingRoster = rivalsUpdates.get(mvp.w.stableId)?.roster || [];
+        const updatedRoster = existingRoster.map(w => w.id === mvp.w.id ? updatedWarrior : w);
+        if (!existingRoster.find(w => w.id === mvp.w.id)) {
+          updatedRoster.push(updatedWarrior);
+        }
+        rivalsUpdates.set(mvp.w.stableId, { roster: updatedRoster });
+      }
+      awards.push(award);
       hofNews.push(`⚔️ ${style.toUpperCase()} MVP: ${mvp.w.name} honored as the elite of their class.`);
     }
   });
 
-  // 4. Stable of the Year
-  const stableStats = new Map<string, { name: string; wins: number; fame: number }>();
-  const addStable = (id: string, name: string, wins: number, fame: number) => {
-    const s = stableStats.get(id) || { name, wins: 0, fame: 0 };
-    s.wins += wins;
-    s.fame += fame;
-    stableStats.set(id, s);
+  const impact: StateImpact = {
+    awards: [...(state.awards || []), ...awards],
+    rosterUpdates,
+    rivalsUpdates
   };
-
-  eligible.forEach(e => {
-    if (e.w.stableId) {
-      const stableName = e.w.stableId === state.player.id ? state.player.stableName : state.rivals.find(r => r.owner.id === e.w.stableId)?.owner.stableName || "Unknown";
-      addStable(e.w.stableId, stableName, e.wins, e.fame);
-    }
-  });
-
-  // ⚡ Bolt: Replaced [...stableStats.entries()].sort()[0] with O(N) iteration, saving array allocations.
-  let bestStable: [string, { name: string; wins: number; fame: number }] | undefined;
-  for (const entry of stableStats.entries()) {
-    if (!bestStable || entry[1].wins > bestStable[1].wins || (entry[1].wins === bestStable[1].wins && entry[1].fame > bestStable[1].fame)) {
-      bestStable = entry;
-    }
+  
+  if (hofNews.length > 0) {
+    impact.newsletterItems = [{
+      id: rngService.uuid(),
+      week: newWeek,
+      title: "Hall of Fame Inductions",
+      items: hofNews
+    }];
   }
-  if (bestStable && bestStable[1].wins > 0) {
-    const award: AnnualAward = {
-      year: prevYear,
-      type: "STABLE_OF_YEAR",
-      stableId: bestStable[0],
-      stableName: bestStable[1].name,
-      value: bestStable[1].wins,
-      reason: `Winningest stable of Year ${prevYear} with ${bestStable[1].wins} total victories.`
-    };
-    updatedState = applyAward(updatedState, award, 50);
-    hofNews.push(`🏟️ STABLE OF THE YEAR: ${bestStable[1].name} dominated the arenas of Year ${prevYear}.`);
-  }
-
-  // 5. Cleanup: Create new snapshots for all warriors for the new year
-  updatedState = createYearlySnapshots(updatedState);
-
-  if (hofNews.length === 0) return updatedState;
-
-  return { 
-    ...updatedState, 
-    newsletter: [
-      ...updatedState.newsletter, 
-      { id: rng.uuid("newsletter"), week: 1, title: `Year ${prevYear} Global Accolades`, items: hofNews }
-    ] 
-  };
+  
+  return impact;
 }
 
-function applyAward(state: GameState, award: AnnualAward, fameBonus: number): GameState {
-  let updatedState = { 
-    ...state, 
-    awards: [...(state.awards || []), award] 
+function applyAward(warrior: Warrior, award: AnnualAward, fameBonus: number): { updatedWarrior: Warrior } {
+  const updatedWarrior = {
+    ...warrior,
+    fame: (warrior.fame || 0) + fameBonus,
+    flair: [...(warrior.flair || []), award.type]
   };
-  const wId = award.warriorId;
-  const sId = award.stableId;
-
-  if (wId) {
-    updatedState = {
-      ...updatedState,
-      roster: updatedState.roster.map(w => w.id === wId ? { ...w, fame: (w.fame || 0) + fameBonus, awards: [...(w.awards || []), award] } : w),
-      rivals: updatedState.rivals.map(r => ({
-        ...r,
-        roster: r.roster.map(w => w.id === wId ? { ...w, fame: (w.fame || 0) + fameBonus, awards: [...(w.awards || []), award] } : w)
-      }))
-    };
-  }
-
-  if (sId) {
-    if (sId === state.player.id) {
-      updatedState = { 
-        ...updatedState, 
-        fame: (updatedState.fame || 0) + fameBonus,
-        player: { ...updatedState.player, fame: (updatedState.player.fame || 0) + fameBonus }
-      };
-    } else {
-      updatedState = {
-        ...updatedState,
-        rivals: updatedState.rivals.map(r => r.owner.id === sId ? { ...r, fame: (r.fame || 0) + fameBonus } : r)
-      };
-    }
-  }
-
-  return updatedState;
+  
+  return { updatedWarrior };
 }
 
-function createYearlySnapshots(state: GameState): GameState {
+function createYearlySnapshots(state: GameState): StateImpact {
   const currentYear = state.year;
-  const snap = (w: Warrior): Warrior => {
+  const rosterUpdates = new Map<string, Partial<Warrior>>();
+  const rivalsUpdates = new Map<string, any>();
+
+  state.roster.forEach((w: Warrior) => {
     const career = w.career || { wins: 0, losses: 0, kills: 0 };
-    return {
-      ...w,
+    rosterUpdates.set(w.id, {
       yearlySnapshots: {
         ...(w.yearlySnapshots || {}),
         [currentYear]: { ...career, fame: w.fame || 0 }
       }
-    };
-  };
+    });
+  });
 
-  return {
-    ...state,
-    roster: state.roster.map(snap),
-    rivals: state.rivals.map(r => ({ ...r, roster: r.roster.map(snap) }))
-  };
+  state.rivals.forEach(r => {
+    const rosterSnapshots: any[] = [];
+    r.roster.forEach((w: Warrior) => {
+      const career = w.career || { wins: 0, losses: 0, kills: 0 };
+      rosterSnapshots.push({
+        yearlySnapshots: {
+          ...(w.yearlySnapshots || {}),
+          [currentYear]: { ...career, fame: w.fame || 0 }
+        }
+      });
+    });
+    rivalsUpdates.set(r.owner.id, { roster: rosterSnapshots });
+  });
+
+  return { rosterUpdates, rivalsUpdates };
 }

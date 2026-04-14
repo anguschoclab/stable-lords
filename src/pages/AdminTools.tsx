@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Settings, Download, Upload, Trash2, FastForward, Activity, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
-import { computeNextSeason } from '@/engine/weekPipeline';
+import { computeNextSeason } from '@/engine/pipeline/passes/WorldPass';
 import type { GameState, RivalStableData } from '@/types/state.types';
 import { ArenaHistory } from '@/engine/history/arenaHistory';
 
@@ -201,12 +201,12 @@ export default function AdminTools() {
               >
                 Force All Mastery
               </Button>
-              <Button 
+            <Button 
               variant="outline" 
               onClick={skipFTUE} 
               className="w-full h-11 font-black uppercase text-[10px] tracking-widest gap-2 bg-accent/5 border-accent/20"
             >
-              <FastForward className="h-4 w-4" /> Bypass FTUE Gate
+              <FastForward className="h-4 w-4" /> Force Temporal Unlock
             </Button>
               <Button 
                 onClick={resetRivals} 

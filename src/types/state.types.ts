@@ -262,6 +262,7 @@ export interface SimulationReport {
   trainingGains: { warriorId: string; warriorName: string; attr: string; gain: number }[];
   agingEvents: string[];
   healthEvents: string[];
+  bouts?: any; // TODO: Replace with proper BoutResult[] type from boutProcessor
 }
 
 export type AnnualAwardType = "WARRIOR_OF_YEAR" | "KILLER_OF_YEAR" | "STABLE_OF_YEAR" | "CLASS_MVP" | "TOURNAMENT_RANK";
@@ -347,6 +348,8 @@ export interface GameState {
   realmRankings: Record<string, RankingEntry>;
   awards: AnnualAward[]; // 🏗️ Prestige Persistence
   lastSimulationReport?: SimulationReport;
+  cachedMetaDrift?: import("@/engine/metaDrift").StyleMeta; // ⚡ Bolt: Cache meta drift weekly for AI components
+  warriorMap?: Map<string, import("@/types/warrior.types").Warrior>; // ⚡ Bolt: Cache warrior map weekly for bout processing
 }
 
 export interface UIPrefs {

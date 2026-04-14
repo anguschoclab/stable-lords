@@ -32,12 +32,12 @@ describe("Tactic Suitability", () => {
       expect(getOffensiveSuitability(FightingStyle.LungingAttack, "Bash")).toBe("U");
     });
 
-    it("should rate Aimed Blow as WS for Decisiveness", () => {
-      expect(getOffensiveSuitability(FightingStyle.AimedBlow, "Decisiveness")).toBe("WS");
+    it("should rate Aimed Blow as U for Decisiveness (canonical: AB relies on precision tactics, not quick decisions)", () => {
+      expect(getOffensiveSuitability(FightingStyle.AimedBlow, "Decisiveness")).toBe("U");
     });
 
-    it("should rate Aimed Blow as U for Bash", () => {
-      expect(getOffensiveSuitability(FightingStyle.AimedBlow, "Bash")).toBe("U");
+    it("should rate Aimed Blow as WS for Bash (canonical: AB well-suited for all attack tactics)", () => {
+      expect(getOffensiveSuitability(FightingStyle.AimedBlow, "Bash")).toBe("WS");
     });
 
     it("should rate Total Parry as U for all offensive tactics", () => {
@@ -55,10 +55,10 @@ describe("Tactic Suitability", () => {
       expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Decisiveness")).toBe("WS");
     });
 
-    it("should rate Striking Attack as S for most tactics", () => {
-      expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Lunge")).toBe("S");
-      expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Slash")).toBe("S");
-      expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Bash")).toBe("S");
+    it("should rate Striking Attack as WS for all attack tactics (canonical: ST is the most versatile offensive style)", () => {
+      expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Lunge")).toBe("WS");
+      expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Slash")).toBe("WS");
+      expect(getOffensiveSuitability(FightingStyle.StrikingAttack, "Bash")).toBe("WS");
     });
   });
 
@@ -72,8 +72,8 @@ describe("Tactic Suitability", () => {
       expect(getDefensiveSuitability(FightingStyle.ParryRiposte, "Riposte")).toBe("WS");
     });
 
-    it("should rate Parry-Riposte as WS for Responsiveness", () => {
-      expect(getDefensiveSuitability(FightingStyle.ParryRiposte, "Responsiveness")).toBe("WS");
+    it("should rate Parry-Riposte as U for Responsiveness (canonical: PR relies on parry/riposte, not reactive speed)", () => {
+      expect(getDefensiveSuitability(FightingStyle.ParryRiposte, "Responsiveness")).toBe("U");
     });
 
     it("should rate Lunging Attack as WS for Dodge", () => {
@@ -97,12 +97,12 @@ describe("Tactic Suitability", () => {
       expect(getDefensiveSuitability(FightingStyle.TotalParry, "Parry")).toBe("WS");
     });
 
-    it("should rate Wall of Steel as WS for Responsiveness", () => {
-      expect(getDefensiveSuitability(FightingStyle.WallOfSteel, "Responsiveness")).toBe("WS");
+    it("should rate Wall of Steel as U for Responsiveness (canonical: WS uses parry/riposte, not reactive footwork)", () => {
+      expect(getDefensiveSuitability(FightingStyle.WallOfSteel, "Responsiveness")).toBe("U");
     });
 
-    it("should rate Striking Attack as U for Riposte", () => {
-      expect(getDefensiveSuitability(FightingStyle.StrikingAttack, "Riposte")).toBe("U");
+    it("should rate Striking Attack as S for Riposte (canonical: ST has some riposte capability)", () => {
+      expect(getDefensiveSuitability(FightingStyle.StrikingAttack, "Riposte")).toBe("S");
     });
 
     it("should rate Slashing Attack as U for Parry", () => {

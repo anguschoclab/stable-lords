@@ -3,19 +3,21 @@
  * Uses the main game state arenaHistory and LoreArchive for hall entries.
  */
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { LoreArchive } from "./LoreArchive";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Swords, Skull, Sparkles, ScrollText, Zap } from "lucide-react";
+import { Trophy, Swords, Skull, Sparkles, ScrollText, Zap, Newspaper } from "lucide-react";
 import { STYLE_DISPLAY_NAMES } from "@/types/game";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { WarriorLink } from "@/components/EntityLink";
+import Gazette from "@/pages/Gazette";
+import Graveyard from "@/pages/Graveyard";
 
 export const HallOfFights: React.FC = () => {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   // Hall entries from LoreArchive
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,6 +84,12 @@ export const HallOfFights: React.FC = () => {
           <TabsTrigger value="stats" className="gap-1.5">
             <Sparkles className="h-3.5 w-3.5" /> Style Stats
           </TabsTrigger>
+          <TabsTrigger value="gazette" className="gap-1.5">
+            <Newspaper className="h-3.5 w-3.5" /> Gazette
+          </TabsTrigger>
+          <TabsTrigger value="graveyard" className="gap-1.5">
+            <Skull className="h-3.5 w-3.5" /> Graveyard
+          </TabsTrigger>
         </TabsList>
 
         {/* Fight History */}
@@ -91,7 +99,7 @@ export const HallOfFights: React.FC = () => {
               <CardContent className="p-8 text-center space-y-3">
                 <ScrollText className="h-10 w-10 mx-auto text-muted-foreground/50" />
                 <p className="text-muted-foreground">No fights recorded yet. Run some rounds to fill the archives.</p>
-                <Link to="/run-round">
+                <Link to="/command/combat">
                   <Button variant="outline" className="gap-2 mt-2">
                     <Zap className="h-4 w-4" /> Run a Round
                   </Button>
@@ -227,6 +235,16 @@ export const HallOfFights: React.FC = () => {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        {/* Gazette */}
+        <TabsContent value="gazette" className="mt-4">
+          <Gazette />
+        </TabsContent>
+
+        {/* Graveyard */}
+        <TabsContent value="graveyard" className="mt-4">
+          <Graveyard />
         </TabsContent>
       </Tabs>
     </div>

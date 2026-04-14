@@ -5,7 +5,7 @@ import { Swords, Flame } from "lucide-react";
 import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import { LethalityBadge } from "./LethalityBadge";
 import { StableLink } from "@/components/EntityLink";
-import type { MatchPairing } from "@/engine/matchmaking/bracketEngine";
+import type { BoutPairing as MatchPairing } from "@/engine/boutProcessor";
 
 interface MatchCardProps {
   pairing: MatchPairing;
@@ -13,7 +13,7 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ pairing, crowdMood }: MatchCardProps) {
-  const { playerWarrior: wA, rivalWarrior: wB, rivalStable, isRivalryBout } = pairing;
+  const { a: wA, d: wB, rivalStable, isRivalry: isRivalryBout } = pairing;
 
   return (
     <Card className="bg-glass-card border border-border/40 hover:border-primary/40 transition-all overflow-hidden group">
@@ -53,7 +53,7 @@ export function MatchCard({ pairing, crowdMood }: MatchCardProps) {
                <WarriorNameTag id={wB.id} name={wB.name} isChampion={wB.champion} />
             </div>
             <div className="flex items-center justify-end gap-2 text-[9px] font-black uppercase tracking-widest text-accent/60">
-               <StableLink name={rivalStable.owner.stableName} className="hover:text-accent transition-colors" />
+               <StableLink name={rivalStable || "Rival Stable"} className="hover:text-accent transition-colors" />
             </div>
           </div>
         </div>
