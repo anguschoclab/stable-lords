@@ -8,7 +8,7 @@
   "main": "electron/main.ts",
   "scripts": {
     "dev": "vite",
-    "electron:dev": "bun run dev & sleep 5 && ELECTRON_IS_DEV=true electron .",
+    "electron:dev": "bun run dev & sleep 5 && ELECTRON_IS_DEV=true electron . --loader tsx",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "electron:build": "bunx tsx build-electron.ts && vite build && electron-builder",
