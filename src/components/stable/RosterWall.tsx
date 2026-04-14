@@ -9,6 +9,7 @@ import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Users, ChevronRight, Trophy, Star, Swords, Target, Crown, Activity, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { StatBattery } from "@/components/ui/StatBattery";
 import { 
   Tooltip,
   TooltipContent,
@@ -156,20 +157,12 @@ export function RosterWall() {
                                     return (
                                        <Tooltip key={k}>
                                           <TooltipTrigger asChild>
-                                             <div className="space-y-1.5">
-                                                <div className="flex items-center justify-between px-0.5">
-                                                   <span className="text-[8px] font-black tracking-widest text-muted-foreground opacity-40">{k}</span>
-                                                </div>
-                                                <div className="h-1.5 w-full bg-black rounded-full overflow-hidden border border-white/5 shadow-inner relative">
-                                                   <div 
-                                                      className={cn(
-                                                         "absolute inset-y-0 left-0 transition-all duration-1000 group-hover:animate-pulse",
-                                                         val >= 20 ? "bg-arena-gold shadow-[0_0_10px_rgba(255,215,0,0.5)]" : val >= 15 ? "bg-primary" : "bg-neutral-800"
-                                                      )} 
-                                                      style={{ width: `${(val / 25) * 100}%` }}
-                                                   />
-                                                </div>
-                                             </div>
+                                             <StatBattery
+                        label={k}
+                        value={val}
+                        max={25}
+                        colorClass={val >= 20 ? "bg-arena-gold shadow-[0_0_10px_rgba(255,215,0,0.5)] group-hover:animate-pulse" : val >= 15 ? "bg-primary group-hover:animate-pulse" : "bg-neutral-800"}
+                      />
                                           </TooltipTrigger>
                                           <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest">
                                              {ATTRIBUTE_LABELS[k]}: {val} / 25

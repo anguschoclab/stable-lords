@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { SortHeader } from "@/components/ui/sort-header";
 import { Trophy, Star, Swords, Skull, Target, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StatBattery } from "@/components/ui/StatBattery";
 
 interface StableRow {
   id: string;
@@ -152,11 +153,14 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                 <TableCell className="text-right font-mono font-black text-xs text-primary">{row.wins}</TableCell>
                 <TableCell className="text-right font-mono font-black text-xs text-muted-foreground/40">{row.losses}</TableCell>
                 <TableCell className="text-right hidden sm:table-cell">
-                   <div className="flex flex-col items-end">
-                      <span className="font-mono font-black text-xs">{row.winRate}%</span>
-                      <div className="w-10 h-1 bg-neutral-900 rounded-full mt-1 overflow-hidden border border-white/5">
-                         <div className="h-full bg-primary" style={{ width: `${row.winRate}%` }} />
-                      </div>
+                   <div className="flex flex-col items-end w-20 ml-auto">
+                      <StatBattery
+                        label="WR"
+                        value={row.winRate}
+                        max={100}
+                        labelValue={`${row.winRate}%`}
+                        colorClass="bg-primary"
+                      />
                    </div>
                 </TableCell>
                 <TableCell className="text-right">
