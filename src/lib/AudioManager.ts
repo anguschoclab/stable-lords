@@ -21,13 +21,13 @@ class AudioManager {
   private async loadMuteState() {
     if (typeof window !== "undefined" && window.electronAPI) {
       try {
-        const muted = await window.electronAPI.storeGet("sl_muted");
+        const muted = await window.electronAPI.storeGet(STORE_KEYS.AUDIO_MUTED);
         this.muted = muted === "true";
       } catch {
         this.muted = false;
       }
     } else if (typeof localStorage !== "undefined") {
-      this.muted = localStorage.getItem("sl_muted") === "true";
+      this.muted = localStorage.getItem(STORE_KEYS.AUDIO_MUTED) === "true";
     }
   }
 
