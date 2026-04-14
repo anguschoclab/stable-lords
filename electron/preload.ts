@@ -30,36 +30,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Notifications
   showNotification: (options: { title: string; body: string }) => 
     ipcRenderer.invoke('show-notification', options),
-  
-  // Menu event listeners
-  onMenuNewGame: (callback: () => void) => {
-    const handler = () => callback();
-    ipcRenderer.on('menu-new-game', handler);
-    return () => ipcRenderer.removeListener('menu-new-game', handler);
-  },
-  onMenuSaveGame: (callback: () => void) => {
-    const handler = () => callback();
-    ipcRenderer.on('menu-save-game', handler);
-    return () => ipcRenderer.removeListener('menu-save-game', handler);
-  },
-  onMenuLoadGame: (callback: () => void) => {
-    const handler = () => callback();
-    ipcRenderer.on('menu-load-game', handler);
-    return () => ipcRenderer.removeListener('menu-load-game', handler);
-  },
-  onMenuExportSave: (callback: (filePath: string) => void) => {
-    const handler = (_event, filePath: string) => callback(filePath);
-    ipcRenderer.on('menu-export-save', handler);
-    return () => ipcRenderer.removeListener('menu-export-save', handler);
-  },
-  onMenuImportSave: (callback: (filePath: string) => void) => {
-    const handler = (_event, filePath: string) => callback(filePath);
-    ipcRenderer.on('menu-import-save', handler);
-    return () => ipcRenderer.removeListener('menu-import-save', handler);
-  },
-  onMenuAbout: (callback: () => void) => {
-    const handler = () => callback();
-    ipcRenderer.on('menu-about', handler);
-    return () => ipcRenderer.removeListener('menu-about', handler);
-  },
 });

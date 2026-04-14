@@ -1,6 +1,7 @@
 import type { GameState } from "@/types/state.types";
 import { archiveService } from "@/engine/storage/electronArchive";
 import { truncateState } from "@/engine/storage/truncation";
+import { STORE_KEYS } from "@/constants/storeKeys";
 
 export interface SaveSlotMeta {
   id: string;
@@ -11,7 +12,7 @@ export interface SaveSlotMeta {
   version: string;
 }
 
-const STORAGE_KEY = "stable-lords-save-slots";
+const STORAGE_KEY = STORE_KEYS.SAVE_SLOTS;
 export const MAX_SAVE_SLOTS = 10;
 
 async function getStoredMeta(): Promise<SaveSlotMeta[]> {
@@ -109,9 +110,15 @@ export async function deleteSlot(slotId: string) {
   const currentMeta = await getStoredMeta();
   const filtered = currentMeta.filter(m => m.id !== slotId);
   await setStoredMeta(filtered);
-  // Note: Electron archive deletion is implicit if we just don't load it, 
-  // but a real implementation might want to unlink the file.
-  // For now, removing meta is enough to "delete" it from UI.
+  
+  // Delete the actual save file from disk
+  if (typeof window !== 'undefined' && window.electronAPI) {
+    try {
+      await window.electronAPI.deleteSave(slotId);
+    } catch (error) {
+      console.error('Failed to delete save file from disk:', error);
+    }
+  }
 }
 
 export function newSlotId(): string {
@@ -121,7 +128,9 @@ export function newSlotId(): string {
 export async function exportSlot(slotId: string): Promise<string | null> {
   const state = await loadFromSlot(slotId);
   if (!state) return null;
-  return JSON.stringify(state);
+  // Truncate state to keep export file size manageable
+  const truncatedState = truncateState(state);
+  return JSON.stringify(truncatedState);
 }
 
 export async function importSaveToNewSlot(data: any): Promise<string | null> {

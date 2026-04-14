@@ -3,13 +3,15 @@
  * Simple persistence for non-gameplay UI state.
  */
 
+import { STORE_KEYS } from "@/constants/storeKeys";
+
 export interface UIPrefs {
   dashboardLayout?: string[];
   theme?: "dark" | "light";
   coachDismissed?: string[];
 }
 
-const STORAGE_KEY = "sl.ui.prefs";
+const STORAGE_KEY = STORE_KEYS.UI_PREFS;
 
 export async function loadUIPrefs(): Promise<UIPrefs> {
   if (typeof window === "undefined") return {};

@@ -1,22 +1,5 @@
 import type { GameState } from "@/types/state.types";
 
-// Type declaration for Electron API exposed via preload script
-declare global {
-  interface Window {
-    electronAPI?: {
-      saveGame: (slotId: string, state: any) => Promise<{ success: boolean; error?: string }>;
-      loadGame: (slotId: string) => Promise<{ success: boolean; data?: any; error?: string }>;
-      archiveBoutLog: (year: number, season: number, boutId: string, logData: string[]) => Promise<{ success: boolean; error?: string }>;
-      retrieveBoutLog: (year: number, season: number, boutId: string) => Promise<{ success: boolean; data?: string[]; error?: string }>;
-      archiveGazette: (season: number, week: number, markdown: string) => Promise<{ success: boolean; error?: string }>;
-      retrieveGazette: (season: number, week: number) => Promise<{ success: boolean; data?: string; error?: string }>;
-      storeGet: (key: string) => Promise<any>;
-      storeSet: (key: string, value: any) => Promise<{ success: boolean }>;
-      storeDelete: (key: string) => Promise<{ success: boolean }>;
-    };
-  }
-}
-
 export interface ArchiveService {
   isSupported: () => boolean;
 
@@ -57,16 +40,18 @@ export class ElectronArchiveService implements ArchiveService {
   }
 
   async archiveHotState(slotId: string, stateData: GameState): Promise<void> {
-    if (!this.isSupported() || !window.electronAPI) return;
-    
-    try {
-      const result = await window.electronAPI.saveGame(slotId, stateData);
-      if (!result.success) {
-        console.error('Failed to archive hot state:', result.error);
+    return this.enqueue(async () => {
+      if (!this.isSupported() || !window.electronAPI) return;
+      
+      try {
+        const result = await window.electronAPI.saveGame(slotId, stateData);
+        if (!result.success) {
+          console.error('Failed to archive hot state:', result.error);
+        }
+      } catch (error) {
+        console.error('Error archiving hot state:', error);
       }
-    } catch (error) {
-      console.error('Error archiving hot state:', error);
-    }
+    });
   }
 
   async retrieveHotState(slotId: string): Promise<GameState | null> {

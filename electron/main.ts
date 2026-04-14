@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, dialog, shell, Tray, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, dialog, shell, Tray, nativeImage, Notification } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -9,13 +9,19 @@ const __dirname = path.dirname(__filename);
 
 // Simple development mode check
 const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_IS_DEV === 'true';
+const devPort = process.env.VITE_PORT || '8080';
 
 // Simple in-memory store for configuration (can be replaced with electron-store later)
 const store = new Map();
 let configPath;
+let configSaveTimeout: NodeJS.Timeout | null = null;
 
 // Load config from file
 function loadConfig() {
+  if (!configPath) {
+    console.warn('Config path not initialized yet');
+    return;
+  }
   try {
     if (fs.existsSync(configPath)) {
       const data = fs.readFileSync(configPath, 'utf-8');
@@ -27,17 +33,22 @@ function loadConfig() {
   }
 }
 
-// Save config to file
+// Save config to file (debounced)
 function saveConfig() {
-  try {
-    const data = {};
-    store.forEach((value, key) => {
-      data[key] = value;
-    });
-    fs.writeFileSync(configPath, JSON.stringify(data, null, 2));
-  } catch (e) {
-    console.error('Failed to save config:', e);
+  if (configSaveTimeout) {
+    clearTimeout(configSaveTimeout);
   }
+  configSaveTimeout = setTimeout(() => {
+    try {
+      const data = {};
+      store.forEach((value, key) => {
+        data[key] = value;
+      });
+      fs.writeFileSync(configPath, JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.error('Failed to save config:', e);
+    }
+  }, 500); // Debounce for 500ms
 }
 
 let mainWindow = null;
@@ -93,7 +104,7 @@ function createWindow() {
 
   // Load the app
   if (isDev) {
-    mainWindow.loadURL('http://localhost:8080');
+    mainWindow.loadURL(`http://localhost:${devPort}`);
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
@@ -305,8 +316,34 @@ function createTray() {
 }
 
 function registerIPCHandlers() {
+  // Validate slot ID format
+  function validateSlotId(slotId: string): boolean {
+    return typeof slotId === 'string' && slotId.length > 0 && /^[a-zA-Z0-9_-]+$/.test(slotId);
+  }
+
+  // Validate season and week numbers
+  function validateSeasonWeek(value: number): boolean {
+    return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  }
+
+  // Validate year
+  function validateYear(value: number): boolean {
+    return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 9999;
+  }
+
+  // Validate bout ID
+  function validateBoutId(boutId: string): boolean {
+    return typeof boutId === 'string' && boutId.length > 0 && /^[a-zA-Z0-9_-]+$/.test(boutId);
+  }
+
   ipcMain.handle('save-game', async (_event, slotId, state) => {
     try {
+      if (!validateSlotId(slotId)) {
+        return { success: false, error: 'Invalid slot ID format' };
+      }
+      if (!state || typeof state !== 'object') {
+        return { success: false, error: 'Invalid state data' };
+      }
       ensureSaveDirectory();
       const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
       fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
@@ -319,6 +356,9 @@ function registerIPCHandlers() {
 
   ipcMain.handle('load-game', async (_event, slotId) => {
     try {
+      if (!validateSlotId(slotId)) {
+        return { success: false, error: 'Invalid slot ID format' };
+      }
       const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
       if (!fs.existsSync(filePath)) {
         return { success: false, error: 'Save file not found' };
@@ -340,7 +380,8 @@ function registerIPCHandlers() {
       const files = fs.readdirSync(saveDir);
       const saveIds = files
         .filter(f => f.endsWith('.json'))
-        .map(f => f.replace('.json', ''));
+        .map(f => f.replace('.json', ''))
+        .filter(validateSlotId);
       return { success: true, data: saveIds };
     } catch (error) {
       console.error('Error listing saves:', error);
@@ -350,6 +391,9 @@ function registerIPCHandlers() {
 
   ipcMain.handle('delete-save', async (_event, slotId) => {
     try {
+      if (!validateSlotId(slotId)) {
+        return { success: false, error: 'Invalid slot ID format' };
+      }
       const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
@@ -363,6 +407,18 @@ function registerIPCHandlers() {
 
   ipcMain.handle('archive-bout-log', async (_event, year, season, boutId, logData) => {
     try {
+      if (!validateYear(year)) {
+        return { success: false, error: 'Invalid year' };
+      }
+      if (!validateSeasonWeek(season)) {
+        return { success: false, error: 'Invalid season' };
+      }
+      if (!validateBoutId(boutId)) {
+        return { success: false, error: 'Invalid bout ID format' };
+      }
+      if (!Array.isArray(logData)) {
+        return { success: false, error: 'Invalid log data format' };
+      }
       ensureSaveDirectory();
       const seasonDir = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'bouts');
       if (!fs.existsSync(seasonDir)) {
@@ -379,6 +435,15 @@ function registerIPCHandlers() {
 
   ipcMain.handle('retrieve-bout-log', async (_event, year, season, boutId) => {
     try {
+      if (!validateYear(year)) {
+        return { success: false, error: 'Invalid year' };
+      }
+      if (!validateSeasonWeek(season)) {
+        return { success: false, error: 'Invalid season' };
+      }
+      if (!validateBoutId(boutId)) {
+        return { success: false, error: 'Invalid bout ID format' };
+      }
       const filePath = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'bouts', `${year}_${boutId}.json`);
       if (!fs.existsSync(filePath)) {
         return { success: false, error: 'Bout log not found' };
@@ -393,6 +458,15 @@ function registerIPCHandlers() {
 
   ipcMain.handle('archive-gazette', async (_event, season, week, markdown) => {
     try {
+      if (!validateSeasonWeek(season)) {
+        return { success: false, error: 'Invalid season' };
+      }
+      if (!validateSeasonWeek(week)) {
+        return { success: false, error: 'Invalid week' };
+      }
+      if (typeof markdown !== 'string') {
+        return { success: false, error: 'Invalid markdown format' };
+      }
       ensureSaveDirectory();
       const seasonDir = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'gazettes');
       if (!fs.existsSync(seasonDir)) {
@@ -409,6 +483,12 @@ function registerIPCHandlers() {
 
   ipcMain.handle('retrieve-gazette', async (_event, season, week) => {
     try {
+      if (!validateSeasonWeek(season)) {
+        return { success: false, error: 'Invalid season' };
+      }
+      if (!validateSeasonWeek(week)) {
+        return { success: false, error: 'Invalid week' };
+      }
       const filePath = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'gazettes', `week_${week}.md`);
       if (!fs.existsSync(filePath)) {
         return { success: false, error: 'Gazette not found' };
@@ -423,16 +503,25 @@ function registerIPCHandlers() {
 
   // IPC Handlers for store
   ipcMain.handle('store-get', async (_event, key) => {
+    if (typeof key !== 'string' || key.length === 0) {
+      return null;
+    }
     return store.get(key);
   });
 
   ipcMain.handle('store-set', async (_event, key, value) => {
+    if (typeof key !== 'string' || key.length === 0) {
+      return { success: false, error: 'Invalid key' };
+    }
     store.set(key, value);
     saveConfig();
     return { success: true };
   });
 
   ipcMain.handle('store-delete', async (_event, key) => {
+    if (typeof key !== 'string' || key.length === 0) {
+      return { success: false, error: 'Invalid key' };
+    }
     store.delete(key);
     saveConfig();
     return { success: true };
@@ -449,7 +538,15 @@ function registerIPCHandlers() {
 
   // IPC Handler for notifications
   ipcMain.handle('show-notification', async (_event, options) => {
-    const { Notification } = require('electron');
+    if (!options || typeof options !== 'object') {
+      return { success: false, error: 'Invalid options' };
+    }
+    if (typeof options.title !== 'string' || options.title.length === 0) {
+      return { success: false, error: 'Invalid notification title' };
+    }
+    if (typeof options.body !== 'string' || options.body.length === 0) {
+      return { success: false, error: 'Invalid notification body' };
+    }
     new Notification({
       title: options.title,
       body: options.body,
