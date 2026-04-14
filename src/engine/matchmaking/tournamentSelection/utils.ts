@@ -3,7 +3,7 @@ import type { GameState, Warrior, TournamentEntry } from '@/types/state.types';
 import { FightingStyle } from '@/types/shared.types';
 import { SeededRNG } from '@/utils/random';
 import { makeWarrior } from '@/engine/factories';
-import { aiPlanForWarrior, defaultPlanForWarrior } from '@/engine/simulate';
+import { aiPlanForWarrior, defaultPlanForWarrior } from '@/engine';
 
 export function findWarriorById(state: GameState, warriorId: string, tournament?: TournamentEntry): Warrior | undefined {
   const playerW = state.roster.find(w => w.id === warriorId);
