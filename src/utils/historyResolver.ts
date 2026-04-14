@@ -20,7 +20,7 @@ export function resolveWarriorName(
   if (!warriorId) return legacyName;
 
   // Search active roster
-  const w = state.roster.find((w: { id: string; name: string }) => w.id === warriorId);
+  const w = state.roster.find(w => w.id === warriorId);
   if (w) return w.name;
 
   // Search graveyard
