@@ -37,8 +37,5 @@ fix_*.cjs
 # Daily Automated Reports
 Daily_Balance_Report.md
 
-# Redundant lockfiles (project uses bun)
-package-lock.json
-
 # AI tool config directories (IDE-local)
 .gemini/
