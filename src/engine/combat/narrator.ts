@@ -165,6 +165,53 @@ export function narrateEvents(
         break;
       }
 
+      case "MOMENTUM_SHIFT": {
+        const newMom = event.value ?? 0;
+        const prevMom = (event.metadata?.prev as number) ?? 0;
+        const swing = Math.abs(newMom - prevMom);
+        if (swing >= 2 || Math.abs(newMom) >= 2) {
+          let text: string | null = null;
+          if (newMom >= 3) {
+            text = `${actorName} is absolutely dominant — driving every exchange.`;
+          } else if (newMom >= 2) {
+            text = `${actorName} seizes the upper hand, dictating the tempo.`;
+          } else if (newMom <= -2) {
+            text = `${actorName} is on the back foot, struggling to find a rhythm.`;
+          } else if (swing >= 2) {
+            const reason = event.metadata?.reason as string;
+            if (reason === "PARRY") {
+              text = `${actorName} turns the tide with a iron-solid block.`;
+            } else {
+              text = `${actorName} turns the tide — a sharp counter reverses the momentum.`;
+            }
+          }
+          if (text) log.push({ minute, text });
+        }
+        break;
+      }
+
+      case "STATE_CHANGE": {
+        const result = event.result as string;
+        if (result === "COMMIT") {
+          log.push({ minute, text: `${actorName} throws aside all caution — a desperate, all-or-nothing assault!` });
+        } else if (result === "SURVIVAL_STRIKE") {
+          log.push({ minute, text: `${actorName} barely survives the onslaught — and answers with fury!` });
+        } else if (result === "DESPERATE") {
+          log.push({ minute, text: `${actorName} is in dire straits — switching to survival mode.` });
+        } else if (result?.startsWith("PSYCH_")) {
+          const state = result.replace("PSYCH_", "");
+          const psychLines: Record<string, string> = {
+            INTHEZONE: `${actorName}'s movements become fluid and precise — completely locked in.`,
+            RATTLED: `${actorName} can't find the rhythm. Something has broken their composure.`,
+            DESPERATE: `${actorName} fights on pure instinct now, their mind fracturing under the pressure.`,
+            CRUISING: `${actorName} looks almost comfortable — controlling this fight with ease.`,
+          };
+          const line = psychLines[state];
+          if (line && rng() < 0.5) log.push({ minute, text: line });
+        }
+        break;
+      }
+
     }
   }
 

@@ -40,6 +40,7 @@ export async function runAutosim(
     );
 
     playerOffers.forEach(offer => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const playerWarriorId = offer.warriorIds.find(id => state.roster.some(w => w.id === id))!;
       // Auto-accept logical offers (Hype > 100 or Purse > 200)
       if (offer.hype > 100 || offer.purse > 200) {
@@ -51,8 +52,8 @@ export async function runAutosim(
     const { state: nextState, results, summary } = processWeekBouts(state);
     state = nextState;
     
-    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const };
-    
+    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: state };
+
     weekSummaries.push({
       week: state.week || 1,
       bouts: summary.bouts,
@@ -83,7 +84,8 @@ export async function runAutosim(
   }
 
   return {
-    finalState: state,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    finalState: state!,
     weeksSimmed,
     stopReason: "max_weeks",
     stopDetail: "Reached maximum simulation weeks",

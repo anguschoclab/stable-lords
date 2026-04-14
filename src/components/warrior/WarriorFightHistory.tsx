@@ -104,6 +104,7 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
                   nameD={f.d}
                   styleA={f.styleA}
                   styleD={f.styleD}
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                   log={f.transcript!.map((text, i) => ({ minute: i + 1, text }))}
                   winner={f.winner}
                   by={f.by}
