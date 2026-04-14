@@ -1,11 +1,12 @@
-import { 
-  type GameState, 
-  type Warrior, 
-  type OwnerPersonality, type FightSummary 
+import {
+  type GameState,
+  type Warrior,
+  type OwnerPersonality, type FightSummary
 } from "@/types/state.types";
 import { type PoolWarrior } from "@/engine/recruitment";
 import narrativeContent from "@/data/narrativeContent.json";
-import { FightingStyle, ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from "@/types/shared.types";
+import type { NarrativeContent } from "@/types/narrative.types";
+import { FightingStyle } from "@/types/shared.types";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { generateFavorites } from "@/engine/favorites";
 import { generateId } from "@/utils/idUtils";
@@ -131,17 +132,22 @@ export function makeWarrior(
     };
 
     // 2. Generate Initial Rivals (4 Stables) - Seeded selection
-    const RIVAL_NAMES = (narrativeContent as any).recruitment.rival_stable_names;
+    const RIVAL_NAMES = (narrativeContent as NarrativeContent).recruitment.rival_stable_names;
     const PERSONALITIES: OwnerPersonality[] = ["Aggressive", "Methodical", "Showman", "Pragmatic", "Tactician"];
-    
+
     // Shuffle and pick 4
     const pool = [...RIVAL_NAMES];
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(rng.next() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
+      const temp = pool[i];
+      const temp2 = pool[j];
+      if (temp !== undefined && temp2 !== undefined) {
+        pool[i] = temp2;
+        pool[j] = temp;
+      }
     }
 
-    state.rivals = pool.slice(0, 4).map((name, i) => {
+    state.rivals = pool.slice(0, 4).map((name) => {
       const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
       return {
         id: rng.uuid(),
@@ -185,7 +191,7 @@ export function makeWarrior(
         ...baseWarrior,
         cost: 150 + Math.floor(rng.next() * 150),
         tier: "Common",
-        lore: (narrativeContent as any).recruitment.origin[0], // Seeded fallback
+        lore: (narrativeContent as NarrativeContent).recruitment.origin[0], // Seeded fallback
         addedWeek: 1,
         potential: { ST: 1, CN: 1, SZ: 1, WT: 1, WL: 1, SP: 1, DF: 1 }
       } as PoolWarrior;

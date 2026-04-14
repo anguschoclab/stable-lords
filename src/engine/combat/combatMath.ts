@@ -18,14 +18,14 @@ export function getPhase(exchange: number, maxExchanges: number): Phase {
 
 export function pickText(rng: () => number, texts: string[]): string {
   if (texts.length === 0) return "";
-  return texts[Math.floor(rng() * texts.length)];
+  const index = Math.floor(rng() * texts.length);
+  return texts[index] ?? "";
 }
 
 export function skillCheck(rng: () => number, skill: number, modifier: number = 0): boolean {
   const roll = Math.floor(rng() * 20) + 1;
   const target = Math.max(1, Math.min(19, Math.floor(skill) + modifier));
   const success = roll === 1 || (roll !== 20 && roll <= target);
-  // console.log(`SKILL CHECK: roll ${roll} vs target ${target} -> ${success ? "SUCCESS" : "FAIL"}`);
   return success;
 }
 

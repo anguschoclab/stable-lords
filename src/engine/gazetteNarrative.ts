@@ -1,20 +1,20 @@
 import narrativeContent from "@/data/narrativeContent.json";
+import type { NarrativeContent } from "@/types/narrative.types";
 /**
  * Gazette Narrative Engine — generates crowd-mood-toned prose from simulation events.
  * Synthesizes weekly fight data into procedural stories.
  */
 import type { FightSummary } from "@/types/combat.types";
-import type { CrowdMoodType, Season } from "@/types/shared.types";
+import type { CrowdMoodType } from "@/types/shared.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { GazetteStory } from "@/types/state.types";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { generateId } from "@/utils/idUtils";
 
 
 
-const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[]; closer: string[] }> = (narrativeContent as any).ux_metadata.mood_tone;
+const MOOD_TONE: Record<CrowdMoodType, { adjectives: string[]; opener: string[]; closer: string[] }> = (narrativeContent as NarrativeContent).ux_metadata.mood_tone;
 
 function styleName(style: string): string {
   return STYLE_DISPLAY_NAMES[style as keyof typeof STYLE_DISPLAY_NAMES] ?? style;
@@ -38,7 +38,7 @@ export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType,
   const adj = safeRng.pick(toneResource.adjectives);
   const winner = fight.winner === "A" ? fight.a : fight.winner === "D" ? fight.d : null;
   const loser = fight.winner === "A" ? fight.d : fight.winner === "D" ? fight.a : null;
-  const g = (narrativeContent.gazette as any).fights;
+  const g = (narrativeContent as NarrativeContent).gazette.fights;
 
   const data = {
     adj,
@@ -82,6 +82,7 @@ export function computeStreaks(allFights: FightSummary[]): Map<string, number> {
   // arenaHistory is append-only and chronological by definition.
   for (let i = 0; i < allFights.length; i++) {
     const f = allFights[i];
+    if (!f) continue;
     if (f.winner === "A") {
       const aStreak = streaks.get(f.a) ?? 0;
       const dStreak = streaks.get(f.d) ?? 0;
@@ -234,7 +235,7 @@ export function generateWeeklyGazette(
   if (upsets.length > 0) tags.push("Upset");
 
   // Headline — streak headlines take priority over standard ones
-  const gh = (narrativeContent.gazette as any).headlines;
+  const gh = (narrativeContent as NarrativeContent).gazette.headlines;
   let headline: string;
   if (hotStreakers.length > 0) {
     // ⚡ Bolt: Reduced O(N log N) sort to O(N) single-pass reduce to find the max streak.
@@ -268,7 +269,7 @@ export function generateWeeklyGazette(
 
   // Body
   const paragraphs: string[] = [rngService.pick(tone.opener)];
-  const gf = (narrativeContent.gazette as any).featured;
+  const gf = (narrativeContent as NarrativeContent).gazette.featured;
 
   // Summary stats
   if (fights.length > 0) {
@@ -361,7 +362,7 @@ export function generateSeasonSummary(
     }
   }
 
-  const gs = (narrativeContent.gazette as any).season_summary;
+  const gs = (narrativeContent as NarrativeContent).gazette.season_summary;
   const headline = t(gs.headline, { season, total, kills });
   const body = [
     t(gs.body[0], { season, total, killRate }),
