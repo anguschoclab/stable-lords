@@ -14,7 +14,7 @@ const NotFound = () => {
         <div className="text-primary text-[10px] uppercase tracking-[0.5em] mb-4 animate-pulse">
           Route Not Found
         </div>
-        <h1 className="text-white text-6xl font-bold uppercase tracking-widest mb-4">404</h1>
+        <h1 className="text-foreground text-6xl font-bold uppercase tracking-widest mb-4">404</h1>
         <p className="text-muted-foreground text-xs uppercase tracking-[0.3em] mb-8">
           This sector of the arena does not exist
         </p>

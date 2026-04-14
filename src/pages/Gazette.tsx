@@ -125,9 +125,9 @@ function GazetteMasthead({ season, week }: { season: string; week: number }) {
   );
 }
 
-// ─── Section Header ────────────────────────────────────────────────────────────
+// ─── Gazette Section Header ────────────────────────────────────────────────────────────
 
-function SectionHeader({
+function GazetteSectionHeader({
   icon: Icon,
   title,
   subtitle,
@@ -280,7 +280,7 @@ export default function Gazette() {
       {/* ── Analytics Registry ────────────────────────────────────────────────── */}
       {hasContent && (
         <section className="space-y-10">
-          <SectionHeader
+          <GazetteSectionHeader
             icon={BarChart3}
             title="Arena Intelligence Matrix"
             subtitle="Tactical Telemetry // Historical Aggregates"
@@ -331,7 +331,7 @@ export default function Gazette() {
 
       {/* ── Narrative Feed ────────────────────────────────────────────────────── */}
       <section className="space-y-12">
-        <SectionHeader
+        <GazetteSectionHeader
           icon={Radio}
           title="Information Oracle"
           subtitle="Editorial Registry // Stylized Archival"
