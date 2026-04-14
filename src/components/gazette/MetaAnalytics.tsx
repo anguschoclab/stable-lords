@@ -165,8 +165,7 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
                   {rowStyle}
                 </td>
                 {TACTICAL_STYLES.map(colStyle => {
-                  const key = `${rowStyle}vs${colStyle}`;
-                  const data = matchupStats[key] || { wins: 0, total: 0 };
+                  const data = matchupStats[rowStyle]?.[colStyle] || { wins: 0, total: 0 };
                   const rate = data.total > 0 ? (data.wins / data.total) * 100 : 50;
                   const isNeutral = data.total === 0;
                   const wins = data.wins;
