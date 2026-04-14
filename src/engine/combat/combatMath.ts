@@ -54,6 +54,8 @@ export function weatherStaminaModifier(weather?: string): number {
       return 1.15; // 15% more stamina drain
     case "Drafty":
       return 0.9; // 10% less stamina drain
+    case "Eclipse":
+      return 0.8; // 20% less stamina drain, slow methodical fights
     case "Overcast":
     case "Clear":
     case "Rainy":

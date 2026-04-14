@@ -1,6 +1,6 @@
 import React from "react";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { Cloud, Sun, CloudRain, ThermometerSun, Wind, Info } from "lucide-react";
+import { Cloud, Sun, CloudRain, ThermometerSun, Wind, Info, Moon } from "lucide-react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -54,6 +54,14 @@ const WEATHER_METADATA = {
     border: "border-stone-300/20",
     description: "Strong shifting winds. Erratic initiative modifiers and slight energy drain.",
     stats: "INITIATIVE_FLUX // STAMINA_DRAIN_120%"
+  },
+  Eclipse: {
+    icon: Moon,
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+    description: "Eerie darkness descends. Fights become slow and methodical as combatants hesitate.",
+    stats: "STAMINA_CONSERVATION_20% // HESITATION"
   }
 };
 
