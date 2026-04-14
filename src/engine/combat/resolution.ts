@@ -247,13 +247,20 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     const overDef = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakD) : Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakA);
     const curAntiSynDef = getStyleAntiSynergy(def.style, (aGoesFirst ? tactD : tactA).offTactic, (aGoesFirst ? tactD : tactA).defTactic);
 
-    const defCheck = performDefenseCheck(rng, def, curDefOE, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, curDefMods, curPassD, curBiasDef, overDef, isDodge, curAntiSynDef, curOffMods);
+    const defCheck = performDefenseCheck(rng, def, curDefOE, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, curDefMods, curPassD, curBiasDef, overDef, isDodge, curAntiSynDef, curOffMods, ctx, att);
 
     if (defCheck.success) {
       events.push({ type: "DEFENSE", actor: defLabel, result: defCheck.type });
       if (!isDodge) {
-        const ripPostParry = performRiposteCheck(rng, def, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, (aGoesFirst ? defModsD : defModsA).ripBonus, curPassD, undefined);
-        if (ripPostParry) executeRiposte(events, rng, att, def, aGoesFirst ? tactD : tactA, aGoesFirst ? passD : passA, attLabel, defLabel);
+        // Successful parry shifts momentum toward defender (+1), not as decisive as a riposte
+        const prevDefMomParry = def.momentum;
+        def.momentum = Math.min(3, def.momentum + 1);
+        if (def.momentum !== prevDefMomParry) {
+          events.push({ type: "MOMENTUM_SHIFT", actor: defLabel, value: def.momentum, metadata: { prev: prevDefMomParry, reason: "PARRY" } });
+        }
+        const ripPostParry = performRiposteCheck(rng, def, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, (aGoesFirst ? defModsD : defModsA).ripBonus + ctx.weatherEffect.riposteMod, curPassD, undefined);
+        const specRiposteMult = aGoesFirst ? (ctx.trainerModsD.riposteDamageMult ?? 1.0) : (ctx.trainerModsA.riposteDamageMult ?? 1.0);
+        if (ripPostParry) executeRiposte(events, rng, att, def, aGoesFirst ? tactD : tactA, aGoesFirst ? passD : passA, attLabel, defLabel, specRiposteMult);
       }
       att.consecutiveHits = 0;
     } else {

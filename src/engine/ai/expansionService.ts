@@ -7,6 +7,7 @@ import { generateRivalStables } from "../rivals";
  * ExpansionService - Handles stable expansion.
  * Manages generation of new rival stables.
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ExpansionService {
   /**
    * Processes expansion by generating new rival stables.

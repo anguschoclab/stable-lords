@@ -143,8 +143,13 @@ export function calculateKillWindow(
   attOE: number = 5,
   attAL: number = 5,
   matchupBonus: number = 0,
-  decSkill: number = 10 // Canonical: DEC skill drives kill/decisiveness ability (1-20)
+  decSkill: number = 10, // Canonical: DEC skill drives kill/decisiveness ability (1-20)
+  momentum: number = 0, // Attacker momentum (-3 to +3). < 1 blocks kill attempts.
+  specialtyBonus: number = 0 // Extra kill window from trainer specialties (e.g. KillerInstinct)
 ): number {
+  // Momentum gate: must have positive momentum to attempt a kill
+  if (momentum < 1) return 0;
+
   // Base threshold (lethal hits are rare but possible)
   // Target: ~10% overall mortality across the league (Unified 1.0 Gold Baseline)
   let threshold = 0.065;
@@ -163,7 +168,6 @@ export function calculateKillWindow(
   threshold *= locMult;
 
   // Strategic Risk (AL/OE): Aggression fuels lethality
-  // At OE 10/AL 10, bonus is +0.01. At OE 1/AL 1, penalty is -0.008.
   threshold += (attOE + attAL - 10) * 0.001;
 
   // Matchup Bias: Dominant styles find more fatal openings
@@ -172,12 +176,18 @@ export function calculateKillWindow(
   // Kill Desire: Attacker's aggression
   threshold += (killDesire - 5) * 0.001;
 
-  // Canonical DEC skill: higher DEC → better at seizing kill opportunities
-  // Range: DEC 1 ≈ -0.011, DEC 10 = 0, DEC 20 ≈ +0.012
+  // DEC skill bonus
   threshold += (decSkill - 10) * 0.0012;
 
   // Phase escalation: fights get more dangerous as time passes
   threshold += phaseLevel * 0.004;
+
+  // Momentum bonus: momentum 2 = +0.01, momentum 3 = +0.02
+  if (momentum >= 3) threshold += 0.02;
+  else if (momentum >= 2) threshold += 0.01;
+
+  // Trainer specialty bonus (e.g. KillerInstinct)
+  threshold += specialtyBonus;
 
   // Cap at 15% for the perfect storm (Unified 1.0 Gold Baseline)
   return Math.max(0, Math.min(0.15, threshold));

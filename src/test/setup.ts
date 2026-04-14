@@ -25,6 +25,7 @@ Object.defineProperty(global, 'localStorage', {
 });
 
 // Mock ResizeObserver for JSDOM
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -52,6 +53,7 @@ Object.defineProperty(global.navigator, 'storage', {
 });
 
 // Mock Worker for Vitest
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 global.Worker = class Worker {
   url: string;
   onmessage: (event: any) => void = () => {};

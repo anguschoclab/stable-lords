@@ -11,6 +11,7 @@ interface LegacyCandidate {
   stableName: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class SeasonalRetirementService {
   /**
    * Processes seasonal retirement for all rival stables.

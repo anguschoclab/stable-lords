@@ -23,7 +23,7 @@ import {
   TACTIC_OVERUSE_CAP
 } from "../combatConstants";
 import { oeAttMod, oeDefMod, alIniMod, getOffensiveTacticMods, getDefensiveTacticMods, calculateFinalOEAL } from "../tacticResolution";
-import { FighterState, ResolutionContext, resolveEffectiveTactics, applyAggressionBias } from "../resolution";
+import { type FighterState, type ResolutionContext, resolveEffectiveTactics, applyAggressionBias } from "../resolution";
 
 export function evaluateInitiative(
   rng: () => number,
@@ -130,12 +130,14 @@ export function executeRiposte(
   defTactics: ReturnType<typeof resolveEffectiveTactics>,
   defPassive: ReturnType<typeof getStylePassive>,
   attLabel: "A" | "D",
-  defLabel: "A" | "D"
+  defLabel: "A" | "D",
+  specialtyRiposteMult: number = 1.0
 ) {
-  const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
+  const ripLoc = rollHitLocation(rng, defTactics.target, attacker.activePlan.protect);
   let ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
   ripDmgRaw = applyArmorTypeMod(ripDmgRaw, defender.weaponId, attacker.armorId);
-  const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
+  ripDmgRaw = Math.round(ripDmgRaw * specialtyRiposteMult);
+  const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.activePlan.protect);
 
   events.push({ type: "DEFENSE", actor: defLabel, result: "RIPOSTE" });
   events.push({ type: "HIT", actor: defLabel, target: attLabel, location: ripLoc, value: ripDmg });
@@ -146,6 +148,15 @@ export function executeRiposte(
   defender.ripostes++;
   defender.consecutiveHits++;
   attacker.consecutiveHits = 0;
+
+  // Riposte swings momentum decisively
+  const prevDefMom = defender.momentum;
+  const prevAttMom = attacker.momentum;
+  defender.momentum = Math.min(3, defender.momentum + 1);
+  attacker.momentum = Math.max(-3, attacker.momentum - 1);
+  if (defender.momentum !== prevDefMom || attacker.momentum !== prevAttMom) {
+    events.push({ type: "MOMENTUM_SHIFT", actor: defLabel, target: attLabel, value: defender.momentum, metadata: { prev: prevDefMom, oppPrev: prevAttMom, oppNew: attacker.momentum } });
+  }
 }
 
 export function executeHit(
@@ -163,11 +174,52 @@ export function executeHit(
   attKD: number,
   attOE: number,
   attAL: number,
-  attMatchup: number
+  attMatchup: number,
+  ctx?: ResolutionContext
 ) {
-  const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
+  // ── Survival Strike: defender has earned a free counter — skip this attack ──
+  if (defender.survivalStrike) {
+    defender.survivalStrike = false;
+    // Defender fires back as a free riposte — re-use executeRiposte logic inline
+    const freeRipLoc = rollHitLocation(rng, attTactics.target, attacker.activePlan.protect);
+    let freeRipDmg = computeHitDamage(rng, defender.derived.damage + attPassive.dmgBonus, freeRipLoc);
+    freeRipDmg = applyArmorTypeMod(freeRipDmg, defender.weaponId, attacker.armorId);
+    freeRipDmg = applyProtectMod(freeRipDmg, freeRipLoc, attacker.activePlan.protect);
+    events.push({ type: "DEFENSE", actor: defLabel, result: "RIPOSTE" });
+    events.push({ type: "HIT", actor: defLabel, target: attLabel, location: freeRipLoc, value: freeRipDmg });
+    attacker.hp -= freeRipDmg;
+    attacker.hitsTaken++;
+    defender.hitsLanded++;
+    if (attacker.hp <= 0) {
+      events.push({ type: "BOUT_END", actor: defLabel, result: "KO", metadata: { location: freeRipLoc, cause: "SURVIVAL_STRIKE" } });
+    }
+    return;
+  }
+
+  // ── Commit mechanic: attacker at low HP with high kill desire commits ──
+  const kdForCommit = attacker.activePlan.killDesire ?? attKD;
+  const isAtLowHp = attacker.hp / attacker.maxHp < 0.35;
+  if (!attacker.committed && isAtLowHp && kdForCommit >= 7) {
+    attacker.committed = true;
+    events.push({ type: "STATE_CHANGE", actor: attLabel, result: "COMMIT" });
+  }
+
+  const hitLoc = rollHitLocation(rng, attTactics.target, defender.activePlan.protect);
   let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
   rawDamage = applyArmorTypeMod(rawDamage, attacker.weaponId, defender.armorId);
+
+  // Apply weather damage multiplier
+  const weatherDamageMult = ctx?.weatherEffect?.damageMult ?? 1.0;
+  rawDamage = Math.round(rawDamage * weatherDamageMult);
+
+  // Commit: +20% damage
+  if (attacker.committed) {
+    rawDamage = Math.round(rawDamage * 1.2);
+  }
+
+  // Apply specialty damage received reduction on the defender
+  const defSpecDamageMult = ctx ? (ctx.trainerModsA === ctx.trainerModsA ? (defender.label === "A" ? (ctx.trainerModsA.damageReceivedMult ?? 1.0) : (ctx.trainerModsD.damageReceivedMult ?? 1.0)) : 1.0) : 1.0;
+  rawDamage = Math.round(rawDamage * defSpecDamageMult);
 
   if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
     rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
@@ -176,7 +228,7 @@ export function executeHit(
     events.push({ type: "HIT", actor: attLabel, target: defLabel, location: hitLoc, value: rawDamage });
   }
 
-  const damage = applyProtectMod(rawDamage, hitLoc, defender.plan.protect);
+  const damage = applyProtectMod(rawDamage, hitLoc, defender.activePlan.protect);
   defender.hp -= damage;
   defender.hitsTaken++;
   attacker.hitsLanded++;
@@ -184,6 +236,21 @@ export function executeHit(
   defender.consecutiveHits = 0;
   if (hitLoc.includes("arm")) defender.armHits++;
   if (hitLoc.includes("leg")) defender.legHits++;
+
+  // ── Momentum: hit shifts momentum toward attacker ──
+  const prevAttMom = attacker.momentum;
+  const prevDefMom = defender.momentum;
+  attacker.momentum = Math.min(3, attacker.momentum + 1);
+  defender.momentum = Math.max(-3, defender.momentum - 1);
+  if (attacker.momentum !== prevAttMom || defender.momentum !== prevDefMom) {
+    events.push({ type: "MOMENTUM_SHIFT", actor: attLabel, target: defLabel, value: attacker.momentum, metadata: { prev: prevAttMom, oppPrev: prevDefMom, oppNew: defender.momentum } });
+  }
+
+  // ── Survival Strike: committed attacker who doesn't kill enables defender counter ──
+  if (attacker.committed && defender.hp > 0) {
+    defender.survivalStrike = true;
+    events.push({ type: "STATE_CHANGE", actor: defLabel, result: "SURVIVAL_STRIKE" });
+  }
 
   if (damage > 0 && rng() < 0.2) {
     const attrs = ["ST", "SP", "DF", "WL"];
@@ -201,9 +268,10 @@ export function executeHit(
 
   if (defender.hp <= defender.maxHp * killMech.killWindowHpMult) {
     const killPos = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
-    // Canonical: DEC skill + style's decBonus both contribute to kill threshold
     const effectiveDec = attacker.skills.DEC + killMech.decBonus;
-    const killThreshold = calculateKillWindow(defender.hp / defender.maxHp, defender.endurance / defender.maxEndurance, hitLoc, attKD + killMech.killBonus, killPos, attOE, attAL, attMatchup, effectiveDec);
+    // Specialty kill window bonus from trainer mods
+    const specKillBonus = ctx ? (attacker.label === "A" ? (ctx.trainerModsA.killWindowBonus ?? 0) : (ctx.trainerModsD.killWindowBonus ?? 0)) : 0;
+    const killThreshold = calculateKillWindow(defender.hp / defender.maxHp, defender.endurance / defender.maxEndurance, hitLoc, attKD + killMech.killBonus, killPos, attOE, attAL, attMatchup, effectiveDec, attacker.momentum, specKillBonus);
     if (rng() < killThreshold) {
       defender.hp = 0;
       didKill = true;

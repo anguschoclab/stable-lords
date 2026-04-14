@@ -22,7 +22,7 @@ function styleName(style: string): string {
 
 function t(template: string | string[], data: Record<string, any>, rng?: IRNGService): string {
   let result = Array.isArray(template)
-    ? (rng ? rng.pick(template) : template[Math.floor(Math.random() * template.length)]!)
+    ? (rng ? rng.pick(template) : /* eslint-disable-next-line no-restricted-properties */ template[Math.floor(Math.random() * template.length)]!)
     : template;
   if (!result) return "";
   for (const [key, value] of Object.entries(data)) {

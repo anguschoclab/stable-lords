@@ -43,14 +43,23 @@ export function handleReporting(
   const tone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") ? "hype" : "neutral");
   // Create a simple RNG wrapper if not provided
   const fallbackRng: IRNGService = {
+    // eslint-disable-next-line no-restricted-properties
     next: () => Math.random(),
-    pick: (arr) => arr[Math.floor(Math.random() * arr.length)]!,
+    pick: (arr) => {
+      // eslint-disable-next-line no-restricted-properties
+      const idx = Math.floor(Math.random() * arr.length);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return arr[idx]!;
+    },
     uuid: (prefix) => generateId(undefined, prefix || "uuid"),
+    // eslint-disable-next-line no-restricted-properties
     roll: (min, max) => Math.floor(Math.random() * (max - min)) + min,
     shuffle: (arr) => {
       const result = [...arr];
       for (let i = result.length - 1; i > 0; i--) {
+        // eslint-disable-next-line no-restricted-properties
         const j = Math.floor(Math.random() * (i + 1));
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         [result[i]!, result[j]!] = [result[j]!, result[i]!];
       }
       return result;
