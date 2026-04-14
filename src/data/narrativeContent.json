@@ -750,7 +750,7 @@
       ],
       "LegacyRivalry": [
         "Week {{week}}: RIVALRY ERUPTS! {{a}} vs {{b}} — Chapter {{count}}!",
-        "Week {{week}}: ETERNAL FOES! {{a}} and {{b}} Clash For The {{count}} Time!",
+        "Week {{week}}: ETERNAL FOES! {{a}} and {{b}} Clash in Chapter {{count}} of Their Saga!",
         "Week {{week}}: THE GRUDGE MATCH OF THE CENTURY! {{a}} vs {{b}} (Chapter {{count}})"
       ],
       "Rivalry": [
