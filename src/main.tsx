@@ -9,6 +9,11 @@ import App from "./App.tsx";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import "./index.css";
 
+// Initialize HowlerGlobal for Electron environment
+if (typeof (window as any).HowlerGlobal === 'undefined') {
+  (window as any).HowlerGlobal = {};
+}
+
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

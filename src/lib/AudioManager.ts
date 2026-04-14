@@ -6,6 +6,13 @@ import { STORE_KEYS } from "@/constants/storeKeys";
  * Uses Howler for high-performance audio playback.
  */
 
+// Initialize HowlerGlobal for Electron environment
+declare global {
+  interface Window {
+    HowlerGlobal?: any;
+  }
+}
+
 export type SfxType = "ui_click" | "hit" | "crit" | "clash" | "death" | "recovery" | "coin" | "arena_ambient";
 
 class AudioManager {
@@ -14,7 +21,12 @@ class AudioManager {
   private muted: boolean = false;
 
   private constructor() {
-    this.loadSfx();
+    // Temporarily disable audio loading to diagnose blank screen issue
+    console.log('AudioManager: Audio temporarily disabled for debugging');
+    // Initialize HowlerGlobal for Electron environment
+    if (typeof (window as any).HowlerGlobal === 'undefined') {
+      (window as any).HowlerGlobal = {};
+    }
     this.loadMuteState();
   }
 

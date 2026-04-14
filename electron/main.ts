@@ -7,13 +7,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Simple development mode check
-const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_IS_DEV === 'true';
+// Simple development mode check - force dev mode for now since we're testing
+const isDev = true;
+// Vite uses port 8080 by default, but may use 8081 if 8080 is in use
 const devPort = process.env.VITE_PORT || '8080';
 
 // Simple in-memory store for configuration (can be replaced with electron-store later)
 const store = new Map();
-let configPath;
+let configPath: string;
 let configSaveTimeout: NodeJS.Timeout | null = null;
 
 // Load config from file
@@ -74,20 +75,24 @@ function getSaveDirectory() {
 }
 
 // Ensure save directory exists
-function ensureSaveDirectory() {
+async function ensureSaveDirectory() {
   const saveDir = getSaveDirectory();
-  if (!fs.existsSync(saveDir)) {
-    fs.mkdirSync(saveDir, { recursive: true });
+  try {
+    await fs.access(saveDir);
+  } catch {
+    await fs.mkdir(saveDir, { recursive: true });
   }
   
   // Create subdirectories
   const subdirs = ['hot_state', 'seasons'];
-  subdirs.forEach(dir => {
+  for (const dir of subdirs) {
     const dirPath = path.join(saveDir, dir);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
+    try {
+      await fs.access(dirPath);
+    } catch {
+      await fs.mkdir(dirPath, { recursive: true });
     }
-  });
+  }
 }
 
 function createWindow() {
@@ -111,11 +116,39 @@ function createWindow() {
 
   // Load the app
   if (isDev) {
-    mainWindow.loadURL(`http://localhost:${devPort}`);
+    console.log(`Loading from http://localhost:${devPort}`);
+    mainWindow.loadURL(`http://localhost:${devPort}`)
+      .catch(err => console.error('Failed to load URL:', err));
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    console.log(`Loading from ${path.join(__dirname, '../dist/index.html')}`);
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+      .catch(err => console.error('Failed to load file:', err));
   }
+
+  // Log any loading errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error('Failed to load:', errorCode, errorDescription, validatedURL);
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('Page loaded successfully');
+  });
+
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`Renderer [${level}]: ${message} (${sourceId}:${line})`);
+  });
+
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('Renderer process gone:', details);
+  });
+
+  // Check if preload script loaded
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.executeJavaScript('window.electronAPI ? "preload loaded" : "preload NOT loaded"')
+      .then(result => console.log('Preload script status:', result))
+      .catch(err => console.error('Failed to check preload:', err));
+  });
 
   // Save window bounds on resize/move
   mainWindow.on('resize', () => {
@@ -351,13 +384,13 @@ function registerIPCHandlers() {
       if (!state || typeof state !== 'object') {
         return { success: false, error: 'Invalid state data' };
       }
-      ensureSaveDirectory();
+      await ensureSaveDirectory();
       const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
-      fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+      await fs.writeFile(filePath, JSON.stringify(state, null, 2));
       return { success: true };
     } catch (error) {
       console.error('Error saving game:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -367,32 +400,36 @@ function registerIPCHandlers() {
         return { success: false, error: 'Invalid slot ID format' };
       }
       const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
-      if (!fs.existsSync(filePath)) {
+      try {
+        await fs.access(filePath);
+      } catch {
         return { success: false, error: 'Save file not found' };
       }
-      const data = fs.readFileSync(filePath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       return { success: true, data: JSON.parse(data) };
     } catch (error) {
       console.error('Error loading game:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
   ipcMain.handle('list-saves', async () => {
     try {
       const saveDir = path.join(getSaveDirectory(), 'hot_state');
-      if (!fs.existsSync(saveDir)) {
+      try {
+        await fs.access(saveDir);
+      } catch {
         return { success: true, data: [] };
       }
-      const files = fs.readdirSync(saveDir);
+      const files = await fs.readdir(saveDir);
       const saveIds = files
-        .filter(f => f.endsWith('.json'))
-        .map(f => f.replace('.json', ''))
+        .filter((f: string) => f.endsWith('.json'))
+        .map((f: string) => f.replace('.json', ''))
         .filter(validateSlotId);
       return { success: true, data: saveIds };
     } catch (error) {
       console.error('Error listing saves:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -402,13 +439,16 @@ function registerIPCHandlers() {
         return { success: false, error: 'Invalid slot ID format' };
       }
       const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      try {
+        await fs.access(filePath);
+        await fs.unlink(filePath);
+      } catch {
+        // File doesn't exist, that's fine
       }
       return { success: true };
     } catch (error) {
       console.error('Error deleting save:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -426,17 +466,19 @@ function registerIPCHandlers() {
       if (!Array.isArray(logData)) {
         return { success: false, error: 'Invalid log data format' };
       }
-      ensureSaveDirectory();
+      await ensureSaveDirectory();
       const seasonDir = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'bouts');
-      if (!fs.existsSync(seasonDir)) {
-        fs.mkdirSync(seasonDir, { recursive: true });
+      try {
+        await fs.access(seasonDir);
+      } catch {
+        await fs.mkdir(seasonDir, { recursive: true });
       }
       const filePath = path.join(seasonDir, `${year}_${boutId}.json`);
-      fs.writeFileSync(filePath, JSON.stringify(logData, null, 2));
+      await fs.writeFile(filePath, JSON.stringify(logData, null, 2));
       return { success: true };
     } catch (error) {
       console.error('Error archiving bout log:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -452,14 +494,16 @@ function registerIPCHandlers() {
         return { success: false, error: 'Invalid bout ID format' };
       }
       const filePath = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'bouts', `${year}_${boutId}.json`);
-      if (!fs.existsSync(filePath)) {
+      try {
+        await fs.access(filePath);
+      } catch {
         return { success: false, error: 'Bout log not found' };
       }
-      const data = fs.readFileSync(filePath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       return { success: true, data: JSON.parse(data) };
     } catch (error) {
       console.error('Error retrieving bout log:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -474,17 +518,19 @@ function registerIPCHandlers() {
       if (typeof markdown !== 'string') {
         return { success: false, error: 'Invalid markdown format' };
       }
-      ensureSaveDirectory();
+      await ensureSaveDirectory();
       const seasonDir = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'gazettes');
-      if (!fs.existsSync(seasonDir)) {
-        fs.mkdirSync(seasonDir, { recursive: true });
+      try {
+        await fs.access(seasonDir);
+      } catch {
+        await fs.mkdir(seasonDir, { recursive: true });
       }
       const filePath = path.join(seasonDir, `week_${week}.md`);
-      fs.writeFileSync(filePath, markdown);
+      await fs.writeFile(filePath, markdown);
       return { success: true };
     } catch (error) {
       console.error('Error archiving gazette:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -497,14 +543,16 @@ function registerIPCHandlers() {
         return { success: false, error: 'Invalid week' };
       }
       const filePath = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'gazettes', `week_${week}.md`);
-      if (!fs.existsSync(filePath)) {
+      try {
+        await fs.access(filePath);
+      } catch {
         return { success: false, error: 'Gazette not found' };
       }
-      const data = fs.readFileSync(filePath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       return { success: true, data };
     } catch (error) {
       console.error('Error retrieving gazette:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   });
 
@@ -561,12 +609,12 @@ function registerIPCHandlers() {
     return { success: true };
   });
 }
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Initialize config path now that app is ready
   configPath = path.join(app.getPath('userData'), 'config.json');
-  loadConfig();
+  await loadConfig();
   
-  ensureSaveDirectory();
+  await ensureSaveDirectory();
   registerIPCHandlers();
   createWindow();
   createMenu();
