@@ -22,7 +22,9 @@
       "WebFetch(domain:www.reality.com)",
       "Bash(bunx vitest:*)",
       "Bash(bunx tsx:*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(rm \"src/test/debug-ws-fight.ts\")",
+      "Bash(bunx tsc:*)"
     ]
   }
 }

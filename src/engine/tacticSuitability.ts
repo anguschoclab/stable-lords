@@ -22,12 +22,12 @@ const OFFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>>
 };
 
 const DEFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>> = {
-  [FightingStyle.AimedBlow]:      { Dodge: "WS", Parry: "U",  Riposte: "WS", Responsiveness: "U"  },
+  [FightingStyle.AimedBlow]:      { Dodge: "WS", Parry: "S",  Riposte: "U",  Responsiveness: "U"  },
   [FightingStyle.BashingAttack]:  { Dodge: "U",  Parry: "U",  Riposte: "U",  Responsiveness: "U"  },
   [FightingStyle.LungingAttack]:  { Dodge: "WS", Parry: "U",  Riposte: "WS", Responsiveness: "U"  },
   [FightingStyle.ParryLunge]:     { Dodge: "WS", Parry: "WS", Riposte: "S",  Responsiveness: "U"  },
-  [FightingStyle.ParryRiposte]:   { Dodge: "U",  Parry: "WS", Riposte: "WS", Responsiveness: "U"  },
-  [FightingStyle.ParryStrike]:    { Dodge: "WS", Parry: "WS", Riposte: "WS", Responsiveness: "WS" },
+  [FightingStyle.ParryRiposte]:   { Dodge: "S",  Parry: "WS", Riposte: "WS", Responsiveness: "S"  },
+  [FightingStyle.ParryStrike]:    { Dodge: "U",  Parry: "WS", Riposte: "S",  Responsiveness: "WS" },
   [FightingStyle.SlashingAttack]: { Dodge: "U",  Parry: "U",  Riposte: "U",  Responsiveness: "U"  },
   [FightingStyle.StrikingAttack]: { Dodge: "U",  Parry: "U",  Riposte: "S",  Responsiveness: "WS" },
   [FightingStyle.TotalParry]:     { Dodge: "WS", Parry: "WS", Riposte: "WS", Responsiveness: "WS" },
