@@ -5,9 +5,10 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Swords, Shield, Flame, Timer, Zap, Clock, Activity, GripVertical, Target, BookOpen, Heart, Gauge } from "lucide-react";
+import { Swords, Shield, Flame, Timer, Zap, Clock, Activity, GripVertical, Target, BookOpen, Heart, Gauge, GitBranch } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { FightPlan, OffensiveTactic, DefensiveTactic, Warrior } from "@/types/game";
+import type { FightPlan, OffensiveTactic, DefensiveTactic, Warrior, PlanCondition } from "@/types/game";
+import ConditionEditor from "@/components/warrior/ConditionEditor";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { getTempoBonus, getStyleAntiSynergy, getEnduranceMult, getKillMechanic, getMastery } from "@/engine/stylePassives";
 import { getMatchupBonus } from "@/engine/combat/combatConstants";
@@ -38,6 +39,7 @@ interface PlanBuilderProps {
 export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }: PlanBuilderProps) {
   const [phaseMode, setPhaseMode] = useState<boolean>(!!plan.phases);
   const [showStylePassives, setShowStylePassives] = useState<boolean>(false);
+  const [showConditions, setShowConditions] = useState<boolean>(!!(plan.conditions?.length));
   
   const matchupAdv = useMemo(() => {
     if (!rivalStyle) return 0;
@@ -411,6 +413,35 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+              </div>
+
+              {/* Contingency Plans */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <GitBranch className="w-4 h-4 text-arena-pop" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-arena-pop">Contingency Plans</span>
+                    {(plan.conditions?.length ?? 0) > 0 && (
+                      <Badge className="rounded-none border-none bg-arena-pop/20 text-arena-pop text-[9px] font-black px-1.5 py-0.5">
+                        {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
+                        {plan.conditions!.length}
+                      </Badge>
+                    )}
+                  </div>
+                  <Switch checked={showConditions} onCheckedChange={setShowConditions} />
+                </div>
+
+                {showConditions && (
+                  <div className="bg-black/40 border border-white/5 p-4">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 italic mb-4">
+                      Override strategy mid-fight when conditions are met. First match wins. WT stat governs how quickly they activate.
+                    </p>
+                    <ConditionEditor
+                      conditions={plan.conditions ?? []}
+                      onChange={(conds: PlanCondition[]) => onPlanChange({ ...plan, conditions: conds.length > 0 ? conds : undefined })}
+                    />
                   </div>
                 )}
               </div>

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Eye, Lightbulb, Swords, Zap, Activity } from "lucide-react";
+import { Eye, Lightbulb, Swords, Zap, Activity, Download } from "lucide-react";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { type Warrior } from "@/types/game";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";

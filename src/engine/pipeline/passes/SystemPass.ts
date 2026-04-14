@@ -54,6 +54,7 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
     const narrGazette = generateOwnerNarratives(state, state.season, rngContext.getRNG());
 
     impact.rivalsUpdates = new Map();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     philRivals.forEach(r => impact.rivalsUpdates!.set(r.owner.id, r));
 
     const combinedNews = [...news, ...gazetteItems, ...narrGazette];

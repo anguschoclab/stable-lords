@@ -54,7 +54,8 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
         const isExpanded = expandedId === f.id;
         const hasTranscript = f.transcript && f.transcript.length > 0;
         const opponent = isA ? f.d : f.a;
-        const record = h2h.get(opponent);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const record = h2h.get(opponent)!;
 
         return (
           <div key={f.id}>
