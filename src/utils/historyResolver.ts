@@ -55,7 +55,7 @@ export function resolveStableName(
   if (state.player.id === stableId) return state.player.stableName;
 
   // Check rival stables
-  const rival = state.rivals.find((r: { id: string; owner: { stableName: string }; roster?: { id: string; name: string }[] }) => r.id === stableId);
+  const rival = state.rivals.find(r => r.id === stableId);
   if (rival) return rival.owner.stableName;
 
   return legacyName;
