@@ -28,7 +28,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "oracle:daily": "bun run scripts/daily_oracle.ts",
-    "bard:daily": "npx tsx src/scripts/daily_bard.ts"
+    "bard:daily": "bunx tsx src/scripts/daily_bard.ts"
   },
   "dependencies": {
     "@fontsource/cinzel": "^5.2.8",

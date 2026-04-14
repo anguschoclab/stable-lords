@@ -3,7 +3,7 @@
  * Currently a DIAGNOSTIC tool, not a gate. The skill seed spread (skillCalc.ts)
  * creates inherent defensive bias that requires seed compression to fully fix.
  *
- * Run with: npx vitest run src/test/balance.test.ts
+ * Run with: bunx vitest run src/test/balance.test.ts
  */
 import { describe, it, expect } from "vitest";
 import { FightingStyle, type Warrior } from "@/types/game";

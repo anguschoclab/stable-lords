@@ -3153,8 +3153,8 @@ Date: 2025-10-11T15:20:57.912676Z
 ## Install
 1. Unzip this archive into your project root (same folder as package.json).
 2. Let it merge/overwrite files when prompted.
-3. Install new UI dep: `npm i @radix-ui/react-badge`
-4. Start dev server: `npm run dev`
+3. Install new UI dep: `bun add @radix-ui/react-badge`
+4. Start dev server: `bun run dev`
 
 ---
 
@@ -3239,7 +3239,7 @@ What you get
 How to install
 1) Unzip this into your existing project root (merges /src).
 2) Ensure these deps exist:
-   npm i @radix-ui/react-toast react-router-dom
+   bun add @radix-ui/react-toast react-router-dom
 3) Wrap your app with <DMToastProvider> once, near the root.
 4) Use <RunRoundPanel simulate={...}/> and call it from your sim pass-through.
 ```
@@ -3276,7 +3276,7 @@ How to apply:
    - Call LoreArchive.signalFight(fightSummary) right after a fight result is committed.
    - Call StyleMeter.recordFight(outcome) per fight, and StyleMeter.flushWeek() after Run Round (if you batch per week).
 4) Ensure toasts provider is mounted once in AppRoot: <ToastsProvider />.
-5) Rebuild: npm run dev (or build).
+5) Rebuild: bun run dev (or build).
 
 Files added:
 - src/lore/HallOfFights.tsx
@@ -3317,7 +3317,7 @@ Install (drop-in)
 1) Unzip this folder into your project root (same folder as index.html).
 2) Overwrite when prompted (index.html gets a tiny version bump + script include).
 3) Optional: run tools/patch-react-vite.command if you prefer to patch your existing index.html instead of overwriting.
-4) Start:  npm run dev  (or open index.html directly if you’re using the quickstart)
+4) Start:  bun run dev  (or open index.html directly if you’re using the quickstart)
 
 Troubleshooting
 ---------------
@@ -3533,7 +3533,7 @@ How to apply
    ./tools/patch-delta-v1.4.4.command .
 
 3) Open index.html (double-click) or run your dev server:
-   npm run dev
+   bun run dev
 
 4) Visual check:
    - The chip in the top bar should read: Stable Lords v1.4.4
@@ -3562,10 +3562,10 @@ Stable Lords — Delta v1.4.1 (Branding + Seed + Always Playable)
 Date: 2025-10-26T12:05:15.387525Z
 
 Drop-in instructions:
-1) Quit `npm run dev` if running.
+1) Quit `bun run dev` if running.
 2) Unzip these files into your project root (same folder as your existing index.html/app.jsx).
 3) Overwrite when prompted.
-4) Run: npm run dev  → open http://localhost:5173
+4) Run: bun run dev  → open http://localhost:5173
 
 What’s inside:
 - index.html  → Title/branding set to Stable Lords v1.4.1.
@@ -3699,9 +3699,9 @@ This is a Next.js + TypeScript starter that wires your provided **src** content 
 ```
 
 ## Getting started
-1. Install: `pnpm i` (or `npm i`, `yarn`)
-2. Dev: `pnpm dev`
-3. Build: `pnpm build && pnpm start`
+1. Install: `bun install`
+2. Dev: `bun run dev`
+3. Build: `bun run build && bun run start`
 
 > First run? If `src/app/AppRoot.tsx` expects specific globals, update `src/app/page.tsx` to the correct entry component.
 
@@ -3750,8 +3750,8 @@ Date: 2025-10-11T15:20:57.912676Z
 ## Install
 1. Unzip this archive into your project root (same folder as package.json).
 2. Let it merge/overwrite files when prompted.
-3. Install new UI dep: `npm i @radix-ui/react-badge`
-4. Start dev server: `npm run dev`
+3. Install new UI dep: `bun add @radix-ui/react-badge`
+4. Start dev server: `bun run dev`
 
 ---
 
@@ -3836,7 +3836,7 @@ What you get
 How to install
 1) Unzip this into your existing project root (merges /src).
 2) Ensure these deps exist:
-   npm i @radix-ui/react-toast react-router-dom
+   bun add @radix-ui/react-toast react-router-dom
 3) Wrap your app with <DMToastProvider> once, near the root.
 4) Use <RunRoundPanel simulate={...}/> and call it from your sim pass-through.
 ```
@@ -3873,7 +3873,7 @@ How to apply:
    - Call LoreArchive.signalFight(fightSummary) right after a fight result is committed.
    - Call StyleMeter.recordFight(outcome) per fight, and StyleMeter.flushWeek() after Run Round (if you batch per week).
 4) Ensure toasts provider is mounted once in AppRoot: <ToastsProvider />.
-5) Rebuild: npm run dev (or build).
+5) Rebuild: bun run dev (or build).
 
 Files added:
 - src/lore/HallOfFights.tsx
@@ -3914,7 +3914,7 @@ Install (drop-in)
 1) Unzip this folder into your project root (same folder as index.html).
 2) Overwrite when prompted (index.html gets a tiny version bump + script include).
 3) Optional: run tools/patch-react-vite.command if you prefer to patch your existing index.html instead of overwriting.
-4) Start:  npm run dev  (or open index.html directly if you’re using the quickstart)
+4) Start:  bun run dev  (or open index.html directly if you’re using the quickstart)
 
 Troubleshooting
 ---------------
@@ -4130,7 +4130,7 @@ How to apply
    ./tools/patch-delta-v1.4.4.command .
 
 3) Open index.html (double-click) or run your dev server:
-   npm run dev
+   bun run dev
 
 4) Visual check:
    - The chip in the top bar should read: Stable Lords v1.4.4
@@ -4171,9 +4171,9 @@ This is a Next.js + TypeScript starter that wires your provided **src** content 
 ```
 
 ## Getting started
-1. Install: `pnpm i` (or `npm i`, `yarn`)
-2. Dev: `pnpm dev`
-3. Build: `pnpm build && pnpm start`
+1. Install: `bun install`
+2. Dev: `bun run dev`
+3. Build: `bun run build && bun run start`
 
 > First run? If `src/app/AppRoot.tsx` expects specific globals, update `src/app/page.tsx` to the correct entry component.
 
@@ -4199,10 +4199,10 @@ Stable Lords — Delta v1.4.1 (Branding + Seed + Always Playable)
 Date: 2025-10-26T12:05:15.387525Z
 
 Drop-in instructions:
-1) Quit `npm run dev` if running.
+1) Quit `bun run dev` if running.
 2) Unzip these files into your project root (same folder as your existing index.html/app.jsx).
 3) Overwrite when prompted.
-4) Run: npm run dev  → open http://localhost:5173
+4) Run: bun run dev  → open http://localhost:5173
 
 What’s inside:
 - index.html  → Title/branding set to Stable Lords v1.4.1.
@@ -4380,8 +4380,8 @@ Add new fields for tournament state and medals.
 Dev build of the Duelmasters project. Run:
 
 ```bash
-npm i
-npm run dev
+bun install
+bun run dev
 ```
 
 Open http://localhost:5173
@@ -4565,7 +4565,7 @@ How to apply
 
 3) Restart Next.js:
    rm -rf .next node_modules/.cache 2>/dev/null || true
-   npm run dev
+   bun run dev
 
 4) Visit http://localhost:3000/gazette
    You should see the weekly recap.

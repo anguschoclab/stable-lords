@@ -19,7 +19,7 @@ There are several ways to run and edit the application.
 
 ### Local Development
 
-If you want to work locally using your own IDE, you can clone this repo. The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating) or use [Bun](https://bun.sh/) for an optimized experience.
+If you want to work locally using your own IDE, you can clone this repo. The only requirement is having [Bun](https://bun.sh/) installed.
 
 ```sh
 # Step 1: Clone the repository
@@ -29,13 +29,9 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies
-npm i
-# Or with bun:
 bun install
 
 # Step 4: Start the development server
-npm run dev &
-# Or with bun:
 bun run dev &
 ```
 
