@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize electron-store for configuration
-const store = new Store();
+const store = new Store() as any;
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -55,7 +55,7 @@ function createWindow() {
     frame: true, // Start with frame, will implement custom title bar later
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,

@@ -1,4 +1,4 @@
-// electron/preload.ts
+// preload.ts
 var import_electron = require("electron");
 import_electron.contextBridge.exposeInMainWorld("electronAPI", {
   // File system operations

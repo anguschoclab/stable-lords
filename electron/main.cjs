@@ -1,11 +1,49 @@
-import { app, BrowserWindow, ipcMain, Menu, dialog, shell, Tray, nativeImage } from 'electron';
-import * as path from 'path';
-import isDev from 'electron-is-dev';
-import Store from 'electron-store';
-import * as fs from 'fs';
-import * as os from 'os';
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const path = __importStar(require("path"));
+const electron_is_dev_1 = __importDefault(require("electron-is-dev"));
+const electron_store_1 = __importDefault(require("electron-store"));
+const fs = __importStar(require("fs"));
+const os = __importStar(require("os"));
 // Initialize electron-store for configuration
-const store = new Store();
+const store = new electron_store_1.default();
 let mainWindow = null;
 let tray = null;
 // Get platform-specific save directory
@@ -37,7 +75,7 @@ function ensureSaveDirectory() {
     });
 }
 function createWindow() {
-    mainWindow = new BrowserWindow({
+    mainWindow = new electron_1.BrowserWindow({
         width: store.get('windowBounds.width') || 1400,
         height: store.get('windowBounds.height') || 900,
         x: store.get('windowBounds.x'),
@@ -55,7 +93,7 @@ function createWindow() {
         icon: path.join(__dirname, '../public/icons/icon-512.png'),
     });
     // Load the app
-    if (isDev) {
+    if (electron_is_dev_1.default) {
         mainWindow.loadURL('http://localhost:8080');
         mainWindow.webContents.openDevTools();
     }
@@ -80,7 +118,7 @@ function createWindow() {
     });
     // Handle external links
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-        shell.openExternal(url);
+        electron_1.shell.openExternal(url);
         return { action: 'deny' };
     });
 }
@@ -89,7 +127,7 @@ function createMenu() {
         ...(process.platform === 'darwin'
             ? [
                 {
-                    label: app.getName(),
+                    label: electron_1.app.getName(),
                     submenu: [
                         { role: 'about' },
                         { type: 'separator' },
@@ -132,7 +170,7 @@ function createMenu() {
                 {
                     label: 'Export Save',
                     click: async () => {
-                        const result = await dialog.showSaveDialog(mainWindow, {
+                        const result = await electron_1.dialog.showSaveDialog(mainWindow, {
                             defaultPath: `stablelords-save-${Date.now()}.json`,
                             filters: [{ name: 'JSON Files', extensions: ['json'] }],
                         });
@@ -144,7 +182,7 @@ function createMenu() {
                 {
                     label: 'Import Save',
                     click: async () => {
-                        const result = await dialog.showOpenDialog(mainWindow, {
+                        const result = await electron_1.dialog.showOpenDialog(mainWindow, {
                             filters: [{ name: 'JSON Files', extensions: ['json'] }],
                         });
                         if (!result.canceled && result.filePaths.length > 0) {
@@ -198,14 +236,14 @@ function createMenu() {
             ],
         },
     ];
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    const menu = electron_1.Menu.buildFromTemplate(template);
+    electron_1.Menu.setApplicationMenu(menu);
 }
 function createTray() {
     const iconPath = path.join(__dirname, '../public/icons/icon-192.png');
-    const image = nativeImage.createFromPath(iconPath);
-    tray = new Tray(image);
-    const contextMenu = Menu.buildFromTemplate([
+    const image = electron_1.nativeImage.createFromPath(iconPath);
+    tray = new electron_1.Tray(image);
+    const contextMenu = electron_1.Menu.buildFromTemplate([
         {
             label: 'Show Stable Lords',
             click: () => {
@@ -238,7 +276,7 @@ function createTray() {
         {
             label: 'Quit',
             click: () => {
-                app.quit();
+                electron_1.app.quit();
             },
         },
     ]);
@@ -260,7 +298,7 @@ function createTray() {
     });
 }
 // IPC Handlers for file operations
-ipcMain.handle('save-game', async (_event, slotId, state) => {
+electron_1.ipcMain.handle('save-game', async (_event, slotId, state) => {
     try {
         ensureSaveDirectory();
         const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
@@ -272,7 +310,7 @@ ipcMain.handle('save-game', async (_event, slotId, state) => {
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('load-game', async (_event, slotId) => {
+electron_1.ipcMain.handle('load-game', async (_event, slotId) => {
     try {
         const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
         if (!fs.existsSync(filePath)) {
@@ -286,7 +324,7 @@ ipcMain.handle('load-game', async (_event, slotId) => {
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('list-saves', async () => {
+electron_1.ipcMain.handle('list-saves', async () => {
     try {
         const hotStateDir = path.join(getSaveDirectory(), 'hot_state');
         if (!fs.existsSync(hotStateDir)) {
@@ -300,7 +338,7 @@ ipcMain.handle('list-saves', async () => {
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('delete-save', async (_event, slotId) => {
+electron_1.ipcMain.handle('delete-save', async (_event, slotId) => {
     try {
         const filePath = path.join(getSaveDirectory(), 'hot_state', `${slotId}.json`);
         if (fs.existsSync(filePath)) {
@@ -313,7 +351,7 @@ ipcMain.handle('delete-save', async (_event, slotId) => {
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('archive-bout-log', async (_event, year, season, boutId, logData) => {
+electron_1.ipcMain.handle('archive-bout-log', async (_event, year, season, boutId, logData) => {
     try {
         ensureSaveDirectory();
         const seasonDir = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'bouts');
@@ -329,7 +367,7 @@ ipcMain.handle('archive-bout-log', async (_event, year, season, boutId, logData)
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('retrieve-bout-log', async (_event, year, season, boutId) => {
+electron_1.ipcMain.handle('retrieve-bout-log', async (_event, year, season, boutId) => {
     try {
         const filePath = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'bouts', `${year}_${boutId}.json`);
         if (!fs.existsSync(filePath)) {
@@ -343,7 +381,7 @@ ipcMain.handle('retrieve-bout-log', async (_event, year, season, boutId) => {
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('archive-gazette', async (_event, season, week, markdown) => {
+electron_1.ipcMain.handle('archive-gazette', async (_event, season, week, markdown) => {
     try {
         ensureSaveDirectory();
         const seasonDir = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'gazettes');
@@ -359,7 +397,7 @@ ipcMain.handle('archive-gazette', async (_event, season, week, markdown) => {
         return { success: false, error: error.message };
     }
 });
-ipcMain.handle('retrieve-gazette', async (_event, season, week) => {
+electron_1.ipcMain.handle('retrieve-gazette', async (_event, season, week) => {
     try {
         const filePath = path.join(getSaveDirectory(), 'seasons', `season_${season}`, 'gazettes', `week_${week}.md`);
         if (!fs.existsSync(filePath)) {
@@ -374,27 +412,27 @@ ipcMain.handle('retrieve-gazette', async (_event, season, week) => {
     }
 });
 // IPC Handlers for electron-store
-ipcMain.handle('store-get', async (_event, key) => {
+electron_1.ipcMain.handle('store-get', async (_event, key) => {
     return store.get(key);
 });
-ipcMain.handle('store-set', async (_event, key, value) => {
+electron_1.ipcMain.handle('store-set', async (_event, key, value) => {
     store.set(key, value);
     return { success: true };
 });
-ipcMain.handle('store-delete', async (_event, key) => {
+electron_1.ipcMain.handle('store-delete', async (_event, key) => {
     store.delete(key);
     return { success: true };
 });
 // IPC Handler for app info
-ipcMain.handle('get-app-info', async () => {
+electron_1.ipcMain.handle('get-app-info', async () => {
     return {
-        name: app.getName(),
-        version: app.getVersion(),
+        name: electron_1.app.getName(),
+        version: electron_1.app.getVersion(),
         platform: process.platform,
     };
 });
 // IPC Handler for notifications
-ipcMain.handle('show-notification', async (_event, options) => {
+electron_1.ipcMain.handle('show-notification', async (_event, options) => {
     const { Notification } = require('electron');
     new Notification({
         title: options.title,
@@ -403,23 +441,23 @@ ipcMain.handle('show-notification', async (_event, options) => {
     return { success: true };
 });
 // App lifecycle
-app.whenReady().then(() => {
+electron_1.app.whenReady().then(() => {
     ensureSaveDirectory();
     createWindow();
     createMenu();
     createTray();
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
+    electron_1.app.on('activate', () => {
+        if (electron_1.BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
     });
 });
-app.on('window-all-closed', () => {
+electron_1.app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit();
+        electron_1.app.quit();
     }
 });
-app.on('before-quit', () => {
+electron_1.app.on('before-quit', () => {
     if (tray) {
         tray.destroy();
     }
