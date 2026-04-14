@@ -15,7 +15,10 @@
       "Bash(bun --version)",
       "Bash(./node_modules/.bin/vite build:*)",
       "Bash(node_modules/.bin/tsc.cmd --noEmit)",
-      "Bash(/c/Users/amauricia/.bun/bin/bun run:*)"
+      "Bash(/c/Users/amauricia/.bun/bin/bun run:*)",
+      "Bash(/c/Users/amauricia/.bun/bin/bun x:*)",
+      "Bash(/c/Users/amauricia/.bun/bin/bunx tsc:*)",
+      "Bash(/c/Users/amauricia/.bun/bin/bun test:*)"
     ]
   }
 }
