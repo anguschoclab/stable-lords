@@ -31,6 +31,25 @@ describe("Bard Narrative Engine", () => {
       const result = NarrativeTemplateEngine.interpolateTemplate(template, {});
       expect(result).toBe("The warrior attacks the opponent.");
     });
+
+    it("interpolates Handlebars-style {{key}} placeholders alongside % tokens", () => {
+      const template = "{{attacker}} feints low, catching {{defender}} off guard before severing their %BP at the elbow. The crowd erupts!";
+      const result = interpolateTemplate(template, {
+        attacker: "Thog",
+        defender: "Grom",
+        bodyPart: "sword-arm"
+      });
+      expect(result).toContain("Thog feints low");
+      expect(result).toContain("catching Grom off guard");
+      expect(result).toContain("severing their sword-arm");
+    });
+
+    it("falls back {{name}} to ctx.attacker and {{attacker}} to ctx.name", () => {
+      const res1 = interpolateTemplate("{{name}} strikes!", { attacker: "Grom" });
+      expect(res1).toBe("Grom strikes!");
+      const res2 = interpolateTemplate("{{attacker}} strikes!", { name: "Grom" });
+      expect(res2).toBe("Grom strikes!");
+    });
   });
 
   describe("NCAA-style Tournament Selection Committee", () => {
