@@ -94,7 +94,7 @@ export function resolveRound(state: GameState, tournamentId: string, seed: numbe
         warriorIdA: losers[0].id,
         warriorIdD: losers[1].id,
         stableIdA: losers[0].stableId,
-        stableIdD: losers[1].id
+        stableIdD: losers[1].stableId
       };
       bracket.push(bronzeBout);
     }
