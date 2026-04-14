@@ -795,7 +795,7 @@
       ],
       "Graveyard": [
         "The Hall of Warriors receives {{count}} new name{{plural}} this week.",
-        "The Halls of the Dead Welcomes {{count}} New Soul{{plural}}.",
+        "The Halls of the Dead Welcome {{count}} New Soul{{plural}}.",
         "A Moment of Silence for the {{count}} Warrior{{plural}} Lost This Week."
       ]
     },
