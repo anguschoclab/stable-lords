@@ -43,8 +43,6 @@ import {
   getMatchupBonus as rawMatchupBonus 
 } from "./combatConstants"; 
 
-export const MAX_EXCHANGES = 250;
-export const EXCHANGES_PER_MINUTE = 25;
 export const DECISION_HIT_MARGIN = 3;
 
 export function getMatchupBonus(styleA: FightingStyle, styleD: FightingStyle): number {
@@ -81,6 +79,9 @@ export interface FighterState {
   favorites?: WarriorFavorites;
   totalFights: number;
   encumbrancePenalty?: { iniPenalty: number; enduranceMult: number };
+  weaponId?: string;
+  armorId?: string;
+  desperate?: boolean;
 }
 
 export interface ResolutionContext {
@@ -96,6 +97,8 @@ export interface ResolutionContext {
   weaponReqD: { endurancePenalty: number; attPenalty: number };
   tacticStreakA: number;
   tacticStreakD: number;
+  lastOffTacticA?: string;
+  lastOffTacticD?: string;
 }
 
 export function resolveEffectiveTactics(plan: FightPlan, phaseKey: "opening" | "mid" | "late") {
@@ -120,6 +123,16 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const { rng, phase, exchange } = ctx;
   const stylePhase = phase as StylePhase;
   const phaseKey = phase === "OPENING" ? "opening" : phase === "MID" ? "mid" : "late";
+
+  // Canonical desperate state: override plan when HP < 30% OR endurance < 20%
+  for (const f of [fA, fD] as FighterState[]) {
+    if (!f.desperate && f.plan.desperatePlan && (f.hp < f.maxHp * 0.3 || f.endurance < f.maxEndurance * 0.2)) {
+      const dp = f.plan.desperatePlan;
+      f.plan = { ...f.plan, OE: dp.OE, AL: dp.AL, ...(dp.killDesire !== undefined && { killDesire: dp.killDesire }), offensiveTactic: dp.offensiveTactic ?? f.plan.offensiveTactic, defensiveTactic: dp.defensiveTactic ?? f.plan.defensiveTactic, target: dp.target ?? f.plan.target, protect: dp.protect ?? f.plan.protect, phases: undefined };
+      f.desperate = true;
+      events.push({ type: "STATE_CHANGE", actor: f.label, result: "DESPERATE" });
+    }
+  }
 
   const tactA = resolveEffectiveTactics(fA.plan, phaseKey);
   const tactD = resolveEffectiveTactics(fD.plan, phaseKey);
@@ -182,7 +195,12 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     const curDefMods = aGoesFirst ? defModsD : defModsA;
     const curPassD = aGoesFirst ? passD : passA;
     const curBiasDef = aGoesFirst ? biasDefD : biasDefA;
-    const isDodge = (aGoesFirst ? tactD : tactA).defTactic === "Dodge";
+    // Canonical: low AL (≤3) forces parry instinct; high AL (≥7) with no explicit tactic defaults to dodge
+    const curDefAL = aGoesFirst ? AL_D : AL_A;
+    const defTacticType = (aGoesFirst ? tactD : tactA).defTactic;
+    const isDodge = curDefAL <= 3 ? false
+      : (curDefAL >= 7 && defTacticType === "none") ? true
+      : defTacticType === "Dodge";
     const overDef = aGoesFirst ? Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakD) : Math.min(TACTIC_OVERUSE_CAP, ctx.tacticStreakA);
     const curAntiSynDef = getStyleAntiSynergy(def.style, (aGoesFirst ? tactD : tactA).offTactic, (aGoesFirst ? tactD : tactA).defTactic);
 
@@ -201,6 +219,14 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   }
 
   applyEnduranceCosts(events, ctx, fA, fD, aGoesFirst, curAttOE, curAttAL, curAttWepReq, aGoesFirst ? ctx.weaponReqD : ctx.weaponReqA, OE_D, AL_D, OE_A, AL_A);
+
+  // Track tactic streaks for overuse penalty
+  const currTacticA = tactA.offTactic;
+  const currTacticD = tactD.offTactic;
+  ctx.tacticStreakA = (currTacticA !== "none" && ctx.lastOffTacticA === currTacticA) ? ctx.tacticStreakA + 1 : (currTacticA !== "none" ? 1 : 0);
+  ctx.tacticStreakD = (currTacticD !== "none" && ctx.lastOffTacticD === currTacticD) ? ctx.tacticStreakD + 1 : (currTacticD !== "none" ? 1 : 0);
+  ctx.lastOffTacticA = currTacticA;
+  ctx.lastOffTacticD = currTacticD;
 
   return events;
 }

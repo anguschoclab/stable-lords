@@ -1,8 +1,7 @@
 import * as Comlink from "comlink";
 import { advanceWeek } from "./pipeline/services/weekPipelineService";
 import { advanceDay } from "./dayPipeline";
-import { PatronTokenService } from "./tokens/patronTokenService";
-import { 
+import {
   createFreshState
 } from "./factories";
 import { TournamentSelectionService } from "./matchmaking/tournamentSelection";

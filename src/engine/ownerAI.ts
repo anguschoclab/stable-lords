@@ -4,10 +4,11 @@ import type { FightPlan } from "@/types/combat.types";
 import type { OwnerPersonality, AIIntent } from "@/types/state.types";
 import { defaultPlanForWarrior } from "./simulate";
 import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from "@/data/ownerData";
+import { computeStrategyScore } from "./strategyAnalysis";
 
 /**
  * Generate a personality-, philosophy-, meta-, and matchup-aware fight plan for an AI warrior.
- * Now includes per-style matchup heuristics and global strategic intent.
+ * Now includes per-style matchup heuristics, global strategic intent, and strategy score validation.
  */
 export function aiPlanForWarrior(
   w: Warrior,
@@ -32,7 +33,7 @@ export function aiPlanForWarrior(
     intentKD = -2;
   } else if (intent === "VENDETTA") {
     intentAL = 2; // Relentless
-    intentKD = 2; 
+    intentKD = 2;
   }
 
   // Grudge-based escalation
@@ -42,16 +43,75 @@ export function aiPlanForWarrior(
   // Per-style matchup heuristics
   const matchup = opponentStyle ? getStyleMatchupMods(w.style, opponentStyle) : { oe: 0, al: 0, kd: 0 };
 
-  return {
+  // Generate initial plan
+  let plan: FightPlan = {
     ...base,
     OE: clamp((base.OE ?? 5) + (pMod.OE ?? 0) + (phMod.OE ?? 0) + matchup.oe + intentOE, 1, 10),
     AL: clamp((base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0) + matchup.al + intentAL + grudgeAL, 1, 10),
     killDesire: clamp((base.killDesire ?? 5) + (pMod.killDesire ?? 0) + (phMod.killDesire ?? 0) + matchup.kd + intentKD + grudgeKD, 1, 10),
   };
+
+  // Strategy score validation with retry logic
+  const minScore = 50;
+  const maxRetries = 3;
+  let retries = 0;
+  let score = computeStrategyScore(plan, w);
+
+  while (score < minScore && retries < maxRetries) {
+    // Adjust plan parameters to improve score
+    // Reduce over-exertion if that's the issue
+    const totalEffort = plan.OE + plan.AL;
+    if (totalEffort > 16) {
+      plan.OE = Math.max(1, plan.OE - 1);
+      plan.AL = Math.max(1, plan.AL - 1);
+    }
+    // Increase effort if too low
+    else if (totalEffort < 6) {
+      plan.OE = Math.min(10, plan.OE + 1);
+      plan.AL = Math.min(10, plan.AL + 1);
+    }
+    // Adjust towards balanced effort
+    else {
+      const avgEffort = Math.floor(totalEffort / 2);
+      plan.OE = clamp(avgEffort, 1, 10);
+      plan.AL = clamp(avgEffort, 1, 10);
+    }
+
+    score = computeStrategyScore(plan, w);
+    retries++;
+  }
+
+  // Tactic suitability validation - adjust OE/AL based on style compatibility
+  // High OE is more suitable for aggressive styles, high AL for defensive styles
+  const styleSuitabilityBias = getStyleSuitabilityBias(w.style);
+  plan.OE = clamp(plan.OE + styleSuitabilityBias.oe, 1, 10);
+  plan.AL = clamp(plan.AL + styleSuitabilityBias.al, 1, 10);
+
+  return plan;
 }
 
 function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v));
+}
+
+/**
+ * Returns OE/AL bias preferences for each fighting style.
+ * Aggressive styles prefer higher OE, defensive styles prefer higher AL.
+ */
+function getStyleSuitabilityBias(style: FightingStyle): { oe: number; al: number } {
+  const biases: Partial<Record<FightingStyle, { oe: number; al: number }>> = {
+    [FightingStyle.BashingAttack]: { oe: 2, al: -1 },
+    [FightingStyle.SlashingAttack]: { oe: 1, al: 0 },
+    [FightingStyle.StrikingAttack]: { oe: 1, al: 0 },
+    [FightingStyle.LungingAttack]: { oe: 1, al: 1 },
+    [FightingStyle.AimedBlow]: { oe: -1, al: 1 },
+    [FightingStyle.TotalParry]: { oe: -2, al: 2 },
+    [FightingStyle.ParryRiposte]: { oe: -1, al: 2 },
+    [FightingStyle.ParryLunge]: { oe: 0, al: 1 },
+    [FightingStyle.ParryStrike]: { oe: 0, al: 1 },
+    [FightingStyle.WallOfSteel]: { oe: -1, al: 2 },
+  };
+  return biases[style] ?? { oe: 0, al: 0 };
 }
 
 /**

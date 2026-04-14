@@ -44,7 +44,7 @@ export function RosterWall() {
            </div>
         </div>
         
-        <Link to="/stable/recruit">
+        <Link to="/ops/personnel">
           <Button variant="outline" size="sm" className="bg-neutral-900 border-white/10 text-[10px] font-black uppercase tracking-[0.2em] gap-2 h-10 px-6 hover:bg-primary hover:text-white hover:border-primary transition-all">
              Initialize_Recruitment <ChevronRight className="h-4 w-4" />
           </Button>
@@ -64,7 +64,7 @@ export function RosterWall() {
                 Synchronization failed. All personnel berths are currently vacant. Proceed to the recruitment terminal to enlist your first combatant asset.
               </p>
             </div>
-            <Link to="/stable/recruit" className="mt-4">
+            <Link to="/ops/personnel" className="mt-4">
                <Button className="bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 h-12 shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all">
                   Initialize_SYNC
                </Button>

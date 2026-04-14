@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Settings, Download, Upload, Trash2, FastForward, Activity, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
-import { computeNextSeason } from '@/engine/weekPipeline';
+import { computeNextSeason } from '@/engine/pipeline/passes/WorldPass';
 import type { GameState, RivalStableData } from '@/types/state.types';
 import { ArenaHistory } from '@/engine/history/arenaHistory';
 

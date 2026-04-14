@@ -4,6 +4,7 @@
  */
 
 import { getFromArchive, interpolateTemplate } from "@/engine/narrativePBP";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 export type AnnounceTone = "neutral" | "hype" | "grim";
 
@@ -15,7 +16,7 @@ export function blurb(opts: {
   winner?: string;
   loser?: string;
   by?: string;
-  rng: () => number;
+  rng: IRNGService;
 }): string {
   const { rng } = opts;
   const tone = opts.tone || "neutral";
@@ -34,7 +35,7 @@ export function blurb(opts: {
  */
 export function commentatorFor(
   tag: "KO" | "Kill" | "Flashy" | "Upset",
-  rng: () => number
+  rng: IRNGService
 ): string {
   return getFromArchive(rng, ["commentary", tag]);
 }
@@ -46,7 +47,7 @@ export function recapLine(
   winner: string,
   loser: string,
   minutes: number,
-  rng: () => number
+  rng: IRNGService
 ): string {
   const template = getFromArchive(rng, ["recap"]);
   

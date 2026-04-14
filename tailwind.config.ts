@@ -57,6 +57,7 @@ export default {
           fame: "hsl(var(--arena-fame))",
           pop: "hsl(var(--arena-pop))",
           steel: "hsl(var(--arena-steel))",
+          bone: "hsl(var(--arena-bone))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -75,6 +76,18 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        "torch-flicker": {
+          "0%":   { opacity: "0.85" },
+          "20%":  { opacity: "0.92" },
+          "40%":  { opacity: "0.88" },
+          "60%":  { opacity: "0.95" },
+          "80%":  { opacity: "0.87" },
+          "100%": { opacity: "0.93" },
+        },
+        "live-pulse": {
+          "0%, 100%": { opacity: "1",   transform: "scale(1)" },
+          "50%":      { opacity: "0.4", transform: "scale(0.85)" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -108,6 +121,8 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "torch-flicker": "torch-flicker 3s ease-in-out infinite alternate",
+        "live-pulse": "live-pulse 2s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "screen-shake": "screen-shake 0.5s ease-out",
         "blood-flash": "blood-flash 0.8s ease-out",

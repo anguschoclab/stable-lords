@@ -348,6 +348,8 @@ export interface GameState {
   realmRankings: Record<string, RankingEntry>;
   awards: AnnualAward[]; // 🏗️ Prestige Persistence
   lastSimulationReport?: SimulationReport;
+  cachedMetaDrift?: import("@/engine/metaDrift").StyleMeta; // ⚡ Bolt: Cache meta drift weekly for AI components
+  warriorMap?: Map<string, import("@/types/warrior.types").Warrior>; // ⚡ Bolt: Cache warrior map weekly for bout processing
 }
 
 export interface UIPrefs {

@@ -52,9 +52,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Run Round ──────────────────────────────────────────────────────────
+  // ── Combat ──────────────────────────────────────────────────────────
   {
-    pattern: "/run-round",
+    pattern: "/command/combat",
     tips: [
       {
         id: "round-first",
@@ -68,9 +68,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Recruit ────────────────────────────────────────────────────────────
+  // ── Personnel ────────────────────────────────────────────────────────────
   {
-    pattern: "/recruit",
+    pattern: "/ops/personnel",
     tips: [
       {
         id: "recruit-tip",
@@ -87,9 +87,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Trainers ──────────────────────────────────────────────────────────
+  // ── Personnel (Trainers tab) ──────────────────────────────────────────────────────────
   {
-    pattern: "/trainers",
+    pattern: "/ops/personnel",
     tips: [
       {
         id: "trainers-first",
@@ -105,7 +105,7 @@ const COACH_ROUTES: RouteEntry[] = [
 
   // ── Tournaments ────────────────────────────────────────────────────────
   {
-    pattern: "/tournaments",
+    pattern: "/world/tournaments",
     tips: [
       {
         id: "tournament-tip",
@@ -117,7 +117,7 @@ const COACH_ROUTES: RouteEntry[] = [
 
   // ── Chronicle ─────────────────────────────────────────────────────────
   {
-    pattern: "/hall-of-fights",
+    pattern: "/world/chronicle",
     tips: [
       {
         id: "chronicle-tip",
@@ -126,9 +126,9 @@ const COACH_ROUTES: RouteEntry[] = [
     ],
   },
 
-  // ── Graveyard ─────────────────────────────────────────────────────────
+  // ── Chronicle (Graveyard tab) ─────────────────────────────────────────────────────────
   {
-    pattern: "/graveyard",
+    pattern: "/world/chronicle",
     tips: [
       {
         id: "graveyard-first-death",

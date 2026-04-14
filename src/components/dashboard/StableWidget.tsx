@@ -105,12 +105,12 @@ export function StableWidget() {
       </div>
 
       <div className="p-4 border-t border-white/5 bg-black/40 grid grid-cols-2 gap-3 relative z-10">
-         <Link to="/stable/recruit">
+         <Link to="/ops/personnel">
             <Button variant="ghost" size="sm" className="w-full h-8 text-[9px] uppercase tracking-widest font-black gap-2 border border-white/5 hover:bg-primary/10 hover:text-primary transition-all">
                <UserPlus className="h-3.5 w-3.5" /> Recruit
             </Button>
          </Link>
-         <Link to="/stable">
+         <Link to="/command/roster">
             <Button variant="ghost" size="sm" className="w-full h-8 text-[9px] uppercase tracking-widest font-black gap-2 border border-white/5 hover:bg-white/5 transition-all">
                <Users className="h-3.5 w-3.5" /> View_All
             </Button>

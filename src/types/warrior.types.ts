@@ -14,6 +14,7 @@ import {
   type FightPlan,
   type DeathEvent
 } from "./shared.types";
+import type { AnnualAward } from "./state.types";
 
 // ─── UI Prop Types ──────────────────────────────────────────────────────────
 

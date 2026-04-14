@@ -16,7 +16,25 @@ function load(): FightSummary[] {
 
 function save(arr: FightSummary[]) {
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem(KEY, JSON.stringify(arr));
+    try {
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    } catch (error) {
+      if ((error as Error)?.name === 'QuotaExceededError') {
+        console.error('localStorage quota exceeded when saving arena history', error);
+        // Arena history is capped at 500 entries, attempt to clear older entries
+        try {
+          const existing = load();
+          if (existing.length > 100) {
+            const trimmed = existing.slice(-100);
+            localStorage.setItem(KEY, JSON.stringify(trimmed));
+          }
+        } catch (retryError) {
+          console.error('Failed to recover from localStorage quota error for arena history', retryError);
+        }
+      } else {
+        console.error('Failed to save arena history', error);
+      }
+    }
   }
 }
 

@@ -7,7 +7,7 @@ import { useGameStore } from "@/state/useGameStore";
 import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/scouting";
 import { type ScoutReportData, type RivalStableData, type Warrior } from "@/types/game";
 import { Search, Eye, ArrowLeftRight, UserRoundSearch } from "lucide-react";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { hashStr } from "@/utils/idUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -43,7 +43,7 @@ export default function Scouting() {
         return;
       }
 
-      const rng = new SeededRNG(week + hashStr(activeWarrior.name));
+      const rng = new SeededRNGService(week + hashStr(activeWarrior.name));
       const { report } = generateScoutReport(activeWarrior, quality, week, rng);
       
       // Ensure we don't have duplicate reports for the same warrior

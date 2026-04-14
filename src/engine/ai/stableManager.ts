@@ -3,6 +3,7 @@ import type { Season } from "@/types/shared.types";
 import { processStaff } from "./workers/staffWorker";
 import { processRoster } from "./workers/rosterWorker";
 import { consolidateAgentMemory, createAgentContext } from "./agentCore";
+import { StateImpact } from "@/engine/impacts";
 
 import { 
   FIGHT_PURSE, 
@@ -19,13 +20,14 @@ import {
 export function processAIStable(
   rival: RivalStableData,
   state: GameState
-): { updatedRival: RivalStableData; isBankrupt: boolean; gazetteItems: string[]; updatedHiringPool: Trainer[] } {
+): { updatedRival: RivalStableData; isBankrupt: boolean; gazetteItems: string[]; updatedHiringPool: Trainer[]; impact: StateImpact } {
   // 1. Initialize Context & Skeptical Memory
   const context = createAgentContext(rival, state);
   let updatedRival = { ...context.rival };
   const activeRoster = updatedRival.roster.filter(w => w.status === "Active");
   let currentHiringPool = [...(state.hiringPool || [])];
   const gazetteItems: string[] = [];
+  const impacts: StateImpact[] = [];
   
   // ── Fatigue Decay for AI Warriors (-25 per week) ──
   updatedRival.roster = updatedRival.roster.map(w => {
@@ -53,16 +55,17 @@ export function processAIStable(
   weeklyIncome = weeklyIncomeFromFights + fameDividend;
 
   // 3. Delegate to Workers (Hierarchical Delegation)
-  
+
   // A) StaffWorker (Hiring/Firing)
-  const staffResult = processStaff(updatedRival, state, currentHiringPool);
+  const staffResult = processStaff(updatedRival, state, currentHiringPool, context);
   updatedRival = staffResult.updatedRival;
   currentHiringPool = staffResult.updatedHiringPool;
   gazetteItems.push(...staffResult.gazetteItems);
+  impacts.push({ hiringPool: currentHiringPool });
 
   // B) RosterWorker (Training/Gear)
-  const rosterSeed = state.week * 8123 + (updatedRival.owner.id.length * 101); 
-  updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed);
+  const rosterSeed = state.week * 8123 + (updatedRival.owner.id.length * 101);
+  updatedRival = processRoster(updatedRival, state.week, state.season, rosterSeed, undefined, context);
 
   // 4. Calculate Final Expenses
   let weeklyExpenses = 0; // Removed 20g hidden tax for parity
@@ -90,10 +93,16 @@ export function processAIStable(
   // 6. Background Consolidation: Prune logs and update burn rate in memory
   updatedRival = consolidateAgentMemory(updatedRival, state.week);
 
+  // Collect impact for this rival
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  rivalsUpdates.set(rival.owner.id, updatedRival);
+  impacts.push({ rivalsUpdates });
+
   return {
     updatedRival,
     isBankrupt,
     gazetteItems,
-    updatedHiringPool: currentHiringPool
+    updatedHiringPool: currentHiringPool,
+    impact: impacts.length > 0 ? impacts[0] : {}
   };
 }

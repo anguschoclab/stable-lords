@@ -1,39 +1,39 @@
-import type { GameState, Season } from "@/types/state.types";
+import type { GameState } from "@/types/state.types";
 import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { computeAgingImpact } from "@/engine/aging";
 import { computeHealthImpact } from "@/engine/health";
-import { resolveImpacts, StateImpact } from "@/engine/impacts";
-import { SeededRNG } from "@/utils/random";
-import { PatronTokenService } from "@/engine/tokens/patronTokenService";
+import { StateImpact, mergeImpacts } from "@/engine/impacts";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * Stable Lords — Warrior Pipeline Pass
  * Handles weekly training, aging, and recovery using the established impact pattern.
  */
-export function runWarriorPass(state: GameState, rng: SeededRNG): GameState {
-  const trainingImpactRaw = computeTrainingImpact(state);
-  const { impact: trainingImpact, seasonalGrowth, results } = trainingImpactToStateImpact(state, trainingImpactRaw, rng);
-  
+export const PASS_METADATA = {
+  name: "WarriorPass",
+  dependencies: ["BoutSimulationPass"] // Depends on bout simulation completing
+};
+
+/**
+ * Stable Lords — Warrior Pipeline Pass
+ * Handles weekly training, aging, and recovery using the established impact pattern.
+ */
+export function runWarriorPass(state: GameState, rng: IRNGService): StateImpact {
+  const trainingImpactRaw = computeTrainingImpact(state, rng);
+  const { impact: trainingImpact, seasonalGrowth } = trainingImpactToStateImpact(state, trainingImpactRaw, rng);
+
   const impacts: StateImpact[] = [
-    trainingImpact, 
-    computeAgingImpact(state, rng), 
+    trainingImpact,
+    computeAgingImpact(state, rng),
     computeHealthImpact(state),
   ];
 
-  let nextState = resolveImpacts(state, impacts);
-  
-  // 🌩️ New System Integration: Insight Token Awards
-  // Low chance (5%) to earn an Insight Token during any successful training week
-  if (results && results.some(r => r.type === "gain" || r.type === "recovery") && rng.roll(0, 100) < 5) {
-    const tokenOptions = ["Style", "Weapon", "Rhythm"] as const;
-    const type = tokenOptions[rng.roll(0, tokenOptions.length - 1)];
-    nextState = PatronTokenService.awardToken(nextState, type, "Exceptional Training", rng);
+  const mergedImpact = mergeImpacts(impacts);
+
+  // Attach seasonal growth to the merged impact
+  if (Array.isArray(seasonalGrowth) && seasonalGrowth.length > 0) {
+    mergedImpact.seasonalGrowth = seasonalGrowth;
   }
 
-  // Correctly merge the seasonal growth arrays
-  if (Array.isArray(seasonalGrowth) && seasonalGrowth.length > 0) {
-    nextState.seasonalGrowth = [...(nextState.seasonalGrowth || []), ...seasonalGrowth];
-  }
-  
-  return nextState;
+  return mergedImpact;
 }

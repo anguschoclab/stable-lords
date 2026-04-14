@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import StableDetail from "@/pages/StableDetail";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/stable/$id")({
-  component: StableDetail,
+  component: () => {
+    const { id } = Route.useParams();
+    return <Navigate to="/world/stable/$id" params={{ id }} />;
+  },
 });

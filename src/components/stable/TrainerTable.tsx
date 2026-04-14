@@ -27,7 +27,7 @@ export function TrainerTable() {
             </p>
           </div>
         </div>
-        <Link to="/stable/trainers">
+        <Link to="/ops/personnel">
           <button className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded transition-all border border-primary/20">
              Manage Staff
           </button>
@@ -42,7 +42,7 @@ export function TrainerTable() {
               <p className="text-sm font-display font-black uppercase tracking-tight text-muted-foreground">The Academy is Empty</p>
               <p className="text-xs text-muted-foreground/60 italic max-w-xs mx-auto">No trainers are currently on payroll. Recruit specialists to accelerate warrior evolution.</p>
             </div>
-            <Link to="/stable/trainers" className="mt-4">
+            <Link to="/ops/personnel" className="mt-4">
                <Surface variant="neon" padding="sm" className="text-[10px] font-black uppercase tracking-[0.2em] px-8 py-2.5 hover:scale-105 transition-transform">
                   Enlist Specialists
                </Surface>

@@ -4,7 +4,6 @@
 export { simulateFight, defaultPlanForWarrior } from "./simulate";
 export { fameFromTags } from "./fame";
 export { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from "./planBias";
-export { getOffensivePenalty, getDefensivePenalty } from "./antiSynergy";
 export { ArenaHistory } from "./history/arenaHistory";
 export { NewsletterFeed } from "./newsletter/feed";
 export { StyleRollups } from "./stats/styleRollups";

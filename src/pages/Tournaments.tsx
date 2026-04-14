@@ -137,7 +137,7 @@ export default function Tournaments() {
         
         <div className="flex items-center gap-2">
           {!currentTournament && activeWarriors.length < 2 && (
-             <Link to="/stable/recruit">
+             <Link to="/ops/personnel">
               <Button variant="outline" className="h-11 font-black uppercase text-[10px] tracking-widest gap-2">
                 <UserPlus className="h-4 w-4" /> RECRUIT_OPERATIVES
               </Button>

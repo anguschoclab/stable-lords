@@ -1,5 +1,3 @@
-import { SeededRNG } from "@/utils/random";
-
 /**
  * Combat Math — RNG, phase detection, skill/contest checks.
  * Single source of truth for combat math utilities used by simulate.ts.
@@ -48,14 +46,16 @@ export function weatherStaminaModifier(weather?: string): number {
   switch (weather) {
     case "Blazing Sun":
       return 1.3; // 30% more stamina drain
-    case "Scalding":
+    case "Sweltering":
       return 1.2; // 20% more stamina drain
     case "Blood Moon":
       return 1.1; // 10% more stamina drain
     case "Gale":
       return 1.15; // 15% more stamina drain
-    case "Drafty":
+    case "Breezy":
       return 0.9; // 10% less stamina drain
+    case "Eclipse":
+      return 0.8; // 20% less stamina drain, slow methodical fights
     case "Overcast":
     case "Clear":
     case "Rainy":

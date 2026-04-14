@@ -1,17 +1,21 @@
-import type { GameState, RivalStableData } from "@/types/state.types";
+import type { GameState, RivalStableData, RestState } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
 import { rollForInjury } from "@/engine/injuries";
 import { addRestState } from "@/engine/matchmaking/historyLogic";
 import { updateEntityInList } from "@/utils/stateUtils";
+import { StateImpact } from "@/engine/impacts";
 
 export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: FightOutcome, week: number, rivalStableId?: string, seed?: number) {
   let injured = false;
   const names: string[] = [];
+  const rosterUpdates = new Map<string, Partial<Warrior>>();
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  const restStates: RestState[] = [...(s.restStates || [])];
   
   if (outcome.by === "KO") {
     const victimId = outcome.winner === "A" ? wD.id : wA.id;
-    s.restStates = addRestState(s.restStates || [], victimId, "KO", week);
+    restStates.push(...addRestState([], victimId, "KO", week));
   }
   
   // 1. Process Warrior A
@@ -21,11 +25,14 @@ export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: 
     names.push(wA.name); 
     const isPlayer = s.roster.some(w => w.id === wA.id);
     if (isPlayer) {
-      s.roster = updateEntityInList(s.roster, wA.id, w => ({ ...w, injuries: [...(w.injuries || []), injA] }));
+      const existing = rosterUpdates.get(wA.id) || wA;
+      rosterUpdates.set(wA.id, { ...existing, injuries: [...(existing.injuries || []), injA] });
     } else if (rivalStableId) {
-      s.rivals = (s.rivals || []).map(r => r.owner.id === rivalStableId
-        ? { ...r, roster: updateEntityInList(r.roster, wA.id, w => ({ ...w, injuries: [...(w.injuries || []), injA] })) }
-        : r);
+      const rival = (s.rivals || []).find(r => r.owner.id === rivalStableId);
+      if (rival) {
+        const updatedRoster = updateEntityInList(rival.roster, wA.id, w => ({ ...w, injuries: [...(w.injuries || []), injA] }));
+        rivalsUpdates.set(rivalStableId, { roster: updatedRoster });
+      }
     }
   }
   
@@ -36,13 +43,22 @@ export function handleInjuries(s: GameState, wA: Warrior, wD: Warrior, outcome: 
     names.push(wD.name); 
     const isPlayer = s.roster.some(w => w.id === wD.id);
     if (isPlayer) {
-      s.roster = updateEntityInList(s.roster, wD.id, w => ({ ...w, injuries: [...(w.injuries || []), injD] }));
+      const existing = rosterUpdates.get(wD.id) || wD;
+      rosterUpdates.set(wD.id, { ...existing, injuries: [...(existing.injuries || []), injD] });
     } else if (rivalStableId) {
-      s.rivals = (s.rivals || []).map(r => r.owner.id === rivalStableId
-        ? { ...r, roster: updateEntityInList(r.roster, wD.id, w => ({ ...w, injuries: [...(w.injuries || []), injD] })) }
-        : r);
+      const rival = (s.rivals || []).find(r => r.owner.id === rivalStableId);
+      if (rival) {
+        const updatedRoster = updateEntityInList(rival.roster, wD.id, w => ({ ...w, injuries: [...(w.injuries || []), injD] }));
+        rivalsUpdates.set(rivalStableId, { roster: updatedRoster });
+      }
     }
   }
 
-  return { s, injured, injuredNames: names };
+  const impact: StateImpact = {
+    rosterUpdates,
+    rivalsUpdates,
+    restStates
+  };
+
+  return { impact, injured, injuredNames: names };
 }

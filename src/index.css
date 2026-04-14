@@ -2,50 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   CODEX SANGUIS — Stable Lords Design System v3.0
+
+   Theme: Roman Imperial Arena Archive
+
+   Concept: You are a powerful patron maintaining meticulous records of your
+   gladiatorial investments. Your office is lit by torchlight, walls adorned
+   with bronze seals, parchment scrolls stacked on shelves. The UI renders
+   this ancient record-keeping system into digital form — warm, authoritative,
+   earned through blood and glory.
+
+   Color Temperature: WARM (amber/bronze/crimson) — not cold cyberpunk
+   Era Feel: Ancient-Rome-meets-dark-age-archives
+   Typography: Cinzel (Roman serif display) + Inter (clean ledger body)
+───────────────────────────────────────────────────────────────────────────── */
+
 @layer base {
   :root {
-    --background: 220 20% 4%;
-    --foreground: 30 15% 95%; /* Off-white Marble */
+    /* ── Core Background Layers ───────────────────────────── */
+    --background: 24 18% 5%;          /* #0C0806 — charred wood/aged parchment ground */
+    --foreground: 34 38% 86%;         /* #E7D3AF — warm papyrus ivory */
 
-    --card: 220 18% 7%;
-    --card-foreground: 30 15% 95%;
+    --card: 26 20% 8%;                /* #140F09 — dark leather/aged timber */
+    --card-foreground: 34 38% 86%;
 
-    --popover: 220 25% 5%;
-    --popover-foreground: 30 15% 95%;
+    --popover: 24 22% 6%;             /* Slightly darker than card */
+    --popover-foreground: 34 38% 86%;
 
-    --primary: 0 75% 45%; /* Sanguine Blood */
-    --primary-foreground: 0 0% 100%;
+    /* ── Brand Colors ────────────────────────────────────── */
+    --primary: 358 65% 32%;           /* #872228 — deep blood crimson */
+    --primary-foreground: 34 38% 95%; /* Near-white papyrus */
 
-    --secondary: 220 15% 10%;
-    --secondary-foreground: 30 10% 80%;
+    --secondary: 26 18% 12%;          /* #1E1510 — dark weathered oak */
+    --secondary-foreground: 34 28% 72%; /* Aged text */
 
-    --muted: 220 12% 12%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 26 16% 14%;              /* #221811 — muted warm dark */
+    --muted-foreground: 32 16% 48%;   /* #7B6A50 — aged ink on parchment */
 
-    --accent: 45 40% 60%; /* Burnished Antique Gold */
-    --accent-foreground: 220 20% 5%;
+    --accent: 38 58% 44%;             /* #BD8A24 — burnished bronze-gold */
+    --accent-foreground: 24 30% 6%;   /* Dark on gold */
 
-    --destructive: 0 90% 40%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 358 72% 40%;       /* Brighter blood for alerts */
+    --destructive-foreground: 34 38% 95%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 12%;
-    --ring: 0 75% 45%;
+    /* ── Structural ──────────────────────────────────────── */
+    --border: 30 18% 16%;             /* #2A1E13 — weathered wood grain */
+    --input: 26 16% 11%;              /* Form fields */
+    --ring: 358 65% 32%;              /* Focus ring — crimson */
 
-    --radius: 0px; /* Pure Brutalism */
+    --radius: 0px;                    /* Pure hard edges — stone-cut */
 
-    /* Custom tokens */
-    --arena-gold: 45 60% 55%;
-    --arena-blood: 0 80% 40%;
-    --arena-fame: 270 50% 60%;
-    --arena-pop: 190 70% 50%;
-    --arena-steel: 215 10% 70%;
-    --marble-vein: rgba(255, 255, 255, 0.03);
+    /* ── Arena Color Tokens ──────────────────────────────── */
+    --arena-gold: 38 62% 50%;         /* #C9972A — burnished arena gold */
+    --arena-blood: 358 70% 36%;       /* #912228 — arena crimson */
+    --arena-fame: 275 42% 58%;        /* #8B5FC4 — fame purple */
+    --arena-pop: 188 55% 46%;         /* #337F8C — crowd teal */
+    --arena-steel: 210 10% 62%;       /* #93939B — cold steel */
+    --arena-bone: 34 28% 72%;         /* #BBA882 — parchment/bone */
 
-    --sidebar-background: 220 25% 2%;
-    --sidebar-foreground: 30 10% 75%;
+    /* ── Special Effect Tokens ───────────────────────────── */
+    --torch-glow: rgba(200, 120, 20, 0.10);
+    --blood-glow-rgb: 135, 34, 40;
+    --gold-glow-rgb: 201, 151, 42;
+    --marble-vein: rgba(255, 245, 220, 0.018);
+    --parchment-texture: rgba(234, 209, 173, 0.025);
+
+    /* ── Sidebar ─────────────────────────────────────────── */
+    --sidebar-background: 24 22% 3%;
+    --sidebar-foreground: 32 18% 62%;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE STYLES
+───────────────────────────────────────────────────────────────────────────── */
 
 @layer base {
   * {
@@ -53,78 +84,395 @@
   }
 
   body {
-    @apply bg-[#030304] text-foreground antialiased;
+    @apply bg-[#0C0806] text-foreground antialiased;
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(0, 80%, 40%, 0.1) 0px, transparent 40%),
-      linear-gradient(to bottom, transparent, rgba(0,0,0,0.8)),
-      url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    background-image:
+      /* Torch glow — upper left warm amber */
+      radial-gradient(ellipse 60% 40% at 0% 0%, var(--torch-glow) 0px, transparent 100%),
+      /* Blood warmth — lower right subtle */
+      radial-gradient(ellipse 50% 50% at 100% 100%, rgba(135, 34, 40, 0.06) 0px, transparent 100%),
+      /* Stone/papyrus micro-texture */
+      url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.04'/%3E%3C/svg%3E");
     background-attachment: fixed;
   }
 
+  /* Display headings — Cinzel Roman serif, engraved feel */
   h1, h2, h3, h4, h5, h6, .font-display {
-    font-family: 'Cinzel', serif;
-    @apply font-bold tracking-[0.05em] uppercase;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-family: 'Cinzel', 'Times New Roman', serif;
+    @apply font-bold tracking-[0.06em] uppercase;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(0, 0, 0, 0.9);
+  }
+
+  /* Clean anchor resets */
+  a {
+    @apply text-foreground;
   }
 }
 
-/* Custom scrollbar for dark theme */
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLLBAR — Warm parchment/wood aesthetic
+───────────────────────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #030304;
+  background: #0C0806;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a1a1c;
-  border: 1px solid #333;
+  background: #2A1E13;
+  border: 1px solid #3D2B1A;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
+  background: hsl(var(--accent) / 0.5);
 }
 
-/* Arena glow effects */
+/* ─────────────────────────────────────────────────────────────────────────────
+   UTILITY CLASSES — Design Tokens
+───────────────────────────────────────────────────────────────────────────── */
+
 @layer utilities {
+
+  /* ── Text Colors ────────────────────────────────────────── */
+  .text-arena-gold   { color: hsl(var(--arena-gold)); }
+  .text-arena-fame   { color: hsl(var(--arena-fame)); }
+  .text-arena-pop    { color: hsl(var(--arena-pop)); }
+  .text-arena-blood  { color: hsl(var(--arena-blood)); }
+  .text-arena-steel  { color: hsl(var(--arena-steel)); }
+  .text-arena-bone   { color: hsl(var(--arena-bone)); }
+
+  /* ── Torch Glow Effects (warm amber — NOT cold blue/white) ── */
   .glow-gold {
-    box-shadow: 0 0 40px -15px hsl(var(--arena-gold) / 0.3), inset 0 0 1px 1px hsl(var(--arena-gold) / 0.1);
-  }
-  .glow-blood {
-    box-shadow: 0 0 40px -15px hsl(var(--arena-blood) / 0.4), inset 0 0 1px 1px hsl(var(--arena-blood) / 0.1);
-  }
-  .text-arena-gold { color: hsl(var(--arena-gold)); }
-  .text-arena-fame { color: hsl(var(--arena-fame)); }
-  .text-arena-pop { color: hsl(var(--arena-pop)); }
-  .text-arena-blood { color: hsl(var(--arena-blood)); }
-  
-  .bg-glass {
-    @apply bg-black/80 backdrop-blur-md border-b border-white/5;
-  }
-  
-  .bg-glass-card {
-    @apply bg-neutral-950/60 backdrop-blur-xl border border-white/10 shadow-2xl;
-    background-image: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+    box-shadow:
+      0 0 40px -15px hsl(var(--arena-gold) / 0.35),
+      inset 0 0 1px 1px hsl(var(--arena-gold) / 0.08);
   }
 
+  .glow-blood {
+    box-shadow:
+      0 0 40px -15px hsl(var(--arena-blood) / 0.4),
+      inset 0 0 1px 1px hsl(var(--arena-blood) / 0.1);
+  }
+
+  .glow-torch {
+    box-shadow:
+      0 0 60px -20px rgba(var(--gold-glow-rgb), 0.3),
+      0 0 20px -10px rgba(200, 120, 20, 0.2);
+  }
+
+  /* ── Text Glow ───────────────────────────────────────────── */
   .text-glow-blood {
-    text-shadow: 0 0 10px hsl(var(--arena-blood) / 0.6);
+    text-shadow: 0 0 12px hsl(var(--arena-blood) / 0.65), 0 2px 4px rgba(0,0,0,0.5);
   }
 
   .text-glow-gold {
-    text-shadow: 0 0 10px hsl(var(--arena-gold) / 0.5);
+    text-shadow: 0 0 12px hsl(var(--arena-gold) / 0.55), 0 2px 4px rgba(0,0,0,0.5);
   }
 
+  .text-glow-crimson {
+    text-shadow: 0 0 16px hsl(var(--primary) / 0.7), 0 2px 8px rgba(0,0,0,0.6);
+  }
+
+  /* ── Engraved / Carved Text ─────────────────────────────── */
+  .text-carved {
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.9),
+      0 -1px 0 rgba(255, 245, 220, 0.06),
+      0 2px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ── Card & Surface Variants ─────────────────────────────── */
+  .bg-glass {
+    @apply bg-[#120D09]/85 backdrop-blur-md border-b border-white/5;
+  }
+
+  .bg-glass-card {
+    @apply bg-[#120D09]/70 backdrop-blur-xl shadow-2xl;
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 245, 220, 0.018) 0%,
+      transparent 60%,
+      rgba(200, 120, 20, 0.02) 100%
+    );
+    border: 1px solid rgba(42, 30, 19, 0.9);
+    border-top-color: rgba(80, 55, 30, 0.4);
+    border-left-color: rgba(70, 48, 26, 0.35);
+  }
+
+  /* Aged parchment card */
+  .bg-parchment-card {
+    background: linear-gradient(
+      145deg,
+      rgba(24, 16, 9, 0.9) 0%,
+      rgba(18, 12, 7, 0.95) 50%,
+      rgba(22, 15, 8, 0.9) 100%
+    );
+    border: 1px solid rgba(60, 42, 22, 0.8);
+    border-top-color: rgba(100, 70, 36, 0.5);
+  }
+
+  /* ── Ornamental Borders ─────────────────────────────────── */
+  /* Classic double-line Roman border effect */
+  .codex-border {
+    @apply border relative;
+    border-color: rgba(60, 42, 22, 0.7);
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 1px solid rgba(42, 30, 16, 0.4);
+      pointer-events: none;
+    }
+  }
+
+  /* Brutalist border with inner inset */
   .brutalist-border {
-    @apply border border-white/10 relative;
+    @apply border border-white/8 relative;
     &::after {
       content: '';
-      @apply absolute inset-0 border border-white/5 pointer-events-none;
+      @apply absolute inset-0 border border-white/4 pointer-events-none;
       margin: 2px;
     }
   }
 
+  /* ── Section Dividers ────────────────────────────────────── */
+  /* Ornamental horizontal rule */
+  .codex-divider {
+    @apply relative flex items-center gap-4;
+    &::before, &::after {
+      content: '';
+      @apply flex-1 h-px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(201, 151, 42, 0.2),
+        transparent
+      );
+    }
+  }
+
+  /* ── Section Label (replaces UPPERCASE_UNDERSCORED text) ── */
+  .codex-label {
+    @apply text-[10px] font-black uppercase tracking-[0.4em];
+    color: hsl(var(--arena-gold) / 0.5);
+    font-family: 'Cinzel', serif;
+  }
+
+  /* ── Marble vein micro-texture ───────────────────────────── */
   .marble-vein {
-    background-image: linear-gradient(45deg, var(--marble-vein) 25%, transparent 25%, transparent 50%, var(--marble-vein) 50%, var(--marble-vein) 75%, transparent 75%, transparent);
-    background-size: 4px 4px;
+    background-image:
+      repeating-linear-gradient(
+        48deg,
+        var(--marble-vein) 0px,
+        transparent 2px,
+        transparent 16px
+      ),
+      repeating-linear-gradient(
+        -33deg,
+        var(--parchment-texture) 0px,
+        transparent 1px,
+        transparent 20px
+      );
+  }
+
+  /* ── Torch / Flame Animation ─────────────────────────────── */
+  .torch-flicker {
+    animation: torchFlicker 3s ease-in-out infinite alternate;
+  }
+
+  /* ── Stat Bars — look like carved stone fills ────────────── */
+  .stat-bar-fill {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary) / 0.7) 100%
+    );
+  }
+
+  /* ── Blood / Kill Accent ─────────────────────────────────── */
+  .kill-accent {
+    color: hsl(var(--arena-blood));
+    text-shadow: 0 0 8px hsl(var(--arena-blood) / 0.5);
+  }
+
+  /* ── Fame Accent ────────────────────────────────────────── */
+  .fame-accent {
+    color: hsl(var(--arena-gold));
+    text-shadow: 0 0 10px hsl(var(--arena-gold) / 0.4);
+  }
+
+  /* ── Wax Seal Effect ─────────────────────────────────────── */
+  .wax-seal {
+    @apply relative inline-flex items-center justify-center;
+    background: radial-gradient(
+      ellipse at 35% 35%,
+      hsl(var(--primary) / 0.9) 0%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--primary) / 0.75) 100%
+    );
+    box-shadow:
+      0 4px 12px hsl(var(--primary) / 0.5),
+      inset 0 1px 0 rgba(255, 200, 200, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* ── Bronze Shimmer on Gold elements ────────────────────── */
+  .bronze-shimmer {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--arena-gold)) 0%,
+      hsl(38 72% 62%) 30%,
+      hsl(var(--arena-gold)) 60%,
+      hsl(38 45% 38%) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Pulsing "live" indicator ────────────────────────────── */
+  .live-pulse {
+    @apply inline-block w-1.5 h-1.5 rounded-full bg-primary;
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  /* ── Imperial Seal border (circular ornament) ────────────── */
+  .imperial-ring {
+    @apply p-2.5 rounded-none relative;
+    background: linear-gradient(135deg, rgba(201, 151, 42, 0.12), rgba(201, 151, 42, 0.04));
+    border: 1px solid rgba(201, 151, 42, 0.3);
+    box-shadow: inset 0 0 8px rgba(201, 151, 42, 0.05);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   KEYFRAME ANIMATIONS
+───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes torchFlicker {
+  0%   { opacity: 0.85; filter: brightness(0.95); }
+  20%  { opacity: 0.92; filter: brightness(1.02); }
+  40%  { opacity: 0.88; filter: brightness(0.97); }
+  60%  { opacity: 0.95; filter: brightness(1.05); }
+  80%  { opacity: 0.87; filter: brightness(0.94); }
+  100% { opacity: 0.93; filter: brightness(1.03); }
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes bloodDrip {
+  0%   { transform: translateY(-2px); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(6px); opacity: 0; }
+}
+
+@keyframes bronzeShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPONENT OVERRIDES — Tailwind base adjustments
+───────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+
+  /* Input fields — leather/wood inset styling */
+  input, textarea, select {
+    @apply caret-accent;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(123, 106, 80, 0.5);
+  }
+
+  /* Selection */
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TITLE SCREEN SPECIAL EFFECTS
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Atmospheric vignette for full-screen pages */
+.screen-vignette {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+/* Colosseum arch CSS ornament */
+.arch-ornament {
+  @apply relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--accent) / 0.4) 30%,
+      hsl(var(--accent) / 0.8) 50%,
+      hsl(var(--accent) / 0.4) 70%,
+      transparent 100%
+    );
+  }
+}
+
+/* Wide decorative top-border for important containers */
+.header-ornament {
+  @apply relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--accent) / 0.3) 20%,
+      hsl(var(--accent) / 0.6) 50%,
+      hsl(var(--accent) / 0.3) 80%,
+      transparent 100%
+    );
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--accent) / 0.15) 30%,
+      hsl(var(--accent) / 0.3) 50%,
+      hsl(var(--accent) / 0.15) 70%,
+      transparent 100%
+    );
   }
 }

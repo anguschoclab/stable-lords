@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Activity, Binary, Search, LayoutGrid } from "lucide-react";
@@ -14,19 +14,33 @@ interface MetaAnalyticsProps {
   allFights: import("@/types/game").FightSummary[];
 }
 
+const TACTICAL_STYLES = ["Brawler", "Technician", "High-Flyer", "Powerhouse", "Grappler"];
+
 export function TacticalStyleAnalysis({ allFights }: MetaAnalyticsProps) {
-  const styles = ["Brawler", "Technician", "High-Flyer", "Powerhouse", "Grappler"];
   
-  const stats = styles.map(style => {
-    const styleFights = allFights.filter(f => f.styleA === style || f.styleD === style);
-    const wins = allFights.filter(f => {
-      if (f.winner === "A") return f.styleA === style;
-      if (f.winner === "D") return f.styleD === style;
-      return false;
-    }).length;
-    const rate = styleFights.length > 0 ? (wins / styleFights.length) * 100 : 0;
-    return { style, wins, total: styleFights.length, rate };
-  }).sort((a, b) => b.rate - a.rate);
+
+  // ⚡ Bolt: Reduced O(S * N) repeated filter calls to O(N) single-pass aggregation and memoized result
+  const stats = useMemo(() => {
+    const agg: Record<string, { wins: number; total: number }> = {};
+    for (const s of TACTICAL_STYLES) agg[s] = { wins: 0, total: 0 };
+
+    for (let i = 0; i < allFights.length; i++) {
+      const f = allFights[i];
+      if (f.winnerStyle && agg[f.winnerStyle]) {
+        agg[f.winnerStyle].wins++;
+        agg[f.winnerStyle].total++;
+      }
+      if (f.loserStyle && agg[f.loserStyle]) {
+        agg[f.loserStyle].total++;
+      }
+    }
+
+    return TACTICAL_STYLES.map(style => {
+      const { wins, total } = agg[style] || { wins: 0, total: 0 };
+      const rate = total > 0 ? (wins / total) * 100 : 0;
+      return { style, wins, total, rate };
+    }).sort((a, b) => b.rate - a.rate);
+  }, [allFights]);
 
   return (
     <Surface variant="glass" className="border-border/10 bg-neutral-900/40 relative overflow-hidden h-full">
@@ -95,7 +109,26 @@ export function TacticalStyleAnalysis({ allFights }: MetaAnalyticsProps) {
 }
 
 export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
-  const styles = ["Brawler", "Technician", "High-Flyer", "Powerhouse", "Grappler"];
+
+
+  // ⚡ Bolt: Reduced O(S^2 * N) nested filtering to O(N) single-pass aggregation and memoized result
+  const matchupStats = useMemo(() => {
+    const agg: Record<string, Record<string, { wins: number; total: number }>> = {};
+    for (const f of allFights || []) {
+      const { winnerStyle: w, loserStyle: l } = f;
+      if (!w || !l) continue;
+
+      if (!agg[w]) agg[w] = {};
+      if (!agg[w][l]) agg[w][l] = { wins: 0, total: 0 };
+      agg[w][l].wins++;
+      agg[w][l].total++;
+
+      if (!agg[l]) agg[l] = {};
+      if (!agg[l][w]) agg[l][w] = { wins: 0, total: 0 };
+      agg[l][w].total++;
+    }
+    return agg;
+  }, [allFights]);
 
   return (
     <Surface variant="glass" className="border-border/10 bg-neutral-900/40 relative overflow-hidden h-full">
@@ -118,7 +151,7 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
           <thead>
             <tr>
               <th className="p-2"></th>
-              {styles.map(s => (
+              {TACTICAL_STYLES.map(s => (
                 <th key={s} className="p-2 text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 text-center w-16 group/header">
                    <div className="rotate-45 mb-4 group-hover/header:text-primary transition-colors">{s}</div>
                 </th>
@@ -126,23 +159,17 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
             </tr>
           </thead>
           <tbody>
-            {styles.map(rowStyle => (
+            {TACTICAL_STYLES.map(rowStyle => (
               <tr key={rowStyle} className="group/row">
                 <td className="p-2 text-[10px] font-black uppercase tracking-widest text-foreground/60 text-right pr-4 group-hover/row:text-arena-gold transition-colors">
                   {rowStyle}
                 </td>
-                {styles.map(colStyle => {
-                  const matches = allFights.filter(f => 
-                    (f.styleA === rowStyle && f.styleD === colStyle) || 
-                    (f.styleA === colStyle && f.styleD === rowStyle)
-                  );
-                  const wins = allFights.filter(f => {
-                    if (f.winner === "A") return f.styleA === rowStyle && f.styleD === colStyle;
-                    if (f.winner === "D") return f.styleD === rowStyle && f.styleA === colStyle;
-                    return false;
-                  }).length;
-                  const rate = matches.length > 0 ? (wins / matches.length) * 100 : 50;
-                  const isNeutral = matches.length === 0;
+                {TACTICAL_STYLES.map(colStyle => {
+                  const data = matchupStats[rowStyle]?.[colStyle] || { wins: 0, total: 0 };
+                  const rate = data.total > 0 ? (data.wins / data.total) * 100 : 50;
+                  const isNeutral = data.total === 0;
+                  const wins = data.wins;
+                  const matchesLength = data.total;
 
                   return (
                     <td key={colStyle} className="p-1">
@@ -167,7 +194,7 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
                             </div>
                          </TooltipTrigger>
                          <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest">
-                            {rowStyle} vs {colStyle}: {rate.toFixed(1)}% Win Rate ({wins}/{matches.length})
+                            {rowStyle} vs {colStyle}: {rate.toFixed(1)}% Win Rate ({wins}/{matchesLength})
                          </TooltipContent>
                       </Tooltip>
                     </td>

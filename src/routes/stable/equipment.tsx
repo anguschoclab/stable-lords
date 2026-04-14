@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import StableEquipment from "@/pages/StableEquipment";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/stable/equipment")({
-  component: StableEquipment,
+  component: () => <Navigate to="/ops/equipment" />,
 });

@@ -145,13 +145,13 @@ export function StableLink({ name, className, children }: StableLinkProps) {
                   Stable Records
                 </div>
                 {isPlayer ? (
-                  <Link to="/stable">
+                  <Link to="/command/roster">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>
                 ) : stableId ? (
-                  <Link to="/stable/$id" params={{ id: stableId }}>
+                  <Link to="/world/stable/$id" params={{ id: stableId }}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
                       <ExternalLink className="h-4 w-4" />
                     </Button>

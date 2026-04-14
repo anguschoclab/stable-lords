@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import BookingOffice from "@/pages/BookingOffice";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/stable/contracts")({
-  component: BookingOffice,
+  component: () => <Navigate to="/ops/contracts" />,
 });

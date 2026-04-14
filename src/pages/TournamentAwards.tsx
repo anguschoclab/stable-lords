@@ -94,21 +94,47 @@ function computeTournamentAwards(
 
   const allStats = [...stats.values()];
 
-  // MVP: champion gets priority, then most wins + kills
+  // ⚡ Bolt: Reduced O(N log N) sorts to O(N) linear scans for single max value lookups
   const champion = tournament.champion;
-  const mvpSorted = [...allStats].sort((a, b) => {
-    if (a.name === champion) return -1;
-    if (b.name === champion) return 1;
-    return (b.wins * 2 + b.kills * 3) - (a.wins * 2 + a.kills * 3);
-  });
+  let bestMvp = null;
+  let bestMvpScore = -Infinity;
+  let bestKill = null;
+  let bestKillScore = 0;
 
-  const killSorted = [...allStats].filter(s => s.kills > 0).sort((a, b) => b.kills - a.kills);
+  for (const s of allStats) {
+    if (s.name === champion) {
+      bestMvp = s;
+      bestMvpScore = Infinity; // Champion always wins MVP
+    } else {
+      const score = s.wins * 2 + s.kills * 3;
+      if (score > bestMvpScore) {
+        bestMvpScore = score;
+        bestMvp = s;
+      }
+    }
+
+    if (s.kills > bestKillScore) {
+      bestKillScore = s.kills;
+      bestKill = s;
+    }
+  }
 
   // Iron Will: survived most rounds (most wins)
-  const mvpName = mvpSorted[0]?.name;
-  const ironSorted = [...allStats]
-    .filter(s => s.name !== mvpName && s.wins >= 2)
-    .sort((a, b) => b.wins - a.wins || (b.wins / (b.wins + b.losses)) - (a.wins / (a.wins + a.losses)));
+  let bestIron: typeof allStats[number] | null = null;
+  let bestIronWins = -Infinity;
+  let bestIronRate = -Infinity;
+  const mvpName = bestMvp?.name;
+
+  for (const s of allStats) {
+    if (s.name !== mvpName && s.wins >= 2) {
+      const rate = s.wins / (s.wins + s.losses);
+      if (s.wins > bestIronWins || (s.wins === bestIronWins && rate > bestIronRate)) {
+        bestIronWins = s.wins;
+        bestIronRate = rate;
+        bestIron = s;
+      }
+    }
+  }
 
   // Upsets
   const upsets: UpsetEntry[] = [];
@@ -134,9 +160,9 @@ function computeTournamentAwards(
   return {
     tournament,
     fights,
-    mvp: mvpSorted[0] ?? null,
-    deadliest: killSorted[0] ?? null,
-    ironWill: ironSorted[0] ?? null,
+    mvp: bestMvp ?? null,
+    deadliest: bestKill ?? null,
+    ironWill: bestIron ?? null,
     upsets: upsets.slice(0, 5),
     totalKills,
     totalBouts: fights.length,

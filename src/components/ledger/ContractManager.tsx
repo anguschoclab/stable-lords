@@ -77,7 +77,7 @@ export function ContractManager() {
                   No specialists are currently under contract. Institutional growth is stagnant. Access the recruitment terminal to restore faculty operations.
                 </p>
               </div>
-              <Link to="/stable/trainers" className="mt-4">
+              <Link to="/ops/personnel" className="mt-4">
                 <Button className="bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 h-11 shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] hover:scale-105 transition-all">
                   Access_Recruitment_Hub
                 </Button>

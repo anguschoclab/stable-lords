@@ -1,7 +1,7 @@
 import type { Warrior } from "@/types/state.types";
 import type { FightOutcome, FightSummary } from "@/types/combat.types";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { generateId } from "@/utils/idUtils";
-import { SeededRNG } from "@/utils/random";
 import { StyleRollups } from "@/engine/stats/styleRollups";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { LoreArchive } from "@/lore/LoreArchive";
@@ -9,22 +9,22 @@ import { NewsletterFeed } from "@/engine/newsletter/feed";
 import { commentatorFor, blurb, type AnnounceTone } from "@/lore/AnnouncerAI";
 
 export function handleReporting(
-  wA: Warrior, 
-  wD: Warrior, 
-  outcome: FightOutcome, 
-  tags: string[], 
-  fA: number, 
-  pA: number, 
-  fD: number, 
-  pD: number, 
-  week: number, 
-  rivalStableId?: string, 
+  wA: Warrior,
+  wD: Warrior,
+  outcome: FightOutcome,
+  tags: string[],
+  fA: number,
+  pA: number,
+  fD: number,
+  pD: number,
+  week: number,
+  rivalStableId?: string,
   isRivalry?: boolean,
   day: number = 0,
-  rng?: () => number
+  rng?: IRNGService
 ) {
-  const safeRng = rng ? { next: rng } : new SeededRNG(week * 100 + day);
-  const boutId = generateId(safeRng as SeededRNG, "bout");
+  const safeRng = rng;
+  const boutId = safeRng ? safeRng.uuid() : generateId(undefined, "bout");
   const summary: FightSummary = { 
     id: boutId, week, title: `${wA.name} vs ${wD.name}`, a: wA.name, d: wD.name, 
     warriorIdA: wA.id, warriorIdD: wD.id,
@@ -41,14 +41,14 @@ export function handleReporting(
   NewsletterFeed.appendFightResult({ summary, transcript: summary.transcript ?? [] });
 
   const tone: AnnounceTone = outcome.by === "Kill" ? "grim" : (tags.includes("Flashy") ? "hype" : "neutral");
-  const announcement = (outcome.by === "Kill" || outcome.by === "KO") 
-    ? commentatorFor(outcome.by, () => (safeRng as SeededRNG).next()) 
-    : blurb({ 
-        tone, 
-        winner: outcome.winner === "A" ? wA.name : wD.name, 
-        loser: outcome.winner === "A" ? wD.name : wA.name, 
+  const announcement = (outcome.by === "Kill" || outcome.by === "KO")
+    ? commentatorFor(outcome.by, () => safeRng ? safeRng.next() : Math.random())
+    : blurb({
+        tone,
+        winner: outcome.winner === "A" ? wA.name : wD.name,
+        loser: outcome.winner === "A" ? wD.name : wA.name,
         by: outcome.by ?? undefined,
-        rng: () => (safeRng as SeededRNG).next()
+        rng: () => safeRng ? safeRng.next() : Math.random()
       });
 
   return { summary, announcement };

@@ -125,7 +125,7 @@ export default function EventLog() {
         subtitle: isKill ? `Killed in combat` : `Victory by ${f.by ?? "decision"}`,
         icon: EVENT_ICONS[isKill ? "kill" : "fight"].icon,
         iconColor: EVENT_ICONS[isKill ? "kill" : "fight"].color,
-        linkTo: "/hall-of-fights",
+        linkTo: "/world/chronicle",
         entityNames: [f.a, f.d],
       });
     });
@@ -194,7 +194,7 @@ export default function EventLog() {
         subtitle: isRecovery ? "Active recovery from injuries" : "Assigned to training grounds",
         icon: EVENT_ICONS[isRecovery ? "recovery" : "training"].icon,
         iconColor: EVENT_ICONS[isRecovery ? "recovery" : "training"].color,
-        linkTo: "/training",
+        linkTo: "/command/training",
         entityNames: [w.name],
       });
     });
@@ -209,7 +209,7 @@ export default function EventLog() {
         subtitle: n.items[0]?.slice(0, 60) ?? "",
         icon: EVENT_ICONS.news.icon,
         iconColor: EVENT_ICONS.news.color,
-        linkTo: "/hall-of-fights",
+        linkTo: "/world/chronicle",
       });
     });
 
@@ -225,7 +225,7 @@ export default function EventLog() {
         subtitle: t.champion ? `Champion: ${t.champion}` : "Tournament completed",
         icon: EVENT_ICONS.tournament.icon,
         iconColor: EVENT_ICONS.tournament.color,
-        linkTo: "/tournaments",
+        linkTo: "/world/tournaments",
         entityNames: names,
       });
     });

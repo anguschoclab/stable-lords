@@ -51,8 +51,10 @@ export async function runAutosim(
     const { state: nextState, results, summary } = processWeekBouts(state);
     state = nextState;
     
+    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const };
+    
     weekSummaries.push({
-      week: state.week,
+      week: state.week || 1,
       bouts: summary.bouts,
       deaths: summary.deaths,
       injuries: summary.injuries,

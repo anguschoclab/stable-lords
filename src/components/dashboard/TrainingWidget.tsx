@@ -51,7 +51,7 @@ export function TrainingWidget() {
         {trainingWarriors.length === 0 ? (
           <div className="py-8 text-center opacity-20 italic">
             <p className="text-[10px] uppercase tracking-[0.2em]">Training_Grounds_Idle</p>
-            <Link to="/stable/training">
+            <Link to="/command/training">
                <Button variant="ghost" size="sm" className="mt-4 text-[9px] uppercase tracking-widest font-black border border-white/5 hover:bg-primary/10 hover:text-primary transition-all">
                   Assign_Modules
                </Button>
@@ -117,7 +117,7 @@ export function TrainingWidget() {
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
          <Link 
-            to="/stable/training"
+            to="/command/training"
             className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
          >
             Sync_Training_Hub <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />

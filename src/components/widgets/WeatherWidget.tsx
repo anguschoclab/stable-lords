@@ -1,6 +1,6 @@
 import React from "react";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { Cloud, Sun, CloudRain, ThermometerSun, Wind, Info } from "lucide-react";
+import { Cloud, Sun, CloudRain, ThermometerSun, Wind, Info, Moon } from "lucide-react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -25,9 +25,9 @@ const WEATHER_METADATA = {
   },
   Rainy: {
     icon: CloudRain,
-    color: "text-blue-400",
-    bg: "bg-blue-400/10",
-    border: "border-blue-400/20",
+    color: "text-stone-400",
+    bg: "bg-stone-400/10",
+    border: "border-stone-400/20",
     description: "Driving rain. Significant penalties to precision and initiative. Footing is uncertain.",
     stats: "PRECISION_PENALTY_15% // INITIATIVE_-10"
   },
@@ -39,7 +39,7 @@ const WEATHER_METADATA = {
     description: "Fierce winds. Substantial penalty to stamina.",
     stats: "STAMINA_DRAIN_115%"
   },
-  Scalding: {
+  Sweltering: {
     icon: ThermometerSun,
     color: "text-orange-500",
     bg: "bg-orange-500/10",
@@ -47,13 +47,21 @@ const WEATHER_METADATA = {
     description: "Oppressive heat. Endurance consumption is doubled. High-constitution warriors favored.",
     stats: "ENDURANCE_DRAIN_200% // FATIGUE_ACCEL"
   },
-  Drafty: {
+  Breezy: {
     icon: Wind,
-    color: "text-cyan-400",
-    bg: "bg-cyan-400/10",
-    border: "border-cyan-400/20",
+    color: "text-stone-300",
+    bg: "bg-stone-300/10",
+    border: "border-stone-300/20",
     description: "Strong shifting winds. Erratic initiative modifiers and slight energy drain.",
     stats: "INITIATIVE_FLUX // STAMINA_DRAIN_120%"
+  },
+  Eclipse: {
+    icon: Moon,
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+    description: "Eerie darkness descends. Fights become slow and methodical as combatants hesitate.",
+    stats: "STAMINA_CONSERVATION_20% // HESITATION"
   }
 };
 

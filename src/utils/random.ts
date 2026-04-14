@@ -58,16 +58,16 @@ export class SeededRNG {
   /** Returns a new SeededRNG with the exact same state */
   clone(): SeededRNG {
     const clone = new SeededRNG(0);
-    (clone as any).state = this.state;
+    clone.state = this.state;
     return clone;
   }
 }
 
 /** Legacy secure RNG (kept for non-deterministic UI needs if any) */
 export function random32(): number {
-  if (typeof globalThis !== "undefined" && (globalThis as any).crypto?.getRandomValues) {
+  if (typeof globalThis !== "undefined" && "crypto" in globalThis && typeof (globalThis.crypto as Crypto).getRandomValues === "function") {
     const array = new Uint32Array(1);
-    (globalThis as any).crypto.getRandomValues(array);
+    (globalThis.crypto as Crypto).getRandomValues(array);
     return array[0];
   }
   throw new Error("Secure random number generator not available in this environment.");

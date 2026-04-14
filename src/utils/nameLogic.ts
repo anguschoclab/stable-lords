@@ -1,4 +1,4 @@
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 /**
  * Stable Lords — Name Logic
@@ -9,7 +9,7 @@ const HONORIFICS = ["II", "III", "IV", "Jr.", "the Younger", "the Heir", "V"];
 const PREFIXES = ["Legacy of", "Blood of", "Protege of", "Shadow of"];
 
 export function generateDynasticName(originalName: string, seed: number): string {
-  const rng = new SeededRNG(seed);
+  const rng = new SeededRNGService(seed);
   const roll = rng.next();
 
   if (roll < 0.6) {
