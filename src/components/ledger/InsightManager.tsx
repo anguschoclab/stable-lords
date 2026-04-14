@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FightingStyle } from "@/types/shared.types";
 
 export function InsightManager() {
-  const { state, doConsumeInsightToken } = useGameStore();
+  const state = useWorldState();
+  const { consumeInsightToken } = useGameStore();
   const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
   const [selectedWarriorId, setSelectedWarriorId] = useState<string | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -52,7 +53,7 @@ export function InsightManager() {
         result: result
       });
 
-      doConsumeInsightToken(selectedToken.id, selectedWarrior.id);
+      consumeInsightToken(selectedToken.id, selectedWarrior.id);
       setIsRevealing(false);
       setSelectedTokenId(null);
       setSelectedWarriorId(null);
@@ -82,8 +83,9 @@ export function InsightManager() {
             </div>
           ) : (
             <div className="space-y-2">
-              {tokens.map(token => (
+              {tokens.map((token: any) => (
                 <button
+                  aria-label={`Select ${token.type} Insight Token, discovered week ${token.discoveredWeek}`}
                   key={token.id}
                   onClick={() => setSelectedTokenId(token.id)}
                   className={`w-full text-left p-4 rounded-xl border transition-all relative overflow-hidden group ${
@@ -118,13 +120,14 @@ export function InsightManager() {
             {selectedTokenId ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {roster.map(w => {
+                  {roster.map((w: any) => {
                     const isRevealed = selectedToken?.type === "Weapon" 
                       ? w.favorites?.discovered.weapon 
                       : w.favorites?.discovered.rhythm;
 
                     return (
                       <button
+                        aria-label={`Select warrior ${w.name} for insight`}
                         key={w.id}
                         disabled={isRevealed || isRevealing}
                         onClick={() => setSelectedWarriorId(w.id)}

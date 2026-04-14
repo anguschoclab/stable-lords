@@ -36,7 +36,7 @@ import { Surface } from "@/components/ui/Surface";
 import { TrainerCard } from "@/components/stable/TrainerCard";
 import { canTransact } from "@/utils/economyUtils";
 import { generateId } from "@/utils/idUtils";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { toast } from "sonner";
 
 export default function Trainers() {
@@ -83,7 +83,7 @@ export default function Trainers() {
         draft.hiringPool = draft.hiringPool.filter((t) => t.id !== trainer.id);
         draft.treasury -= cost;
         draft.ledger.push({
-          id: generateId(new SeededRNG(Date.now()), "ledger"),
+          id: new SeededRNGService(Date.now()).uuid(),
           week: draft.week,
           label: `Acquisition: ${trainer.name}`,
           amount: -cost,
@@ -132,7 +132,7 @@ export default function Trainers() {
         subtitle="STABLE_STAFF // TACTICAL_MASTERY // RECRUITMENT_REVEAL"
         icon={Users}
         actions={
-          <div className="flex flex-col md:flex-row items-center gap-6 bg-neutral-900/40 backdrop-blur-md px-6 py-3 rounded-xl border border-white/5 shadow-inner">
+          <div className="flex flex-col md:flex-row items-center gap-6 bg-neutral-900/40 backdrop-blur-md px-6 py-3 rounded-none border border-white/5 shadow-inner">
              <div className="flex flex-col items-center border-r border-white/10 pr-6">
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Staff Capacity</span>
                 <span className="font-mono font-black text-primary text-lg flex items-center gap-1.5 leading-none">
@@ -150,11 +150,11 @@ export default function Trainers() {
       />
 
       <Tabs defaultValue="current" className="space-y-8">
-        <TabsList className="bg-neutral-900/60 border border-white/5 p-1 h-12 rounded-xl">
-          <TabsTrigger value="current" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-lg font-black uppercase text-[10px] tracking-widest">
+        <TabsList className="bg-neutral-900/60 border border-white/5 p-1 h-12 rounded-none">
+          <TabsTrigger value="current" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
             <GraduationCap className="h-3.5 w-3.5" /> Stability Staff
           </TabsTrigger>
-          <TabsTrigger value="hire" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-lg font-black uppercase text-[10px] tracking-widest">
+          <TabsTrigger value="hire" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
             <UserPlus className="h-3.5 w-3.5" /> Tactical Hire
           </TabsTrigger>
         </TabsList>
@@ -204,7 +204,7 @@ export default function Trainers() {
                       .reduce((sum, t) => sum + (TIER_BONUS[t.tier as TrainerTier] ?? 1), 0);
                     
                     return total > 0 && (
-                      <div key={focus} className="group relative flex flex-col items-center gap-6 p-4 rounded-xl hover:bg-white/5 transition-all">
+                      <div key={focus} className="group relative flex flex-col items-center gap-6 p-4 rounded-none hover:bg-white/5 transition-all">
                         <div className="text-4xl filter group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500">
                           {FOCUS_ICONS[focus]}
                         </div>
@@ -227,8 +227,8 @@ export default function Trainers() {
             <div className="pt-8 border-t border-white/5">
               <Dialog open={convertDialogOpen} onOpenChange={setConvertDialogOpen}>
                 <DialogTrigger asChild>
-                  <button className="w-full h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center gap-4 group hover:bg-primary/20 hover:border-primary transition-all">
-                    <div className="p-2 rounded-lg bg-primary/20 group-hover:bg-primary transition-colors">
+                  <button className="w-full h-16 rounded-none bg-primary/10 border border-primary/30 flex items-center justify-center gap-4 group hover:bg-primary/20 hover:border-primary transition-all">
+                    <div className="p-2 rounded-none bg-primary/20 group-hover:bg-primary transition-colors">
                        <Armchair className="h-5 w-5 text-white" />
                     </div>
                     <div className="text-left">
@@ -240,7 +240,7 @@ export default function Trainers() {
                 <DialogContent className="bg-neutral-950/95 backdrop-blur-2xl border-white/10 sm:max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
                   <DialogHeader className="p-6 border-b border-white/5 flex flex-col gap-4">
                     <DialogTitle className="font-display text-2xl font-black uppercase tracking-tight flex items-center gap-4">
-                       <div className="p-2 rounded-xl bg-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
+                       <div className="p-2 rounded-none bg-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
                           <GraduationCap className="h-6 w-6" />
                        </div>
                        Retired_to_Staff_Sync
@@ -256,7 +256,7 @@ export default function Trainers() {
                       return (
                         <div
                           key={w.id}
-                          className="flex items-center justify-between p-4 rounded-2xl bg-neutral-900 border border-white/5 group hover:border-primary/40 transition-all"
+                          className="flex items-center justify-between p-4 rounded-none bg-neutral-900 border border-white/5 group hover:border-primary/40 transition-all"
                         >
                           <div className="flex items-center gap-6">
                             <div>
@@ -274,7 +274,7 @@ export default function Trainers() {
                           </div>
                           <button 
                             onClick={() => convertWarrior(w.id)}
-                            className="bg-primary text-white px-6 py-2.5 rounded-lg font-black uppercase text-[10px] tracking-widest shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all"
+                            className="bg-primary text-white px-6 py-2.5 rounded-none font-black uppercase text-[10px] tracking-widest shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all"
                           >
                              ESTABLISH_Staff
                           </button>
@@ -289,9 +289,9 @@ export default function Trainers() {
         </TabsContent>
 
         <TabsContent value="hire" className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex flex-col sm:flex-row items-center justify-between bg-neutral-900/60 p-6 rounded-2xl border border-white/5 gap-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between bg-neutral-900/60 p-6 rounded-none border border-white/5 gap-6">
             <div className="flex items-center gap-4">
-               <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+               <div className="p-3 rounded-none bg-primary/10 border border-primary/20">
                   <RefreshCw className="h-6 w-6 text-primary" />
                </div>
                <div>
@@ -303,7 +303,7 @@ export default function Trainers() {
             </div>
             <button 
               onClick={refreshPool} 
-              className="flex items-center gap-2.5 bg-neutral-950 border border-white/10 hover:border-primary/50 px-5 py-2.5 rounded-xl transition-all group/refresh"
+              className="flex items-center gap-2.5 bg-neutral-950 border border-white/10 hover:border-primary/50 px-5 py-2.5 rounded-none transition-all group/refresh"
             >
               <RefreshCw className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:rotate-180 transition-all duration-700" />
               <span className="text-[10px] font-black uppercase tracking-widest">Update_Registry</span>
@@ -321,7 +321,7 @@ export default function Trainers() {
                     <div className="flex items-center gap-3">
                        <Tooltip>
                           <TooltipTrigger asChild>
-                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black border border-white/5 font-mono font-black text-xs text-arena-gold shadow-inner">
+                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-black border border-white/5 font-mono font-black text-xs text-arena-gold shadow-inner">
                                 <Coins className="h-3.5 w-3.5" /> {TIER_COST[t.tier as TrainerTier] ?? 50}G
                              </div>
                           </TooltipTrigger>
@@ -332,7 +332,7 @@ export default function Trainers() {
                           disabled={!canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)}
                           onClick={() => hireTrainer(t)}
                           className={cn(
-                            "flex items-center gap-2 px-5 py-1.5 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all",
+                            "flex items-center gap-2 px-5 py-1.5 rounded-none font-black uppercase text-[10px] tracking-widest transition-all",
                             !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
                               ? "bg-neutral-900 border border-white/5 text-muted-foreground/40 cursor-not-allowed"
                               : "bg-primary text-white border border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95"

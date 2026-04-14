@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { type Warrior, STYLE_DISPLAY_NAMES } from "@/types/game";
 import { getRecommendedChallenges, getMatchupsToAvoid, type MatchupScore } from "@/engine/schedulingAssistant";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +81,7 @@ interface SchedulingWidgetProps {
 }
 
 export function SchedulingWidget({ warrior }: SchedulingWidgetProps) {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const recommendations = useMemo(() => 
     getRecommendedChallenges(state, warrior, 2), 

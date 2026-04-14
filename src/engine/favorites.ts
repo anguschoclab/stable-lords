@@ -140,7 +140,7 @@ export function getFavoriteWeaponBonus(warrior: Warrior): number {
   const fav = warrior.favorites;
   if (!fav?.discovered.weapon) return 0;
   const equippedWeapon = warrior.equipment?.weapon ?? "broadsword";
-  return equippedWeapon === fav.weaponId ? 2 : 0;
+  return equippedWeapon === fav.weaponId ? 1 : 0;
 }
 
 /** Get INI bonus from matching favorite rhythm (only if discovered, perfect match) */

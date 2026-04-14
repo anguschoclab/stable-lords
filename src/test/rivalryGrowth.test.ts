@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { updateRivalriesFromBouts } from "@/engine/matchmaking/rivalryLogic";
 import { FightSummary, Rivalry } from "@/types/game";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
   it("verifies that rivalry intensity scales correctly with fame outcomes", () => {
@@ -15,6 +16,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
         createdAt: new Date().toISOString(),
         a: "PlayerStable",
         d: "RivalStable",
+        warriorIdA: "warrior1",
+        warriorIdD: "warrior2",
         winner: "A",
         by: "KO",
         styleA: "WS",
@@ -25,7 +28,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
       },
     ];
 
-    const rivalriesAfter1 = updateRivalriesFromBouts(existingRivalries, highFameFights, week);
+    const rng = new SeededRNGService(12345);
+    const rivalriesAfter1 = updateRivalriesFromBouts(existingRivalries, highFameFights, week, rng);
     const feud = rivalriesAfter1.find(r => r.stableIdA === "PlayerStable" && r.stableIdB === "RivalStable");
     
     expect(feud).toBeDefined();
@@ -41,6 +45,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
         createdAt: new Date().toISOString(),
         a: "NewStable",
         d: "OtherStable",
+        warriorIdA: "warrior3",
+        warriorIdD: "warrior4",
         winner: "D",
         by: "Stoppage",
         styleA: "LU",
@@ -51,7 +57,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
       },
     ];
 
-    const rivalriesAfter2 = updateRivalriesFromBouts(rivalriesAfter1, lowFameFights, week);
+    const rng2 = new SeededRNGService(week * 7919 + 1);
+    const rivalriesAfter2 = updateRivalriesFromBouts(rivalriesAfter1, lowFameFights, week, rng2);
     const minorRivalry = rivalriesAfter2.find(r => r.stableIdA === "NewStable" && r.stableIdB === "OtherStable");
     
     expect(minorRivalry).toBeDefined();
@@ -69,6 +76,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
          createdAt: new Date().toISOString(),
          a: "TitanStable",
          d: "ColossusStable",
+         warriorIdA: `warriorA_${w}`,
+         warriorIdD: `warriorD_${w}`,
          winner: "A",
          by: "Kill", 
          styleA: "BA",
@@ -77,7 +86,8 @@ describe("Stable Lords 1.0 Rivalry Growth Audit", () => {
          fameD: 98,
          week: w
        };
-       rivalries = updateRivalriesFromBouts(rivalries, [bout], w);
+       const rng = new SeededRNGService(w * 7919);
+       rivalries = updateRivalriesFromBouts(rivalries, [bout], w, rng);
      }
 
      const bloodFeud = rivalries.find(r => r.stableIdA === "TitanStable" && r.stableIdB === "ColossusStable");

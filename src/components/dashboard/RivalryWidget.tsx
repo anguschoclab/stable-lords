@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { GameState } from "@/types/game";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
@@ -142,7 +142,7 @@ const intensityColor = (n: number) =>
 
 // Main Widget Component
 export function RivalryWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const rosterNames = usePlayerRosterNames(state as GameState);
   const rivalWarriorStable = useRivalWarriorStable(state as GameState);
   const rivalries = useRivalriesList(state as GameState, rosterNames, rivalWarriorStable);

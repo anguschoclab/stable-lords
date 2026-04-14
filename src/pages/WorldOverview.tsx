@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Globe, Trophy, Swords, Skull, Crown, Activity, Brain } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -14,14 +14,14 @@ type SortField = "rank" | "name" | "fame" | "wins" | "losses" | "kills" | "winRa
 type WarriorSortField = "name" | "stable" | "fame" | "wins" | "losses" | "kills" | "winRate" | "style";
 
 export default function WorldOverview() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const [stableSort, setStableSort] = useState<{ field: SortField; dir: "asc" | "desc" }>({ field: "fame", dir: "desc" });
   const [warriorSort, setWarriorSort] = useState<{ field: WarriorSortField; dir: "asc" | "desc" }>({ field: "fame", dir: "desc" });
 
   const templates = useMemo(() => getStableTemplates(), []);
 
   const stableRows = useMemo(() => {
-    const rows: { id: string, name: string, fame: number, rank: number, isPlayer: boolean, wins: number, losses: number, killCount: number, titles: number }[] = [];
+    const rows: any[] = [];
     let pWins = 0;
     let pLosses = 0;
     let pKills = 0;
@@ -91,8 +91,24 @@ export default function WorldOverview() {
     });
   }, [state, stableSort, templates]);
 
-  const warriorRows = useMemo(() => {
-    const mapWarrior = (w: Warrior, stableName: string, stableId: string, isPlayer: boolean) => {
+  interface WarriorRow {
+    id: string;
+    name: string;
+    stableName: string;
+    stableId: string;
+    fame: number;
+    wins: number;
+    losses: number;
+    kills: number;
+    winRate: number;
+    style: string;
+    isPlayer: boolean;
+    officialRank: number;
+    compositeScore: number;
+  }
+
+  const warriorRows = useMemo<WarriorRow[]>(() => {
+    const mapWarrior = (w: Warrior, stableName: string, stableId: string, isPlayer: boolean): WarriorRow => {
       const total = w.career.wins + w.career.losses;
       const ranking = state.realmRankings?.[w.id];
       return {
@@ -112,7 +128,7 @@ export default function WorldOverview() {
       };
     };
 
-    const rows = state.roster.reduce((acc: { id: string, name: string, style: string, fame: number, isPlayer: boolean, stableId: string, stableName: string, wins: number, losses: number, killCount: number }[], w: import("@/types/game").Warrior) => {
+    const rows: WarriorRow[] = state.roster.reduce((acc: WarriorRow[], w: Warrior) => {
       if (w.status === "Active") {
         acc.push(mapWarrior(w, state.player.stableName, state.player.id, true));
       }
@@ -145,16 +161,16 @@ export default function WorldOverview() {
       }
 
       if (f === "name" || f === "stable" || f === "style") {
-        const va = f === "stable" ? a.stableName : a[f];
-        const vb = f === "stable" ? b.stableName : b[f];
+        const va = f === "stable" ? a.stableName : (a as any)[f];
+        const vb = f === "stable" ? b.stableName : (b as any)[f];
         return String(va).localeCompare(String(vb)) * dir;
       }
-      return ((a[f] as number) - (b[f] as number)) * dir;
+      return (((a as any)[f] as number) - ((b as any)[f] as number)) * dir;
     });
   }, [state, warriorSort]);
 
   const totalWarriors = stableRows.reduce((s, r) => s + r.roster, 0);
-  const totalKills = stableRows.reduce((s, r) => s + r.kills, 0);
+  const totalKills = stableRows.reduce((s, r) => s + (r.kills || 0), 0);
   const topStable = stableRows[0]?.name ?? "—";
 
   return (
@@ -200,7 +216,7 @@ export default function WorldOverview() {
           <StableRankings 
             rows={stableRows} 
             sort={stableSort} 
-            onSort={(field) => setStableSort(prev => ({ field, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
+            onSort={(field: any) => setStableSort(prev => ({ field: field as SortField, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
           />
         </TabsContent>
 
@@ -212,7 +228,7 @@ export default function WorldOverview() {
           <WarriorLeaderboard 
             rows={warriorRows} 
             sort={warriorSort} 
-            onSort={(field) => setWarriorSort(prev => ({ field, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
+            onSort={(field: any) => setWarriorSort(prev => ({ field: field as WarriorSortField, dir: prev.field === field && prev.dir === "desc" ? "asc" : "desc" }))} 
           />
         </TabsContent>
 

@@ -1,27 +1,16 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { useState, useMemo } from "react";
+import { DragDropContext, DropResult, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Crosshair, Swords, Shield, Flame, AlertTriangle, Timer, Zap, Clock, 
-  ChevronDown, Sparkles, Activity, BookOpen, GripVertical, Target
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Swords, Shield, Flame, Timer, Zap, Clock, Activity, GripVertical, Target, BookOpen, Heart, Gauge } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { 
-  FightPlan, PhaseStrategy, OffensiveTactic, DefensiveTactic, Warrior,
-  AttackTarget, ProtectTarget 
-} from "@/types/game";
+import type { FightPlan, OffensiveTactic, DefensiveTactic, Warrior } from "@/types/game";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
-import { getTempoBonus, getStyleAntiSynergy } from "@/engine/stylePassives";
-import { getOffensiveSuitability, getDefensiveSuitability, SUITABILITY_COLORS, getStyleMatchupAdvantage } from "@/engine/tacticSuitability";
-import { STYLE_PRESETS } from "@/engine/stylePresets";
-
+import { getTempoBonus, getStyleAntiSynergy, getEnduranceMult, getKillMechanic, getMastery } from "@/engine/stylePassives";
+import { getMatchupBonus } from "@/engine/combat/combatConstants";
 import { computeStrategyScore, getScoreColor } from "@/engine/strategyAnalysis";
 
 /* ── DnD Types & Data ───────────────────────────────────── */
@@ -42,23 +31,23 @@ const TACTIC_BANK = [
 interface PlanBuilderProps {
   plan: FightPlan;
   onPlanChange: (plan: FightPlan) => void;
-  warriorName?: string;
   warrior?: Warrior;
   rivalStyle?: FightingStyle;
 }
 
-export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, rivalStyle }: PlanBuilderProps) {
+export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }: PlanBuilderProps) {
   const [phaseMode, setPhaseMode] = useState<boolean>(!!plan.phases);
+  const [showStylePassives, setShowStylePassives] = useState<boolean>(false);
   
   const matchupAdv = useMemo(() => {
-    if (!rivalStyle) return 1.0;
-    return getStyleMatchupAdvantage(plan.style, rivalStyle);
+    if (!rivalStyle) return 0;
+    return getMatchupBonus(plan.style, rivalStyle);
   }, [plan.style, rivalStyle]);
 
   const score = useMemo(() => computeStrategyScore(plan, warrior), [plan, warrior]);
 
   const onDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
+    const { destination, draggableId } = result;
     if (!destination) return;
 
     const tactic = TACTIC_BANK.find(t => t.id === draggableId);
@@ -102,16 +91,16 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
           </div>
           
           <div className="text-right flex items-center gap-6">
-            {matchupAdv !== 1.0 && (
+            {matchupAdv !== 0 && (
               <div className="text-right">
                 <Badge className={cn(
                   "rounded-none border-none font-black text-[10px] tracking-tight px-1.5 py-0.5",
-                  matchupAdv > 1.0 ? "bg-green-500/20 text-green-500" : "bg-destructive/20 text-destructive"
+                  matchupAdv > 0 ? "bg-green-500/20 text-green-500" : "bg-destructive/20 text-destructive"
                 )}>
-                  {matchupAdv > 1.0 ? "MATCHUP_ADV" : "MATCHUP_PENALTY"}
+                  {matchupAdv > 0 ? "MATCHUP_ADV" : "MATCHUP_PENALTY"}
                 </Badge>
-                <div className={cn("text-lg font-mono font-black italic", matchupAdv > 1.0 ? "text-green-500" : "text-destructive")}>
-                   {matchupAdv > 1.0 ? "+" : ""}{Math.round((matchupAdv - 1) * 100)}%
+                <div className={cn("text-lg font-mono font-black italic", matchupAdv > 0 ? "text-green-500" : "text-destructive")}>
+                  {matchupAdv > 0 ? "+" : ""}{matchupAdv}
                 </div>
               </div>
             )}
@@ -139,15 +128,15 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                 <span className="text-[10px] font-black uppercase tracking-widest">Tactic Bank</span>
               </div>
               <Droppable droppableId="bank">
-                {(provided) => (
+                {(provided: any) => (
                   <div 
                     {...provided.droppableProps} 
                     ref={provided.innerRef}
                     className="flex flex-col gap-2 p-2 bg-black/40 border border-white/5 rounded-none"
                   >
-                    {TACTIC_BANK.map((t, index) => (
-                      <Draggable key={t.id} draggableId={t.id} index={index}>
-                        {(provided, snapshot) => (
+                    {TACTIC_BANK.map((t, idx) => (
+                      <Draggable key={t.id} draggableId={t.id} index={idx}>
+                        {(provided: any, snapshot: any) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
@@ -191,10 +180,10 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                       <Label className="text-[10px] font-black uppercase tracking-widest text-arena-fame">Activity Level</Label>
                       <span className="text-sm font-mono font-bold text-arena-fame">{plan.AL}</span>
                     </div>
-                    <Slider 
-                      value={[plan.AL]} 
-                      onValueChange={([v]) => onPlanChange({ ...plan, AL: v })} 
-                      min={1} max={10} step={1} 
+                    <Slider
+                      value={[plan.AL || 5]}
+                      onValueChange={([v]) => onPlanChange({ ...plan, AL: v })}
+                      min={1} max={10} step={1}
                     />
                   </div>
                 </div>
@@ -203,7 +192,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Label className="text-[10px] font-black uppercase tracking-widest text-destructive">Kill Desire</Label>
-                      <span className="text-sm font-mono font-bold text-destructive">{plan.killDesire || 5}</span>
+                      <span className="text-sm font-mono font-bold text-destructive">{plan.killDesire ?? 5}</span>
                     </div>
                     <Slider 
                       value={[plan.killDesire || 5]} 
@@ -212,7 +201,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                     />
                   </div>
                   <Droppable droppableId="base">
-                    {(provided, snapshot) => (
+                    {(provided: any, snapshot: any) => (
                       <div 
                         {...provided.droppableProps} 
                         ref={provided.innerRef}
@@ -252,17 +241,11 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                   <Switch checked={phaseMode} onCheckedChange={setPhaseMode} />
                 </div>
 
-                <AnimatePresence>
-                  {phaseMode && (
-                    <motion.div 
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                    >
+                {phaseMode && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(["opening", "mid", "late"] as const).map(p => (
                         <Droppable key={p} droppableId={p}>
-                          {(provided, snapshot) => (
+                          {(provided: any, snapshot: any) => (
                             <div
                               {...provided.droppableProps}
                               ref={provided.innerRef}
@@ -274,7 +257,7 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                               <div className="flex items-center justify-between">
                                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{p}</span>
                                 {plan.phases?.[p] && (
-                                  <button 
+                                  <button
                                     onClick={() => {
                                       const next = { ...plan.phases };
                                       delete next[p];
@@ -282,10 +265,10 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                                     }}
                                     className="text-[9px] font-black uppercase text-arena-blood hover:underline"
                                     aria-label={`Clear phase ${p}`}
-                                  >Clear</button>
+                                    >Clear</button>
                                 )}
                               </div>
-                              
+
                               <div className="flex flex-wrap gap-1">
                                 {plan.phases?.[p]?.offensiveTactic && (
                                   <Badge className="bg-arena-blood/20 text-arena-blood border border-arena-blood/30 text-[9px] uppercase font-black px-1.5 py-0.5">
@@ -304,23 +287,129 @@ export default function PlanBuilder({ plan, onPlanChange, warriorName, warrior, 
                                   <span>OE</span>
                                   <span>{plan.phases?.[p]?.OE ?? plan.OE}</span>
                                 </div>
-                                <Slider 
-                                  value={[plan.phases?.[p]?.OE ?? plan.OE]} 
+                                <Slider
+                                  value={[plan.phases?.[p]?.OE ?? plan.OE]}
                                   onValueChange={([v]) => {
                                     const next = { ...(plan.phases || {}) };
                                     next[p] = { ...(next[p] || { OE: plan.OE, AL: plan.AL, killDesire: plan.killDesire || 5 }), OE: v };
                                     onPlanChange({ ...plan, phases: next });
-                                  }} 
-                                  min={1} max={10} step={1} 
+                                  }}
+                                  min={1} max={10} step={1}
                                 />
                               </div>
                             </div>
                           )}
                         </Droppable>
                       ))}
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
+              </div>
+
+              {/* Style Passives */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-arena-gold" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-arena-gold">Style Passives</span>
+                  </div>
+                  <Switch checked={showStylePassives} onCheckedChange={setShowStylePassives} />
+                </div>
+
+                {showStylePassives && (
+                  <div className="bg-black/40 border border-white/5 p-4 space-y-4">
+                    {/* Tempo */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        <Timer className="w-3 h-3" />
+                        <span>Tempo</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-[9px]">
+                        <div className="bg-white/5 p-2">
+                          <div className="text-muted-foreground/60 uppercase">Opening</div>
+                          <div className="font-mono font-bold text-arena-gold">{getTempoBonus(plan.style, "OPENING") > 0 ? "+" : ""}{getTempoBonus(plan.style, "OPENING")}</div>
+                        </div>
+                        <div className="bg-white/5 p-2">
+                          <div className="text-muted-foreground/60 uppercase">Mid</div>
+                          <div className="font-mono font-bold text-arena-gold">{getTempoBonus(plan.style, "MID") > 0 ? "+" : ""}{getTempoBonus(plan.style, "MID")}</div>
+                        </div>
+                        <div className="bg-white/5 p-2">
+                          <div className="text-muted-foreground/60 uppercase">Late</div>
+                          <div className="font-mono font-bold text-arena-gold">{getTempoBonus(plan.style, "LATE") > 0 ? "+" : ""}{getTempoBonus(plan.style, "LATE")}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-[9px] text-muted-foreground/60">
+                        <Heart className="w-3 h-3" />
+                        <span>Endurance Multiplier: {(getEnduranceMult(plan.style) * 100).toFixed(0)}%</span>
+                      </div>
+                    </div>
+
+                    {/* Mastery */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        <Gauge className="w-3 h-3" />
+                        <span>Mastery</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-[9px]">
+                        <span className="text-muted-foreground/60">Fights: {(warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)}</span>
+                        <Badge className={cn(
+                          "rounded-none border-none font-black text-[9px] uppercase px-2 py-0.5",
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 50 ? "bg-arena-gold text-black" :
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 30 ? "bg-arena-fame/20 text-arena-fame" :
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 20 ? "bg-stone-500/20 text-stone-400" :
+                          ((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)) >= 10 ? "bg-arena-pop/20 text-arena-pop" :
+                          "bg-white/10 text-muted-foreground"
+                        )}>
+                          {getMastery((warrior?.career?.wins || 0) + (warrior?.career?.losses || 0)).tier}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Kill Mechanics */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        <Flame className="w-3 h-3 text-destructive" />
+                        <span>Kill Mechanics</span>
+                      </div>
+                      <div className="bg-white/5 p-3 text-[9px] space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground/60">Kill Bonus</span>
+                          <span className="font-mono font-bold text-destructive">{(getKillMechanic(plan.style, { phase: "OPENING", hitsLanded: 0, consecutiveHits: 0, hitLocation: "body" }).killBonus * 100).toFixed(0)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground/60">Decisiveness Bonus</span>
+                          <span className="font-mono font-bold text-arena-gold">+{getKillMechanic(plan.style, { phase: "OPENING", hitsLanded: 0, consecutiveHits: 0, hitLocation: "body" }).decBonus}</span>
+                        </div>
+                        <div className="text-muted-foreground/60 italic mt-2">
+                          "{getKillMechanic(plan.style, { phase: "OPENING", hitsLanded: 0, consecutiveHits: 0, hitLocation: "body" }).killNarrative}"
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Anti-Synergy Warnings */}
+                    {(plan.offensiveTactic || plan.defensiveTactic) && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                          <Activity className="w-3 h-3" />
+                          <span>Anti-Synergy</span>
+                        </div>
+                        <div className="bg-white/5 p-3 text-[9px]">
+                          {(() => {
+                            const antiSynergy = getStyleAntiSynergy(plan.style, plan.offensiveTactic, plan.defensiveTactic);
+                            if (antiSynergy.warning) {
+                              return (
+                                <div className="flex items-start gap-2 text-destructive">
+                                  <Activity className="w-3 h-3 mt-0.5 shrink-0" />
+                                  <span>{antiSynergy.warning}</span>
+                                </div>
+                              );
+                            }
+                            return <span className="text-muted-foreground/60">No anti-synergy conflicts detected.</span>;
+                          })()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
             </div>

@@ -29,6 +29,12 @@ test-results/
 bun_output.txt
 test_output.txt
 
+# Playwright e2e test artifacts
+e2e/screenshots/
+playwright-report/
+test-results/
+playwright/.cache/
+
 # One-off fix scripts
 fix_*.cjs
 

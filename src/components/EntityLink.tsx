@@ -4,7 +4,7 @@
  */
 import React from "react";
 import { Link } from "@tanstack/react-router";
-import { useGameStore as useGame } from "@/state/useGameStore";
+import { useGameStore as useGame, useWorldState } from "@/state/useGameStore";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -34,7 +34,7 @@ interface WarriorLinkProps {
 }
 
 export function WarriorLink({ name, id, className, children }: WarriorLinkProps) {
-  const { state } = useGame();
+  const state = useWorldState();
   const resolvedId = id ?? resolveWarriorId(name, state);
 
   if (!resolvedId) {
@@ -110,10 +110,10 @@ interface StableLinkProps {
 }
 
 export function StableLink({ name, className, children }: StableLinkProps) {
-  const { state } = useGame();
+  const state = useWorldState();
   
   // Resolve stable name to owner ID
-  const rival = (state.rivals ?? []).find(r => r.owner.stableName === name);
+  const rival = (state.rivals ?? []).find((r: any) => r.owner.stableName === name);
   const isPlayer = state.player.stableName === name;
   const stableId = isPlayer ? "player" : rival?.owner.id;
 
@@ -145,13 +145,13 @@ export function StableLink({ name, className, children }: StableLinkProps) {
                   Stable Records
                 </div>
                 {isPlayer ? (
-                  <Link to="/stable">
+                  <Link to="/command/roster">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>
                 ) : stableId ? (
-                  <Link to="/stable/$id" params={{ id: stableId }}>
+                  <Link to="/world/stable/$id" params={{ id: stableId }}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
                       <ExternalLink className="h-4 w-4" />
                     </Button>

@@ -1,11 +1,14 @@
-import type { 
-  GameState, 
-  RivalStableData, 
-  AIEvent, 
+import type {
+  GameState,
+  RivalStableData,
+  AIEvent,
   AIAgentMemory,
   AIIntent
 } from "@/types/state.types";
+import { generateId } from "../../utils/idUtils";
 import { computeMetaDrift } from "../metaDrift";
+import type { BudgetReport } from "./workers/budgetWorker";
+import { checkBudget } from "./workers/budgetWorker";
 
 /**
  * LeadAgent Orchestrator
@@ -16,6 +19,7 @@ export interface AgentContext {
   rival: RivalStableData;
   state: GameState;
   meta: Record<string, number>;
+  budgetReport?: BudgetReport; // ⚡ Bolt: Cache budget report for the week
 }
 
 export function createAgentContext(rival: RivalStableData, state: GameState): AgentContext {
@@ -28,13 +32,17 @@ export function createAgentContext(rival: RivalStableData, state: GameState): Ag
     currentIntent: "SURVIVAL"
   };
 
-  // ⚡ Continuous Alignment: Compute meta awareness from current arena history
-  const meta = computeMetaDrift(state.arenaHistory || []);
+  // ⚡ Continuous Alignment: Compute meta awareness from current arena history (use cached if available)
+  const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory || []);
+
+  // ⚡ Bolt: Pre-compute budget report for the week
+  const budgetReport = checkBudget(rival, 0, "OTHER"); // Zero cost for baseline report
 
   return {
     rival: { ...rival, agentMemory },
     state,
-    meta
+    meta,
+    budgetReport
   };
 }
 
@@ -48,7 +56,7 @@ export function logAgentAction(
   riskTier: AIEvent["riskTier"],
   week: number
 ): RivalStableData {
-  const newEvent: AIEvent = { week, type, description, riskTier };
+  const newEvent: AIEvent = { id: generateId(undefined, "event"), week, type, description, riskTier };
   const actionHistory = [newEvent, ...(rival.actionHistory || [])].slice(0, 20); 
   
   // ⚡ Intent Recognition: Infer intent from action type

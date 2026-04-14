@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function HallOfWarriors() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const retired = state.retired ?? [];
 
   return (

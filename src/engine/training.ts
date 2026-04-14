@@ -1,6 +1,7 @@
 import type { GameState, SeasonalGrowth } from "@/types/state.types";
 import type { Warrior, InjuryData } from "@/types/warrior.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { type StateImpact } from "./impacts";
 import { 
@@ -25,12 +26,11 @@ export interface TrainingImpact {
  * Compute the impact of training assignments for the current week.
  * Returns a pure impact object without modifying game state directly.
  */
-export function computeTrainingImpact(state: GameState): TrainingImpact {
+export function computeTrainingImpact(state: GameState, rng: IRNGService): TrainingImpact {
   if (!state.trainingAssignments || state.trainingAssignments.length === 0) {
     return { updatedRoster: state.roster, updatedSeasonalGrowth: state.seasonalGrowth ?? [], results: [] };
   }
 
-  const rng = new SeededRNG(state.week * 1337 + 7);
   const results: TrainingResult[] = [];
   let currentRoster = [...state.roster];
   let seasonalGrowth = [...(state.seasonalGrowth ?? [])];
@@ -45,7 +45,7 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
       const { updatedInjuries, message } = processRecovery(warrior, healingBonus);
       currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({ 
         ...w, 
-        injuries: updatedInjuries as (string | InjuryData)[] 
+        injuries: updatedInjuries as InjuryData[] 
       }));
       results.push({ type: "recovery", warriorId: warrior.id, message });
       continue;
@@ -79,7 +79,7 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
     if (injury && injuryResult) {
       currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({ 
         ...w, 
-        injuries: [...w.injuries, injury] as (string | InjuryData)[] 
+        injuries: [...w.injuries, injury] as InjuryData[] 
       }));
       results.push(injuryResult);
     }
@@ -88,10 +88,11 @@ export function computeTrainingImpact(state: GameState): TrainingImpact {
   return { updatedRoster: currentRoster, updatedSeasonalGrowth: seasonalGrowth, results };
 }
 
+/** @deprecated Use computeTrainingImpact and resolveImpacts instead. Process training for all warriors at week-end. */
 export function processTraining(state: GameState): GameState {
-  const impact = computeTrainingImpact(state);
-  const rng = new SeededRNG(state.week * 555 + 1); // Legacy wrapper seed
-  const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact, rng);
+  const rngService = new SeededRNGService(state.week * 555 + 1);
+  const impact = computeTrainingImpact(state, rngService);
+  const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact, rngService);
   
   const newState = { ...state, seasonalGrowth, trainingAssignments: [] };
   if (stateImpact.newsletterItems) {
@@ -109,9 +110,9 @@ export function processTraining(state: GameState): GameState {
  * Convert a TrainingImpact to a generic StateImpact for the pipeline.
  */
 export function trainingImpactToStateImpact(
-  state: GameState, 
-  impact: TrainingImpact, 
-  rng: SeededRNG
+  state: GameState,
+  impact: TrainingImpact,
+  rng: IRNGService
 ): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[]; results: TrainingResult[] } {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   

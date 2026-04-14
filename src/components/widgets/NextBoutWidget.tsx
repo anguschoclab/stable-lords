@@ -75,7 +75,7 @@ export function NextBoutWidget() {
         <CardTitle className="text-sm font-display font-black flex items-center gap-2 uppercase tracking-tighter">
           <Target className="h-4 w-4 text-primary" /> Match Preview
         </CardTitle>
-        <Link to="/run-round">
+        <Link to="/command/combat">
           <ChevronRight className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
         </Link>
       </CardHeader>

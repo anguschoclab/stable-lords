@@ -154,8 +154,19 @@ export function BestByStyle({ allFights }: LeaderboardProps) {
       const warriors: Record<string, number> = {};
       for (let i = 0; i < allFights.length; i++) {
         const f = allFights[i];
-        if (f.winnerStyle === style) {
-          warriors[f.winner] = (warriors[f.winner] || 0) + 1;
+        let wStyle: string | null = null;
+        let wName: string | null = null;
+        
+        if (f.winner === "A") {
+          wStyle = f.styleA;
+          wName = f.a;
+        } else if (f.winner === "D") {
+          wStyle = f.styleD;
+          wName = f.d;
+        }
+        
+        if (wStyle === style && wName) {
+          warriors[wName] = (warriors[wName] || 0) + 1;
         }
       }
       let topName = "No Data";

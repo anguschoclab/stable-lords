@@ -10,7 +10,7 @@ import type { Warrior } from "@/types/warrior.types";
 import type { CombatEvent } from "@/types/combat.types";
 import type { Trainer } from "@/types/state.types";
 import { skillCheck, contestCheck } from "../combatMath";
-import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "../combatDamage";
+import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow, applyArmorTypeMod } from "../combatDamage";
 import { enduranceCost, fatiguePenalty } from "../combatFatigue";
 import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, Phase as StylePhase } from "../../stylePassives";
 import { getFavoriteRhythmBonus } from "../../../engine/favorites";
@@ -125,7 +125,8 @@ export function executeRiposte(
   defLabel: "A" | "D"
 ) {
   const ripLoc = rollHitLocation(rng, defTactics.target, attacker.plan.protect);
-  const ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
+  let ripDmgRaw = computeHitDamage(rng, defender.derived.damage + defPassive.dmgBonus, ripLoc);
+  ripDmgRaw = applyArmorTypeMod(ripDmgRaw, defender.weaponId, attacker.armorId);
   const ripDmg = applyProtectMod(ripDmgRaw, ripLoc, attacker.plan.protect);
 
   events.push({ type: "DEFENSE", actor: defLabel, result: "RIPOSTE" });
@@ -158,6 +159,7 @@ export function executeHit(
 ) {
   const hitLoc = rollHitLocation(rng, attTactics.target, defender.plan.protect);
   let rawDamage = computeHitDamage(rng, attacker.derived.damage + attOffMods.dmgBonus + attPassive.dmgBonus, hitLoc);
+  rawDamage = applyArmorTypeMod(rawDamage, attacker.weaponId, defender.armorId);
 
   if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
     rawDamage = Math.round(rawDamage * CRIT_DAMAGE_MULT);
@@ -191,7 +193,9 @@ export function executeHit(
 
   if (defender.hp <= defender.maxHp * killMech.killWindowHpMult) {
     const killPos = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
-    const killThreshold = calculateKillWindow(defender.hp / defender.maxHp, defender.endurance / defender.maxEndurance, hitLoc, attKD + killMech.killBonus, killPos, attOE, attAL, attMatchup);
+    // Canonical: DEC skill + style's decBonus both contribute to kill threshold
+    const effectiveDec = attacker.skills.DEC + killMech.decBonus;
+    const killThreshold = calculateKillWindow(defender.hp / defender.maxHp, defender.endurance / defender.maxEndurance, hitLoc, attKD + killMech.killBonus, killPos, attOE, attAL, attMatchup, effectiveDec);
     if (rng() < killThreshold) {
       defender.hp = 0;
       didKill = true;

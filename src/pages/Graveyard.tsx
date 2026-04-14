@@ -49,11 +49,11 @@ export default function Graveyard() {
       </div>
 
       <Tabs defaultValue="memorial" className="w-full">
-        <TabsList className="bg-secondary/20 p-1 rounded-xl h-12">
-          <TabsTrigger value="memorial" className="flex-1 rounded-lg gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+        <TabsList className="bg-secondary/20 p-1 rounded-none h-12">
+          <TabsTrigger value="memorial" className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
             <Zap className="h-3.5 w-3.5" /> Private Memorial
           </TabsTrigger>
-          <TabsTrigger value="world" className="flex-1 rounded-lg gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-white transition-all">
+          <TabsTrigger value="world" className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-white transition-all">
             <Skull className="h-3.5 w-3.5" /> World Cemetery
           </TabsTrigger>
         </TabsList>
@@ -76,7 +76,7 @@ function FallenGrid({ warriors, season, emptyTitle, emptyDesc }: { warriors: any
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="text-center py-32 bg-glass-card rounded-2xl border-2 border-border/20 border-dashed"
+        className="text-center py-32 bg-glass-card rounded-none border-2 border-border/20 border-dashed"
       >
         <Shield className="w-16 h-16 text-muted-foreground/20 mx-auto mb-6" />
         <h3 className="text-xl font-display font-black uppercase tracking-tight">{emptyTitle}</h3>
@@ -93,7 +93,7 @@ function FallenGrid({ warriors, season, emptyTitle, emptyDesc }: { warriors: any
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: idx * 0.05 }}
-          className="group relative bg-glass-card border border-border/40 rounded-2xl overflow-hidden hover:border-destructive/40 transition-all duration-500 shadow-xl"
+          className="group relative bg-glass-card border border-border/40 rounded-none overflow-hidden hover:border-destructive/40 transition-all duration-500 shadow-xl"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-destructive via-destructive/40 to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
 
@@ -111,7 +111,7 @@ function FallenGrid({ warriors, season, emptyTitle, emptyDesc }: { warriors: any
               </div>
             </div>
 
-            <div className="bg-destructive/5 rounded-xl p-4 mb-6 border border-destructive/10 relative">
+            <div className="bg-destructive/5 rounded-none p-4 mb-6 border border-destructive/10 relative">
               <Skull className="absolute top-2 right-2 w-10 h-10 text-destructive/5 pointer-events-none" />
               <p className="text-xs text-foreground/80 italic font-medium leading-relaxed mb-1 pr-6">
                 "{w.deathEvent?.deathSummary || w.causeOfDeath || w.deathCause || 'Fatal injury sustained during tactical engagement.'}"
@@ -133,20 +133,20 @@ function FallenGrid({ warriors, season, emptyTitle, emptyDesc }: { warriors: any
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="bg-secondary/20 p-3 rounded-xl border border-border/20 text-center">
+              <div className="bg-secondary/20 p-3 rounded-none border border-border/20 text-center">
                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 block mb-1">SERVICE_RECORD</span>
                  <span className="text-sm font-mono font-bold">{(w.career?.wins || 0)}W-{(w.career?.losses || 0)}L-{(w.career?.kills || 0)}K</span>
               </div>
-              <div className="bg-secondary/20 p-3 rounded-xl border border-border/20 text-center">
+              <div className="bg-secondary/20 p-3 rounded-none border border-border/20 text-center">
                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 block mb-1">FINAL_FAME</span>
                  <span className="text-sm font-mono font-bold text-arena-gold">{w.fame}</span>
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2 pt-4 border-t border-border/20">
-              {w.career?.medals?.gold > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2 py-1 rounded">🥇 GOLD_MEDALIST</span>}
-              {w.career?.medals?.silver > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-muted/10 px-2 py-1 rounded">🥈 SILVER_TOKEN</span>}
-              {w.career?.medals?.bronze > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-orange-500 bg-orange-500/10 px-2 py-1 rounded">🥉 BRONZE_ELITE</span>}
+              {w.career?.medals?.gold > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2 py-1 rounded-none">🥇 GOLD_MEDALIST</span>}
+              {w.career?.medals?.silver > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-muted/10 px-2 py-1 rounded-none">🥈 SILVER_TOKEN</span>}
+              {w.career?.medals?.bronze > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-orange-500 bg-orange-500/10 px-2 py-1 rounded-none">🥉 BRONZE_ELITE</span>}
               {w.flair?.map((f: string, i: number) => (
                 <span key={`flair-${i}`} className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/5 px-2 py-1 rounded border border-arena-gold/20">
                   {f}

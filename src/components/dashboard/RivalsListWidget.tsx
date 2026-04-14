@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Skull, Activity, Shield, Target, Zap, TrendingUp, Globe, Sword, Users, Star } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function RivalsListWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const rivals = state.rivals ?? [];
 
   // Find recent bouts involving rival warriors

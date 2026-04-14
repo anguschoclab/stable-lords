@@ -9,7 +9,8 @@
  */
 import type { Warrior, InjuryData, InjurySeverity } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { generateId } from "@/utils/idUtils";
 
 const INJURY_TABLE: Omit<InjuryData, "id" | "weeksRemaining">[] = [
@@ -41,13 +42,8 @@ const SEVERITY_WEEKS: Record<InjurySeverity, [number, number]> = {
 };
 
 /** Roll for a possible injury after a fight. Returns an Injury or null. */
-export function rollForInjury(
-  warrior: Warrior,
-  outcome: FightOutcome,
-  side: "A" | "D",
-  seed?: number
-): InjuryData | null {
-  const rng = new SeededRNG(seed ?? (outcome.post?.fatalExchangeIndex ?? 0) + side.charCodeAt(0));
+export function generateInjury(warrior: Warrior, outcome: FightOutcome, side: "A" | "D", seed?: number, rng?: IRNGService): InjuryData | null {
+  const rngService = rng || new SeededRNGService(seed ?? (outcome.post?.fatalExchangeIndex ?? 0) + side.charCodeAt(0));
   const wasHit = side === "A" ? (outcome.post?.hitsD ?? 0) : (outcome.post?.hitsA ?? 0);
   const lost = outcome.winner !== side && outcome.winner !== null;
   const wasKilled = (side === "A" && outcome.post?.gotKillD) || (side === "D" && outcome.post?.gotKillA);
@@ -63,10 +59,10 @@ export function rollForInjury(
   const cnBonus = (warrior.attributes.CN - 10) * 0.01;
   chance = Math.max(0.02, chance - cnBonus);
 
-  if (rng.next() >= chance) return null;
+  if (rngService.next() >= chance) return null;
 
   // Determine severity based on damage taken
-  let severityRoll = rng.next();
+  let severityRoll = rngService.next();
   if (outcome.by === "KO" && lost) severityRoll += 0.2;
   
   let severity: InjurySeverity;
@@ -76,17 +72,22 @@ export function rollForInjury(
 
   // Pick a random injury of the right severity
   const candidates = INJURY_TABLE.filter((i) => i.severity === severity);
-  const template = rng.pick(candidates);
+  if (candidates.length === 0) return null;
+
+  const template = rngService.pick(candidates);
   
   const [minWeeks, maxWeeks] = SEVERITY_WEEKS[severity];
-  const weeks = minWeeks + Math.floor(rng.next() * (maxWeeks - minWeeks + 1));
+  const weeks = minWeeks + Math.floor(rngService.next() * (maxWeeks - minWeeks + 1));
 
   return {
     ...template,
-    id: generateId(rng, "injury"),
+    id: rngService.uuid(),
     weeksRemaining: weeks,
   };
 }
+
+/** Alias for generateInjury for backward compatibility */
+export const rollForInjury = generateInjury;
 
 /** Tick all injuries down by 1 week, remove healed ones. Returns updated injuries array and healed names. */
 export function tickInjuries(injuries: InjuryData[]): { active: InjuryData[]; healed: string[] } {

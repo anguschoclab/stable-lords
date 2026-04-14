@@ -1,11 +1,11 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { TRAINER_WEEKLY_SALARY } from "@/engine/trainers";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { StatBattery } from "@/components/ui/StatBattery";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GraduationCap, AlertTriangle, Coins, Target, Calendar, UserCheck, Clock, TrendingDown, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ContractManager() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const trainers = state.trainers ?? [];
   const activeTrainers = trainers.filter(t => t.contractWeeksLeft > 0);
 
@@ -77,7 +77,7 @@ export function ContractManager() {
                   No specialists are currently under contract. Institutional growth is stagnant. Access the recruitment terminal to restore faculty operations.
                 </p>
               </div>
-              <Link to="/stable/trainers" className="mt-4">
+              <Link to="/ops/personnel" className="mt-4">
                 <Button className="bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 h-11 shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] hover:scale-105 transition-all">
                   Access_Recruitment_Hub
                 </Button>
@@ -129,22 +129,15 @@ export function ContractManager() {
                       <TableCell className="py-5">
                         <Tooltip>
                            <TooltipTrigger asChild>
-                              <div className="flex flex-col items-center gap-2 mx-auto w-full max-w-32">
-                                 <div className="flex items-center gap-2 w-full">
-                                    <div className="h-1.5 flex-1 bg-black rounded-full overflow-hidden border border-white/5 relative">
-                                       <div 
-                                          className={cn(
-                                             "absolute inset-y-0 left-0 transition-all duration-1000",
-                                             isExpiring ? "bg-destructive shadow-[0_0_10px_rgba(255,0,0,0.3)] animate-pulse" : "bg-primary"
-                                          )} 
-                                          style={{ width: `${pct}%` }}
-                                       />
-                                    </div>
-                                    <span className={cn("text-[10px] font-mono font-black min-w-8 text-right", isExpiring ? "text-destructive" : "text-primary/60")}>
-                                       {weeksLeft}W
-                                    </span>
-                                 </div>
-                                 {isExpiring && <span className="text-[8px] font-black uppercase text-destructive tracking-[0.2em] animate-pulse">Critical_End_Notice</span>}
+                              <div className="flex flex-col gap-1 mx-auto w-full max-w-40">
+                                 <StatBattery
+                                   label="TNR"
+                                   value={pct}
+                                   max={100}
+                                   labelValue={`${weeksLeft}W`}
+                                   colorClass={isExpiring ? "bg-destructive animate-pulse" : "bg-primary"}
+                                 />
+                                 {isExpiring && <span className="text-[8px] font-black uppercase text-destructive tracking-[0.2em] animate-pulse text-center">Critical_End_Notice</span>}
                               </div>
                            </TooltipTrigger>
                            <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest">

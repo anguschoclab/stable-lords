@@ -3,22 +3,23 @@ import { resolveDecision } from "./bout/decisionLogic";
 import { defaultPlanForWarrior } from "./bout/planDefaults";
 import { getPhase as getCombatPhase } from "./combat/combatMath";
 import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
-import { getTrainingBonus } from "./trainers";
 import { getMatchupBonus, MAX_EXCHANGES, EXCHANGES_PER_MINUTE } from "./combat/combatConstants";
 import { resolveEffectiveTactics, resolveExchange, type ResolutionContext } from "./combat/resolution";
-import { 
-  generateWarriorIntro, 
-  battleOpener, 
-  minuteStatusLine, 
+import {
+  generateWarriorIntro,
+  battleOpener,
+  minuteStatusLine,
   narrateBoutEnd,
   conservingLine
 } from "./narrativePBP";
 import { narrateEvents, NarrationContext } from "./combat/narrator";
-import { SeededRNG } from "@/utils/random";
-import type { GameState, Trainer, FightOutcomeBy } from "@/types/state.types";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import type { Trainer, FightOutcomeBy } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket } from "@/types/combat.types";
-import type { WeatherType, FightingStyle } from "@/types/shared.types";
+import type { WeatherType } from "@/types/shared.types";
+import { getTrainerMods } from "./combat/simulate/core/simulateHelpers";
 
 // ─── Exports from sub-modules for backward compatibility ───
 export { createFighterState, resolveDecision, defaultPlanForWarrior };
@@ -28,19 +29,6 @@ type Phase = "OPENING" | "MID" | "LATE";
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const p = getCombatPhase(exchange, maxExchanges);
   return p.toUpperCase() as Phase;
-}
-
-function getTrainerMods(trainers: Trainer[], style: FightingStyle) {
-  const bonus = getTrainingBonus(trainers, style);
-  return {
-    attMod: bonus.Aggression,
-    parMod: Math.floor(bonus.Defense * 0.6),
-    defMod: Math.floor(bonus.Defense * 0.4),
-    iniMod: Math.floor(bonus.Mind * 0.6),
-    decMod: Math.floor(bonus.Mind * 0.4),
-    endMod: bonus.Endurance * 2,
-    healMod: bonus.Healing,
-  };
 }
 
 /**
@@ -63,15 +51,18 @@ export function simulateFight(
   weather: WeatherType = "Clear"
 ): FightOutcome {
   // 1. Deterministic RNG setup
+  let rngService: IRNGService;
   let rng: () => number;
   if (typeof providedRng === "function") {
     rng = providedRng;
+    // Create a wrapper service for functions that need IRNGService
+    rngService = { next: rng, pick: <T>(arr: T[]) => arr[Math.floor(rng() * arr.length)] } as IRNGService;
   } else {
     const seed = typeof providedRng === "number" 
       ? providedRng 
       : crypto.getRandomValues(new Uint32Array(1))[0];
-    const sRng = new SeededRNG(seed);
-    rng = () => sRng.next();
+    rngService = new SeededRNGService(seed);
+    rng = () => rngService.next();
   }
 
   const nameA = warriorA?.name ?? "Attacker";
@@ -91,8 +82,8 @@ export function simulateFight(
   const modsA = trainers ? getTrainerMods(trainers, planA.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
   const modsD = trainers ? getTrainerMods(trainers, planD.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
 
-  const weaponReqA = checkWeaponRequirements(weaponA, warriorA?.attributes ?? { ST: 10, DF: 10, SP: 10 });
-  const weaponReqD = checkWeaponRequirements(weaponD, warriorD?.attributes ?? { ST: 10, DF: 10, SP: 10 });
+  const weaponReqA = checkWeaponRequirements(weaponA, warriorA?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
+  const weaponReqD = checkWeaponRequirements(weaponD, warriorD?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
 
   const resCtx: ResolutionContext = {
     rng,
@@ -123,15 +114,15 @@ export function simulateFight(
   let fatalExchangeIndex: number | undefined;
 
   // ── 1. Introductions ──
-  const introA = generateWarriorIntro(rng, { name: nameA, style: planA.style, weaponId: weaponA, armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor, helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm }, warriorA?.attributes?.SZ);
-  const introD = generateWarriorIntro(rng, { name: nameD, style: planD.style, weaponId: weaponD, armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor, helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm }, warriorD?.attributes?.SZ);
+  const introA = generateWarriorIntro(rngService, { name: nameA, style: planA.style, weaponId: weaponA, armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor, helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm }, warriorA?.attributes?.SZ);
+  const introD = generateWarriorIntro(rngService, { name: nameD, style: planD.style, weaponId: weaponD, armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor, helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm }, warriorD?.attributes?.SZ);
   
   introA.forEach(line => log.push({ minute: 0, text: line }));
   log.push({ minute: 0, text: "" });
   introD.forEach(line => log.push({ minute: 0, text: line }));
   log.push({ minute: 0, text: "" });
 
-  log.push({ minute: 1, text: battleOpener(rng) });
+  log.push({ minute: 1, text: battleOpener(rngService) });
   if (planA.OE <= 3) log.push({ minute: 1, text: conservingLine(nameA) });
   if (planD.OE <= 3) log.push({ minute: 1, text: conservingLine(nameD) });
 
@@ -162,7 +153,7 @@ export function simulateFight(
     if (min > lastMinuteMarker && min > 1) {
       lastMinuteMarker = min;
       log.push({ minute: min, text: `MINUTE ${min}.` });
-      log.push({ minute: min, text: minuteStatusLine(rng, min, nameA, nameD, fA.hitsLanded, fD.hitsLanded) });
+      log.push({ minute: min, text: minuteStatusLine(rngService, min, nameA, nameD, fA.hitsLanded, fD.hitsLanded) });
     }
 
     // A. Resolve Math (Dice)
@@ -170,10 +161,14 @@ export function simulateFight(
 
     // B. Resolve Narration (Drama)
     const narCtx: NarrationContext = {
-      rng, nameA, nameD, weaponA, weaponD,
+      rng: rngService, nameA, nameD, weaponA, weaponD,
       styleA: fA.style, styleD: fD.style,
       maxHpA: fA.maxHp, maxHpD: fD.maxHp,
-      prevHpRatioA, prevHpRatioD
+      prevHpRatioA, prevHpRatioD,
+      fameA: warriorA?.fame ?? 0,
+      fameD: warriorD?.fame ?? 0,
+      isFavoriteA: !!(warriorA?.favorites?.discovered?.weapon),
+      isFavoriteD: !!(warriorD?.favorites?.discovered?.weapon)
     };
     const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
     log.push(...newLines);
@@ -183,13 +178,27 @@ export function simulateFight(
     // C. Check for End Events
     const boutEnd = events.find(e => e.type === "BOUT_END");
     if (boutEnd) {
-      winner = boutEnd.actor === "A" ? "A" : "D";
       by = boutEnd.result as FightOutcomeBy;
       fatalHitLocation = boutEnd.metadata?.location as string;
       fatalExchangeIndex = ex;
       causeBucket = boutEnd.metadata?.cause as DeathCauseBucket;
-      
-      const boutEndLines = narrateBoutEnd(rng, by as string, boutEnd.actor === "A" ? nameA : nameD, boutEnd.actor === "A" ? nameD : nameA);
+
+      // Kill/KO: actor = who scored it (winner)
+      // Stoppage: actor = who ran out of endurance (loser) → other fighter wins
+      // Exhaustion: both ran out simultaneously → draw
+      if (by === "Stoppage") {
+        winner = boutEnd.actor === "A" ? "D" : "A";
+      } else if (by === "Exhaustion") {
+        winner = null;
+      } else {
+        winner = boutEnd.actor === "A" ? "A" : "D";
+      }
+
+      // For narration: winnerName first, loserName second
+      const boutActorIsWinner = by !== "Stoppage";
+      const narWinner = boutActorIsWinner ? (boutEnd.actor === "A" ? nameA : nameD) : (boutEnd.actor === "A" ? nameD : nameA);
+      const narLoser  = boutActorIsWinner ? (boutEnd.actor === "A" ? nameD : nameA) : (boutEnd.actor === "A" ? nameA : nameD);
+      const boutEndLines = narrateBoutEnd(rng, by as string, narWinner, narLoser);
       boutEndLines.forEach(line => log.push({ minute: min, text: line }));
       break;
     }
@@ -204,6 +213,10 @@ export function simulateFight(
   }
 
   // Outcome Tags & Postprocessing
+  const fightMinutes = Math.max(1, log[log.length - 1]?.minute ?? 1);
+  if (fightMinutes <= 3) tags.add("Quick");
+  if (fightMinutes >= 8) tags.add("Epic");
+
   if (winner) {
     const w = winner === "A" ? fA : fD;
     const l = winner === "A" ? fD : fA;
@@ -211,6 +224,8 @@ export function simulateFight(
     if (w.hitsLanded >= 5) tags.add("Dominance");
     if (by === "KO") tags.add("KO");
     if (by === "Kill") tags.add("Kill");
+    if (w.ripostes >= 3) tags.add("RiposteChain");
+    if (w.ripostes >= 2 || w.hitsLanded >= 6) tags.add("Flashy");
   }
 
   return {

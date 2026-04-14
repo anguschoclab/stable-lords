@@ -26,20 +26,21 @@ export function generateId(rng?: SeededRNG, prefix?: string): string {
     return rng.uuid(prefix);
   }
 
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
+  const cryptoObj = typeof globalThis !== "undefined" ? globalThis.crypto : (typeof crypto !== "undefined" ? crypto : undefined);
+
+  if (cryptoObj?.randomUUID) {
+    return cryptoObj.randomUUID();
   }
 
   // Fallback for environments where crypto is available but randomUUID is not
-  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+  if (cryptoObj?.getRandomValues) {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => {
         const n = parseInt(c, 10);
-        return (n ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (n / 4)))).toString(16);
+        return (n ^ (cryptoObj.getRandomValues(new Uint8Array(1))[0] & (15 >> (n / 4)))).toString(16);
     });
   }
 
-  // Ultimate fallback
-  return Date.now() + "_" + Math.floor(Math.random() * 1e6);
+  throw new Error("Secure random number generator not available in this environment.");
 }
 
 /** Simple FNV-1a hash for deterministic seeds from IDs */

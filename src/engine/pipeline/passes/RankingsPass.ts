@@ -1,5 +1,16 @@
 import { GameState, Warrior, RankingEntry } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
+import { StateImpact } from "@/engine/impacts";
+
+/**
+ * Stable Lords — Rankings Pass
+ * Phase 1: Calculates the global and class-specific power rankings.
+ * This cache is used by Promoters for matchmaking and Tournaments for seeding.
+ */
+export const PASS_METADATA = {
+  name: "RankingsPass",
+  dependencies: ["WorldPass"] // Depends on world transitions
+};
 
 /**
  * Stable Lords — Rankings Pass
@@ -7,7 +18,7 @@ import { FightingStyle } from "@/types/shared.types";
  * This cache is used by Promoters for matchmaking and Tournaments for seeding.
  */
 
-export function runRankingsPass(state: GameState): GameState {
+export function runRankingsPass(state: GameState): StateImpact {
   // 1. Gather all active warriors from player and rivals
   const allWarriors: { w: Warrior; stableId: string }[] = [];
   
@@ -60,7 +71,6 @@ export function runRankingsPass(state: GameState): GameState {
   });
 
   return {
-    ...state,
     realmRankings
   };
 }

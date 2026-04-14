@@ -1,20 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
-import { 
-  Swords, LayoutDashboard, Zap, Trophy, HelpCircle, 
-  RotateCcw, ScrollText, UserPlus, Skull, GraduationCap, 
-  LogOut, PanelLeftClose, PanelLeft, Save, Download, 
-  Dumbbell, Sun, Moon, Search, Globe, Newspaper, 
-  Crown, Shield, BarChart3, Target, Award, BookOpen, 
-  Eye, Landmark, Settings, Users, Activity, Volume2, VolumeX,
-  Coins
+import {
+  Swords, RotateCcw, LogOut, Save,
+  Activity, Volume2, VolumeX,
+  Coins, Crown
 } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import { Button } from "@/components/ui/button";
 import { useGameStore } from "@/state/useGameStore";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MOOD_ICONS } from "@/engine/crowdMood";
 import {
@@ -34,73 +28,9 @@ import {
 } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useCoachTip } from "@/hooks/useCoachTip";
-import EventLog from "@/components/EventLog";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useRivalryAlerts } from "@/hooks/useRivalryAlerts";
-
-const NAV_SECTIONS = [
-  {
-    id: "hub",
-    label: "Management",
-    items: [
-      { to: "/", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/run-round", label: "Arena Combat", icon: Swords },
-    ]
-  },
-  {
-    id: "stable",
-    label: "My Stable",
-    items: [
-      { to: "/stable", label: "Roster", icon: Users },
-      { to: "/stable/training", label: "Training", icon: Dumbbell },
-      { to: "/stable/recruit", label: "Recruitment", icon: UserPlus },
-      { to: "/stable/equipment", label: "Armory", icon: Shield },
-      { to: "/stable/planner", label: "Tactics", icon: BarChart3 },
-    ]
-  },
-  {
-    id: "ops",
-    label: "Operations",
-    items: [
-      { to: "/stable/trainers", label: "Staffing", icon: GraduationCap },
-      { to: "/stable/finance", label: "Treasury", icon: Coins },
-      { to: "/stable/contracts", label: "Booking Office", icon: ScrollText },
-    ]
-  },
-  {
-    id: "world",
-    label: "The World",
-    items: [
-      { to: "/world", label: "Power Rankings", icon: Globe },
-      { to: "/world/tournaments", label: "Tournaments", icon: Trophy },
-      { to: "/world/scouting", label: "Scouting", icon: Search },
-      { to: "/world/gazette", label: "Gazette", icon: Newspaper },
-      { to: "/help", label: "Library", icon: BookOpen },
-    ]
-  },
-  {
-    id: "legacy",
-    label: "Archive",
-    items: [
-      { to: "/legacy", label: "Graveyard", icon: Skull },
-      { to: "/legacy/hall-of-fame", label: "Hall of Fame", icon: Crown },
-      { to: "/world/history", label: "Chronicle", icon: ScrollText },
-      { to: "/legacy/tournament-awards", label: "Tournament Awards", icon: Trophy },
-      { to: "/legacy/awards", label: "Trophy Room", icon: Trophy },
-      { to: "/legacy/analytics", label: "Kill Stats", icon: Target },
-    ]
-  },
-  {
-    id: "dev",
-    label: "Diagnostics",
-    items: [
-      { to: "/dev/equipment", label: "Gear Optimizer", icon: Shield },
-      { to: "/dev/physicals", label: "Body Simulator", icon: Activity },
-      { to: "/dev/admin", label: "Control Tower", icon: Settings },
-    ]
-  }
-];
+import { HubNav } from "@/components/navigation/HubNav";
+import { TacticalBar } from "@/components/navigation/TacticalBar";
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -109,9 +39,9 @@ import { CoachOverlay } from "@/components/ui/CoachOverlay";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-    const { 
-    week, day, isTournamentWeek, treasury, fame, crowdMood, roster, 
-    doReset, returnToTitle, lastSavedAt, doAdvanceWeek, doAdvanceDay,
+    const {
+    week, day, isTournamentWeek, treasury, fame, crowdMood, roster,
+    doReset, returnToTitle, lastSavedAt,
     isSimulating, isInitialized
   } = useGameStore(
     useShallow((s: any) => ({
@@ -125,18 +55,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       doReset: s.doReset,
       returnToTitle: s.returnToTitle,
       lastSavedAt: s.lastSavedAt,
-      doAdvanceWeek: s.doAdvanceWeek,
-      doAdvanceDay: s.doAdvanceDay,
       isSimulating: s.isSimulating,
       isInitialized: s.isInitialized,
     }))
   );
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
   const activePath = location.pathname;
   const moodIcon = MOOD_ICONS[crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
   const [resetOpen, setResetOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [saveFlash, setSaveFlash] = useState(false);
   const [isMuted, setIsMuted] = useState(audioManager.isMuted());
 
@@ -145,10 +71,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     audioManager.setMuted(next);
     setIsMuted(next);
   };
-
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
-
-  useKeyboardShortcuts({ onToggleSidebar: toggleSidebar });
   useRivalryAlerts();
 
   useEffect(() => {
@@ -186,7 +108,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Link to="/" className="flex items-center gap-3 group active:scale-95 transition-transform">
             <motion.div 
               whileHover={{ rotate: 15 }}
-              className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
+              className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
               <Swords className="h-5 w-5 text-white" />
             </motion.div>
@@ -235,7 +157,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-white/5 transition-colors"
+                className="h-9 w-9 rounded-none hover:bg-white/5 transition-colors"
                 onClick={toggleMute}
                 title={isMuted ? "Unmute audio" : "Mute audio"}
                 aria-label={isMuted ? "Unmute audio" : "Mute audio"}
@@ -255,7 +177,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-9 w-9 rounded-lg transition-all",
+                  "h-9 w-9 rounded-none transition-all",
                   saveFlash ? "bg-primary/20 text-primary scale-110" : "hover:bg-white/5"
                 )}
                 title="Save status"
@@ -274,7 +196,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors"
+                className="h-9 w-9 rounded-none hover:bg-destructive/10 hover:text-destructive transition-colors"
                 onClick={() => setResetOpen(true)}
                 title="Reset game"
                 aria-label="Reset game"
@@ -294,7 +216,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30"
+                className="h-9 w-9 rounded-none hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30"
                 onClick={returnToTitle}
                 disabled={isSimulating}
                 title="Exit to title"
@@ -310,82 +232,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* ─── Persistent Sidebar ─── */}
-        <aside 
-          className={cn(
-            "border-r border-white/5 bg-[#080809] flex flex-col transition-all duration-500 ease-in-out z-40 group",
-            sidebarOpen ? "w-64" : "w-16"
-          )}
-        >
-          <div className="p-3 border-b border-white/5 flex items-center justify-between">
-            {sidebarOpen && <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pl-3 opacity-40">Main Sequence</span>}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSidebar} 
-              className={cn("h-8 w-8 hover:bg-white/5", !sidebarOpen && "mx-auto")}
-              title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-              aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-              aria-expanded={sidebarOpen}
-            >
-              {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
-            </Button>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto py-6 space-y-8 scrollbar-hide">
-            {NAV_SECTIONS.map((section) => (
-              <div key={section.id} className="space-y-2">
-                {sidebarOpen && <h4 className="px-6 text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">{section.label}</h4>}
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const isActive = activePath === item.to || (item.to !== "/" && activePath.startsWith(item.to));
-                    return (
-                      <Tooltip key={item.to} delayDuration={sidebarOpen ? 1000 : 0}>
-                        <TooltipTrigger asChild>
-                          <Link
-                            to={item.to as any}
-                            className={cn(
-                              "flex items-center gap-3 px-6 py-2.5 text-sm font-semibold transition-all relative group h-10",
-                              isActive 
-                                ? "text-primary bg-primary/5" 
-                                : "text-muted-foreground hover:text-foreground hover:bg-white/5",
-                              isSimulating && "opacity-40 cursor-not-allowed pointer-events-none"
-                            )}
-                          >
-                            {isActive && <motion.div layoutId="nav-glow" className="absolute inset-y-0 left-0 w-1 bg-primary shadow-[0_0_10px_rgba(255,0,0,0.8)]" />}
-                            <item.icon className={cn("h-4 w-4 flex-shrink-0 transition-transform group-hover:scale-110", isActive && "text-primary")} />
-                            {sidebarOpen && <span className="truncate">{item.label}</span>}
-                          </Link>
-                        </TooltipTrigger>
-                        {!sidebarOpen && (
-                          <TooltipContent side="right" className="text-[10px] font-black uppercase tracking-widest font-mono">
-                            {item.label}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
-
-          <div className="p-4 border-t border-white/5">
-            <Button 
-              onClick={() => isTournamentWeek ? doAdvanceDay() : doAdvanceWeek()}
-              disabled={isSimulating}
-              className={cn(
-                "w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.3)] border border-white/10",
-                !sidebarOpen && "p-0",
-                isSimulating && "animate-pulse"
-              )}
-            >
-              <RotateCcw className={cn("h-4 w-4", (sidebarOpen && !isSimulating) && "mr-2", isSimulating && "animate-spin")} />
-              {sidebarOpen && (isSimulating ? "Simulating..." : (isTournamentWeek ? `Advance Day ${day + 1}` : "End Week Sequence"))}
-            </Button>
-          </div>
-        </aside>
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        {/* ─── Hub Navigation ─── */}
+        <HubNav />
 
         {/* ─── Main Content Area ─── */}
         <main className="flex-1 flex flex-col relative bg-[#050506] overflow-hidden">
@@ -410,8 +259,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </AnimatePresence>
           </div>
 
-          <EventLog />
           <CoachOverlay />
+          <TacticalBar />
 
           <AnimatePresence>
             {!isInitialized && (
@@ -421,7 +270,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 z-50 bg-[#050506] flex items-center justify-center flex-col gap-4"
               >
-                <div className="w-12 h-12 rounded-xl border-2 border-primary/20 border-t-primary animate-spin" />
+                <div className="w-12 h-12 rounded-none border-2 border-primary/20 border-t-primary animate-spin" />
                 <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 animate-pulse">
                   Restoring_Temporal_Sync...
                 </div>

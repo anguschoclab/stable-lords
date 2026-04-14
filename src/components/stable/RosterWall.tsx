@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/game";
 import { Surface } from "@/components/ui/Surface";
@@ -9,6 +9,7 @@ import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Users, ChevronRight, Trophy, Star, Swords, Target, Crown, Activity, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { StatBattery } from "@/components/ui/StatBattery";
 import { 
   Tooltip,
   TooltipContent,
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function RosterWall() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const navigate = useNavigate();
 
   const sortedRoster = useMemo(
@@ -44,7 +45,7 @@ export function RosterWall() {
            </div>
         </div>
         
-        <Link to="/stable/recruit">
+        <Link to="/ops/personnel">
           <Button variant="outline" size="sm" className="bg-neutral-900 border-white/10 text-[10px] font-black uppercase tracking-[0.2em] gap-2 h-10 px-6 hover:bg-primary hover:text-white hover:border-primary transition-all">
              Initialize_Recruitment <ChevronRight className="h-4 w-4" />
           </Button>
@@ -64,7 +65,7 @@ export function RosterWall() {
                 Synchronization failed. All personnel berths are currently vacant. Proceed to the recruitment terminal to enlist your first combatant asset.
               </p>
             </div>
-            <Link to="/stable/recruit" className="mt-4">
+            <Link to="/ops/personnel" className="mt-4">
                <Button className="bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 h-12 shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all">
                   Initialize_SYNC
                </Button>
@@ -156,20 +157,12 @@ export function RosterWall() {
                                     return (
                                        <Tooltip key={k}>
                                           <TooltipTrigger asChild>
-                                             <div className="space-y-1.5">
-                                                <div className="flex items-center justify-between px-0.5">
-                                                   <span className="text-[8px] font-black tracking-widest text-muted-foreground opacity-40">{k}</span>
-                                                </div>
-                                                <div className="h-1.5 w-full bg-black rounded-full overflow-hidden border border-white/5 shadow-inner relative">
-                                                   <div 
-                                                      className={cn(
-                                                         "absolute inset-y-0 left-0 transition-all duration-1000 group-hover:animate-pulse",
-                                                         val >= 20 ? "bg-arena-gold shadow-[0_0_10px_rgba(255,215,0,0.5)]" : val >= 15 ? "bg-primary" : "bg-neutral-800"
-                                                      )} 
-                                                      style={{ width: `${(val / 25) * 100}%` }}
-                                                   />
-                                                </div>
-                                             </div>
+                                             <StatBattery
+                        label={k}
+                        value={val}
+                        max={25}
+                        colorClass={val >= 20 ? "bg-arena-gold shadow-[0_0_10px_rgba(255,215,0,0.5)] group-hover:animate-pulse" : val >= 15 ? "bg-primary group-hover:animate-pulse" : "bg-neutral-800"}
+                      />
                                           </TooltipTrigger>
                                           <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest">
                                              {ATTRIBUTE_LABELS[k]}: {val} / 25

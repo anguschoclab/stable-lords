@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { ArenaHistory } from "@/engine/history/arenaHistory";
 import { StyleRollups, type StyleRecord } from "@/engine/stats/styleRollups";
 import type { FightSummary, Warrior } from "@/types/game";
@@ -129,7 +129,7 @@ const COLORS = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"
 /* ── Main Page ───────────────────────────────────────────── */
 
 export default function KillAnalytics() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const allFights = useMemo(() => {
     const hist = ArenaHistory.all();
     return hist.length > 0 ? hist : state.arenaHistory;

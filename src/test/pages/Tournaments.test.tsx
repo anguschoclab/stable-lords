@@ -30,10 +30,16 @@ describe('Tournaments Page', () => {
 
   const mockState = {
     week: 1,
-    season: 'Spring' as const, // Force Literal type
-    roster: [mockActiveWarrior], // Only 1 active warrior, so it satisfies < 2 condition
+    season: 'Spring' as const,
+    roster: [mockActiveWarrior], 
     tournaments: [],
-    rivals: []
+    rivals: [],
+    treasury: 1000,
+    fame: 10,
+    lastSimulationReport: null,
+    newsletter: [],
+    gazettes: [],
+    awards: [],
   };
 
   beforeEach(() => {

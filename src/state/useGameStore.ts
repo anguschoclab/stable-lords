@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as Comlink from "comlink";
+import { shallow } from "zustand/shallow";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import type { FightSummary } from "@/types/combat.types";
@@ -39,13 +40,11 @@ export interface GameStoreActions {
 
 export type GameStore = GameStoreState & GameStoreActions & EconomySlice & RosterSlice & WorldSlice & TournamentSlice;
 
-/**
- * Reconstructs a full GameState from the modular slices for engine consumption.
- */
+let lastResult: GameState | null = null;
+let lastStoreValues: any = null;
+
 export function reconstructGameState(store: GameStore): GameState {
-  const fresh = createFreshState("reconstruct-default");
-  return {
-    ...fresh,
+  const currentValues = {
     treasury: store.treasury,
     ledger: store.ledger,
     roster: store.roster,
@@ -87,7 +86,45 @@ export function reconstructGameState(store: GameStore): GameState {
     isFTUE: store.isFTUE,
     ftueStep: store.ftueStep,
     ftueComplete: store.ftueComplete,
+    coachDismissed: store.coachDismissed,
+    rivalries: store.rivalries,
+    matchHistory: store.matchHistory,
+    ownerGrudges: store.ownerGrudges,
+    phase: store.phase,
+    playerChallenges: store.playerChallenges,
+    playerAvoids: store.playerAvoids,
   };
+
+  if (lastResult && lastStoreValues) {
+    let changed = false;
+    for (const key of Object.keys(currentValues)) {
+      if ((currentValues as any)[key] !== lastStoreValues[key]) {
+        changed = true;
+        break;
+      }
+    }
+    if (!changed) return lastResult;
+  }
+
+  const result: GameState = {
+    meta: {
+      gameName: "Stable Lords",
+      version: "2.1.0-hardened",
+      createdAt: store.lastSavedAt || new Date().toISOString(),
+    },
+    ...currentValues,
+    coachDismissed: store.coachDismissed || [],
+    rivalries: store.rivalries || [],
+    matchHistory: store.matchHistory || [],
+    ownerGrudges: store.ownerGrudges || [],
+    phase: store.phase || "planning",
+    playerChallenges: store.playerChallenges || [],
+    playerAvoids: store.playerAvoids || [],
+  };
+
+  lastResult = result;
+  lastStoreValues = currentValues;
+  return result;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -127,15 +164,15 @@ export const useGameStore = create<GameStore>()(
           draft.day = state.day;
           draft.season = state.season;
           draft.weather = state.weather;
-          draft.promoters = state.promoters;
-          draft.boutOffers = state.boutOffers;
+          draft.promoters = state.promoters || {};
+          draft.boutOffers = state.boutOffers || {};
           draft.rivals = state.rivals;
           draft.gazettes = state.gazettes;
           draft.scoutReports = state.scoutReports || [];
-          draft.unacknowledgedDeaths = state.unacknowledgedDeaths;
-          draft.rosterBonus = state.rosterBonus;
-          draft.tournaments = state.tournaments;
-          draft.isTournamentWeek = state.isTournamentWeek;
+          draft.unacknowledgedDeaths = state.unacknowledgedDeaths || [];
+          draft.rosterBonus = state.rosterBonus || 0;
+          draft.tournaments = state.tournaments || [];
+          draft.isTournamentWeek = state.isTournamentWeek || false;
           draft.activeTournamentId = state.activeTournamentId;
           draft.year = state.year || 1;
           
@@ -154,8 +191,15 @@ export const useGameStore = create<GameStore>()(
           draft.hallOfFame = state.hallOfFame || [];
           draft.settings = state.settings || { featureFlags: { tournaments: true, scouting: true } };
           draft.isFTUE = state.isFTUE || false;
-          draft.ftueStep = state.ftueStep;
+          draft.ftueStep = state.ftueStep || 0;
           draft.ftueComplete = state.ftueComplete || false;
+          draft.coachDismissed = state.coachDismissed || [];
+          draft.rivalries = state.rivalries || [];
+          draft.matchHistory = state.matchHistory || [];
+          draft.ownerGrudges = state.ownerGrudges || [];
+          draft.phase = state.phase || "planning";
+          draft.playerChallenges = state.playerChallenges || [];
+          draft.playerAvoids = state.playerAvoids || [];
           
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
@@ -264,6 +308,7 @@ export const useGameStore = create<GameStore>()(
 );
 
 /** --- Fine-Grained Selectors (v4.1: Source from Slice only) --- */
+export const useWorldState = () => useGameStore(reconstructGameState, shallow);
 export const usePlayer = () => useGameStore(s => s.player);
 export const useRoster = () => useGameStore(s => s.roster);
 export const useRivals = () => useGameStore(s => s.rivals);

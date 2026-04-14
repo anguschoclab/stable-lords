@@ -8,6 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MarkdownReader } from "@/components/MarkdownReader";
 
 interface GazetteIssue {
   week: number;
@@ -67,9 +68,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">FEATURE_DISPATCH</span>
             </div>
             
-            <p className="text-base md:text-lg text-foreground/80 leading-relaxed font-serif italic selection:bg-primary/30 tracking-wide">
-              {issue.mainStory}
-            </p>
+            <MarkdownReader content={issue.mainStory} />
             
             <div className="pt-6 flex items-center justify-between">
                <div className="flex items-center gap-4">
@@ -105,9 +104,9 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
                        <Zap className="h-3 w-3 text-arena-gold opacity-40 group-hover/short:opacity-100 transition-opacity" />
                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover/short:text-arena-gold transition-colors">INTEL_FRAGMENT</span>
                     </div>
-                    <p className="text-[11px] md:text-xs text-muted-foreground group-hover/short:text-foreground transition-colors leading-relaxed font-medium">
-                       {story}
-                    </p>
+                    <div className="text-[11px] md:text-xs text-muted-foreground group-hover/short:text-foreground transition-colors leading-relaxed font-medium">
+                       <MarkdownReader content={story} />
+                    </div>
                   </div>
                 ))}
               </div>

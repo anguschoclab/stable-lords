@@ -1,8 +1,9 @@
-import type { GameState } from "@/types/state.types";
+import type { GameState, RivalStableData } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { addMatchRecord } from "@/engine/matchmaking/historyLogic";
+import { StateImpact } from "@/engine/impacts";
 
 export function applyRecords(
   s: GameState, 
@@ -15,7 +16,10 @@ export function applyRecords(
   fameD: number, 
   popD: number, 
   rivalStableId?: string
-): GameState {
+): StateImpact {
+  const rosterUpdates = new Map<string, Partial<Warrior>>();
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  
   const updateW = (w: Warrior, f: number, p: number, win: boolean, kill: boolean) => ({
     ...w, 
     fame: Math.max(0, (w.fame || 0) + f), 
@@ -26,19 +30,21 @@ export function applyRecords(
       losses: (w.career.losses || 0) + (!win ? 1 : 0), 
       kills: (w.career.kills || 0) + (kill ? 1 : 0) 
     },
-    flair: win && tags.includes("Flashy") ? Array.from(new Set([...w.flair, "Flashy"])) : w.flair,
+    flair: win && tags.includes("Flashy") ? Array.from(new Set([...(w.flair || []), "Flashy"])) : w.flair,
   });
 
-  s.roster = updateEntityInList(s.roster, wA.id, w => updateW(w, fameA, popA, outcome.winner === "A", outcome.winner === "A" && outcome.by === "Kill"));
+  rosterUpdates.set(wA.id, updateW(wA, fameA, popA, outcome.winner === "A", outcome.winner === "A" && outcome.by === "Kill"));
   
   if (!rivalStableId) {
-    s.roster = updateEntityInList(s.roster, wD.id, w => updateW(w, fameD, popD, outcome.winner === "D", outcome.winner === "D" && outcome.by === "Kill"));
+    rosterUpdates.set(wD.id, updateW(wD, fameD, popD, outcome.winner === "D", outcome.winner === "D" && outcome.by === "Kill"));
   } else {
-    s.rivals = (s.rivals || []).map(r => r.owner.id === rivalStableId 
-      ? { ...r, roster: updateEntityInList(r.roster, wD.id, w => updateW(w, fameD, 0, outcome.winner === "D", outcome.winner === "D" && outcome.by === "Kill")) } 
-      : r);
-    s.matchHistory = addMatchRecord(s.matchHistory || [], wA.id, wD.id, rivalStableId, s.week);
+    const rival = (s.rivals || []).find(r => r.owner.id === rivalStableId);
+    if (rival) {
+      const updatedRoster = updateEntityInList(rival.roster, wD.id, w => updateW(w, fameD, 0, outcome.winner === "D", outcome.winner === "D" && outcome.by === "Kill"));
+      rivalsUpdates.set(rivalStableId, { roster: updatedRoster });
+    }
   }
   
-  return s;
+  const impact: StateImpact = { rosterUpdates, rivalsUpdates };
+  return impact;
 }

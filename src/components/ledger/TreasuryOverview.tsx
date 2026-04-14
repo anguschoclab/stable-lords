@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ import {
 import { type Warrior, type LedgerEntry } from "@/types/game";
 
 export function TreasuryOverview() {
-  const state = useGameStore();
+  const state = useWorldState();
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
   const gold = state.treasury ?? 0;
   

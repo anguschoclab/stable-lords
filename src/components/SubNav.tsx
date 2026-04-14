@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -20,7 +20,8 @@ interface SubNavProps {
 }
 
 export default function SubNav({ tabs, activeTab, onTabChange }: SubNavProps) {
-  const isFTUE = useGameStore(s => s.state.isFTUE);
+  const state = useWorldState();
+  const isFTUE = state.isFTUE;
   if (isFTUE) return null;
 
   return (
@@ -30,6 +31,7 @@ export default function SubNav({ tabs, activeTab, onTabChange }: SubNavProps) {
           <Tooltip key={tab.id}>
             <TooltipTrigger asChild>
               <button
+                aria-label={`Switch to ${tab.label} tab`}
                 onClick={() => onTabChange(tab.id)}
                 aria-current={activeTab === tab.id ? "page" : undefined}
                 className={cn(

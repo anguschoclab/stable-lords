@@ -4,14 +4,15 @@ import { Surface } from "@/components/ui/Surface";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { GraduationCap, UserMinus, Sparkles, Clock, Target, Trophy, ChevronRight, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StatBattery } from "@/components/ui/StatBattery";
 import type { Trainer as TrainerData, TrainerFocus, TrainerTier } from "@/types/state.types";
 import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import { FOCUS_ICONS, FOCUS_DESCRIPTIONS, TIER_BONUS } from "@/engine/trainers";
 
 const TIER_ACCENTS: Record<string, string> = {
   Novice: "border-border/40 text-muted-foreground",
-  Seasoned: "border-blue-500/40 text-blue-400 bg-blue-500/10",
-  Master: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_15px_rgba(255,215,0,0.1)]",
+  Seasoned: "border-stone-500/40 text-stone-300 bg-stone-500/10",
+  Master: "border-arena-gold text-arena-gold bg-arena-gold/10 shadow-[0_0_15px_rgba(201,151,42,0.15)]",
 };
 
 interface TrainerCardProps {
@@ -46,8 +47,8 @@ export function TrainerCard({
         {/* Tier Indicator Strip */}
         <div className={cn(
           "w-1.5 shrink-0",
-          trainer.tier === "Master" ? "bg-arena-gold" : 
-          trainer.tier === "Seasoned" ? "bg-blue-500" : "bg-neutral-800"
+          trainer.tier === "Master" ? "bg-arena-gold" :
+          trainer.tier === "Seasoned" ? "bg-stone-500" : "bg-neutral-800"
         )} />
 
         <div className="p-6 flex-1 flex flex-col justify-between">
@@ -143,19 +144,13 @@ export function TrainerCard({
             <div className="shrink-0 w-48">
                {owned ? (
                  <div className="bg-neutral-900 rounded-xl border border-white/5 p-3 transition-all">
-                    <div className="flex items-center justify-between mb-1.5">
-                       <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">Term Duration</span>
-                       <span className="text-[10px] font-mono font-black text-white">{trainer.contractWeeksLeft}W</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-black rounded-full overflow-hidden border border-white/5">
-                       <div 
-                         className={cn(
-                           "h-full transition-all duration-1000",
-                           trainer.contractWeeksLeft < 4 ? "bg-destructive shadow-[0_0_5px_rgba(var(--destructive-rgb),0.5)]" : "bg-primary/40"
-                         )} 
-                         style={{ width: `${Math.min(100, (trainer.contractWeeksLeft / 24) * 100)}%` }} 
-                       />
-                    </div>
+                    <StatBattery
+                      label="TNR"
+                      value={Math.min(100, (trainer.contractWeeksLeft / 24) * 100)}
+                      max={100}
+                      labelValue={`${trainer.contractWeeksLeft}W`}
+                      colorClass={trainer.contractWeeksLeft < 4 ? "bg-destructive" : "bg-primary/40"}
+                    />
                  </div>
                ) : (
                  <div className="flex flex-col gap-1 px-4">

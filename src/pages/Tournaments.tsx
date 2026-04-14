@@ -3,7 +3,7 @@
  * Modularized for better maintainability and strict type safety.
  */
 import React, { useState, useCallback, useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, reconstructGameState } from "@/state/useGameStore";
 import { simulateFight, defaultPlanForWarrior, fameFromTags, aiPlanForWarrior } from "@/engine";
 import { type TournamentEntry, type TournamentBout, type FightSummary, type Warrior, FightingStyle } from "@/types/game";
 import { generateId, hashStr } from "@/utils/idUtils";
@@ -54,7 +54,10 @@ export default function Tournaments() {
     arenaHistory,
     player,
     rosterBonus,
-    setState
+    setState,
+    activeSlotId,
+    loadGame,
+    setSimulating
   } = useGameStore();
 
   const [expandedBout, setExpandedBout] = useState<string | null>(null);
@@ -134,7 +137,7 @@ export default function Tournaments() {
         
         <div className="flex items-center gap-2">
           {!currentTournament && activeWarriors.length < 2 && (
-             <Link to="/stable/recruit">
+             <Link to="/ops/personnel">
               <Button variant="outline" className="h-11 font-black uppercase text-[10px] tracking-widest gap-2">
                 <UserPlus className="h-4 w-4" /> RECRUIT_OPERATIVES
               </Button>

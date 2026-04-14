@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { FastForward, Activity, AlertCircle, CheckCircle2 } from "lucide-react";
-import type { AutosimResult, WeekSummary } from "@/engine/autosim";
+import type { AutosimResult, AutosimWeekSummary as WeekSummary } from "@/engine/autosim";
 
 interface AutosimConsoleProps {
   isSimulating: boolean;

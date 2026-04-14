@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { computeStableReputation } from "@/engine/stableReputation";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { StatBattery } from "@/components/ui/StatBattery";
 import { Shield, Skull, Sparkles, Star, Eye, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ const REP_LABELS: { key: keyof ReturnType<typeof computeStableReputation>; label
 ];
 
 export function ReputationSliders() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const rep = useMemo(() => computeStableReputation(state), [state]);
 
   return (
@@ -41,25 +41,25 @@ export function ReputationSliders() {
                 <Icon className={cn("h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity", color)} />
                 <span className="text-xs font-display font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">{label}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className={cn("font-mono font-black text-sm", color)}>{rep[key]}%</span>
+              <div className="flex items-center gap-3 w-full max-w-xs ml-auto">
+                <div className="w-full">
+                  <StatBattery
+                     label=""
+                     value={rep[key]}
+                     max={100}
+                     labelValue={`${rep[key]}%`}
+                     colorClass={glow}
+                  />
+                </div>
                 <Tooltip>
                    <TooltipTrigger asChild>
-                      <Info className="h-3 w-3 text-muted-foreground/30 hover:text-muted-foreground transition-colors cursor-help" />
+                      <Info className="h-3 w-3 text-muted-foreground/30 hover:text-muted-foreground transition-colors cursor-help shrink-0" />
                    </TooltipTrigger>
                    <TooltipContent className="w-full max-w-xs text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10">
                       {desc}
                    </TooltipContent>
                 </Tooltip>
               </div>
-            </div>
-            
-            <div className="relative h-2 bg-neutral-900 rounded-full overflow-hidden border border-white/5 shadow-inner">
-              <div
-                className={cn("absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(0,0,0,0.5)]", glow)}
-                style={{ width: `${rep[key]}%` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none" />
             </div>
           </div>
         ))}

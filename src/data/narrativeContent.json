@@ -368,7 +368,8 @@
       ],
       "solid": [
         "{{attacker}} unleashes a blinding flurry of cuts with his {{weapon}}, biting into the {{bodyPart}}!",
-        "{{attacker}}'s {{weapon}} lunges with awesome cutting power, rending the {{bodyPart}}!"
+        "{{attacker}}'s {{weapon}} lunges with awesome cutting power, rending the {{bodyPart}}!",
+        "{{attacker}} lunges with sudden ferocity, leaving a bloody trail across {{defender}}'s {{bodyPart}}!"
       ],
       "mastery": [
         "In a blur of practiced rhythm, {{attacker}}'s {{weapon}} flows through {{defender}}'s guard to find the {{bodyPart}}.",
@@ -469,7 +470,11 @@
       "The stench of old blood rises as the fighters step onto the sand.",
       "The crowd bays for blood as the combatants lock eyes.",
       "Steel is drawn, and the roar of the coliseum becomes deafening!",
-      "A hush falls. Then the ARENAMASTER drops his hand, and steel is drawn."
+      "A hush falls. Then the ARENAMASTER drops his hand, and steel is drawn.",
+      "The arena gates screech open, and the warriors step forth into the unforgiving light.",
+      "Sand crunching underfoot, the combatants measure each other before the first blow falls.",
+      "The crowd's chanting swells to a roar as weapons are unsheathed and readied.",
+      "Blood-stained sand awaits fresh tribute as the ARENAMASTER signals the start."
     ],
     "whiffs": [
       "{{attacker}} swings his {{weapon}} but finds only air.",
@@ -1047,6 +1052,9 @@
   "meta": {
     "flair": {
       "Flashy": "Crowd favorite — earns +2 Popularity per flashy fight."
+    },
+    "title": {
+      "Champion": "Arena title holder. Earns passive fame each week."
     },
     "injury": {
       "Broken Arm": "Reduces Attack and Parry effectiveness until healed."

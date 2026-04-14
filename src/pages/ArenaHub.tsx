@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { STYLE_DISPLAY_NAMES, type Warrior, FightingStyle } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
+import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/shared.types";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Badge } from "@/components/ui/badge";
 import { WarriorNameTag } from "@/components/ui/WarriorBadges";

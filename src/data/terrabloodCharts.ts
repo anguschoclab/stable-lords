@@ -94,9 +94,11 @@ export function getDamageRating(damageClass: number): DamageRating {
 
 export type EncumbranceClass = "A" | "B" | "C" | "D" | "E" | "F";
 
-// Each class ≈ 9 weight points of gear capacity
+// Each class ≈ 6 weight points of gear capacity
+// Canonical: average warrior (ST12/CN12) = class C = 18 points
+// Max loadout weight: 2H(8) + Plate(14) + FullHelm(4) = 26 → only class E(30)/F(36) can carry it
 export const ENCUMBRANCE_CAPACITY: Record<EncumbranceClass, number> = {
-  A: 9, B: 18, C: 27, D: 36, E: 45, F: 54,
+  A: 6, B: 12, C: 18, D: 24, E: 30, F: 36,
 };
 
 export const ENCUMBRANCE_LABELS: Record<EncumbranceClass, string> = {

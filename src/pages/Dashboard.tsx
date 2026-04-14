@@ -22,10 +22,14 @@ import { TrainingWidget } from "@/components/dashboard/TrainingWidget";
 import { RivalsListWidget } from "@/components/dashboard/RivalsListWidget";
 import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
 import { StableComparisonWidget } from "@/components/dashboard/StableComparisonWidget";
+import { StableStrategyWidget } from "@/components/dashboard/StableStrategyWidget";
 import { CrowdMoodWidget } from "@/components/widgets/CrowdMoodWidget";
 import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
 import { IntelligenceHubWidget } from "@/components/dashboard/IntelligenceHubWidget";
 import BubbleWatchWidget from "@/components/widgets/BubbleWatchWidget";
+import EventLog from "@/components/EventLog";
+import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
+import { WeatherWidget } from "@/components/widgets/WeatherWidget";
 
 // ─── Widget Registry ───────────────────────────────────────────────────────
 
@@ -48,9 +52,13 @@ const MemoMetaPulseWidget = React.memo(MetaPulseWidget);
 const MemoRecentBoutsWidget = React.memo(RecentBoutsWidget);
 const MemoCrowdMoodWidget = React.memo(CrowdMoodWidget);
 const MemoStableComparisonWidget = React.memo(StableComparisonWidget);
+const MemoStableStrategyWidget = React.memo(StableStrategyWidget);
 const MemoMedicalAuditWidget = React.memo(MedicalAuditWidget);
 const MemoIntelligenceHubWidget = React.memo(IntelligenceHubWidget);
 const MemoBubbleWatchWidget = React.memo(BubbleWatchWidget);
+const MemoEventLog = React.memo(EventLog);
+const MemoNextBoutWidget = React.memo(NextBoutWidget);
+const MemoWeatherWidget = React.memo(WeatherWidget);
 
 const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
@@ -60,6 +68,7 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "training", label: "Training Status",    component: MemoTrainingWidget },
   { id: "rivals",    label: "Rival Stables",      component: MemoRivalsWidget },
   { id: "stableCompare", label: "Stable Comparison", component: MemoStableComparisonWidget, wide: true },
+  { id: "strategy", label: "Stable Strategy",    component: MemoStableStrategyWidget },
   { id: "bubbleWatch", label: "Tournament Bubble Watch", component: MemoBubbleWatchWidget },
   { id: "rivalries", label: "Rivalries",          component: MemoRivalryWidget, wide: true },
   { id: "rankings", label: "Warrior Rankings",   component: MemoRankingsWidget, wide: true },
@@ -67,6 +76,9 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "medical",   label: "Medical Audit",     component: MemoMedicalAuditWidget },
   { id: "meta",     label: "Meta Pulse",         component: MemoMetaPulseWidget },
   { id: "bouts",    label: "Recent Bouts",       component: MemoRecentBoutsWidget, wide: true },
+  { id: "eventLog", label: "Event Log",          component: MemoEventLog, wide: true },
+  { id: "nextBout", label: "Next Bout",          component: MemoNextBoutWidget },
+  { id: "weather",  label: "Weather",            component: MemoWeatherWidget },
 ];
 
 const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);
@@ -74,14 +86,14 @@ const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);
 // ─── Drag & Drop Hook ─────────────────────────────────────────────────────
 
 function useDraggableWidgets() {
-  const prefs = loadUIPrefs();
-  const savedOrder = prefs.dashboardLayout ?? DEFAULT_ORDER;
+  const prefs = loadUIPrefs() as any;
+  const savedOrder = prefs?.dashboardLayout ?? DEFAULT_ORDER;
   
   // Ensure all widgets are present
   const validIds = new Set(DEFAULT_ORDER);
   const savedOrderSet = new Set(savedOrder);
   const order = [
-    ...savedOrder.filter(id => validIds.has(id)),
+    ...savedOrder.filter((id: string) => validIds.has(id)),
     ...DEFAULT_ORDER.filter(id => !savedOrderSet.has(id)),
   ];
 
@@ -173,7 +185,7 @@ export default function Dashboard() {
         icon={LayoutDashboard}
         actions={
           <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-lg border border-white/5 shrink-0 shadow-inner">
+            <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-none border border-white/5 shrink-0 shadow-inner">
                <div className="flex items-center gap-2 border-r border-white/5 pr-4">
                   <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Gold</span>
                   <span className="font-mono text-arena-gold font-black">{Math.round(treasury).toLocaleString()}G</span>
@@ -186,20 +198,16 @@ export default function Dashboard() {
 
             <div className="flex items-center gap-2 shrink-0">
               {isEditing && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-[10px] font-black uppercase tracking-widest gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all" 
+                <Button
+                  className="text-[10px] font-black uppercase tracking-widest gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all h-9 px-3 text-xs"
                   onClick={resetLayout}
                 >
                   <RotateCcw className="h-3 w-3" /> Reset
                 </Button>
               )}
               <Button
-                variant={isEditing ? "default" : "secondary"}
-                size="sm"
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-lg", 
+                  "text-[10px] font-black uppercase tracking-widest gap-2 transition-all shadow-lg h-9 px-3 text-xs",
                   isEditing ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]" : "bg-neutral-900/60 border border-white/5"
                 )}
                 onClick={() => setIsEditing(v => !v)}
@@ -234,7 +242,7 @@ export default function Dashboard() {
                 def.wide && "md:col-span-2",
                 isEditing && "cursor-grab active:cursor-grabbing",
                 isDragging && "opacity-40 scale-[0.97]",
-                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-xl",
+                isDragOver && "ring-2 ring-primary/50 ring-offset-1 ring-offset-background rounded-none",
               )}
             >
               {isEditing && (

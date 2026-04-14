@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import RunRound from "@/pages/RunRound";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/run-round")({
-  component: RunRound,
+  component: () => <Navigate to="/command/combat" />,
 });

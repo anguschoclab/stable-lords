@@ -7,8 +7,9 @@ import type { FightSummary } from "@/types/combat.types";
 import type { CrowdMoodType, Season } from "@/types/shared.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { GazetteStory } from "@/types/state.types";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { STYLE_DISPLAY_NAMES } from "@/types/shared.types";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { generateId } from "@/utils/idUtils";
 
 
@@ -19,16 +20,19 @@ function styleName(style: string): string {
   return STYLE_DISPLAY_NAMES[style as keyof typeof STYLE_DISPLAY_NAMES] ?? style;
 }
 
-function t(template: string, data: Record<string, any>): string {
-  let result = template;
+function t(template: string | string[], data: Record<string, any>, rng?: IRNGService): string {
+  let result = Array.isArray(template)
+    ? (rng ? rng.pick(template) : template[Math.floor(Math.random() * template.length)])
+    : template;
+  if (!result) return "";
   for (const [key, value] of Object.entries(data)) {
     result = result.replace(new RegExp(`{{${key}}}`, "g"), String(value));
   }
   return result;
 }
 
-export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType, rng?: SeededRNG): string {
-  const safeRng = rng ?? new SeededRNG(fight.week * 42);
+export function generateFightNarrative(fight: FightSummary, mood: CrowdMoodType, rng?: IRNGService): string {
+  const safeRng = rng || new SeededRNGService(fight.week * 42);
   const toneResource = MOOD_TONE[mood] || MOOD_TONE["Calm"];
   if (!MOOD_TONE[mood]) console.error(`Missing mood tone logic for: ${mood}`);
   const adj = safeRng.pick(toneResource.adjectives);
@@ -145,10 +149,10 @@ export function generateWeeklyGazette(
   week: number,
   graveyard: Warrior[],
   allFights?: FightSummary[],
-  seed?: number
+  rng?: IRNGService
 ): GazetteStory {
-  const rng = new SeededRNG(seed ?? (week * 7919 + 55));
-  const storyId = rng.uuid("gazette");
+  const rngService = rng || new SeededRNGService(week * 7919 + 55);
+  const storyId = rngService.uuid();
   const moodKey = mood && MOOD_TONE[mood] ? mood : "Calm";
   const tone = MOOD_TONE[moodKey];
   const kills = fights.filter(f => f.by === "Kill");
@@ -263,7 +267,7 @@ export function generateWeeklyGazette(
   }
 
   // Body
-  const paragraphs: string[] = [rng.pick(tone.opener)];
+  const paragraphs: string[] = [rngService.pick(tone.opener)];
   const gf = (narrativeContent.gazette as any).featured;
 
   // Summary stats
@@ -320,7 +324,7 @@ export function generateWeeklyGazette(
     }
   }
 
-  paragraphs.push(rng.pick(tone.closer));
+  paragraphs.push(rngService.pick(tone.closer));
 
   return {
     id: storyId,
