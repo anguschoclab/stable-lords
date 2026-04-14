@@ -65,13 +65,13 @@ class AudioManager {
     this.muted = muted;
     if (typeof window !== "undefined" && window.electronAPI) {
       try {
-        await window.electronAPI.storeSet("sl_muted", String(muted));
+        await window.electronAPI.storeSet(STORE_KEYS.AUDIO_MUTED, String(muted));
       } catch (error) {
         console.error('Failed to save mute state to electron-store', error);
       }
     } else if (typeof localStorage !== "undefined") {
       try {
-        localStorage.setItem("sl_muted", String(muted));
+        localStorage.setItem(STORE_KEYS.AUDIO_MUTED, String(muted));
       } catch (error) {
         if ((error as Error)?.name === 'QuotaExceededError') {
           console.error('localStorage quota exceeded when saving mute state', error);

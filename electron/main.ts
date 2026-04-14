@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu, dialog, shell, Tray, nativeImage, Notification } from 'electron';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as os from 'os';
 import { fileURLToPath } from 'url';
 
@@ -17,17 +17,20 @@ let configPath;
 let configSaveTimeout: NodeJS.Timeout | null = null;
 
 // Load config from file
-function loadConfig() {
+async function loadConfig() {
   if (!configPath) {
     console.warn('Config path not initialized yet');
     return;
   }
   try {
-    if (fs.existsSync(configPath)) {
-      const data = fs.readFileSync(configPath, 'utf-8');
-      const parsed = JSON.parse(data);
-      Object.keys(parsed).forEach(key => store.set(key, parsed[key]));
+    try {
+      await fs.access(configPath);
+    } catch {
+      return; // File doesn't exist, that's fine
     }
+    const data = await fs.readFile(configPath, 'utf-8');
+    const parsed = JSON.parse(data);
+    Object.keys(parsed).forEach(key => store.set(key, parsed[key]));
   } catch (e) {
     console.error('Failed to load config:', e);
   }
