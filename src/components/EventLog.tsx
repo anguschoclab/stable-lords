@@ -279,7 +279,7 @@ export default function EventLog() {
                   return (
                     <button
                       key={event.id}
-                      aria-label={`View details for event: ${event.message}`}
+                      aria-label={`View details for event: ${event.title}`}
                       onClick={() => navigate({ to: event.linkTo })}
                       className={cn(
                         "w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors border-b border-border/30",
