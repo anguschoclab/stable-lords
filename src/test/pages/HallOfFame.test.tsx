@@ -108,6 +108,7 @@ describe("HallOfFame Component", () => {
 
     // Find the 'Reaper' card directly
     const reaperElements = getAllByText("Reaper");
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const reaperCard = (reaperElements[0] as HTMLElement).closest("[data-testid='inductee-card']")!;
     expect(reaperCard).not.toBeNull();
 

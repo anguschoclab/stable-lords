@@ -96,6 +96,7 @@ describe("WorldOverview Component", () => {
     expect(screen.getByText(/Commanded by Player Owner/i)).toBeInTheDocument();
 
     const pOwner = screen.getByText(/Commanded by Player Owner/i);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const playerRow = pOwner.closest("tr")!;
     expect(playerRow).not.toBeNull();
     const playerWlkCell = within(playerRow).getAllByText(/15/);
@@ -106,6 +107,7 @@ describe("WorldOverview Component", () => {
     expect(rivalStables.length).toBeGreaterThan(0);
 
     const rOwner = screen.getByText(/Commanded by Rival Owner/i);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const rivalRow = rOwner.closest("tr")!;
     expect(rivalRow).not.toBeNull();
     const rivalWlkCell = within(rivalRow).getAllByText(/20/);
@@ -122,6 +124,7 @@ describe("WorldOverview Component", () => {
     const rw1Elements = await screen.findAllByText("RivalWarrior1");
     expect(rw1Elements.length).toBeGreaterThan(0);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const pw1Row = pw1Elements[0].closest("tr")!;
     const pw1Cells = within(pw1Row).getAllByText(/Player Stable/i);
     expect(pw1Cells.length).toBeGreaterThan(0);

@@ -221,7 +221,9 @@ export const StyleRollups = {
     const kill = opts.by === "Kill";
     const addRolling = (s: string, win: boolean, killed: boolean) => {
       if (!rolling[s]) rolling[s] = [];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       rolling[s]!.push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       while (rolling[s]!.length > 10) rolling[s]!.shift();
     };
     addRolling(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
@@ -234,7 +236,9 @@ export const StyleRollups = {
       const tid = opts.isTournament;
       tour[tid] = tour[tid] || {};
       const bump = (s: string, win: boolean, killed: boolean) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         tour[tid]![s] = tour[tid]![s] || { W: 0, L: 0, K: 0, fights: 0 };
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const b = tour[tid]![s]!;
         b.W += win ? 1 : 0;
         b.L += win ? 0 : 1;

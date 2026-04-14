@@ -26,7 +26,7 @@ const DEFENSIVE_MATRIX: Record<FightingStyle, Record<string, SuitabilityRating>>
   [FightingStyle.BashingAttack]:  { Dodge: "U",  Parry: "U",  Riposte: "U",  Responsiveness: "U"  },
   [FightingStyle.LungingAttack]:  { Dodge: "WS", Parry: "U",  Riposte: "WS", Responsiveness: "U"  },
   [FightingStyle.ParryLunge]:     { Dodge: "WS", Parry: "WS", Riposte: "S",  Responsiveness: "U"  },
-  [FightingStyle.ParryRiposte]:   { Dodge: "S",  Parry: "WS", Riposte: "WS", Responsiveness: "S"  },
+  [FightingStyle.ParryRiposte]:   { Dodge: "S",  Parry: "WS", Riposte: "WS", Responsiveness: "U"  },
   [FightingStyle.ParryStrike]:    { Dodge: "U",  Parry: "WS", Riposte: "S",  Responsiveness: "WS" },
   [FightingStyle.SlashingAttack]: { Dodge: "U",  Parry: "U",  Riposte: "U",  Responsiveness: "U"  },
   [FightingStyle.StrikingAttack]: { Dodge: "U",  Parry: "U",  Riposte: "S",  Responsiveness: "WS" },

@@ -129,6 +129,7 @@ export function useRivalryAlerts() {
       if (!stable) continue;
 
       if (!map.has(stable)) map.set(stable, { stableName: stable, kills: 0, bouts: 0 });
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const r = map.get(stable)!;
       r.bouts++;
       if (bout.by === "Kill" && bout.winner) r.kills++;

@@ -23,8 +23,8 @@ export function runBoutSimulationPass(state: GameState, _rng: IRNGService): Stat
   const { impact: boutImpact, summary } = processWeekBouts(state);
   
   // Attach the summary to the state for use in later narrative or event passes if needed
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   boutImpact.lastSimulationReport = {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     id: _rng!.uuid(),
     week: state.week,
     treasuryChange: 0,

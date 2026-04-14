@@ -80,6 +80,7 @@ describe("Trainers Component", () => {
     renderWithGameState(<Trainers />, mockState);
 
     // Find the current trainer card
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const trainerCard = (await screen.findAllByTestId("trainer-card")).find(el => el.textContent?.includes("Master Splinter"))!;
 
     // The fire button now uses aria-label="Release Trainer"
@@ -98,6 +99,7 @@ describe("Trainers Component", () => {
     
     // Find the trainer card within that tab
     const rockies = within(hireTab).getAllByText("Coach Rocky");
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const trainerCard = rockies[0].closest("[data-testid='trainer-card']")!;
     expect(trainerCard).not.toBeNull();
 

@@ -681,6 +681,46 @@
     "Stoppage": "The match is called. {{defender}} cannot continue. {{attacker}} wins!",
     "Exhaustion": "Both warriors are spent, but {{attacker}} is awarded the victory."
   },
+  "blurbs": {
+    "neutral": [
+      "{{attacker}} defeated {{defender}}{{hits}} in a hard-fought contest.",
+      "{{attacker}} emerged victorious over {{defender}}{{hits}}.",
+      "{{attacker}} bested {{defender}}{{hits}}."
+    ],
+    "hype": [
+      "{{attacker}} DOMINATED {{defender}}{{hits}}! The crowd goes wild!",
+      "What a performance! {{attacker}} crushed {{defender}}{{hits}}!",
+      "{{attacker}} finishes {{defender}}{{hits}} with a spectacular display!"
+    ],
+    "grim": [
+      "{{attacker}} cut down {{defender}}{{hits}} without mercy.",
+      "{{defender}} fell to {{attacker}}{{hits}}. The sands drink deep.",
+      "{{attacker}} ended {{defender}}{{hits}} in brutal fashion."
+    ]
+  },
+  "commentary": {
+    "KO": [
+      "What a knockout! The crowd erupts!",
+      "{{attacker}} lays out {{defender}} with a devastating blow!"
+    ],
+    "Kill": [
+      "A brutal finish! {{attacker}} has killed {{defender}}!",
+      "The life leaves {{defender}}'s eyes. What a savage display!"
+    ],
+    "Flashy": [
+      "What a flashy display of skill!",
+      "{{attacker}} is putting on a show!"
+    ],
+    "Upset": [
+      "The upset of the week! {{defender}} never saw it coming!",
+      "What a shock! {{attacker}} defies the odds!"
+    ]
+  },
+  "recap": [
+    "{{attacker}} defeated {{defender}} in {{hits}} minutes.",
+    "{{attacker}} bested {{defender}} after {{hits}} minutes of combat.",
+    "{{attacker}} emerged victorious over {{defender}} in {{hits}} minutes."
+  ],
   "events": {
     "tavern_brawl": {
       "title": "Tavern Brawl!",
@@ -692,6 +732,12 @@
       "title": "A Sign from the Gods!",
       "newsletter": [
         "A shooting star was seen over the arena exactly as {{name}} was training. (+{{fame}} Fame, +{{xp}} XP)"
+      ]
+    },
+    "lost_relic": {
+      "title": "Lost Relic Discovery",
+      "newsletter": [
+        "{{name}} discovered an ancient artifact while exploring the ruins! (+{{fame}} Fame, +{{xp}} XP)"
       ]
     }
   },

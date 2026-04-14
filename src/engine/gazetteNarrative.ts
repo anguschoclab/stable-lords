@@ -22,6 +22,7 @@ function styleName(style: string): string {
 
 function t(template: string | string[], data: Record<string, any>, rng?: IRNGService): string {
   let result = Array.isArray(template)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     ? (rng ? rng.pick(template) : template[Math.floor(new SeededRNGService(Date.now()).next() * template.length)]!)
     : template;
   if (!result) return "";
