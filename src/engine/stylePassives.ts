@@ -125,13 +125,9 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killWindowHpMult: 0.80,
       killNarrative: "delivers a precise, clinical strike to a vital point!",
     }),
-    getAntiSynergy: (off, def) => {
-      let offMult = 1, warning;
-      const defMult = 1;
-      if (off === "Bash") { offMult = 0.4; warning = "Aimed Blows sacrifice all precision when bashing"; }
-      if (off === "Slash") { offMult = 0.6; warning = "Slashing undermines the Aimed Blow's precision"; }
-      return { offMult, defMult, warning };
-    }
+    // Canonical suitability: AB is WS for Bash, Slash, and Lunge; only Decisiveness is U.
+    // Anti-synergy is therefore a no-op for AB — suitability handles tactical fit correctly.
+    getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
   },
 
   [FightingStyle.BashingAttack]: {
@@ -157,12 +153,14 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         killNarrative: "unleashes the full weight of their momentum in a crushing final blow!",
       };
     },
+    // Canonical suitability: Lunge/Dodge/Riposte are all U for BA (suitability already penalises them).
+    // Decisiveness is WS for BA — no additional penalty.
+    // Anti-synergy only reinforces physical incompatibilities beyond the U suitability floor.
     getAntiSynergy: (off, def) => {
       let offMult = 1, defMult = 1, warning;
-      if (off === "Lunge") { offMult = 0.5; warning = "Bashers are terrible lungers — too heavy and slow"; }
-      if (off === "Decisiveness") { offMult = 0.85; }
-      if (def === "Dodge") { defMult = 0.5; warning = (warning ? warning + "; " : "") + "Bashers are too heavy to dodge effectively"; }
-      if (def === "Riposte") { defMult = 0.5; }
+      if (off === "Lunge") { offMult = 0.7; warning = "Bashers are too heavy for effective lunging"; }
+      if (def === "Dodge") { defMult = 0.7; warning = (warning ? warning + "; " : "") + "Bashers cannot dodge effectively"; }
+      if (def === "Riposte") { defMult = 0.7; }
       return { offMult, defMult, warning };
     }
   },

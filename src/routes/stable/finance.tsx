@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import StableLedger from "@/pages/StableLedger";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/stable/finance")({
-  component: StableLedger,
+  component: () => <Navigate to="/ops/finance" />,
 });

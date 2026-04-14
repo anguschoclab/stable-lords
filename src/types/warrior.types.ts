@@ -14,6 +14,7 @@ import {
   type FightPlan,
   type DeathEvent
 } from "./shared.types";
+import type { AnnualAward } from "./state.types";
 
 // ─── UI Prop Types ──────────────────────────────────────────────────────────
 
@@ -135,7 +136,7 @@ export interface Warrior {
   dateOfDeath?: string;
   causeOfDeath?: string;
   yearlySnapshots?: Record<number, CareerRecord>; // 📸 Snapshot at Year Start
-  awards?: any[]; // Avoiding circular dependency with state.types for now, or just use any if it's transient
+  awards?: import("./state.types").AnnualAward[];
 }
 
 // Re-exports for convenience

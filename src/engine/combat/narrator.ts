@@ -14,11 +14,11 @@ import {
 import { getWeaponDisplayName } from "../narrative/narrativeUtils";
 
 export interface NarrationContext {
-  rng: () => number;
+  rng: IRNGService;
   nameA: string;
   nameD: string;
-  weaponA?: string;
-  weaponD?: string;
+  weaponA: string;
+  weaponD: string;
   styleA: FightingStyle;
   styleD: FightingStyle;
   maxHpA: number;
@@ -27,8 +27,8 @@ export interface NarrationContext {
   prevHpRatioD: number;
   fameA: number;
   fameD: number;
-  isFavoriteA: boolean;
-  isFavoriteD: boolean;
+  isFavoriteA?: boolean;
+  isFavoriteD?: boolean;
 }
 
 export function narrateEvents(
@@ -61,8 +61,8 @@ export function narrateEvents(
 
     switch (event.type) {
       case "INITIATIVE":
-        if (rng() < 0.3) {
-          log.push({ minute, text: narrateInitiative(rng, actorName, rng() < 0.3) });
+        if (rng.next() < 0.3) {
+          log.push({ minute, text: narrateInitiative(rng, actorName, rng.next() < 0.3) });
         }
         break;
 

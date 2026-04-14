@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Newspaper, Bell, Quote, ChevronRight, Info, Zap, TrendingUp, Target, Activity, Send } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Surface } from "@/components/ui/Surface";
@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentReasoningWidget } from "./AgentReasoningWidget";
 
 export function IntelligenceHubWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const recentGazettes = useMemo(() => {
     return (state.gazettes || []).slice(-5).reverse();
@@ -145,7 +145,7 @@ export function IntelligenceHubWidget() {
             <TabsContent value="reasoning" className="m-0 h-full">
               <ScrollArea className="h-72 px-6">
                 <div className="py-6">
-                  <AgentReasoningWidget />
+                  <AgentReasoningWidget rival={state.rivals?.[0] as any} />
                 </div>
                 <div className="h-6" />
               </ScrollArea>
@@ -156,7 +156,7 @@ export function IntelligenceHubWidget() {
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
          <Link 
-            to="/world/gazette"
+            to="/world/chronicle"
             className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
          >
             Sync_Full_Archive <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />

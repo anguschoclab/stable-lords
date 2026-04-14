@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim, Moon } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function SeasonWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const week = ((state.week - 1) % 13) + 1;
   const season = state.season;
   
@@ -32,13 +32,13 @@ export function SeasonWidget() {
 
   if (weather === "Rainy") {
     WeatherIcon = CloudRain;
-    weatherColor = "text-blue-500";
-    weatherBg = "bg-blue-500/10 border-blue-500/20";
+    weatherColor = "text-stone-400";
+    weatherBg = "bg-stone-400/10 border-stone-400/20";
   } else if (weather === "Blazing Sun") {
     WeatherIcon = Sun;
     weatherColor = "text-red-500";
     weatherBg = "bg-red-500/10 border-red-500/20";
-  } else if (weather === "Scalding") {
+  } else if (weather === "Sweltering") {
     WeatherIcon = Sun;
     weatherColor = "text-orange-500";
     weatherBg = "bg-orange-500/10 border-orange-500/20";
@@ -50,10 +50,18 @@ export function SeasonWidget() {
     WeatherIcon = Cloud;
     weatherColor = "text-gray-400";
     weatherBg = "bg-gray-400/10 border-gray-400/20";
-  } else if (weather === "Drafty") {
+  } else if (weather === "Gale") {
     WeatherIcon = Wind;
-    weatherColor = "text-cyan-400";
-    weatherBg = "bg-cyan-400/10 border-cyan-400/20";
+    weatherColor = "text-emerald-500";
+    weatherBg = "bg-emerald-500/10 border-emerald-500/20";
+  } else if (weather === "Breezy") {
+    WeatherIcon = Wind;
+    weatherColor = "text-stone-300";
+    weatherBg = "bg-stone-300/10 border-stone-300/20";
+  } else if (weather === "Eclipse") {
+    WeatherIcon = Moon;
+    weatherColor = "text-purple-500";
+    weatherBg = "bg-purple-500/10 border-purple-500/20";
   }
 
   return (
@@ -141,9 +149,11 @@ export function SeasonWidget() {
                    </TooltipTrigger>
                    <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest w-full max-w-xs">
                       {weather === "Blazing Sun" ? "30% more stamina drain in combat." :
-                       weather === "Scalding" ? "20% more stamina drain in combat." :
+                       weather === "Sweltering" ? "20% more stamina drain in combat." :
                        weather === "Blood Moon" ? "A crimson moon rises. Fighters are bloodthirsty, vastly increasing lethality. 10% more stamina drain." :
-                       weather === "Drafty" ? "10% less stamina drain in combat." :
+                       weather === "Gale" ? "Fierce winds. 15% more stamina drain in combat." :
+                       weather === "Breezy" ? "10% less stamina drain in combat." :
+                       weather === "Eclipse" ? "20% less stamina drain in combat. Fights are slow and methodical." :
                        weather === "Rainy" ? "Poor visibility and slick ground penalize initiative and attack." :
                        "Standard atmospheric conditions."}
                    </TooltipContent>

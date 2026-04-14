@@ -4,7 +4,7 @@ import type {
 } from "@/types/state.types";
 import type { FightOutcome } from "@/types/combat.types";
 import { getStablePairKey, getWarriorPairKey } from "@/utils/keyUtils";
-import { SeededRNG } from "@/utils/random";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 /**
  * Matchmaking Scoring Service - handles the weights and logic for pairing warriors.
@@ -104,8 +104,7 @@ export class AIBoutService {
   /**
    * Generates a narrative line for a rival rivalry bout.
    */
-  static generateRivalryNarrative(stableA: string, stableB: string, warriorA: string, warriorB: string, seed?: number): string {
-    const rng = new SeededRNG(seed ?? (stableA.length * 101 + stableB.length));
+  static generateRivalryNarrative(stableA: string, stableB: string, warriorA: string, warriorB: string, rng: IRNGService): string {
     const templates = [
       `🔥 RIVALRY REPORT: The feud between ${stableA} and ${stableB} rages on — ${warriorA} faced ${warriorB} in a grudge match!`,
       `⚔️ VENDETTA IN THE PITS: ${stableA} vs ${stableB} — ${warriorA} and ${warriorB} settled scores in the arena!`,
@@ -113,20 +112,4 @@ export class AIBoutService {
     ];
     return rng.pick(templates);
   }
-}
-
-/**
- * Calculate rivalry intensity adjustment based on match outcomes.
- * Base (bouts fought) + Death (+5) + Upset (+3).
- */
-export function calculateRivalryScore(
-  boutsFought: number,
-  deathsCount: number,
-  upsetsCount: number
-): number {
-  let score = 0;
-  score += Math.floor(boutsFought / 3);
-  score += deathsCount * 5;
-  score += upsetsCount * 3;
-  return Math.max(1, Math.min(5, score));
 }

@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { SortHeader } from "@/components/ui/sort-header";
 import { Trophy, Star, Swords, Skull, Target, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StatBattery } from "@/components/ui/StatBattery";
 
 interface StableRow {
   id: string;
@@ -27,7 +28,7 @@ interface StableRow {
 const TIER_ACCENTS: Record<string, string> = {
   Legendary: "bg-arena-gold text-black border-arena-gold/30",
   Major: "bg-primary/20 text-primary border-primary/30",
-  Established: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Established: "bg-stone-500/10 text-stone-400 border-stone-500/20",
   Minor: "bg-neutral-900/40 text-muted-foreground border-white/5",
   Player: "bg-primary text-primary-foreground border-primary",
 };
@@ -107,15 +108,22 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>
-                           <Link
-                             to={row.isPlayer ? "/stable/hall" : "/stable/$id"} params={row.isPlayer ? {} : { id: row.id }}
-                             className={cn(
-                                "font-display font-black uppercase text-xs tracking-tight transition-all",
-                                row.isPlayer ? "text-primary hover:text-white" : "text-foreground hover:text-primary"
-                             )}
-                           >
-                             {row.name}
-                           </Link>
+                           {row.isPlayer ? (
+                             <Link
+                               to="/command/roster"
+                               className="font-display font-black uppercase text-xs tracking-tight transition-all text-primary hover:text-white"
+                             >
+                               {row.name}
+                             </Link>
+                           ) : (
+                             <Link
+                               to="/world/stable/$id"
+                               params={{ id: row.id }}
+                               className="font-display font-black uppercase text-xs tracking-tight transition-all text-foreground hover:text-primary"
+                             >
+                               {row.name}
+                             </Link>
+                           )}
                            <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[9px] font-black text-muted-foreground uppercase opacity-40 leading-none">Commanded by {row.ownerName}</span>
                               {row.isPlayer && <Badge variant="outline" className="text-[8px] font-black border-primary/20 bg-primary/10 text-primary py-0 px-1 leading-none h-3">ACTIVE_PLAYER</Badge>}
@@ -145,11 +153,14 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                 <TableCell className="text-right font-mono font-black text-xs text-primary">{row.wins}</TableCell>
                 <TableCell className="text-right font-mono font-black text-xs text-muted-foreground/40">{row.losses}</TableCell>
                 <TableCell className="text-right hidden sm:table-cell">
-                   <div className="flex flex-col items-end">
-                      <span className="font-mono font-black text-xs">{row.winRate}%</span>
-                      <div className="w-10 h-1 bg-neutral-900 rounded-full mt-1 overflow-hidden border border-white/5">
-                         <div className="h-full bg-primary" style={{ width: `${row.winRate}%` }} />
-                      </div>
+                   <div className="flex flex-col items-end w-20 ml-auto">
+                      <StatBattery
+                        label="WR"
+                        value={row.winRate}
+                        max={100}
+                        labelValue={`${row.winRate}%`}
+                        colorClass="bg-primary"
+                      />
                    </div>
                 </TableCell>
                 <TableCell className="text-right">

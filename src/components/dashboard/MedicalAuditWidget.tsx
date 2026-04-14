@@ -1,15 +1,15 @@
 import React, { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { HeartPulse, Activity, Skull, AlertCircle, Thermometer, ShieldAlert, ChevronRight } from "lucide-react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { StatBattery } from "@/components/ui/StatBattery";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { WarriorLink } from "@/components/EntityLink";
 
 export function MedicalAuditWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
 
   const atRisk = useMemo(() => {
     return state.roster.filter(w => {
@@ -80,26 +80,17 @@ export function MedicalAuditWidget() {
                              </TooltipContent>
                           </Tooltip>
                        )}
-                       <div className="flex flex-col items-end">
-                          <span className={cn(
-                            "text-xs font-mono font-black",
-                            condition < 40 ? "text-destructive" : "text-amber-500"
-                          )}>
-                            {condition}%
-                          </span>
                        </div>
-                    </div>
                   </div>
                   
-                  <div className="relative h-1.5 w-full bg-black/40 rounded-full overflow-hidden border border-white/5">
-                    <div 
-                      className={cn(
-                        "h-full rounded-full transition-all duration-1000",
-                        condition < 40 ? "bg-destructive shadow-[0_0_10px_rgba(239,68,68,0.4)]" : "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)]"
-                      )} 
-                      style={{ width: `${condition}%` }} 
-                    />
-                  </div>
+                  <StatBattery
+                     label="VIT"
+                     value={condition}
+                     max={100}
+                     labelValue={`${condition}%`}
+                     colorClass={condition < 40 ? "bg-destructive" : "bg-amber-500"}
+                     className="mt-1 w-full"
+                  />
                   
                   {isInjured && (
                     <div className="mt-2 flex flex-wrap gap-1.5 pl-1 border-l border-destructive/30 ml-0.5">

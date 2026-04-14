@@ -14,12 +14,13 @@ import {
 
 type RNG = () => number;
 
-interface CombatContext {
+export interface CombatContext {
   attacker?: string;
   defender?: string;
   name?: string;
   weapon?: string;
   bodyPart?: string;
+  hits?: string | number;
 }
 
 // ─── Core Narrative Engine (Bard of the Blood Sands) ─────────────────────────
@@ -27,12 +28,33 @@ interface CombatContext {
 /**
  * Replaces canonical tokens (%A, %D, %W, %BP) with contextual values.
  */
-function interpolateTemplate(template: string, ctx: CombatContext): string {
-  return template
-    .replace(/%A/g, ctx.attacker || "The warrior")
+/**
+ * Replaces canonical tokens (%A, %D, %W, %BP, %H) with contextual values.
+ */
+export function interpolateTemplate(template: string, ctx: CombatContext): string {
+  if (!template) return "No description available.";
+  let result = template
+    .replace(/%A/g, ctx.attacker || ctx.name || "The warrior")
     .replace(/%D/g, ctx.defender || "the opponent")
     .replace(/%W/g, ctx.weapon || "weapon")
-    .replace(/%BP/g, ctx.bodyPart || "body");
+    .replace(/%BP/g, ctx.bodyPart || "body")
+    .replace(/%H/g, String(ctx.hits || ""));
+
+  // Also support Handlebars-style placeholders
+  for (const [key, value] of Object.entries(ctx)) {
+    if (value !== undefined) {
+      result = result.replace(new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, "g"), String(value));
+    }
+  }
+
+  // Fallbacks for specific templates that use {{name}} but only pass attacker/defender
+  if (ctx.attacker && !ctx.name) {
+    result = result.replace(/\{\{\s*name\s*\}\}/g, String(ctx.attacker));
+  } else if (ctx.name && !ctx.attacker) {
+    result = result.replace(/\{\{\s*attacker\s*\}\}/g, String(ctx.name));
+  }
+
+  return result;
 }
 
 /**
@@ -69,7 +91,10 @@ function getStrikeSeverity(
 /**
  * Safely picks a template from the JSON archive or returns a generic fallback.
  */
-function getFromArchive(rng: RNG, path: string[]): string {
+/**
+ * Safely picks a template from the JSON archive or returns a generic fallback.
+ */
+export function getFromArchive(rng: RNG, path: string[]): string {
   try {
     let current: any = narrativeContent;
     for (const key of path) {

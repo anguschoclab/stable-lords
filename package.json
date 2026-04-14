@@ -1,16 +1,32 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "stable-lords",
+  "productName": "Stable Lords",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.1.0",
+  "description": "Manage your stable of warriors, train fighting styles, and compete in the arena!",
+  "author": "Stable Lords Team",
+  "main": "electron/main.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "electron:dev": "bun run dev & sleep 5 && electron .",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "electron:build": "bun run build && electron-builder",
+    "electron:build:all": "bun run build && electron-builder -mwl",
+    "electron:pack": "bun run build && electron-builder --dir",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed",
+    "e2e:debug": "playwright test --debug",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "oracle:daily": "bun run scripts/daily_oracle.ts",
     "bard:daily": "npx tsx src/scripts/daily_bard.ts"
   },
@@ -64,7 +80,6 @@
     "react-hook-form": "^7.61.1",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.9",
-    "react-router-dom": "^7.13.1",
     "recharts": "^2.15.4",
     "remark-gfm": "^4.0.1",
     "sonner": "^1.7.4",
@@ -77,8 +92,8 @@
     "@eslint/js": "^9.39.4",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/typography": "^0.5.16",
-    "@tanstack/react-router": "^1.167.0",
-    "@tanstack/router-vite-plugin": "^1.166.9",
+    "@tanstack/react-router": "1.166.8",
+    "@tanstack/router-vite-plugin": "1.166.8",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -86,30 +101,72 @@
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
-    "@vitejs/plugin-react-swc": "^3.11.0",
+    "@vitejs/plugin-react-swc": "^4.3.0",
     "@vitest/coverage-v8": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "comlink": "^4.4.2",
+    "concurrently": "^9.2.1",
     "dexie": "^4.3.0",
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1",
+    "electron-is-dev": "^3.0.1",
+    "electron-store": "^11.0.2",
+    "esbuild": "^0.28.0",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
-    "framer-motion": "^12.36.0",
     "globals": "^15.15.0",
     "howler": "^2.2.4",
     "immer": "^11.1.4",
     "inkjs": "^2.4.0",
-    "jsdom": "^20.0.3",
-    "lovable-tagger": "^1.1.13",
+    "jsdom": "^25.0.0",
     "postcss": "^8.5.6",
+    "prettier": "^3.4.2",
     "rollup-plugin-visualizer": "^7.0.1",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.57.0",
-    "vite": "^5.4.19",
+    "vite": "^7.3.2",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.2.4",
+    "wait-on": "^9.0.5",
     "zustand": "^5.0.11"
+  },
+  "build": {
+    "appId": "com.stablelords.app",
+    "productName": "Stable Lords",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.games",
+      "icon": "public/icons/icon-512.png",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ]
+    },
+    "win": {
+      "icon": "public/icons/icon-512.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

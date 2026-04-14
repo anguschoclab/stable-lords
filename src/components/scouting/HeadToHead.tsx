@@ -79,9 +79,14 @@ export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) 
 
             <div className="space-y-1.5 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
               {h2h.slice().reverse().map(f => {
-                const aIsStableA = idsA.has(f.warriorIdA) || idsA.has(f.warriorIdD); // Fix: Determine which side is A for this display row
+                const aIsStableA = idsA.has(f.warriorIdA);
                 const winnerIsA = (idsA.has(f.warriorIdA) && f.winner === "A") || (idsA.has(f.warriorIdD) && f.winner === "D");
                 const winnerIsB = (idsB.has(f.warriorIdA) && f.winner === "A") || (idsB.has(f.warriorIdD) && f.winner === "D");
+
+                const warriorIdLeft = aIsStableA ? f.warriorIdA : f.warriorIdD;
+                const warriorNameLeft = aIsStableA ? f.a : f.d;
+                const warriorIdRight = aIsStableA ? f.warriorIdD : f.warriorIdA;
+                const warriorNameRight = aIsStableA ? f.d : f.a;
                 
                 return (
                   <div key={f.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0 group/row hover:bg-white/5 transition-colors px-2 rounded-lg">
@@ -90,7 +95,7 @@ export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) 
                       "flex-1 truncate text-[11px] font-black transition-colors uppercase tracking-tight",
                       winnerIsA ? "text-primary" : "text-muted-foreground/40"
                     )}>
-                      {resolveWarriorName(state, f.warriorIdA, f.a)}
+                      {resolveWarriorName(state, warriorIdLeft, warriorNameLeft)}
                     </div>
                     <div className="flex items-center gap-1 mx-4">
                        <Target className="h-3 w-3 text-arena-gold/40" />
@@ -100,7 +105,7 @@ export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) 
                       "flex-1 truncate text-right text-[11px] font-black transition-colors uppercase tracking-tight",
                       winnerIsB ? "text-accent" : "text-muted-foreground/40"
                     )}>
-                      {resolveWarriorName(state, f.warriorIdD, f.d)}
+                      {resolveWarriorName(state, warriorIdRight, warriorNameRight)}
                     </div>
                   </div>
                 );

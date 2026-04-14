@@ -7,15 +7,17 @@ function createMockFight(overrides: Partial<FightSummary> = {}): FightSummary {
   return {
     id: "test-fight",
     week: 1,
-    phase: "resolution",
     title: "Test Bout",
     a: "Warrior A",
     d: "Warrior B",
+    warriorIdA: "wa-a",
+    warriorIdD: "wa-d",
     winner: "A",
     by: "KO",
-    styleA: "Brawler",
-    styleD: "Fencer",
+    styleA: "Brawler" as any,
+    styleD: "Fencer" as any,
     createdAt: new Date().toISOString(),
+    transcript: [],
     ...overrides,
   };
 }

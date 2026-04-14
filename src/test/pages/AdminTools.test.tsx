@@ -79,8 +79,8 @@ describe('AdminTools Page', () => {
     // AdminTools uses a functional update: draft => { ... }
     const draft = { ...mockState, ftueComplete: false };
     const updater = mockSetState.mock.calls[0][0];
-    updater(draft); 
-    expect(draft.ftueComplete).toBe(true);
+    const result = updater(draft); 
+    expect(result.ftueComplete).toBe(true);
   });
 
   it('renders a JSON state dump', () => {

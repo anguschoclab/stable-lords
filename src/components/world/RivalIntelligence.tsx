@@ -65,7 +65,7 @@ export function RivalIntelligence({ rivals }: RivalIntelligenceProps) {
                               <Badge className={cn(
                                 "text-[9px] font-black border-none uppercase tracking-widest px-2 py-0.5",
                                 rival.strategy?.intent === "VENDETTA" ? "bg-red-500/20 text-red-400" :
-                                rival.strategy?.intent === "EXPANSION" ? "bg-blue-500/20 text-blue-400" :
+                                rival.strategy?.intent === "EXPANSION" ? "bg-stone-500/20 text-stone-400" :
                                 rival.strategy?.intent === "RECOVERY" ? "bg-orange-500/20 text-orange-400" :
                                 "bg-emerald-500/20 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
                               )}>
@@ -80,12 +80,12 @@ export function RivalIntelligence({ rivals }: RivalIntelligenceProps) {
                            <div className="flex items-center gap-2">
                               <div className={cn(
                                 "h-1.5 w-1.5 rounded-full animate-pulse",
-                                rival.gold < 150 ? "bg-destructive shadow-[0_0_8px_red]" : 
-                                rival.gold < 500 ? "bg-orange-500 shadow-[0_0_8px_orange]" : 
+                                rival.treasury < 150 ? "bg-destructive shadow-[0_0_8px_red]" : 
+                                rival.treasury < 500 ? "bg-orange-500 shadow-[0_0_8px_orange]" : 
                                 "bg-emerald-500 shadow-[0_0_8px_green]"
                               )} />
                               <span className="text-[10px] font-black uppercase tracking-tight text-foreground/90">
-                                {rival.gold < 150 ? "DEBT_THRESHOLD" : rival.gold < 500 ? "DEPLETED" : rival.gold < 1200 ? "OPERATIONAL" : "SURPLUS_RESERVE"}
+                                {rival.treasury < 150 ? "DEBT_THRESHOLD" : rival.treasury < 500 ? "DEPLETED" : rival.treasury < 1200 ? "OPERATIONAL" : "SURPLUS_RESERVE"}
                               </span>
                               <div className="ml-auto text-[9px] font-bold text-muted-foreground flex items-center gap-1">
                                  <Activity className="h-2.5 w-2.5" /> {rival.trainers?.length || 0} STAFF

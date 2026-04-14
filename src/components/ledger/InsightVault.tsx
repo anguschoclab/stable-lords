@@ -1,5 +1,5 @@
 import React from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Shield, Zap, Target, Database, Binary, Info, Search, Box, Lock, Unlock } from "lucide-react";
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function InsightVault() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const tokens = state.insightTokens ?? [];
   const weaponTokens = tokens.filter(t => t.type === "Weapon");
   const rhythmTokens = tokens.filter(t => t.type === "Rhythm");

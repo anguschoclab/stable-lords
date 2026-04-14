@@ -4,29 +4,74 @@
     "description": "Unified Bard 1.0 — Universal Narrative Archive",
     "mood_tone": {
       "Calm": {
-        "adjectives": ["measured", "technical", "efficient", "precise"],
-        "opener": ["The arena is quiet today, the air heavy with expectation."],
-        "closer": ["A professional display by the arena's finest."]
+        "adjectives": [
+          "measured",
+          "technical",
+          "efficient",
+          "precise"
+        ],
+        "opener": [
+          "The arena is quiet today, the air heavy with expectation."
+        ],
+        "closer": [
+          "A professional display by the arena's finest."
+        ]
       },
       "Bloodthirsty": {
-        "adjectives": ["visceral", "savage", "brutal", "unforgiving"],
-        "opener": ["They want blood, and the arena delivers!"],
-        "closer": ["No mercy was found today in the circle of truth."]
+        "adjectives": [
+          "visceral",
+          "savage",
+          "brutal",
+          "unforgiving"
+        ],
+        "opener": [
+          "They want blood, and the arena delivers!"
+        ],
+        "closer": [
+          "No mercy was found today in the circle of truth."
+        ]
       },
       "Theatrical": {
-        "adjectives": ["stunning", "operatic", "magnificent", "dramatic"],
-        "opener": ["A drama unfolds on the sands today!"],
-        "closer": ["A performance for the ages, etched in the memories of all who watched."]
+        "adjectives": [
+          "stunning",
+          "operatic",
+          "magnificent",
+          "dramatic"
+        ],
+        "opener": [
+          "A drama unfolds on the sands today!"
+        ],
+        "closer": [
+          "A performance for the ages, etched in the memories of all who watched."
+        ]
       },
       "Solemn": {
-        "adjectives": ["heavy", "shadowed", "somber", "mournful"],
-        "opener": ["A heavy silence hangs over the arena walls."],
-        "closer": ["The games continue, though the air remains thick with memory."]
+        "adjectives": [
+          "heavy",
+          "shadowed",
+          "somber",
+          "mournful"
+        ],
+        "opener": [
+          "A heavy silence hangs over the arena walls."
+        ],
+        "closer": [
+          "The games continue, though the air remains thick with memory."
+        ]
       },
       "Festive": {
-        "adjectives": ["vibrant", "energetic", "celebratory", "boisterous"],
-        "opener": ["Music and laughter fill the air as the festive games begin!"],
-        "closer": ["A day of celebration ends with hearts full and wine flowing."]
+        "adjectives": [
+          "vibrant",
+          "energetic",
+          "celebratory",
+          "boisterous"
+        ],
+        "opener": [
+          "Music and laughter fill the air as the festive games begin!"
+        ],
+        "closer": [
+          "A day of celebration ends with hearts full and wine flowing."
+        ]
       }
     }
   },
@@ -34,103 +79,256 @@
     "good": {
       "initiative": {
         "high": [
-          { "min": 34, "text": "Summons a storm of steel that leaves no room to breathe" },
-          { "min": 33, "text": "A terrifying maestro of battle tempo, dictating every bloody exchange" },
-          { "min": 32, "text": "Bends the chaos of the pit to his will, forcing foes to fight on his terms" },
-          { "min": 31, "text": "Drowns his opponent in a relentless tide of crushing aggression" },
-          { "min": 30, "text": "Forces a suffocating, lethal rhythm onto the blood-soaked sands" },
-          { "min": 15, "text": "Steals the center of the pit and refuses to yield a single step" },
-          { "min": 0, "text": "Has learned how to keep his foe in trouble" }
+          {
+            "min": 34,
+            "text": "Summons a storm of steel that leaves no room to breathe"
+          },
+          {
+            "min": 33,
+            "text": "A terrifying maestro of battle tempo, dictating every bloody exchange"
+          },
+          {
+            "min": 32,
+            "text": "Bends the chaos of the pit to his will, forcing foes to fight on his terms"
+          },
+          {
+            "min": 31,
+            "text": "Drowns his opponent in a relentless tide of crushing aggression"
+          },
+          {
+            "min": 30,
+            "text": "Forces a suffocating, lethal rhythm onto the blood-soaked sands"
+          },
+          {
+            "min": 15,
+            "text": "Steals the center of the pit and refuses to yield a single step"
+          },
+          {
+            "min": 0,
+            "text": "Has learned how to keep his foe in trouble"
+          }
         ],
         "low": [
-          { "min": 27, "text": "Lunges from the shadows before the opponent is ready" },
-          { "min": 26, "text": "Fights with a hungry, restless aggression" },
-          { "min": 15, "text": "With a very aggressive and clever fighting style" },
-          { "min": 0, "text": "Has learned how to be decisive and quick" }
+          {
+            "min": 27,
+            "text": "Lunges from the shadows before the opponent is ready"
+          },
+          {
+            "min": 26,
+            "text": "Fights with a hungry, restless aggression"
+          },
+          {
+            "min": 15,
+            "text": "With a very aggressive and clever fighting style"
+          },
+          {
+            "min": 0,
+            "text": "Has learned how to be decisive and quick"
+          }
         ]
       },
       "riposte": {
         "high": [
-          { "min": 26, "text": "Baits their opponent into a fatal trap of their own making" },
-          { "min": 25, "text": "Turns the opponent's strength into their execution" },
-          { "min": 15, "text": "Makes the most of his enemy's mistakes" },
-          { "min": 0, "text": "Makes good dueling decisions" }
+          {
+            "min": 26,
+            "text": "Baits their opponent into a fatal trap of their own making"
+          },
+          {
+            "min": 25,
+            "text": "Turns the opponent's strength into their execution"
+          },
+          {
+            "min": 15,
+            "text": "Makes the most of his enemy's mistakes"
+          },
+          {
+            "min": 0,
+            "text": "Makes good dueling decisions"
+          }
         ],
         "low": [
-          { "min": 23, "text": "Twists an enemy's assault into a sudden, bloody end" },
-          { "min": 15, "text": "Does a lot of little things well" },
-          { "min": 0, "text": "Cleverly controls his foe's actions" }
+          {
+            "min": 23,
+            "text": "Twists an enemy's assault into a sudden, bloody end"
+          },
+          {
+            "min": 15,
+            "text": "Does a lot of little things well"
+          },
+          {
+            "min": 0,
+            "text": "Cleverly controls his foe's actions"
+          }
         ]
       },
       "attack": {
         "high": [
-          { "min": 37, "text": "Obliterates opponents with god-like, merciless precision" },
-          { "min": 30, "text": "Hunts for the vital organs with terrifying precision" },
-          { "min": 15, "text": "Makes very clever attacks" },
-          { "min": 0, "text": "He lands blows on less protected areas" }
+          {
+            "min": 37,
+            "text": "Obliterates opponents with god-like, merciless precision"
+          },
+          {
+            "min": 30,
+            "text": "Hunts for the vital organs with terrifying precision"
+          },
+          {
+            "min": 15,
+            "text": "Makes very clever attacks"
+          },
+          {
+            "min": 0,
+            "text": "He lands blows on less protected areas"
+          }
         ],
         "low": [
-          { "min": 26, "text": "Transforms every meager opening into a harrowing bloodbath" },
-          { "min": 15, "text": "Has an unusual fighting style that confuses many opponents" },
-          { "min": 0, "text": "Makes clever attacks" }
+          {
+            "min": 26,
+            "text": "Transforms every meager opening into a harrowing bloodbath"
+          },
+          {
+            "min": 15,
+            "text": "Has an unusual fighting style that confuses many opponents"
+          },
+          {
+            "min": 0,
+            "text": "Makes clever attacks"
+          }
         ]
       },
       "parry": {
         "high": [
-          { "min": 25, "text": "An impenetrable wall of iron, turning aside the deadliest steel" },
-          { "min": 15, "text": "Parrys very intelligently" },
-          { "min": 0, "text": "Is gifted at parrying" }
+          {
+            "min": 25,
+            "text": "An impenetrable wall of iron, turning aside the deadliest steel"
+          },
+          {
+            "min": 15,
+            "text": "Parrys very intelligently"
+          },
+          {
+            "min": 0,
+            "text": "Is gifted at parrying"
+          }
         ],
         "low": [
-          { "min": 23, "text": "Denies the killing stroke with grim, practiced resolve" },
-          { "min": 15, "text": "Rarely makes mistakes" },
-          { "min": 0, "text": "Parrys intelligently" }
+          {
+            "min": 23,
+            "text": "Denies the killing stroke with grim, practiced resolve"
+          },
+          {
+            "min": 15,
+            "text": "Rarely makes mistakes"
+          },
+          {
+            "min": 0,
+            "text": "Parrys intelligently"
+          }
         ]
       },
       "defense": {
         "high": [
-          { "min": 32, "text": "Displays a chilling level of situational dominance" },
-          { "min": 15, "text": "Is always thinking ahead" },
-          { "min": 0, "text": "Is gifted at avoiding a blow" }
+          {
+            "min": 32,
+            "text": "Displays a chilling level of situational dominance"
+          },
+          {
+            "min": 15,
+            "text": "Is always thinking ahead"
+          },
+          {
+            "min": 0,
+            "text": "Is gifted at avoiding a blow"
+          }
         ],
         "low": [
-          { "min": 23, "text": "Weaves through the carnage with grim efficiency" },
-          { "min": 15, "text": "Avoids blows well" },
-          { "min": 0, "text": "Makes few mistakes" }
+          {
+            "min": 23,
+            "text": "Weaves through the carnage with grim efficiency"
+          },
+          {
+            "min": 15,
+            "text": "Avoids blows well"
+          },
+          {
+            "min": 0,
+            "text": "Makes few mistakes"
+          }
         ]
       },
       "endurance": {
         "high": [
-          { "min": 26, "text": "A tireless engine of destruction, grinding foes to bloody paste" },
-          { "min": 15, "text": "Rarely wastes his endurance needlessly" },
-          { "min": 0, "text": "Can conserve his endurance past what might normally be expected" }
+          {
+            "min": 26,
+            "text": "A tireless engine of destruction, grinding foes to bloody paste"
+          },
+          {
+            "min": 15,
+            "text": "Rarely wastes his endurance needlessly"
+          },
+          {
+            "min": 0,
+            "text": "Can conserve his endurance past what might normally be expected"
+          }
         ],
         "low": [
-          { "min": 24, "text": "Refuses to empty his lungs until the slaughter is completely finished" },
-          { "min": 15, "text": "He plans out every move he makes, seldom wasting any effort" },
-          { "min": 0, "text": "Seldom wastes his endurance needlessly" }
+          {
+            "min": 24,
+            "text": "Refuses to empty his lungs until the slaughter is completely finished"
+          },
+          {
+            "min": 15,
+            "text": "He plans out every move he makes, seldom wasting any effort"
+          },
+          {
+            "min": 0,
+            "text": "Seldom wastes his endurance needlessly"
+          }
         ]
       }
     },
     "bad": {
       "initiative": {
         "high": [
-          { "min": 18, "text": "Surrenders the momentum to the butcher immediately, standing completely helpless" },
-          { "min": 0, "text": "He needs time to think things through before he can act" }
+          {
+            "min": 18,
+            "text": "Surrenders the momentum to the butcher immediately, standing completely helpless"
+          },
+          {
+            "min": 0,
+            "text": "He needs time to think things through before he can act"
+          }
         ],
         "low": [
-          { "min": 26, "text": "Moves with the urgency of a stone sinking in mud" },
-          { "min": 0, "text": "He stands around slack-jawed" }
+          {
+            "min": 26,
+            "text": "Moves with the urgency of a stone sinking in mud"
+          },
+          {
+            "min": 0,
+            "text": "He stands around slack-jawed"
+          }
         ]
       },
       "attack": {
         "high": [
-          { "min": 18, "text": "Telegraphs every swing so heavily it practically invites his own death" },
-          { "min": 0, "text": "He makes a lot of mistakes" }
+          {
+            "min": 18,
+            "text": "Telegraphs every swing so heavily it practically invites his own death"
+          },
+          {
+            "min": 0,
+            "text": "He makes a lot of mistakes"
+          }
         ],
         "low": [
-          { "min": 28, "text": "Telegraphs every swing like a lumbering ox" },
-          { "min": 0, "text": "He makes stupid feints that fool no one" }
+          {
+            "min": 28,
+            "text": "Telegraphs every swing like a lumbering ox"
+          },
+          {
+            "min": 0,
+            "text": "He makes stupid feints that fool no one"
+          }
         ]
       }
     },
@@ -170,7 +368,8 @@
       ],
       "solid": [
         "{{attacker}} unleashes a blinding flurry of cuts with his {{weapon}}, biting into the {{bodyPart}}!",
-        "{{attacker}}'s {{weapon}} lunges with awesome cutting power, rending the {{bodyPart}}!"
+        "{{attacker}}'s {{weapon}} lunges with awesome cutting power, rending the {{bodyPart}}!",
+        "{{attacker}} lunges with sudden ferocity, leaving a bloody trail across {{defender}}'s {{bodyPart}}!"
       ],
       "mastery": [
         "In a blur of practiced rhythm, {{attacker}}'s {{weapon}} flows through {{defender}}'s guard to find the {{bodyPart}}.",
@@ -186,32 +385,75 @@
       ],
       "fatal": [
         "{{attacker}} feints low, catching {{defender}} off guard before severing their {{bodyPart}} at the joint.",
-        "A fountain of gore erupts as {{attacker}}'s final strike decapitates {{defender}}!"
+        "A fountain of gore erupts as {{attacker}}'s final strike decapitates {{defender}}!",
+        "{{attacker}} feints low, catching {{defender}} off guard before severing their sword-arm at the elbow. The crowd erupts!"
       ]
     },
     "bashing": {
-      "glancing": ["{{attacker}}'s {{weapon}} bounces off the {{bodyPart}} with a hollow clang."],
-      "solid": ["{{attacker}} roars, bringing the {{weapon}} down like an executioner's maul on the {{bodyPart}}!"],
-      "mastery": ["{{attacker}} catches {{defender}} in a perfect orbit of weight, hammering the {{bodyPart}} with crushing precision."],
-      "critical_human": ["The arena trembles as {{attacker}} unleashes a terrifying overhead smash, crushing the {{bodyPart}}!"],
-      "critical_supernatural": ["Gravity itself seems to bow to {{attacker}}'s {{weapon}}, creating a localized shockwave on the {{bodyPart}}."],
-      "fatal": ["{{attacker}} delivers a horrifying, skull-crushing execution!"]
+      "glancing": [
+        "{{attacker}}'s {{weapon}} bounces off the {{bodyPart}} with a hollow clang."
+      ],
+      "solid": [
+        "{{attacker}} roars, bringing the {{weapon}} down like an executioner's maul on the {{bodyPart}}!"
+      ],
+      "mastery": [
+        "{{attacker}} catches {{defender}} in a perfect orbit of weight, hammering the {{bodyPart}} with crushing precision.",
+        "{{attacker}} effortlessly steps inside the guard, crashing the {{weapon}} into the {{bodyPart}} with bone-jarring force."
+      ],
+      "critical_human": [
+        "The arena trembles as {{attacker}} unleashes a terrifying overhead smash, crushing the {{bodyPart}}!"
+      ],
+      "critical_supernatural": [
+        "Gravity itself seems to bow to {{attacker}}'s {{weapon}}, creating a localized shockwave on the {{bodyPart}}."
+      ],
+      "fatal": [
+        "{{attacker}} delivers a horrifying, skull-crushing execution!",
+        "{{attacker}} brings the {{weapon}} down with the force of a falling star, ending {{defender}}'s career—and life—instantly."
+      ]
     },
     "piercing": {
-      "glancing": ["{{attacker}}'s {{weapon}} skips off the {{bodyPart}}, barely scratching the surface."],
-      "solid": ["{{attacker}} drops his center and drives a blinding lunge with his {{weapon}} into the {{bodyPart}}!"],
-      "mastery": ["{{attacker}}'s {{weapon}} finds the microscopic gap in {{defender}}'s defense, sliding effortlessly into the {{bodyPart}}."],
-      "critical_human": ["{{attacker}} extends fully, every ounce of reach behind his {{weapon}} as it sinks deep into the {{bodyPart}}!"],
-      "critical_supernatural": ["The {{weapon}} hums a low, deathly note, bypassing reality to hit the {{bodyPart}} with cold light."],
-      "fatal": ["{{attacker}} executes {{defender}} with a chilling lunge of the {{weapon}} through the {{bodyPart}}!"]
+      "glancing": [
+        "{{attacker}}'s {{weapon}} skips off the {{bodyPart}}, barely scratching the surface."
+      ],
+      "solid": [
+        "{{attacker}} drops his center and drives a blinding lunge with his {{weapon}} into the {{bodyPart}}!"
+      ],
+      "mastery": [
+        "{{attacker}}'s {{weapon}} finds the microscopic gap in {{defender}}'s defense, sliding effortlessly into the {{bodyPart}}."
+      ],
+      "critical_human": [
+        "{{attacker}} extends fully, every ounce of reach behind his {{weapon}} as it sinks deep into the {{bodyPart}}!"
+      ],
+      "critical_supernatural": [
+        "The {{weapon}} hums a low, deathly note, bypassing reality to hit the {{bodyPart}} with cold light."
+      ],
+      "fatal": [
+        "{{attacker}} executes {{defender}} with a chilling lunge of the {{weapon}} through the {{bodyPart}}!",
+        "A blindingly fast lunge from {{attacker}} finds the heart, leaving {{defender}} to collapse onto the bloody sand."
+      ]
     },
     "fist": {
-      "glancing": ["{{attacker}} throws a PUNCH, but it merely grazes {{defender}}'s {{bodyPart}}."],
-      "solid": ["{{attacker}} steps inside the guard and unleashes a horrific combination on the {{bodyPart}}!"],
-      "mastery": ["{{attacker}}'s limbs are a blur of technical perfection, striking the {{bodyPart}} with rhythmic violence."],
-      "critical_human": ["{{attacker}} throws a rock-fisted PUNCH of incredible felling power into the {{bodyPart}}!"],
-      "critical_supernatural": ["A golden light follows {{attacker}}'s strike, shattering the air as the {{bodyPart}} is struck by 'The Enlightened Hand'."],
-      "fatal": ["{{attacker}} grabs his opponent and drives a sickening KNEE into their midsection. {{defender}} collapses dead."]
+      "glancing": [
+        "{{attacker}} throws a PUNCH, but it merely grazes {{defender}}'s {{bodyPart}}."
+      ],
+      "solid": [
+        "{{attacker}} steps inside the guard and unleashes a horrific combination on the {{bodyPart}}!"
+      ],
+      "mastery": [
+        "{{attacker}}'s limbs are a blur of technical perfection, striking the {{bodyPart}} with rhythmic violence."
+      ],
+      "critical_human": [
+        "{{attacker}} throws a rock-fisted PUNCH of incredible felling power into the {{bodyPart}}!"
+      ],
+      "critical_supernatural": [
+        "A golden light follows {{attacker}}'s strike, shattering the air as the {{bodyPart}} is struck by 'The Enlightened Hand'."
+      ],
+      "fatal": [
+        "{{attacker}} grabs his opponent and drives a sickening KNEE into their midsection. {{defender}} collapses dead.",
+        "{{attacker}} rains down relentless, skull-shattering blows until {{defender}} stops twitching.",
+        "With a terrifying display of raw strength, {{attacker}} snaps {{defender}}'s neck with a violent twist.",
+        "{{attacker}} drives a devastating punch straight into {{defender}}'s windpipe, crushing it instantly."
+      ]
     }
   },
   "pbp": {
@@ -219,56 +461,204 @@
       "The stench of old blood rises as the fighters step onto the sand.",
       "The crowd bays for blood as the combatants lock eyes.",
       "Steel is drawn, and the roar of the coliseum becomes deafening!",
-      "A hush falls. Then the ARENAMASTER drops his hand, and steel is drawn."
+      "A hush falls. Then the ARENAMASTER drops his hand, and steel is drawn.",
+      "The arena gates screech open, and the warriors step forth into the unforgiving light.",
+      "Sand crunching underfoot, the combatants measure each other before the first blow falls.",
+      "The crowd's chanting swells to a roar as weapons are unsheathed and readied.",
+      "Blood-stained sand awaits fresh tribute as the ARENAMASTER signals the start."
     ],
     "whiffs": [
       "{{attacker}} swings his {{weapon}} but finds only air.",
-      "{{defender}} sidesteps the incoming {{weapon}} with ease."
+      "{{defender}} sidesteps the incoming {{weapon}} with ease.",
+      "{{attacker}} fakes high and goes low, but {{defender}} leaps back just in time to avoid the {{weapon}}.",
+      "{{attacker}}'s {{weapon}} whistles through the air as {{defender}} cleanly ducks the swing.",
+      "{{attacker}} overcommits to the swing, and {{defender}} easily dances out of range.",
+      "A wild swing from {{attacker}} misses {{defender}} completely."
     ],
     "hit_locations": {
-      "head": ["HEAD", "JAW", "TEMPLE", "FOREHEAD", "SKULL", "FACE", "THROAT", "NECK", "side of the HEAD", "CHEEK", "BROW", "CHIN", "EAR", "NOSE", "CROWN"],
-      "chest": ["CHEST", "RIBS", "RIGHT RIBCAGE", "LEFT RIBCAGE", "upper BODY", "BREAST", "STERNUM", "COLLARBONE", "SHOULDER BLADE", "UPPER CHEST"],
-      "abdomen": ["STOMACH", "ABDOMEN", "PELVIS", "KIDNEYS", "GROIN", "BELLY", "LOWER BODY", "SOLAR PLEXUS", "MIDSECTION", "SIDE", "FLANK", "GUT"],
-      "right arm": ["RIGHT ARM", "RIGHT FOREARM", "RIGHT BICEPS", "RIGHT ELBOW", "RIGHT HAND", "RIGHT WRIST", "RIGHT SHOULDER", "RIGHT KNUCKLES", "RIGHT UPPER ARM"],
-      "left arm": ["LEFT ARM", "LEFT FOREARM", "LEFT BICEPS", "LEFT ELBOW", "LEFT HAND", "LEFT WRIST", "LEFT SHOULDER", "LEFT KNUCKLES", "LEFT UPPER ARM"],
-      "right leg": ["RIGHT LEG", "RIGHT THIGH", "RIGHT KNEE", "RIGHT SHIN", "RIGHT BUTTOCKS", "RIGHT HIP", "RIGHT CALF", "RIGHT ANKLE", "RIGHT HAMSTRING"],
-      "left leg": ["LEFT LEG", "LEFT THIGH", "LEFT KNEE", "LEFT SHIN", "LEFT HIP", "LEFT CALF", "LEFT ANKLE", "LEFT HAMSTRING", "LEFT QUADRICEP"]
+      "head": [
+        "HEAD",
+        "JAW",
+        "TEMPLE",
+        "FOREHEAD",
+        "SKULL",
+        "FACE",
+        "THROAT",
+        "NECK",
+        "side of the HEAD",
+        "CHEEK",
+        "BROW",
+        "CHIN",
+        "EAR",
+        "NOSE",
+        "CROWN"
+      ],
+      "chest": [
+        "CHEST",
+        "RIBS",
+        "RIGHT RIBCAGE",
+        "LEFT RIBCAGE",
+        "upper BODY",
+        "BREAST",
+        "STERNUM",
+        "COLLARBONE",
+        "SHOULDER BLADE",
+        "UPPER CHEST"
+      ],
+      "abdomen": [
+        "STOMACH",
+        "ABDOMEN",
+        "PELVIS",
+        "KIDNEYS",
+        "GROIN",
+        "BELLY",
+        "LOWER BODY",
+        "SOLAR PLEXUS",
+        "MIDSECTION",
+        "SIDE",
+        "FLANK",
+        "GUT"
+      ],
+      "right arm": [
+        "RIGHT ARM",
+        "RIGHT FOREARM",
+        "RIGHT BICEPS",
+        "RIGHT ELBOW",
+        "RIGHT HAND",
+        "RIGHT WRIST",
+        "RIGHT SHOULDER",
+        "RIGHT KNUCKLES",
+        "RIGHT UPPER ARM"
+      ],
+      "left arm": [
+        "LEFT ARM",
+        "LEFT FOREARM",
+        "LEFT BICEPS",
+        "LEFT ELBOW",
+        "LEFT HAND",
+        "LEFT WRIST",
+        "LEFT SHOULDER",
+        "LEFT KNUCKLES",
+        "LEFT UPPER ARM"
+      ],
+      "right leg": [
+        "RIGHT LEG",
+        "RIGHT THIGH",
+        "RIGHT KNEE",
+        "RIGHT SHIN",
+        "RIGHT BUTTOCKS",
+        "RIGHT HIP",
+        "RIGHT CALF",
+        "RIGHT ANKLE",
+        "RIGHT HAMSTRING"
+      ],
+      "left leg": [
+        "LEFT LEG",
+        "LEFT THIGH",
+        "LEFT KNEE",
+        "LEFT SHIN",
+        "LEFT HIP",
+        "LEFT CALF",
+        "LEFT ANKLE",
+        "LEFT HAMSTRING",
+        "LEFT QUADRICEP"
+      ]
     },
     "damage_severity": {
-      "deadly": ["It was a deadly attack!", "What a massive blow!", "What a devastating attack!"],
-      "terrific": ["It was an incredible blow!", "It is a terrific blow!"],
-      "powerful": ["It is a tremendous blow!", "It was a powerful blow!"],
-      "glancing": ["The attack is a glancing blow only.", "The stroke lands ineffectively."]
+      "deadly": [
+        "It was a deadly attack!",
+        "What a massive blow!",
+        "What a devastating attack!",
+        "An absolutely lethal strike!",
+        "A brutal, bone-shattering blow!",
+        "The impact is monstrous, echoing across the arena!"
+      ],
+      "terrific": [
+        "It was an incredible blow!",
+        "It is a terrific blow!"
+      ],
+      "powerful": [
+        "It is a tremendous blow!",
+        "It was a powerful blow!"
+      ],
+      "glancing": [
+        "The attack is a glancing blow only.",
+        "The stroke lands ineffectively."
+      ]
     },
     "status_changes": {
-      "severe": ["{{name}} is severely hurt!!", "{{name}} is dangerously stunned!"],
-      "desperate": ["{{name}} appears DESPERATE!"],
-      "serious": ["{{name}} has sustained serious wounds!"]
+      "severe": [
+        "{{name}} is severely hurt!!",
+        "{{name}} is dangerously stunned!"
+      ],
+      "desperate": [
+        "{{name}} appears DESPERATE!"
+      ],
+      "serious": [
+        "{{name}} has sustained serious wounds!"
+      ]
     },
     "defenses": {
       "dodge": {
-        "success": ["{{defender}} twists his body with prideful grace, allowing the attack to pass harmlessly by."]
+        "success": [
+          "{{defender}} twists his body with prideful grace, allowing the attack to pass harmlessly by.",
+          "{{defender}} weaves beneath the strike, moving with unnatural grace.",
+          "A quick step back allows {{defender}} to avoid {{attacker}}'s reaching blade.",
+          "{{defender}} shifts their weight, narrowly evading a swipe that could have ended the fight."
+        ]
       },
       "parry": {
-        "success": ["{{defender}} catches the strike on the edge of his {{weapon}}, turning it aside with ease."]
+        "success": [
+          "{{defender}} catches the strike on the edge of his {{weapon}}, turning it aside with ease.",
+          "{{defender}} brings up their {{weapon}} just in time, deflecting the blow with a shower of sparks.",
+          "With a sharp clang, {{defender}} turns aside {{attacker}}'s brutal strike.",
+          "{{defender}} meets the attack head-on, their parry holding firm against {{attacker}}'s might."
+        ]
       },
       "shield": {
-        "success": ["{{defender}} catches the blow on his SHIELD."]
+        "success": [
+          "{{defender}} catches the blow on his SHIELD."
+        ]
       }
     },
     "pacing": {
-      "stalemate": ["The fighters slowly circle each other, looking for a weakness."],
-      "trading_blows": ["The two warriors fiercely trade attacks and parry."],
-      "pressing": ["{{attacker}} presses the attack relentlessly, giving his foe no room to breathe!"]
+      "stalemate": [
+        "The fighters slowly circle each other, looking for a weakness."
+      ],
+      "trading_blows": [
+        "The two warriors fiercely trade attacks and parry."
+      ],
+      "pressing": [
+        "{{attacker}} presses the attack relentlessly, giving his foe no room to breathe!"
+      ]
     },
     "reactions": {
-      "positive": ["The crowd ROARS in approval!"],
-      "negative": ["Boos and jeers echo from the arena walls."],
-      "encourage": ["The crowd urges the warriors on."]
+      "positive": [
+        "The crowd ROARS in approval!",
+        "The stands erupt into a frenzy of cheering!",
+        "A thunderous applause sweeps through the coliseum!",
+        "Spectators leap to their feet, roaring with bloodlust!"
+      ],
+      "negative": [
+        "Boos and jeers echo from the arena walls.",
+        "Displeased mutters and sharp whistles rain down from the stands.",
+        "The crowd's energy wanes, replaced by a chorus of impatient groans.",
+        "Jeers cut through the air as the audience demands more action."
+      ],
+      "encourage": [
+        "The crowd urges the warriors on.",
+        "Chants for blood echo rhythmically from the stands.",
+        "The audience leans in collectively, sensing a turning point in the bout.",
+        "The crowd begins to pound the benches, demanding a spectacular finish."
+      ]
     },
     "taunts": {
-      "winner": ["{{attacker}} roars, 'Who else wants to die today?!'"],
-      "loser": ["{{attacker}} spits blood and refuses to look away."]
+      "winner": [
+        "{{attacker}} roars, 'Who else wants to die today?!'"
+      ],
+      "loser": [
+        "{{attacker}} spits blood and refuses to look away."
+      ]
     },
     "initiative": [
       "With a sudden burst of speed, {{attacker}} seizes the opening!",
@@ -278,10 +668,18 @@
       "{{attacker}} feints a high line, drawing {{defender}} out of position."
     ],
     "insights": {
-      "ST": ["His parry shatters under your monstrous strength!"],
-      "SP": ["He moves with blinding speed, leaving you swinging at shadows."],
-      "DF": ["He clumsily overextends, leaving himself wide open."],
-      "WL": ["Despite the punishment, his iron will keeps him standing."]
+      "ST": [
+        "His parry shatters under your monstrous strength!"
+      ],
+      "SP": [
+        "He moves with blinding speed, leaving you swinging at shadows."
+      ],
+      "DF": [
+        "He clumsily overextends, leaving himself wide open."
+      ],
+      "WL": [
+        "Despite the punishment, his iron will keeps him standing."
+      ]
     }
   },
   "conclusions": {
@@ -293,21 +691,47 @@
   "events": {
     "tavern_brawl": {
       "title": "Tavern Brawl!",
-      "newsletter": ["{{name}} got into a wild tavern brawl last night! They gained +{{fame}} Fame but suffered a minor injury."]
+      "newsletter": [
+        "{{name}} got into a wild tavern brawl last night! They gained +{{fame}} Fame but suffered a minor injury."
+      ]
     },
     "celestial_blessing": {
       "title": "A Sign from the Gods!",
-      "newsletter": ["A shooting star was seen over the arena exactly as {{name}} was training. (+{{fame}} Fame, +{{xp}} XP)"]
+      "newsletter": [
+        "A shooting star was seen over the arena exactly as {{name}} was training. (+{{fame}} Fame, +{{xp}} XP)"
+      ]
+    },
+    "lost_relic": {
+      "title": "Lost Relic Discovery",
+      "newsletter": [
+        "{{name}} discovered an ancient artifact! (+{{fame}} Fame, +{{xp}} XP)"
+      ]
     }
   },
   "gazette": {
     "fights": {
-      "Kill": ["In a {{adj}} display, {{winner}} struck down {{loser}} with a killing blow."],
-      "KO": ["{{winner}} battered {{loser}} into unconsciousness with {{adj}} efficiency."],
-      "Stoppage": ["{{winner}} ground {{loser}} down. The Arenamaster called the stoppage."],
-      "Exhaustion": ["Both fighters pushed to total exhaustion. {{winner}} was awarded the bout."],
-      "Draw": ["The sands of time ran out before a victor could be declared."],
-      "Default": ["A hard-fought struggle between {{a}} and {{d}} ended in {{winner}}'s favor."]
+      "Kill": [
+        "In a {{adj}} display, {{winner}} struck down {{loser}} with a killing blow.",
+        "In a display of absolute butchery, {{winner}} cleaved through {{loser}}, leaving the crowd stunned.",
+        "The sands drank deep as {{winner}} executed {{loser}} in cold blood.",
+        "{{loser}}'s final moments were met with a roar from the crowd as {{winner}} delivered the fatal strike."
+      ],
+      "KO": [
+        "{{winner}} battered {{loser}} into unconsciousness with {{adj}} efficiency.",
+        "A sudden, vicious blow from {{winner}} sent {{loser}} crumpling to the sand, out cold."
+      ],
+      "Stoppage": [
+        "{{winner}} ground {{loser}} down. The Arenamaster called the stoppage."
+      ],
+      "Exhaustion": [
+        "Both fighters pushed to total exhaustion. {{winner}} was awarded the bout."
+      ],
+      "Draw": [
+        "The sands of time ran out before a victor could be declared."
+      ],
+      "Default": [
+        "A hard-fought struggle between {{a}} and {{d}} ended in {{winner}}'s favor."
+      ]
     },
     "headlines": {
       "LegendaryStreak": "Week {{week}}: UNSTOPPABLE! {{name}} Extends Legendary {{streak}}-Win Streak!",
@@ -318,11 +742,20 @@
       "RisingStar": "Week {{week}}: A STAR IS BORN! {{name}} remains undefeated!",
       "Upset": "Week {{week}}: UPSET! {{winner}} Topples the Mighty {{loser}}!",
       "MultipleKills": "Week {{week}}: THE REAPER'S HARVEST! {{count}} warriors fallen!",
-      "Kill": "Week {{week}}: DEATH IN THE PIT! {{killer}} claims a life!",
+      "Kill": [
+        "Week {{week}}: DEATH IN THE PIT! {{killer}} claims a life!",
+        "Week {{week}}: A Bloody End: {{killer}} Claims Another Victim!",
+        "Week {{week}}: {{killer}} Executes Flawless Victory in the Sands!"
+      ],
       "MultipleKOs": "Week {{week}}: {{adj}} DEVASTATION! The sands are littered with the fallen!",
-      "Standard": "Week {{week}}: {{adj}} CLASHES! The arena roars for its champions!",
+      "Standard": [
+        "Week {{week}}: {{adj}} CLASHES! The arena roars for its champions!",
+        "Week {{week}}: An action-packed week leaves the fans breathless!",
+        "Week {{week}}: Sand and Steel: This week's bouts deliver!"
+      ],
       "Empty": "Week {{week}}: A quiet week in the arena. The peace won't last.",
-      "Graveyard": "The Hall of Warriors receives {{count}} new name{{plural}} this week."
+      "Graveyard": "The Hall of Warriors receives {{count}} new name{{plural}} this week.",
+      "Kill2": "Week {{week}}: BLOOD FOR THE GODS! {{killer}}'s blade finds its mark!"
     },
     "featured": {
       "LegendaryStreak": "Whispers of the ancients surround {{name}}, whose {{streak}} victories have become legend.",
@@ -332,7 +765,8 @@
       "Rivalry": "The bad blood between {{a}} and {{b}} was on full display today.",
       "RisingStar": "All eyes are on {{name}}, a rising star who refuses to taste defeat.",
       "Upset": "The impossible happened! {{winner}} (fame: {{fameW}}) overcame {{loser}} (fame: {{fameL}}).",
-      "Graveyard": "We mourn the {{count}} warrior{{plural}} who gave everything to the sands this week."
+      "Graveyard": "We mourn the {{count}} warrior{{plural}} who gave everything to the sands this week.",
+      "Kill2": "{{killer}} claimed another soul in the arena today, leaving the crowd in awe of their brutality."
     },
     "season_summary": {
       "headline": "{{season}} Season in Review: {{total}} Bouts, {{kills}} Deaths",
@@ -356,8 +790,18 @@
     "btn_honor": "Honor the Fallen",
     "btn_planning": "Acknowledge & Begin Planning",
     "btn_next": "Next Report",
-    "armor_intro_verbs": ["is wearing", "is armored in", "steps forth in", "glimmers in"],
-    "weapon_intro_verbs": ["is armed with %W", "clutches a %W", "prepares to fight with %W", "draws his %W"]
+    "armor_intro_verbs": [
+      "is wearing",
+      "is armored in",
+      "steps forth in",
+      "glimmers in"
+    ],
+    "weapon_intro_verbs": [
+      "is armed with %W",
+      "clutches a %W",
+      "prepares to fight with %W",
+      "draws his %W"
+    ]
   },
   "memorials": {
     "tributes": [
@@ -367,43 +811,377 @@
   },
   "recruitment": {
     "names": [
-      "ARAK", "BRIX", "CARN", "DRAV", "ESKA", "FAEL", "GRIX", "HASK",
-      "IVOR", "JETT", "KAEL", "LYNX", "MORD", "NYX", "ORIN", "PYKE",
-      "QUIL", "RASK", "SORN", "TAHL", "URSA", "VALK", "WREN", "XAEL",
-      "YGOR", "ZETH", "BANE", "CROW", "DUSK", "EDGE", "FLUX", "GALE",
-      "HAZE", "IRON", "JADE", "KNOT", "LASH", "MACE", "NAIL", "OMEN",
-      "PYRE", "RAZE", "SCAR", "TUSK", "VICE", "WOLF", "AXEL", "BLITZ",
-      "CRAG", "DIRK", "ECHO", "FLAK", "GRIM", "HAWK", "INK", "JINX",
-      "KITE", "LURK", "MOSS", "NOCK", "OPUS", "PALE", "ROOK", "SLAG",
-      "TORN", "ULRIC", "VEX", "WYRM", "XENO", "YOKE", "ZINC", "ASHE",
-      "BOSK", "CHAR", "DALE", "ETCH", "FERN", "GHOL", "HELM", "ISLE",
-      "JOLT", "KERN", "LOOM", "MIRK", "NARD", "OPAL", "PITH", "RIME",
-      "SILT", "TARN", "VALE", "WOAD", "ZEAL", "BRAGG", "CLASH", "DREAD",
-      "FORGE", "GLINT", "HAVOK", "KREEL", "LANCE", "MAUL", "RASP", "SCALD"
+      "ARAK",
+      "BRIX",
+      "CARN",
+      "DRAV",
+      "ESKA",
+      "FAEL",
+      "GRIX",
+      "HASK",
+      "IVOR",
+      "JETT",
+      "KAEL",
+      "LYNX",
+      "MORD",
+      "NYX",
+      "ORIN",
+      "PYKE",
+      "QUIL",
+      "RASK",
+      "SORN",
+      "TAHL",
+      "URSA",
+      "VALK",
+      "WREN",
+      "XAEL",
+      "YGOR",
+      "ZETH",
+      "BANE",
+      "CROW",
+      "DUSK",
+      "EDGE",
+      "FLUX",
+      "GALE",
+      "HAZE",
+      "IRON",
+      "JADE",
+      "KNOT",
+      "LASH",
+      "MACE",
+      "NAIL",
+      "OMEN",
+      "PYRE",
+      "RAZE",
+      "SCAR",
+      "TUSK",
+      "VICE",
+      "WOLF",
+      "AXEL",
+      "BLITZ",
+      "CRAG",
+      "DIRK",
+      "ECHO",
+      "FLAK",
+      "GRIM",
+      "HAWK",
+      "INK",
+      "JINX",
+      "KITE",
+      "LURK",
+      "MOSS",
+      "NOCK",
+      "OPUS",
+      "PALE",
+      "ROOK",
+      "SLAG",
+      "TORN",
+      "ULRIC",
+      "VEX",
+      "WYRM",
+      "XENO",
+      "YOKE",
+      "ZINC",
+      "ASHE",
+      "BOSK",
+      "CHAR",
+      "DALE",
+      "ETCH",
+      "FERN",
+      "GHOL",
+      "HELM",
+      "ISLE",
+      "JOLT",
+      "KERN",
+      "LOOM",
+      "MIRK",
+      "NARD",
+      "OPAL",
+      "PITH",
+      "RIME",
+      "SILT",
+      "TARN",
+      "VALE",
+      "WOAD",
+      "ZEAL",
+      "BRAGG",
+      "CLASH",
+      "DREAD",
+      "FORGE",
+      "GLINT",
+      "HAVOK",
+      "KREEL",
+      "LANCE",
+      "MAUL",
+      "RASP",
+      "SCALD",
+      "VOTOL",
+      "VINIP",
+      "VYME",
+      "LAVOQ",
+      "HUVI",
+      "QIXO",
+      "HEJEL",
+      "JIROJ",
+      "SOPE",
+      "REMEX",
+      "DAVED",
+      "KEBA",
+      "WOSE",
+      "JOJA",
+      "BANY",
+      "DYBUF",
+      "QADIV",
+      "KEXE",
+      "MOZUN",
+      "XALAH",
+      "PYNA",
+      "NOFA",
+      "HOBOL",
+      "PYDI",
+      "GUDEP",
+      "SYMIZ",
+      "JAPA",
+      "QEVY",
+      "FANUW",
+      "ZYQO",
+      "BEWUP",
+      "JITI",
+      "MIPAL",
+      "WUTIB",
+      "JOMU",
+      "DAQUW",
+      "SOXYC",
+      "MISUH",
+      "ZISAK",
+      "DOLAG",
+      "QEWY",
+      "HOVUN",
+      "ZOPEP",
+      "COPO",
+      "MUBAT",
+      "MYRE",
+      "LYMAP",
+      "BAVI",
+      "QEJY",
+      "WUQAM",
+      "QEKED",
+      "SAZI",
+      "WIJY",
+      "FARU",
+      "RENEB",
+      "LICAL",
+      "BYKED",
+      "QIZUS",
+      "RIMY",
+      "LUSEP",
+      "SYGI",
+      "POVUX",
+      "CYBYW",
+      "TIGY",
+      "SYDE",
+      "CAXAM",
+      "SYBON",
+      "HYHAX",
+      "LEZE",
+      "HOWYZ",
+      "TOJA",
+      "GEKU",
+      "TOPUC",
+      "QYDY",
+      "VOTA",
+      "RANAM",
+      "DOQAG",
+      "HANAR",
+      "TUNIB",
+      "HYFEG",
+      "PUDOD",
+      "VOHE",
+      "ZABO",
+      "ZYRE",
+      "LACE",
+      "ZYKOZ",
+      "JYXY",
+      "LITU",
+      "VEFUR",
+      "VYTUB",
+      "SYRY",
+      "MIFOL",
+      "FUWU",
+      "ZODEK",
+      "XEXEB",
+      "WARE",
+      "GOQO",
+      "GYZIP",
+      "GEMUL",
+      "COPYF",
+      "LOFU",
+      "XOPEX",
+      "NEZIZ",
+      "WOTU",
+      "MUNYG",
+      "KINY",
+      "DEMO",
+      "CIJI",
+      "MILYG",
+      "PAZYS",
+      "LAPAM",
+      "MIVAN",
+      "FYCOD",
+      "NELIC",
+      "FAGYQ",
+      "MISA",
+      "DAJE",
+      "SALU",
+      "BOBO",
+      "DUMA",
+      "GUCOP",
+      "CUSY",
+      "DOKI",
+      "DUSY",
+      "TAHAG",
+      "HYLIR",
+      "NARIS",
+      "MYKIM",
+      "HYSUZ",
+      "ZAXU",
+      "BOSAH",
+      "RYMYN",
+      "GOGON",
+      "ZUNE",
+      "BYFOH",
+      "ZYGA",
+      "NEWI",
+      "JUBA",
+      "BEFOQ",
+      "TAQE",
+      "SASEC",
+      "FOVOJ",
+      "LEVEZ",
+      "FYHYQ",
+      "QAQE",
+      "GYBOP",
+      "FIMI",
+      "POZAC",
+      "HENO",
+      "SUFE",
+      "DUNE",
+      "HOHIV",
+      "LIJO",
+      "GOQAX",
+      "NOCUN",
+      "FELA",
+      "ZYSEF",
+      "ZIHAJ",
+      "CYHAM",
+      "NAJE",
+      "SOMIH",
+      "NUSUS",
+      "TURY",
+      "NIQY",
+      "NOTUS",
+      "WAHID",
+      "XONI",
+      "VEQO",
+      "LOCA",
+      "WOQI",
+      "KOMIM",
+      "NUZOG",
+      "KYPY",
+      "JOJY",
+      "XOHO",
+      "WIHO",
+      "CEPAL",
+      "VIDUM",
+      "DUKEM",
+      "XEGU",
+      "DOLO",
+      "QIVAH",
+      "WADOX",
+      "KECUQ",
+      "BIZYH",
+      "KUGE",
+      "BEDI",
+      "VEDYZ",
+      "BOQE",
+      "HYSU",
+      "LOTY",
+      "JUHA",
+      "DIPOH",
+      "KAPO",
+      "ZUTIS",
+      "GOQY",
+      "DONYV",
+      "CULUZ",
+      "JOBYV",
+      "VAPU"
     ],
     "rival_stable_names": [
-      "Iron Crown", "Shadow Blades", "Golden Lions", "Silent Storm", 
-      "Vanguard", "Nightfall", "Ebon Hand", "Gilded Fang",
-      "Azure Rose", "Crimson Guard", "Onyx Shield"
+      "Iron Crown",
+      "Shadow Blades",
+      "Golden Lions",
+      "Silent Storm",
+      "Vanguard",
+      "Nightfall",
+      "Ebon Hand",
+      "Gilded Fang",
+      "Azure Rose",
+      "Crimson Guard",
+      "Onyx Shield"
     ],
     "tiers": {
-      "Common": { "points": [66, 70], "cost": 100, "stars": 0 },
-      "Promising": { "points": [70, 74], "cost": 150, "stars": 1 },
-      "Exceptional": { "points": [74, 78], "cost": 250, "stars": 2 },
-      "Prodigy": { "points": [78, 82], "cost": 400, "stars": 3 }
+      "Common": {
+        "points": [
+          66,
+          70
+        ],
+        "cost": 100,
+        "stars": 0
+      },
+      "Promising": {
+        "points": [
+          70,
+          74
+        ],
+        "cost": 150,
+        "stars": 1
+      },
+      "Exceptional": {
+        "points": [
+          74,
+          78
+        ],
+        "cost": 250,
+        "stars": 2
+      },
+      "Prodigy": {
+        "points": [
+          78,
+          82
+        ],
+        "cost": 400,
+        "stars": 3
+      }
     },
     "origin": [
       "Found fighting for scraps in the pit districts.",
       "A former soldier seeking glory."
     ],
     "style_blurbs": {
-      "Aimed Blow": ["Precise and calculating."],
-      "Bashing Attack": ["Raw power incarnate."]
+      "Aimed Blow": [
+        "Precise and calculating."
+      ],
+      "Bashing Attack": [
+        "Raw power incarnate."
+      ]
     }
   },
   "meta": {
     "flair": {
       "Flashy": "Crowd favorite — earns +2 Popularity per flashy fight."
+    },
+    "title": {
+      "Champion": "Arena title holder. Earns passive fame each week."
     },
     "injury": {
       "Broken Arm": "Reduces Attack and Parry effectiveness until healed."
@@ -415,7 +1193,47 @@
     }
   },
   "passives": {
-    "AimedBlow": ["{{attacker}} studies the opponent's rhythm, waiting for the perfect opening."],
-    "BashingAttack": ["{{attacker}} hammers through the defensive stance — raw power overwhelms technique!"]
+    "AimedBlow": [
+      "{{attacker}} studies the opponent's rhythm, waiting for the perfect opening."
+    ],
+    "BashingAttack": [
+      "{{attacker}} hammers through the defensive stance — raw power overwhelms technique!"
+    ]
+  },
+  "recap": [
+    "%A dismantled %D in a brisk %H-minute clash.",
+    "%D could not weather %A's onslaught—done in %H.",
+    "%A outfoxed %D and sealed it in %H.",
+    "%A turned the tide and toppled %D after %H minutes.",
+    "%A took center stage, leaving %D reeling in %H."
+  ],
+  "commentary": {
+    "KO": [
+      "What a knockout! The crowd erupts!"
+    ],
+    "Kill": [
+      "A fatal finish—steel and silence. The arena gasps."
+    ],
+    "Flashy": [
+      "Spectacle! Flourishes and feints—pure theatre!"
+    ],
+    "Upset": [
+      "An upset for the ages! The favorite falls."
+    ]
+  },
+  "blurbs": {
+    "neutral": [
+      "%A bests %D%H."
+    ],
+    "hype": [
+      "Great heavens! %A drops the guard in a blur!",
+      "By the gods! %A finds the opening with a deft twist!",
+      "Witness! %A presses the advantage after a feint!",
+      "What a clash! %A seals the bout despite the odds!",
+      "%A drives the point home to the crowd's delight!"
+    ],
+    "grim": [
+      "%A overcomes %D%H, the arena falls hushed."
+    ]
   }
 }

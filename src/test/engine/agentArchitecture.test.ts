@@ -71,7 +71,7 @@ describe("AI Agent Architecture - Weather Skepticism", () => {
     const mockCalculated = { treasury: 500, owner: { personality: "Calculated" } } as unknown as RivalStableData;
     const decision = verifyBoutAcceptance(mockCalculated, lungeWarrior, tankWarrior, mockRival, "Rainy");
     expect(decision.accepted).toBe(false);
-    expect(decision.reason).toContain("disadvantage in Rainy conditions");
+    expect(decision.reason).toContain("rain");
   });
 
   it("should accept a bout for LungingAttack in Clear weather", () => {
@@ -80,16 +80,15 @@ describe("AI Agent Architecture - Weather Skepticism", () => {
     expect(decision.accepted).toBe(true);
   });
 
-  it("should decline a bout for low CON warrior in Scalding weather", () => {
-    mockRival.owner.personality = "Aggressive";
-    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Scalding");
+  it("should decline a bout for low CON warrior in Sweltering weather", () => {
+    const decision = verifyBoutAcceptance(mockRival, lungeWarrior, tankWarrior, mockRival, "Sweltering");
     expect(decision.accepted).toBe(false);
-    expect(decision.reason).toContain("dangerous for this unit");
+    expect(decision.reason).toContain("Heatstroke");
   });
 
-  it("should accept a bout for high CON warrior in Scalding weather", () => {
+  it("should accept a bout for high CON warrior in Sweltering weather", () => {
     const mockCalculated = { treasury: 500, owner: { personality: "Calculated" } } as unknown as RivalStableData;
-    const decision = verifyBoutAcceptance(mockCalculated, tankWarrior, lungeWarrior, mockRival, "Scalding");
+    const decision = verifyBoutAcceptance(mockCalculated, tankWarrior, lungeWarrior, mockRival, "Sweltering");
     expect(decision.accepted).toBe(true);
   });
 });

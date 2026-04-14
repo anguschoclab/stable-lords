@@ -11,8 +11,8 @@ function makeFight(overrides: Partial<FightSummary>): FightSummary {
     d: "Warrior D",
     winner: "A",
     by: "KO",
-    styleA: FightingStyle.SlashingAttack,
-    styleD: FightingStyle.AimedBlow,
+    warriorIdA: "w1",
+    warriorIdD: "w2",
     createdAt: new Date().toISOString(),
     ...overrides,
   };

@@ -132,6 +132,16 @@ export interface PhaseStrategy {
   aggressionBias?: number; // 0-10
 }
 
+export interface DesperatePlan {
+  OE: number;
+  AL: number;
+  killDesire?: number;
+  offensiveTactic?: OffensiveTactic;
+  defensiveTactic?: DefensiveTactic;
+  target?: AttackTarget;
+  protect?: ProtectTarget;
+}
+
 export interface FightPlan {
   style: FightingStyle;
   OE: number;
@@ -145,6 +155,8 @@ export interface FightPlan {
   offensiveTactic?: OffensiveTactic;
   defensiveTactic?: DefensiveTactic;
   gear?: Gear;
+  /** Overrides ALL strategy when fighter is desperate (HP < 30% OR endurance < 20%). Canonical "Desperate" slot. */
+  desperatePlan?: DesperatePlan;
   phases?: {
     opening?: PhaseStrategy;
     mid?: PhaseStrategy;
@@ -163,7 +175,7 @@ export type ScoutQuality = "Basic" | "Detailed" | "Expert";
 
 // ─── Weather Types ────────────────────────────────────────────────────────
 
-export type WeatherType = "Clear" | "Rainy" | "Scalding" | "Drafty" | "Overcast" | "Blazing Sun" | "Blood Moon";
+export type WeatherType = "Clear" | "Rainy" | "Sweltering" | "Breezy" | "Overcast" | "Blazing Sun" | "Gale" | "Blood Moon" | "Eclipse";
 
 export interface DeathEvent {
   boutId: string;

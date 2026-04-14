@@ -1,8 +1,9 @@
 import { GameState } from "@/types/state.types";
+import { StateImpact } from "@/engine/impacts";
 
-export function respondToBoutOffer(state: GameState, offerId: string, warriorId: string, response: "Accepted" | "Declined"): GameState {
+export function respondToBoutOffer(state: GameState, offerId: string, warriorId: string, response: "Accepted" | "Declined"): StateImpact {
   const offer = state.boutOffers[offerId];
-  if (!offer) return state;
+  if (!offer) return {};
 
   const newResponses = {
     ...offer.responses,
@@ -20,7 +21,6 @@ export function respondToBoutOffer(state: GameState, offerId: string, warriorId:
   }
 
   return {
-    ...state,
     boutOffers: {
       ...state.boutOffers,
       [offerId]: {

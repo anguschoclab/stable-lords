@@ -1,6 +1,5 @@
 import { type RivalStableData, type PoolWarrior, type Warrior } from "@/types/state.types";
 import { PERSONALITY_STYLE_PREFS } from "@/data/ownerData";
-import { SeededRNG } from "@/utils/random";
 import { generateId } from "@/utils/idUtils";
 import { logAgentAction } from "../agentCore";
 import { checkBudget } from "./budgetWorker";
@@ -14,7 +13,7 @@ export function processRecruitment(
   rival: RivalStableData,
   pool: PoolWarrior[],
   week: number,
-  rng: SeededRNG,
+  rng: IRNGService,
   isMajorDraftWeek: boolean,
   meta: Record<string, number> = {}
 ): { updatedRival: RivalStableData; updatedPool: PoolWarrior[]; gazetteItems: string[] } {
@@ -32,7 +31,7 @@ export function processRecruitment(
   }
 
   const intentBonus = intent === "EXPANSION" ? 0.6 : 0;
-  const willRecruit = isMajorDraftWeek || (activeCount < 4 && rng.chance(0.3 + intentBonus)) || (rng.chance(0.05 + intentBonus));
+  const willRecruit = isMajorDraftWeek || (activeCount < 4 && rng.next() < 0.3 + intentBonus) || (rng.next() < 0.05 + intentBonus);
   
   if (!willRecruit) {
     return { updatedRival, updatedPool: remainingPool, gazetteItems };
@@ -86,7 +85,7 @@ export function processRecruitment(
       remainingPool.splice(bestIdx, 1);
 
       const newWarrior: Warrior = {
-        id: generateId(rng, "warrior"),
+        id: rng.uuid(),
         name: recruit.name,
         style: recruit.style,
         attributes: { ...recruit.attributes },

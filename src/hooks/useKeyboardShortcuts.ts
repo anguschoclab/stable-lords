@@ -2,7 +2,7 @@
  * Global keyboard shortcuts for Stable Lords.
  *
  * Shortcuts (active when no input/textarea is focused):
- *   Space       — Navigate to Run Round (advance time)
+ *   Space       — Navigate to Combat (advance time)
  *   1-9         — Navigate to nav items by index
  *   E           — Toggle event log sidebar
  *   ?           — Navigate to Help
@@ -11,15 +11,15 @@ import { useEffect, useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 const NAV_ROUTES = [
-  "/",             // 1 — Hub
-  "/run-round",    // 2 — Run Round
-  "/recruit",      // 3 — Recruit
-  "/training",     // 4 — Training
-  "/scouting",     // 5 — Scouting
-  "/trainers",     // 6 — Trainers
-  "/tournaments",  // 7 — Tournaments
-  "/hall-of-fights",// 8 — Chronicle
-  "/graveyard",    // 9 — Hall of Warriors
+  "/",                // 1 — Command Hub
+  "/command/combat",  // 2 — Combat
+  "/ops/personnel",   // 3 — Personnel
+  "/command/training",// 4 — Training
+  "/world/intelligence",// 5 — Intelligence/Scouting
+  "/ops/equipment",   // 6 — Equipment
+  "/world/tournaments",// 7 — Tournaments
+  "/world/chronicle", // 8 — Chronicle
+  "/ops/finance",     // 9 — Finance
 ];
 
 interface UseKeyboardShortcutsOpts {
@@ -41,10 +41,10 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
 
       const key = e.key;
 
-      // Space → go to Run Round
+      // Space → go to Combat
       if (key === " ") {
         e.preventDefault();
-        navigate({ to: "/run-round" });
+        navigate({ to: "/command/combat" });
         return;
       }
 

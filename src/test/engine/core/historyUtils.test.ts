@@ -5,6 +5,8 @@ import { FightingStyle, type FightSummary } from '@/types/game';
 describe('getRecentFightsForWarrior', () => {
   const createMockFight = (overrides: Partial<FightSummary>): FightSummary => ({
     id: 'mock-id',
+    a: overrides.warriorIdA ?? 'Attacker',
+    d: overrides.warriorIdD ?? 'Defender',
     warriorIdA: 'Attacker',
     warriorIdD: 'Defender',
     winner: 'A',
@@ -13,8 +15,9 @@ describe('getRecentFightsForWarrior', () => {
     styleD: FightingStyle.ParryRiposte,
     week: 1,
     createdAt: new Date().toISOString(),
+    transcript: [],
     ...overrides,
-  } as unknown as FightSummary);
+  });
 
   it('returns empty array when history is empty', () => {
     const history: FightSummary[] = [];

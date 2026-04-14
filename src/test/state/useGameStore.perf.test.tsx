@@ -1,17 +1,13 @@
 import { render, act } from "@testing-library/react";
 import { useGameStore } from "@/state/useGameStore";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React, { useRef } from "react";
+import React from "react";
 import { useShallow } from "zustand/react/shallow";
 
-// Mock component that tracks renders via a ref to avoid side effects during render
-const RenderTracker = ({ selector, onRender }: { selector: (state: any) => any, onRender: () => void }) => {
+// Mock component that tracks renders via ref
+const RenderTracker = ({ selector, renderCountRef }: { selector: (state: any) => any, renderCountRef: React.MutableRefObject<number> }) => {
   const value = useGameStore(selector);
-  const renderCount = useRef(0);
-  
-  renderCount.current++;
-  onRender();
-  
+  renderCountRef.current++;
   return <div data-testid="value">{JSON.stringify(value)}</div>;
 };
 
@@ -21,11 +17,11 @@ describe("useGameStore Optimization (Epic 4)", () => {
   });
 
   it("re-renders when selected state changes", async () => {
-    const onRender = vi.fn();
+    const renderCountRef = { current: 0 };
     const selector = (s: any) => s.treasury;
-    
-    render(<RenderTracker selector={selector} onRender={onRender} />);
-    expect(onRender).toHaveBeenCalledTimes(1);
+
+    render(<RenderTracker selector={selector} renderCountRef={renderCountRef} />);
+    expect(renderCountRef.current).toBe(1);
 
     await act(async () => {
       useGameStore.getState().setState((draft: any) => {
@@ -33,15 +29,15 @@ describe("useGameStore Optimization (Epic 4)", () => {
       });
     });
 
-    expect(onRender).toHaveBeenCalledTimes(2);
+    expect(renderCountRef.current).toBe(2);
   });
 
   it("does NOT re-render when unrelated state changes (with precise selector)", async () => {
-    const onRender = vi.fn();
+    const renderCountRef = { current: 0 };
     const selector = (s: any) => s.treasury;
-    
-    render(<RenderTracker selector={selector} onRender={onRender} />);
-    expect(onRender).toHaveBeenCalledTimes(1);
+
+    render(<RenderTracker selector={selector} renderCountRef={renderCountRef} />);
+    expect(renderCountRef.current).toBe(1);
 
     await act(async () => {
       useGameStore.getState().setState((draft: any) => {
@@ -50,35 +46,22 @@ describe("useGameStore Optimization (Epic 4)", () => {
     });
 
     // Zustand with precise selector (returning primitive) should NOT re-render
-    expect(onRender).toHaveBeenCalledTimes(1);
+    expect(renderCountRef.current).toBe(1);
   });
 
-  it.skip("requires useShallow for object-returning selectors to avoid extra renders", async () => {
-    const onRenderWithShallow = vi.fn();
-    const onRenderWithoutShallow = vi.fn();
+  it("requires useShallow for object-returning selectors to avoid extra renders", async () => {
+    const renderCountWithShallow = { current: 0 };
     const selector = (s: any) => ({ treasury: s.treasury, week: s.week });
 
     const WithShallow = () => {
       const val = useGameStore(useShallow(selector));
-      onRenderWithShallow();
+      renderCountWithShallow.current++;
       return <div>{val.treasury}</div>;
     };
 
-    const WithoutShallow = () => {
-      const val = useGameStore(selector);
-      onRenderWithoutShallow();
-      return <div>{val.treasury}</div>;
-    };
+    render(<WithShallow />);
 
-    render(
-      <>
-        <WithShallow />
-        <WithoutShallow />
-      </>
-    );
-
-    expect(onRenderWithShallow).toHaveBeenCalledTimes(1);
-    expect(onRenderWithoutShallow).toHaveBeenCalledTimes(1);
+    expect(renderCountWithShallow.current).toBe(1);
 
     await act(async () => {
       useGameStore.getState().setState((draft: any) => {
@@ -87,9 +70,15 @@ describe("useGameStore Optimization (Epic 4)", () => {
     });
 
     // WithShallow should NOT re-render because the returned object is shallowly equal
-    expect(onRenderWithShallow).toHaveBeenCalledTimes(1);
-    
-    // WithoutShallow SHOULD re-render because it returns a NEW object every time
-    expect(onRenderWithoutShallow).toHaveBeenCalledTimes(2);
+    expect(renderCountWithShallow.current).toBe(1);
+
+    await act(async () => {
+      useGameStore.getState().setState((draft: any) => {
+        draft.treasury += 10;
+      });
+    });
+
+    // WithShallow SHOULD re-render when selected values change
+    expect(renderCountWithShallow.current).toBe(2);
   });
 });

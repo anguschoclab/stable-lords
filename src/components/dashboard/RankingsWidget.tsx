@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Trophy, ChevronRight, Star, Award, Target, TrendingUp, Zap } from "lucide-react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { selectActiveWarriors } from "@/state/selectors";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function RankingsWidget() {
-  const { state } = useGameStore();
+  const state = useWorldState();
   const navigate = useNavigate();
 
   const ranked = useMemo(

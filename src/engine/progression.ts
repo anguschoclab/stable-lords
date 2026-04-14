@@ -15,10 +15,11 @@
  */
 import type { Warrior } from "@/types/warrior.types";
 import type { FightOutcome } from "@/types/combat.types";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from "@/types/shared.types";
 import { computeWarriorStats } from "./skillCalc";
 import { canGrow, diminishingReturnsFactor, revealPotential } from "./potential";
-import { SeededRNG } from "@/utils/random";
 
 const XP_PER_LEVEL = 5;
 const TOTAL_ATTR_CAP = 80;
@@ -54,8 +55,8 @@ export function calculateXP(
 }
 
 /** Apply XP to a warrior, potentially triggering a level-up improvement */
-export function applyXP(warrior: Warrior, xpGained: number, seed?: number): { warrior: Warrior; gain: XPGain } {
-  const rng = new SeededRNG(seed ?? (xpGained * 7919 + 42));
+export function applyXP(warrior: Warrior, xpGained: number, rng?: IRNGService): { warrior: Warrior; gain: XPGain } {
+  const rngService = rng || new SeededRNGService(xpGained * 7919 + 42);
   const currentXp = (warrior as Warrior).xp ?? 0;
   const newXp = currentXp + xpGained;
   const oldLevel = Math.floor(currentXp / XP_PER_LEVEL);
@@ -83,7 +84,7 @@ export function applyXP(warrior: Warrior, xpGained: number, seed?: number): { wa
           return Math.max(0.1, dr); // minimum weight so nothing is impossible
         });
         const totalWeight = weights.reduce((s, w) => s + w, 0);
-        let roll = rng.next() * totalWeight;
+        let roll = rngService.next() * totalWeight;
         let chosen = improvableAttrs[0];
         for (let i = 0; i < improvableAttrs.length; i++) {
           roll -= weights[i];
@@ -102,8 +103,8 @@ export function applyXP(warrior: Warrior, xpGained: number, seed?: number): { wa
   const unrevealed = ATTRIBUTE_KEYS.filter(
     (k) => !updated.potentialRevealed?.[k] && updated.potential?.[k] !== undefined
   );
-  if (unrevealed.length > 0 && rng.chance(POTENTIAL_REVEAL_CHANCE)) {
-    const revealKey = rng.pick(unrevealed);
+  if (unrevealed.length > 0 && rngService.next() < POTENTIAL_REVEAL_CHANCE) {
+    const revealKey = rngService.pick(unrevealed);
     updated = {
       ...updated,
       potentialRevealed: revealPotential(updated.potentialRevealed, revealKey),

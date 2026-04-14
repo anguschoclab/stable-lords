@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { execSync } from "child_process";
 import { runSimulation } from "./simulation-harness";
 
 const WEEKS_TO_SIMULATE = 1000;
@@ -148,7 +149,7 @@ async function main() {
          }
       }
   } else if (avgEconomy > 50000) {
-      const ecoFile = require('path').join(process.cwd(), "src/data/economyConstants.ts");
+      const ecoFile = path.join(process.cwd(), "src/data/economyConstants.ts");
       if (fs.existsSync(ecoFile)) {
          let ecoContent = fs.readFileSync(ecoFile, "utf-8");
          const fightPurseMatch = ecoContent.match(/export const FIGHT_PURSE = ([0-9.]+);/);
@@ -170,11 +171,10 @@ async function main() {
     console.log(commitMessage);
 
     try {
-        const { execSync } = require("child_process");
         execSync("git add src/engine/combat/combatConstants.ts src/data/economyConstants.ts Autobalance_Report.md || true");
         execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
         console.log("Committed to git successfully.");
-    } catch (e) {
+    } catch (e: any) {
         console.error("Git commit failed:", e.message);
     }
   } else {

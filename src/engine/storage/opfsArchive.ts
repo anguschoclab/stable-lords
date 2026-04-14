@@ -5,8 +5,8 @@ export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
-  retrieveBoutLog: (season: number, boutId: string) => Promise<string[] | null>;
+  archiveBoutLog: (year: number, season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
+  retrieveBoutLog: (year: number, season: number, boutId: string) => Promise<string[] | null>;
 
   // Gazettes (Markdown)
   archiveGazette: (season: number, week: number, markdown: string) => Promise<void>;
@@ -67,19 +67,27 @@ export class OPFSArchiveService implements ArchiveService {
   }
 
   async archiveHotState(slotId: string, stateData: GameState): Promise<void> {
+    let writable: FileSystemWritableFileStream | null = null;
     try {
       const dirHandle = await this.getHotStateDirectory();
       if (!dirHandle) return;
       const fileName = `${slotId}.json`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-      const writable = await fileHandle.createWritable();
+      writable = await fileHandle.createWritable();
       await writable.write(JSON.stringify(stateData));
-      await writable.close();
     } catch (error) {
       if ((error as Error)?.name === 'QuotaExceededError') {
          console.error('OPFS Quota Exceeded during hot state archival', error);
          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
          return;
+      }
+    } finally {
+      if (writable) {
+        try {
+          await writable.close();
+        } catch (closeError) {
+          console.warn('Failed to close writable stream:', closeError);
+        }
       }
     }
   }
@@ -105,12 +113,13 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(season: number, boutId: string, logData: string[], overwrite = false): Promise<void> {
+  async archiveBoutLog(year: number, season: number, boutId: string, logData: string[], overwrite = false): Promise<void> {
+    let writable: FileSystemWritableFileStream | null = null;
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return;
 
-      const fileName = `${season}_${boutId}.json`;
+      const fileName = `${year}_${boutId}.json`;
 
       let fileHandle;
       try {
@@ -126,9 +135,8 @@ export class OPFSArchiveService implements ArchiveService {
          fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
       }
 
-        const writable = await fileHandle.createWritable();
+        writable = await fileHandle.createWritable();
         await writable.write(JSON.stringify(logData));
-        await writable.close();
 
     } catch (error) {
       if (error instanceof ArchiveConflictError) {
@@ -144,15 +152,23 @@ export class OPFSArchiveService implements ArchiveService {
         throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
       }
       console.error('Unknown error during bout log archival', error);
+    } finally {
+      if (writable) {
+        try {
+          await writable.close();
+        } catch (closeError) {
+          console.warn('Failed to close writable stream:', closeError);
+        }
+      }
     }
   }
 
-  async retrieveBoutLog(season: number, boutId: string): Promise<string[] | null> {
+  async retrieveBoutLog(year: number, season: number, boutId: string): Promise<string[] | null> {
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
       if (!dirHandle) return null;
 
-      const fileName = `${boutId}.json`;
+      const fileName = `${year}_${boutId}.json`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
       const file = await fileHandle.getFile();
 
@@ -173,15 +189,15 @@ export class OPFSArchiveService implements ArchiveService {
 
   async archiveGazette(season: number, week: number, markdown: string): Promise<void> {
     return this.enqueue(async () => {
+      let writable: FileSystemWritableFileStream | null = null;
       try {
         const dirHandle = await this.getDirectory(season, 'gazettes');
         if (!dirHandle) return;
 
         const fileName = `week_${week}.md`;
         const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-        const writable = await fileHandle.createWritable();
+        writable = await fileHandle.createWritable();
         await writable.write(markdown);
-        await writable.close();
 
       } catch (error) {
         if ((error as Error)?.name === 'QuotaExceededError') {
@@ -189,6 +205,14 @@ export class OPFSArchiveService implements ArchiveService {
            // Dispatch to Zustand to show Toast
            if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
            return;
+        }
+      } finally {
+        if (writable) {
+          try {
+            await writable.close();
+          } catch (closeError) {
+            console.warn('Failed to close writable stream:', closeError);
+          }
         }
       }
     });

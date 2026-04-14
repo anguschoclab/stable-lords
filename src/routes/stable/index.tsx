@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import StableHall from "@/pages/StableHall";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/stable/")({
-  component: StableHall,
+  component: () => <Navigate to="/command/roster" />,
 });
