@@ -108,16 +108,17 @@ export function performDefenseCheck(
   curAntiSynDef: ReturnType<typeof getStyleAntiSynergy>,
   curOffMods: ReturnType<typeof getOffensiveTacticMods>,
   ctx?: { weatherEffect?: { riposteMod: number } },
-  attacker?: FighterState
+  attacker?: FighterState,
+  extraDefPenalty: number = 0
 ) {
   // Committed attacker is fully open — defender gets +15 on defense
   const commitPenalty = attacker?.committed ? 15 : 0;
   if (isDodge) {
-    const success = skillCheck(rng, def.skills.DEF, oeDefMod(curDefOE) + matchup + fat + curDefMods.defBonus + curPassD.defBonus + curBiasDef - overDef - def.legHits + commitPenalty);
+    const success = skillCheck(rng, def.skills.DEF, oeDefMod(curDefOE) + matchup + fat + curDefMods.defBonus + curPassD.defBonus + curBiasDef - overDef - def.legHits + commitPenalty - extraDefPenalty);
     return { success, type: "DODGE" as const };
   } else {
     const riposteMod = ctx?.weatherEffect?.riposteMod ?? 0;
-    const success = skillCheck(rng, def.skills.PAR, oeDefMod(curDefOE) + matchup + fat + curDefMods.parBonus + curPassD.parBonus + Math.round((curAntiSynDef.defMult - 1) * 3) - curOffMods.defPenalty - curOffMods.parryBypass + GLOBAL_PAR_PENALTY + curBiasDef - overDef - def.armHits + commitPenalty + riposteMod);
+    const success = skillCheck(rng, def.skills.PAR, oeDefMod(curDefOE) + matchup + fat + curDefMods.parBonus + curPassD.parBonus + Math.round((curAntiSynDef.defMult - 1) * 3) - curOffMods.defPenalty - curOffMods.parryBypass + GLOBAL_PAR_PENALTY + curBiasDef - overDef - def.armHits + commitPenalty + riposteMod - extraDefPenalty);
     return { success, type: "PARRY" as const };
   }
 }
