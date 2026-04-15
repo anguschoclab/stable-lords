@@ -250,7 +250,7 @@ export function generateWeeklyGazette(
     } else if (top.streak >= 7) {
       headline = t(rng.pick(gh.HotStreak), { week, name: top.name, streak: top.streak });
     } else {
-      headline = t(rng.pick(gh.Streak), { week, name: top.name, streak: top.streak });
+      headline = t(rng.pick(gh.win_streak ? gh.win_streak : gh.Streak), { week, name: top.name, streak: top.streak });
     }
   } else if (rivalryPair) {
     headline = t(rng.pick(rivalryPair.count >= 5 ? gh.LegacyRivalry : gh.Rivalry), {
@@ -259,7 +259,7 @@ export function generateWeeklyGazette(
   } else if (risingStars.length > 0) {
     headline = t(rng.pick(gh.RisingStar), { week, name: risingStars[0] });
   } else if (upsets.length > 0) {
-    headline = t(rng.pick(gh.Upset), { week, winner: upsets[0].winner, loser: upsets[0].loser });
+    headline = t(rng.pick(upsets[0].loserFame / upsets[0].winnerFame >= 3 && gh.major_upset ? gh.major_upset : gh.Upset), { week, winner: upsets[0].winner, loser: upsets[0].loser });
   } else if (kills.length >= 2) {
     headline = t(rng.pick(gh.MultipleKills), { week, count: kills.length });
   } else if (kills.length === 1) {

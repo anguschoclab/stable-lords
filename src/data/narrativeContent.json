@@ -390,6 +390,13 @@
         "{{attacker}} spins with terrible grace, their {{weapon}} severing {{defender}}'s {{bodyPart}}. The crowd screams as {{defender}} falls lifeless.",
         "A masterful stroke! {{attacker}} brings the {{weapon}} down with executioner's finality upon {{defender}}'s {{bodyPart}}.",
         "{{attacker}} feints high, then sweeps the {{weapon}} low, completely butchering {{defender}}'s {{bodyPart}} in a fatal arc."
+      ],
+      "critical": [
+        "{{attacker}}'s {{weapon}} becomes a blur of silver, opening a horrific gash on {{defender}}'s {{bodyPart}}!",
+        "A masterful, sweeping cut from {{attacker}} bites deep into bone!",
+        "Blood flows like a river as {{attacker}}'s slash finds its mark on {{defender}}'s {{bodyPart}}!",
+        "{{attacker}} executes a perfect draw-cut, leaving a devastating wound!",
+        "With unnatural speed, {{attacker}}'s blade carves through {{defender}}'s defenses and flesh alike!"
       ]
     },
     "bashing": {
@@ -592,6 +599,18 @@
       "glancing": [
         "The attack is a glancing blow only.",
         "The stroke lands ineffectively."
+      ],
+      "fatal": [
+        "{{attacker}} executes a merciless coup de grâce, ending {{defender}}'s misery.",
+        "The crowd falls dead silent as {{attacker}}'s strike abruptly ends {{defender}}'s life.",
+        "With an explosive burst of violence, {{attacker}} extinguishes the light from {{defender}}'s eyes.",
+        "A brutal, uncompromising blow by {{attacker}} shatters {{defender}} completely.",
+        "{{attacker}} roars in triumph over the broken, lifeless form of {{defender}}.",
+        "Blood sprays across the sands as {{attacker}} delivers the final, fatal judgment.",
+        "{{attacker}}'s {{weapon}} claims another soul for the void today.",
+        "The arena echoes with the sickening sound of {{defender}}'s life being crushed out by {{attacker}}.",
+        "There is no recovery from that—{{attacker}} has sent {{defender}} to the ancestors.",
+        "{{attacker}} stands victorious, {{defender}} dead before they even hit the ground."
       ]
     },
     "status_changes": {
@@ -643,6 +662,27 @@
       ],
       "encourage": [
         "The crowd urges the warriors on."
+      ],
+      "gasp": [
+        "The crowd gasps at the shocking display!",
+        "A collective intake of breath from the stands!",
+        "The audience recoils from the sheer violence!",
+        "A sudden hush falls over the arena.",
+        "The spectators clutch their pearls in horror!"
+      ],
+      "cheer": [
+        "The crowd erupts into deafening cheers!",
+        "Chants echo through the coliseum!",
+        "The audience screams their approval!",
+        "A roar of bloodlust rises from the stands!",
+        "The spectators are on their feet, demanding more blood!"
+      ],
+      "boo": [
+        "Jeers and boos rain down from the cheap seats.",
+        "The crowd hurls insults, displeased with the display.",
+        "A chorus of groans sweeps the arena.",
+        "The audience demands a better show!",
+        "Fruit is thrown from the stands in disgust."
       ]
     },
     "taunts": {
@@ -843,6 +883,20 @@
         "The Hall of Warriors receives {{count}} new name{{plural}} this week.",
         "The Halls of the Dead Welcome {{count}} New Soul{{plural}}.",
         "A Moment of Silence for the {{count}} Warrior{{plural}} Lost This Week."
+      ],
+      "major_upset": [
+        "Week {{week}}: THE UNTHINKABLE HAPPENS! {{winner}} SHOCKS THE WORLD!",
+        "Week {{week}}: {{loser}} HUMILIATED! A stunning victory for the underdog {{winner}}!",
+        "Week {{week}}: GODS BLEED! The mighty {{loser}} has been struck down by {{winner}}!",
+        "Week {{week}}: DOWN GOES THE CHAMPION! {{winner}} causes the upset of the century!",
+        "Week {{week}}: BOOKMAKERS WEEP! {{winner}} defies all odds against {{loser}}!"
+      ],
+      "win_streak": [
+        "Week {{week}}: {{name}}'S RAMPAGE CONTINUES! {{streak}} AND COUNTING!",
+        "Week {{week}}: WHO CAN STOP THEM? {{name}} notches win number {{streak}}!",
+        "Week {{week}}: A TRAIL OF BODIES! {{name}}'s win streak hits {{streak}}!",
+        "Week {{week}}: THE JUGGERNAUT! {{name}} secures their {{streak}}th consecutive victory!",
+        "Week {{week}}: FLAWLESS! {{name}} celebrates {{streak}} straight wins!"
       ]
     },
     "featured": {

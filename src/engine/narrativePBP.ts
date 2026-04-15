@@ -303,8 +303,9 @@ export function fatigueLine(rng: RNG, name: string, endRatio: number): string | 
 
 export function crowdReaction(rng: RNG, loserName: string, winnerName: string, hpRatio: number): string | null {
   if (rng() > 0.25) return null;
-  const mood = hpRatio <= 0.3 ? "encourage" : rng() < 0.5 ? "negative" : "positive";
-  const template = getFromArchive(rng, ["pbp", "reactions", mood]);
+  const isDeadly = hpRatio <= 0.1;
+  const mood = isDeadly ? "gasp" : hpRatio <= 0.3 ? "encourage" : rng() < 0.5 ? "boo" : "cheer";
+  const template = getFromArchive(rng, ["pbp", "reactions", mood]) || getFromArchive(rng, ["pbp", "reactions", mood === "boo" ? "negative" : mood === "cheer" ? "positive" : "encourage"]);
   return interpolateTemplate(template, { name: loserName });
 }
 
