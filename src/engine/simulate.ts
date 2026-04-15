@@ -19,9 +19,10 @@ import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import type { Trainer, FightOutcomeBy } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket } from "@/types/combat.types";
-import type { WeatherType } from "@/types/shared.types";
+import type { WeatherType, DistanceRange, ArenaZone } from "@/types/shared.types";
 import { getTrainerMods } from "./combat/simulate/core/simulateHelpers";
 import { getWeatherEffect, weatherOpeningLine } from "./combat/weatherEffects";
+import { getArenaById } from "@/data/arenas";
 
 // ─── Exports from sub-modules for backward compatibility ───
 export { createFighterState, resolveDecision, defaultPlanForWarrior };
@@ -50,7 +51,8 @@ export function simulateFight(
   warriorD?: Warrior,
   providedRng?: (() => number) | number,
   trainers?: Trainer[],
-  weather: WeatherType = "Clear"
+  weather: WeatherType = "Clear",
+  arenaId: string = "standard_arena"
 ): FightOutcome {
   // 1. Deterministic RNG setup
   let rngService: IRNGService;
@@ -102,6 +104,11 @@ export function simulateFight(
     weaponReqD: { endurancePenalty: weaponReqD.endurancePenalty, attPenalty: weaponReqD.attPenalty },
     tacticStreakA: 0,
     tacticStreakD: 0,
+    range: "Striking" as DistanceRange,
+    zone: "Center" as ArenaZone,
+    arenaConfig: getArenaById(arenaId),
+    surfaceMod: getArenaById(arenaId).surfaceMod,
+    pushedFighter: undefined,
   };
 
   const log: MinuteEvent[] = [];
