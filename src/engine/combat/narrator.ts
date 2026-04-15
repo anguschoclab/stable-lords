@@ -61,7 +61,7 @@ export function narrateEvents(
     switch (event.type) {
       case "INITIATIVE":
         if (rng() < 0.3) {
-          log.push({ minute, text: narrateInitiative(rng, actorName, rng() < 0.3) });
+          log.push({ minute, text: narrateInitiative(rng, actorName, rng() < 0.3, opponentName) });
         }
         break;
 

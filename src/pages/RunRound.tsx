@@ -3,7 +3,7 @@
  * Modularized for better maintainability and strict type safety.
  */
 import React, { useState, useMemo, useCallback } from "react";
-import { useGameStore, reconstructGameState } from "@/state/useGameStore";
+import { useGameStore, reconstructGameState, type GameStore } from "@/state/useGameStore";
 import { type GameState, type Warrior, type RivalStableData } from "@/types/game";
 
 import { generatePairings } from "@/engine/bout/core/pairings";
@@ -83,7 +83,7 @@ export default function RunRound() {
       });
 
       setAutosimResult(result);
-      setState((draft: any) => {
+      setState((draft: GameStore) => {
         Object.assign(draft, result.finalState);
       });
     } catch (err) {

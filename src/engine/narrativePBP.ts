@@ -310,10 +310,10 @@ export function crowdReaction(rng: RNG, loserName: string, winnerName: string, h
   return interpolateTemplate(template, { name: loserName });
 }
 
-export function narrateInitiative(rng: RNG, winnerName: string, isFeint: boolean): string {
+export function narrateInitiative(rng: RNG, winnerName: string, isFeint: boolean, defenderName?: string): string {
   const path = isFeint ? ["pbp", "feints"] : ["pbp", "initiative"];
   const template = getFromArchive(rng, path);
-  return interpolateTemplate(template, { attacker: winnerName });
+  return interpolateTemplate(template, { attacker: winnerName, defender: defenderName });
 }
 
 export function minuteStatusLine(rng: RNG, minute: number, nameA: string, nameD: string, hitsA: number, hitsD: number): string {

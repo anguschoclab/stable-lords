@@ -1,24 +1,26 @@
 import React, { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useGameStore, useWorldState, type GameStore } from "@/state/useGameStore";
 import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Briefcase, 
-  User, 
-  Coins, 
-  Zap, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
+import {
+  Briefcase,
+  User,
+  Coins,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  Clock,
   ShieldAlert,
   Crown
 } from "lucide-react";
 import { toast } from "sonner";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
+import type { Warrior } from "@/types/state.types";
+import type { BoutOffer } from "@/types/state.types";
 
 export default function BookingOffice() {
   const state = useWorldState();
@@ -27,19 +29,19 @@ export default function BookingOffice() {
 
   // Filter offers involving the player's warriors
   const playerOffers = useMemo(() => {
-    return Object.values(boutOffers).filter((offer: any) => 
-      offer.warriorIds.some((wId: string) => roster.some((playerW: any) => playerW.id === wId)) &&
+    return Object.values(boutOffers).filter((offer: BoutOffer) =>
+      offer.warriorIds.some((wId: string) => roster.some((playerW: Warrior) => playerW.id === wId)) &&
       offer.status === "Proposed"
     );
   }, [boutOffers, roster]);
 
   const handleResponse = (offerId: string, warriorId: string, response: "Accepted" | "Declined") => {
-    setState((s: any) => {
+    setState((s: GameStore) => {
       // respondToBoutOffer utility expects full world state
       const next = respondToBoutOffer(state, offerId, warriorId, response);
       // Synchronize back to slices
-      s.boutOffers = next.boutOffers;
-      s.roster = next.roster;
+      s.boutOffers = next.boutOffers ?? {};
+      s.roster = next.roster ?? [];
     });
     toast.success(`Offer ${response === "Accepted" ? "accepted" : "declined"}.`);
   };

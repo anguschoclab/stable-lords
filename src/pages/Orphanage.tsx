@@ -4,7 +4,7 @@
  * Dynamic warrior selection → Tutorial bout → Summary
  */
 import React, { useState, useMemo, useCallback } from "react";
-import { useGameStore } from "@/state/useGameStore";
+import { useGameStore, type GameStore } from "@/state/useGameStore";
 import { makeWarrior } from "@/engine/factories";
 import { simulateFight, defaultPlanForWarrior } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
@@ -333,7 +333,7 @@ export default function Orphanage() {
       new SeededRNGService(poolSeedValue + 888)
     );
 
-    setState((draft: any) => {
+    setState((draft: GameStore) => {
       draft.isFTUE = false;
       draft.ftueComplete = true;
       draft.roster = aliveWarriors;

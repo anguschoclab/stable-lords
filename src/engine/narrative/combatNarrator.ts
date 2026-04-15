@@ -175,10 +175,10 @@ export class CombatNarrator {
   /**
    * Narrates initiative winner.
    */
-  static narrateInitiative(rng: IRNGService, winnerName: string, isFeint: boolean): string {
+  static narrateInitiative(rng: IRNGService, winnerName: string, isFeint: boolean, defenderName?: string): string {
     const path = isFeint ? ["pbp", "feints"] : ["pbp", "initiative"];
     const template = NarrativeTemplateEngine.getFromArchive(rng, path);
-    return NarrativeTemplateEngine.interpolateTemplate(template, { attacker: winnerName });
+    return NarrativeTemplateEngine.interpolateTemplate(template, { attacker: winnerName, defender: defenderName });
   }
 
   /**
