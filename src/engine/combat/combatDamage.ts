@@ -147,8 +147,9 @@ export function calculateKillWindow(
   momentum: number = 0, // Attacker momentum (-3 to +3). < 1 blocks kill attempts.
   specialtyBonus: number = 0 // Extra kill window from trainer specialties (e.g. KillerInstinct)
 ): number {
-  // Momentum gate: must have positive momentum to attempt a kill
-  if (momentum < 1) return 0;
+  // Momentum gate: must not be deeply negative momentum to attempt a kill
+  // Softened from < 1 to < -1 to allow kills at neutral momentum
+  if (momentum < -1) return 0;
 
   // Base threshold (lethal hits are rare but possible)
   // Target: ~10% overall mortality across the league (Unified 1.0 Gold Baseline)

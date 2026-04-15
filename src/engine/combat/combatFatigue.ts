@@ -7,16 +7,16 @@ import { getWeatherEffect } from "./weatherEffects";
 import type { WeatherType } from "@/types/shared.types";
 
 // Endurance scaling
-const ENDURANCE_OE_SCALING = 0.4;
-const ENDURANCE_AL_SCALING = 0.2;
+const ENDURANCE_OE_SCALING = 0.22;
+const ENDURANCE_AL_SCALING = 0.10;
 
-// Fatigue thresholds
-const FATIGUE_MODERATE_THRESHOLD = 0.65;
-const FATIGUE_HEAVY_THRESHOLD = 0.45;
+// Fatigue thresholds (fighters need to be genuinely exhausted before penalties kick in)
+const FATIGUE_MODERATE_THRESHOLD = 0.45;
+const FATIGUE_HEAVY_THRESHOLD = 0.25;
 
-// Fatigue penalties
-const FATIGUE_MODERATE_PENALTY = -6;
-const FATIGUE_HEAVY_PENALTY = -15;
+// Fatigue penalties (reduced to avoid disproportionately punishing aggressive styles)
+const FATIGUE_MODERATE_PENALTY = -4;
+const FATIGUE_HEAVY_PENALTY = -8;
 
 export function enduranceCost(oe: number, al: number, weather?: WeatherType | string): number {
   const baseCost = oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING;

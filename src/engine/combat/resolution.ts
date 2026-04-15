@@ -276,7 +276,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     att.endurance -= Math.max(1, Math.floor(enduranceCost(curAttOE, curAttAL, ctx.weather) * 0.5)) + curOffMods.endCost;
 
     const curAntiSynDef = getStyleAntiSynergy(def.style, (aGoesFirst ? tactD : tactA).offTactic, (aGoesFirst ? tactD : tactA).defTactic);
-    const ripCheck = performRiposteCheck(rng, def, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, curOffMods.defPenalty, aGoesFirst ? passD : passA, curAntiSynDef);
+    // Whiff riposte is harder than post-parry riposte — attacker missed but also retreated
+    const ripCheck = performRiposteCheck(rng, def, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, curOffMods.defPenalty - 4, aGoesFirst ? passD : passA, curAntiSynDef);
     if (ripCheck) executeRiposte(events, rng, att, def, aGoesFirst ? tactD : tactA, aGoesFirst ? passD : passA, attLabel, defLabel);
   } else {
     const curDefOE = aGoesFirst ? OE_D : OE_A;
@@ -297,11 +298,13 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     if (defCheck.success) {
       events.push({ type: "DEFENSE", actor: defLabel, result: defCheck.type });
       if (!isDodge) {
-        // Successful parry shifts momentum toward defender (+1), not as decisive as a riposte
+        // Successful parry shifts momentum: defender gains +1, attacker loses -1
         const prevDefMomParry = def.momentum;
+        const prevAttMomParry = att.momentum;
         def.momentum = Math.min(3, def.momentum + 1);
-        if (def.momentum !== prevDefMomParry) {
-          events.push({ type: "MOMENTUM_SHIFT", actor: defLabel, value: def.momentum, metadata: { prev: prevDefMomParry, reason: "PARRY" } });
+        att.momentum = Math.max(-3, att.momentum - 1);
+        if (def.momentum !== prevDefMomParry || att.momentum !== prevAttMomParry) {
+          events.push({ type: "MOMENTUM_SHIFT", actor: defLabel, value: def.momentum, metadata: { prev: prevDefMomParry, reason: "PARRY", attPrev: prevAttMomParry, attNew: att.momentum } });
         }
         const ripPostParry = performRiposteCheck(rng, def, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, (aGoesFirst ? defModsD : defModsA).ripBonus + ctx.weatherEffect.riposteMod, curPassD, undefined);
         const specRiposteMult = aGoesFirst ? (ctx.trainerModsD.riposteDamageMult ?? 1.0) : (ctx.trainerModsA.riposteDamageMult ?? 1.0);

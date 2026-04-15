@@ -4,8 +4,8 @@ import { FightingStyle } from "@/types/shared.types";
  * Stable Lords — Combat Engine Constants & Tuning
  */
 
-export const GLOBAL_ATT_BONUS = -1.5; 
-export const GLOBAL_PAR_PENALTY = 0.5;
+export const GLOBAL_ATT_BONUS = 2.5;
+export const GLOBAL_PAR_PENALTY = -2.5;
 export const MAX_EXCHANGES = 30; // 10 minutes (Death Rattle calibration)
 export const EXCHANGES_PER_MINUTE = 3;
 export const INITIATIVE_PRESS_BONUS = 1;
@@ -15,7 +15,7 @@ export const OE_DEF_SCALING = 0.5;
 export const AL_INI_SCALING = 0.7;
 export const AL_ATTR_SCALING = 0.5;
 
-export const DEFENDER_ENDURANCE_DISCOUNT = 0.92;
+export const DEFENDER_ENDURANCE_DISCOUNT = 0.60;
 export const DAMAGE_TAX_SCALING = 0.7;
 export const KILL_WINDOW_ENDURANCE = 0.4;
 export const KILL_DESIRE_SCALING = 0.04;
