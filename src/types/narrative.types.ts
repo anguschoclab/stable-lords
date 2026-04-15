@@ -148,10 +148,10 @@ export interface PbpNarratives {
 // ─── Conclusions ──────────────────────────────────────────────────────────
 
 export interface Conclusions {
-  Kill: string;
-  KO: string;
-  Stoppage: string;
-  Exhaustion: string;
+  Kill: string | string[];
+  KO: string | string[];
+  Stoppage: string | string[];
+  Exhaustion: string | string[];
 }
 
 // ─── Events ────────────────────────────────────────────────────────────────
