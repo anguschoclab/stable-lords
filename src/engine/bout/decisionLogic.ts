@@ -45,7 +45,7 @@ function decisionNarrative(winner: "A" | "D", loser: "A" | "D", winName: string,
   const dmgDealt = fL.maxHp - fL.hp;
   const dmgTaken = fW.maxHp - fW.hp;
 
-  let prefix = "Time! ";
+  const prefix = "Time! ";
   let result: string;
 
   if (voteType === "overtime") {

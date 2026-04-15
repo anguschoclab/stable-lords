@@ -1,15 +1,11 @@
 import { create } from "zustand";
-import * as Comlink from "comlink";
 import { shallow } from "zustand/shallow";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
-import type { FightSummary } from "@/types/combat.types";
-import type { GameState, Warrior } from "@/types/state.types";
+import type { GameState } from "@/types/state.types";
 import { type BoutResult } from "@/engine/boutProcessor";
 import { createFreshState } from "@/engine/factories";
 import { engineProxy } from "@/engine/workerProxy";
-import { hashStr } from "@/utils/idUtils";
-import { SeededRNG } from "@/utils/random";
 import { opfsArchive } from "@/engine/storage/opfsArchive";
 
 // ─── Slices ────────────────────────────────────────────────────────────────
@@ -43,7 +39,60 @@ export interface GameStoreActions {
 export type GameStore = GameStoreState & GameStoreActions & EconomySlice & RosterSlice & WorldSlice & TournamentSlice;
 
 let lastResult: GameState | null = null;
-let lastStoreValues: GameStore | null = null;
+
+// Type for the extracted values from GameStore that we compare for change detection
+// Note: This only includes properties that are directly extracted from store slices
+type GameStateValues = {
+  treasury: number;
+  ledger: GameState['ledger'];
+  roster: GameState['roster'];
+  graveyard: GameState['graveyard'];
+  retired: GameState['retired'];
+  recruitPool: GameState['recruitPool'];
+  insightTokens: GameState['insightTokens'];
+  arenaHistory: GameState['arenaHistory'];
+  player: GameState['player'];
+  week: number;
+  day: number;
+  season: GameState['season'];
+  weather: GameState['weather'];
+  promoters: GameState['promoters'];
+  boutOffers: GameState['boutOffers'];
+  rivals: GameState['rivals'];
+  gazettes: GameState['gazettes'];
+  scoutReports: GameState['scoutReports'];
+  unacknowledgedDeaths: GameState['unacknowledgedDeaths'];
+  rosterBonus: number;
+  tournaments: GameState['tournaments'];
+  isTournamentWeek: boolean;
+  activeTournamentId: GameState['activeTournamentId'];
+  year: number;
+  popularity: number;
+  fame: number;
+  realmRankings: GameState['realmRankings'];
+  awards: GameState['awards'];
+  trainers: GameState['trainers'];
+  hiringPool: GameState['hiringPool'];
+  trainingAssignments: GameState['trainingAssignments'];
+  seasonalGrowth: GameState['seasonalGrowth'];
+  restStates: GameState['restStates'];
+  crowdMood: GameState['crowdMood'];
+  moodHistory: GameState['moodHistory'];
+  newsletter: GameState['newsletter'];
+  hallOfFame: GameState['hallOfFame'];
+  settings: GameState['settings'];
+  isFTUE: boolean;
+  ftueStep: GameState['ftueStep'];
+  ftueComplete: boolean;
+  coachDismissed: GameState['coachDismissed'];
+  rivalries: GameState['rivalries'];
+  matchHistory: GameState['matchHistory'];
+  ownerGrudges: GameState['ownerGrudges'];
+  phase: GameState['phase'];
+  playerChallenges: GameState['playerChallenges'];
+  playerAvoids: GameState['playerAvoids'];
+};
+let lastStoreValues: GameStateValues | null = null;
 
 export function reconstructGameState(store: GameStore): GameState {
   const currentValues = {
@@ -99,8 +148,9 @@ export function reconstructGameState(store: GameStore): GameState {
 
   if (lastResult && lastStoreValues) {
     let changed = false;
-    for (const key of Object.keys(currentValues)) {
-      if ((currentValues as any)[key] !== lastStoreValues[key]) {
+    const keys = Object.keys(currentValues) as Array<keyof GameStateValues>;
+    for (const key of keys) {
+      if (currentValues[key] !== lastStoreValues[key]) {
         changed = true;
         break;
       }
