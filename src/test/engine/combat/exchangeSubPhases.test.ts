@@ -49,8 +49,8 @@ describe("runCommit", () => {
     const fA = makeFighter({ activePlan: { style: "SLASHING ATTACK" as any, OE: 3, AL: 5 } });
     const result = runCommit(fA, 3);
     expect(result.level).toBe("Cautious");
-    expect(result.attBonus).toBe(-2);
-    expect(result.defPenalty).toBe(2);
+    expect(result.attBonus).toBe(0);
+    expect(result.defPenalty).toBe(1);
     expect(result.debtToWrite).toBe(0);
   });
 
@@ -58,9 +58,9 @@ describe("runCommit", () => {
     const fA = makeFighter({ activePlan: { style: "SLASHING ATTACK" as any, OE: 7, AL: 5 }, momentum: 0 });
     const result = runCommit(fA, 7);
     expect(result.level).toBe("Full");
-    expect(result.attBonus).toBe(3);
-    expect(result.defPenalty).toBe(-3);
-    expect(result.debtToWrite).toBe(2);
+    expect(result.attBonus).toBe(2);
+    expect(result.defPenalty).toBe(-1);
+    expect(result.debtToWrite).toBe(1);
   });
 
   it("returns Full when momentum ≥ 2 regardless of OE", () => {

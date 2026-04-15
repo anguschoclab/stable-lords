@@ -116,10 +116,10 @@ export interface CommitResult {
 export function runCommit(fighter: FighterState, OE: number): CommitResult {
   const hpRatio = fighter.hp / fighter.maxHp;
   if (hpRatio < 0.30 || OE <= 3) {
-    return { level: "Cautious", attBonus: -2, defPenalty: 2, debtToWrite: 0 };
+    return { level: "Cautious", attBonus: 0, defPenalty: 1, debtToWrite: 0 };
   }
   if (OE >= 7 || fighter.momentum >= 2) {
-    return { level: "Full", attBonus: 3, defPenalty: -3, debtToWrite: 2 };
+    return { level: "Full", attBonus: 2, defPenalty: -1, debtToWrite: 1 };
   }
   return { level: "Standard", attBonus: 0, defPenalty: 0, debtToWrite: 0 };
 }

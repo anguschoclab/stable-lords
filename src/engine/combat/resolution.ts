@@ -345,7 +345,7 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     const zonePenalty = ctx.pushedFighter === def.label
       ? Math.abs(getZonePenalty(ctx.zone, ctx.arenaConfig))
       : 0;
-    const extraDefPenalty = zonePenalty + Math.max(0, -defCommit.defPenalty) + feintDefBonus;
+    const extraDefPenalty = zonePenalty - defCommit.defPenalty + feintDefBonus;
 
     const defCheck = performDefenseCheck(rng, def, curDefOE, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, curDefMods, curPassD, curBiasDef, overDef, isDodge, curAntiSynDef, curOffMods, ctx, att, extraDefPenalty);
 

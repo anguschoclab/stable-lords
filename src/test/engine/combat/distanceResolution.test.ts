@@ -42,13 +42,13 @@ describe("getWeaponPreferredRange", () => {
 });
 
 describe("contestDistance", () => {
-  it("winner gets +3 rangeMod, loser gets -3", () => {
+  it("winner gets +1 rangeMod, loser gets -1", () => {
     const rng = vi.fn().mockReturnValue(0.1);
     const fA = { skills: { INI: 15 }, activePlan: { OE: 5 }, recoveryDebt: 0, weaponId: "broad_sword" } as any;
     const fD = { skills: { INI: 5  }, activePlan: { OE: 5 }, recoveryDebt: 0, weaponId: "broad_sword" } as any;
     const result = contestDistance(rng, fA, fD, 5, 5, "Striking");
-    expect(result.rangeModA).toBe(3);
-    expect(result.rangeModD).toBe(-3);
+    expect(result.rangeModA).toBe(1);
+    expect(result.rangeModD).toBe(-1);
     expect(result.distanceWinner).toBe("A");
   });
 
