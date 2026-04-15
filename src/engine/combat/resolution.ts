@@ -65,6 +65,15 @@ import {
   getDefensiveTacticMods,
   calculateFinalOEAL,
 } from "./tacticResolution";
+import {
+  makeExchangeState,
+  runApproach,
+  runFeint,
+  runCommit,
+  runRecovery,
+  type ExchangeState,
+} from "./exchangeSubPhases";
+import { getZonePenalty } from "./distanceResolution";
 
 // ─── Fighter State & Context ───────────────────────────────────────────────
 
@@ -260,6 +269,13 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
 
   if (passA.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "A", result: passA.narrative });
   if (passD.narrative && rng() < 0.4) events.push({ type: "PASSIVE", actor: "D", result: passD.narrative });
+
+  // ── Spatial Sub-Phases ──
+  const es = makeExchangeState();
+
+  // Sub-phase 1: Approach — contest distance, update ctx.range
+  runApproach(rng, fA, fD, OE_A, OE_D, ctx, es);
+  events.push(...es.events.splice(0));
 
   // 2. Initiative Phase
   const masteryIniA = fA.favorites ? getFavoriteRhythmBonus(fA as unknown as Warrior, OE_A, AL_A) : 0;
