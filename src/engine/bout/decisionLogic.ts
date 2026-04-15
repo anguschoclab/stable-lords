@@ -38,6 +38,43 @@ function judgeScore(
   return null;
 }
 
+function decisionNarrative(winner: "A" | "D", loser: "A" | "D", winName: string, loseName: string, fW: FighterState, fL: FighterState, voteType: "unanimous" | "split" | "overtime", dissenter?: string): string {
+  const hitMargin = fW.hitsLanded - fL.hitsLanded;
+  const domination = hitMargin >= 5;
+  const close = hitMargin <= 2;
+  const dmgDealt = fL.maxHp - fL.hp;
+  const dmgTaken = fW.maxHp - fW.hp;
+
+  let prefix = "Time! ";
+  let result: string;
+
+  if (voteType === "overtime") {
+    return `${prefix}After a grinding overtime exchange, ${winName} edges out the win by the slimmest of margins.`;
+  }
+
+  if (domination) {
+    const verb = voteType === "unanimous" ? "dominates" : "dominates";
+    result = `${winName} ${verb} on points — landing ${hitMargin} more strikes than ${loseName}. All three judges are in agreement.`;
+    if (voteType === "split") {
+      result = `${winName} dominates on points, landing ${hitMargin} more strikes. The ${dissenter} judge dissented, but the scorecards tell the story.`;
+    }
+  } else if (close) {
+    if (voteType === "unanimous") {
+      result = `${winName} takes a narrow unanimous decision. The margin was razor-thin — ${dmgDealt} damage dealt to ${dmgTaken} taken.`;
+    } else {
+      result = `${winName} scrapes out a split decision. The ${dissenter} judge saw it for ${loseName}, but the majority sided with ${winName}.`;
+    }
+  } else {
+    if (voteType === "unanimous") {
+      result = `${winName} wins a clear unanimous decision on points, outworking ${loseName} over the distance.`;
+    } else {
+      result = `${winName} wins a split decision on points. The ${dissenter} judge sided with ${loseName}, but ${winName} controlled enough of the fight.`;
+    }
+  }
+
+  return prefix + result;
+}
+
 /**
  * Resolves a fight that reached the time limit.
  * Three judges with different archetypes score the bout.
@@ -55,38 +92,37 @@ export function resolveDecision(
 
   const aVotes = votes.filter(v => v === "A").length;
   const dVotes = votes.filter(v => v === "D").length;
-  const tieVotes = votes.filter(v => v === null).length;
 
   // ── Unanimous ──
   if (aVotes === 3) {
-    return { winner: "A", by: "Stoppage", narrative: `Time! ${nameA} wins a unanimous decision. All three judges saw it clearly.` };
+    return { winner: "A", by: "Stoppage", narrative: decisionNarrative("A", "D", nameA, nameD, fA, fD, "unanimous") };
   }
   if (dVotes === 3) {
-    return { winner: "D", by: "Stoppage", narrative: `Time! ${nameD} wins a unanimous decision. All three judges saw it clearly.` };
+    return { winner: "D", by: "Stoppage", narrative: decisionNarrative("D", "A", nameD, nameA, fD, fA, "unanimous") };
   }
 
   // ── Split 2-1 ──
   if (aVotes === 2) {
-    const minority = archetypes[votes.indexOf("D")];
-    return { winner: "A", by: "Stoppage", narrative: `Time! ${nameA} wins a split decision — the ${minority} judge dissented.` };
+    const dissentIdx = votes.indexOf("D") >= 0 ? votes.indexOf("D") : votes.indexOf(null);
+    const dissenter = dissentIdx >= 0 ? archetypes[dissentIdx] : "Blood";
+    return { winner: "A", by: "Stoppage", narrative: decisionNarrative("A", "D", nameA, nameD, fA, fD, "split", dissenter) };
   }
   if (dVotes === 2) {
-    const minority = archetypes[votes.indexOf("A")];
-    return { winner: "D", by: "Stoppage", narrative: `Time! ${nameD} wins a split decision — the ${minority} judge dissented.` };
+    const dissentIdx = votes.indexOf("A") >= 0 ? votes.indexOf("A") : votes.indexOf(null);
+    const dissenter = dissentIdx >= 0 ? archetypes[dissentIdx] : "Blood";
+    return { winner: "D", by: "Stoppage", narrative: decisionNarrative("D", "A", nameD, nameA, fD, fA, "split", dissenter) };
   }
 
   // ── Contested / overtime ──
-  // 1-1-1 with ties or all tied — one exchange overtime coin flip (weighted by HP)
   if (rng) {
     const hpA = fA.hp / fA.maxHp;
     const hpD = fD.hp / fD.maxHp;
     const total = hpA + hpD;
     if (total > 0) {
-      const roll = rng();
-      if (roll < hpA / total) {
-        return { winner: "A", by: "Stoppage", narrative: `Time! After a grueling overtime exchange, ${nameA} edges out the win.` };
+      if (rng() < hpA / total) {
+        return { winner: "A", by: "Stoppage", narrative: decisionNarrative("A", "D", nameA, nameD, fA, fD, "overtime") };
       } else {
-        return { winner: "D", by: "Stoppage", narrative: `Time! After a grueling overtime exchange, ${nameD} edges out the win.` };
+        return { winner: "D", by: "Stoppage", narrative: decisionNarrative("D", "A", nameD, nameA, fD, fA, "overtime") };
       }
     }
   }

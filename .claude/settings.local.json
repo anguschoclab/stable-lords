@@ -2,11 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(bun run:*)",
-      "Bash(bun run:*)",
-      "Bash(bunx vite:*)",
+      "Bash(npm run:*)",
+      "Bash(npx vite:*)",
       "Bash(node -e ':*)",
       "WebFetch(domain:terrablood.com)",
-      "Bash(bunx tsc:*)",
+      "Bash(npx tsc:*)",
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(ls node_modules/.bin/tsc*)",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('scripts',{}\\)\\)\")",
@@ -28,12 +28,8 @@
       "mcp__plugin_serena_serena__get_symbols_overview",
       "Bash(grep:*)",
       "Bash(xargs sed:*)",
-      "Bash(bun test:*)",
-      "Bash(bun install:*)",
-      "Bash(bun test:*)",
-      "Bash(ls bun.lock* package-lock* yarn.lock*)",
-      "Bash(rm -rf node_modules)",
-      "Bash(bun install:*)"
+      "Bash(npm test:*)",
+      "Bash(bun test:*)"
     ]
   }
 }
