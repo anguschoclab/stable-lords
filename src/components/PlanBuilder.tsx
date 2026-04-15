@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { DragDropContext, DropResult, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DragDropContext, DropResult, Droppable, Draggable, type DroppableProvided, type DraggableProvided, type DraggableStateSnapshot, type DroppableStateSnapshot } from "@hello-pangea/dnd";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -130,7 +130,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                 <span className="text-[10px] font-black uppercase tracking-widest">Tactic Bank</span>
               </div>
               <Droppable droppableId="bank">
-                {(provided: any) => (
+                {(provided: DroppableProvided) => (
                   <div 
                     {...provided.droppableProps} 
                     ref={provided.innerRef}
@@ -247,7 +247,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(["opening", "mid", "late"] as const).map(p => (
                         <Droppable key={p} droppableId={p}>
-                          {(provided: any, snapshot: any) => (
+                          {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
                             <div
                               {...provided.droppableProps}
                               ref={provided.innerRef}

@@ -76,6 +76,7 @@ export interface WorldSlice {
   renamePlayer: (newName: string) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get) => ({
   year: 1,
   week: 1,
@@ -165,11 +166,11 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   },
 
   respondToBoutOffer: (offerId, warriorId, response) => {
-    set((state: any) => engineRespondToBoutOffer(state, offerId, warriorId, response));
+    set((state) => engineRespondToBoutOffer(state, offerId, warriorId, response));
   },
 
   clearExpiredOffers: () => {
-    set((state: any) => {
+    set((state) => {
       const newOffers = { ...state.boutOffers };
       let changed = false;
 
@@ -186,7 +187,7 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   },
 
   updatePromoterHistory: (promoterId, purse, boutId) => {
-    set((state: any) => engineUpdatePromoterHistory(state, promoterId, purse, boutId));
+    set((state) => engineUpdatePromoterHistory(state, promoterId, purse, boutId));
   },
 
   replacePromoter: (oldId, newPromoter) => {
@@ -203,13 +204,13 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   },
 
   updateWarriorStatus: (warriorId, won, killed, fameDelta, popDelta, rivalStableId) => {
-    set((state: any) => {
+    set((state) => {
       if (rivalStableId) {
         return {
-          rivals: state.rivals.map((r: any) => r.owner.id === rivalStableId
+          rivals: state.rivals.map((r) => r.owner.id === rivalStableId
             ? {
                 ...r,
-                roster: r.roster.map((w: any) => w.id === warriorId
+                roster: r.roster.map((w) => w.id === warriorId
                   ? {
                       ...w,
                       fame: Math.max(0, (w.fame || 0) + fameDelta),
@@ -228,7 +229,7 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
       }
 
       return {
-        roster: state.roster.map((w: any) => w.id === warriorId
+        roster: state.roster.map((w) => w.id === warriorId
           ? {
               ...w,
               fame: Math.max(0, (w.fame || 0) + fameDelta),

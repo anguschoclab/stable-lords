@@ -3,7 +3,7 @@ import { getItemById } from "@/data/equipment";
 import { audioManager } from "@/lib/AudioManager";
 import narrativeContent from "@/data/narrativeContent.json";
 import type { NarrativeContent } from "@/types/narrative.types";
-import { NarrativeTemplateEngine, type CombatContext } from "./narrativeTemplateEngine";
+import { NarrativeTemplateEngine } from "./narrativeTemplateEngine";
 import { szToHeight, getWeaponDisplayName, getWeaponType } from "./narrativeUtils";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
@@ -74,7 +74,7 @@ export class CombatNarrator {
   /**
    * Narrates an attack (whiff).
    */
-  static narrateAttack(rng: IRNGService, attackerName: string, weaponId?: string, isMastery?: boolean): string {
+  static narrateAttack(rng: IRNGService, attackerName: string, weaponId?: string, _isMastery?: boolean): string {
     const wName = getWeaponDisplayName(weaponId);
     const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "whiffs"]);
     return NarrativeTemplateEngine.interpolateTemplate(template, {
@@ -126,7 +126,7 @@ export class CombatNarrator {
     rng: IRNGService,
     defenderName: string,
     location: string,
-    isMastery?: boolean,
+    _isMastery?: boolean,
     isSuperFlashy?: boolean,
     attackerName?: string,
     weaponId?: string,
