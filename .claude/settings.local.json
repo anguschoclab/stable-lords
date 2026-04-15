@@ -29,7 +29,9 @@
       "Bash(grep:*)",
       "Bash(xargs sed:*)",
       "Bash(npm test:*)",
-      "Bash(bun test:*)"
+      "Bash(bun test:*)",
+      "Bash(./node_modules/.bin/tsc.exe --noEmit)",
+      "Bash(npx vitest *)"
     ]
   }
 }
