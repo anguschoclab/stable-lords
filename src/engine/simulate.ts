@@ -12,6 +12,7 @@ import {
   narrateBoutEnd,
   conservingLine,
   tacticStreakLine,
+  arenaIntroLine,
 } from "./narrativePBP";
 import { narrateEvents, NarrationContext } from "./combat/narrator";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
@@ -136,6 +137,11 @@ export function simulateFight(
   // Emit weather opening line with explicit type name (skipped for Clear/Overcast)
   const weatherLine = weatherOpeningLine(weather);
   if (weatherLine) log.push({ minute: 0, text: `☁ ${weather.toUpperCase()} — ${weatherLine}` });
+
+  // Emit arena intro line for non-default arenas
+  if (arenaId !== "standard_arena") {
+    log.push({ minute: 0, text: arenaIntroLine(resCtx.arenaConfig) });
+  }
 
   log.push({ minute: 1, text: battleOpener(rng) });
   if (planA.OE <= 3) log.push({ minute: 1, text: conservingLine(nameA) });

@@ -9,6 +9,7 @@ import {
   narrateHit, damageSeverityLine, stateChangeLine,
   fatigueLine, crowdReaction, narrateInitiative,
   tauntLine, narrateInsightHint, narratePassive,
+  narrateRangeShift, narrateFeint, narrateZoneShift,
 } from "../narrativePBP";
 import { getWeaponDisplayName } from "../narrative/narrativeUtils";
 
@@ -208,6 +209,29 @@ export function narrateEvents(
           };
           const line = psychLines[state];
           if (line && rng() < 0.5) log.push({ minute, text: line });
+        }
+        break;
+      }
+
+      case "RANGE_SHIFT": {
+        if (event.result) {
+          log.push({ minute, text: narrateRangeShift(rng, actorName, event.result as string) });
+        }
+        break;
+      }
+
+      case "FEINT_SUCCESS":
+        log.push({ minute, text: narrateFeint(rng, actorName, true) });
+        break;
+
+      case "FEINT_FAIL":
+        log.push({ minute, text: narrateFeint(rng, actorName, false) });
+        break;
+
+      case "ZONE_SHIFT": {
+        if (event.result && event.target) {
+          const pushedName = getName(event.target as "A" | "D");
+          log.push({ minute, text: narrateZoneShift(rng, pushedName, event.result as string) });
         }
         break;
       }
