@@ -4,7 +4,7 @@ import { audioManager } from "@/lib/AudioManager";
 import narrativeContent from "@/data/narrativeContent.json";
 import type { NarrativeContent } from "@/types/narrative.types";
 import { NarrativeTemplateEngine, type CombatContext } from "./narrativeTemplateEngine";
-import { pick, szToHeight, getWeaponDisplayName, getWeaponType } from "./narrativeUtils";
+import { szToHeight, getWeaponDisplayName } from "./narrativeUtils";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 
 export interface WarriorIntroData {
