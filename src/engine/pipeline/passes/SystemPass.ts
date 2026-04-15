@@ -30,7 +30,7 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
   const impact: StateImpact = {
     ...hofImpact,
     ...tierImpact,
-    seasonalGrowth: state.seasonalGrowth,
+    seasonalGrowth: state.seasonalGrowth ? [...state.seasonalGrowth] : [],
     season: state.season,
     weather: state.weather
   };

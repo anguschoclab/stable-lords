@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import PlanBuilder from "@/components/PlanBuilder";
 import { FightingStyle } from "@/types/shared.types";
 import { describe, it, expect, vi } from "vitest";
-import React from "react";
 import "@testing-library/jest-dom";
 
 // Mock DnD to avoid context errors in JSDOM
@@ -45,8 +44,8 @@ describe("PlanBuilder Matchup Rendering", () => {
   });
 
   it("renders MATCHUP_PENALTY when player has a style disadvantage", () => {
-    // Aimed Blow (0.88) is weak to Lunging Attack
-    const weakPlan = { ...mockPlan, style: FightingStyle.AimedBlow };
+    // ParryLunge is weak to Lunging Attack (-1 penalty)
+    const weakPlan = { ...mockPlan, style: FightingStyle.ParryLunge };
     render(
       <PlanBuilder 
         plan={weakPlan} 
@@ -56,7 +55,7 @@ describe("PlanBuilder Matchup Rendering", () => {
     );
 
     expect(screen.getByText("MATCHUP_PENALTY")).toBeInTheDocument();
-    expect(screen.getByText("-12%")).toBeInTheDocument();
+    expect(screen.getByText("-1")).toBeInTheDocument();
   });
 
   it("renders no badge when matchup is neutral", () => {

@@ -244,7 +244,7 @@ describe("simulateFight — phase strategies", () => {
 });
 
 describe("simulateFight — endurance and exhaustion", () => {
-  it.skip("high OE+AL drains endurance faster", () => {
+  it("high OE+AL drains endurance faster", () => {
     // Two identical warriors, one with max OE+AL
     const w = makeWarrior("Test", FightingStyle.StrikingAttack);
 

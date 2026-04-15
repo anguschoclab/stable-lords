@@ -148,33 +148,36 @@ describe("Week Advancement Integration", () => {
       let state = initialState;
       expect(state.season).toBe("Spring");
       
-      // Advance 13 weeks (1 season = 13 weeks)
+      // Advance 13 weeks (weeks 1-13: Spring, week 14: Summer)
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
       
+      // After 13 weeks, we're at week 14, which should be Summer
       expect(state.season).toBe("Summer");
       
-      // Another 13 weeks
+      // Another 13 weeks (weeks 14-26: Summer, week 27: Fall)
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
       
-      // TODO: Verify season calculation - might be off by one depending on week numbering
-      // expect(state.season).toBe("Fall");
+      expect(state.season).toBe("Fall");
       
-      // Another 13 weeks
+      // Another 13 weeks (weeks 27-39: Fall, week 40: Winter)
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
       
-      // Another 13 weeks should wrap back to Spring
+      expect(state.season).toBe("Winter");
+      
+      // Another 13 weeks (weeks 40-52: Winter, week 1: Spring of next year)
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
       
       expect(state.year).toBe(2);
       expect(state.week).toBe(1);
+      expect(state.season).toBe("Spring");
     });
 
     it("should not crash on seasonal growth check", () => {

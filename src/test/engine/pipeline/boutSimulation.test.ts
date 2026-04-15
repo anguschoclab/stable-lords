@@ -3,39 +3,30 @@ import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { GameState, Warrior, BoutOffer, Promoter } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import { makeWarrior } from "@/engine/factories";
 
 describe("Bout Simulation Integration - getFromArchive function issue", () => {
   it("should simulate a signed bout and update state accordingly", async () => {
     const rng = new SeededRNGService(1);
     
     // 1. Setup a minimal state with a signed bout
-    const warriorA: Warrior = {
-      id: "warrior-a",
-      name: "Fighter A",
-      age: 20,
-      status: "Active",
-      style: FightingStyle.StrikingAttack,
-      attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
-      career: { wins: 0, losses: 0, kills: 0, tournaments: 0 },
-      xp: 0,
-      fame: 10,
-      fatigue: 0,
-      injuries: []
-    } as any;
+    const warriorA = makeWarrior(
+      "warrior-a",
+      "Fighter A",
+      FightingStyle.StrikingAttack,
+      { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
+      { fame: 10 },
+      rng
+    );
 
-    const warriorD: Warrior = {
-      id: "warrior-d",
-      name: "Fighter D",
-      age: 22,
-      status: "Active",
-      style: FightingStyle.BashingAttack,
-      attributes: { ST: 12, CN: 12, SZ: 10, WT: 10, WL: 10, SP: 8, DF: 10 },
-      career: { wins: 0, losses: 0, kills: 0, tournaments: 0 },
-      xp: 0,
-      fame: 5,
-      fatigue: 0,
-      injuries: []
-    } as any;
+    const warriorD = makeWarrior(
+      "warrior-d",
+      "Fighter D",
+      FightingStyle.BashingAttack,
+      { ST: 12, CN: 12, SZ: 10, WT: 10, WL: 10, SP: 8, DF: 10 },
+      { fame: 5 },
+      rng
+    );
 
     const promoter: Promoter = {
       id: "promoter-1",
