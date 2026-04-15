@@ -29,7 +29,7 @@ export function runWarriorPass(state: GameState, rng: IRNGService): StateImpact 
   ];
 
   if (Array.isArray(seasonalGrowth) && seasonalGrowth.length > 0) {
-    impacts.push({ seasonalGrowth });
+    impacts.push({ seasonalGrowth: [...seasonalGrowth] });
   }
 
   return mergeImpacts(impacts);

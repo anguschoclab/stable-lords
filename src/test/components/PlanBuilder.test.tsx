@@ -30,17 +30,17 @@ describe("PlanBuilder Matchup Rendering", () => {
   };
 
   it("renders MATCHUP_ADV when player has a style advantage", () => {
-    // Lunging Attack (1.15) beats Aimed Blow
+    // Lunging Attack has +1 advantage vs ParryLunge
     render(
       <PlanBuilder 
         plan={mockPlan} 
         onPlanChange={vi.fn()} 
-        rivalStyle={FightingStyle.AimedBlow} 
+        rivalStyle={FightingStyle.ParryLunge} 
       />
     );
 
     expect(screen.getByText("MATCHUP_ADV")).toBeInTheDocument();
-    expect(screen.getByText("+15%")).toBeInTheDocument();
+    expect(screen.getByText("+1")).toBeInTheDocument();
   });
 
   it("renders MATCHUP_PENALTY when player has a style disadvantage", () => {

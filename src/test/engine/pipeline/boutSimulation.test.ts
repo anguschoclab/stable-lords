@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
-import { GameState, Warrior, BoutOffer, Promoter } from "@/types/state.types";
+import { GameState, BoutOffer, Promoter } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { makeWarrior } from "@/engine/factories";
@@ -85,18 +85,16 @@ describe("Bout Simulation Integration - getFromArchive function issue", () => {
 
     // 3. Verifications
     // - Should have 1 fight in history (if bout was processed)
-    if (nextState.arenaHistory.length > 0) {
-      expect(nextState.arenaHistory.length).toBe(1);
+    expect(nextState.arenaHistory.length).toBe(1);
 
-      // - The offer should be removed from boutOffers (assuming processWeekBouts prunes it)
-      expect(nextState.boutOffers["offer-1"]).toBeUndefined();
+    // - The offer should be removed from boutOffers (assuming processWeekBouts prunes it)
+    expect(nextState.boutOffers["offer-1"]).toBeUndefined();
 
-      // - Treasury should have changed (purse or show fee)
-      expect(nextState.treasury).not.toBe(1000);
+    // - Treasury should have changed (purse or show fee)
+    expect(nextState.treasury).not.toBe(1000);
 
-      // - Warrior record should have updated
-      const updatedA = nextState.roster.find(w => w.id === "warrior-a");
-      expect(updatedA?.career.wins + updatedA?.career.losses).toBe(1);
-    }
+    // - Warrior record should have updated
+    const updatedA = nextState.roster.find(w => w.id === "warrior-a");
+    expect((updatedA?.career.wins ?? 0) + (updatedA?.career.losses ?? 0)).toBe(1);
   });
 });

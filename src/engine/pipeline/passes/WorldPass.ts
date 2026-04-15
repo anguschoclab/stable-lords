@@ -31,7 +31,7 @@ export function rollWeather(rng: IRNGService): WeatherType {
   return "Eclipse";
 }
 
-export function runWorldPass(state: GameState, nextWeek: number, rng?: IRNGService): StateImpact {
+export function runWorldPass(_state: GameState, nextWeek: number, rng?: IRNGService): StateImpact {
   const rngService = rng || new SeededRNGService(nextWeek * 13);
   const nextSeason = computeNextSeason(nextWeek);
   const nextWeather = rollWeather(rngService);

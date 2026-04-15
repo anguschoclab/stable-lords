@@ -9,6 +9,7 @@ import { WorldManagementService } from "@/engine/ai/worldManagement";
 import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
 import { generateOwnerNarratives } from "@/engine/ownerNarrative";
 import { BankruptcyService } from "@/engine/ai/bankruptcyService";
+import { computeNextSeason } from "./WorldPass";
 
 /**
  * Stable Lords — System & Season Pipeline Pass
@@ -27,12 +28,12 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
   const hofImpact = processHallOfFame(state, nextWeek);
   const tierImpact = processTierProgression(state, state.season, nextWeek);
 
+  // SystemPass runs AFTER WorldPass in the pipeline, so we must not override these values
   const impact: StateImpact = {
     ...hofImpact,
     ...tierImpact,
     seasonalGrowth: state.seasonalGrowth ? [...state.seasonalGrowth] : [],
-    season: state.season,
-    weather: state.weather
+    // Do NOT set season or weather here - WorldPass handles them
   };
 
   // 2. Player Bankruptcy Check (after economy pass)
@@ -43,15 +44,17 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
 
   // 3. Seasonal Churn & AI Philosophy Evolution
   // This usually runs only on season change (handled by internal logic or check here)
+  // The new season is set by WorldPass, so we use state.season (which will be updated by the time this runs)
+  // Calculate the next season to check for season change
+  const nextSeason = computeNextSeason(nextWeek);
   const prevSeason = state.season;
-  const currentSeason = impact.season || state.season;
-  if (prevSeason !== currentSeason) {
+  if (prevSeason !== nextSeason) {
     const seasonSeed = nextWeek * 133;
     const rngContext = new RNGContext(seasonSeed + 55);
     const { news } = WorldManagementService.processSeasonalChurn(state, rngContext);
 
-    const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(state, state.season, rngContext.getRNG());
-    const narrGazette = generateOwnerNarratives(state, state.season, rngContext.getRNG());
+    const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(state, nextSeason, rngContext.getRNG());
+    const narrGazette = generateOwnerNarratives(state, nextSeason, rngContext.getRNG());
 
     impact.rivalsUpdates = new Map();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

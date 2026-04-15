@@ -28,7 +28,7 @@ export interface TrainingImpact {
  */
 export function computeTrainingImpact(state: GameState, rng: IRNGService): TrainingImpact {
   if (!state.trainingAssignments || state.trainingAssignments.length === 0) {
-    return { updatedRoster: state.roster, updatedSeasonalGrowth: state.seasonalGrowth ?? [], results: [] };
+    return { updatedRoster: state.roster, updatedSeasonalGrowth: state.seasonalGrowth ? [...state.seasonalGrowth] : [], results: [] };
   }
 
   const results: TrainingResult[] = [];
@@ -115,6 +115,7 @@ export function trainingImpactToStateImpact(
   rng: IRNGService
 ): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[]; results: TrainingResult[] } {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
+  const seasonalGrowth = impact.updatedSeasonalGrowth ? [...impact.updatedSeasonalGrowth] : [];
   
   impact.updatedRoster.forEach(w => {
     const original = state.roster.find(r => r.id === w.id);
@@ -145,7 +146,7 @@ export function trainingImpactToStateImpact(
         items: newsItems
       }] : []
     },
-    seasonalGrowth: impact.updatedSeasonalGrowth,
+    seasonalGrowth,
     results: impact.results
   };
 }
