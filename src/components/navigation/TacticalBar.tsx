@@ -150,7 +150,13 @@ export function TacticalBar() {
           <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
             W{week}
           </span>
-          <Button variant="ghost" size="icon" className="h-6 w-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            title={expanded ? "Collapse tactical alerts" : "Expand tactical alerts"}
+            aria-label={expanded ? "Collapse tactical alerts" : "Expand tactical alerts"}
+          >
             {expanded ? (
               <ChevronDown className="h-4 w-4" />
             ) : (
