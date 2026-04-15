@@ -64,10 +64,10 @@ export default function WarriorDetail() {
   const handlePlanChange = useCallback(
     (newPlan: FightPlan) => {
       if (!warrior) return;
-      setState((draft: GameStore) => {
+      setState((draft: any) => {
         const index = draft.roster.findIndex((w: Warrior) => w.id === warrior.id);
         if (index !== -1) {
-          draft.roster[index]?.plan = newPlan;
+          draft.roster[index].plan = newPlan;
         }
       });
     },
