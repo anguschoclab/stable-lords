@@ -281,8 +281,8 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
   const masteryIniA = fA.favorites ? getFavoriteRhythmBonus(fA as unknown as Warrior, OE_A, AL_A) : 0;
   const masteryIniD = fD.favorites ? getFavoriteRhythmBonus(fD as unknown as Warrior, OE_D, AL_D) : 0;
 
-  const iniA = fA.skills.INI + alIniMod(AL_A) + ctx.matchupA + fatA + defModsA.iniBonus + getTempoBonus(fA.style, stylePhase) + passA.iniBonus + masteryIniA - fA.legHits + psychA.iniMod + (fA.momentum * 2) + (ctx.trainerModsA.iniMod ?? 0) + ctx.weatherEffect.initiativeMod;
-  const iniD = fD.skills.INI + alIniMod(AL_D) + ctx.matchupD + fatD + defModsD.iniBonus + getTempoBonus(fD.style, stylePhase) + passD.iniBonus + masteryIniD - fD.legHits + psychD.iniMod + (fD.momentum * 2) + (ctx.trainerModsD.iniMod ?? 0) + ctx.weatherEffect.initiativeMod;
+  const iniA = fA.skills.INI + alIniMod(AL_A) + ctx.matchupA + fatA + defModsA.iniBonus + getTempoBonus(fA.style, stylePhase) + passA.iniBonus + masteryIniA - fA.legHits + psychA.iniMod + (fA.momentum * 2) + (ctx.trainerModsA.iniMod ?? 0) + ctx.weatherEffect.initiativeMod + ctx.surfaceMod.initiativeMod;
+  const iniD = fD.skills.INI + alIniMod(AL_D) + ctx.matchupD + fatD + defModsD.iniBonus + getTempoBonus(fD.style, stylePhase) + passD.iniBonus + masteryIniD - fD.legHits + psychD.iniMod + (fD.momentum * 2) + (ctx.trainerModsD.iniMod ?? 0) + ctx.weatherEffect.initiativeMod + ctx.surfaceMod.initiativeMod;
   
   const aGoesFirst = contestCheck(rng, iniA, iniD);
   const attLabel = aGoesFirst ? "A" : "D";
@@ -293,6 +293,19 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
 
   const att = aGoesFirst ? fA : fD;
   const def = aGoesFirst ? fD : fA;
+
+  // Sub-phase 2: Feint (attacker only)
+  const feintResult = runFeint(rng, att, def);
+  events.push(...feintResult.events);
+  const feintAttBonus = feintResult.feintBonus;
+  const feintDefBonus = feintResult.feintFailed ? 2 : 0;
+
+  // Sub-phase 3: Commit — determine CommitLevel for attacker and defender
+  const attCommit = runCommit(att, aGoesFirst ? OE_A : OE_D);
+  const defCommit = runCommit(def, aGoesFirst ? OE_D : OE_A);
+  es.recoveryDebtToWriteA = aGoesFirst ? attCommit.debtToWrite : defCommit.debtToWrite;
+  es.recoveryDebtToWriteD = aGoesFirst ? defCommit.debtToWrite : attCommit.debtToWrite;
+
   const curAttOE = aGoesFirst ? OE_A : OE_D;
   const curAttAL = aGoesFirst ? AL_A : AL_D;
   const curOffMods = aGoesFirst ? offModsA : offModsD;
