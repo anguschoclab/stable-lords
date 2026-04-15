@@ -218,7 +218,9 @@ export function executeHit(
   }
 
   // Apply specialty damage received reduction on the defender
-  const defSpecDamageMult = ctx ? (ctx.trainerModsA === ctx.trainerModsA ? (defender.label === "A" ? (ctx.trainerModsA.damageReceivedMult ?? 1.0) : (ctx.trainerModsD.damageReceivedMult ?? 1.0)) : 1.0) : 1.0;
+  const defSpecDamageMult = ctx
+    ? (defender.label === "A" ? (ctx.trainerModsA.damageReceivedMult ?? 1.0) : (ctx.trainerModsD.damageReceivedMult ?? 1.0))
+    : 1.0;
   rawDamage = Math.round(rawDamage * defSpecDamageMult);
 
   if (attPassive.critChance > 0 && rng() < attPassive.critChance) {
