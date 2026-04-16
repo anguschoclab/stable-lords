@@ -232,87 +232,21 @@ export default function Orphanage() {
       <div className="relative z-10 w-full max-w-xl space-y-6">
 
         {/* Progress */}
-        <StepProgress step={step} total={STEP_LABELS.length} />
+        <StepProgress step={step} total={4} />
 
         {/* ── Step 0: Identity ────────────────────────────────────────────────── */}
         {step === 0 && (
-          <div
-            className="p-7 space-y-6"
-            style={{
-              background: "linear-gradient(145deg, #150F08 0%, #110C07 60%, #140E08 100%)",
-              border: "1px solid rgba(60,42,22,0.9)",
-              borderTopColor: "rgba(100,70,36,0.5)",
+          <IdentityStep
+            ownerInput={ownerInput}
+            setOwnerInput={setOwnerInput}
+            stableInput={stableInput}
+            setStableInput={setStableInput}
+            onBack={returnToTitle}
+            onSubmit={() => {
+              initializeStable(ownerInput.trim(), stableInput.trim());
+              setStep(1);
             }}
-          >
-            <div>
-              <h2 className="font-display text-xl font-bold text-foreground">
-                Establish Your Identity
-              </h2>
-              <p className="text-xs text-muted-foreground/60 mt-1 leading-relaxed">
-                Your name and stable name will be recorded in the Imperial Ledger
-                for all time.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70">
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  value={ownerInput}
-                  onChange={(e) => setOwnerInput(e.target.value)}
-                  className="w-full h-10 px-3 text-sm"
-                  placeholder="e.g. Master Thorne"
-                  style={{
-                    background: "#0A0705",
-                    border: "1px solid rgba(60,42,22,0.8)",
-                    color: "hsl(var(--foreground))",
-                    outline: "none",
-                  }}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70">
-                  Stable Name
-                </label>
-                <input
-                  type="text"
-                  value={stableInput}
-                  onChange={(e) => setStableInput(e.target.value)}
-                  className="w-full h-10 px-3 text-sm"
-                  placeholder="e.g. The Iron Sentinels"
-                  style={{
-                    background: "#0A0705",
-                    border: "1px solid rgba(60,42,22,0.8)",
-                    color: "hsl(var(--foreground))",
-                    outline: "none",
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-1">
-              <Button
-                variant="outline"
-                onClick={returnToTitle}
-                className="gap-2 border-[rgba(60,42,22,0.8)] bg-transparent hover:bg-white/5 text-muted-foreground"
-              >
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-              <Button
-                disabled={!ownerInput.trim() || !stableInput.trim()}
-                onClick={() => {
-                  initializeStable(ownerInput.trim(), stableInput.trim());
-                  setStep(1);
-                }}
-                className="flex-1 gap-2 font-display font-bold tracking-wider uppercase"
-              >
-                Proceed <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          />
         )}
 
         {/* ── Step 1: Choose Warriors ──────────────────────────────────────────── */}
