@@ -3,7 +3,7 @@
  * Renders a heraldic crest based on CrestData
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { CrestData, ShieldShape, FieldType } from '@/types/crest.types';
 import { getChargePathsByType, type ChargePath } from '@/engine/crest/chargePaths';
 
@@ -14,6 +14,9 @@ interface StableCrestProps {
   showHelmet?: boolean;
   animate?: boolean;
   className?: string;
+  selected?: boolean; // Ring highlight for selection
+  showTooltip?: boolean; // Show heraldic description on hover
+  showGenerationBadge?: boolean; // Show G1/G2 badge for legacy stables
 }
 
 // Size mappings
@@ -239,6 +242,9 @@ export function StableCrest({
   showHelmet,
   animate = false,
   className = '',
+  selected = false,
+  showTooltip = true,
+  showGenerationBadge = true,
 }: StableCrestProps): React.ReactElement {
   // Determine pixel size
   const pixelSize = typeof size === 'number' ? size : SIZE_MAP[size];
@@ -253,24 +259,55 @@ export function StableCrest({
   // Determine metal color hex
   const metalColor = crest.metalColor === 'gold' ? '#D4AF37' : '#C0C0C0';
 
-  // Container style for animation
+  // Glow effect based on metal color
+  const glowColor = crest.metalColor === 'gold' 
+    ? 'rgba(212, 175, 55, 0.3)' 
+    : 'rgba(192, 192, 192, 0.25)';
+  
+  const glowStyle: React.CSSProperties = pixelSize >= 64 ? {
+    filter: `drop-shadow(0 0 ${pixelSize * 0.15}px ${glowColor})`,
+  } : {};
+
+  // Container style for animation and hover
   const containerStyle: React.CSSProperties = {
     width: pixelSize,
     height: pixelSize,
     display: 'inline-block',
+    position: 'relative',
+    transition: 'transform 200ms ease-out, filter 200ms ease-out',
+    willChange: 'transform',
+    ...glowStyle,
     ...(animate && {
       animation: 'crestFadeIn 0.3s ease-out',
     }),
   };
 
+  // Heraldic description for tooltip
+  const heraldicDesc = useMemo(() => {
+    const metal = crest.metalColor === 'gold' ? 'Or' : 'Argent';
+    const field = crest.fieldType === 'solid' ? '' : ` ${crest.fieldType}`;
+    const charge = crest.charge.count > 1 ? `${crest.charge.count} ${crest.charge.name}s` : crest.charge.name;
+    return `${metal}${field} with ${charge}`;
+  }, [crest]);
+
+  // Generation badge position
+  const hasGeneration = showGenerationBadge && crest.generation && crest.generation > 0;
+
   return (
-    <div className={`stable-crest ${className}`} style={containerStyle}>
-      <svg
-        viewBox="0 0 100 100"
-        width={pixelSize}
-        height={pixelSize}
-        aria-label={`Stable crest: ${crest.charge.name} on ${crest.fieldType} field`}
-      >
+    <div 
+      className={`stable-crest ${className} ${selected ? 'ring-2 ring-accent/50 rounded-sm' : ''} group`}
+      style={containerStyle}
+      title={showTooltip ? heraldicDesc : undefined}
+    >
+      {/* Hover scale effect wrapper */}
+      <div className="w-full h-full transition-transform duration-200 ease-out group-hover:scale-105">
+        <svg
+          viewBox="0 0 100 100"
+          width={pixelSize}
+          height={pixelSize}
+          aria-label={`Stable crest: ${crest.charge.name} on ${crest.fieldType} field`}
+          className="transition-all duration-200 group-hover:drop-shadow-lg"
+        >
         <defs>
           {/* Drop shadow filter */}
           <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -317,6 +354,7 @@ export function StableCrest({
           </g>
         </g>
       </svg>
+      </div> {/* Close hover scale wrapper */}
 
       {/* Animation styles */}
       {animate && (
@@ -332,6 +370,16 @@ export function StableCrest({
             }
           }
         `}</style>
+      )}
+      
+      {/* Generation Badge */}
+      {hasGeneration && (
+        <div 
+          className="absolute -bottom-1 -right-1 text-[8px] font-black px-1 py-0.5 rounded-none bg-black/80 border border-accent/30 text-accent/80"
+          style={{ fontSize: Math.max(8, pixelSize * 0.15) }}
+        >
+          G{crest.generation}
+        </div>
       )}
     </div>
   );

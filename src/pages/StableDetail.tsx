@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import { FormSparkline } from "@/components/charts/FormSparkline";
 import { ConditionBattery } from "@/components/ui/ConditionBattery";
+import { StableCrest } from "@/components/crest/StableCrest";
 
 const TIER_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   Legendary: { label: "Legendary", color: "text-arena-gold border-arena-gold/40 bg-arena-gold/10", icon: Crown },
@@ -80,19 +81,52 @@ export default function StableDetail() {
         </Button>
 
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold flex items-center gap-3">
-              <Shield className="h-7 w-7 text-primary" />
-              {rival.owner.stableName}
-            </h1>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <Badge variant="outline" className={`${tierCfg.color} gap-1`}>
-                <TierIcon className="h-3 w-3" />
-                {tierCfg.label}
-              </Badge>
-              <Badge variant="outline">{rival.owner.personality}</Badge>
-              {rival.philosophy && (
-                <Badge variant="secondary" className="text-xs">{rival.philosophy}</Badge>
+          <div className="flex items-start gap-4">
+            {/* Heraldic Crest - Hero Display */}
+            {rival.crest ? (
+              <div className="relative flex-shrink-0">
+                <StableCrest 
+                  crest={rival.crest} 
+                  size={80} 
+                  showMantling 
+                  className="drop-shadow-[0_0_20px_rgba(201,151,42,0.2)]"
+                />
+                {/* Subtle background tint using crest color */}
+                <div 
+                  className="absolute inset-0 -z-10 blur-2xl opacity-10 rounded-full"
+                  style={{ backgroundColor: rival.crest.primaryColor }}
+                />
+              </div>
+            ) : (
+              <div className="h-20 w-20 flex items-center justify-center border border-border/40 bg-secondary/20">
+                <Shield className="h-10 w-10 text-muted-foreground/40" />
+              </div>
+            )}
+            
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-display font-bold">
+                {rival.owner.stableName}
+              </h1>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <Badge variant="outline" className={`${tierCfg?.color} gap-1`}>
+                  <TierIcon className="h-3 w-3" />
+                  {tierCfg?.label}
+                </Badge>
+                <Badge variant="outline">{rival.owner.personality}</Badge>
+                {rival.philosophy && (
+                  <Badge variant="secondary" className="text-xs">{rival.philosophy}</Badge>
+                )}
+                {rival.crest && rival.owner.generation && rival.owner.generation > 0 && (
+                  <Badge variant="outline" className="text-[9px] border-accent/30 text-accent/70">
+                    Generation {rival.owner.generation}
+                  </Badge>
+                )}
+              </div>
+              {rival.crest && (
+                <p className="text-[10px] text-muted-foreground/70 mt-1.5 italic">
+                  {rival.crest.metalColor === 'gold' ? 'Or' : 'Argent'} {rival.crest.fieldType} with {rival.crest.charge.name}
+                  {rival.crest.charge.count > 1 && ` ×${rival.crest.charge.count}`}
+                </p>
               )}
             </div>
           </div>

@@ -5,6 +5,7 @@ import { Swords, Flame } from "lucide-react";
 import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import { LethalityBadge } from "./LethalityBadge";
 import { StableLink } from "@/components/EntityLink";
+import { StableCrest } from "@/components/crest/StableCrest";
 import type { BoutPairing as MatchPairing } from "@/engine/boutProcessor";
 
 interface MatchCardProps {

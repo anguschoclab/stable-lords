@@ -89,6 +89,7 @@ export interface Owner {
   metaAdaptation?: MetaAdaptation;
   favoredStyles?: FightingStyle[];
   generation?: number; // 🛡️ Crest lineage depth (0 = original founder)
+  crest?: CrestData; // 🛡️ Heraldic crest for the stable
 }
 
 // ─── Game State ─────────────────────────────────────────────────────────────

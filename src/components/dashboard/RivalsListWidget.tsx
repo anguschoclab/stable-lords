@@ -5,6 +5,7 @@ import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { StableCrest } from "@/components/crest/StableCrest";
 import {
   Tooltip,
   TooltipContent,
@@ -68,7 +69,22 @@ export function RivalsListWidget() {
                   return (
                      <div key={r.owner.id} className="p-4 hover:bg-white/2 transition-colors group/item">
                         <div className="flex items-center justify-between mb-2">
-                           <div className="flex items-center gap-2">
+                           <div className="flex items-center gap-3">
+                              {/* Mini Crest - 16px for compact list */}
+                              {r.crest ? (
+                                 <div className="w-4 h-4 flex-shrink-0">
+                                    <StableCrest 
+                                       crest={r.crest} 
+                                       size="xs" 
+                                       showTooltip={false}
+                                       showGenerationBadge={false}
+                                    />
+                                 </div>
+                              ) : (
+                                 <div className="w-4 h-4 flex items-center justify-center bg-neutral-800 border border-white/10">
+                                    <span className="text-[6px] text-muted-foreground">?</span>
+                                 </div>
+                              )}
                               <span className="text-xs font-black uppercase tracking-tight text-foreground/80 group-hover/item:text-primary transition-colors">
                                  {r.owner.stableName}
                               </span>

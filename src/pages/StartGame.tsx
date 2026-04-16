@@ -46,6 +46,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { randomOwnerName, randomStableName } from "@/data/randomNames";
+import { generateCrest } from "@/engine/crest/crestGenerator";
+import { StableCrest } from "@/components/crest/StableCrest";
+import type { CrestData } from "@/types/crest.types";
 
 type Screen = "title" | "newGame";
 
@@ -247,7 +250,23 @@ export default function StartGame() {
 
   const [ownerName, setOwnerName] = useState("");
   const [stableName, setStableName] = useState("");
+  
+  // Generate initial player crest with random seed
+  const [playerCrest, setPlayerCrest] = useState<CrestData>(() => 
+    generateCrest({ seed: Math.floor(Math.random() * 100000), philosophy: "Balanced", tier: "Established" })
+  );
+  
   const canCreate = ownerName.trim().length >= 2 && stableName.trim().length >= 2;
+  
+  // Randomize player crest
+  const randomizeCrest = useCallback(() => {
+    const newCrest = generateCrest({ 
+      seed: Math.floor(Math.random() * 100000), 
+      philosophy: "Balanced", 
+      tier: "Established" 
+    });
+    setPlayerCrest(newCrest);
+  }, []);
 
   const refreshSlots = useCallback(() => setSlots(listSaveSlots()), []);
 
@@ -280,10 +299,12 @@ export default function StartGame() {
     const fresh = createFreshState("alpha-prime-10");
     fresh.player.name = ownerName.trim();
     fresh.player.stableName = stableName.trim();
+    fresh.player.crest = playerCrest; // 🛡️ Store the selected heraldic crest
+    fresh.player.generation = 0; // Player is the original founder
     const slotId = newSlotId();
     saveToSlot(slotId, fresh.player.stableName, fresh);
     loadGame(slotId, fresh);
-  }, [ownerName, stableName, loadGame]);
+  }, [ownerName, stableName, playerCrest, loadGame]);
 
   const handleImport = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -444,6 +465,66 @@ export default function StartGame() {
                     className="h-10 w-10 shrink-0 border-[rgba(60,42,22,0.8)] bg-[#0A0705] hover:border-accent/40 hover:bg-accent/5"
                   >
                     <Dices className="h-4 w-4 text-accent/70" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Heraldic Crest Selection */}
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70 flex items-center gap-2">
+                  Heraldic Seal
+                  <span className="text-[8px] text-muted-foreground/50 normal-case tracking-normal">— Your sigil in the arena</span>
+                </label>
+                
+                {/* Crest Preview Container */}
+                <div 
+                  className="relative p-6 flex flex-col items-center gap-4"
+                  style={{
+                    background: `linear-gradient(145deg, rgba(201,151,42,0.05) 0%, rgba(${parseInt(playerCrest.primaryColor.slice(1,3), 16)}, ${parseInt(playerCrest.primaryColor.slice(3,5), 16)}, ${parseInt(playerCrest.primaryColor.slice(5,7), 16)}, 0.03) 50%, rgba(21,15,8,0.8) 100%)`,
+                    border: "1px solid rgba(201, 151, 42, 0.25)",
+                    borderTopColor: "rgba(201, 151, 42, 0.4)",
+                  }}
+                >
+                  {/* Ornament top */}
+                  <div
+                    className="absolute top-0 left-4 right-4 h-px"
+                    style={{
+                      background: "linear-gradient(90deg, transparent, rgba(201,151,42,0.3) 30%, rgba(201,151,42,0.5) 50%, rgba(201,151,42,0.3) 70%, transparent)",
+                    }}
+                  />
+                  
+                  {/* Crest Display */}
+                  <div className="relative">
+                    <StableCrest 
+                      crest={playerCrest} 
+                      size={80} 
+                      showMantling 
+                      className="drop-shadow-[0_0_15px_rgba(201,151,42,0.2)]"
+                    />
+                  </div>
+                  
+                  {/* Crest Description */}
+                  <div className="text-center space-y-1">
+                    <p className="text-[10px] text-muted-foreground italic">
+                      {playerCrest.fieldType} field • {playerCrest.shieldShape} shield
+                    </p>
+                    <p className="text-[9px] text-accent/60 uppercase tracking-widest">
+                      {playerCrest.charge.name}
+                      {playerCrest.charge.count > 1 && ` ×${playerCrest.charge.count}`}
+                    </p>
+                  </div>
+                  
+                  {/* Randomize Button */}
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={randomizeCrest}
+                    title="Randomize heraldry"
+                    aria-label="Randomize your heraldic crest"
+                    className="h-9 px-4 gap-2 border-[rgba(60,42,22,0.8)] bg-[#0A0705] hover:border-accent/40 hover:bg-accent/5 text-[11px] font-black uppercase tracking-wider"
+                  >
+                    <Dices className="h-4 w-4 text-accent/70" />
+                    Randomize Heraldry
                   </Button>
                 </div>
               </div>
