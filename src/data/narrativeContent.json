@@ -389,7 +389,11 @@
         "With a sickening crunch, {{attacker}}'s {{weapon}} cleaves through {{defender}}'s {{bodyPart}}, ending their life in an instant.",
         "{{attacker}} spins with terrible grace, their {{weapon}} severing {{defender}}'s {{bodyPart}}. The crowd screams as {{defender}} falls lifeless.",
         "A masterful stroke! {{attacker}} brings the {{weapon}} down with executioner's finality upon {{defender}}'s {{bodyPart}}.",
-        "{{attacker}} feints high, then sweeps the {{weapon}} low, completely butchering {{defender}}'s {{bodyPart}} in a fatal arc."
+        "{{attacker}} feints high, then sweeps the {{weapon}} low, completely butchering {{defender}}'s {{bodyPart}} in a fatal arc.",
+        "{{attacker}} feints low, catching {{defender}} off guard before severing their {{bodyPart}} with a clinical strike. The crowd erupts!",
+        "A horrific spray of crimson follows as {{attacker}}'s blade effortlessly cleaves through {{defender}}'s {{bodyPart}}.",
+        "{{attacker}} sidesteps a desperate lunge, bringing the {{weapon}} down in a monstrous arc that takes {{defender}}'s {{bodyPart}} clean off.",
+        "{{defender}} screams in agony as {{attacker}} butchers their {{bodyPart}}, leaving a gruesome testament to {{attacker}}'s prowess."
       ],
       "critical": [
         "{{attacker}}'s {{weapon}} becomes a blur of silver, opening a horrific gash on {{defender}}'s {{bodyPart}}!",
@@ -420,7 +424,11 @@
         "The heavy thud of {{attacker}}'s {{weapon}} against {{defender}}'s {{bodyPart}} signals a brutal end to the bout.",
         "{{defender}}'s {{bodyPart}} caves in with a wet crunch as {{attacker}} brings the {{weapon}} crashing down. It is over.",
         "There is no getting up from that. {{attacker}} shatters {{defender}}'s {{bodyPart}} completely with a horrific smash.",
-        "{{attacker}} winds up and unleashes hell, the {{weapon}} obliterating {{defender}}'s {{bodyPart}} and their life with it."
+        "{{attacker}} winds up and unleashes hell, the {{weapon}} obliterating {{defender}}'s {{bodyPart}} and their life with it.",
+        "The horrifying crunch of bone echoes through the arena as {{attacker}}'s {{weapon}} utterly demolishes {{defender}}'s {{bodyPart}}.",
+        "{{attacker}} heaves the {{weapon}} overhead and brings it down like a falling mountain, smashing {{defender}}'s {{bodyPart}} into pulp.",
+        "With terrifying momentum, {{attacker}} sweeps the {{weapon}} into {{defender}}'s {{bodyPart}}, delivering a crushing blow that ends the fight instantly.",
+        "There is nothing but ruin left of {{defender}}'s {{bodyPart}} after {{attacker}} connects with a sickening, wet thud."
       ]
     },
     "piercing": {
@@ -444,7 +452,11 @@
         "{{attacker}} finds the perfect angle, burying the {{weapon}} to the hilt in {{defender}}'s {{bodyPart}}. A clean kill.",
         "A blinding thrust! {{attacker}}'s {{weapon}} pierces directly through {{defender}}'s {{bodyPart}}, pinning them to their fate.",
         "{{defender}} gasps as {{attacker}}'s {{weapon}} slides into their {{bodyPart}}, the lethal point emerging from the other side.",
-        "With snake-like speed, {{attacker}} drives the {{weapon}} deep into {{defender}}'s {{bodyPart}}. The light leaves {{defender}}'s eyes."
+        "With snake-like speed, {{attacker}} drives the {{weapon}} deep into {{defender}}'s {{bodyPart}}. The light leaves {{defender}}'s eyes.",
+        "{{attacker}} lunges forward, sinking the {{weapon}} so deeply into {{defender}}'s {{bodyPart}} that it requires leverage to pull it free.",
+        "A masterful thrust from {{attacker}} finds the seam in armor, skewering {{defender}} through the {{bodyPart}} and anchoring them to the sand.",
+        "{{defender}}'s eyes widen in disbelief as they look down at {{attacker}}'s {{weapon}} protruding from their {{bodyPart}}.",
+        "With surgical precision, {{attacker}} drives the {{weapon}} through {{defender}}'s {{bodyPart}}, severing the vital arteries."
       ]
     },
     "fist": {
@@ -468,7 +480,11 @@
         "{{attacker}} grabs {{defender}}'s head and snaps their neck in one terrifying, fluid motion.",
         "A devastating haymaker from {{attacker}} catches {{defender}} flush on the {{bodyPart}}, breaking bone and stopping their heart.",
         "{{attacker}} pummels {{defender}} into the sand with merciless fury, the final strike to the {{bodyPart}} sealing their doom.",
-        "In a terrifying display of raw power, {{attacker}} crushes {{defender}}'s {{bodyPart}} with a bare-handed execution."
+        "In a terrifying display of raw power, {{attacker}} crushes {{defender}}'s {{bodyPart}} with a bare-handed execution.",
+        "{{attacker}} leaps forward, delivering a brutal flying strike that pulverizes {{defender}}'s {{bodyPart}} and ends their life.",
+        "A sickening snap resounds as {{attacker}} twists {{defender}}'s {{bodyPart}} into an unnatural angle, securing a lethal finish.",
+        "{{attacker}} rains a flurry of merciless blows upon {{defender}}'s {{bodyPart}}, battering them completely to death.",
+        "With an explosive surge of strength, {{attacker}} drives their fist into {{defender}}'s {{bodyPart}}, delivering a final, lethal strike."
       ]
     }
   },
@@ -491,7 +507,12 @@
       "{{defender}} ducks under {{attacker}}'s heavy {{weapon}} swing.",
       "{{attacker}} overextends, the {{weapon}} whistling harmlessly past {{defender}}.",
       "{{defender}} leans back just in time to watch {{attacker}}'s {{weapon}} carve empty air.",
-      "With an elegant pivot, {{defender}} makes {{attacker}}'s {{weapon}} look clumsy."
+      "With an elegant pivot, {{defender}} makes {{attacker}}'s {{weapon}} look clumsy.",
+      "{{attacker}}'s {{weapon}} cuts only the wind as {{defender}} gracefully evades.",
+      "{{defender}} weaves out of the path of {{attacker}}'s predictable {{weapon}} swing.",
+      "A wild strike from {{attacker}} misses by miles.",
+      "{{attacker}} telegraphs the strike, allowing {{defender}} an easy sidestep.",
+      "{{defender}} misdirects {{attacker}}, causing the {{weapon}} to slam uselessly into the dirt."
     ],
     "hit_locations": {
       "head": [
@@ -633,7 +654,12 @@
       },
       "parry": {
         "success": [
-          "{{defender}} catches the strike on the edge of his {{weapon}}, turning it aside with ease."
+          "{{defender}} catches the strike on the edge of his {{weapon}}, turning it aside with ease.",
+          "{{defender}} meets the {{weapon}} with a resounding clash of steel!",
+          "Sparks fly as {{defender}} cleanly deflects {{attacker}}'s powerful swing.",
+          "{{defender}} holds their ground, knocking the incoming {{weapon}} aside.",
+          "With an expert twist of the wrist, {{defender}} parries the strike harmlessly away.",
+          "The crowd cheers as {{defender}} demonstrates perfect defensive form."
         ]
       },
       "shield": {
@@ -716,7 +742,13 @@
     }
   },
   "conclusions": {
-    "Kill": "The life fades from {{defender}}'s eyes as {{attacker}} stands victorious.",
+    "Kill": [
+      "The life fades from {{defender}}'s eyes as {{attacker}} stands victorious.",
+      "The arena falls utterly silent for a heartbeat, before erupting at the brutal execution delivered by {{attacker}}.",
+      "{{attacker}} stands triumphant over the remains of {{defender}}, as blood soaks the thirsty sands.",
+      "In a terrifying display of lethal intent, {{attacker}} reduces {{defender}} to a mere memory.",
+      "{{attacker}} roars a challenge to the heavens, having just claimed another soul in the Blood Sands."
+    ],
     "KO": "{{defender}} collapses into the sand, unconscious. {{attacker}} is the victor.",
     "Stoppage": "The match is called. {{defender}} cannot continue. {{attacker}} wins!",
     "Exhaustion": "Both warriors are spent, but {{attacker}} is awarded the victory."
@@ -795,19 +827,34 @@
         "In a {{adj}} display, {{winner}} struck down {{loser}} with a killing blow.",
         "With a {{adj}} final strike, {{winner}} executed {{loser}} without mercy.",
         "The crowd gasped as {{winner}} ended {{loser}}'s life in a {{adj}} climax.",
-        "{{loser}}'s blood stained the sands after a {{adj}} killing blow from {{winner}}."
+        "{{loser}}'s blood stained the sands after a {{adj}} killing blow from {{winner}}.",
+        "{{winner}} painted the sands red, butchering {{loser}} in a truly {{adj}} spectacle.",
+        "No quarter was asked and none given, as {{winner}} systematically dismantled {{loser}} before a {{adj}} execution.",
+        "The crowd roared their approval when {{winner}} claimed {{loser}}'s life in a {{adj}} climax of violence.",
+        "A grisly end for {{loser}}, who fell victim to {{winner}}'s {{adj}} and inescapable wrath.",
+        "{{winner}} delivered a masterclass in brutality, ending {{loser}} with a {{adj}} and decisive blow."
       ],
       "KO": [
         "{{winner}} battered {{loser}} into unconsciousness with {{adj}} efficiency.",
         "{{winner}} delivered a {{adj}} blow that sent {{loser}} spiraling into darkness.",
         "A {{adj}} masterclass from {{winner}} left {{loser}} twitching on the sand.",
-        "{{loser}}'s legs gave out after a {{adj}} assault by {{winner}}."
+        "{{loser}}'s legs gave out after a {{adj}} assault by {{winner}}.",
+        "A deafening crack rang out as {{winner}} dropped {{loser}} with a {{adj}} final blow.",
+        "{{loser}} crumbled like a puppet with cut strings after enduring {{winner}}'s {{adj}} assault.",
+        "{{winner}} put {{loser}} to sleep, much to the crowd's {{adj}} delight.",
+        "In a shocking turn, {{winner}} found the perfect angle to knock {{loser}} senseless in a {{adj}} finish.",
+        "{{loser}} will wake up with a hell of a headache, thanks to {{winner}}'s {{adj}} right hand."
       ],
       "Stoppage": [
         "{{winner}} ground {{loser}} down. The Arenamaster called the stoppage.",
         "The sheer {{adj}} pressure from {{winner}} forced the officials to save {{loser}}'s life.",
         "Mercy was shown to {{loser}}, as the Arenamaster halted {{winner}}'s {{adj}} onslaught.",
-        "{{winner}} broke {{loser}}'s spirit with a {{adj}} display, prompting an early end."
+        "{{winner}} broke {{loser}}'s spirit with a {{adj}} display, prompting an early end.",
+        "The Arenamaster interceded to save {{loser}} from {{winner}}'s {{adj}} and unrelenting fury.",
+        "A merciful stoppage spared {{loser}} further humiliation against the {{adj}} might of {{winner}}.",
+        "{{winner}} battered {{loser}} into submission, forcing a {{adj}} end to the bout.",
+        "The white towel flew for {{loser}}, yielding the sands to {{winner}} in a {{adj}} display.",
+        "{{winner}} showed {{adj}} dominance, leaving the officials no choice but to call it."
       ],
       "Exhaustion": [
         "Both fighters pushed to total exhaustion. {{winner}} was awarded the bout.",
