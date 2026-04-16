@@ -9,21 +9,19 @@ import {
 import type { Warrior } from "@/types/warrior.types";
 import type { CombatEvent } from "@/types/combat.types";
 import type { Trainer } from "@/types/state.types";
-import { skillCheck, contestCheck } from "../combatMath";
+import { skillCheck } from "../combatMath";
 import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow, applyArmorTypeMod } from "../combatDamage";
-import { enduranceCost, fatiguePenalty } from "../combatFatigue";
-import { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, Phase as StylePhase } from "../../stylePassives";
-import { getFavoriteRhythmBonus } from "../../../engine/favorites";
+import { enduranceCost } from "../combatFatigue";
+import { getStylePassive, getKillMechanic, getStyleAntiSynergy, getEnduranceMult, Phase as StylePhase } from "../../stylePassives";
 import {
   GLOBAL_ATT_BONUS,
   GLOBAL_PAR_PENALTY,
   INITIATIVE_PRESS_BONUS,
   DEFENDER_ENDURANCE_DISCOUNT,
-  CRIT_DAMAGE_MULT,
-  TACTIC_OVERUSE_CAP
+  CRIT_DAMAGE_MULT
 } from "../combatConstants";
-import { oeAttMod, oeDefMod, alIniMod, getOffensiveTacticMods, getDefensiveTacticMods, calculateFinalOEAL } from "../tacticResolution";
-import { type FighterState, type ResolutionContext, resolveEffectiveTactics, applyAggressionBias } from "../resolution";
+import { oeAttMod, oeDefMod, getOffensiveTacticMods, getDefensiveTacticMods } from "../tacticResolution";
+import { type FighterState, type ResolutionContext, resolveEffectiveTactics } from "../resolution";
 
 export function performAttackCheck(
   rng: () => number,

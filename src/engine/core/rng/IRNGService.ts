@@ -28,4 +28,14 @@ export interface IRNGService {
    * Shuffles an array in place and returns it.
    */
   shuffle<T>(array: T[]): T[];
+
+  /**
+   * Weighted random selection from items array.
+   */
+  pickWeighted<T>(items: T[], weights: number[]): T;
+
+  /**
+   * Returns true with given probability (0-1).
+   */
+  chance(probability: number): boolean;
 }

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   Swords, RotateCcw, LogOut, Save,
   Activity, Volume2, VolumeX,
-  Coins, Crown
+  Coins, Crown, Cloud
 } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ import EventLog from "@/components/EventLog";
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
     const {
-    week, day, isTournamentWeek, treasury, fame, crowdMood, roster,
+    week, day, isTournamentWeek, treasury, fame, crowdMood, weather, roster,
     doReset, returnToTitle, lastSavedAt,
     isSimulating, isInitialized, eventLogOpen
   } = useGameStore(
@@ -53,6 +53,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       treasury: s.treasury,
       fame: s.fame,
       crowdMood: s.crowdMood,
+      weather: s.weather,
       roster: s.roster,
       doReset: s.doReset,
       returnToTitle: s.returnToTitle,
@@ -149,6 +150,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Crowd Mood</span>
               <span className="font-mono font-black text-xs text-arena-pop flex items-center gap-1">
                 {moodIcon} <Activity className="h-3 w-3 opacity-60" />
+              </span>
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Weather</span>
+              <span className="font-mono font-black text-xs text-sky-400 flex items-center gap-1">
+                <Cloud className="h-3 w-3 opacity-60" /> {weather || "Clear"}
               </span>
             </div>
           </div>

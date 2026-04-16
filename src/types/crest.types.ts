@@ -17,7 +17,8 @@ export type FieldType =
   | 'gyronny'
   | 'bend-sinister'
   | 'pale-environ'
-  | 'chevron-inverted';
+  | 'chevron-inverted'
+  | 'quarterly';
 
 export type MetalColor = 'gold' | 'silver';
 

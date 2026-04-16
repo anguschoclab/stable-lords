@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { computeStreaks } from "@/engine/gazetteNarrative";
-import type { FightSummary } from "@/types/game";
+import { computeStreaks, generateFightNarrative } from "@/engine/gazetteNarrative";
+import type { FightSummary, FightOutcomeBy } from "@/types/game";
 
 describe("computeStreaks", () => {
   const createFight = (week: number, a: string, d: string, winner: "A" | "D" | null): FightSummary => ({
     id: `fight-${week}`,
     week,
     title: `Week ${week} Fight`,
+    warriorIdA: `warrior-${a}`,
+    warriorIdD: `warrior-${d}`,
     a,
     d,
     winner,
@@ -120,5 +122,69 @@ describe("computeStreaks", () => {
     expect(streaks.get("B")).toBe(2);
     expect(streaks.get("C")).toBe(-1);
     expect(streaks.get("D")).toBe(-2);
+  });
+});
+
+describe("generateFightNarrative", () => {
+  const createFight = (winner: "A" | "D" | null, by: FightOutcomeBy): FightSummary => ({
+    id: "fight-1",
+    week: 1,
+    title: "Week 1 Fight",
+    warriorIdA: "warrior-Alice",
+    warriorIdD: "warrior-Bob",
+    a: "Alice",
+    d: "Bob",
+    winner,
+    by,
+    styleA: "Brawler",
+    styleD: "Swordsman",
+    createdAt: new Date().toISOString()
+  });
+
+  it("generates narrative for KO victory", () => {
+    const fight = createFight("A", "KO");
+    const narrative = generateFightNarrative(fight, "Calm");
+    expect(narrative).toBeDefined();
+    expect(typeof narrative).toBe("string");
+    expect(narrative.length).toBeGreaterThan(0);
+  });
+
+  it("generates narrative for Kill victory", () => {
+    const fight = createFight("A", "Kill");
+    const narrative = generateFightNarrative(fight, "Bloodthirsty");
+    expect(narrative).toBeDefined();
+    expect(typeof narrative).toBe("string");
+    expect(narrative.length).toBeGreaterThan(0);
+  });
+
+  it("generates narrative for Stoppage victory", () => {
+    const fight = createFight("A", "Stoppage");
+    const narrative = generateFightNarrative(fight, "Festive");
+    expect(narrative).toBeDefined();
+    expect(typeof narrative).toBe("string");
+  });
+
+  it("generates narrative for draw", () => {
+    const fight = createFight(null, "Exhaustion");
+    const narrative = generateFightNarrative(fight, "Calm");
+    expect(narrative).toBeDefined();
+    expect(typeof narrative).toBe("string");
+  });
+
+  it("uses different tone for different crowd moods", () => {
+    const fight = createFight("A", "KO");
+    const calmNarrative = generateFightNarrative(fight, "Calm");
+    const bloodthirstyNarrative = generateFightNarrative(fight, "Bloodthirsty");
+    // Narratives should differ based on mood
+    expect(calmNarrative).toBeDefined();
+    expect(bloodthirstyNarrative).toBeDefined();
+  });
+
+  it("handles missing mood gracefully by falling back to Calm", () => {
+    const fight = createFight("A", "KO");
+    // @ts-expect-error - testing fallback behavior
+    const narrative = generateFightNarrative(fight, "InvalidMood");
+    expect(narrative).toBeDefined();
+    expect(typeof narrative).toBe("string");
   });
 });

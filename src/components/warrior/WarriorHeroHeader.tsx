@@ -1,11 +1,12 @@
 import React from "react";
-import { Trophy, Flame, Star } from "lucide-react";
+import { Trophy, Flame, Star, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { TagBadge } from "@/components/ui/WarriorBadges";
 import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/game";
 import { EditableText } from "@/components/ui/EditableText";
 import { useGameStore } from "@/state/useGameStore";
 import { cn } from "@/lib/utils";
+import type { InsightToken } from "@/types/state.types";
 
 interface ObfuscatedWarrior {
   name: string;
@@ -26,10 +27,14 @@ interface WarriorHeroHeaderProps {
   streakVal: number;
   id?: string;
   isPlayerOwned?: boolean;
+  insightTokens?: InsightToken[];
 }
 
-export function WarriorHeroHeader({ warrior, record, streakLabel, streakVal, id, isPlayerOwned }: WarriorHeroHeaderProps) {
+export function WarriorHeroHeader({ warrior, record, streakLabel, streakVal, id, isPlayerOwned, insightTokens }: WarriorHeroHeaderProps) {
   const store = useGameStore();
+  
+  // Get insight tokens for this warrior
+  const warriorInsightTokens = insightTokens?.filter(token => token.warriorId === id) || [];
 
   return (
     <div className="relative rounded-none border border-border bg-gradient-to-br from-secondary via-card to-secondary p-4 sm:p-8 overflow-hidden">
@@ -50,6 +55,11 @@ export function WarriorHeroHeader({ warrior, record, streakLabel, streakVal, id,
             {warrior.champion && (
               <Badge className="bg-arena-gold text-black gap-1">
                 <Trophy className="h-3 w-3" /> Champion
+              </Badge>
+            )}
+            {warriorInsightTokens.length > 0 && (
+              <Badge variant="outline" className="gap-1 border-primary/50 bg-primary/10">
+                <Eye className="h-3 w-3" /> {warriorInsightTokens.length} Insights
               </Badge>
             )}
           </div>

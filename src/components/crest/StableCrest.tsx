@@ -153,12 +153,51 @@ function getFieldPattern(fieldType: FieldType, colors: { primary: string; second
         </>
       );
 
+    case 'quarterly':
+      return (
+        <>
+          <rect x="0" y="0" width="50" height="50" fill={primary} />
+          <rect x="50" y="0" width="50" height="50" fill={secondary} />
+          <rect x="0" y="50" width="50" height="50" fill={secondary} />
+          <rect x="50" y="50" width="50" height="50" fill={primary} />
+        </>
+      );
+
     default:
       return <rect x="0" y="0" width="100" height="100" fill={primary} />;
   }
 }
 
+// Posture transforms applied within the 100x100 charge path space (centered at 50,50)
+function getPostureTransform(posture?: CrestData['charge']['posture']): string {
+  switch (posture) {
+    case 'rampant':
+      // Rearing up - rotated backward
+      return 'rotate(-18 50 50)';
+    case 'passant':
+      // Walking - slight lean
+      return 'skewX(-6)';
+    case 'sejant':
+      // Seated - compressed vertically
+      return 'translate(0 6) scale(1 0.82)';
+    case 'statant':
+      // Standing still - no transform
+      return '';
+    case 'couchant':
+      // Lying down - squashed and lowered
+      return 'translate(0 10) scale(1.05 0.7)';
+    case 'forcene':
+      // Rearing wildly - forward tilt
+      return 'rotate(14 50 50) skewY(-4)';
+    default:
+      return '';
+  }
+}
+
 // Get charge SVG component
+// Charge path center is at (50,50) in a 100x100 box.
+// For a translate(tx,ty) scale(s), the path center maps to (tx + 50s, ty + 50s).
+// To place the center at (cX, cY): tx = cX - 50*s, ty = cY - 50*s
 function ChargeComponent({ charge, metal }: { charge: CrestData['charge']; metal: string }): React.ReactNode {
   const paths = getChargePathsByType(charge.type);
   const chargeData: ChargePath | undefined = paths[charge.name];
@@ -166,71 +205,112 @@ function ChargeComponent({ charge, metal }: { charge: CrestData['charge']; metal
   if (!chargeData) return null;
 
   const count = charge.count;
+  const postureTransform = getPostureTransform(charge.posture);
 
-  // Single charge - centered
-  if (count === 1) {
-    return (
-      <g transform="translate(50, 55) scale(0.4)">
+  const renderPath = (tx: number, ty: number, s: number, key?: string | number) => (
+    <g key={key} transform={`translate(${tx} ${ty}) scale(${s})`}>
+      {postureTransform ? (
+        <g transform={postureTransform}>
+          <path d={chargeData.path} fill={metal} />
+        </g>
+      ) : (
         <path d={chargeData.path} fill={metal} />
-      </g>
-    );
+      )}
+    </g>
+  );
+
+  // Single charge - centered at (50, 52), scale 0.5
+  if (count === 1) {
+    // tx = 50 - 50*0.5 = 25, ty = 52 - 50*0.5 = 27
+    return renderPath(25, 27, 0.5);
   }
 
-  // Two charges - side by side
+  // Two charges - centered at (33, 55) and (67, 55), scale 0.32
   if (count === 2) {
+    // tx = 33 - 50*0.32 = 17, ty = 55 - 50*0.32 = 39
+    // tx = 67 - 50*0.32 = 51, ty = 39
     return (
       <>
-        <g transform="translate(30, 55) scale(0.3)">
-          <path d={chargeData.path} fill={metal} />
-        </g>
-        <g transform="translate(70, 55) scale(0.3)">
-          <path d={chargeData.path} fill={metal} />
-        </g>
+        {renderPath(17, 39, 0.32, 'l')}
+        {renderPath(51, 39, 0.32, 'r')}
       </>
     );
   }
 
-  // Three charges - triangle formation
+  // Three charges - triangle: top at (50, 36), bottom-left (33, 64), bottom-right (67, 64), scale 0.28
+  // top: tx = 50 - 14 = 36, ty = 36 - 14 = 22
+  // bl:  tx = 33 - 14 = 19, ty = 64 - 14 = 50
+  // br:  tx = 67 - 14 = 53, ty = 64 - 14 = 50
   return (
     <>
-      <g transform="translate(30, 65) scale(0.28)">
-        <path d={chargeData.path} fill={metal} />
-      </g>
-      <g transform="translate(70, 65) scale(0.28)">
-        <path d={chargeData.path} fill={metal} />
-      </g>
-      <g transform="translate(50, 35) scale(0.28)">
-        <path d={chargeData.path} fill={metal} />
-      </g>
+      {renderPath(36, 22, 0.28, 't')}
+      {renderPath(19, 50, 0.28, 'bl')}
+      {renderPath(53, 50, 0.28, 'br')}
     </>
   );
 }
 
-// Optional mantling decoration
+// Optional mantling decoration - stylized leafy flourishes behind the shield
 function Mantling({ color }: { color: string }): React.ReactNode {
   return (
-    <g opacity="0.3">
-      {/* Left mantling */}
-      <path
-        d="M10,10 Q5,30 10,50 Q15,70 10,90 Q20,80 25,60 Q20,40 25,20 Q15,15 10,10"
-        fill={color}
-      />
+    <g>
+      {/* Left mantling - layered flourish */}
+      <g opacity="0.35">
+        <path
+          d="M10,12 Q2,28 6,45 Q10,60 4,72 Q2,82 10,88 Q16,80 18,68 Q20,56 16,45 Q14,34 18,22 Q16,14 10,12 Z"
+          fill={color}
+        />
+      </g>
+      <g opacity="0.22">
+        <path
+          d="M14,18 Q8,32 12,48 Q16,62 12,74 Q16,78 20,72 Q18,60 22,48 Q24,36 20,24 Q18,16 14,18 Z"
+          fill={color}
+        />
+      </g>
       {/* Right mantling */}
-      <path
-        d="M90,10 Q95,30 90,50 Q85,70 90,90 Q80,80 75,60 Q80,40 75,20 Q85,15 90,10"
-        fill={color}
-      />
+      <g opacity="0.35">
+        <path
+          d="M90,12 Q98,28 94,45 Q90,60 96,72 Q98,82 90,88 Q84,80 82,68 Q80,56 84,45 Q86,34 82,22 Q84,14 90,12 Z"
+          fill={color}
+        />
+      </g>
+      <g opacity="0.22">
+        <path
+          d="M86,18 Q92,32 88,48 Q84,62 88,74 Q84,78 80,72 Q82,60 78,48 Q76,36 80,24 Q82,16 86,18 Z"
+          fill={color}
+        />
+      </g>
     </g>
   );
 }
 
-// Optional helmet for higher tiers
+// Optional helmet for higher tiers - more detailed knight's helm
 function Helmet({ metal }: { metal: string }): React.ReactNode {
+  const isGold = metal === '#D4AF37';
+  const shadow = isGold ? '#8B7016' : '#808080';
+  const highlight = isGold ? '#F5D76E' : '#E8E8E8';
   return (
-    <g transform="translate(50, 5)">
-      <ellipse cx="0" cy="0" rx="15" ry="8" fill={metal} />
-      <rect x="-8" y="-5" width="16" height="10" rx="2" fill={metal} opacity="0.8" />
-      <line x1="-15" y1="0" x2="15" y2="0" stroke="#333" strokeWidth="1" />
+    <g transform="translate(50, 4)">
+      {/* Dome shadow */}
+      <ellipse cx="0" cy="0" rx="14" ry="9" fill={shadow} />
+      {/* Main dome */}
+      <ellipse cx="0" cy="-1" rx="13" ry="8" fill={metal} />
+      {/* Dome highlight */}
+      <ellipse cx="-3" cy="-3" rx="5" ry="2.5" fill={highlight} opacity="0.7" />
+      {/* Neck guard */}
+      <path d="M-11,5 Q-10,9 -8,11 L8,11 Q10,9 11,5 Z" fill={shadow} />
+      <path d="M-10,4 Q-9,8 -7,10 L7,10 Q9,8 10,4 Z" fill={metal} />
+      {/* Visor plate */}
+      <rect x="-9" y="-4" width="18" height="8" rx="1.5" fill={shadow} opacity="0.9" />
+      {/* Visor slits */}
+      <line x1="-8" y1="-2" x2="8" y2="-2" stroke={metal} strokeWidth="0.8" />
+      <line x1="-8" y1="0" x2="8" y2="0" stroke={metal} strokeWidth="0.8" />
+      <line x1="-8" y1="2" x2="8" y2="2" stroke={metal} strokeWidth="0.8" />
+      {/* Center ridge */}
+      <line x1="0" y1="-10" x2="0" y2="4" stroke={shadow} strokeWidth="1" />
+      {/* Rivets */}
+      <circle cx="-9" cy="4" r="0.8" fill={highlight} />
+      <circle cx="9" cy="4" r="0.8" fill={highlight} />
     </g>
   );
 }

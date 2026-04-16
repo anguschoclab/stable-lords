@@ -88,7 +88,14 @@ function RecruitCard({
           <CardTitle className="font-display font-black uppercase text-sm tracking-tight group-hover:text-primary transition-colors">
             {warrior.name}
           </CardTitle>
-          <TierBadge tier={warrior.tier} />
+          <div className="flex items-center gap-2">
+            <TierBadge tier={warrior.tier} />
+            {isScouted && (
+              <Badge variant="outline" className="gap-1 border-primary/50 bg-primary/10 text-[10px] px-2 py-0 h-5">
+                <Eye className="h-3 w-3" /> Scouted
+              </Badge>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
           <StatBadge styleName={warrior.style} showFullName />

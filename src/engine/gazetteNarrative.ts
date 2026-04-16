@@ -161,17 +161,67 @@ export function generateWeeklyGazette(
   const storyId = rngService.uuid();
   const moodKey = mood && MOOD_TONE[mood] ? mood : "Calm";
   const tone = MOOD_TONE[moodKey];
+
+  // Run all detections
+  const streaks = allFights ? computeStreaks(allFights) : new Map<string, number>();
+  const hotStreakers = detectHotStreakers(fights, streaks);
+  const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
+  const risingStars = detectRisingStars(fights, allFights ?? []);
+  const upsets = detectUpsets(fights);
+
+  const detections: GazetteDetections = {
+    tags: [],
+    hotStreakers,
+    rivalryPair,
+    risingStars,
+    upsets,
+  };
+
+  // Generate tags from detections
+  detections.tags = detectGazetteTags(fights, detections);
+
+  // Generate headline and body using helper functions
+  const headline = generateGazetteHeadline(detections, fights, week, mood, rngService, tone);
+  const body = generateGazetteBody(detections, fights, mood, week, graveyard, rngService, tone);
+
+  return {
+    id: storyId,
+    headline,
+    body,
+    mood,
+    tags: detections.tags,
+    week,
+  };
+}
+
+// ─── Gazette Detection Helpers ───────────────────────────────────────────────
+
+interface GazetteDetections {
+  tags: string[];
+  hotStreakers: { name: string; streak: number }[];
+  rivalryPair: { a: string; b: string; count: number } | null;
+  risingStars: string[];
+  upsets: { winner: string; loser: string; winnerFame: number; loserFame: number }[];
+}
+
+function detectGazetteTags(fights: FightSummary[], detections: GazetteDetections): string[] {
+  const tags: string[] = [];
   const kills = fights.filter(f => f.by === "Kill");
   const knockouts = fights.filter(f => f.by === "KO");
-  const tags: string[] = [];
 
   if (kills.length >= 2) tags.push("Bloodbath");
   if (fights.some(f => f.flashyTags?.includes("Comeback"))) tags.push("Comeback");
   if (fights.some(f => f.flashyTags?.includes("Dominance"))) tags.push("Dominance");
   if (knockouts.length >= 3) tags.push("KO Fest");
+  if (detections.hotStreakers.length > 0) tags.push("Hot Streak");
+  if (detections.rivalryPair) tags.push("Rivalry");
+  if (detections.risingStars.length > 0) tags.push("Rising Star");
+  if (detections.upsets.length > 0) tags.push("Upset");
 
-  // Detect active streaks (5+) among this week's winners
-  const streaks = allFights ? computeStreaks(allFights) : new Map<string, number>();
+  return tags;
+}
+
+function detectHotStreakers(fights: FightSummary[], streaks: Map<string, number>): { name: string; streak: number }[] {
   const hotStreakers: { name: string; streak: number }[] = [];
   for (const f of fights) {
     if (!f.winner) continue;
@@ -179,58 +229,49 @@ export function generateWeeklyGazette(
     const s = streaks.get(winnerName) ?? 0;
     if (s >= 5) hotStreakers.push({ name: winnerName, streak: s });
   }
-  if (hotStreakers.length > 0) tags.push("Hot Streak");
+  return hotStreakers;
+}
 
-  // Detect rivalries — pairs who have fought 3+ times across all history
-  const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
-  if (rivalryPair) tags.push("Rivalry");
-
-  // Detect rising stars — warriors whose total career is exactly 3 wins, 0 losses
+function detectRisingStars(fights: FightSummary[], allFights: FightSummary[]): string[] {
   const risingStars: string[] = [];
-  if (allFights && fights.length > 0) {
-    const candidates = new Set<string>();
-    for (let i = 0; i < fights.length; i++) {
-      const f = fights[i];
-      if (!f) continue;
-      if (f.winner) {
-        candidates.add(f.winner === "A" ? f.a : f.d);
-      }
-    }
+  if (!allFights || fights.length === 0) return risingStars;
 
-    const stats = new Map<string, { total: number; wins: number }>();
-    for (const c of candidates) {
-      stats.set(c, { total: 0, wins: 0 });
-    }
-
-    // ⚡ Bolt: Check if candidates Set has a/d to avoid Map lookups for everyone
-    for (let i = 0; i < allFights.length; i++) {
-      const af = allFights[i];
-      if (!af) continue;
-      if (candidates.has(af.a)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const s = stats.get(af.a)!;
-        s.total++;
-        if (af.winner === "A") s.wins++;
-      }
-      if (candidates.has(af.d)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const s = stats.get(af.d)!;
-        s.total++;
-        if (af.winner === "D") s.wins++;
-      }
-    }
-
-    for (const c of candidates) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const s = stats.get(c)!;
-      if (s.total === 3 && s.wins === 3) {
-        risingStars.push(c);
-      }
+  const candidates = new Set<string>();
+  for (const f of fights) {
+    if (f.winner) {
+      candidates.add(f.winner === "A" ? f.a : f.d);
     }
   }
-  if (risingStars.length > 0) tags.push("Rising Star");
 
-  // Detect upsets — low-fame warrior beats high-fame warrior (fame ratio >= 2x, min 10 fame gap)
+  const stats = new Map<string, { total: number; wins: number }>();
+  for (const c of candidates) {
+    stats.set(c, { total: 0, wins: 0 });
+  }
+
+  for (const af of allFights) {
+    if (candidates.has(af.a)) {
+      const s = stats.get(af.a)!;
+      s.total++;
+      if (af.winner === "A") s.wins++;
+    }
+    if (candidates.has(af.d)) {
+      const s = stats.get(af.d)!;
+      s.total++;
+      if (af.winner === "D") s.wins++;
+    }
+  }
+
+  for (const c of candidates) {
+    const s = stats.get(c)!;
+    if (s.total === 3 && s.wins === 3) {
+      risingStars.push(c);
+    }
+  }
+
+  return risingStars;
+}
+
+function detectUpsets(fights: FightSummary[]): { winner: string; loser: string; winnerFame: number; loserFame: number }[] {
   const upsets: { winner: string; loser: string; winnerFame: number; loserFame: number }[] = [];
   for (const f of fights) {
     if (!f.winner || f.fameA == null || f.fameD == null) continue;
@@ -242,48 +283,71 @@ export function generateWeeklyGazette(
       upsets.push({ winner: winnerName, loser: loserName, winnerFame, loserFame });
     }
   }
-  if (upsets.length > 0) tags.push("Upset");
+  return upsets;
+}
 
-  // Headline — streak headlines take priority over standard ones
+function generateGazetteHeadline(
+  detections: GazetteDetections,
+  fights: FightSummary[],
+  week: number,
+  mood: CrowdMoodType,
+  rngService: IRNGService,
+  tone: { adjectives: string[] }
+): string {
   const gh = (narrativeContent as NarrativeContent).gazette.headlines;
-  let headline: string;
-  if (hotStreakers.length > 0) {
-    // ⚡ Bolt: Reduced O(N log N) sort to O(N) single-pass reduce to find the max streak.
-    const top = hotStreakers.reduce((max, curr) => curr.streak > max.streak ? curr : max, hotStreakers[0] as { name: string; streak: number });
-    if (!top) {
-      headline = t(rngService.pick(gh.Standard), { week, adj: rngService.pick(tone.adjectives) });
-    } else if (top.streak >= 10) {
-      headline = t(rngService.pick(gh.LegendaryStreak), { week, name: top.name, streak: top.streak });
-    } else if (top.streak >= 7) {
-      headline = t(rngService.pick(gh.HotStreak), { week, name: top.name, streak: top.streak });
-    } else {
-      headline = t(rngService.pick((gh as any).win_streak ? (gh as any).win_streak : gh.Streak), { week, name: top.name, streak: top.streak });
-    }
-  } else if (rivalryPair) {
-    const rivalryHeadline = rivalryPair.count >= 5 ? (gh.LegacyRivalry || gh.Rivalry) : (gh.Rivalry || gh.Rivalry);
-    headline = t(rngService.pick(rivalryHeadline), {
-      week, a: rivalryPair.a, b: rivalryPair.b, count: rivalryPair.count 
-    });
-  } else if (risingStars.length > 0) {
-    headline = t(rngService.pick(gh.RisingStar || gh.Standard), { week, name: risingStars[0] });
-  } else if (upsets.length > 0) {
-    const upsetHeadline = (gh as any).major_upset && upsets[0].loserFame / upsets[0].winnerFame >= 3 ? (gh as any).major_upset : gh.Upset;
-    headline = t(rngService.pick(upsetHeadline), { week, winner: upsets[0].winner, loser: upsets[0].loser });
-  } else if (kills.length >= 2) {
-    headline = t(rngService.pick(gh.MultipleKills), { week, count: kills.length });
-  } else if (kills.length === 1) {
-    headline = t(rngService.pick(gh.Kill), { week, killer: kills[0]?.winner === "A" ? kills[0]?.a : kills[0]?.d });
-  } else if (knockouts.length >= 2) {
-    headline = t(rngService.pick(gh.MultipleKOs), { week, adj: rngService.pick(tone.adjectives) });
-  } else if (fights.length > 0) {
-    headline = t(rngService.pick(gh.Standard), { week, adj: rngService.pick(tone.adjectives) });
-  } else {
-    headline = t(rngService.pick(gh.Empty), { week });
-  }
+  const kills = fights.filter(f => f.by === "Kill");
+  const knockouts = fights.filter(f => f.by === "KO");
 
-  // Body
+  if (detections.hotStreakers.length > 0) {
+    const top = detections.hotStreakers.reduce((max, curr) => curr.streak > max.streak ? curr : max, detections.hotStreakers[0] as { name: string; streak: number });
+    if (!top) {
+      return t(rngService.pick(gh.Standard), { week, adj: rngService.pick(tone.adjectives) });
+    } else if (top.streak >= 10) {
+      return t(rngService.pick(gh.LegendaryStreak), { week, name: top.name, streak: top.streak });
+    } else if (top.streak >= 7) {
+      return t(rngService.pick(gh.HotStreak), { week, name: top.name, streak: top.streak });
+    } else {
+      return t(rngService.pick((gh as any).win_streak ? (gh as any).win_streak : gh.Streak), { week, name: top.name, streak: top.streak });
+    }
+  } else if (detections.rivalryPair) {
+    const rivalryHeadline = detections.rivalryPair.count >= 5 ? (gh.LegacyRivalry || gh.Rivalry) : (gh.Rivalry || gh.Rivalry);
+    return t(rngService.pick(rivalryHeadline), {
+      week, a: detections.rivalryPair.a, b: detections.rivalryPair.b, count: detections.rivalryPair.count 
+    });
+  } else if (detections.risingStars.length > 0) {
+    return t(rngService.pick(gh.RisingStar || gh.Standard), { week, name: detections.risingStars[0] });
+  } else if (detections.upsets.length > 0) {
+    const [upset] = detections.upsets;
+    if (!upset) {
+      return t(rngService.pick(gh.Standard), { week, adj: rngService.pick(tone.adjectives) });
+    }
+    const upsetHeadline = (gh as any).major_upset && upset.loserFame / upset.winnerFame >= 3 ? (gh as any).major_upset : gh.Upset;
+    return t(rngService.pick(upsetHeadline), { week, winner: upset.winner, loser: upset.loser });
+  } else if (kills.length >= 2) {
+    return t(rngService.pick(gh.MultipleKills), { week, count: kills.length });
+  } else if (kills.length === 1) {
+    return t(rngService.pick(gh.Kill), { week, killer: kills[0]?.winner === "A" ? kills[0]?.a : kills[0]?.d });
+  } else if (knockouts.length >= 2) {
+    return t(rngService.pick(gh.MultipleKOs), { week, adj: rngService.pick(tone.adjectives) });
+  } else if (fights.length > 0) {
+    return t(rngService.pick(gh.Standard), { week, adj: rngService.pick(tone.adjectives) });
+  } else {
+    return t(rngService.pick(gh.Empty), { week });
+  }
+}
+
+function generateGazetteBody(
+  detections: GazetteDetections,
+  fights: FightSummary[],
+  mood: CrowdMoodType,
+  week: number,
+  graveyard: Warrior[],
+  rngService: IRNGService,
+  tone: { adjectives: string[]; opener: string[]; closer: string[] }
+): string {
   const paragraphs: string[] = [rngService.pick(tone.opener)];
   const gf = (narrativeContent as NarrativeContent).gazette.featured;
+  const kills = fights.filter(f => f.by === "Kill");
 
   // Summary stats
   if (fights.length > 0) {
@@ -300,11 +364,11 @@ export function generateWeeklyGazette(
     .slice(0, 3);
 
   for (const { fight } of scoredFights) {
-    paragraphs.push(generateFightNarrative(fight, mood, rng));
+    paragraphs.push(generateFightNarrative(fight, mood, rngService));
   }
 
   // Streak narratives
-  for (const s of hotStreakers) {
+  for (const s of detections.hotStreakers) {
     if (s.streak >= 10) {
       paragraphs.push(t(rngService.pick(gf.LegendaryStreak), { name: s.name, streak: s.streak }));
     } else if (s.streak >= 7) {
@@ -315,19 +379,19 @@ export function generateWeeklyGazette(
   }
 
   // Rivalry narrative
-  if (rivalryPair) {
-    paragraphs.push(t(rngService.pick(rivalryPair.count >= 5 ? gf.LegacyRivalry : gf.Rivalry), {
-      a: rivalryPair.a, b: rivalryPair.b, count: rivalryPair.count, suffix: rivalryPair.count === 3 ? "rd" : "th" 
+  if (detections.rivalryPair) {
+    paragraphs.push(t(rngService.pick(detections.rivalryPair.count >= 5 ? gf.LegacyRivalry : gf.Rivalry), {
+      a: detections.rivalryPair.a, b: detections.rivalryPair.b, count: detections.rivalryPair.count, suffix: detections.rivalryPair.count === 3 ? "rd" : "th" 
     }));
   }
 
   // Rising star narrative
-  for (const star of risingStars) {
+  for (const star of detections.risingStars) {
     paragraphs.push(t(rngService.pick(gf.RisingStar), { name: star }));
   }
 
   // Upset narrative
-  for (const u of upsets) {
+  for (const u of detections.upsets) {
     paragraphs.push(t(rngService.pick(gf.Upset), { winner: u.winner, loser: u.loser, fameW: u.winnerFame, fameL: u.loserFame }));
   }
 
@@ -341,14 +405,7 @@ export function generateWeeklyGazette(
 
   paragraphs.push(rngService.pick(tone.closer));
 
-  return {
-    id: storyId,
-    headline,
-    body: paragraphs.join("\n\n"),
-    mood,
-    tags,
-    week,
-  };
+  return paragraphs.join("\n\n");
 }
 
 /** Generate a season-end retrospective */

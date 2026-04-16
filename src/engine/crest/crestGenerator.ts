@@ -23,60 +23,8 @@ import {
   DEFAULT_INHERITANCE,
 } from '@/types/crest.types';
 import { getChargePathsByType } from './chargePaths';
-
-// Seeded random number generator for deterministic crests
-class SeededRNG {
-  private seed: number;
-
-  constructor(seed: number) {
-    this.seed = seed;
-  }
-
-  // Linear congruential generator
-  next(): number {
-    this.seed = (this.seed * 9301 + 49297) % 233280;
-    return this.seed / 233280;
-  }
-
-  // Pick a random element from an array
-  pick<T>(arr: T[]): T {
-    if (arr.length === 0) throw new Error('Cannot pick from empty array');
-    return arr[Math.floor(this.next() * arr.length)]!;
-  }
-
-  // Weighted random selection
-  pickWeighted<T>(items: T[], weights: number[]): T {
-    if (items.length !== weights.length) {
-      throw new Error('Items and weights must have same length');
-    }
-    if (items.length === 0) throw new Error('Cannot pick from empty array');
-    const totalWeight = weights.reduce((a, b) => a + b, 0);
-    let random = this.next() * totalWeight;
-    for (let i = 0; i < items.length; i++) {
-      random -= weights[i]!;
-      if (random <= 0) return items[i]!;
-    }
-    return items[items.length - 1]!;
-  }
-
-  // Random integer in range [min, max]
-  roll(min: number, max: number): number {
-    return Math.floor(this.next() * (max - min + 1)) + min;
-  }
-
-  // Roll with chance of success
-  chance(probability: number): boolean {
-    return this.next() < probability;
-  }
-}
-
-// Color palette groups for thematic selection (available for future use)
-// const COLOR_GROUPS = {
-//   warm: ['crimson', 'brick', 'maroon', 'rust', 'bronze', 'ochre', 'amber'] as CrestColorKey[],
-//   cool: ['royal', 'navy', 'steel', 'forest', 'hunter', 'emerald', 'moss'] as CrestColorKey[],
-//   dark: ['sable', 'charcoal', 'blood', 'midnight', 'wine'] as CrestColorKey[],
-//   light: ['pearl', 'platinum', 'silver', 'gold'] as CrestColorKey[],
-// };
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 // Philosophy color preferences
 const PHILOSOPHY_COLOR_PREFERENCES: Record<string, CrestColorKey[]> = {
@@ -104,7 +52,7 @@ function getInheritanceConfig(generation: number): CrestInheritanceConfig {
  * Select a shield shape based on tier and RNG
  */
 function selectShieldShape(
-  rng: SeededRNG,
+  rng: IRNGService,
   tier: 'Minor' | 'Established' | 'Major' | 'Legendary',
   parentShape?: ShieldShape,
   generation: number = 0
@@ -127,7 +75,7 @@ function selectShieldShape(
  * Select field pattern type
  */
 function selectFieldType(
-  rng: SeededRNG,
+  rng: IRNGService,
   tier: 'Minor' | 'Established' | 'Major' | 'Legendary',
   parentFieldType?: FieldType,
   generation: number = 0
@@ -142,8 +90,8 @@ function selectFieldType(
   const fieldTypesByTier: Record<string, FieldType[]> = {
     Minor: ['solid', 'fess', 'pale', 'bend'],
     Established: ['solid', 'fess', 'pale', 'bend', 'chevron', 'per-pale', 'per-fess'],
-    Major: ['solid', 'fess', 'pale', 'bend', 'chevron', 'cross', 'per-pale', 'per-fess', 'gyronny', 'saltire'],
-    Legendary: ['solid', 'fess', 'pale', 'bend', 'chevron', 'cross', 'saltire', 'per-pale', 'per-fess', 'gyronny', 'bend-sinister', 'chevron-inverted'],
+    Major: ['solid', 'fess', 'pale', 'bend', 'chevron', 'cross', 'per-pale', 'per-fess', 'gyronny', 'saltire', 'pale-environ', 'quarterly'],
+    Legendary: ['solid', 'fess', 'pale', 'bend', 'chevron', 'cross', 'saltire', 'per-pale', 'per-fess', 'gyronny', 'bend-sinister', 'chevron-inverted', 'pale-environ', 'quarterly'],
   };
 
   const availableTypes = fieldTypesByTier[tier] ?? ['solid', 'fess', 'pale'];
@@ -161,11 +109,12 @@ function selectFieldType(
  * Select colors for the crest
  */
 function selectColors(
-  rng: SeededRNG,
+  rng: IRNGService,
   philosophy: string,
   fieldType: FieldType,
   parentPrimaryColor?: string,
   parentSecondaryColor?: string,
+  parentMetalColor?: MetalColor,
   generation: number = 0
 ): { primaryColor: string; secondaryColor?: string; metalColor: MetalColor } {
   const config = getInheritanceConfig(generation);
@@ -196,11 +145,11 @@ function selectColors(
   }
 
   // Determine metal color (gold or silver)
+  // If a parent metal exists and the inheritance roll succeeds, preserve it.
+  // Otherwise pick fresh, with a slight bias toward gold.
   let metalColor: MetalColor;
-  if (rng.chance(config.metalColorChance)) {
-    // If inheriting, we don't have the parent's metal color stored separately
-    // so just pick randomly
-    metalColor = rng.chance(0.5) ? 'gold' : 'silver';
+  if (parentMetalColor && rng.chance(config.metalColorChance)) {
+    metalColor = parentMetalColor;
   } else {
     metalColor = rng.chance(0.6) ? 'gold' : 'silver';
   }
@@ -209,10 +158,10 @@ function selectColors(
 }
 
 /**
- * Select charge based on philosophy and tier
+ * Select charges for the crest
  */
 function selectCharge(
-  rng: SeededRNG,
+  rng: IRNGService,
   philosophy: string,
   tier: 'Minor' | 'Established' | 'Major' | 'Legendary',
   parentChargeType?: ChargeType,
@@ -274,7 +223,7 @@ function selectCharge(
  */
 export function generateCrest(config: StableCrestConfig): CrestData {
   const { seed, philosophy, tier, parentCrest } = config;
-  const rng = new SeededRNG(seed);
+  const rng = new SeededRNGService(seed);
 
   // Determine generation
   const generation = parentCrest ? parentCrest.generation + 1 : 0;
@@ -302,6 +251,7 @@ export function generateCrest(config: StableCrestConfig): CrestData {
     fieldType,
     parentCrest?.primaryColor,
     parentCrest?.secondaryColor,
+    parentCrest?.metalColor,
     generation
   );
 

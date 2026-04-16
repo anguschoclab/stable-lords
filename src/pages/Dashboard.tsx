@@ -81,7 +81,11 @@ const WIDGET_REGISTRY: WidgetDef[] = [
   { id: "weather",  label: "Weather",            component: MemoWeatherWidget },
 ];
 
-const DEFAULT_ORDER = WIDGET_REGISTRY.map(w => w.id);
+const DEFAULT_ORDER = [
+  "season", "stable", "weather", "crowd", "finances", "training",
+  "rivals", "stableCompare", "strategy", "bubbleWatch", "rivalries",
+  "rankings", "intel", "medical", "meta", "bouts", "eventLog", "nextBout"
+];
 
 // ─── Drag & Drop Hook ─────────────────────────────────────────────────────
 

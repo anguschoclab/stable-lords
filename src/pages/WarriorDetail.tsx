@@ -135,6 +135,7 @@ export default function WarriorDetail() {
         streakVal={streakVal} 
         id={id}
         isPlayerOwned={isPlayerOwned}
+        insightTokens={insightTokens}
       />
       <SubNav tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 

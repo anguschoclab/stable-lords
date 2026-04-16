@@ -32,4 +32,22 @@ export class SeededRNGService implements IRNGService {
   shuffle<T>(array: T[]): T[] {
     return this.rng.shuffle(array);
   }
+
+  pickWeighted<T>(items: T[], weights: number[]): T {
+    if (items.length !== weights.length) {
+      throw new Error('Items and weights must have same length');
+    }
+    if (items.length === 0) throw new Error('Cannot pick from empty array');
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    let random = this.rng.next() * totalWeight;
+    for (let i = 0; i < items.length; i++) {
+      random -= weights[i]!;
+      if (random <= 0) return items[i]!;
+    }
+    return items[items.length - 1]!;
+  }
+
+  chance(probability: number): boolean {
+    return this.rng.next() < probability;
+  }
 }

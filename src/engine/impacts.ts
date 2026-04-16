@@ -141,119 +141,90 @@ export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameSt
   return newState;
 }
 
+// Merge strategy configuration
+type MergeStrategy = 'accumulate' | 'append' | 'mapMerge' | 'replace';
+
+const MERGE_CONFIG: Record<keyof StateImpact, { strategy: MergeStrategy; defaultValue: any }> = {
+  treasuryDelta: { strategy: 'accumulate', defaultValue: 0 },
+  fameDelta: { strategy: 'accumulate', defaultValue: 0 },
+  popularityDelta: { strategy: 'accumulate', defaultValue: 0 },
+  rosterUpdates: { strategy: 'mapMerge', defaultValue: new Map() },
+  rivalsUpdates: { strategy: 'mapMerge', defaultValue: new Map() },
+  newsletterItems: { strategy: 'append', defaultValue: [] },
+  ledgerEntries: { strategy: 'append', defaultValue: [] },
+  graveyard: { strategy: 'append', defaultValue: [] },
+  arenaHistory: { strategy: 'append', defaultValue: [] },
+  matchHistory: { strategy: 'append', defaultValue: [] },
+  restStates: { strategy: 'append', defaultValue: [] },
+  insightTokens: { strategy: 'append', defaultValue: [] },
+  awards: { strategy: 'append', defaultValue: [] },
+  retired: { strategy: 'append', defaultValue: [] },
+  scoutReports: { strategy: 'append', defaultValue: [] },
+  hallOfFame: { strategy: 'append', defaultValue: [] },
+  moodHistory: { strategy: 'append', defaultValue: [] },
+  playerChallenges: { strategy: 'append', defaultValue: [] },
+  playerAvoids: { strategy: 'append', defaultValue: [] },
+  coachDismissed: { strategy: 'append', defaultValue: [] },
+  unacknowledgedDeaths: { strategy: 'append', defaultValue: [] },
+  seasonalGrowth: { strategy: 'append', defaultValue: [] },
+  rosterRemovals: { strategy: 'append', defaultValue: [] },
+  tournaments: { strategy: 'replace', defaultValue: undefined },
+  recruitPool: { strategy: 'replace', defaultValue: undefined },
+  newPoolRecruits: { strategy: 'replace', defaultValue: undefined },
+  realmRankings: { strategy: 'replace', defaultValue: undefined },
+  boutOffers: { strategy: 'replace', defaultValue: undefined },
+  promoters: { strategy: 'replace', defaultValue: undefined },
+  trainers: { strategy: 'replace', defaultValue: undefined },
+  hiringPool: { strategy: 'replace', defaultValue: undefined },
+  gazettes: { strategy: 'replace', defaultValue: undefined },
+  ownerGrudges: { strategy: 'replace', defaultValue: undefined },
+  rivalries: { strategy: 'replace', defaultValue: undefined },
+  trainingAssignments: { strategy: 'replace', defaultValue: undefined },
+  lastSimulationReport: { strategy: 'replace', defaultValue: undefined },
+  isTournamentWeek: { strategy: 'replace', defaultValue: undefined },
+  activeTournamentId: { strategy: 'replace', defaultValue: undefined },
+  day: { strategy: 'replace', defaultValue: undefined },
+  week: { strategy: 'replace', defaultValue: undefined },
+  season: { strategy: 'replace', defaultValue: undefined },
+  weather: { strategy: 'replace', defaultValue: undefined },
+  crowdMood: { strategy: 'replace', defaultValue: undefined },
+};
+
 export function mergeImpacts(impacts: StateImpact[]): StateImpact {
-  const merged: StateImpact = {
-    treasuryDelta: 0,
-    fameDelta: 0,
-    popularityDelta: 0,
-    rosterUpdates: new Map(),
-    rivalsUpdates: new Map(),
-    newsletterItems: [],
-    ledgerEntries: [],
-    graveyard: [],
-    arenaHistory: [],
-    matchHistory: [],
-    restStates: [],
-    insightTokens: [],
-    awards: [],
-    retired: [],
-    scoutReports: [],
-    hallOfFame: [],
-    moodHistory: [],
-    playerChallenges: [],
-    playerAvoids: [],
-    coachDismissed: [],
-    unacknowledgedDeaths: [],
-    seasonalGrowth: [],
-    rosterRemovals: [],
-  };
+  const merged: StateImpact = {} as StateImpact;
+
+  // Initialize merged with default values
+  for (const [key, config] of Object.entries(MERGE_CONFIG)) {
+    (merged as any)[key] = config.defaultValue;
+  }
 
   for (const imp of impacts) {
-    // Numeric accumulation
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.treasuryDelta) merged.treasuryDelta! += imp.treasuryDelta;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.fameDelta) merged.fameDelta! += imp.fameDelta;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.popularityDelta) merged.popularityDelta! += imp.popularityDelta;
+    for (const [key, config] of Object.entries(MERGE_CONFIG)) {
+      const value = imp[key as keyof StateImpact];
+      if (value === undefined || value === null) continue;
 
-    // Map merges (shallow-merge per key)
-    if (imp.rosterUpdates) {
-      imp.rosterUpdates.forEach((val, key) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existing = merged.rosterUpdates!.get(key) || {};
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        merged.rosterUpdates!.set(key, { ...existing, ...val });
-      });
+      switch (config.strategy) {
+        case 'accumulate':
+          (merged as any)[key] += value;
+          break;
+        case 'append':
+          if (Array.isArray(value) && value.length > 0) {
+            (merged as any)[key].push(...value);
+          }
+          break;
+        case 'mapMerge':
+          if (value instanceof Map && value.size > 0) {
+            value.forEach((val: any, mapKey: string) => {
+              const existing = (merged as any)[key].get(mapKey) || {};
+              (merged as any)[key].set(mapKey, { ...existing, ...val });
+            });
+          }
+          break;
+        case 'replace':
+          (merged as any)[key] = value;
+          break;
+      }
     }
-    if (imp.rivalsUpdates) {
-      imp.rivalsUpdates.forEach((val, key) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existing = merged.rivalsUpdates!.get(key) || {};
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        merged.rivalsUpdates!.set(key, { ...existing, ...val });
-      });
-    }
-
-    // Array appends
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.newsletterItems?.length) merged.newsletterItems!.push(...imp.newsletterItems);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.ledgerEntries?.length) merged.ledgerEntries!.push(...imp.ledgerEntries);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.graveyard?.length) merged.graveyard!.push(...imp.graveyard);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.arenaHistory?.length) merged.arenaHistory!.push(...imp.arenaHistory);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.matchHistory?.length) merged.matchHistory!.push(...imp.matchHistory);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.restStates?.length) merged.restStates!.push(...imp.restStates);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.insightTokens?.length) merged.insightTokens!.push(...imp.insightTokens);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.awards?.length) merged.awards!.push(...imp.awards);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.retired?.length) merged.retired!.push(...imp.retired);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.scoutReports?.length) merged.scoutReports!.push(...imp.scoutReports);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.hallOfFame?.length) merged.hallOfFame!.push(...imp.hallOfFame);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.moodHistory?.length) merged.moodHistory!.push(...imp.moodHistory);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.playerChallenges?.length) merged.playerChallenges!.push(...imp.playerChallenges);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.playerAvoids?.length) merged.playerAvoids!.push(...imp.playerAvoids);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.coachDismissed?.length) merged.coachDismissed!.push(...imp.coachDismissed);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.unacknowledgedDeaths?.length) merged.unacknowledgedDeaths!.push(...imp.unacknowledgedDeaths);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.seasonalGrowth?.length) merged.seasonalGrowth!.push(...imp.seasonalGrowth);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (imp.rosterRemovals?.length) merged.rosterRemovals!.push(...imp.rosterRemovals);
-
-    // Replace semantics (last writer wins)
-    if (imp.tournaments) merged.tournaments = imp.tournaments;
-    if (imp.recruitPool !== undefined) merged.recruitPool = imp.recruitPool;
-    if (imp.newPoolRecruits !== undefined) merged.newPoolRecruits = imp.newPoolRecruits;
-    if (imp.realmRankings !== undefined) merged.realmRankings = imp.realmRankings;
-    if (imp.boutOffers !== undefined) merged.boutOffers = imp.boutOffers;
-    if (imp.promoters !== undefined) merged.promoters = imp.promoters;
-    if (imp.trainers !== undefined) merged.trainers = imp.trainers;
-    if (imp.hiringPool !== undefined) merged.hiringPool = imp.hiringPool;
-    if (imp.gazettes !== undefined) merged.gazettes = imp.gazettes;
-    if (imp.ownerGrudges !== undefined) merged.ownerGrudges = imp.ownerGrudges;
-    if (imp.rivalries !== undefined) merged.rivalries = imp.rivalries;
-    if (imp.trainingAssignments !== undefined) merged.trainingAssignments = imp.trainingAssignments;
-    if (imp.lastSimulationReport !== undefined) merged.lastSimulationReport = imp.lastSimulationReport;
-    if (imp.isTournamentWeek !== undefined) merged.isTournamentWeek = imp.isTournamentWeek;
-    if (imp.activeTournamentId !== undefined) merged.activeTournamentId = imp.activeTournamentId;
-    if (imp.day !== undefined) merged.day = imp.day;
-    if (imp.week !== undefined) merged.week = imp.week;
-    if (imp.season !== undefined) merged.season = imp.season;
-    if (imp.weather !== undefined) merged.weather = imp.weather;
-    if (imp.crowdMood !== undefined) merged.crowdMood = imp.crowdMood;
   }
 
   return merged;
