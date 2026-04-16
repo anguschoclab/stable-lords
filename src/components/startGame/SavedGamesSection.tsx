@@ -1,5 +1,5 @@
 import type { SaveSlotMeta } from "@/state/saveSlots";
-import SaveSlotCard from "@/components/startGame/SaveSlotCard";
+import SaveSlotCard from "./SaveSlotCard";
 
 interface SavedGamesSectionProps {
   slots: SaveSlotMeta[];
