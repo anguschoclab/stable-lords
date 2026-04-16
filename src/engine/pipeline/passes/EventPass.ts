@@ -136,6 +136,6 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: IRNGS
     });
   }
 
-  return { rosterUpdates, newsletterItems, ...(treasuryDelta > 0 ? { treasuryDelta } : {}) };
+  return { rosterUpdates, newsletterItems, ...(ledgerEntries.length > 0 ? { ledgerEntries } : {}), ...(treasuryDelta > 0 ? { treasuryDelta } : {}) };
 
 }
