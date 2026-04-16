@@ -53,7 +53,7 @@ export default function SpatialControls({ plan, warrior, onPlanChange }: Spatial
             const isNatural = warrior?.equipment?.weapon && getWeaponPreferredRange(warrior.equipment.weapon) === r;
             const isSelected = (plan.rangePreference ?? getWeaponPreferredRange(warrior?.equipment?.weapon)) === r;
             return (
-              <button
+              <button aria-label="button"
                 key={r}
                 onClick={() => onPlanChange({ ...plan, rangePreference: r })}
                 className={cn(

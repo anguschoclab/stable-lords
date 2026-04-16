@@ -80,7 +80,7 @@ export default function MiniCombatLog({
             <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
           )}
           {onClose && (
-            <button
+            <button aria-label="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();

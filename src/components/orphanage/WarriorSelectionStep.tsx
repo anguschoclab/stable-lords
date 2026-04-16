@@ -50,7 +50,7 @@ export default function WarriorSelectionStep({
             </div>
           </div>
         </div>
-        <button
+        <button aria-label="button"
           onClick={onRerollPool}
           className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-accent transition-colors px-3 py-2"
         >

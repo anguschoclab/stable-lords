@@ -15,7 +15,7 @@ export default function ColomseumArch() {
         }}
       />
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-48 opacity-25"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/5 h-48 opacity-25"
         style={{
           background: "radial-gradient(ellipse at center bottom, rgba(135, 34, 40, 0.3) 0%, transparent 70%)",
         }}

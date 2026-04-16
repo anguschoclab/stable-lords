@@ -140,7 +140,7 @@ export function TrainerCard({
                            </span>
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-[200px] text-[10px]">
+                      <TooltipContent side="bottom" className="max-w-xs text-[10px]">
                         +5% gain chance for {STYLE_DISPLAY_NAMES[trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? trainer.styleBonusStyle} warriors during training sessions
                       </TooltipContent>
                     </Tooltip>

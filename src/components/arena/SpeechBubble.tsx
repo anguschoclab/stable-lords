@@ -39,7 +39,7 @@ export default function SpeechBubble({ bubble, onDismiss, position = "left" }: S
         "absolute z-20 animate-in fade-in slide-in-from-bottom-2 duration-300",
         position === "left" ? "left-1/2 -translate-x-1/4" : "right-1/2 translate-x-1/4"
       )}
-      style={{ top: "-60px" }}
+      className="-top-[60px]"
     >
       <div
         className={cn(

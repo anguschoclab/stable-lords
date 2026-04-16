@@ -35,7 +35,7 @@ export function WorldStats({ stableCount, warriorCount, killCount, topStable }: 
               {item.value}
             </p>
           </div>
-          <div className={cn("absolute bottom-0 left-0 w-full h-[2px] opacity-20 bg-gradient-to-r from-transparent via-current to-transparent", item.color)} />
+          <div className={cn("absolute bottom-0 left-0 w-full h-0.5 opacity-20 bg-gradient-to-r from-transparent via-current to-transparent", item.color)} />
         </Surface>
       ))}
     </div>

@@ -74,7 +74,7 @@ export function RivalStableList({ rivals, selectedRivalId, onSelectRival }: Riva
                       </div>
                     </div>
                   </div>
-                  {selectedRivalId === rival.owner.id && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary" />}
+                  {selectedRivalId === rival.owner.id && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary" />}
                 </Surface>
               </button>
             </TooltipTrigger>

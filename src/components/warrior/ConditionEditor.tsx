@@ -218,11 +218,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       OE {cond.override.OE !== undefined ? cond.override.OE : "—"}
                     </Label>
                     {cond.override.OE !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="button" onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold">
+                      <button aria-label="button" onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold">
                         set
                       </button>
                     )}
@@ -246,11 +246,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       AL {cond.override.AL !== undefined ? cond.override.AL : "—"}
                     </Label>
                     {cond.override.AL !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="button" onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame">
+                      <button aria-label="button" onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame">
                         set
                       </button>
                     )}
@@ -274,11 +274,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       KD {cond.override.killDesire !== undefined ? cond.override.killDesire : "—"}
                     </Label>
                     {cond.override.killDesire !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="button" onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="button" onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         set
                       </button>
                     )}
@@ -338,7 +338,7 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
         );
       })}
 
-      <button
+      <button aria-label="button"
         onClick={addCondition}
         className="w-full flex items-center justify-center gap-2 border border-dashed border-white/10 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:border-arena-gold/40 hover:text-arena-gold transition-all"
       >

@@ -29,7 +29,7 @@ export function TrainerTable() {
           </div>
         </div>
         <Link to="/ops/personnel">
-          <button className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded transition-all border border-primary/20">
+          <button aria-label="button" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded transition-all border border-primary/20">
              Manage Staff
           </button>
         </Link>
@@ -88,7 +88,7 @@ export function TrainerTable() {
                                   <span className="text-[9px] font-black uppercase tracking-widest text-arena-gold">Affinity: {STYLE_DISPLAY_NAMES[t.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? t.styleBonusStyle}</span>
                                </div>
                              </TooltipTrigger>
-                             <TooltipContent side="right" className="max-w-[200px] text-[10px]">
+                             <TooltipContent side="right" className="max-w-xs text-[10px]">
                                +5% training gain chance for {STYLE_DISPLAY_NAMES[t.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? t.styleBonusStyle} warriors
                              </TooltipContent>
                            </Tooltip>

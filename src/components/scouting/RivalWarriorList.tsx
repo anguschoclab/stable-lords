@@ -78,7 +78,7 @@ export function RivalWarriorList({ warriors, selectedWarriorId, onSelectWarrior,
                         <ChevronRight className="h-4 w-4 text-muted-foreground/20 group-hover:text-primary/40 group-hover:translate-x-1 transition-all" />
                       )}
                     </div>
-                    {isSelected && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />}
+                    {isSelected && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />}
                   </Surface>
                 </button>
               </TooltipTrigger>

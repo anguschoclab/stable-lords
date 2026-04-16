@@ -16,7 +16,7 @@ export function ConditionBattery({ value, className, showText = false }: Conditi
     <div className={cn("flex items-center gap-1.5", className)}>
       <div className="relative w-8 h-4 border border-muted-foreground/30 rounded-[2px] p-[1px] bg-background/50 overflow-hidden">
         {/* Battery Top Notch */}
-        <div className="absolute right-[-2px] top-1/2 -translate-y-1/2 w-[2px] h-2 bg-muted-foreground/30 rounded-r-[1px]" />
+        <div className="absolute right-[-2px] top-1/2 -translate-y-1/2 w-0.5 h-2 bg-muted-foreground/30 rounded-r-[1px]" />
         
         {/* Fill */}
         <div 

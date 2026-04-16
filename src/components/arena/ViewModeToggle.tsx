@@ -24,7 +24,7 @@ export default function ViewModeToggle({
         className
       )}
     >
-      <button
+      <button aria-label="button"
         onClick={() => onChange("log")}
         className={cn(
           "flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all",
@@ -38,7 +38,7 @@ export default function ViewModeToggle({
         <span>Tactical Log</span>
       </button>
       
-      <button
+      <button aria-label="button"
         onClick={() => onChange("arena")}
         className={cn(
           "flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all",

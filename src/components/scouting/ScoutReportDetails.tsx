@@ -44,7 +44,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
               const cost = getScoutCost(q);
               const canAfford = treasury >= cost;
               return (
-                <button
+                <button aria-label="button"
                   key={q}
                   disabled={!canAfford}
                   onClick={() => onScout(q)}
@@ -221,7 +221,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
         </div>
 
         {report.quality !== "Expert" && (
-          <button
+          <button aria-label="button"
             className="w-full h-12 bg-primary/10 border border-primary/20 rounded-none hover:bg-primary hover:text-white transition-all group/expand"
             onClick={() => onScout(report.quality === "Basic" ? "Detailed" : "Expert")}
           >
