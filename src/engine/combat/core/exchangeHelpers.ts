@@ -25,33 +25,6 @@ import {
 import { oeAttMod, oeDefMod, alIniMod, getOffensiveTacticMods, getDefensiveTacticMods, calculateFinalOEAL } from "../tacticResolution";
 import { type FighterState, type ResolutionContext, resolveEffectiveTactics, applyAggressionBias } from "../resolution";
 
-export function evaluateInitiative(
-  rng: () => number,
-  fA: FighterState,
-  fD: FighterState,
-  ctx: ResolutionContext,
-  stylePhase: StylePhase,
-  OE_A: number,
-  AL_A: number,
-  OE_D: number,
-  AL_D: number,
-  fatA: number,
-  fatD: number,
-  defModsA: ReturnType<typeof getDefensiveTacticMods>,
-  defModsD: ReturnType<typeof getDefensiveTacticMods>,
-  passA: ReturnType<typeof getStylePassive>,
-  passD: ReturnType<typeof getStylePassive>
-) {
-  const masteryIniA = fA.favorites ? getFavoriteRhythmBonus(fA as any, OE_A, AL_A) : 0;
-  const masteryIniD = fD.favorites ? getFavoriteRhythmBonus(fD as any, OE_D, AL_D) : 0;
-
-  const iniA = fA.skills.INI + alIniMod(AL_A) + ctx.matchupA + fatA + defModsA.iniBonus + getTempoBonus(fA.style, stylePhase) + passA.iniBonus + masteryIniA - fA.legHits;
-  const iniD = fD.skills.INI + alIniMod(AL_D) + ctx.matchupD + fatD + defModsD.iniBonus + getTempoBonus(fD.style, stylePhase) + passD.iniBonus + masteryIniD - fD.legHits;
-
-  const aGoesFirst = contestCheck(rng, iniA, iniD);
-  return { aGoesFirst, attMasteryIni: aGoesFirst ? masteryIniA : masteryIniD, iniA, iniD };
-}
-
 export function performAttackCheck(
   rng: () => number,
   att: FighterState,

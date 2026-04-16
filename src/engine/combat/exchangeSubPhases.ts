@@ -109,9 +109,11 @@ export interface CommitResult {
 
 /**
  * Determines CommitLevel for one fighter.
- * - Cautious (OE≤3 or HP<30%): −2 ATT, +2 DEF, 0 debt
- * - Standard (default):          0 ATT,  0 DEF, 0 debt
- * - Full (OE≥7 or momentum≥2): +3 ATT, −3 DEF, 2 debt
+ * - Cautious (OE≤3 or HP<30%): 0 ATT, +1 DEF penalty, 0 debt
+ * - Standard (default):          0 ATT,  0 DEF,          0 debt
+ * - Full (OE≥7 or momentum≥2): +2 ATT, −1 DEF penalty,  1 debt
+ *   Note: the `committed` flag separately adds +10 ATT / +15 defender bonus
+ *   when HP<35% and killDesire≥7 (the all-or-nothing desperate commit).
  */
 export function runCommit(fighter: FighterState, OE: number): CommitResult {
   const hpRatio = fighter.hp / fighter.maxHp;

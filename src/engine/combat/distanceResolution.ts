@@ -35,6 +35,55 @@ export function getWeaponPreferredRange(weaponId?: string): DistanceRange {
   return WEAPON_PREFERRED_RANGE[weaponId] ?? "Striking";
 }
 
+// ─── Weapon Range Modifiers ───────────────────────────────────────────────────
+//
+// ATT bonus/penalty based on how well a weapon performs at a given range.
+// Striking = 0 baseline for all weapons (most weapons are designed for this range).
+// Values represent flat modifier to the attack roll target.
+//
+// Design intent: a dagger user at Grapple gets +4 ATT — they should close range.
+//               A pike user at Grapple gets −10 ATT — they should flee to Extended.
+
+const WEAPON_RANGE_MODIFIERS: Record<string, Partial<Record<DistanceRange, number>>> = {
+  // ── Grapple-preferred ─────────────────────────────────────────────────────
+  open_hand:    { Grapple: +6, Tight: +3,  Striking:  0, Extended: -6 },
+
+  // ── Tight-preferred ───────────────────────────────────────────────────────
+  dagger:       { Grapple: +3, Tight: +4,  Striking:  0, Extended: -5 },
+  club:         { Grapple: +2, Tight: +3,  Striking:  0, Extended: -3 },
+  short_sword:  { Grapple: +2, Tight: +4,  Striking:  0, Extended: -4 },
+  mace:         { Grapple: -1, Tight: +3,  Striking:  0, Extended: -2 },
+
+  // ── Striking-preferred (default swords / axes) ────────────────────────────
+  broad_sword:  { Grapple: -3, Tight:  0,  Striking:  0, Extended: -1 },
+  long_sword:   { Grapple: -4, Tight: -1,  Striking:  0, Extended: +2 },
+  axe:          { Grapple: -2, Tight:  0,  Striking:  0, Extended: -2 },
+  scimitar:     { Grapple: -2, Tight: -1,  Striking:  0, Extended: -1 },
+  falchion:     { Grapple: -2, Tight: -1,  Striking:  0, Extended: -1 },
+  battle_axe:   { Grapple: -5, Tight: -2,  Striking:  0, Extended: +1 },
+  war_hammer:   { Grapple: -4, Tight: -1,  Striking:  0, Extended:  0 },
+  morning_star: { Grapple: -3, Tight: -1,  Striking:  0, Extended: +1 },
+  flail:        { Grapple: -2, Tight:  0,  Striking:  0, Extended: +2 },
+
+  // ── Extended-preferred (polearms) ─────────────────────────────────────────
+  spear:        { Grapple: -6, Tight: -3,  Striking:  0, Extended: +4 },
+  halberd:      { Grapple: -7, Tight: -4,  Striking:  0, Extended: +4 },
+  great_sword:  { Grapple: -6, Tight: -3,  Striking:  0, Extended: +3 },
+  pike:         { Grapple: -10, Tight: -6, Striking: -2,  Extended: +6 },
+};
+
+/**
+ * Returns the ATT modifier for a weapon at a given range.
+ * Positive = advantage (weapon is well-suited to this range).
+ * Negative = disadvantage (fighter should fight to change range).
+ */
+export function getWeaponRangeMod(weaponId: string | undefined, range: DistanceRange): number {
+  if (!weaponId) return 0;
+  const mods = WEAPON_RANGE_MODIFIERS[weaponId];
+  if (!mods) return 0;
+  return mods[range] ?? 0;
+}
+
 // ─── Reach Score ──────────────────────────────────────────────────────────────
 
 /**
@@ -61,8 +110,10 @@ export interface DistanceContestResult {
 
 /**
  * Contests range control for the current exchange.
- * Winner gains +3 ATT via rangeMod, loser takes -3 ATT.
- * Range shifts one step toward winner's preferred weapon range.
+ * Winner gains +1 initiative advantage (rangeModA/D = ±1).
+ * More importantly, both fighters immediately feel the effect of the current
+ * range via getWeaponRangeMod() applied to their attack checks.
+ * Range shifts one step toward the winner's preferred weapon range.
  */
 export function contestDistance(
   rng: () => number,

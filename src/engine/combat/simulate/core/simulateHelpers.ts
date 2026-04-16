@@ -1,15 +1,11 @@
-import { FightingStyle, type WeatherType } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightPlan, FightOutcome, DeathCauseBucket } from "@/types/combat.types";
+import { FightingStyle } from "@/types/shared.types";
+import type { FightOutcome } from "@/types/combat.types";
 import type { Trainer } from "@/types/state.types";
-import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
-import { getMatchupBonus, type ResolutionContext, type FighterState } from "@/engine/combat/resolution";
+import { type ResolutionContext, type FighterState } from "@/engine/combat/resolution";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { createFighterState } from "@/engine/bout/fighterState";
 import { getTrainingBonus } from "@/engine/trainers";
-import { getWeatherEffect } from "@/engine/combat/weatherEffects";
-import { getSpecialtyMods, defaultSpecialtyMods } from "@/engine/trainerSpecialties";
+import { getSpecialtyMods } from "@/engine/trainerSpecialties";
 
 export function createRNGForContext(seed: number, rng?: IRNGService): IRNGService {
   return rng || new SeededRNGService(seed);
@@ -65,49 +61,6 @@ export function getTrainerMods(
   }
 
   return { ...base, killWindowBonus: 0, damageReceivedMult: 1.0, riposteDamageMult: 1.0, fatiguePenaltyReduction: 0 };
-}
-
-export function setupFightersAndContext(
-  planA: FightPlan,
-  planD: FightPlan,
-  warriorA: Warrior | undefined,
-  warriorD: Warrior | undefined,
-  trainers: Trainer[] | undefined,
-  weather: WeatherType,
-  rng: () => number
-) {
-  const nameA = warriorA?.name ?? "Attacker";
-  const nameD = warriorD?.name ?? "Defender";
-  const weaponA = (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon;
-  const weaponD = (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon;
-
-  const fA = createFighterState("A", planA, warriorA, trainers);
-  const fD = createFighterState("D", planD, warriorD, trainers);
-
-  const modsA = getTrainerMods(trainers, planA.style);
-  const modsD = getTrainerMods(trainers, planD.style);
-
-  const weaponReqA = checkWeaponRequirements(weaponA, warriorA?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
-  const weaponReqD = checkWeaponRequirements(weaponD, warriorD?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
-
-  const resCtx: ResolutionContext = {
-    rng,
-    phase: "OPENING",
-    exchange: 0,
-    weather,
-    weatherEffect: getWeatherEffect(weather),
-    matchupA: getMatchupBonus(planA.style, planD.style),
-    matchupD: getMatchupBonus(planD.style, planA.style),
-    trainerModsA: modsA,
-    trainerModsD: modsD,
-    trainers: trainers ?? [],
-    weaponReqA: { endurancePenalty: weaponReqA.endurancePenalty, attPenalty: weaponReqA.attPenalty },
-    weaponReqD: { endurancePenalty: weaponReqD.endurancePenalty, attPenalty: weaponReqD.attPenalty },
-    tacticStreakA: 0,
-    tacticStreakD: 0,
-  };
-
-  return { nameA, nameD, weaponA, weaponD, fA, fD, resCtx };
 }
 
 export function processOutcomeTags(

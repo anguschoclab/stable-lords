@@ -1,5 +1,4 @@
 import {
-  evaluateInitiative,
   performAttackCheck,
   performRiposteCheck,
   performDefenseCheck,
@@ -73,7 +72,7 @@ import {
   runRecovery,
   type ExchangeState,
 } from "./exchangeSubPhases";
-import { getZonePenalty } from "./distanceResolution";
+import { getZonePenalty, getWeaponRangeMod } from "./distanceResolution";
 
 // ─── Fighter State & Context ───────────────────────────────────────────────
 
@@ -317,7 +316,11 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
 
   const attMomentumBonus = att.momentum * 2;
   const attPsychMod = aGoesFirst ? psychA.attMod : psychD.attMod;
-  const attSucc = performAttackCheck(rng, att, curAttOE, aGoesFirst ? ctx.matchupA : ctx.matchupD, aGoesFirst ? fatA : fatD, curOffMods, curPassA, curAntiSyn, curBiasAtt, overAtt, curAttWepReq, attMomentumBonus + attPsychMod + (aGoesFirst ? es.rangeModA : es.rangeModD) + attCommit.attBonus + feintAttBonus);
+  // Weapon range modifier: how well this weapon performs at the current range.
+  // A dagger user at Grapple gets +3-4; a pike user at Grapple gets -10.
+  const attWeaponRangeMod = getWeaponRangeMod(att.weaponId, ctx.range);
+  const defWeaponRangeMod = getWeaponRangeMod(def.weaponId, ctx.range);
+  const attSucc = performAttackCheck(rng, att, curAttOE, aGoesFirst ? ctx.matchupA : ctx.matchupD, aGoesFirst ? fatA : fatD, curOffMods, curPassA, curAntiSyn, curBiasAtt, overAtt, curAttWepReq, attMomentumBonus + attPsychMod + (aGoesFirst ? es.rangeModA : es.rangeModD) + attCommit.attBonus + feintAttBonus + attWeaponRangeMod);
 
   if (!attSucc) {
     events.push({ type: "ATTACK", actor: attLabel, result: "WHIFF" });
@@ -345,7 +348,10 @@ export function resolveExchange(ctx: ResolutionContext, fA: FighterState, fD: Fi
     const zonePenalty = ctx.pushedFighter === def.label
       ? Math.abs(getZonePenalty(ctx.zone, ctx.arenaConfig))
       : 0;
-    const extraDefPenalty = zonePenalty - defCommit.defPenalty + feintDefBonus;
+    // Negative defWeaponRangeMod means defender is disadvantaged at this range
+    // (e.g. pike user can't parry effectively at Grapple). Convert to a positive penalty.
+    const defRangePenalty = Math.max(0, -defWeaponRangeMod);
+    const extraDefPenalty = zonePenalty - defCommit.defPenalty + feintDefBonus + defRangePenalty;
 
     const defCheck = performDefenseCheck(rng, def, curDefOE, aGoesFirst ? ctx.matchupD : ctx.matchupA, aGoesFirst ? fatD : fatA, curDefMods, curPassD, curBiasDef, overDef, isDodge, curAntiSynDef, curOffMods, ctx, att, extraDefPenalty);
 
