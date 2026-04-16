@@ -40,8 +40,11 @@ export function runApproach(
   es: ExchangeState
 ): void {
   const result = contestDistance(rng, fA, fD, OE_A, OE_D, ctx.range);
-  es.rangeModA = result.rangeModA;
-  es.rangeModD = result.rangeModD;
+  // rangeModA/D are intentionally 0: the contest winner shifts the range (which
+  // matters for weapon range mods), but does NOT grant a flat ATT bonus. A flat
+  // bonus is correlated with OE and double-stacks with commit level, breaking balance.
+  es.rangeModA = 0;
+  es.rangeModD = 0;
   es.distanceWinner = result.distanceWinner;
   es.events.push(...result.events);
   ctx.range = result.newRange;
@@ -121,7 +124,7 @@ export function runCommit(fighter: FighterState, OE: number): CommitResult {
     return { level: "Cautious", attBonus: 0, defPenalty: 1, debtToWrite: 0 };
   }
   if (OE >= 7 || fighter.momentum >= 2) {
-    return { level: "Full", attBonus: 2, defPenalty: -1, debtToWrite: 1 };
+    return { level: "Full", attBonus: 1, defPenalty: -1, debtToWrite: 1 };
   }
   return { level: "Standard", attBonus: 0, defPenalty: 0, debtToWrite: 0 };
 }
