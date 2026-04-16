@@ -9,6 +9,7 @@ import type { IRNGService } from "@/engine/core/rng/IRNGService";
 interface LegacyCandidate {
   name: string;
   stableName: string;
+  parentStableId?: string; // 🛡️ Track parent stable for crest inheritance
 }
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -42,7 +43,8 @@ export class SeasonalRetirementService {
             const newStableName = `${w.name}'s Academy`;
             legacyCandidates.push({
               name: w.name,
-              stableName: newStableName
+              stableName: newStableName,
+              parentStableId: rival.id, // 🛡️ Track parent for crest inheritance
             });
           }
         });

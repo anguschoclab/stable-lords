@@ -12,6 +12,7 @@ import {
 } from "./shared.types";
 
 import { type Warrior, type DeathEvent } from "./warrior.types";
+import { type CrestData } from "./crest.types";
 
 export type { 
   Warrior, 
@@ -23,7 +24,8 @@ export type {
   TrainerTier,
   TrainerFocus,
   Trainer,
-  ScoutQuality
+  ScoutQuality,
+  CrestData
 };
 import { type FightSummary, type FightOutcomeBy } from "./combat.types";
 export type { FightSummary, FightOutcomeBy };
@@ -86,6 +88,7 @@ export interface Owner {
   personality?: OwnerPersonality;
   metaAdaptation?: MetaAdaptation;
   favoredStyles?: FightingStyle[];
+  generation?: number; // 🛡️ Crest lineage depth (0 = original founder)
 }
 
 // ─── Game State ─────────────────────────────────────────────────────────────
@@ -178,6 +181,7 @@ export interface RivalStableData {
   origin?: string;
   philosophy?: string;
   tier?: "Minor" | "Established" | "Major" | "Legendary";
+  crest?: CrestData;
 }
 
 export interface ScoutReportData {

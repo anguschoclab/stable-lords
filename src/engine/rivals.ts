@@ -5,6 +5,7 @@ import { computeWarriorStats } from "./skillCalc";
 import { makeWarrior } from "./factories";
 import { STABLE_TEMPLATES, type StableTemplate } from "@/data/stableTemplates";
 import type { GameState } from "@/types/state.types";
+import { generateCrest } from "./crest/crestGenerator";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 /**
@@ -142,9 +143,20 @@ export function generateRivalStables(count: number, seed: number, week: number =
     const catchupGold = week * 50;
     const initialGold = (tmpl.tier === "Legendary" ? 2000 : tmpl.tier === "Major" ? 1200 : tmpl.tier === "Established" ? 800 : 500) + catchupGold;
 
+    // Generate crest for this stable
+    const crestSeed = Math.floor(rng.next() * 100000);
+    const crest = generateCrest({
+      seed: crestSeed,
+      philosophy: tmpl.philosophy,
+      tier: tmpl.tier,
+    });
+
     rivals.push({ 
       id: stableId,
-      owner, 
+      owner: {
+        ...owner,
+        generation: 0, // 🛡️ Original founder
+      }, 
       roster: warriors, 
       treasury: initialGold,
       motto: tmpl.motto,
@@ -163,7 +175,8 @@ export function generateRivalStables(count: number, seed: number, week: number =
         knownRivals: [],
       },
       actionHistory: [],
-      fame: iteration > 0 ? 50 + (iteration * 100) : 0 // 🏗️ Initial prestige
+      fame: iteration > 0 ? 50 + (iteration * 100) : 0, // 🏗️ Initial prestige
+      crest, // 🛡️ Generated heraldic crest
     });
   }
   return rivals;

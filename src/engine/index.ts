@@ -18,3 +18,24 @@ export { evolvePhilosophies } from "./ownerPhilosophy";
 export { generateRivalStables } from "./rivals";
 export { processWeekBouts, generatePairings, resolveBout } from "./boutProcessor";
 export { getTempoBonus, getEnduranceMult, getStylePassive, getKillMechanic, getStyleAntiSynergy, getMastery } from "./stylePassives";
+
+// 🛡️ Crest System
+export {
+  generateCrest,
+  inheritCrest,
+  getCrestColor,
+  getChargeDescription,
+  getCrestDescription,
+} from "./crest/crestGenerator";
+export {
+  StableCrest,
+  SIZE_MAP,
+} from "@/components/crest/StableCrest";
+export type {
+  CrestData,
+  CrestCharge,
+  ShieldShape,
+  FieldType,
+  MetalColor,
+  ChargeType,
+} from "@/types/crest.types";
