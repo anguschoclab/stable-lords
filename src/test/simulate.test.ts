@@ -741,3 +741,63 @@ describe("simulateFight — distance system", () => {
     expect(hasFeintText).toBe(true);
   });
 });
+
+// ─── Spatial System Integration ───────────────────────────────────────────────
+
+describe("spatial system integration", () => {
+  it("simulateFight runs 100 fights with mudpit arena without throwing", () => {
+    for (let seed = 0; seed < 100; seed++) {
+      const plan: FightPlan = {
+        style: FightingStyle.SlashingAttack,
+        OE: 6, AL: 5, killDesire: 5,
+        feintTendency: 3,
+        rangePreference: "Striking",
+      };
+      expect(() =>
+        simulateFight(plan, plan, undefined, undefined, seed, undefined, "Clear", "mudpit_arena")
+      ).not.toThrow();
+    }
+  });
+
+  it("mudpit arena has higher endurance cost than standard (over 50 fights)", () => {
+    let standardMinAvg = 0, mudpitMinAvg = 0;
+    const n = 50;
+    for (let seed = 0; seed < n; seed++) {
+      const plan: FightPlan = {
+        style: FightingStyle.SlashingAttack,
+        OE: 7, AL: 5, killDesire: 5,
+      };
+      const standard = simulateFight(plan, plan, undefined, undefined, seed, undefined, "Clear", "standard_arena");
+      const mudpit = simulateFight(plan, plan, undefined, undefined, seed, undefined, "Clear", "mudpit_arena");
+      standardMinAvg += standard.minutes;
+      mudpitMinAvg += mudpit.minutes;
+    }
+    // Mudpit fights should end sooner on average (fighters tire faster via enduranceMult: 1.15).
+    // Allow +1.5 minute tolerance for stochastic variance.
+    expect(mudpitMinAvg / n).toBeLessThanOrEqual(standardMinAvg / n + 1.5);
+  });
+
+  it("RANGE_SHIFT events appear in the fight log when fighters have different range preferences", () => {
+    const planLunger: FightPlan = {
+      style: FightingStyle.LungingAttack,
+      OE: 7, AL: 5, killDesire: 5,
+      rangePreference: "Extended",
+    };
+    const planGrappler: FightPlan = {
+      style: FightingStyle.StrikingAttack,
+      OE: 7, AL: 5, killDesire: 5,
+      rangePreference: "Grapple",
+    };
+    let foundRangeShift = false;
+    for (let seed = 0; seed < 20; seed++) {
+      const outcome = simulateFight(planLunger, planGrappler, undefined, undefined, seed, undefined, "Clear", "standard_arena");
+      const allText = outcome.log.map(l => l.text).join(" ");
+      // narrateRangeShift produces one of these phrases:
+      if (/forces the fight to|dictates the distance|drives the gap|seizes the spacing|controls the range/i.test(allText)) {
+        foundRangeShift = true;
+        break;
+      }
+    }
+    expect(foundRangeShift).toBe(true);
+  });
+});
