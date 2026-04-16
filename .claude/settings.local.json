@@ -35,7 +35,8 @@
       "Bash(npm list *)",
       "Bash(./node_modules/.bin/tsc --noEmit)",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\); print\\(list\\(d.get\\('pbp',{}\\).keys\\(\\)\\)\\)\")",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(wc -l src/engine/crest/*.ts src/components/crest/*.tsx)"
     ]
   }
 }
