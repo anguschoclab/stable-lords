@@ -129,8 +129,9 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
 
   const handleInsight = (type: "weapon" | "rhythm") => {
     const msg = applyInsightToken(warrior, type);
-    setState((s: any) => {
-      s.roster = s.roster.map((w: Warrior) => w.id === warrior.id ? { ...w, favorites: warrior.favorites } : w);
+    setState((s) => {
+      const w = s.roster.find((x) => x.id === warrior.id);
+      if (w) w.favorites = warrior.favorites;
     });
     toast.success(msg);
     onUpdate();
@@ -139,12 +140,15 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
   const handleApplyRhythm = () => {
     const fav = warrior.favorites;
     if (!fav?.discovered.rhythm) return;
-    setState((s: any) => {
-      s.roster = s.roster.map((w: Warrior) => {
-        if (w.id !== warrior.id) return w;
-        const basePlan = w.plan ?? {};
-        return { ...w, plan: { ...basePlan, OE: fav.rhythm.oe, AL: fav.rhythm.al } };
-      });
+    setState((s) => {
+      const w = s.roster.find((x) => x.id === warrior.id);
+      if (w) {
+        if (!w.plan) w.plan = { style: w.style, OE: fav.rhythm.oe, AL: fav.rhythm.al };
+        else {
+          w.plan.OE = fav.rhythm.oe;
+          w.plan.AL = fav.rhythm.al;
+        }
+      }
     });
     toast.success(`${warrior.name}'s strategy updated — OE ${fav.rhythm.oe} / AL ${fav.rhythm.al} locked in.`);
     onUpdate();
@@ -153,12 +157,12 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
   const handleEquipFavoriteWeapon = () => {
     const fav = warrior.favorites;
     if (!fav?.discovered.weapon) return;
-    setState((s: any) => {
-      s.roster = s.roster.map((w: Warrior) => {
-        if (w.id !== warrior.id) return w;
-        const equip = w.equipment ?? {};
-        return { ...w, equipment: { ...equip, weapon: fav.weaponId } };
-      });
+    setState((s) => {
+      const w = s.roster.find((x) => x.id === warrior.id);
+      if (w) {
+        if (!w.equipment) w.equipment = { weapon: fav.weaponId, armor: "none_armor", shield: "none_shield", helm: "none_helm" };
+        else w.equipment.weapon = fav.weaponId;
+      }
     });
     const weaponName = favDisplay.weapon ?? fav.weaponId;
     toast.success(`${warrior.name} equipped with their soul-bond weapon: ${weaponName}.`);

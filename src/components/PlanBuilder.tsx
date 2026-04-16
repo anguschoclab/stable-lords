@@ -138,14 +138,14 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                   >
                     {TACTIC_BANK.map((t, idx) => (
                       <Draggable key={t.id} draggableId={t.id} index={idx}>
-                        {(provided: any, snapshot: any) => (
+                        {(dragProvided: DraggableProvided, dragSnapshot: DraggableStateSnapshot) => (
                           <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
+                            ref={dragProvided.innerRef}
+                            {...dragProvided.draggableProps}
+                            {...dragProvided.dragHandleProps}
                             className={cn(
                               "flex items-center gap-3 p-3 text-xs font-bold uppercase tracking-wider border transition-all cursor-grab active:cursor-grabbing",
-                              snapshot.isDragging ? "bg-arena-blood border-white text-white z-50" : "bg-white/5 border-white/10 text-muted-foreground hover:border-arena-gold/40 hover:text-foreground"
+                              dragSnapshot.isDragging ? "bg-arena-blood border-white text-white z-50" : "bg-white/5 border-white/10 text-muted-foreground hover:border-arena-gold/40 hover:text-foreground"
                             )}
                           >
                             <t.icon className="w-4 h-4 shrink-0" />
@@ -203,13 +203,13 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                     />
                   </div>
                   <Droppable droppableId="base">
-                    {(provided: any, snapshot: any) => (
-                      <div 
-                        {...provided.droppableProps} 
-                        ref={provided.innerRef}
+                    {(dropProvided: DroppableProvided, dropSnapshot: DroppableStateSnapshot) => (
+                      <div
+                        {...dropProvided.droppableProps}
+                        ref={dropProvided.innerRef}
                         className={cn(
                           "min-h-[60px] border-2 border-dashed flex items-center justify-center p-4 transition-colors",
-                          snapshot.isDraggingOver ? "bg-arena-gold/10 border-arena-gold/40" : "bg-black/20 border-white/10"
+                          dropSnapshot.isDraggingOver ? "bg-arena-gold/10 border-arena-gold/40" : "bg-black/20 border-white/10"
                         )}
                       >
                          <div className="flex gap-2">

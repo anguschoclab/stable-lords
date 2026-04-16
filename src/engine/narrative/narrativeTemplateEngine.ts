@@ -50,9 +50,13 @@ export class NarrativeTemplateEngine {
    */
   static getFromArchive(rng: IRNGService, path: string[]): string {
     try {
-      let current: any = narrativeContent;
+      let current: unknown = narrativeContent;
       for (const key of path) {
-        current = current[key];
+        if (current && typeof current === "object" && key in current) {
+          current = (current as Record<string, unknown>)[key];
+        } else {
+          throw new Error(`Invalid path: ${key}`);
+        }
       }
       if (Array.isArray(current) && current.length > 0) {
         return rng.pick(current);
