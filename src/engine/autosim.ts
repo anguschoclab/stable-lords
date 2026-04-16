@@ -50,7 +50,7 @@ export async function runAutosim(
 
     // 3. Process Weekly Bouts (Actually runs the fights)
     const boutResult = processWeekBouts(state);
-    state = boutResult.state;
+    state = resolveImpacts(state, [boutResult.impact]);
     const { results, summary } = boutResult;
 
     if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: null as any, weekSummaries };
