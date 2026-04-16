@@ -34,6 +34,7 @@ export function runEventPass(state: GameState, nextWeek: number, rootRng?: IRNGS
   const rosterUpdates = new Map<string, any>();
   const newsletterItems: NewsletterItem[] = [];
   let treasuryDelta = 0;
+  const ledgerEntries: StateImpact["ledgerEntries"] = [];
   
   // 🍺 Tavern Brawl Event
   if (brawlRng.next() < 0.05 && state.roster.length > 0) {
