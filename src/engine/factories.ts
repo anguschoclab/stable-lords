@@ -9,6 +9,7 @@ import type { NarrativeContent } from "@/types/narrative.types";
 import { FightingStyle } from "@/types/shared.types";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { generateFavorites } from "@/engine/favorites";
+import { generatePotential } from "@/engine/potential";
 import { generateId } from "@/utils/idUtils";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
@@ -193,7 +194,7 @@ export function makeWarrior(
         tier: "Common",
         lore: (narrativeContent as NarrativeContent).recruitment.origin[0], // Seeded fallback
         addedWeek: 1,
-        potential: { ST: 1, CN: 1, SZ: 1, WT: 1, WL: 1, SP: 1, DF: 1 }
+        potential: generatePotential(attrs, "Common", () => rng.next())
       } as PoolWarrior;
     });
 

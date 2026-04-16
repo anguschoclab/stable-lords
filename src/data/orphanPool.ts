@@ -4,6 +4,8 @@
  * personality traits, ages, and style-appropriate attribute spreads.
  */
 import { FightingStyle, type Attributes, ATTRIBUTE_KEYS } from "@/types/game";
+import type { AttributePotential } from "@/types/warrior.types";
+import { generatePotential } from "@/engine/potential";
 
 export interface OrphanWarrior {
   id: string;
@@ -14,7 +16,38 @@ export interface OrphanWarrior {
   lore: string;
   trait: string;
   origin: string;
+  potential: AttributePotential;
 }
+
+/**
+ * Maps orphan trait strings to partial FightPlan overrides.
+ * Applied at adoption time to give traits mechanical weight.
+ */
+export const TRAIT_PLAN_MODIFIERS: Record<string, {
+  OE?: number; AL?: number; killDesire?: number;
+  feintTendency?: number; rangePreference?: "Grapple" | "Tight" | "Striking" | "Extended";
+}> = {
+  "Fearless":         { killDesire: 8, OE: 7 },
+  "Calculating":      { feintTendency: 6, AL: 7 },
+  "Savage":           { killDesire: 9, OE: 9, AL: 3 },
+  "Patient":          { AL: 7, OE: 3 },
+  "Reckless":         { OE: 9, AL: 3, killDesire: 7 },
+  "Stoic":            { AL: 6, OE: 5 },
+  "Hot-blooded":      { OE: 8, killDesire: 7 },
+  "Methodical":       { feintTendency: 4, AL: 8 },
+  "Cunning":          { feintTendency: 7, OE: 5 },
+  "Relentless":       { OE: 8, AL: 4, killDesire: 6 },
+  "Cold-eyed":        { feintTendency: 5, killDesire: 8 },
+  "Scrappy":          { OE: 7, rangePreference: "Grapple" },
+  "Iron-willed":      { AL: 6, killDesire: 6 },
+  "Quiet fury":       { feintTendency: 3, killDesire: 7 },
+  "Born survivor":    { AL: 8, OE: 4 },
+  "Ruthless":         { killDesire: 9, OE: 8 },
+  "Deceptively calm": { feintTendency: 8, AL: 7 },
+  "Feral instinct":   { OE: 8, rangePreference: "Grapple", killDesire: 7 },
+  "Natural leader":   { feintTendency: 4, AL: 6, OE: 6 },
+  "Lone wolf":        { OE: 7, AL: 5, killDesire: 6 },
+};
 
 // ── Name pools by archetype ─────────────────────────────────────────────
 
@@ -252,6 +285,8 @@ export function generateOrphanPool(count: number = 8, seed?: number): OrphanWarr
     const origin = pick(ORIGINS, rng);
     const trait = pick(TRAITS, rng);
     const lore = generateLore(name, archetype, rng);
+    // Orphans all start at Common tier potential — street kids with raw ability
+    const potential = generatePotential(attrs, "Common", rng);
 
     pool.push({
       id: `orp_${i}_${Math.floor(rng() * 1e6)}`,
@@ -262,6 +297,7 @@ export function generateOrphanPool(count: number = 8, seed?: number): OrphanWarr
       lore,
       trait,
       origin,
+      potential,
     });
   }
 

@@ -97,5 +97,14 @@ export function advanceWeek(state: GameState): GameState {
   finalizedState.day = 0; // Reset daily counter
   finalizedState.trainingAssignments = []; // Reset weekly assignments
 
+  // Prune stale seasonal growth entries on season change to prevent unbounded growth.
+  // The seasonal cap is keyed by season name, so old-season entries are already ignored
+  // mechanically — this just keeps the array from growing forever.
+  if (finalizedState.season !== state.season) {
+    finalizedState.seasonalGrowth = (finalizedState.seasonalGrowth ?? []).filter(
+      (sg) => sg.season === finalizedState.season
+    );
+  }
+
   return archiveWeekLogs(finalizedState);
 }

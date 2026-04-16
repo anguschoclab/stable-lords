@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, X, Heart, AlertTriangle, Lock, Zap, Gauge, ArrowUpRight } from "lucide-react";
 import { computeGainChance } from "@/engine/training";
+import { canGrow } from "@/engine/potential";
 import { WarriorNameTag } from "@/components/ui/WarriorBadges";
 import { Surface } from "@/components/ui/Surface";
 import { cn } from "@/lib/utils";
@@ -87,15 +88,23 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
               const maxed = val >= 25;
               const isSZ = key === "SZ";
               const seasonCapped = (seasonalGains[key] ?? 0) >= 3;
-              const disabled = !!assignment || maxed || atCap || isSZ || seasonCapped;
-
-              const chance = (!isSZ && !maxed && !atCap && !seasonCapped)
-                ? Math.round(computeGainChance(warrior, key, trainers) * 100)
-                : 0;
-
               const isRevealed = !!warrior.potentialRevealed?.[key];
               const potVal = warrior.potential?.[key] ?? 25;
-              const nearCeiling = isRevealed && val >= potVal;
+              const ceilingHit = !canGrow(val, warrior.potential?.[key]);
+              const nearCeiling = isRevealed && val >= potVal - 1;
+              const disabled = !!assignment || maxed || atCap || isSZ || seasonCapped || ceilingHit;
+
+              // Determine the lock reason for the tooltip
+              const lockReason = isSZ ? "Size is fixed"
+                : maxed ? "Attribute max (25)"
+                : ceilingHit ? "At potential ceiling"
+                : atCap ? "Total stat cap (80) reached"
+                : seasonCapped ? "Seasonal cap (3/3 this season)"
+                : null;
+
+              const chance = (!isSZ && !maxed && !atCap && !seasonCapped && !ceilingHit)
+                ? Math.round(computeGainChance(warrior, key, trainers) * 100)
+                : 0;
 
               return (
                 <Tooltip key={key}>
@@ -116,7 +125,7 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
                       {/* Label & Value */}
                       <div className="w-16 shrink-0">
                         <div className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                          {isSZ && <Lock className="h-2.5 w-2.5 opacity-40" />}
+                          {lockReason && !isSelected && <Lock className="h-2.5 w-2.5 opacity-60 shrink-0" />}
                           {key}
                         </div>
                         <div className="text-[10px] font-mono opacity-60">
@@ -145,6 +154,10 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
                           <Check className="h-3.5 w-3.5 text-primary float-right drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
                         ) : maxed ? (
                           <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">MAX</div>
+                        ) : ceilingHit ? (
+                          <Lock className="h-3 w-3 text-arena-gold/60 float-right" />
+                        ) : atCap ? (
+                          <Lock className="h-3 w-3 text-destructive/60 float-right" />
                         ) : seasonCapped ? (
                           <div className="text-[8px] font-black text-arena-gold uppercase tracking-widest">3/3</div>
                         ) : !disabled ? (
@@ -170,14 +183,18 @@ export function WarriorTrainingCard({ warrior, assignment, seasonalGains, traine
                       {isSZ ? (
                         <p className="text-[9px] leading-relaxed opacity-60 italic">Physiological constants are immutable. Size remains fixed after recruitment.</p>
                       ) : maxed ? (
-                        <p className="text-[9px] leading-relaxed text-primary italic">Absolute peak performance reached. No further gains possible.</p>
+                        <p className="text-[9px] leading-relaxed text-primary italic">Absolute peak reached (25). No further gains possible.</p>
+                      ) : ceilingHit ? (
+                        <p className="text-[9px] leading-relaxed text-arena-gold italic">Warrior has reached their potential ceiling for {key}. Scouts may reveal if further growth is possible.</p>
+                      ) : atCap ? (
+                        <p className="text-[9px] leading-relaxed text-destructive/80 italic">Total stat pool (80) is full. Another attribute must decline before this one can grow.</p>
                       ) : seasonCapped ? (
                         <p className="text-[9px] leading-relaxed text-arena-gold italic">Metabolic fatigue detected. Warrior requires end-of-season recalibration to resume growth.</p>
                       ) : (
                         <p className="text-[9px] leading-relaxed opacity-60">
                           {isSelected ? `Assigned to focus on ${ATTRIBUTE_LABELS[key]}. Progress roll executes at week end.` : `Click to prioritize ${key} training this week.`}
-                          {isRevealed && val < potVal && " Significant growth room identified before metabolic ceiling."}
-                          {nearCeiling && " Approaching genetic potential threshold. Diminishing returns in effect."}
+                          {isRevealed && !nearCeiling && " Significant growth room identified before metabolic ceiling."}
+                          {nearCeiling && !ceilingHit && " Approaching genetic potential threshold. Diminishing returns in effect."}
                         </p>
                       )}
                     </div>

@@ -131,12 +131,19 @@ export function TrainerCard({
                      </div>
                   </div>
                   {trainer.styleBonusStyle && (
-                    <div className="text-right border-l border-white/10 pl-4">
-                       <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest block leading-none mb-1">Style Proxy</span>
-                       <span className="text-[10px] font-black text-arena-gold uppercase tracking-widest">
-                          {STYLE_DISPLAY_NAMES[trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? trainer.styleBonusStyle}
-                       </span>
-                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="text-right border-l border-white/10 pl-4 cursor-help">
+                           <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest block leading-none mb-1">Style Affinity</span>
+                           <span className="text-[10px] font-black text-arena-gold uppercase tracking-widest">
+                              {STYLE_DISPLAY_NAMES[trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? trainer.styleBonusStyle}
+                           </span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[200px] text-[10px]">
+                        +5% gain chance for {STYLE_DISPLAY_NAMES[trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? trainer.styleBonusStyle} warriors during training sessions
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                </div>
             </div>

@@ -7,6 +7,7 @@ import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { GraduationCap, ChevronRight, Target, Coins, Activity, Zap } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export function TrainerTable() {
@@ -80,10 +81,17 @@ export function TrainerTable() {
                            <span className="text-[9px] font-black uppercase tracking-widest">{t.focus} Registry</span>
                         </div>
                         {t.styleBonusStyle && (
-                           <div className="flex items-center gap-1.5 opacity-80">
-                              <Zap className="h-3 w-3 text-arena-gold" />
-                              <span className="text-[9px] font-black uppercase tracking-widest text-arena-gold">Bonus: {STYLE_DISPLAY_NAMES[t.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? t.styleBonusStyle}</span>
-                           </div>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <div className="flex items-center gap-1.5 opacity-80 cursor-help">
+                                  <Zap className="h-3 w-3 text-arena-gold" />
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-arena-gold">Affinity: {STYLE_DISPLAY_NAMES[t.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? t.styleBonusStyle}</span>
+                               </div>
+                             </TooltipTrigger>
+                             <TooltipContent side="right" className="max-w-[200px] text-[10px]">
+                               +5% training gain chance for {STYLE_DISPLAY_NAMES[t.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES] ?? t.styleBonusStyle} warriors
+                             </TooltipContent>
+                           </Tooltip>
                         )}
                       </div>
 

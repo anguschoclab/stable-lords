@@ -1,6 +1,6 @@
 import { MinuteEvent } from "@/types/game";
 
-export function classifyEvent(event: MinuteEvent | string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" | "phase" {
+export function classifyEvent(event: MinuteEvent | string): "hit" | "miss" | "crit" | "death" | "ko" | "exhaust" | "status" | "riposte" | "initiative" | "phase" | "spatial" {
   const text = typeof event === "string" ? event : event.text;
 
   if (text.startsWith("—") && text.includes("Phase")) return "phase";
@@ -18,6 +18,7 @@ export function classifyEvent(event: MinuteEvent | string): "hit" | "miss" | "cr
   if (t.includes("devastating") || t.includes("critical") || t.includes("massive") || t.includes("lethal")) return "crit";
   if (t.includes("counter-attack") || t.includes("riposte")) return "riposte";
   if (t.includes("initiative") || t.includes("seizes")) return "initiative";
+  if (t.includes("range") || t.includes("feint") || t.includes("closes in") || t.includes("backs away") || t.includes("pushes") || t.includes("forced to") || t.includes("corner") || t.includes("edge of") || t.includes("center of")) return "spatial";
   if (t.includes("damage") || t.includes("strikes") || t.includes("hits") || t.includes("lands") || t.includes("striking")) return "hit";
   if (t.includes("miss") || t.includes("parr") || t.includes("dodge") || t.includes("turns") || t.includes("no opening") || t.includes("blocks")) return "miss";
   return "status";

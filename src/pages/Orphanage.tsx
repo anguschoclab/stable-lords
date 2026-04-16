@@ -24,7 +24,13 @@ import {
   Swords, ArrowRight, ArrowLeft, Skull,
   CheckCircle2, Zap, RefreshCw, Flame,
 } from "lucide-react";
-import { generateOrphanPool } from "@/data/orphanPool";
+import { generateOrphanPool, TRAIT_PLAN_MODIFIERS } from "@/data/orphanPool";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const STEP_LABELS = [
   "Establish Identity",
@@ -137,11 +143,33 @@ function WarriorCard({
 
         {/* Main info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
+          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <span className="font-display font-bold text-sm text-foreground">
               {warrior.name}
             </span>
             <StatBadge styleName={warrior.style} variant="secondary" showFullName />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-arena-gold/30 bg-arena-gold/5 text-arena-gold cursor-help">
+                    {warrior.trait}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[220px] text-[10px]">
+                  {(() => {
+                    const mods = TRAIT_PLAN_MODIFIERS[warrior.trait];
+                    if (!mods) return <span>Flavor trait — shapes personality</span>;
+                    const parts: string[] = [];
+                    if (mods.OE) parts.push(`OE ${mods.OE}`);
+                    if (mods.AL) parts.push(`AL ${mods.AL}`);
+                    if (mods.killDesire) parts.push(`KD ${mods.killDesire}`);
+                    if (mods.feintTendency) parts.push(`Feint ${mods.feintTendency}`);
+                    if (mods.rangePreference) parts.push(`Prefers ${mods.rangePreference}`);
+                    return <span>{warrior.trait}: {parts.join(", ")}</span>;
+                  })()}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <p className="text-[10px] text-muted-foreground/60 italic leading-relaxed line-clamp-2">
             {warrior.lore}
@@ -257,15 +285,18 @@ export default function Orphanage() {
     const finishRng = new SeededRNGService(poolSeedValue + 999);
 
     const warriors = selectedWarriors.map((pw) => {
-      const potential = generatePotential(pw.attrs, "Promising", () =>
-        finishRng.next()
-      );
+      // Use the orphan's pre-generated potential (or regenerate if somehow missing)
+      const potential = pw.potential ?? generatePotential(pw.attrs, "Common", () => finishRng.next());
+      // Build base plan and merge trait-based modifiers
+      const basePlan = defaultPlanForWarrior(makeWarrior(undefined, pw.name, pw.style, pw.attrs));
+      const traitMods = TRAIT_PLAN_MODIFIERS[pw.trait] ?? {};
+      const plan = { ...basePlan, ...traitMods };
       const w = makeWarrior(
         finishRng.uuid(),
         pw.name,
         pw.style,
         pw.attrs,
-        { potential, age: pw.age },
+        { potential, age: pw.age, plan },
         finishRng
       );
       if (boutResult) {

@@ -3,13 +3,14 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { MinuteEvent } from "@/types/combat.types";
 import { classifyEvent } from "@/lib/boutUtils";
-import { 
-  Swords, 
-  Zap, 
-  Skull, 
-  Shield, 
-  Target, 
-  Activity 
+import {
+  Swords,
+  Zap,
+  Skull,
+  Shield,
+  Target,
+  Activity,
+  MoveHorizontal
 } from "lucide-react";
 
 interface TacticalLogViewProps {
@@ -29,6 +30,7 @@ function getEventIcon(type: ReturnType<typeof classifyEvent>) {
     case "initiative": return <Zap className="h-3 w-3 text-primary" />;
     case "exhaust": return <Activity className="h-3 w-3 text-muted-foreground/40" />;
     case "phase": return <Target className="h-3 w-3 text-primary/60" />;
+    case "spatial": return <MoveHorizontal className="h-3 w-3 text-blue-400" />;
     default: return <div className="h-2 w-2 rounded-full bg-muted-foreground/20" />;
   }
 }
@@ -44,6 +46,7 @@ function getEventColor(type: ReturnType<typeof classifyEvent>) {
     case "exhaust": return "border-white/5 bg-white/5";
     case "miss": return "border-white/5 bg-transparent opacity-60";
     case "phase": return "border-primary/40 bg-primary/10 py-3 my-2";
+    case "spatial": return "border-blue-500/20 bg-blue-500/5";
     default: return "border-white/5 bg-transparent";
   }
 }

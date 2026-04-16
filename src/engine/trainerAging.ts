@@ -16,11 +16,21 @@ export function computeTrainerAging(state: GameState, rng?: IRNGService): { upda
   const isAgingWeek = state.week % WEEKS_PER_YEAR === 0;
 
   // Process all trainers in the world (active & hiring pool)
-  const processAging = (trainers: Trainer[], locLabel: string) => {
+  const processAging = (trainers: Trainer[], isActive: boolean) => {
     const kept: Trainer[] = [];
-    for (const t of (trainers || [])) {
+    for (let t of (trainers || [])) {
       let currentAge = t.age ?? 45;
       if (isAgingWeek) currentAge++;
+
+      // ── Contract expiration (active trainers only) ──
+      if (isActive && t.contractWeeksLeft !== undefined) {
+        const weeksLeft = t.contractWeeksLeft - 1;
+        if (weeksLeft <= 0) {
+          news.push(`📋 CONTRACT: ${t.name}'s contract has expired and they have left the stable.`);
+          continue; // Remove from active trainers
+        }
+        t = { ...t, contractWeeksLeft: weeksLeft };
+      }
 
       let retired = false;
       if (currentAge >= 65) {
@@ -29,7 +39,7 @@ export function computeTrainerAging(state: GameState, rng?: IRNGService): { upda
 
         // 🛡️ Legend Protection: -1% per 10 Fame (max -10%)
         const fameDiscount = Math.min(0.10, (t.fame || 0) * 0.001);
-        
+
         // 🛡️ Retired Warrior Protection: -5% flat
         const legacyDiscount = t.retiredFromWarrior ? 0.05 : 0;
 
@@ -49,8 +59,8 @@ export function computeTrainerAging(state: GameState, rng?: IRNGService): { upda
     return kept;
   };
 
-  const updatedTrainers = processAging(state.trainers, "Active");
-  const updatedHiringPool = processAging(state.hiringPool, "Pool");
+  const updatedTrainers = processAging(state.trainers, true);
+  const updatedHiringPool = processAging(state.hiringPool, false);
 
   return { updatedTrainers, news, updatedHiringPool };
 }

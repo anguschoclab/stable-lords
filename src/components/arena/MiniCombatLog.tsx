@@ -42,6 +42,7 @@ export default function MiniCombatLog({
       case "initiative": return "⚡";
       case "exhaust": return "😮‍💨";
       case "phase": return "◆";
+      case "spatial": return "↔";
       default: return "•";
     }
   };
