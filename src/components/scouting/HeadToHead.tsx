@@ -31,20 +31,20 @@ export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) 
 
     for (let i = allFights.length - 1; i >= 0; i--) {
       const f = allFights[i];
-      const aIsA = idsA.has(f.warriorIdA);
-      const aIsD = idsA.has(f.warriorIdD);
-      const bIsA = idsB.has(f.warriorIdA);
-      const bIsD = idsB.has(f.warriorIdD);
+      const idA = f.warriorIdA;
+      const idD = f.warriorIdD;
+      const aIsA = idsA.has(idA);
 
-      if ((aIsA && bIsD) || (aIsD && bIsA)) {
+      if (aIsA && idsB.has(idD)) {
         reversed.push(f);
-        if ((aIsA && f.winner === "A") || (aIsD && f.winner === "D")) {
-          wA++;
-        } else if ((bIsA && f.winner === "A") || (bIsD && f.winner === "D")) {
-          wB++;
-        } else {
-          d++;
-        }
+        if (f.winner === "A") wA++;
+        else if (f.winner === "D") wB++;
+        else d++;
+      } else if (idsA.has(idD) && idsB.has(idA)) {
+        reversed.push(f);
+        if (f.winner === "D") wA++;
+        else if (f.winner === "A") wB++;
+        else d++;
       }
     }
 
