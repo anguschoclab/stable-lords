@@ -11,7 +11,7 @@ declare global {
       archiveGazette: (season: number, week: number, markdown: string) => Promise<{ success: boolean; error?: string }>;
       retrieveGazette: (season: number, week: number) => Promise<{ success: boolean; data?: string; error?: string }>;
       storeGet: <T = unknown>(key: string) => Promise<T | null>;
-      storeSet: <T = unknown>(key: string, value: T) => Promise<{ success: boolean }>;
+      storeSet: <T = unknown>(key: string, value: T) => Promise<{ success: boolean; error?: string }>;
       storeDelete: (key: string) => Promise<{ success: boolean }>;
       getAppInfo: () => Promise<{ name: string; version: string; platform: string }>;
       showNotification: (options: { title: string; body: string }) => Promise<{ success: boolean; error?: string }>;
