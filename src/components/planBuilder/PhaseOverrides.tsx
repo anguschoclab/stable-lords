@@ -13,7 +13,7 @@ interface PhaseOverridesProps {
 }
 
 export default function PhaseOverrides({ plan, onPlanChange }: PhaseOverridesProps) {
-  const [phaseMode, setPhaseMode] = React.useState(!!plan.phases);
+  const [phaseMode, setPhaseMode] = useState(!!plan.phases);
   
   return (
     <div className="space-y-4">
