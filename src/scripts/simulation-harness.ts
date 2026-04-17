@@ -4,6 +4,7 @@ import { processWeekBouts } from "@/engine/boutProcessor";
 import { populateInitialWorld } from "@/engine/core/worldSeeder";
 import { createFreshState } from "@/engine/factories";
 import { collectPulse, type SimPulse } from "@/engine/stats/simulationMetrics";
+import { resolveImpacts } from "@/engine/impacts";
 
 export interface SimulationConfig {
   weeks: number;

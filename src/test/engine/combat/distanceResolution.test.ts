@@ -6,7 +6,7 @@ import {
   getZonePenalty,
   transitionZone,
   resetZone,
-} from "@/engine/combat/distanceResolution";
+} from "@/engine/combat/mechanics/distanceResolution";
 
 describe("computeReachScore", () => {
   it("returns INI + 0 when OE=5, no motivation, no debt", () => {

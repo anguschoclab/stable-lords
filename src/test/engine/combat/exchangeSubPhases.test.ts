@@ -4,7 +4,7 @@ import {
   runCommit,
   runFeint,
   runRecovery,
-} from "@/engine/combat/exchangeSubPhases";
+} from "@/engine/combat/resolution/exchangeSubPhases";
 import type { FighterState } from "@/engine/combat/resolution";
 
 function makeFighter(overrides: Partial<FighterState> = {}): FighterState {

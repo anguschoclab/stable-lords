@@ -2,7 +2,7 @@
  * Narrative Intro - Pre-bout introduction functions
  * Extracted from narrativePBP.ts to follow SRP
  */
-import type { FightingStyle } from "@/types/shared.types";
+import { type FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import { getItemById } from "@/data/equipment";
 import { szToHeight, getWeaponDisplayName } from "./narrativeUtils";
 import { getFromArchive, interpolateTemplate, type CombatContext } from "./narrativePBPUtils";
@@ -53,7 +53,6 @@ export function generateWarriorIntro(rng: RNG, data: WarriorIntroData, sz?: numb
     lines.push(interpolateTemplate(verb, { attacker: n, weapon: weaponName }));
   }
 
-  const { STYLE_DISPLAY_NAMES } = require("@/types/shared.types");
   lines.push(`${n} uses the ${STYLE_DISPLAY_NAMES[data.style]} style.`);
   lines.push(`${n} is well suited to the weapons selected.`);
 

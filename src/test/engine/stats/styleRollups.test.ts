@@ -9,7 +9,19 @@ describe('StyleRollups', () => {
 
   describe('loadWeek (via getWeekRollup)', () => {
     beforeEach(() => {
-      // Clear localStorage before each test
+      // Ensure localStorage is a valid mock object before each test
+      if (!globalThis.localStorage) {
+        Object.defineProperty(globalThis, 'localStorage', {
+          value: {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            removeItem: vi.fn(),
+            clear: vi.fn(),
+          },
+          writable: true,
+          configurable: true,
+        });
+      }
       (globalThis.localStorage as any).clear();
     });
 
@@ -68,7 +80,13 @@ describe('StyleRollups', () => {
 
   describe('loadRolling (via last10)', () => {
     beforeEach(() => {
-      // Clear localStorage before each test
+      if (!globalThis.localStorage) {
+        Object.defineProperty(globalThis, 'localStorage', {
+          value: { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn(), clear: vi.fn() },
+          writable: true,
+          configurable: true,
+        });
+      }
       (globalThis.localStorage as any).clear();
     });
 
@@ -137,7 +155,13 @@ describe('StyleRollups', () => {
 
   describe('loadTour (via tournament)', () => {
     beforeEach(() => {
-      // Clear localStorage before each test
+      if (!globalThis.localStorage) {
+        Object.defineProperty(globalThis, 'localStorage', {
+          value: { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn(), clear: vi.fn() },
+          writable: true,
+          configurable: true,
+        });
+      }
       (globalThis.localStorage as any).clear();
     });
 

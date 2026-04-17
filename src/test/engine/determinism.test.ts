@@ -6,12 +6,12 @@ import { createFreshState } from "@/engine/factories";
 // Mock the archive service to avoid disk I/O during tests
 vi.mock("@/engine/storage/opfsArchive", () => {
   return {
-    OPFSArchiveService: vi.fn().mockImplementation(() => ({
-      isSupported: () => false,
-      archiveHotState: () => Promise.resolve(),
-      retrieveHotState: () => Promise.resolve(null),
-      archiveBoutLog: () => Promise.resolve(),
-    }))
+    OPFSArchiveService: class {
+      isSupported() { return false; }
+      archiveHotState() { return Promise.resolve(); }
+      retrieveHotState() { return Promise.resolve(null); }
+      archiveBoutLog() { return Promise.resolve(); }
+    }
   };
 });
 
