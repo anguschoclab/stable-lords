@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { createFreshState } from "@/engine/factories";
 import { FightingStyle } from "@/types/shared.types";
 import { findWarriorById, modifyWarrior } from "@/engine/matchmaking/tournament/tournamentStateMutator";
