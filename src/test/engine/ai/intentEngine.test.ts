@@ -15,7 +15,14 @@ describe("pickWeeklyIntent", () => {
       renown: 50,
       titles: 0,
     },
-    roster: [],
+    roster: [
+      { id: "w1", name: "Warrior 1", style: "BASHING ATTACK", status: "Active", injuries: [], attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, baseSkills: {}, derivedStats: {} },
+      { id: "w2", name: "Warrior 2", style: "SLASHING ATTACK", status: "Active", injuries: [], attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, baseSkills: {}, derivedStats: {} },
+      { id: "w3", name: "Warrior 3", style: "STRIKING ATTACK", status: "Active", injuries: [], attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, baseSkills: {}, derivedStats: {} },
+      { id: "w4", name: "Warrior 4", style: "AIMED BLOW", status: "Active", injuries: [], attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, baseSkills: {}, derivedStats: {} },
+      { id: "w5", name: "Warrior 5", style: "LUNGING ATTACK", status: "Active", injuries: [], attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, baseSkills: {}, derivedStats: {} },
+      { id: "w6", name: "Warrior 6", style: "WALL OF STEEL", status: "Active", injuries: [], attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 }, baseSkills: {}, derivedStats: {} },
+    ],
     treasury: 1000,
     fame: 500,
     strategy: undefined,
@@ -44,7 +51,7 @@ describe("pickWeeklyIntent", () => {
   });
 
   it("returns CONSOLIDATION as default", () => {
-    const rival = createMockRival();
+    const rival = createMockRival({ treasury: 500 }); // Lower treasury to avoid EXPANSION trigger
     const state = createMockState();
     const intent = pickWeeklyIntent(rival, state);
     expect(intent).toBe("CONSOLIDATION");

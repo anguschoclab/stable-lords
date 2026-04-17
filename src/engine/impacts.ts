@@ -193,9 +193,15 @@ const MERGE_CONFIG: Record<keyof StateImpact, { strategy: MergeStrategy; default
 export function mergeImpacts(impacts: StateImpact[]): StateImpact {
   const merged: StateImpact = {} as StateImpact;
 
-  // Initialize merged with default values
+  // Initialize merged with default values (create new instances to avoid reference sharing)
   for (const [key, config] of Object.entries(MERGE_CONFIG)) {
-    (merged as any)[key] = config.defaultValue;
+    if (Array.isArray(config.defaultValue)) {
+      (merged as any)[key] = [...config.defaultValue];
+    } else if (config.defaultValue instanceof Map) {
+      (merged as any)[key] = new Map(config.defaultValue);
+    } else {
+      (merged as any)[key] = config.defaultValue;
+    }
   }
 
   for (const imp of impacts) {

@@ -23,8 +23,8 @@ export default function MiniCombatLog({
   const [isExpanded, setIsExpanded] = React.useState(true);
 
   useEffect(() => {
-    if (isExpanded) {
-      logEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (isExpanded && logEndRef.current?.scrollIntoView) {
+      logEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [visibleCount, isExpanded]);
 
