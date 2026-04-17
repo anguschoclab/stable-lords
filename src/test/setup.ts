@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
 // Mock localStorage for Bun/Vitest environment
@@ -22,6 +23,11 @@ const localStorageMock = (function() {
 
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock
+});
+
+// Clear localStorage before each test to prevent pollution
+beforeEach(() => {
+  localStorageMock.clear();
 });
 
 // Mock ResizeObserver for JSDOM
