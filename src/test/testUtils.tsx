@@ -1,16 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
 
-// Ensure document is defined before setting up localStorage
-if (typeof document === 'undefined') {
-  // jsdom should provide this, but if it's missing, provide a minimal mock
-  (global as any).document = {
-    body: {},
-    createElement: () => ({}),
-    querySelector: () => null,
-  };
-}
-
 // Provide a default mock for localStorage BEFORE importing game store
 const localStorageMock = (function() {
   let store: Record<string, string> = {};

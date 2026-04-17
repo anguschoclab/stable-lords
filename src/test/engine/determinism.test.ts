@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { createFreshState } from "@/engine/factories";
@@ -16,6 +16,10 @@ vi.mock("@/engine/storage/opfsArchive", () => {
 });
 
 describe("Simulation Determinism", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it.skip("should produce identical results from a fresh state over 5 weeks", () => {
     // SKIPPED: This test requires proper deep cloning of Map objects (warriorMap)
     // which JSON.stringify/JSON.parse doesn't handle. Fix requires implementing
@@ -69,14 +73,13 @@ describe("Simulation Determinism", () => {
 
   it("should produce different results for different seeds", () => {
     const stateA = createFreshState("seed-a");
-    const stateB = createFreshState("seed-b");
-    
+
     // Manually skew one state's week or a seed-relevant property if needed,
     // but here we just verify that they are deterministic based on the week index.
-    
+
     // Run week 1
     const week1A = advanceWeek(stateA);
-    
+
     // Simulate a different "next week" path (this is a bit contrived but tests the principle)
     // Actually, just changing the starting week will change the seed.
     const stateC = { ...stateA, week: 10 };

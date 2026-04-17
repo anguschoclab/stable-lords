@@ -1,28 +1,9 @@
 import { render, screen, cleanup } from "@testing-library/react";
 import { PaperDoll } from "@/components/ui/PaperDoll";
-import { describe, it, expect, afterEach, beforeEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import "@testing-library/jest-dom";
 
 describe("PaperDoll", () => {
-  beforeEach(() => {
-    // Ensure document is defined for jsdom environment
-    if (typeof document === 'undefined') {
-      const mockElement = {
-        style: {},
-        classList: [],
-        appendChild: () => mockElement,
-        removeChild: () => mockElement,
-      };
-      (global as any).document = {
-        body: mockElement,
-        createElement: () => mockElement,
-        querySelector: () => null,
-        getElementById: () => null,
-        documentElement: mockElement,
-      };
-    }
-  });
-
   afterEach(() => {
     cleanup();
   });

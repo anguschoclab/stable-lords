@@ -1,35 +1,5 @@
 import "@testing-library/jest-dom";
 
-// Ensure document and window are defined for jsdom environment
-if (typeof document === 'undefined') {
-  const mockElement = {
-    style: {},
-    classList: [],
-    appendChild: () => mockElement,
-    removeChild: () => mockElement,
-    querySelector: () => null,
-    getElementById: () => null,
-    getAttribute: () => null,
-    setAttribute: () => null,
-  };
-  
-  (global as any).document = {
-    body: mockElement,
-    createElement: () => mockElement,
-    querySelector: () => null,
-    getElementById: () => null,
-    documentElement: mockElement,
-  };
-  
-  (global as any).window = {
-    document: (global as any).document,
-    localStorage: undefined,
-    navigator: {
-      userAgent: 'test',
-    },
-  };
-}
-
 // Mock localStorage for Bun/Vitest environment
 const localStorageMock = (function() {
   let store: Record<string, string> = {};
