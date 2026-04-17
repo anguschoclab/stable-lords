@@ -4,6 +4,7 @@ import { FightingStyle } from "@/types/shared.types";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { FIGHT_PURSE } from "@/data/economyConstants";
+import { collectAllActiveWarriors } from "@/engine/core/warriorCollection";
 /**
  * Stable Lords — Promoter Pass
  * Phase 2: Promoters scan the world and dispatch bout offers.
@@ -50,16 +51,8 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
     }
   }
   
-  // 1. Gather all active warriors
-  const allWarriors: { w: Warrior; stableId: string }[] = [];
-  (state.roster || []).forEach(w => {
-    if (w.status === "Active") allWarriors.push({ w, stableId: state.player.id });
-  });
-  (state.rivals || []).forEach(r => {
-    r.roster.forEach(w => {
-      if (w.status === "Active") allWarriors.push({ w, stableId: r.owner.id });
-    });
-  });
+  // 1. Gather all active warriors using utility
+  const allWarriors = collectAllActiveWarriors(state);
 
   // ⚡ Bolt: Pre-compute available warriors to avoid repeated availability checks
   // Available = No SIGNED bout for Week+2 or Week+3
@@ -71,7 +64,7 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
     }
   });
 
-  const availableWarriors = allWarriors.filter(entry => !unavailableWarriorIds.has(entry.w.id));
+  const availableWarriors = allWarriors.filter(entry => !unavailableWarriorIds.has(entry.warrior.id));
 
   // 2. Iterate through Promoters
   Object.values(state.promoters || []).forEach(promoter => {
@@ -84,16 +77,16 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
     for (const warriorA of shuffledWarriors) {
       if (generated >= capacity) break;
 
-      const rankA = rankings[warriorA.w.id]?.overallRank || 999;
+      const rankA = rankings[warriorA.warrior.id]?.overallRank || 999;
       if (rankA > RANK_REQUIREMENTS[promoter.tier]) continue;
 
       // Find an opponent B
       const opponentB = shuffledWarriors.find(candidate => {
-        if (candidate.w.id === warriorA.w.id) return false;
+        if (candidate.warrior.id === warriorA.warrior.id) return false;
 
-        const rankB = rankings[candidate.w.id]?.overallRank || 999;
-        const scoreA = rankings[warriorA.w.id]?.compositeScore || 0;
-        const scoreB = rankings[candidate.w.id]?.compositeScore || 0;
+        const rankB = rankings[candidate.warrior.id]?.overallRank || 999;
+        const scoreA = rankings[warriorA.warrior.id]?.compositeScore || 0;
+        const scoreB = rankings[candidate.warrior.id]?.compositeScore || 0;
 
         // Qualification & Score Proximity (25% gap max)
         const gap = Math.abs(scoreA - scoreB) / Math.max(1, scoreA);
@@ -102,22 +95,22 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
 
       if (opponentB) {
         const offerId = rngService.uuid();
-        const hype = calculateHype(warriorA.w, opponentB.w, promoter);
+        const hype = calculateHype(warriorA.warrior, opponentB.warrior, promoter);
         const basePurse = FIGHT_PURSE * TIER_MULTIPLIERS[promoter.tier];
         const finalPurse = Math.floor(basePurse * (hype / 100));
 
         newOffers[offerId] = {
           id: offerId,
           promoterId: promoter.id,
-          warriorIds: [warriorA.w.id, opponentB.w.id],
+          warriorIds: [warriorA.warrior.id, opponentB.warrior.id],
           boutWeek: targetWeek,
           expirationWeek: state.week + 1,
           purse: finalPurse,
           hype,
           status: "Proposed",
           responses: {
-            [warriorA.w.id]: "Pending",
-            [opponentB.w.id]: "Pending"
+            [warriorA.warrior.id]: "Pending",
+            [opponentB.warrior.id]: "Pending"
           }
         };
         generated++;

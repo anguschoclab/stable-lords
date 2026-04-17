@@ -1,6 +1,7 @@
-import { GameState, Warrior, RankingEntry } from "@/types/state.types";
+import { GameState, RankingEntry } from "@/types/state.types";
 import { FightingStyle } from "@/types/shared.types";
 import { StateImpact } from "@/engine/impacts";
+import { collectAllActiveWarriors } from "@/engine/core/warriorCollection";
 
 /**
  * Stable Lords — Rankings Pass
@@ -19,32 +20,22 @@ export const PASS_METADATA = {
  */
 
 export function runRankingsPass(state: GameState): StateImpact {
-  // 1. Gather all active warriors from player and rivals
-  const allWarriors: { w: Warrior; stableId: string }[] = [];
-  
-  state.roster.forEach(w => {
-    if (w.status === "Active") allWarriors.push({ w, stableId: state.player.id });
-  });
-
-  (state.rivals || []).forEach(r => {
-    r.roster.forEach(w => {
-      if (w.status === "Active") allWarriors.push({ w, stableId: r.owner.id });
-    });
-  });
+  // 1. Gather all active warriors from player and rivals using utility
+  const allWarriors = collectAllActiveWarriors(state);
 
   // 2. Calculate Composite Scores
   const scores = allWarriors.map(entry => {
-    const { w } = entry;
-    const wins = w.career?.wins || 0;
-    const losses = w.career?.losses || 0;
+    const { warrior } = entry;
+    const wins = warrior.career?.wins || 0;
+    const losses = warrior.career?.losses || 0;
     const total = wins + losses;
     const winRate = total > 0 ? wins / total : 0;
-    const kills = w.career?.kills || 0;
-    const fame = w.fame || 0;
+    const kills = warrior.career?.kills || 0;
+    const fame = warrior.fame || 0;
 
     // Formula: Fame + (Win% * 100) + (Kills * 50)
     const compositeScore = Math.floor(fame + (winRate * 100) + (kills * 50));
-    return { id: w.id, score: compositeScore, style: w.style };
+    return { id: warrior.id, score: compositeScore, style: warrior.style };
   });
 
   // 3. Sort Globally

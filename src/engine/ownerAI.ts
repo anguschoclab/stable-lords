@@ -5,6 +5,7 @@ import type { OwnerPersonality, AIIntent } from "@/types/state.types";
 import { defaultPlanForWarrior } from "./simulate";
 import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from "@/data/ownerData";
 import { computeStrategyScore } from "./strategyAnalysis";
+import { clamp } from "@/utils/math";
 
 /**
  * Generate a personality-, philosophy-, meta-, and matchup-aware fight plan for an AI warrior.
@@ -88,10 +89,6 @@ export function aiPlanForWarrior(
   plan.AL = clamp(plan.AL + styleSuitabilityBias.al, 1, 10);
 
   return plan;
-}
-
-function clamp(v: number, lo: number, hi: number): number {
-  return Math.max(lo, Math.min(hi, v));
 }
 
 /**
