@@ -9,9 +9,9 @@ import {
 import type { Warrior } from "@/types/warrior.types";
 import type { CombatEvent } from "@/types/combat.types";
 import type { Trainer } from "@/types/state.types";
-import { skillCheck } from "../combatMath";
-import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow, applyArmorTypeMod } from "../combatDamage";
-import { enduranceCost } from "../combatFatigue";
+import { skillCheck } from "../mechanics/combatMath";
+import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow, applyArmorTypeMod } from "../mechanics/combatDamage";
+import { enduranceCost } from "../mechanics/combatFatigue";
 import { getStylePassive, getKillMechanic, getStyleAntiSynergy, getEnduranceMult, Phase as StylePhase } from "../../stylePassives";
 import {
   GLOBAL_ATT_BONUS,
@@ -19,9 +19,9 @@ import {
   INITIATIVE_PRESS_BONUS,
   DEFENDER_ENDURANCE_DISCOUNT,
   CRIT_DAMAGE_MULT
-} from "../combatConstants";
-import { oeAttMod, oeDefMod, getOffensiveTacticMods, getDefensiveTacticMods } from "../tacticResolution";
-import { type FighterState, type ResolutionContext, resolveEffectiveTactics } from "../resolution";
+} from "../mechanics/combatConstants";
+import { oeAttMod, oeDefMod, getOffensiveTacticMods, getDefensiveTacticMods } from "../mechanics/tacticResolution";
+import { type FighterState, type ResolutionContext, resolveEffectiveTactics } from "./resolution";
 
 export function performAttackCheck(
   rng: () => number,

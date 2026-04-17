@@ -1,7 +1,7 @@
 import type { CommitLevel } from "@/types/shared.types";
 import type { CombatEvent } from "@/types/combat.types";
 import type { FighterState, ResolutionContext } from "./resolution";
-import { contestDistance, transitionZone, resetZone } from "./distanceResolution";
+import { contestDistance, transitionZone, resetZone } from "../mechanics/distanceResolution";
 
 // ─── ExchangeState Accumulator ────────────────────────────────────────────────
 

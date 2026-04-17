@@ -5,7 +5,7 @@ import {
   executeRiposte,
   executeHit,
   applyEnduranceCosts
-} from "./core/exchangeHelpers";
+} from "./exchangeHelpers";
 import { FightingStyle } from "@/types/shared.types";
 import type { Warrior, WarriorFavorites } from "@/types/warrior.types";
 import type { FightPlan, FightSummary, CombatEvent } from "@/types/combat.types";
@@ -22,13 +22,13 @@ import type {
   ArenaConfig,
   SurfaceMod
 } from "@/types/shared.types";
-import type { WeatherEffect } from "./weatherEffects";
-import { getWeatherEffect } from "./weatherEffects";
-import { evaluateConditions, PSYCH_STATE_MODS } from "./conditionEngine";
-import { getSpecialtyMods } from "../trainerSpecialties";
-import { skillCheck, contestCheck } from "./combatMath";
-import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "./combatDamage";
-import { enduranceCost, fatiguePenalty } from "./combatFatigue";
+import type { WeatherEffect } from "../mechanics/weatherEffects";
+import { getWeatherEffect } from "../mechanics/weatherEffects";
+import { evaluateConditions, PSYCH_STATE_MODS } from "../mechanics/conditionEngine";
+import { getSpecialtyMods } from "../../trainerSpecialties";
+import { skillCheck, contestCheck } from "../mechanics/combatMath";
+import { computeHitDamage, rollHitLocation, applyProtectMod, calculateKillWindow } from "../mechanics/combatDamage";
+import { enduranceCost, fatiguePenalty } from "../mechanics/combatFatigue";
 import { 
   getTempoBonus, 
   getEnduranceMult, 
@@ -37,8 +37,8 @@ import {
   getStyleAntiSynergy, 
   type Phase as StylePhase,
   type MasteryTier
-} from "../stylePassives";
-import { getFavoriteRhythmBonus } from "../favorites";
+} from "../../stylePassives";
+import { getFavoriteRhythmBonus } from "../../favorites";
 import { 
   GLOBAL_ATT_BONUS, 
   GLOBAL_PAR_PENALTY, 
@@ -46,24 +46,23 @@ import {
   DEFENDER_ENDURANCE_DISCOUNT, 
   CRIT_DAMAGE_MULT,
   TACTIC_OVERUSE_CAP,
-} from "./combatConstants";
-import { 
-  getMatchupBonus as rawMatchupBonus 
-} from "./combatConstants"; 
+  getMatchupBonus as rawMatchupBonus
+} from "../mechanics/combatConstants";
+import {
+  oeAttMod,
+  oeDefMod,
+  getOffensiveTacticMods,
+  getDefensiveTacticMods,
+  calculateFinalOEAL,
+  alIniMod
+} from "../mechanics/tacticResolution";
 
 export const DECISION_HIT_MARGIN = 3;
 
 export function getMatchupBonus(styleA: FightingStyle, styleD: FightingStyle): number {
   return rawMatchupBonus(styleA, styleD);
 }
-import {
-  oeAttMod,
-  oeDefMod,
-  alIniMod,
-  getOffensiveTacticMods,
-  getDefensiveTacticMods,
-  calculateFinalOEAL,
-} from "./tacticResolution";
+
 import {
   makeExchangeState,
   runApproach,
@@ -72,7 +71,7 @@ import {
   runRecovery,
   type ExchangeState,
 } from "./exchangeSubPhases";
-import { getZonePenalty, getWeaponRangeMod } from "./distanceResolution";
+import { getZonePenalty, getWeaponRangeMod } from "../mechanics/distanceResolution";
 
 // ─── Fighter State & Context ───────────────────────────────────────────────
 

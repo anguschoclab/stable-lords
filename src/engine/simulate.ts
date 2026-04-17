@@ -1,28 +1,20 @@
 import { createFighterState } from "./bout/fighterState";
 import { resolveDecision } from "./bout/decisionLogic";
 import { defaultPlanForWarrior } from "./bout/planDefaults";
-import { getPhase as getCombatPhase } from "./combat/combatMath";
+import { getPhase as getCombatPhase } from "./combat/mechanics/combatMath";
 import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
-import { getMatchupBonus, MAX_EXCHANGES, EXCHANGES_PER_MINUTE } from "./combat/combatConstants";
-import { resolveEffectiveTactics, resolveExchange, type ResolutionContext } from "./combat/resolution";
-import {
-  generateWarriorIntro,
-  battleOpener,
-  minuteStatusLine,
-  narrateBoutEnd,
-  conservingLine,
-  tacticStreakLine,
-  arenaIntroLine,
-} from "./narrativePBP";
-import { narrateEvents, NarrationContext } from "./combat/narrator";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { getMatchupBonus, MAX_EXCHANGES, EXCHANGES_PER_MINUTE } from "./combat/mechanics/combatConstants";
+import { resolveEffectiveTactics, resolveExchange, type ResolutionContext } from "./combat/resolution/resolution";
+import { narrateEvents, NarrationContext } from "./combat/narrative/narrator";
+import { generateWarriorIntro, battleOpener, minuteStatusLine, narrateBoutEnd, conservingLine, tacticStreakLine, arenaIntroLine } from "./narrativePBP";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import type { Trainer, FightOutcomeBy } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket } from "@/types/combat.types";
 import type { WeatherType, DistanceRange, ArenaZone } from "@/types/shared.types";
-import { getTrainerMods } from "./combat/simulate/core/simulateHelpers";
-import { getWeatherEffect, weatherOpeningLine } from "./combat/weatherEffects";
+import { getTrainerMods } from "./combat/mechanics/simulateHelpers";
+import { getWeatherEffect, weatherOpeningLine } from "./combat/mechanics/weatherEffects";
 import { getArenaById } from "@/data/arenas";
 
 // ─── Exports from sub-modules for backward compatibility ───

@@ -10,7 +10,7 @@ import {
   fatigueLine, crowdReaction, narrateInitiative,
   tauntLine, narrateInsightHint, narratePassive,
   narrateRangeShift, narrateFeint, narrateZoneShift,
-} from "../narrativePBP";
+} from "../../narrativePBP";
 import { getWeaponDisplayName } from "../narrative/narrativeUtils";
 
 export interface NarrationContext {

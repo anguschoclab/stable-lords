@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import { Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { FightPlan, Warrior, OffensiveTactic, DefensiveTactic } from "@/types/game";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
-import { getMatchupBonus } from "@/engine/combat/combatConstants";
+import { getMatchupBonus } from "@/engine/combat/mechanics/combatConstants";
 import { computeStrategyScore, getScoreColor } from "@/engine/strategyAnalysis";
 import { TACTIC_BANK } from "./planBuilder/TacticBank";
 import TacticBank from "./planBuilder/TacticBank";

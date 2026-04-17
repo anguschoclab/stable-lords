@@ -4,7 +4,7 @@ import { MoveHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FightPlan, Warrior } from "@/types/game";
 import type { DistanceRange } from "@/types/shared.types";
-import { getWeaponPreferredRange, getWeaponRangeMod } from "@/engine/combat/distanceResolution";
+import { getWeaponPreferredRange, getWeaponRangeMod } from "@/engine/combat/mechanics/distanceResolution";
 
 const DISTANCE_RANGES: DistanceRange[] = ["Grapple", "Tight", "Striking", "Extended"];
 

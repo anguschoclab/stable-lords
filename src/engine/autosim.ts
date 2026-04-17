@@ -2,6 +2,7 @@ import { type GameState } from "@/types/state.types";
 import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
 import { processWeekBouts } from "@/engine/bout/services/boutProcessorService";
 import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
+import { resolveImpacts } from "./impacts";
 
 export interface AutosimWeekSummary {
   week: number;
@@ -53,7 +54,7 @@ export async function runAutosim(
     state = resolveImpacts(state, [boutResult.impact]);
     const { results, summary } = boutResult;
 
-    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: null as any, weekSummaries };
+    if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: null as any };
 
     weekSummaries.push({
       week: state.week || 1,
