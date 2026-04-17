@@ -8,7 +8,7 @@ import { generateId } from "@/utils/idUtils";
 /**
  * Creates a fight summary for testing purposes.
  */
-export function makeFightSummary(overrides: Partial<FightSummary> = {}): FightSummary {
+export function makeFightSummary(overrides: Partial<FightSummary> = {}, createdAt: string = new Date().toISOString()): FightSummary {
   return {
     id: generateId(undefined, "fight"),
     week: 1,
@@ -22,7 +22,7 @@ export function makeFightSummary(overrides: Partial<FightSummary> = {}): FightSu
     by: "KO",
     title: "Practice Match",
     transcript: [],
-    createdAt: new Date().toISOString(),
+    createdAt,
     ...overrides,
   };
 }

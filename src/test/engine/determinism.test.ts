@@ -27,9 +27,9 @@ describe("Simulation Determinism", () => {
     // TODO: Implement proper deep clone for Maps/Sets or restructure state
 
     // 1. Setup two identical states
-    // Note: createFreshState uses the root seed and should be stable.
-    const stateA = createFreshState("test-seed-1");
-    const stateB = JSON.parse(JSON.stringify(stateA)) as typeof stateA; // Deep copy
+    // Pass a fixed timestamp to ensure meta.createdAt remains stable
+    const stateA = createFreshState("test-seed-1", "2026-04-11T09:00:00Z");
+    const stateB = createFreshState("test-seed-1", "2026-04-11T09:00:00Z");
 
     // 2. Advance both states 5 weeks
     let currentA = stateA;
@@ -40,7 +40,12 @@ describe("Simulation Determinism", () => {
       currentB = advanceWeek(currentB);
     }
 
-    // 3. Compare states
+    // 3. Compare states (Omit non-serializable caches)
+    delete (currentA as any).warriorMap;
+    delete (currentB as any).warriorMap;
+    delete (currentA as any).cachedMetaDrift;
+    delete (currentB as any).cachedMetaDrift;
+
     const strA = JSON.stringify(currentA);
     const strB = JSON.stringify(currentB);
 
