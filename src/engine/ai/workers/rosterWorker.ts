@@ -46,9 +46,9 @@ export function processRoster(
     const gearCost = 150;
     const budgetReport = checkBudget(updatedRival, gearCost, "ROSTER");
     
-    if (budgetReport.isAffordable) {
+    if (budgetReport.isAffordable && activeRoster.length > 0) {
       // ⚡ TSA: Role-Based Gearing (Prioritize Champion or the 'Muddy' Basher for rain insurance)
-      const gearCandidate = activeRoster.find(w => w.champion) || 
+      const gearCandidate = activeRoster.find(w => w.champion) ||
                           activeRoster.find(w => w.style === "BASHING ATTACK") ||
                           rngService.pick(activeRoster);
 
@@ -94,7 +94,9 @@ function applyGearUpgrade(w: Warrior, _rng: IRNGService): Warrior {
     // If the prioritized attribute is capped, fall back to lowest stat
     if (!key || newAttrs[key] >= 25) {
       // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to find minimum stat
-      key = keys.reduce((min, k) => newAttrs[k] < newAttrs[min] ? k : min, keys[0]);
+      if (keys.length > 0) {
+        key = keys.reduce((min, k) => newAttrs[k] < newAttrs[min] ? k : min, keys[0]!);
+      }
     }
 
     if (key && newAttrs[key] < 25) newAttrs[key]++;
@@ -115,7 +117,9 @@ function performAITraining(w: Warrior, season?: Season): Warrior {
   // Fallback to lowest stat if no seasonal priority or stat capped
   if (!chosen || w.attributes[chosen] >= 25) {
     // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan to find minimum stat
-    chosen = keys.reduce((min, k) => w.attributes[k] < w.attributes[min] ? k : min, keys[0]);
+    if (keys.length > 0) {
+      chosen = keys.reduce((min, k) => w.attributes[k] < w.attributes[min] ? k : min, keys[0]!);
+    }
   }
 
   if (chosen && w.attributes[chosen] < 25) {
