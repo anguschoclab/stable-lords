@@ -238,13 +238,16 @@ export function executeHit(
   });
 
   let didKill = false;
-  let causeBucket = "KO";
+  // Bucket precedence: EXECUTION > CRITICAL_CHAIN > RIVALRY_FINISH > ARMOR_FAILURE > FATAL_DAMAGE.
+  // Defaults to FATAL_DAMAGE for any simple hp<=0 hit without a more specific flag.
+  let causeBucket: string = "FATAL_DAMAGE";
 
   if (defender.hp <= defender.maxHp * killMech.killWindowHpMult) {
     const killPos = phase === "LATE" ? 2 : phase === "MID" ? 1 : 0;
     const effectiveDec = attacker.skills.DEC + killMech.decBonus;
-    // Specialty kill window bonus from trainer mods
     const specKillBonus = ctx ? (attacker.label === "A" ? (ctx.trainerModsA.killWindowBonus ?? 0) : (ctx.trainerModsD.killWindowBonus ?? 0)) : 0;
+    // Execution gating (spec §5.2): kill-window open ∧ DEC success ∧ defender already failed PAR/DEF (reached here).
+    // skillCheck against DEC gates the execution attempt; kill-window roll then decides lethality.
     const killThreshold = calculateKillWindow(defender.hp / defender.maxHp, defender.endurance / defender.maxEndurance, hitLoc, attKD + killMech.killBonus, killPos, attOE, attAL, attMatchup, effectiveDec, attacker.momentum, specKillBonus);
     if (rng() < killThreshold) {
       defender.hp = 0;
@@ -254,10 +257,22 @@ export function executeHit(
   }
 
   if (defender.hp <= 0) {
+    // Critical-chain: 3+ consecutive hits before this one converted into a lethal finish.
+    if (!didKill && attacker.consecutiveHits >= 3) {
+      causeBucket = "CRITICAL_CHAIN";
+    }
+    // Armor failure: heavy raw damage slipped through covered armor (protect was in place).
+    const wasCovered = !!defender.activePlan.protect && defender.activePlan.protect !== "Any";
+    if (!didKill && causeBucket === "FATAL_DAMAGE" && wasCovered && rawDamage >= 20) {
+      causeBucket = "ARMOR_FAILURE";
+    }
     if (didKill) {
       events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { location: hitLoc, cause: causeBucket } });
     } else {
-      events.push({ type: "BOUT_END", actor: attLabel, result: "KO", metadata: { location: hitLoc, cause: "FATAL_DAMAGE" } });
+      // Lethal damage that wasn't an execution still counts as a Kill outcome
+      // (it's a death in the arena, not merely a KO). KO is reserved for unconsciousness
+      // via fatigue-gate in applyEnduranceCosts.
+      events.push({ type: "BOUT_END", actor: attLabel, result: "Kill", metadata: { location: hitLoc, cause: causeBucket } });
     }
   }
 }

@@ -1,8 +1,9 @@
-import { 
-  FightingStyle, 
-  type Attributes, 
-  type Season, 
-  type CrowdMoodType, 
+import {
+  FightingStyle,
+  type Attributes,
+  type BaseSkills,
+  type Season,
+  type CrowdMoodType,
   type NewsletterItem,
   type TrainerTier,
   type TrainerFocus,
@@ -124,8 +125,10 @@ export interface TournamentEntry {
 
 export interface TrainingAssignment {
   warriorId: string;
-  type: "attribute" | "recovery";
+  type: "attribute" | "recovery" | "skillDrill";
   attribute?: keyof Attributes;
+  /** For skillDrill assignments — which combat skill to drill (ATT/PAR/DEF/INI/RIP/DEC). */
+  skill?: keyof BaseSkills;
 }
 
 export interface SeasonalGrowth {

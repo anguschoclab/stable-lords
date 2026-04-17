@@ -63,13 +63,16 @@ export function createFighterState(
 
   const classicBonus = warrior ? getClassicWeaponBonus(plan.style, equip.weapon) : 0;
 
+  // Skill drilling bonuses — flat additive modifiers from dedicated drill training.
+  const drills = warrior?.skillDrills ?? {};
+
   const effSkills: BaseSkills = {
-    ATT: skills.ATT + (trainerMods?.attMod ?? 0) + favWeapon + classicBonus + weaponReq.attPenalty + totalShieldAtt,
-    PAR: skills.PAR + (trainerMods?.parMod ?? 0) + totalShieldDef,
-    DEF: skills.DEF + (trainerMods?.defMod ?? 0) + totalShieldDef,
-    INI: skills.INI + (trainerMods?.iniMod ?? 0) + encumbranceIniPenalty,
-    RIP: skills.RIP,
-    DEC: skills.DEC + (trainerMods?.decMod ?? 0),
+    ATT: skills.ATT + (trainerMods?.attMod ?? 0) + favWeapon + classicBonus + weaponReq.attPenalty + totalShieldAtt + (drills.ATT ?? 0),
+    PAR: skills.PAR + (trainerMods?.parMod ?? 0) + totalShieldDef + (drills.PAR ?? 0),
+    DEF: skills.DEF + (trainerMods?.defMod ?? 0) + totalShieldDef + (drills.DEF ?? 0),
+    INI: skills.INI + (trainerMods?.iniMod ?? 0) + encumbranceIniPenalty + (drills.INI ?? 0),
+    RIP: skills.RIP + (drills.RIP ?? 0),
+    DEC: skills.DEC + (trainerMods?.decMod ?? 0) + (drills.DEC ?? 0),
   };
 
   return {

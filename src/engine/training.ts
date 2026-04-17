@@ -4,12 +4,13 @@ import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { updateEntityInList } from "@/utils/stateUtils";
 import { type StateImpact } from "./impacts";
-import { 
-  computeGainChance, 
-  processRecovery, 
-  processAttributeTraining, 
-  rollForTrainingInjury, 
-  type TrainingResult 
+import {
+  computeGainChance,
+  processRecovery,
+  processAttributeTraining,
+  processSkillDrillTraining,
+  rollForTrainingInjury,
+  type TrainingResult
 } from "./training/trainingGains";
 import { getHealingTrainerBonus } from "./training/coachLogic";
 
@@ -43,11 +44,32 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
     // ── Recovery Mode ──
     if (assignment.type === "recovery") {
       const { updatedInjuries, message } = processRecovery(warrior, healingBonus);
-      currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({ 
-        ...w, 
-        injuries: updatedInjuries as InjuryData[] 
+      currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({
+        ...w,
+        injuries: updatedInjuries as InjuryData[]
       }));
       results.push({ type: "recovery", warriorId: warrior.id, message });
+      continue;
+    }
+
+    // ── Skill Drilling ──
+    if (assignment.type === "skillDrill") {
+      if (!assignment.skill) continue;
+      const { updatedWarrior, result, hardCapped } = processSkillDrillTraining(warrior, assignment.skill, state, rng);
+      if (result.message !== "") results.push(result);
+      if (updatedWarrior) {
+        currentRoster = updateEntityInList(currentRoster, warrior.id, () => updatedWarrior);
+      }
+      if (hardCapped) continue;
+      // Skill drilling still carries injury risk, though slightly lower than attribute training
+      const { injury, result: injuryResult } = rollForTrainingInjury(updatedWarrior || warrior, healingBonus + 1, rng);
+      if (injury && injuryResult) {
+        currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({
+          ...w,
+          injuries: [...w.injuries, injury] as InjuryData[],
+        }));
+        results.push(injuryResult);
+      }
       continue;
     }
 

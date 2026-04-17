@@ -125,6 +125,8 @@ export interface Warrior {
   seasonPoints?: number;
   xp?: number;
   potentialRevealed?: Partial<Record<keyof Attributes, boolean>>;
+  /** Skill drilling bonuses — additive flat modifiers on top of attribute-derived baseSkills. Capped at SKILL_DRILL_CAP per skill. */
+  skillDrills?: Partial<Record<keyof BaseSkills, number>>;
   deathWeek?: number;
   deathCause?: string;
   deathEvent?: DeathEvent;

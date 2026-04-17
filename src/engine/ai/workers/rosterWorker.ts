@@ -37,7 +37,7 @@ export function processRoster(
     
     if (budgetReport.isAffordable) {
       updatedRival.treasury -= trainingCost;
-      updatedRival.roster = updatedRival.roster.map(w => w.id === trainee.id ? performAITraining(w, season) : w);
+      updatedRival.roster = updatedRival.roster.map(w => w.id === trainee.id ? performAITraining(w, season, rngService) : w);
     }
   }
 
@@ -106,7 +106,16 @@ function applyGearUpgrade(w: Warrior, _rng: IRNGService): Warrior {
   return { ...w, attributes: newAttrs, baseSkills, derivedStats };
 }
 
-function performAITraining(w: Warrior, season?: Season): Warrior {
+/**
+ * AI training runs at ~80% player effectiveness per the Training Mechanics spec.
+ * Rather than always gaining, we roll a 0.8 success gate; on failure the week is spent
+ * without a stat gain, matching the player-side gain-chance variance.
+ */
+const AI_TRAINING_EFFECTIVENESS = 0.8;
+
+function performAITraining(w: Warrior, season?: Season, rng?: IRNGService): Warrior {
+  if (rng && rng.next() >= AI_TRAINING_EFFECTIVENESS) return w;
+
   const keys = (Object.keys(w.attributes) as (keyof typeof w.attributes)[]).filter(k => k !== "SZ");
 
   // ⚡ TSA: Seasonal Priority Training

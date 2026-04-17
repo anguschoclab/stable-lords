@@ -1,12 +1,13 @@
-import { 
-  type GameState, 
-  type TrainingAssignment 
+import {
+  type GameState,
+  type TrainingAssignment
 } from "@/types/state.types";
 import { type Warrior, type InjuryData } from "@/types/warrior.types";
-import { 
-  type Attributes, 
-  ATTRIBUTE_KEYS, 
-  ATTRIBUTE_MAX 
+import {
+  type Attributes,
+  type BaseSkills,
+  ATTRIBUTE_KEYS,
+  ATTRIBUTE_MAX
 } from "@/types/shared.types";
 import { type SeasonalGrowth } from "@/types/state.types";
 import { canGrow, diminishingReturnsFactor } from "@/engine/potential";
@@ -24,6 +25,24 @@ export const GAIN_CHANCE_MIN = 0.15;
 export const GAIN_CHANCE_MAX = 0.85;
 export const INJURY_CHANCE_MIN = 0.01;
 export const INJURY_CHANCE_MAX = 0.10;
+
+// ─── Skill Drilling ────────────────────────────────────────────────────────
+// Drilling a combat skill (ATT/PAR/DEF/INI/RIP/DEC) grants a flat bonus on top
+// of the attribute-derived baseSkills. Per-skill cap keeps drilling a supplement,
+// not a replacement for attribute training.
+export const SKILL_DRILL_CAP = 3;
+export const SKILL_DRILL_BASE_CHANCE = 0.40;
+export const SKILL_DRILL_GAIN_MIN = 0.15;
+export const SKILL_DRILL_GAIN_MAX = 0.70;
+
+export const SKILL_TRAINER_FOCUS: Record<keyof BaseSkills, import("@/types/shared.types").TrainerFocus> = {
+  ATT: "Aggression",
+  PAR: "Defense",
+  DEF: "Defense",
+  INI: "Mind",
+  RIP: "Aggression",
+  DEC: "Mind",
+};
 
 export const TRAINING_INJURIES = [
   { name: "Pulled Muscle", description: "Overextended during drills.", penalties: { ST: -1 }, weeksRange: [1, 2] },
@@ -147,6 +166,72 @@ export function processAttributeTraining(
   }
 
   return { updatedWarrior: null, updatedSeasonalGrowth: null, result: { type: "blocked", warriorId: warrior.id, message: "" } };
+}
+
+export function computeSkillDrillChance(
+  warrior: Warrior,
+  skill: keyof BaseSkills,
+  trainers: GameState["trainers"]
+): number {
+  const focus = SKILL_TRAINER_FOCUS[skill];
+  // Lean on trainer focus/affinity: a matching-focus trainer gives a modest boost.
+  let trainerBonus = 0;
+  for (const t of trainers) {
+    if (t.contractWeeksLeft <= 0) continue;
+    if (t.focus === focus) {
+      // TIER_BONUS lives in engine/trainers; fall back to 1 if unavailable to keep this module self-contained.
+      trainerBonus += 1;
+    }
+    if (t.styleBonusStyle === warrior.style) trainerBonus += 0.5;
+  }
+  const wtBonus = ((warrior.attributes.WT ?? 10) - 10) * 0.01;
+  const agePenalty = (warrior.age ?? 18) > 28 ? (((warrior.age ?? 18) - 28) * 0.02) : 0;
+  const current = warrior.skillDrills?.[skill] ?? 0;
+  // Diminishing returns: each point already drilled halves the marginal gain chance.
+  const dr = Math.pow(0.6, current);
+  const raw = (SKILL_DRILL_BASE_CHANCE + trainerBonus * 0.04 + wtBonus - agePenalty) * dr;
+  return Math.max(SKILL_DRILL_GAIN_MIN, Math.min(SKILL_DRILL_GAIN_MAX, raw));
+}
+
+export function processSkillDrillTraining(
+  warrior: Warrior,
+  skill: keyof BaseSkills,
+  state: GameState,
+  rng: IRNGService
+): { updatedWarrior: Warrior | null; result: TrainingResult; hardCapped?: boolean } {
+  const current = warrior.skillDrills?.[skill] ?? 0;
+  if (current >= SKILL_DRILL_CAP) {
+    return {
+      updatedWarrior: null,
+      result: {
+        type: "blocked",
+        warriorId: warrior.id,
+        message: `${warrior.name} has already mastered ${skill} drilling (cap ${SKILL_DRILL_CAP}).`,
+      },
+      hardCapped: true,
+    };
+  }
+
+  const chance = computeSkillDrillChance(warrior, skill, state.trainers ?? []);
+  if (rng.next() < chance) {
+    const drills = { ...(warrior.skillDrills ?? {}), [skill]: current + 1 };
+    return {
+      updatedWarrior: { ...warrior, skillDrills: drills },
+      result: {
+        type: "gain",
+        warriorId: warrior.id,
+        message: `${warrior.name} sharpened their ${skill} through focused drilling (+1, now +${current + 1}).`,
+      },
+    };
+  }
+  return {
+    updatedWarrior: null,
+    result: {
+      type: "blocked",
+      warriorId: warrior.id,
+      message: `${warrior.name} drilled ${skill} but made no measurable progress this week.`,
+    },
+  };
 }
 
 export function rollForTrainingInjury(warrior: Warrior, healingBonus: number, rng: IRNGService): { injury: InjuryData | null, result: TrainingResult | null } {
