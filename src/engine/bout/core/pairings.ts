@@ -23,6 +23,12 @@ export function generatePairings(state: GameState): BoutPairing[] {
     return map;
   })();
 
+  // ⚡ Bolt: Create O(N) map for name-based lookup instead of repeated O(N) Array.from searches
+  const warriorNameMap = new Map<string, Warrior>();
+  for (const w of warriorMap.values()) {
+    warriorNameMap.set(w.name, w);
+  }
+
   // 2. Derive pairings from Signed Contracts for this week
   const currentOffers = Object.values(state.boutOffers || {}).filter(
     o => o.status === "Signed" && o.boutWeek === currentWeek
@@ -56,8 +62,8 @@ export function generatePairings(state: GameState): BoutPairing[] {
       const tournamentBouts = tournament.bracket.filter(b => b.round === currentDay && b.winner === undefined);
       
       tournamentBouts.forEach(bout => {
-        const wA = warriorMap.get(bout.a) || Array.from(warriorMap.values()).find(w => w.name === bout.a);
-        const wD = warriorMap.get(bout.d) || Array.from(warriorMap.values()).find(w => w.name === bout.d);
+        const wA = warriorMap.get(bout.a) || warriorNameMap.get(bout.a);
+        const wD = warriorMap.get(bout.d) || warriorNameMap.get(bout.d);
         
         if (wA && wD) {
           pairings.push({
