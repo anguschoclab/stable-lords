@@ -11,6 +11,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
     testTimeout: 30000,
+    hookTimeout: 10000,
     exclude: ['node_modules/', 'e2e/'],
     coverage: {
       provider: 'v8',

@@ -1,6 +1,6 @@
 
 import { describe, it, expect, vi } from "vitest";
-import { skillCheck, getPhase } from "@/engine/combat/combatMath";
+import { skillCheck, getPhase } from "@/engine/combat/mechanics/combatMath";
 
 describe("combatMath engine", () => {
   describe("skillCheck", () => {

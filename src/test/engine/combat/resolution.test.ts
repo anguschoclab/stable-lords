@@ -3,7 +3,7 @@ import {
   getMatchupBonus,
   resolveEffectiveTactics,
   applyAggressionBias,
-} from "@/engine/combat/resolution";
+} from "@/engine/combat/resolution/resolution";
 import { FightingStyle, type FightPlan, type PhaseStrategy } from "@/types/game";
 
 describe("getMatchupBonus", () => {

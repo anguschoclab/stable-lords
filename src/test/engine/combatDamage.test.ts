@@ -4,9 +4,8 @@ import {
   rollHitLocation,
   applyProtectMod,
   computeHitDamage,
-  HIT_LOCATIONS,
-  type HitLocation
-} from "@/engine/combat/combatDamage";
+  HIT_LOCATIONS
+} from "@/engine/combat/mechanics/combatDamage";
 
 describe("combatDamage engine", () => {
   describe("protectCovers", () => {
@@ -192,7 +191,6 @@ describe("combatDamage engine", () => {
 
     it("respects variance range", () => {
       const baseClass = 10;
-      const baseVal = 12; // 10 + 2
 
       const rngMin = vi.fn().mockReturnValue(0);
       const resMin = computeHitDamage(rngMin, baseClass, "right arm");

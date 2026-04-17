@@ -1,10 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import { PaperDoll } from "@/components/ui/PaperDoll";
-import { describe, it, expect } from "vitest";
-import React from "react";
+import { describe, it, expect, afterEach } from "vitest";
 import "@testing-library/jest-dom";
 
 describe("PaperDoll", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it("renders all body parts", () => {
     render(<PaperDoll healthMap={{}} />);
     expect(screen.getByTestId("body-part-head")).toBeInTheDocument();

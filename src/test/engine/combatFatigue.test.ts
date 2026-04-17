@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { enduranceCost, fatiguePenalty } from "@/engine/combat/combatFatigue";
+import { enduranceCost, fatiguePenalty } from "@/engine/combat/mechanics/combatFatigue";
 
 describe("combatFatigue engine", () => {
   describe("fatiguePenalty", () => {

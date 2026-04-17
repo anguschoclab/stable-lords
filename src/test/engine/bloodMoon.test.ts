@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { weatherStaminaModifier } from "@/engine/combat/combatMath";
+import { weatherStaminaModifier } from "@/engine/combat/mechanics/combatMath";
 import { rollWeather } from "@/engine/pipeline/passes/WorldPass";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 

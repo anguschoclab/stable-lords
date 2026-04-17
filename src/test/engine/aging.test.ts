@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { processAging } from "@/engine/aging";
 import type { GameState, Warrior, Attributes } from "@/types/game";
 import { FightingStyle } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
-import { SeededRNG } from "@/utils/random";
+import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────
 
@@ -82,13 +82,17 @@ function makeGameState(week: number, roster: Warrior[]): GameState {
 // ─── Tests ────────────────────────────────────────────────────────────────
 
 describe("processAging — basic aging", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("increments age by 1 on multiples of 52 weeks", () => {
     const w = makeWarrior("w1", 20);
     const state = makeGameState(52, [w]);
 
     const newState = processAging(state);
 
-    expect(newState.roster[0].age).toBe(21);
+    expect(newState.roster[0]!.age).toBe(21);
   });
 
   it("does not increment age on non-multiples of 52 weeks", () => {
@@ -96,14 +100,18 @@ describe("processAging — basic aging", () => {
     const state = makeGameState(51, [w]);
     const newState = processAging(state);
 
-    expect(newState.roster[0].age).toBe(20);
+    expect(newState.roster[0]!.age).toBe(20);
   });
 });
 
 describe("processAging — aging penalties", () => {
   beforeEach(() => {
     // Default mock to avoid retirement unless requested
-    vi.spyOn(SeededRNG.prototype, "next").mockReturnValue(0.99);
+    vi.spyOn(SeededRNGService.prototype, "next").mockReturnValue(0.99);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("does not apply penalties to a warrior under the age penalty start limit", () => {
@@ -112,9 +120,9 @@ describe("processAging — aging penalties", () => {
 
     const newState = processAging(state);
 
-    expect(newState.roster[0].age).toBe(28);
-    expect(newState.roster[0].attributes.SP).toBe(15);
-    expect(newState.roster[0].attributes.DF).toBe(15);
+    expect(newState.roster[0]!.age).toBe(28);
+    expect(newState.roster[0]!.attributes.SP).toBe(15);
+    expect(newState.roster[0]!.attributes.DF).toBe(15);
   });
 
   it("applies penalty to SP and DF when age exceeds AGING_PENALTY_START", () => {
@@ -123,9 +131,9 @@ describe("processAging — aging penalties", () => {
 
     const newState = processAging(state);
 
-    expect(newState.roster[0].age).toBe(32);
-    expect(newState.roster[0].attributes.SP).toBe(14);
-    expect(newState.roster[0].attributes.DF).toBe(14);
+    expect(newState.roster[0]!.age).toBe(32);
+    expect(newState.roster[0]!.attributes.SP).toBe(14);
+    expect(newState.roster[0]!.attributes.DF).toBe(14);
   });
 
   it("adds a newsletter event when aging penalties are applied", () => {
@@ -135,11 +143,15 @@ describe("processAging — aging penalties", () => {
     const newState = processAging(state);
 
     expect(newState.newsletter.length).toBe(1);
-    expect(newState.newsletter[0].title).toBe("Aging Report");
+    expect(newState.newsletter[0]!.title).toBe("Aging Report");
   });
 });
 
 describe("processAging — forced retirement", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("guarantees retirement for a warrior at FORCED_RETIRE_MAX (40+)", () => {
     const w = makeWarrior("w1", 40);
     const state = makeGameState(10, [w]);
@@ -155,7 +167,7 @@ describe("processAging — forced retirement", () => {
     const state = makeGameState(12, [w]);
 
     // Retire chance at 35 is 0.075. Set mock to 0.01 to trigger.
-    vi.spyOn(SeededRNG.prototype, "next").mockReturnValue(0.01);
+    vi.spyOn(SeededRNGService.prototype, "next").mockReturnValue(0.01);
 
     const newState = processAging(state);
     expect(newState.roster.length).toBe(0);
@@ -166,7 +178,7 @@ describe("processAging — forced retirement", () => {
     const w = makeWarrior("w1", 35);
     const state = makeGameState(12, [w]);
 
-    vi.spyOn(SeededRNG.prototype, "next").mockReturnValue(0.99);
+    vi.spyOn(SeededRNGService.prototype, "next").mockReturnValue(0.99);
 
     const newState = processAging(state);
     expect(newState.roster.length).toBe(1);
