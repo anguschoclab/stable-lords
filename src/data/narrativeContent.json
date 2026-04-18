@@ -394,9 +394,9 @@
         "A horrific spray of crimson follows as {{attacker}}'s blade effortlessly cleaves through {{defender}}'s {{bodyPart}}.",
         "{{attacker}} sidesteps a desperate lunge, bringing the {{weapon}} down in a monstrous arc that takes {{defender}}'s {{bodyPart}} clean off.",
         "{{defender}} screams in agony as {{attacker}} butchers their {{bodyPart}}, leaving a gruesome testament to {{attacker}}'s prowess.",
-        "{{attacker}} feints low, catching {{defender}} off guard before severing their sword-arm at the elbow. The crowd erupts!",
-        "With a terrifying horizontal sweep, {{attacker}} unzips {{defender}}'s midsection. The sands drink deep today.",
-        "{{attacker}} hooks {{defender}}'s guard away, then delivers a spinning decapitation strike that silences the arena for a split second before the roar."
+        "{{attacker}} feints low, then pivots with blinding speed to sever {{defender}}'s {{bodyPart}}. The crowd erupts!",
+        "With a terrifying horizontal sweep, {{attacker}} unzips {{defender}}'s {{bodyPart}}. The sands drink deep today.",
+        "{{attacker}} hooks {{defender}}'s guard away, then delivers a spinning strike to the {{bodyPart}} that silences the arena for a split second before the roar."
       ],
       "critical": [
         "{{attacker}}'s {{weapon}} becomes a blur of silver, opening a horrific gash on {{defender}}'s {{bodyPart}}!",
