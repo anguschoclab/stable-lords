@@ -215,7 +215,7 @@ export function mergeImpacts(impacts: StateImpact[]): StateImpact {
           break;
         case 'append':
           if (Array.isArray(value) && value.length > 0) {
-            (merged as any)[key] = [...((merged as any)[key] || []), ...value];
+(merged as any)[key] = (merged as any)[key].concat(value);
           }
           break;
         case 'mapMerge':
