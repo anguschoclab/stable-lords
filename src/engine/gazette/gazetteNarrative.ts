@@ -174,11 +174,20 @@ export function generateGazetteBody(
     paragraphs.push(t(rngService.pick(gf.Upset), { winner: u.winner, loser: u.loser, fameW: u.winnerFame, fameL: u.loserFame }));
   }
 
-  // Graveyard mention
+  // Debuts — first-ever appearance this week.
+  if (detections.debuts && detections.debuts.length > 0) {
+    const names = detections.debuts.slice(0, 4).join(", ");
+    const verb = detections.debuts.length === 1 ? "makes" : "make";
+    paragraphs.push(`${names} ${verb} their debut in the arena this week.`);
+  }
+
+  // Graveyard + named memorials.
   if (graveyard.length > 0) {
     const recent = graveyard.filter(w => w.deathWeek === week);
     if (recent.length > 0) {
       paragraphs.push(t(rngService.pick(gf.Graveyard), { count: recent.length, plural: recent.length !== 1 ? "s" : "" }));
+      const names = recent.map(w => w.name).slice(0, 5).join(", ");
+      paragraphs.push(`In memoriam: ${names}. May their names echo in the stands.`);
     }
   }
 

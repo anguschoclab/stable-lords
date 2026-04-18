@@ -14,6 +14,8 @@ import SpatialControls from "./planBuilder/SpatialControls";
 import PhaseOverrides from "./planBuilder/PhaseOverrides";
 import StylePassives from "./planBuilder/StylePassives";
 import ContingencyPlans from "./planBuilder/ContingencyPlans";
+import StaminaCurve from "./planBuilder/StaminaCurve";
+import { validateStrategy } from "@/engine/strategyValidator";
 
 /* ── Sub-components ─────────────────────────────────────── */
 
@@ -31,6 +33,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
   }, [plan.style, rivalStyle]);
 
   const score = useMemo(() => computeStrategyScore(plan, warrior), [plan, warrior]);
+  const warnings = useMemo(() => validateStrategy(plan, warrior), [plan, warrior]);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, draggableId } = result;
@@ -104,6 +107,28 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
       </CardHeader>
 
       <CardContent className="pt-6 space-y-8">
+        <div className="flex flex-wrap items-start justify-between gap-6 pb-4 border-b border-white/5">
+          <StaminaCurve plan={plan} warrior={warrior} />
+          {warnings.length > 0 && (
+            <ul className="flex-1 min-w-[240px] space-y-1">
+              {warnings.map(w => (
+                <li
+                  key={w.code}
+                  className={cn(
+                    "text-[10px] font-mono uppercase tracking-wide px-2 py-1 border rounded-none",
+                    w.severity === "error" ? "text-destructive border-destructive/40 bg-destructive/5"
+                    : w.severity === "warn" ? "text-amber-400 border-amber-400/30 bg-amber-400/5"
+                    : "text-muted-foreground border-white/10 bg-black/40"
+                  )}
+                >
+                  <span className="opacity-60 mr-2">[{w.severity.toUpperCase()}]</span>
+                  {w.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">

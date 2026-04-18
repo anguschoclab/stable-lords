@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { GraduationCap, UserPlus, RefreshCw, Armchair, Zap, Users, Coins, ChevronRight } from "lucide-react";
+import { GraduationCap, UserPlus, RefreshCw, Armchair, Zap, Users, Coins, ChevronRight, Award, Skull } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -42,8 +42,8 @@ import { toast } from "sonner";
 export default function Trainers() {
   // Flat destructuring from 1.0 store
   const { 
-    trainers, hiringPool, week, retired, treasury, 
-    setState 
+    trainers, hiringPool, week, retired, graveyard, treasury,
+    setState
   } = useGameStore();
 
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
@@ -156,6 +156,12 @@ export default function Trainers() {
           </TabsTrigger>
           <TabsTrigger value="hire" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
             <UserPlus className="h-3.5 w-3.5" /> Tactical Hire
+          </TabsTrigger>
+          <TabsTrigger value="mentors" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
+            <Award className="h-3.5 w-3.5" /> Top Mentors
+          </TabsTrigger>
+          <TabsTrigger value="legends" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
+            <Skull className="h-3.5 w-3.5" /> Departed Legends
           </TabsTrigger>
         </TabsList>
 
@@ -352,6 +358,105 @@ export default function Trainers() {
               <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">Waiting_for_Connection...</p>
             </Surface>
           )}
+        </TabsContent>
+
+        <TabsContent value="mentors" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center gap-3 px-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">TOP_MENTORS</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
+          </div>
+          {(() => {
+            const ranked = [...currentTrainers]
+              .map(t => ({ t, score: (t.legacyWins ?? 0) * 2 + (t.legacyKills ?? 0) * 3 + (t.fame ?? 0) }))
+              .filter(x => x.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 8);
+            if (ranked.length === 0) {
+              return (
+                <Surface variant="glass" className="py-20 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
+                  <Award className="h-10 w-10 text-muted-foreground opacity-20" />
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">No mentor legacy recorded yet.</p>
+                </Surface>
+              );
+            }
+            return (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                {ranked.map(({ t, score }, i) => (
+                  <Surface key={t.id} variant="glass" className="px-5 py-4 border-border/30 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl font-display font-black text-arena-gold w-8 text-center">#{i + 1}</span>
+                      <div>
+                        <div className="text-sm font-black uppercase tracking-tight">{t.name}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{t.tier} · {t.focus}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-5 text-[10px] font-mono font-black">
+                      <div className="text-center">
+                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">Wins</div>
+                        <div className="text-primary">{t.legacyWins ?? 0}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">Kills</div>
+                        <div className="text-destructive">{t.legacyKills ?? 0}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">Score</div>
+                        <div className="text-arena-gold">{score}</div>
+                      </div>
+                    </div>
+                  </Surface>
+                ))}
+              </div>
+            );
+          })()}
+        </TabsContent>
+
+        <TabsContent value="legends" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center gap-3 px-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-destructive">DEPARTED_LEGENDS</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-destructive/20 via-border/20 to-transparent" />
+          </div>
+          {(() => {
+            const fallen = [
+              ...((graveyard ?? []).map(w => ({ name: w.name, style: w.style, kind: "fallen" as const, fame: w.fame ?? 0, week: (w as any).deathWeek }))),
+              ...((retired ?? []).map(w => ({ name: w.name, style: w.style, kind: "retired" as const, fame: w.fame ?? 0, week: (w as any).retiredWeek ?? 0 }))),
+            ].sort((a, b) => b.fame - a.fame).slice(0, 12);
+            if (fallen.length === 0) {
+              return (
+                <Surface variant="glass" className="py-20 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
+                  <Skull className="h-10 w-10 text-muted-foreground opacity-20" />
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">No legends to memorialise.</p>
+                </Surface>
+              );
+            }
+            return (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                {fallen.map((w, i) => (
+                  <Surface key={`${w.kind}-${w.name}-${i}`} variant="glass" className="px-5 py-4 border-border/30 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        "p-2 rounded-none border",
+                        w.kind === "fallen" ? "bg-destructive/10 border-destructive/30 text-destructive" : "bg-muted/10 border-white/10 text-muted-foreground"
+                      )}>
+                        {w.kind === "fallen" ? <Skull className="h-4 w-4" /> : <Armchair className="h-4 w-4" />}
+                      </div>
+                      <div>
+                        <div className="text-sm font-black uppercase tracking-tight">{w.name}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                          {STYLE_DISPLAY_NAMES[w.style as FightingStyle] ?? w.style} · {w.kind === "fallen" ? "Fallen in the arena" : "Retired"}
+                          {w.week ? ` · Wk ${w.week}` : ""}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[8px] text-muted-foreground/50 uppercase tracking-widest">Fame</div>
+                      <div className="font-mono font-black text-arena-gold">{w.fame}</div>
+                    </div>
+                  </Surface>
+                ))}
+              </div>
+            );
+          })()}
         </TabsContent>
       </Tabs>
     </div>

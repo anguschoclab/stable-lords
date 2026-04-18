@@ -69,10 +69,12 @@ function StatBar({ label, value, max = 21 }: { label: string; value: number; max
 }
 
 function RecruitCard({
-  warrior, canAfford, rosterFull, onRecruit, isScouted, onScout, canAffordScout
+  warrior, canAfford, rosterFull, onRecruit, isScouted, onScout, canAffordScout, canAffordBonus
 }: {
-  warrior: PoolWarrior; canAfford: boolean; rosterFull: boolean; onRecruit: (w: PoolWarrior) => void;
+  warrior: PoolWarrior; canAfford: boolean; rosterFull: boolean;
+  onRecruit: (w: PoolWarrior, bonus?: boolean) => void;
   isScouted: boolean; onScout: (w: PoolWarrior) => void; canAffordScout: boolean;
+  canAffordBonus: boolean;
 }) {
   const grade = potentialGrade(potentialRating(warrior.potential));
   const isElite = warrior.tier === "Prodigy" || warrior.tier === "Exceptional";
@@ -174,10 +176,20 @@ function RecruitCard({
                 isElite ? "bg-arena-gold text-black hover:bg-arena-gold/80" : "bg-primary text-black hover:bg-primary/80"
               )}
               disabled={!canAfford || rosterFull}
-              onClick={() => onRecruit(warrior)}
+              onClick={() => onRecruit(warrior, false)}
             >
               <UserPlus className="h-3.5 w-3.5 mr-1.5" />
               HIRE
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-9 px-3 font-black uppercase tracking-widest border-arena-gold/40 text-arena-gold hover:bg-arena-gold/10"
+              disabled={!canAffordBonus || rosterFull}
+              onClick={() => onRecruit(warrior, true)}
+              title="Pay a 50g signing bonus — warrior arrives eager (+2 XP) and gets a gazette mention."
+            >
+              + BONUS [50G]
             </Button>
           </div>
         </div>
@@ -201,10 +213,12 @@ export default function Recruit() {
   const rosterFull = roster.length >= MAX_ROSTER;
   const canRefresh = canTransact(treasury, REFRESH_COST);
 
-  const handleRecruit = useCallback((w: PoolWarrior) => {
+  const handleRecruit = useCallback((w: PoolWarrior, bonus: boolean = false) => {
     setState((draft: GameStore) => {
-      if (!canTransact(draft.treasury, w.cost)) {
-        toast.error(`Not enough funds! Need ${w.cost}g.`);
+      const BONUS_COST = 50;
+      const totalCost = w.cost + (bonus ? BONUS_COST : 0);
+      if (!canTransact(draft.treasury, totalCost)) {
+        toast.error(`Not enough funds! Need ${totalCost}g.`);
         return;
       }
       if (draft.roster.length >= MAX_ROSTER) {
@@ -220,26 +234,35 @@ export default function Recruit() {
         { age: w.age, potential: w.potential }
       );
 
+      // Signing bonus perk — +2 XP and an "Eager" flair tag.
+      if (bonus) {
+        (warrior as any).xp = ((warrior as any).xp ?? 0) + 2;
+        const tags = (warrior as any).tags ?? (warrior as any).flair ?? [];
+        (warrior as any).tags = [...tags, "Eager"];
+      }
+
       draft.roster.push(warrior);
-      draft.treasury -= w.cost;
+      draft.treasury -= totalCost;
       draft.recruitPool = (draft.recruitPool ?? []).filter((p: PoolWarrior) => p.id !== w.id);
 
       draft.ledger.push({
         id: String(hashStr(`${draft.week}-${w.name}`)),
         week: draft.week,
-        label: `Recruit: ${w.name} (${w.tier})`,
-        amount: -w.cost,
+        label: `Recruit: ${w.name} (${w.tier})${bonus ? " + signing bonus" : ""}`,
+        amount: -totalCost,
         category: "recruit",
       });
 
+      const items = [`${draft.player.stableName} signed ${w.name}, a ${w.tier.toLowerCase()} ${STYLE_DISPLAY_NAMES[w.style]}.`];
+      if (bonus) items.push(`A 50g signing bonus sealed the deal — ${w.name} arrived eager to prove themselves.`);
       draft.newsletter.push({
         id: String(hashStr(`${draft.week}-recruitment-${w.name}`)),
         week: draft.week,
         title: "Recruitment",
-        items: [`${draft.player.stableName} signed ${w.name}, a ${w.tier.toLowerCase()} ${STYLE_DISPLAY_NAMES[w.style]}.`],
+        items,
       });
 
-      toast.success(`${w.name} has joined your stable! (-${w.cost}g)`);
+      toast.success(`${w.name} has joined your stable! (-${totalCost}g)`);
     });
   }, [MAX_ROSTER, setState]);
 
@@ -402,6 +425,7 @@ export default function Recruit() {
                   isScouted={scoutedIds.has(w.id)}
                   onScout={handleScout}
                   canAffordScout={canTransact(treasury, 25)}
+                  canAffordBonus={canTransact(treasury, w.cost + 50)}
                 />
               ))}
             </div>

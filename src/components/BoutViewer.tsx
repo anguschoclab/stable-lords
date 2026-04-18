@@ -16,6 +16,7 @@ import { useGameStore } from "@/state/useGameStore";
 import ViewModeToggle from "./arena/ViewModeToggle";
 import ArenaView from "./arena/ArenaView";
 import TacticalLogView from "./arena/TacticalLogView";
+import HighlightLog from "./arena/HighlightLog";
 import type { ViewMode } from "./arena/ViewModeToggle";
 
 interface BoutViewerProps {
@@ -308,6 +309,9 @@ export default function BoutViewer({
               visibleCount={visibleCount}
             />
           )}
+
+          {/* Highlight Reel — curated notable minutes */}
+          <HighlightLog log={log} visibleCount={visibleCount} />
 
           {/* Cinematic Resolution Banner */}
           {isComplete && winner && (

@@ -6,6 +6,7 @@ import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatBadge, WarriorNameTag } from "@/components/ui/WarriorBadges";
+import { potentialRating, potentialGrade } from "@/engine/potential";
 import { Users, ChevronRight, Trophy, Star, Swords, Target, Crown, Activity, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -131,6 +132,25 @@ export function RosterWall() {
                                           <Star className={cn("h-3 w-3", w.fame > 1000 ? "text-arena-gold" : "text-muted-foreground/60")} />
                                           <span className={cn("text-[10px] font-mono font-black", w.fame > 1000 ? "text-arena-gold" : "text-muted-foreground")}>{w.fame}G</span>
                                        </div>
+                                       {w.potential && (() => {
+                                          const grade = potentialGrade(potentialRating(w.potential));
+                                          const color = grade === "S" ? "text-arena-gold border-arena-gold/40"
+                                                      : grade === "A" ? "text-primary border-primary/40"
+                                                      : grade === "B" ? "text-emerald-400 border-emerald-400/40"
+                                                      : grade === "C" ? "text-muted-foreground border-white/10"
+                                                                      : "text-muted-foreground/60 border-white/5";
+                                          return (
+                                             <Tooltip>
+                                               <TooltipTrigger asChild>
+                                                 <div className={cn("flex items-center gap-1 px-2 py-0.5 rounded-none bg-black border opacity-80 group-hover:opacity-100 transition-all", color)}>
+                                                   <span className="text-[8px] font-black uppercase tracking-widest opacity-60">POT</span>
+                                                   <span className="text-[10px] font-mono font-black">{grade}</span>
+                                                 </div>
+                                               </TooltipTrigger>
+                                               <TooltipContent>Potential grade — ceiling for training gains.</TooltipContent>
+                                             </Tooltip>
+                                          );
+                                       })()}
                                     </div>
                                  </div>
 

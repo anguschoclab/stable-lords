@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, Coins, Sparkles, GraduationCap, ScrollText, Skull } from "lucide-react";
+import { BookOpen, Coins, Sparkles, GraduationCap, ScrollText, Skull, CalendarDays } from "lucide-react";
 import { useGameStore } from "@/state/useGameStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,6 +10,7 @@ import { InsightManager } from "@/components/ledger/InsightManager";
 import { ContractManager } from "@/components/ledger/ContractManager";
 import { Chronicle } from "@/components/ledger/Chronicle";
 import { HallOfWarriors } from "@/components/ledger/HallOfWarriors";
+import { YearEndRecap } from "@/components/ledger/YearEndRecap";
 
 export default function StableLedger() {
   const { season, week, treasury } = useGameStore();
@@ -31,7 +32,7 @@ export default function StableLedger() {
       />
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="w-full grid grid-cols-2 md:grid-cols-5 h-auto p-1 bg-secondary/20 border border-border/40 backdrop-blur-sm rounded-none mb-8">
+        <TabsList className="w-full grid grid-cols-2 md:grid-cols-6 h-auto p-1 bg-secondary/20 border border-border/40 backdrop-blur-sm rounded-none mb-8">
           <TabsTrigger value="overview" className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Coins className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Overview</span>
           </TabsTrigger>
@@ -47,6 +48,9 @@ export default function StableLedger() {
           <TabsTrigger value="hall" className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-destructive data-[state=active]:text-white">
             <Skull className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Legends Hall</span>
           </TabsTrigger>
+          <TabsTrigger value="year-end" className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-arena-gold data-[state=active]:text-black">
+            <CalendarDays className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Year-End</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="focus-visible:outline-none"><TreasuryOverview /></TabsContent>
@@ -58,6 +62,7 @@ export default function StableLedger() {
         <TabsContent value="contracts" className="focus-visible:outline-none"><ContractManager /></TabsContent>
         <TabsContent value="chronicle" className="focus-visible:outline-none"><Chronicle /></TabsContent>
         <TabsContent value="hall" className="focus-visible:outline-none"><HallOfWarriors /></TabsContent>
+        <TabsContent value="year-end" className="focus-visible:outline-none"><YearEndRecap /></TabsContent>
       </Tabs>
     </div>
   );

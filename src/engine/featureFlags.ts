@@ -25,14 +25,18 @@ export interface FeatureFlags {
 }
 
 const DEFAULTS: FeatureFlags = {
-  narrativeGen2: false,
-  crowdMoodLethality: false,
+  // UI + narrative polish — safe default on.
+  narrativeGen2: true,
+  highlightLog: true,
+  potentialGradeUI: true,
+  offseasonFlow: true,
+  // Engine lethality modulation — crowdKillBonus is capped; baseline preserved.
+  crowdMoodLethality: true,
+  // Dev-only surfaces stay off by default.
   telemetryDashboard: false,
-  highlightLog: false,
+  // Scaffolded orchestrator — flag stays off until the scheduler consumes its plan.
   weeklyMatchmaker: false,
-  offseasonFlow: false,
-  potentialGradeUI: false,
-  // Skill drilling is data-complete; gate the player-facing assignment UI here.
+  // Skill drilling is data-complete.
   skillDrilling: true,
 };
 
