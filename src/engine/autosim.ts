@@ -49,10 +49,11 @@ export async function runAutosim(
       }
     });
 
-    // 3. Process Weekly Bouts (Actually runs the fights)
-    const boutResult = processWeekBouts(state);
-    state = resolveImpacts(state, [boutResult.impact]);
-    const { results, summary } = boutResult;
+    // Bouts are now handled inside advanceWeek via BoutSimulationPass.
+    // We just extract the summary from the last simulation report.
+    const report = state.lastSimulationReport?.bouts;
+    const summary = report || { bouts: 0, deaths: 0, injuries: 0, deathNames: [], injuryNames: [] };
+    const results: any[] = []; // Only checked for length down below
 
     if (!state) return { weekSummaries, weeksSimmed, stopReason: "no_pairings" as const, finalState: null as any };
 

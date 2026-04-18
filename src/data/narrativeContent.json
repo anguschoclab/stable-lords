@@ -647,6 +647,11 @@
       ]
     },
     "defenses": {
+      "counterstrike": {
+        "success": [
+          "{{defender}} masterfully avoids the blow and lands a devastating counter-blow!"
+        ]
+      },
       "dodge": {
         "success": [
           "{{defender}} twists his body with prideful grace, allowing the attack to pass harmlessly by."
