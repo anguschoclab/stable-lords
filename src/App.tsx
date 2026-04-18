@@ -6,6 +6,7 @@ import { Suspense, lazy } from "react";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useDeathNotifications } from "@/hooks/useDeathNotifications";
 
 const ResolutionReveal = lazy(() => import("@/components/ResolutionReveal"));
 const StartGame = lazy(() => import("@/pages/StartGame"));
@@ -29,6 +30,9 @@ const queryClient = new QueryClient();
 function GameRoutes() {
   const state = useWorldState();
   const { atTitleScreen } = useGameStore();
+
+  // App-wide death ping — subscribes once, cleans up on unmount.
+  useDeathNotifications();
 
   // No active game → show title / start screen
   if (atTitleScreen) {

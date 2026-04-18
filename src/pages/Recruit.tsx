@@ -18,6 +18,7 @@ import {
 } from "@/engine/recruitment";
 import { canTransact } from "@/utils/economyUtils";
 import { potentialRating, potentialGrade } from "@/engine/potential";
+import { revealRecruitPotential, type PotentialScoutReport } from "@/engine/recruitScouting";
 import WarriorBuilder from "@/components/WarriorBuilder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,12 +70,14 @@ function StatBar({ label, value, max = 21 }: { label: string; value: number; max
 }
 
 function RecruitCard({
-  warrior, canAfford, rosterFull, onRecruit, isScouted, onScout, canAffordScout, canAffordBonus
+  warrior, canAfford, rosterFull, onRecruit, isScouted, onScout, canAffordScout, canAffordBonus,
+  scoutReport
 }: {
   warrior: PoolWarrior; canAfford: boolean; rosterFull: boolean;
   onRecruit: (w: PoolWarrior, bonus?: boolean) => void;
   isScouted: boolean; onScout: (w: PoolWarrior) => void; canAffordScout: boolean;
   canAffordBonus: boolean;
+  scoutReport?: PotentialScoutReport;
 }) {
   const grade = potentialGrade(potentialRating(warrior.potential));
   const isElite = warrior.tier === "Prodigy" || warrior.tier === "Exceptional";
@@ -147,6 +150,23 @@ function RecruitCard({
            </p>
         </div>
 
+        {/* Scouting partial-reveal — appears only when SCOUT [25G] has been used on this recruit. */}
+        {isScouted && scoutReport && Object.keys(scoutReport.revealed).length > 0 && (
+          <div className="p-3 border border-primary/30 bg-primary/5 rounded-none space-y-1.5">
+            <div className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">
+              Scout_Report
+            </div>
+            <p className="text-[10px] text-muted-foreground italic">{scoutReport.summary}</p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {Object.entries(scoutReport.revealed).map(([k, v]) => (
+                <span key={k} className="text-[10px] font-mono px-2 py-0.5 border border-primary/30 bg-black/40 text-primary">
+                  {k} ceiling: <span className="font-black">{v}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Cost & Action Buttons */}
         <div className="flex items-center justify-between pt-2 border-t border-border/20">
           <div className="flex flex-col">
@@ -209,6 +229,7 @@ export default function Recruit() {
   const MAX_ROSTER = BASE_ROSTER_CAP + (rosterBonus ?? 0);
 
   const [scoutedIds, setScoutedIds] = useState<Set<string>>(new Set());
+  const [scoutReports, setScoutReports] = useState<Record<string, PotentialScoutReport>>({});
 
   const rosterFull = roster.length >= MAX_ROSTER;
   const canRefresh = canTransact(treasury, REFRESH_COST);
@@ -273,6 +294,10 @@ export default function Recruit() {
         return;
       }
       setScoutedIds(s => new Set(s).add(w.id));
+      // Deterministic partial reveal — same (recruit, week) always yields the
+      // same subset, so save/load doesn't shuffle the intel.
+      const report = revealRecruitPotential(w.id, draft.week, w.potential);
+      setScoutReports(prev => ({ ...prev, [w.id]: report }));
       draft.treasury -= 25;
       draft.ledger.push({
         id: String(hashStr(`${draft.week}-scout-${w.name}`)),
@@ -426,6 +451,7 @@ export default function Recruit() {
                   onScout={handleScout}
                   canAffordScout={canTransact(treasury, 25)}
                   canAffordBonus={canTransact(treasury, w.cost + 50)}
+                  scoutReport={scoutReports[w.id]}
                 />
               ))}
             </div>

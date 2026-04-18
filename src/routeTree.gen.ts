@@ -37,6 +37,7 @@ import { Route as StableEquipmentRouteImport } from './routes/stable/equipment'
 import { Route as StableContractsRouteImport } from './routes/stable/contracts'
 import { Route as StableIdRouteImport } from './routes/stable/$id'
 import { Route as OpsPersonnelRouteImport } from './routes/ops/personnel'
+import { Route as OpsOffseasonRouteImport } from './routes/ops/offseason'
 import { Route as OpsFinanceRouteImport } from './routes/ops/finance'
 import { Route as OpsEquipmentRouteImport } from './routes/ops/equipment'
 import { Route as OpsContractsRouteImport } from './routes/ops/contracts'
@@ -189,6 +190,11 @@ const OpsFinanceRoute = OpsFinanceRouteImport.update({
   path: '/ops/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpsOffseasonRoute = OpsOffseasonRouteImport.update({
+  id: '/ops/offseason',
+  path: '/ops/offseason',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OpsEquipmentRoute = OpsEquipmentRouteImport.update({
   id: '/ops/equipment',
   path: '/ops/equipment',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/ops/contracts': typeof OpsContractsRoute
   '/ops/equipment': typeof OpsEquipmentRoute
   '/ops/finance': typeof OpsFinanceRoute
+  '/ops/offseason': typeof OpsOffseasonRoute
   '/ops/personnel': typeof OpsPersonnelRoute
   '/stable/$id': typeof StableIdRoute
   '/stable/contracts': typeof StableContractsRoute
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/ops/contracts': typeof OpsContractsRoute
   '/ops/equipment': typeof OpsEquipmentRoute
   '/ops/finance': typeof OpsFinanceRoute
+  '/ops/offseason': typeof OpsOffseasonRoute
   '/ops/personnel': typeof OpsPersonnelRoute
   '/stable/$id': typeof StableIdRoute
   '/stable/contracts': typeof StableContractsRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/ops/contracts': typeof OpsContractsRoute
   '/ops/equipment': typeof OpsEquipmentRoute
   '/ops/finance': typeof OpsFinanceRoute
+  '/ops/offseason': typeof OpsOffseasonRoute
   '/ops/personnel': typeof OpsPersonnelRoute
   '/stable/$id': typeof StableIdRoute
   '/stable/contracts': typeof StableContractsRoute
@@ -364,6 +373,7 @@ export interface FileRouteTypes {
     | '/ops/contracts'
     | '/ops/equipment'
     | '/ops/finance'
+    | '/ops/offseason'
     | '/ops/personnel'
     | '/stable/$id'
     | '/stable/contracts'
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/ops/contracts'
     | '/ops/equipment'
     | '/ops/finance'
+    | '/ops/offseason'
     | '/ops/personnel'
     | '/stable/$id'
     | '/stable/contracts'
@@ -439,6 +450,7 @@ export interface FileRouteTypes {
     | '/ops/contracts'
     | '/ops/equipment'
     | '/ops/finance'
+    | '/ops/offseason'
     | '/ops/personnel'
     | '/stable/$id'
     | '/stable/contracts'
@@ -479,6 +491,7 @@ export interface RootRouteChildren {
   OpsContractsRoute: typeof OpsContractsRoute
   OpsEquipmentRoute: typeof OpsEquipmentRoute
   OpsFinanceRoute: typeof OpsFinanceRoute
+  OpsOffseasonRoute: typeof OpsOffseasonRoute
   OpsPersonnelRoute: typeof OpsPersonnelRoute
   StableIdRoute: typeof StableIdRoute
   StableContractsRoute: typeof StableContractsRoute
@@ -707,6 +720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpsFinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ops/offseason': {
+      id: '/ops/offseason'
+      path: '/ops/offseason'
+      fullPath: '/ops/offseason'
+      preLoaderRoute: typeof OpsOffseasonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ops/equipment': {
       id: '/ops/equipment'
       path: '/ops/equipment'
@@ -783,6 +803,7 @@ const rootRouteChildren: RootRouteChildren = {
   OpsContractsRoute: OpsContractsRoute,
   OpsEquipmentRoute: OpsEquipmentRoute,
   OpsFinanceRoute: OpsFinanceRoute,
+  OpsOffseasonRoute: OpsOffseasonRoute,
   OpsPersonnelRoute: OpsPersonnelRoute,
   StableIdRoute: StableIdRoute,
   StableContractsRoute: StableContractsRoute,
