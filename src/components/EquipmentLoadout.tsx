@@ -21,6 +21,7 @@ import {
   isPreferredWeapon,
   isOverEncumbered,
   checkWeaponRequirements,
+  validateLoadout,
   type WeaponReqResult,
 } from "@/data/equipment";
 
