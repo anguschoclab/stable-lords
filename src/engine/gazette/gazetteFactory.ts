@@ -16,6 +16,7 @@ import {
   detectHotStreakers,
   detectRisingStars,
   detectUpsets,
+  detectDebuts,
   type GazetteDetections
 } from "./gazetteDetections";
 import { generateGazetteHeadline, generateGazetteBody, generateSeasonSummary } from "./gazetteNarrative";
@@ -42,6 +43,7 @@ export function generateWeeklyGazette(
   const rivalryPair = detectRivalryMatchup(fights, allFights ?? []);
   const risingStars = detectRisingStars(fights, allFights ?? []);
   const upsets = detectUpsets(fights);
+  const debuts = allFights ? detectDebuts(fights, allFights) : [];
 
   const detections: GazetteDetections = {
     tags: [],
@@ -49,6 +51,7 @@ export function generateWeeklyGazette(
     rivalryPair,
     risingStars,
     upsets,
+    debuts,
   };
 
   // Generate tags from detections

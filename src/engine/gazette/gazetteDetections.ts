@@ -10,6 +10,33 @@ export interface GazetteDetections {
   rivalryPair: { a: string; b: string; count: number } | null;
   risingStars: string[];
   upsets: { winner: string; loser: string; winnerFame: number; loserFame: number }[];
+  /** Warriors whose first-ever bout is among this week's fights. */
+  debuts?: string[];
+}
+
+/**
+ * Detect warriors making their debut this week — i.e. warriors who appear in
+ * `weekFights` but have no earlier appearance in `allFights`. `allFights` is
+ * assumed to be ordered chronologically, with `weekFights` forming its tail.
+ */
+export function detectDebuts(
+  weekFights: FightSummary[],
+  allFights: FightSummary[]
+): string[] {
+  const priorCount = Math.max(0, allFights.length - weekFights.length);
+  const priorNames = new Set<string>();
+  for (let i = 0; i < priorCount; i++) {
+    const f = allFights[i];
+    if (!f) continue;
+    priorNames.add(f.a);
+    priorNames.add(f.d);
+  }
+  const debuts = new Set<string>();
+  for (const f of weekFights) {
+    if (!priorNames.has(f.a)) debuts.add(f.a);
+    if (!priorNames.has(f.d)) debuts.add(f.d);
+  }
+  return [...debuts];
 }
 
 /**
