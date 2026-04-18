@@ -463,9 +463,9 @@
         "A masterful thrust from {{attacker}} finds the seam in armor, skewering {{defender}} through the {{bodyPart}} and anchoring them to the sand.",
         "{{defender}}'s eyes widen in disbelief as they look down at {{attacker}}'s {{weapon}} protruding from their {{bodyPart}}.",
         "With surgical precision, {{attacker}} drives the {{weapon}} through {{defender}}'s {{bodyPart}}, severing the vital arteries.",
-        "{{attacker}} violently drives their point through {{defender}}'s sternum, lifting them momentarily off the ground.",
-        "A blinding lunge from {{attacker}} catches {{defender}} perfectly in the throat. The fight ends in a gurgling gasp.",
-        "{{attacker}} pins {{defender}} against the metaphorical ropes, burying the blade to the hilt in their ribs."
+        "{{attacker}} violently drives their point through {{defender}}'s {{bodyPart}}, lifting them momentarily off the ground.",
+        "A blinding lunge from {{attacker}} catches {{defender}} perfectly in the {{bodyPart}}. The fight ends in a gurgling gasp.",
+        "{{attacker}} pins {{defender}} against the metaphorical ropes, burying the blade to the hilt in their {{bodyPart}}."
       ]
     },
     "fist": {
