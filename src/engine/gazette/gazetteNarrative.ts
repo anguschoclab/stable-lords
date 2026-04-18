@@ -102,7 +102,7 @@ export function generateGazetteHeadline(
   } else if (kills.length >= 2) {
     return t(rngService.pick(gh.MultipleKills), { week, count: kills.length });
   } else if (kills.length === 1) {
-    return t(rngService.pick(gh.Kill), { week, killer: kills[0]?.winner === "A" ? kills[0]?.a : kills[0]?.d });
+    return t(rngService.pick(gh.Kill), { week, killer: kills[0]?.winner === "A" ? kills[0]?.a : kills[0]?.d, loser: kills[0]?.winner === "A" ? kills[0]?.d : kills[0]?.a });
   } else if (knockouts.length >= 2) {
     return t(rngService.pick(gh.MultipleKOs), { week, adj: rngService.pick(tone.adjectives) });
   } else if (fights.length > 0) {
