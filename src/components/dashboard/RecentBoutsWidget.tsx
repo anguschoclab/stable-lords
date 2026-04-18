@@ -19,9 +19,19 @@ export function RecentBoutsWidget() {
   // Get the last 5 bouts involving the player's stable
   const recentBouts = useMemo(() => {
     const playerStableId = state.player.id;
-    return (state.arenaHistory || [])
-      .filter(bout => bout.stableIdA === playerStableId || bout.stableIdD === playerStableId)
-      .slice(0, 5);
+    const history = state.arenaHistory || [];
+    const results = [];
+
+    // ⚡ Bolt: Replaced O(N) full-array filter and slice with an O(1) forward scan
+    // to find the first 5 bouts without scanning or allocating the entire history.
+    for (let i = 0; i < history.length; i++) {
+      const bout = history[i];
+      if (bout.stableIdA === playerStableId || bout.stableIdD === playerStableId) {
+        results.push(bout);
+        if (results.length >= 5) break;
+      }
+    }
+    return results;
   }, [state.arenaHistory, state.player.id]);
 
   return (
