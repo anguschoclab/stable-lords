@@ -59,8 +59,7 @@ export default function NewGameForm({
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 relative"
-      style={{ background: "#0C0806" }}
+      className="min-h-screen flex items-center justify-center p-4 relative bg-background"
     >
       <div className="relative z-10 w-full max-w-xl space-y-6">
         <button
@@ -90,7 +89,7 @@ export default function NewGameForm({
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center w-20 h-20 mx-auto relative">
               <div className="absolute inset-0 rounded-full" style={{ background: "conic-gradient(from 0deg, rgba(201, 151, 42, 0.5), rgba(201, 151, 42, 0.15), rgba(201, 151, 42, 0.5), rgba(201, 151, 42, 0.15), rgba(201, 151, 42, 0.5))", padding: "1px" }}>
-                <div className="w-full h-full rounded-full" style={{ background: "#0C0806" }} />
+                <div className="w-full h-full rounded-full bg-background" />
               </div>
               <div className="relative z-10 flex items-center justify-center w-14 h-14 rounded-full" style={{ background: "radial-gradient(ellipse at 35% 35%, rgba(160, 40, 48, 0.95) 0%, #872228 55%, rgba(100, 20, 26, 0.9) 100%)", boxShadow: "0 4px 16px rgba(135, 34, 40, 0.5), inset 0 1px 0 rgba(255, 200, 200, 0.15), inset 0 -1px 0 rgba(0,0,0,0.3)" }}>
                 <Dices className="h-6 w-6 text-[#F2D5B8]" strokeWidth={1.5} />
@@ -100,7 +99,7 @@ export default function NewGameForm({
               <h2 className="text-2xl font-display font-bold text-foreground">
                 Forge Your Stable
               </h2>
-              <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-[280px] mx-auto">
+              <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-sm mx-auto">
                 The orphanage doors creak open. Beyond them lies the roar of the crowd, the clash of steel, and a chance to forge legends.
               </p>
             </div>

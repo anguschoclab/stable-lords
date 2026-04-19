@@ -80,7 +80,7 @@ export default function WarriorCard({
                     {warrior.trait}
                   </span>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[220px] text-[10px]">
+                <TooltipContent side="top" className="max-w-xs text-[10px]">
                   {(() => {
                     const mods = TRAIT_PLAN_MODIFIERS[warrior.trait];
                     if (!mods) return <span>Flavor trait — shapes personality</span>;

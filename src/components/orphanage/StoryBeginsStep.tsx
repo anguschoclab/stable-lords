@@ -37,7 +37,7 @@ export default function StoryBeginsStep({ onFinish }: StoryBeginsStepProps) {
         <h2 className="font-display text-2xl font-black text-foreground">
           Your Story Begins
         </h2>
-        <p className="text-sm text-muted-foreground/70 leading-relaxed max-w-[280px] mx-auto">
+        <p className="text-sm text-muted-foreground/70 leading-relaxed max-w-sm mx-auto">
           Stable registered. Warriors enrolled. The imperial commission
           has been notified. The arena awaits.
         </p>

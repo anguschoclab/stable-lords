@@ -217,11 +217,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       OE {cond.override.OE !== undefined ? cond.override.OE : "—"}
                     </Label>
                     {cond.override.OE !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="Clear Offensive Effort override" onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold">
+                      <button aria-label="Set Offensive Effort to max" onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold">
                         set
                       </button>
                     )}
@@ -245,11 +245,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       AL {cond.override.AL !== undefined ? cond.override.AL : "—"}
                     </Label>
                     {cond.override.AL !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="Clear Action Level override" onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame">
+                      <button aria-label="Set Action Level to max" onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame">
                         set
                       </button>
                     )}
@@ -273,11 +273,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       KD {cond.override.killDesire !== undefined ? cond.override.killDesire : "—"}
                     </Label>
                     {cond.override.killDesire !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="Clear Kill Desire override" onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button aria-label="Set Kill Desire to max" onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
                         set
                       </button>
                     )}

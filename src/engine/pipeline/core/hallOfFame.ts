@@ -1,6 +1,7 @@
-  type GameState, 
-  type AnnualAward,
-  type RivalStableData 
+import type {
+  GameState,
+  AnnualAward,
+  RivalStableData
 } from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
 import { FightingStyle, type WarriorId, type StableId } from "@/types/shared.types";

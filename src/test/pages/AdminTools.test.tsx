@@ -1,3 +1,8 @@
+/**
+ * @vitest-environment jsdom
+ */
+import { enableMapSet } from 'immer';
+enableMapSet();
 import { describe, it, expect, vi, beforeEach , Mock} from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AdminTools from '../../pages/AdminTools';

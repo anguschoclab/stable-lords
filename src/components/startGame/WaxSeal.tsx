@@ -11,7 +11,7 @@ export default function WaxSeal() {
           padding: "1px",
         }}
       >
-        <div className="w-full h-full rounded-full" style={{ background: "#0C0806" }} />
+        <div className="w-full h-full rounded-full bg-background" />
       </div>
       <div
         className="relative z-10 flex items-center justify-center w-14 h-14 rounded-full"
