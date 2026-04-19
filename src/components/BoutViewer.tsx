@@ -17,7 +17,9 @@ import ViewModeToggle from "./arena/ViewModeToggle";
 import ArenaView from "./arena/ArenaView";
 import TacticalLogView from "./arena/TacticalLogView";
 import HighlightLog from "./arena/HighlightLog";
+import TelemetryDashboard from "./debug/TelemetryDashboard";
 import type { ViewMode } from "./arena/ViewModeToggle";
+import type { ExchangeLogEntry } from "@/types/combat.types";
 
 interface BoutViewerProps {
   nameA: string;
@@ -32,6 +34,7 @@ interface BoutViewerProps {
   arenaTier?: "training" | "standard" | "championship" | "grand";
   weather?: string;
   transcript?: string[];
+  exchangeLog?: ExchangeLogEntry[];
 }
 
 function getOutcomeStyles(by: FightOutcomeBy) {
@@ -56,6 +59,7 @@ export default function BoutViewer({
   isRivalry,
   arenaTier = "standard",
   weather = "Clear",
+  exchangeLog,
 }: BoutViewerProps) {
   const store = useGameStore();
   const arenaPrefs = store.arenaPreferences;
@@ -312,6 +316,9 @@ export default function BoutViewer({
 
           {/* Highlight Reel — curated notable minutes */}
           <HighlightLog log={log} visibleCount={visibleCount} />
+
+          {/* Dev-only telemetry dashboard (flagged) */}
+          <TelemetryDashboard exchangeLog={exchangeLog} />
 
           {/* Cinematic Resolution Banner */}
           {isComplete && winner && (
