@@ -135,7 +135,9 @@ export function updateWarriorFromBoutOutcome(
   warrior: Warrior,
   isAttacker: boolean,
   winnerSide: "A" | "D" | null,
-  isKill: boolean
+  isKill: boolean,
+  /** If true, skip fatigue accrual (for tournament participants during tournament week) */
+  skipFatigue?: boolean
 ): Warrior {
   const isWinner = (isAttacker && winnerSide === "A") || (!isAttacker && winnerSide === "D");
   const isVictim = !isWinner && isKill;
@@ -144,6 +146,7 @@ export function updateWarriorFromBoutOutcome(
     isWinner,
     isKill,
     isVictim,
+    skipFatigue,
   };
 
   const result = calculateCareerUpdate(warrior, input);

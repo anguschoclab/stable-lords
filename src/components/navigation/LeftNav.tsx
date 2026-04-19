@@ -3,14 +3,15 @@
  * Replaces HubNav (top bar) + SubTabNav (secondary tabs) with a single
  * collapsible left rail: hub switcher + per-hub sub-pages + alert badges.
  */
+import React from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Swords, Users, Globe,
   LayoutDashboard, BookUser, Dumbbell, Target, Cpu,
-  Package, Wrench, Coins, ScrollText,
-  Trophy, Radar, Newspaper, Skull,
+  Wrench, Coins, ScrollText,
+  Trophy, Radar, Newspaper, FileText,
   ChevronRight,
   AlertCircle,
   CalendarClock,
@@ -53,11 +54,11 @@ const HUBS = [
     icon: Globe,
     to: "/world",
     pages: [
-      { to: "/world",                label: "Rankings",    icon: Trophy,    exact: true },
+      { to: "/world",                label: "Rankings",    icon: Trophy,       exact: true },
       { to: "/world/tournaments",    label: "Tournaments", icon: CalendarClock },
       { to: "/world/intelligence",   label: "Scouting",    icon: Radar },
       { to: "/world/chronicle",      label: "Chronicle",   icon: Newspaper },
-      { to: "/world/graveyard",      label: "Graveyard",   icon: Skull },
+      { to: "/world/history",        label: "History",     icon: FileText },
     ],
   },
 ] as const;
@@ -67,20 +68,23 @@ type HubId = (typeof HUBS)[number]["id"];
 // ─── Alert badge helper ──────────────────────────────────────────────────────
 
 function useNavAlerts() {
-  const { roster, boutOffers, isTournamentWeek } = useGameStore(
+  const { roster, boutOffers, isTournamentWeek, trainingAssignments } = useGameStore(
     useShallow((s) => ({
       roster: s.roster,
       boutOffers: s.boutOffers,
       isTournamentWeek: s.isTournamentWeek,
+      trainingAssignments: s.trainingAssignments,
     }))
   );
 
+  const assignedIds = new Set((trainingAssignments ?? []).map((a) => a.warriorId));
   const untrainedCount = roster.filter(
-    (w) => w.status === "Active" && !w.trainingPlan
+    (w) => w.status === "Active" && !assignedIds.has(w.id)
   ).length;
 
-  const pendingOffers = Object.values(boutOffers || {}).filter(
-    (o) => o.offeredTo === roster[0]?.stableId
+  const rosterIds = new Set(roster.map((w) => w.id));
+  const pendingOffers = Object.values(boutOffers || {}).filter((o) =>
+    o.status === "Proposed" && o.warriorIds.some((id) => rosterIds.has(id))
   ).length;
 
   return {
@@ -160,7 +164,8 @@ export function LeftNav({ className }: LeftNavProps) {
               className="flex flex-col gap-0.5 px-2"
             >
               {HUBS.find((h) => h.id === activeHubId)?.pages.map((page) => {
-                const isActive = page.exact
+                const pageAny = page as { to: string; exact?: boolean };
+                const isActive = pageAny.exact
                   ? currentPath === page.to
                   : currentPath === page.to ||
                     currentPath.startsWith(`${page.to}/`);
@@ -209,20 +214,23 @@ export function LeftNav({ className }: LeftNavProps) {
 // ─── Bottom alert strip ──────────────────────────────────────────────────────
 
 function AlertStrip() {
-  const { roster, isTournamentWeek, boutOffers } = useGameStore(
+  const { roster, isTournamentWeek, boutOffers, trainingAssignments } = useGameStore(
     useShallow((s) => ({
       roster: s.roster,
       isTournamentWeek: s.isTournamentWeek,
       boutOffers: s.boutOffers,
+      trainingAssignments: s.trainingAssignments,
     }))
   );
 
+  const assignedIds = new Set((trainingAssignments ?? []).map((a) => a.warriorId));
   const untrainedCount = roster.filter(
-    (w) => w.status === "Active" && !w.trainingPlan
+    (w) => w.status === "Active" && !assignedIds.has(w.id)
   ).length;
 
-  const pendingOffers = Object.values(boutOffers || {}).filter(
-    (o) => o.offeredTo === roster[0]?.stableId
+  const rosterIds = new Set(roster.map((w) => w.id));
+  const pendingOffers = Object.values(boutOffers || {}).filter((o) =>
+    o.status === "Proposed" && o.warriorIds.some((id) => rosterIds.has(id))
   ).length;
 
   const alerts: { icon: React.ElementType; label: string; color: string }[] = [];

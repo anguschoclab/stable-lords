@@ -30,8 +30,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useRivalryAlerts } from "@/hooks/useRivalryAlerts";
-import { HubNav } from "@/components/navigation/HubNav";
-import { TacticalBar } from "@/components/navigation/TacticalBar";
+import { LeftNav } from "@/components/navigation/LeftNav";
 
 import { useShallow } from 'zustand/react/shallow';
 
@@ -243,28 +242,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col overflow-hidden relative">
-        {/* ─── Hub Navigation ─── */}
-        <HubNav />
-
-        {/* ─── Event Log Sidebar (E to toggle) ─── */}
-        <AnimatePresence>
-          {eventLogOpen && (
-            <motion.aside
-              key="event-log"
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "100%", opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute right-0 top-0 bottom-0 z-40 w-80 border-l border-white/10 bg-[#0d0f14] overflow-hidden flex flex-col"
-            >
-              <EventLog />
-            </motion.aside>
-          )}
-        </AnimatePresence>
+      <div className="flex-1 flex flex-row overflow-hidden relative">
+        {/* ─── Left Navigation Rail ─── */}
+        <LeftNav />
 
         {/* ─── Main Content Area ─── */}
-        <main className={cn("flex-1 flex flex-col relative bg-[#050506] overflow-hidden transition-all duration-300", eventLogOpen && "mr-80")}>
+        <main className="flex-1 flex flex-col relative bg-[#050506] overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
           
           <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10">
@@ -287,10 +270,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <CoachOverlay />
-          <TacticalBar />
 
           <AnimatePresence>
             {!isInitialized && (
+
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -305,6 +288,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             )}
           </AnimatePresence>
         </main>
+
+        {/* ─── Event Log Right Rail ─── */}
+        <AnimatePresence>
+          {eventLogOpen && (
+            <motion.aside
+              key="event-log"
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 320, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-shrink-0 border-l border-white/10 bg-[#0d0f14] overflow-hidden flex flex-col"
+            >
+              <EventLog />
+            </motion.aside>
+          )}
+        </AnimatePresence>
       </div>
 
       <DeathModal />

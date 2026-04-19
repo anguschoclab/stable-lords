@@ -1,0 +1,479 @@
+/**
+ * Stable Lords — Control Center
+ * Phase 2: Replaces the draggable Dashboard with a fixed Command Grid.
+ * Archetype: Command Grid — Hero KPI bar + 5 tabbed sections + 6-card grid.
+ */
+import React, { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useGameStore } from "@/state/useGameStore";
+import { useShallow } from "zustand/react/shallow";
+import { cn } from "@/lib/utils";
+
+import { calculateStableStats } from "@/engine/stats/stableStats";
+import { collectPulse } from "@/engine/stats/simulationMetrics";
+import { computeStableReputation } from "@/engine/stableReputation";
+import { computeMetaDrift } from "@/engine/metaDrift";
+import { getRecommendedChallenges, getMatchupsToAvoid } from "@/engine/schedulingAssistant";
+import { SEASON_NAMES } from "@/data/gameConstants";
+
+import { Surface } from "@/components/ui/Surface";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { SeasonWidget } from "@/components/dashboard/SeasonWidget";
+import { RecentBoutsWidget } from "@/components/dashboard/RecentBoutsWidget";
+import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
+import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
+import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
+import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
+import { WeatherWidget } from "@/components/widgets/WeatherWidget";
+import { FormSparkline } from "@/components/charts/FormSparkline";
+import { STYLE_ABBREV, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
+
+import {
+  Swords, Crown, Coins, Star, Skull, TrendingUp,
+  Shield, Activity, ChevronRight, Zap, Users,
+  BarChart3, Target, AlertTriangle, BookOpen,
+  Trophy, Eye, Flame,
+} from "lucide-react";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type TabId = "overview" | "roster" | "intel" | "meta" | "ops";
+
+// ─── KPI Bar ──────────────────────────────────────────────────────────────────
+
+function KpiBar() {
+  const { roster, treasury, fame, week, arenaHistory, rivals } = useGameStore(
+    useShallow((s) => ({
+      roster: s.roster,
+      treasury: s.treasury,
+      fame: s.fame,
+      week: s.week,
+      arenaHistory: s.arenaHistory,
+      rivals: s.rivals,
+    }))
+  );
+
+  const stats = useMemo(() => calculateStableStats(roster), [roster]);
+  const totalBouts = arenaHistory.length;
+  const killRate = totalBouts > 0
+    ? Math.round((stats.totalKills / totalBouts) * 100)
+    : 0;
+
+  const kpis = [
+    { label: "Treasury",    value: `${(treasury ?? 0).toLocaleString()}g`, icon: Coins,    color: "text-arena-gold",  glow: "shadow-[0_0_10px_rgba(212,175,55,0.2)]" },
+    { label: "Influence",   value: String(fame),                           icon: Crown,    color: "text-arena-fame",  glow: "shadow-[0_0_10px_rgba(180,100,220,0.2)]" },
+    { label: "Roster",      value: String(stats.activeCount),              icon: Users,    color: "text-arena-pop",   glow: "" },
+    { label: "Win Rate",    value: `${stats.winRate}%`,                    icon: TrendingUp, color: "text-primary",   glow: "shadow-[0_0_10px_rgba(255,0,0,0.2)]" },
+    { label: "Total Kills", value: String(stats.totalKills),               icon: Skull,    color: "text-destructive", glow: "" },
+    { label: "Kill Rate",   value: `${killRate}%`,                         icon: Flame,    color: "text-orange-400",  glow: "" },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+      {kpis.map(({ label, value, icon: Icon, color, glow }) => (
+        <Surface key={label} variant="glass" className={cn("p-4 flex flex-col gap-2", glow)}>
+          <div className="flex items-center gap-2">
+            <Icon className={cn("h-3.5 w-3.5", color)} />
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{label}</span>
+          </div>
+          <span className={cn("font-display font-black text-2xl tracking-tighter leading-none", color)}>{value}</span>
+        </Surface>
+      ))}
+    </div>
+  );
+}
+
+// ─── Hero Panel ───────────────────────────────────────────────────────────────
+
+function HeroPanel() {
+  const { player, roster, week, season, isTournamentWeek } = useGameStore(
+    useShallow((s) => ({
+      player: s.player,
+      roster: s.roster,
+      week: s.week,
+      season: s.season,
+      isTournamentWeek: s.isTournamentWeek,
+    }))
+  );
+
+  const stats = useMemo(() => calculateStableStats(roster), [roster]);
+  const seasonName = SEASON_NAMES?.[season - 1] ?? `Season ${season}`;
+
+  return (
+    <Surface variant="glass" className="p-6 flex items-start justify-between gap-6 border-primary/10">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.2)]">
+            <Swords className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="font-display font-black text-2xl tracking-tighter uppercase leading-none">
+              {player?.stableName ?? "Your Stable"}
+            </h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 mt-0.5">
+              {player?.ownerName ?? "Commander"} · {seasonName} · Week {week}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {isTournamentWeek && (
+            <Badge className="bg-arena-blood/20 text-arena-blood border-arena-blood/30 text-[9px] font-black uppercase tracking-widest rounded-none">
+              <Trophy className="h-2.5 w-2.5 mr-1" /> Tournament Week
+            </Badge>
+          )}
+          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest rounded-none border-white/10">
+            {stats.activeCount} Active Warriors
+          </Badge>
+          {stats.topWarrior && (
+            <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest rounded-none border-primary/20 text-primary">
+              <Star className="h-2.5 w-2.5 mr-1" />
+              {stats.topWarrior.name} — Top Fighter
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden lg:flex flex-col items-end gap-1">
+        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Overall Record</span>
+        <span className="font-display font-black text-4xl tracking-tighter leading-none">
+          <span className="text-primary">{stats.totalWins}</span>
+          <span className="text-muted-foreground/30 mx-1">—</span>
+          <span className="text-muted-foreground/60">{stats.totalLosses}</span>
+        </span>
+        <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest">W — L</span>
+      </div>
+    </Surface>
+  );
+}
+
+// ─── Roster Snapshot Tab ──────────────────────────────────────────────────────
+
+function RosterSnapshot() {
+  const { roster, arenaHistory } = useGameStore(
+    useShallow((s) => ({ roster: s.roster, arenaHistory: s.arenaHistory }))
+  );
+
+  const active = useMemo(() => roster.filter((w) => w.status === "Active"), [roster]);
+
+  return (
+    <div className="flex flex-col gap-3">
+      {active.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground/40 text-sm font-black uppercase tracking-widest">
+          No Active Warriors
+        </div>
+      )}
+      {active.map((w) => {
+        const history = arenaHistory
+          .filter((b) => b.warriorIdA === w.id || b.warriorIdB === w.id)
+          .slice(-10);
+
+        return (
+          <Link key={w.id} to="/command/roster" className="block group">
+            <Surface variant="glass" className="p-4 hover:border-primary/20 transition-colors">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-none bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <Swords className="h-3.5 w-3.5 text-muted-foreground/60" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-display font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">
+                      {w.name}
+                    </div>
+                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50 flex items-center gap-2">
+                      <span>{STYLE_ABBREV[w.style] ?? w.style}</span>
+                      <span className="opacity-30">·</span>
+                      <span className="text-arena-gold">{w.fame} fame</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="text-right hidden sm:block">
+                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Record</div>
+                    <div className="font-mono font-black text-xs">
+                      <span className="text-primary">{w.career?.wins ?? 0}</span>
+                      <span className="text-muted-foreground/30 mx-0.5">-</span>
+                      <span className="text-muted-foreground/60">{w.career?.losses ?? 0}</span>
+                      {(w.career?.kills ?? 0) > 0 && (
+                        <span className="text-destructive ml-1 text-[9px]">/{w.career.kills}K</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {w.fatigue !== undefined && (
+                    <div className="text-right hidden md:block">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Fatigue</div>
+                      <div className={cn(
+                        "font-mono font-black text-xs",
+                        w.fatigue > 70 ? "text-destructive" : w.fatigue > 40 ? "text-arena-gold" : "text-primary"
+                      )}>
+                        {w.fatigue}%
+                      </div>
+                    </div>
+                  )}
+
+                  <FormSparkline warrior={w} history={history} size="sm" />
+
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                </div>
+              </div>
+            </Link>
+          </Surface>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Intel Tab ────────────────────────────────────────────────────────────────
+
+function IntelTab() {
+  const state = useGameStore();
+  const { roster } = useGameStore(useShallow((s) => ({ roster: s.roster })));
+
+  const topWarrior = useMemo(() => {
+    const active = roster.filter((w) => w.status === "Active");
+    return active.sort((a, b) => (b.fame ?? 0) - (a.fame ?? 0))[0] ?? null;
+  }, [roster]);
+
+  const recommended = useMemo(
+    () => (topWarrior ? getRecommendedChallenges(state, topWarrior, 4) : []),
+    [state, topWarrior]
+  );
+
+  const avoid = useMemo(
+    () => (topWarrior ? getMatchupsToAvoid(state, topWarrior, 3) : []),
+    [state, topWarrior]
+  );
+
+  if (!topWarrior) return (
+    <div className="text-center py-12 text-muted-foreground/40 text-sm font-black uppercase tracking-widest">
+      No active warriors for matchup analysis
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Target className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-primary">Recommended Challenges</span>
+          <span className="text-[9px] text-muted-foreground/40 ml-1">for {topWarrior.name}</span>
+        </div>
+        {recommended.map((m, i) => (
+          <Surface key={i} variant="glass" className="p-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="font-display font-black text-sm uppercase tracking-tight">{m.rivalWarrior.name}</div>
+              <div className="text-[9px] text-muted-foreground/50 font-black uppercase tracking-widest">
+                {m.rivalStableName} · {STYLE_ABBREV[m.rivalWarrior.style] ?? m.rivalWarrior.style}
+              </div>
+              {m.notes[0] && (
+                <div className="text-[9px] text-arena-gold mt-1">{m.notes[0]}</div>
+              )}
+            </div>
+            <div className="text-right shrink-0">
+              <div className={cn(
+                "font-display font-black text-lg tracking-tighter",
+                m.score >= 110 ? "text-primary" : m.score >= 90 ? "text-arena-gold" : "text-muted-foreground/60"
+              )}>{m.score}</div>
+              <div className="text-[9px] text-muted-foreground/40 font-black uppercase">Score</div>
+            </div>
+          </Surface>
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-destructive">Matchups to Avoid</span>
+        </div>
+        {avoid.map((m, i) => (
+          <Surface key={i} variant="glass" className="p-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="font-display font-black text-sm uppercase tracking-tight">{m.rivalWarrior.name}</div>
+              <div className="text-[9px] text-muted-foreground/50 font-black uppercase tracking-widest">
+                {m.rivalStableName} · {STYLE_ABBREV[m.rivalWarrior.style] ?? m.rivalWarrior.style}
+              </div>
+              {m.notes[0] && (
+                <div className="text-[9px] text-destructive mt-1">{m.notes[0]}</div>
+              )}
+            </div>
+            <div className="text-right shrink-0">
+              <div className="font-display font-black text-lg tracking-tighter text-destructive">{m.score}</div>
+              <div className="text-[9px] text-muted-foreground/40 font-black uppercase">Score</div>
+            </div>
+          </Surface>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Meta Tab ─────────────────────────────────────────────────────────────────
+
+function MetaTab() {
+  const { arenaHistory } = useGameStore(useShallow((s) => ({ arenaHistory: s.arenaHistory })));
+  const drift = useMemo(() => computeMetaDrift(arenaHistory), [arenaHistory]);
+
+  const sorted = useMemo(
+    () => Object.entries(drift).sort((a, b) => b[1] - a[1]),
+    [drift]
+  );
+
+  const max = Math.max(...Object.values(drift).map(Math.abs), 1);
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 mb-1">
+          <BarChart3 className="h-3.5 w-3.5 text-arena-fame" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-arena-fame">Style Meta Drift</span>
+        </div>
+        {sorted.map(([style, score]) => {
+          const pct = Math.abs(score) / max;
+          const isUp = score >= 0;
+          return (
+            <div key={style} className="flex items-center gap-3">
+              <div className="w-28 text-[10px] font-black uppercase tracking-wider text-muted-foreground/60 shrink-0 truncate">
+                {STYLE_ABBREV[style as keyof typeof STYLE_ABBREV] ?? style}
+              </div>
+              <div className="flex-1 h-1.5 bg-white/5 rounded-none overflow-hidden">
+                <div
+                  className={cn("h-full rounded-none transition-all", isUp ? "bg-primary" : "bg-destructive")}
+                  style={{ width: `${pct * 100}%` }}
+                />
+              </div>
+              <div className={cn("w-10 text-right font-mono font-black text-xs shrink-0", isUp ? "text-primary" : "text-destructive")}>
+                {score > 0 ? "+" : ""}{score.toFixed(1)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <MetaDriftWidget />
+      </div>
+    </div>
+  );
+}
+
+// ─── Reputation Tab ───────────────────────────────────────────────────────────
+
+function ReputationTab() {
+  const state = useGameStore();
+  const rep = useMemo(() => computeStableReputation(state), [state]);
+
+  const dims: { key: keyof typeof rep; label: string; color: string; icon: React.ElementType; desc: string }[] = [
+    { key: "fame",         label: "Fame",          color: "text-arena-gold",  icon: Star,    desc: "Public acclaim from victories and showmanship." },
+    { key: "notoriety",    label: "Notoriety",     color: "text-destructive", icon: Skull,   desc: "Feared reputation built on kills and ruthlessness." },
+    { key: "honor",        label: "Honor",         color: "text-primary",     icon: Shield,  desc: "Moral standing and respect from arena elite." },
+    { key: "adaptability", label: "Adaptability",  color: "text-arena-pop",   icon: Zap,     desc: "Strategic response to the shifting combat meta." },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {dims.map(({ key, label, color, icon: Icon, desc }) => {
+        const val = rep[key] as number;
+        return (
+          <Surface key={key} variant="glass" className="p-5 flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Icon className={cn("h-4 w-4", color)} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{label}</span>
+            </div>
+            <div className={cn("font-display font-black text-4xl tracking-tighter leading-none", color)}>
+              {val}
+              <span className="text-lg text-muted-foreground/30 ml-1">/100</span>
+            </div>
+            <div className="h-1 bg-white/5 rounded-none overflow-hidden">
+              <div
+                className={cn("h-full rounded-none transition-all", color.replace("text-", "bg-"))}
+                style={{ width: `${val}%` }}
+              />
+            </div>
+            <p className="text-[9px] text-muted-foreground/40 leading-relaxed">{desc}</p>
+          </Surface>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Ops Tab ──────────────────────────────────────────────────────────────────
+
+function OpsTab() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <MedicalAuditWidget />
+      <NextBoutWidget />
+      <WeatherWidget />
+    </div>
+  );
+}
+
+// ─── Tab Bar ──────────────────────────────────────────────────────────────────
+
+const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+  { id: "overview", label: "Overview",   icon: Activity },
+  { id: "roster",   label: "Roster",     icon: Users },
+  { id: "intel",    label: "Intel",      icon: Eye },
+  { id: "meta",     label: "Meta",       icon: BarChart3 },
+  { id: "ops",      label: "Operations", icon: Zap },
+];
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+
+export default function ControlCenter() {
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+
+  return (
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-20">
+      {/* Hero panel */}
+      <HeroPanel />
+
+      {/* KPI bar */}
+      <KpiBar />
+
+      {/* Tab nav */}
+      <div className="flex items-center gap-1 border-b border-white/5 pb-0">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={cn(
+              "relative flex items-center gap-2 px-4 py-2.5 text-[11px] font-black uppercase tracking-wider transition-all duration-150",
+              activeTab === id
+                ? "text-primary border-b-2 border-primary -mb-px"
+                : "text-muted-foreground/50 hover:text-foreground border-b-2 border-transparent -mb-px"
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="min-h-[400px]">
+        {activeTab === "overview" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-6">
+              <SeasonWidget />
+              <RecentBoutsWidget />
+            </div>
+            <div className="flex flex-col gap-6">
+              <RivalryWidget />
+              <MetaDriftWidget />
+            </div>
+          </div>
+        )}
+        {activeTab === "roster"   && <RosterSnapshot />}
+        {activeTab === "intel"    && <IntelTab />}
+        {activeTab === "meta"     && <MetaTab />}
+        {activeTab === "ops"      && <OpsTab />}
+      </div>
+    </div>
+  );
+}

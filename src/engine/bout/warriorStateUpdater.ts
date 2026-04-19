@@ -2,7 +2,7 @@ import type { Warrior } from "@/types/warrior.types";
 
 /**
  * Update a warrior's state after a bout
- * Consolidates fame, popularity, career stats, and flair updates
+ * Consolidates fame, popularity, career stats, flair updates, and fatigue
  */
 export function updateWarriorAfterBout(
   warrior: Warrior,
@@ -10,8 +10,17 @@ export function updateWarriorAfterBout(
   popularityDelta: number,
   isWinner: boolean,
   wasKilled: boolean,
-  tags: string[]
+  tags: string[],
+  /** If true, skip fatigue accrual (for tournament participants during tournament week) */
+  skipFatigue?: boolean
 ): Warrior {
+  // Calculate fatigue: reset to 0 if killed, otherwise +25 (capped at 100)
+  // 🔒 Skip fatigue accrual for tournament participants during tournament week
+  const fatigue = wasKilled ? 0 : (skipFatigue
+    ? (warrior.fatigue || 0)  // Keep current fatigue (no accrual)
+    : Math.min(100, (warrior.fatigue || 0) + 25)  // Normal +25 fatigue
+  );
+
   return {
     ...warrior,
     fame: Math.max(0, (warrior.fame || 0) + fameDelta),
@@ -22,9 +31,10 @@ export function updateWarriorAfterBout(
       losses: (warrior.career.losses || 0) + (!isWinner ? 1 : 0),
       kills: (warrior.career.kills || 0) + (wasKilled ? 1 : 0),
     },
-    flair: isWinner && tags.includes("Flashy") 
-      ? Array.from(new Set([...(warrior.flair || []), "Flashy"])) 
+    flair: isWinner && tags.includes("Flashy")
+      ? Array.from(new Set([...(warrior.flair || []), "Flashy"]))
       : warrior.flair,
+    fatigue,
   };
 }
 

@@ -185,14 +185,14 @@ const OpsPersonnelRoute = OpsPersonnelRouteImport.update({
   path: '/ops/personnel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OpsFinanceRoute = OpsFinanceRouteImport.update({
-  id: '/ops/finance',
-  path: '/ops/finance',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OpsOffseasonRoute = OpsOffseasonRouteImport.update({
   id: '/ops/offseason',
   path: '/ops/offseason',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpsFinanceRoute = OpsFinanceRouteImport.update({
+  id: '/ops/finance',
+  path: '/ops/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpsEquipmentRoute = OpsEquipmentRouteImport.update({
@@ -713,18 +713,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpsPersonnelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ops/finance': {
-      id: '/ops/finance'
-      path: '/ops/finance'
-      fullPath: '/ops/finance'
-      preLoaderRoute: typeof OpsFinanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/ops/offseason': {
       id: '/ops/offseason'
       path: '/ops/offseason'
       fullPath: '/ops/offseason'
       preLoaderRoute: typeof OpsOffseasonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ops/finance': {
+      id: '/ops/finance'
+      path: '/ops/finance'
+      fullPath: '/ops/finance'
+      preLoaderRoute: typeof OpsFinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ops/equipment': {

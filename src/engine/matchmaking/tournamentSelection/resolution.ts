@@ -136,7 +136,9 @@ export function applyBoutResults(
   outcome: FightOutcome,
   tId: string,
   tName: string,
-  rng: SeededRNG
+  rng: SeededRNG,
+  /** If true, skip fatigue accrual (tournament bouts during tournament week) */
+  skipFatigue?: boolean
 ): GameState {
   const isKill = outcome.by === "Kill";
   const winnerSide = outcome.winner;
@@ -154,17 +156,20 @@ export function applyBoutResults(
 
   updatedState.arenaHistory = [...(updatedState.arenaHistory || []), summary].slice(-500);
 
+  // 🔒 Tournament fatigue exemption: No fatigue accrual for tournament participants during tournament week
+  const shouldSkipFatigue = skipFatigue ?? state.isTournamentWeek;
+
   updatedState.roster = updatedState.roster.map(w => {
-    if (w.id === wA.id) return updateWarriorFromBoutOutcome(w, true, winnerSide, isKill);
-    if (w.id === wD.id) return updateWarriorFromBoutOutcome(w, false, winnerSide, isKill);
+    if (w.id === wA.id) return updateWarriorFromBoutOutcome(w, true, winnerSide, isKill, shouldSkipFatigue);
+    if (w.id === wD.id) return updateWarriorFromBoutOutcome(w, false, winnerSide, isKill, shouldSkipFatigue);
     return w;
   });
 
   updatedState.rivals = updatedState.rivals.map(r => ({
     ...r,
     roster: r.roster.map(w => {
-      if (w.id === wA.id) return updateWarriorFromBoutOutcome(w, true, winnerSide, isKill);
-      if (w.id === wD.id) return updateWarriorFromBoutOutcome(w, false, winnerSide, isKill);
+      if (w.id === wA.id) return updateWarriorFromBoutOutcome(w, true, winnerSide, isKill, shouldSkipFatigue);
+      if (w.id === wD.id) return updateWarriorFromBoutOutcome(w, false, winnerSide, isKill, shouldSkipFatigue);
       return w;
     })
   }));
