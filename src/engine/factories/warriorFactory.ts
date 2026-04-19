@@ -3,7 +3,7 @@
  * Extracted from factories.ts to follow SRP
  */
 import type { Warrior } from "@/types/state.types";
-import { FightingStyle } from "@/types/shared.types";
+import { FightingStyle, type WarriorId } from "@/types/shared.types";
 import { computeWarriorStats } from "@/engine/skillCalc";
 import { generateFavorites } from "@/engine/favorites";
 import { generateId } from "@/utils/idUtils";
@@ -20,7 +20,7 @@ import type { IRNGService } from "@/engine/core/rng/IRNGService";
  * @param rng - Optional SeededRNG for deterministic generation
  */
 export function makeWarrior(
-  id: string | undefined,
+  id: WarriorId | undefined,
   name: string,
   style: FightingStyle,
   attrs: { ST: number; CN: number; SZ: number; WT: number; WL: number; SP: number; DF: number },
@@ -31,7 +31,7 @@ export function makeWarrior(
   const favorites = generateFavorites(style, rng ? () => rng.next() : () => 0.5);
   
   return {
-    id: id ?? (rng ? rng.uuid() : generateId(undefined, "warrior")),
+    id: id ?? (rng ? (rng.uuid() as WarriorId) : (generateId(undefined, "warrior") as WarriorId)),
     name,
     style,
     attributes: attrs,

@@ -6,8 +6,8 @@ import type { StateImpact } from "@/engine/impacts";
  * BankruptcyService - Handles bankruptcy detection and processing.
  * Manages rival stable bankruptcy and removal, and player bankruptcy consequences.
  */
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class BankruptcyService {
+  private constructor() {}
   /**
    * Processes bankruptcy for all rival stables.
    * Removes stables that have gone bankrupt.

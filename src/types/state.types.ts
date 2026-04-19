@@ -1,15 +1,18 @@
-import {
-  FightingStyle,
-  type Attributes,
-  type BaseSkills,
-  type Season,
-  type CrowdMoodType,
-  type NewsletterItem,
-  type TrainerTier,
-  type TrainerFocus,
-  type Trainer,
-  type ScoutQuality,
-  type WeatherType
+  type WeatherType,
+  type WarriorId,
+  type StableId,
+  type PromoterId,
+  type TrainerId,
+  type TournamentId,
+  type BoutOfferId,
+  type LedgerEntryId,
+  type ScoutReportId,
+  type NewsId,
+  type GrudgeId,
+  type RivalryId,
+  type InsightId,
+  type HallEntryId,
+  type SimulationReportId
 } from "./shared.types";
 
 import { type Warrior, type DeathEvent } from "./warrior.types";
@@ -45,21 +48,21 @@ export type BoutOfferStatus = "Proposed" | "Signed" | "Rejected" | "Canceled" | 
 export type BoutOfferResponse = "Pending" | "Accepted" | "Declined";
 
 export interface BoutOffer {
-  id: string;
-  promoterId: string;
-  warriorIds: string[];
+  id: BoutOfferId;
+  promoterId: PromoterId;
+  warriorIds: WarriorId[];
   boutWeek: number;
   expirationWeek: number;
   purse: number;
   hype: number;
   status: BoutOfferStatus;
-  responses: Record<string, BoutOfferResponse>;
+  responses: Record<WarriorId, BoutOfferResponse>;
 }
 
 export type PromoterPersonality = "Greedy" | "Honorable" | "Sadistic" | "Flashy" | "Corporate";
 
 export interface Promoter {
-  id: string;
+  id: PromoterId;
   name: string;
   age: number;
   personality: PromoterPersonality;
@@ -68,8 +71,8 @@ export interface Promoter {
   biases: FightingStyle[];
   history: {
     totalPursePaid: number;
-    notableBouts: string[];
-    mentorId?: string;
+    notableBouts: FightId[];
+    mentorId?: PromoterId;
     legacyFame: number;
   };
 }
@@ -80,7 +83,7 @@ export type OwnerPersonality = "Aggressive" | "Methodical" | "Showman" | "Pragma
 export type MetaAdaptation = "MetaChaser" | "Traditionalist" | "Opportunist" | "Innovator";
 
 export interface Owner {
-  id: string;
+  id: StableId;
   name: string;
   stableName: string;
   fame: number;
@@ -92,7 +95,7 @@ export interface Owner {
   generation?: number; // 🛡️ Crest lineage depth (0 = original founder)
   crest?: CrestData; // 🛡️ Heraldic crest for the stable
   backstoryId?: import("@/data/backstories").BackstoryId;
-  foundedByWarriorId?: string; // Lineage breadcrumb for legacy founders
+  foundedByWarriorId?: WarriorId; // Lineage breadcrumb for legacy founders
 }
 
 // ─── Game State ─────────────────────────────────────────────────────────────
@@ -102,31 +105,31 @@ export interface TournamentBout {
   matchIndex: number;
   a: string; // snapshots name for display
   d: string; 
-  warriorIdA: string;
-  warriorIdD: string;
-  stableIdA?: string;
-  stableIdD?: string;
+  warriorIdA: WarriorId;
+  warriorIdD: WarriorId;
+  stableIdA?: StableId;
+  stableIdD?: StableId;
   stableA?: string;
   stableD?: string;
   winner?: "A" | "D" | null;
   by?: FightOutcomeBy;
-  fightId?: string;
+  fightId?: FightId;
 }
 
 export interface TournamentEntry {
-  id: string;
+  id: TournamentId;
   season: Season;
   week: number;
   tierId: string; // 🌩️ Tier Identity (v1.0)
   name: string;
   bracket: TournamentBout[];
-  participants: Warrior[]; // Persisted 64-man roster (including Freelancers)
-  champion?: string;
+  participants: Warrior[]; 
+  champion?: WarriorId;
   completed: boolean;
 }
 
 export interface TrainingAssignment {
-  warriorId: string;
+  warriorId: WarriorId;
   type: "attribute" | "recovery" | "skillDrill";
   attribute?: keyof Attributes;
   /** For skillDrill assignments — which combat skill to drill (ATT/PAR/DEF/INI/RIP/DEC). */
@@ -134,13 +137,13 @@ export interface TrainingAssignment {
 }
 
 export interface SeasonalGrowth {
-  warriorId: string;
+  warriorId: WarriorId;
   season: Season;
   gains: Partial<Record<keyof Attributes, number>>;
 }
 
 export interface LedgerEntry {
-  id: string;
+  id: LedgerEntryId;
   week: number;
   label: string;
   amount: number;
@@ -151,14 +154,14 @@ export type AIIntent = "EXPANSION" | "CONSOLIDATION" | "VENDETTA" | "RECOVERY" |
 
 export interface AIStrategy {
   intent: AIIntent;
-  targetStableId?: string;
+  targetStableId?: StableId;
   planWeeksRemaining: number;
 }
 
 // TrainerData was here, now using Trainer from shared.types
 
 export interface AIEvent {
-  id: string;
+  id: string; // Events are often transient or don't need branding if not referenced
   week: number;
   type: "STRATEGY" | "FINANCE" | "ROSTER" | "STAFF";
   description: string;
@@ -169,14 +172,14 @@ export interface AIAgentMemory {
   lastTreasury: number;
   burnRate: number;
   metaAwareness: Record<string, number>; 
-  knownRivals: string[]; 
+  knownRivals: StableId[]; 
   currentIntent?: AIIntent;
 }
 
 export interface RivalStableData {
-  id: string;
+  id: StableId;
   owner: Owner;
-  fame: number; // 🏗️ Prestige Persistence
+  fame: number; 
   roster: Warrior[];
   trainers?: Trainer[];
   treasury: number;
@@ -188,22 +191,16 @@ export interface RivalStableData {
   philosophy?: string;
   tier?: "Minor" | "Established" | "Major" | "Legendary";
   crest?: CrestData;
-  /**
-   * Per-stable seasonal training growth — mirrors `GameState.seasonalGrowth` so
-   * rival warriors hit the same `SEASONAL_CAP_PER_ATTR` wall the player does.
-   * Optional for backward compat with factories that don't seed it; treated as
-   * `[]` by the training pipeline.
-   */
   seasonalGrowth?: SeasonalGrowth[];
 }
 
 export interface ScoutReportData {
-  id: string;
+  id: ScoutReportId;
   warriorName: string;
   style: string;
   quality: ScoutQuality;
   week: number;
-  attributeRanges: Record<string, string>;
+  attributeRanges: Partial<Record<keyof Attributes, string>>;
   record: string;
   knownInjuries: string[];
   suspectedOE?: string;
@@ -212,14 +209,14 @@ export interface ScoutReportData {
 }
 
 export interface RestState {
-  warriorId: string;
+  warriorId: WarriorId;
   restUntilWeek: number;
 }
 
 export interface Rivalry {
-  id: string;
-  stableIdA: string;
-  stableIdB: string;
+  id: RivalryId;
+  stableIdA: StableId;
+  stableIdB: StableId;
   intensity: number;
   reason: string;
   startWeek: number;
@@ -227,15 +224,15 @@ export interface Rivalry {
 
 export interface MatchRecord {
   week: number;
-  playerWarriorId: string;
-  opponentWarriorId: string;
-  opponentStableId: string;
+  playerWarriorId: WarriorId;
+  opponentWarriorId: WarriorId;
+  opponentStableId: StableId;
 }
 
 export interface OwnerGrudge {
-  id: string;
-  ownerIdA: string;
-  ownerIdB: string;
+  id: GrudgeId;
+  ownerIdA: StableId;
+  ownerIdB: StableId;
   intensity: number;
   reason: string;
   startWeek: number;
@@ -243,7 +240,7 @@ export interface OwnerGrudge {
 }
 
 export interface GazetteStory {
-  id: string;
+  id: NewsId;
   headline: string;
   body: string;
   mood: CrowdMoodType;
@@ -254,9 +251,9 @@ export interface GazetteStory {
 export type InsightTokenType = "Weapon" | "Rhythm" | "Style" | "Attribute" | "Tactic";
 
 export interface InsightToken {
-  id: string;
+  id: InsightId;
   type: InsightTokenType;
-  warriorId: string;
+  warriorId: WarriorId;
   warriorName: string;
   detail: string;
   targetKey?: string;
@@ -264,19 +261,19 @@ export interface InsightToken {
 }
 
 export interface HallEntry {
-  id: string;
+  id: HallEntryId;
   week: number;
   label: "Fight of the Week" | "Fight of the Tournament";
-  fightId: string;
+  fightId: FightId;
 }
 
 // ─── Simulation & Awards ────────────────────────────────────────────────────
 
 export interface SimulationReport {
-  id: string;
+  id: SimulationReportId;
   week: number;
   treasuryChange: number;
-  trainingGains: { warriorId: string; warriorName: string; attr: string; gain: number }[];
+  trainingGains: { warriorId: WarriorId; warriorName: string; attr: keyof Attributes; gain: number }[];
   agingEvents: string[];
   healthEvents: string[];
   bouts?: import("@/types/combat.types").FightSummary[];
@@ -287,9 +284,9 @@ export type AnnualAwardType = "WARRIOR_OF_YEAR" | "KILLER_OF_YEAR" | "STABLE_OF_
 export interface AnnualAward {
   year: number;
   type: AnnualAwardType;
-  warriorId?: string;
+  warriorId?: WarriorId;
   warriorName?: string;
-  stableId?: string;
+  stableId?: StableId;
   stableName?: string;
   style?: FightingStyle;
   value: number; // e.g. 15 wins, 5 kills
@@ -358,15 +355,15 @@ export interface GameState {
   // ─── Daily Progression ───
   day: number; // 0-7
   isTournamentWeek: boolean;
-  activeTournamentId?: string;
+  activeTournamentId?: TournamentId;
   // ─── Promoter System ───
-  promoters: Record<string, Promoter>;
-  boutOffers: Record<string, BoutOffer>;
-  realmRankings: Record<string, RankingEntry>;
-  awards: AnnualAward[]; // 🏗️ Prestige Persistence
+  promoters: Record<PromoterId, Promoter>;
+  boutOffers: Record<BoutOfferId, BoutOffer>;
+  realmRankings: Record<WarriorId, RankingEntry>;
+  awards: AnnualAward[]; 
   lastSimulationReport?: SimulationReport;
-  cachedMetaDrift?: import("@/engine/metaDrift").StyleMeta; // ⚡ Bolt: Cache meta drift weekly for AI components
-  warriorMap?: Map<string, import("@/types/warrior.types").Warrior>; // ⚡ Bolt: Cache warrior map weekly for bout processing
+  cachedMetaDrift?: import("@/engine/metaDrift").StyleMeta; 
+  warriorMap?: Map<WarriorId, import("@/types/warrior.types").Warrior>; 
 }
 
 export interface UIPrefs {

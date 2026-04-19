@@ -108,17 +108,15 @@ describe("HallOfFame Component", () => {
 
     // Find the 'Reaper' card directly
     const reaperElements = getAllByText("Reaper");
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const reaperCard = (reaperElements[0] as HTMLElement).closest("[data-testid='inductee-card']")!;
-    expect(reaperCard).not.toBeNull();
+    const reaperCard = (reaperElements[0] as HTMLElement).closest("[data-testid='inductee-card']");
+    if (!reaperCard) throw new Error("Reaper card not found");
 
     // Within the card, look for the 'Greatest Fight' section block
     const greatestFightSection = within(reaperCard as HTMLElement).getByText("CHRONICLE_PEAK").closest("div")?.parentElement;
     expect(greatestFightSection).not.toBeUndefined();
 
-    // Search for the opponent's name within this section
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const opponent = within(greatestFightSection!).getByText("Victim");
+    if (!greatestFightSection) throw new Error("Greatest fight section not found");
+    const opponent = within(greatestFightSection).getByText("Victim");
     expect(opponent).toBeInTheDocument();
 
     // fight2 (Victim2) shouldn't be the top

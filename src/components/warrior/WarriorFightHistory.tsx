@@ -15,9 +15,11 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
     for (const f of fights) {
       const isA = f.a === warriorName;
       const opponent = isA ? f.d : f.a;
-      if (!map.has(opponent)) map.set(opponent, { wins: 0, losses: 0, draws: 0, kills: 0, deaths: 0 });
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const rec = map.get(opponent)!;
+      let rec = map.get(opponent);
+      if (!rec) {
+        rec = { wins: 0, losses: 0, draws: 0, kills: 0, deaths: 0 };
+        map.set(opponent, rec);
+      }
       const won = (isA && f.winner === "A") || (!isA && f.winner === "D");
       const lost = (isA && f.winner === "D") || (!isA && f.winner === "A");
       if (won) {
@@ -53,9 +55,8 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
         const won = (isA && f.winner === "A") || (!isA && f.winner === "D");
         const isExpanded = expandedId === f.id;
         const hasTranscript = f.transcript && f.transcript.length > 0;
-        const opponent = isA ? f.d : f.a;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const record = h2h.get(opponent)!;
+        const record = h2h.get(opponent);
+        if (!record) return null;
 
         return (
           <div key={f.id}>
@@ -105,8 +106,7 @@ export function WarriorFightHistory({ warriorName, arenaHistory }: { warriorName
                   nameD={f.d}
                   styleA={f.styleA}
                   styleD={f.styleD}
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  log={f.transcript!.map((text, i) => ({ minute: i + 1, text }))}
+                  log={(f.transcript || []).map((text, i) => ({ minute: i + 1, text }))}
                   winner={f.winner}
                   by={f.by}
                   isRivalry={f.isRivalry}

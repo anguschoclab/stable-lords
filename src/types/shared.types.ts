@@ -1,3 +1,24 @@
+// ─── Branded IDs ───────────────────────────────────────────────────────────
+/** Branded ID pattern to prevent mixing different ID types at compile time. */
+export type Brand<T, TBrand extends string> = T & { readonly __brand: TBrand };
+
+export type WarriorId = Brand<string, "WarriorId">;
+export type StableId = Brand<string, "StableId">;
+export type PromoterId = Brand<string, "PromoterId">;
+export type TrainerId = Brand<string, "TrainerId">;
+export type FightId = Brand<string, "FightId">;
+export type TournamentId = Brand<string, "TournamentId">;
+export type BoutOfferId = Brand<string, "BoutOfferId">;
+export type InjuryId = Brand<string, "InjuryId">;
+export type LedgerEntryId = Brand<string, "LedgerEntryId">;
+export type ScoutReportId = Brand<string, "ScoutReportId">;
+export type NewsId = Brand<string, "NewsId">;
+export type GrudgeId = Brand<string, "GrudgeId">;
+export type RivalryId = Brand<string, "RivalryId">;
+export type InsightId = Brand<string, "InsightId">;
+export type HallEntryId = Brand<string, "HallEntryId">;
+export type SimulationReportId = Brand<string, "SimulationReportId">;
+
 // ─── Fighting Styles ────────────────────────────────────────────────────────
 
 export enum FightingStyle {
@@ -93,7 +114,7 @@ export type Season = "Spring" | "Summer" | "Fall" | "Winter";
 export type CrowdMoodType = "Calm" | "Bloodthirsty" | "Theatrical" | "Solemn" | "Festive";
 
 export interface NewsletterItem {
-  id: string;
+  id: string; // Could be branded but loosely used in many places for now
   week: number;
   title: string;
   items: string[];

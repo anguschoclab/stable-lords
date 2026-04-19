@@ -14,8 +14,10 @@ if (typeof (window as any).HowlerGlobal === 'undefined') {
   (window as any).HowlerGlobal = {};
 }
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-createRoot(document.getElementById("root")!).render(
+const container = document.getElementById("root");
+if (!container) throw new Error("Root element not found");
+
+createRoot(container).render(
   <ErrorBoundary>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <App />

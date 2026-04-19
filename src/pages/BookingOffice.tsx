@@ -35,7 +35,8 @@ export default function BookingOffice() {
     );
   }, [boutOffers, roster]);
 
-  const handleResponse = (offerId: string, warriorId: string, response: "Accepted" | "Declined") => {
+  const handleResponse = (offerId: string, warriorId: string | undefined, response: "Accepted" | "Declined") => {
+    if (!warriorId) return;
     setState((s: GameStore) => {
       // respondToBoutOffer utility expects full world state
       const next = respondToBoutOffer(state, offerId, warriorId, response);
@@ -145,16 +146,14 @@ export default function BookingOffice() {
                    <div className="flex gap-3 pt-2">
                       <Button 
                         className="flex-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 gap-2 font-black uppercase text-[10px] tracking-widest"
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        onClick={() => handleResponse(offer.id, playerWarriorId!, "Accepted")}
+                        onClick={() => handleResponse(offer.id, playerWarriorId, "Accepted")}
                       >
                         <CheckCircle2 className="h-4 w-4" /> Sign_Contract
                       </Button>
                       <Button 
                         variant="ghost"
                         className="flex-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive gap-2 font-black uppercase text-[10px] tracking-widest"
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        onClick={() => handleResponse(offer.id, playerWarriorId!, "Declined")}
+                        onClick={() => handleResponse(offer.id, playerWarriorId, "Declined")}
                       >
                         <XCircle className="h-4 w-4" /> Decline
                       </Button>

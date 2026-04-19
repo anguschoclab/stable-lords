@@ -12,7 +12,10 @@ import {
   type DerivedStats,
   type Gear, 
   type FightPlan,
-  type DeathEvent
+  type DeathEvent,
+  type WarriorId,
+  type StableId,
+  type InjuryId
 } from "./shared.types";
 import type { AnnualAward } from "./state.types";
 
@@ -73,7 +76,7 @@ export const INJURY_SEVERITY_WEEKS: Record<InjurySeverity, { min: number; max: n
 export type InjuryLocation = "Head" | "Chest" | "Abdomen" | "Right Arm" | "Left Arm" | "Right Leg" | "Left Leg" | "General";
 
 export interface InjuryData {
-  id: string;
+  id: InjuryId;
   name: string;
   description: string;
   severity: InjurySeverity;
@@ -97,7 +100,7 @@ export interface WarriorFavorites {
 }
 
 export interface Warrior {
-  id: string;
+  id: WarriorId;
   name: string;
   style: FightingStyle;
   attributes: Attributes;
@@ -132,7 +135,7 @@ export interface Warrior {
   deathEvent?: DeathEvent;
   killedBy?: string;
   retiredWeek?: number;
-  stableId?: string;
+  stableId?: StableId;
   favorites?: WarriorFavorites;
   isDead?: boolean;
   dateOfDeath?: string;

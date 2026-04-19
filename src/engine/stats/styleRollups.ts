@@ -223,11 +223,10 @@ export const StyleRollups = {
     const rolling = loadRolling();
     const kill = opts.by === "Kill";
     const addRolling = (s: string, win: boolean, killed: boolean) => {
-      if (!rolling[s]) rolling[s] = [];
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      rolling[s]!.push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      while (rolling[s]!.length > 10) rolling[s]!.shift();
+      const list = rolling[s] || [];
+      rolling[s] = list;
+      list.push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
+      while (list.length > 10) list.shift();
     };
     addRolling(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
     addRolling(opts.styleD, opts.winner === "D", kill && opts.winner === "D");
@@ -239,10 +238,10 @@ export const StyleRollups = {
       const tid = opts.isTournament;
       tour[tid] = tour[tid] || {};
       const bump = (s: string, win: boolean, killed: boolean) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        tour[tid]![s] = tour[tid]![s] || { W: 0, L: 0, K: 0, fights: 0 };
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const b = tour[tid]![s]!;
+        const tourData = tour[tid] || {};
+        tour[tid] = tourData;
+        const b = tourData[s] || { W: 0, L: 0, K: 0, fights: 0 };
+        tourData[s] = b;
         b.W += win ? 1 : 0;
         b.L += win ? 0 : 1;
         b.K += killed ? 1 : 0;

@@ -1,6 +1,9 @@
-import type { GameState, AnnualAward } from "@/types/state.types";
+  type GameState, 
+  type AnnualAward,
+  type RivalStableData 
+} from "@/types/state.types";
 import type { Warrior } from "@/types/warrior.types";
-import { FightingStyle } from "@/types/shared.types";
+import { FightingStyle, type WarriorId, type StableId } from "@/types/shared.types";
 import type { IRNGService } from "@/engine/core/rng/IRNGService";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { StateImpact } from "@/engine/impacts";
@@ -11,8 +14,8 @@ export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGS
 
   const prevYear = state.year - 1;
   const hofNews: string[] = [];
-  const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const rivalsUpdates = new Map<string, any>();
+  const rosterUpdates = new Map<WarriorId, Partial<Warrior>>();
+  const rivalsUpdates = new Map<StableId, Partial<RivalStableData>>();
   const awards: AnnualAward[] = [];
 
   interface WarriorStats { w: Warrior; wins: number; kills: number; fame: number; }
@@ -31,8 +34,7 @@ export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGS
 
   if (eligible.length === 0) return {};
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const woty = eligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max, eligible[0]!);
+  const woty = eligible.reduce((max, curr) => (curr.wins > max.wins || (curr.wins === max.wins && curr.fame > max.fame)) ? curr : max, eligible[0]);
   if (woty && woty.wins > 0) {
     const award: AnnualAward = {
       year: prevYear,
@@ -47,19 +49,19 @@ export function processHallOfFame(state: GameState, newWeek: number, rng?: IRNGS
     if (woty.w.stableId === state.player.id) {
       rosterUpdates.set(woty.w.id, updatedWarrior);
     } else if (woty.w.stableId) {
-      const existingRoster = rivalsUpdates.get(woty.w.stableId)?.roster || [];
+      const stableId = woty.w.stableId;
+      const existingRoster = rivalsUpdates.get(stableId)?.roster || [];
       const updatedRoster = existingRoster.map((w: Warrior) => w.id === woty.w.id ? updatedWarrior : w);
       if (!existingRoster.find((w: Warrior) => w.id === woty.w.id)) {
         updatedRoster.push(updatedWarrior);
       }
-      rivalsUpdates.set(woty.w.stableId, { roster: updatedRoster });
+      rivalsUpdates.set(stableId, { roster: updatedRoster });
     }
     awards.push(award);
     hofNews.push(`🏛️ WARRIOR OF THE YEAR: ${woty.w.name} is the champion of Year ${prevYear} with ${woty.wins} wins!`);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const koty = eligible.reduce((max, curr) => (curr.kills > max.kills || (curr.kills === max.kills && curr.wins > max.wins)) ? curr : max, eligible[0]!);
+  const koty = eligible.reduce((max, curr) => (curr.kills > max.kills || (curr.kills === max.kills && curr.wins > max.wins)) ? curr : max, eligible[0]);
   if (koty && koty.kills > 0) {
     const award: AnnualAward = {
       year: prevYear,
@@ -145,8 +147,8 @@ function applyAward(warrior: Warrior, award: AnnualAward, fameBonus: number): { 
 
 function createYearlySnapshots(state: GameState): StateImpact {
   const currentYear = state.year;
-  const rosterUpdates = new Map<string, Partial<Warrior>>();
-  const rivalsUpdates = new Map<string, any>();
+  const rosterUpdates = new Map<WarriorId, Partial<Warrior>>();
+  const rivalsUpdates = new Map<StableId, Partial<RivalStableData>>();
 
   state.roster.forEach((w: Warrior) => {
     const career = w.career || { wins: 0, losses: 0, kills: 0 };
@@ -159,17 +161,17 @@ function createYearlySnapshots(state: GameState): StateImpact {
   });
 
   state.rivals.forEach(r => {
-    const rosterSnapshots: any[] = [];
-    r.roster.forEach((w: Warrior) => {
+    const updatedRoster = r.roster.map((w: Warrior) => {
       const career = w.career || { wins: 0, losses: 0, kills: 0 };
-      rosterSnapshots.push({
+      return {
+        ...w,
         yearlySnapshots: {
           ...(w.yearlySnapshots || {}),
           [currentYear]: { ...career, fame: w.fame || 0 }
         }
-      });
+      };
     });
-    rivalsUpdates.set(r.owner.id, { roster: rosterSnapshots });
+    rivalsUpdates.set(r.id, { roster: updatedRoster });
   });
 
   return { rosterUpdates, rivalsUpdates };

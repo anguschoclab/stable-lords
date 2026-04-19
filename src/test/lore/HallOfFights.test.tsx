@@ -108,9 +108,9 @@ describe("HallOfFights Component", () => {
 
     // Assert row stats for Lunger
     // Fought 2 times, won both, 100% win rate
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const lungerRow = lungerText[0].closest("tr")!;
+    const lungerRow = lungerText[0].closest("tr");
     expect(lungerRow).toBeInTheDocument();
+    if (!lungerRow) throw new Error("Lunger row not found");
     const lungerCells = within(lungerRow).getAllByRole("cell");
     // Order: Style, Fights, Wins, Losses, Kills, WinRate
     expect(lungerCells[1]).toHaveTextContent("2"); // fights

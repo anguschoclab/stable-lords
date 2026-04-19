@@ -2,11 +2,11 @@
  * Game State Factory - Creates initial game state
  * Extracted from factories.ts to follow SRP
  */
-import type { GameState, OwnerPersonality } from "@/types/state.types";
+import type { GameState, OwnerPersonality, RivalStableData } from "@/types/state.types";
 import { type PoolWarrior } from "@/engine/recruitment";
 import narrativeContent from "@/data/narrativeContent.json";
 import type { NarrativeContent } from "@/types/narrative.types";
-import { FightingStyle } from "@/types/shared.types";
+import { FightingStyle, type StableId, type WarriorId } from "@/types/shared.types";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { makeWarrior } from "./warriorFactory";
 import { generatePotential } from "@/engine/potential";
@@ -30,7 +30,7 @@ export function createFreshState(seed: string, createdAt: string = new Date().to
     ftueStep: 0,
     coachDismissed: [],
     player: {
-      id: "stable-player",
+      id: "stable-player" as StableId,
       name: "You",
       stableName: "Dragon's Hearth",
       fame: 0,
@@ -104,15 +104,16 @@ export function createFreshState(seed: string, createdAt: string = new Date().to
     }
   }
 
-  state.rivals = pool.slice(0, 4).map((name) => {
+  state.rivals = pool.slice(0, 4).map((name): RivalStableData => {
     const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
     const backstoryId = BACKSTORY_IDS[Math.floor(rng.next() * BACKSTORY_IDS.length)]!;
+    const ownerId = rng.uuid() as StableId;
     return {
-      id: rng.uuid(),
+      id: rng.uuid() as StableId,
       fame: 100,
       treasury: 1500 + Math.floor(rng.next() * 1000),
       owner: {
-        id: rng.uuid(),
+        id: ownerId,
         name: `Lord ${name.split(" ")[0]}`,
         stableName: name,
         personality: PERSONALITIES[personalityIndex],
@@ -144,7 +145,7 @@ export function createFreshState(seed: string, createdAt: string = new Date().to
       WT: attrBase(), WL: attrBase(), SP: attrBase(), DF: attrBase()
     };
     
-    const baseWarrior = makeWarrior(rng.uuid(), `Recruit ${i + 1}`, style, attrs, {}, rng);
+    const baseWarrior = makeWarrior(rng.uuid() as WarriorId, `Recruit ${i + 1}`, style, attrs, {}, rng);
     return {
       ...baseWarrior,
       cost: 150 + Math.floor(rng.next() * 150),

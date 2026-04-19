@@ -40,8 +40,7 @@ export function runBoutSimulationPass(state: GameState, _rng: IRNGService): Stat
   
   // Attach the summary to the state for use in later narrative or event passes if needed
   boutImpact.lastSimulationReport = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    id: _rng!.uuid(),
+    id: _rng.uuid(),
     week: state.week,
     treasuryChange: 0,
     trainingGains: [],

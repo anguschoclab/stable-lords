@@ -1,4 +1,5 @@
 import { StateCreator } from "zustand";
+import type { GameStore } from "@/state/useGameStore";
 import {
   Season,
   WeatherType,
@@ -19,6 +20,14 @@ import { FightSummary } from "@/types/combat.types";
 import { truncateArray } from "@/utils/stateUtils";
 import { updatePromoterHistory as engineUpdatePromoterHistory } from "@/engine/promoters";
 import { respondToBoutOffer as engineRespondToBoutOffer } from "@/state/mutations/contractMutations";
+import { 
+  type WarriorId, 
+  type StableId, 
+  type PromoterId, 
+  type BoutOfferId, 
+  type FightId, 
+  type TournamentId 
+} from "@/types/shared.types";
 
 export interface ArenaPreferences {
   defaultViewMode: "log" | "arena";
@@ -34,8 +43,8 @@ export interface WorldSlice {
   day: number;
   season: Season;
   weather: WeatherType;
-  promoters: Record<string, Promoter>;
-  boutOffers: Record<string, BoutOffer>;
+  promoters: Record<PromoterId, Promoter>;
+  boutOffers: Record<BoutOfferId, BoutOffer>;
   rivals: RivalStableData[];
   gazettes: GazetteStory[];
   scoutReports: ScoutReportData[];
@@ -66,18 +75,17 @@ export interface WorldSlice {
   setArenaPreferences: (prefs: Partial<ArenaPreferences>) => void;
   initializeStable: (name: string, stableName: string) => void;
   appendFight: (summary: FightSummary) => void;
-  updateBoutOfferStatus: (offerId: string, status: BoutOffer["status"]) => void;
-  respondToBoutOffer: (offerId: string, warriorId: string, response: "Accepted" | "Declined") => void;
+  updateBoutOfferStatus: (offerId: BoutOfferId, status: BoutOffer["status"]) => void;
+  respondToBoutOffer: (offerId: BoutOfferId, warriorId: WarriorId, response: "Accepted" | "Declined") => void;
   clearExpiredOffers: () => void;
-  updatePromoterHistory: (promoterId: string, purse: number, boutId: string) => void;
-  replacePromoter: (oldId: string, newPromoter: Promoter) => void;
-  updateWarriorStatus: (warriorId: string, won: boolean, killed: boolean, fameDelta: number, popDelta: number, rivalStableId?: string) => void;
+  updatePromoterHistory: (promoterId: PromoterId, purse: number, boutId: FightId) => void;
+  replacePromoter: (oldId: PromoterId, newPromoter: Promoter) => void;
+  updateWarriorStatus: (warriorId: WarriorId, won: boolean, killed: boolean, fameDelta: number, popDelta: number, rivalStableId?: StableId) => void;
   renameStable: (newName: string) => void;
   renamePlayer: (newName: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get) => ({
+export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (set, get) => ({
   year: 1,
   week: 1,
   day: 0,
@@ -108,7 +116,7 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
   },
   isFTUE: false,
   ftueComplete: false,
-  player: { id: "p1", name: "Rookie", stableName: "Fresh Stable", fame: 0, renown: 0, titles: 0 },
+  player: { id: "p1" as StableId, name: "Rookie", stableName: "Fresh Stable", fame: 0, renown: 0, titles: 0 },
   coachDismissed: [],
   rivalries: [],
   matchHistory: [],
@@ -174,13 +182,13 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
       const newOffers = { ...state.boutOffers };
       let changed = false;
 
-      for (const id of Object.keys(newOffers) as string[]) {
+      (Object.keys(newOffers) as BoutOfferId[]).forEach(id => {
         const offer = newOffers[id];
         if (offer.status === "Proposed" && state.week >= offer.expirationWeek) {
           newOffers[id] = { ...offer, status: "Expired" };
           changed = true;
         }
-      }
+      });
 
       return changed ? { boutOffers: newOffers } : state;
     });
@@ -192,10 +200,8 @@ export const createWorldSlice: StateCreator<any, [], [], WorldSlice> = (set, get
 
   replacePromoter: (oldId, newPromoter) => {
     set((state: WorldSlice) => {
-      const newPromoters = { ...state.promoters };
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete newPromoters[oldId];
-      newPromoters[newPromoter.id] = newPromoter;
+      const { [oldId]: removed, ...remainingPromoters } = state.promoters;
+      const newPromoters = { ...remainingPromoters, [newPromoter.id]: newPromoter };
 
       return {
         promoters: newPromoters,

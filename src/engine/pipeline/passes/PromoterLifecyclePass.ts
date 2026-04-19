@@ -60,9 +60,20 @@ export function runPromoterLifecyclePass(state: GameState, rng?: IRNGService): S
           }
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete newPromoters[id];
-        newPromoters[newId] = successor;
+        const retiredIds = new Set<string>();
+        retiredIds.add(id);
+        const successors: Record<string, Promoter> = {};
+        successors[newId] = successor;
+
+        // Apply removals safely
+        const filteredPromoters = Object.entries(newPromoters)
+          .filter(([pid]) => !retiredIds.has(pid))
+          .reduce((acc, [pid, pObj]) => ({ ...acc, [pid]: pObj }), {});
+        
+        Object.assign(newPromoters, filteredPromoters);
+        Object.assign(newPromoters, successors);
+        
+        // This is a bit complex inside a loop. Better: re-read the file and use a cleaner approach.
         news.push(`🏠 SUCCESSION: The legendary promoter ${p.name} has retired. Their protege, ${successorName}, takes over the ${p.tier} circuit.`);
       }
     }

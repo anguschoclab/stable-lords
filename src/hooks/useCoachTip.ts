@@ -250,6 +250,6 @@ export function useCoachTip(pathname: string) {
     }, 1000);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, ftueComplete]);
+    // We primarily want to trigger when the pathname or relevant state changes
+  }, [pathname, ftueComplete, state, setState]);
 }

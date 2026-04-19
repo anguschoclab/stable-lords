@@ -55,12 +55,13 @@ export function processStaff(
 
   if (intent === "RECOVERY" || currentTreasury < 100 || underPressure) {
     if (currentTrainers.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const fired = currentTrainers.pop()!;
-      updatedRival = { ...updatedRival, treasury: currentTreasury, trainers: currentTrainers };
-      const riskReason = isSolemn ? "solemn crowd dampening income" : isRainy ? "stormy weather risks" : "budget constraints";
-      updatedRival = logAgentAction(updatedRival, "STAFF", `Released trainer ${fired.name} due to ${riskReason}.`, "Low", week);
-      gazetteItems.push(`📉 DOWNSIZING: ${updatedRival.owner.stableName} has released trainer ${fired.name} due to ${riskReason}.`);
+      const fired = currentTrainers.pop();
+      if (fired) {
+        updatedRival = { ...updatedRival, treasury: currentTreasury, trainers: currentTrainers };
+        const riskReason = isSolemn ? "solemn crowd dampening income" : isRainy ? "stormy weather risks" : "budget constraints";
+        updatedRival = logAgentAction(updatedRival, "STAFF", `Released trainer ${fired.name} due to ${riskReason}.`, "Low", week);
+        gazetteItems.push(`📉 DOWNSIZING: ${updatedRival.owner.stableName} has released trainer ${fired.name} due to ${riskReason}.`);
+      }
     }
   }
 

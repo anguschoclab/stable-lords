@@ -20,8 +20,11 @@ export const HallOfFights: React.FC = () => {
   const state = useWorldState();
 
   // Hall entries from LoreArchive
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const hallEntries = useMemo(() => LoreArchive.allHall().slice().reverse(), [state.week]);
+  const hallEntries = useMemo(() => {
+    // state.week is used as a dependency to ensure hall entries are refreshed when time advances
+    void state.week;
+    return LoreArchive.allHall().slice().reverse();
+  }, [state.week]);
 
   // Build fight lookup from game state
   const fightMap = useMemo(

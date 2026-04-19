@@ -10,8 +10,8 @@ import type { FightingStyle } from "@/types/shared.types";
  * ExpansionService - Handles stable expansion.
  * Manages generation of new rival stables.
  */
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ExpansionService {
+  private constructor() {}
   /**
    * Processes expansion by generating new rival stables.
    * Adds new stables to maintain world population.

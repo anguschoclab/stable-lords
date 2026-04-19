@@ -7,8 +7,8 @@ import type { Warrior } from "@/types/game";
  * BoutNarrator - Intro, opener, and conclusion narration.
  * Handles bout-level narrative generation.
  */
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class BoutNarrator {
+  private constructor() {}
   /**
    * Delegates to CombatNarrator for warrior intro.
    */

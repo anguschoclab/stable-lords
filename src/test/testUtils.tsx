@@ -7,8 +7,10 @@ const localStorageMock = (function() {
   return {
     getItem: function(key: string) { return store[key] || null; },
     setItem: function(key: string, value: string) { store[key] = value.toString(); },
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    removeItem: function(key: string) { delete store[key]; },
+    removeItem: function(key: string) { 
+      const { [key]: _, ...rest } = store;
+      store = rest;
+    },
     clear: function() { store = {}; }
   };
 })();
@@ -30,12 +32,12 @@ export function renderWithGameState(ui: React.ReactElement, partialState: Partia
     ...partialState,
   };
 
-  // Set the state in the store directly (Zustand is now a flat modular store)
+  // Set the state in the store directly
+  useGameStore.getState().loadGame("test-slot", mockState as GameState);
   useGameStore.setState({ 
-    ...mockState, 
     atTitleScreen: false,
     isInitialized: true 
-  } as any);
+  });
 
   return render(
     <TooltipProvider>

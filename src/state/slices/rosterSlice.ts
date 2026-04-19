@@ -1,6 +1,7 @@
 import { StateCreator } from "zustand";
 import { GameState, Warrior, PoolWarrior, DeathEvent, InsightToken, Trainer, TrainingAssignment, SeasonalGrowth, RestState } from "@/types/state.types";
 import type { GameStore } from "@/state/useGameStore";
+import { type WarriorId, type StableId, type InsightId, type ShieldSize } from "@/types/shared.types";
 
 export interface RosterSlice {
   roster: Warrior[];
@@ -14,15 +15,15 @@ export interface RosterSlice {
   seasonalGrowth: SeasonalGrowth[];
   restStates: RestState[];
   rosterBonus: number;
-  unacknowledgedDeaths: string[];
+  unacknowledgedDeaths: WarriorId[];
   setRoster: (roster: Warrior[]) => void;
   addWarrior: (warrior: Warrior) => void;
-  killWarrior: (warriorId: string, killedBy: string, cause: string, deathEvent?: DeathEvent) => void;
-  retireWarrior: (warriorId: string) => void;
-  consumeInsightToken: (tokenId: string, warriorId: string) => void;
-  updateWarriorEquipment: (warriorId: string, equipment: { weapon: string; armor: string; shield: string; helm: string }) => void;
-  renameWarrior: (warriorId: string, newName: string) => void;
-  acknowledgeDeath: (warriorId: string) => void;
+  killWarrior: (warriorId: WarriorId, killedBy: string, cause: string, deathEvent?: DeathEvent) => void;
+  retireWarrior: (warriorId: WarriorId) => void;
+  consumeInsightToken: (tokenId: InsightId, warriorId: WarriorId) => void;
+  updateWarriorEquipment: (warriorId: WarriorId, equipment: { weapon: string; armor: string; shield: string; helm: string }) => void;
+  renameWarrior: (warriorId: WarriorId, newName: string) => void;
+  acknowledgeDeath: (warriorId: WarriorId) => void;
 }
 
 export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (set, get) => ({
@@ -129,7 +130,7 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
             ...w.gear,
             weapon: { name: equipment.weapon },
             armor: equipment.armor,
-            shield: equipment.shield as any,
+            shield: equipment.shield as ShieldSize,
             helm: equipment.helm,
           }
         };
@@ -153,7 +154,7 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
 
   acknowledgeDeath: (warriorId) => {
     set((state: GameStore) => ({
-      unacknowledgedDeaths: (state.unacknowledgedDeaths || []).filter((id: string) => id !== warriorId)
+      unacknowledgedDeaths: (state.unacknowledgedDeaths || []).filter(id => id !== warriorId)
     }));
   },
 });

@@ -11,6 +11,7 @@
  * attach handlers once at boot and tear them down in tests via `clearDeathHandlers`.
  */
 import { engineEventBus, type EngineEvent } from "@/engine/core/EventBus";
+import { logger } from "@/utils/logger";
 
 export interface DeathNotification {
   warriorId: string;
@@ -36,8 +37,7 @@ function ensureSubscribed(): void {
       } catch (err) {
         // Handlers are side-effect sinks (UI toasts, chronicle writers, etc.) —
         // a failing handler must not block the others from firing.
-        // eslint-disable-next-line no-console
-        console.error("[deathNotifier] handler threw:", err);
+        logger.error("[deathNotifier] handler threw:", err);
       }
     });
   });

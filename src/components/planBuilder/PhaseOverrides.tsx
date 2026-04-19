@@ -43,10 +43,9 @@ export default function PhaseOverrides({ plan, onPlanChange }: PhaseOverridesPro
                       {plan.phases?.[p] && (
                         <button
                           onClick={() => {
-                            const next = { ...plan.phases };
-                            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                            delete next[p];
-                            onPlanChange({ ...plan, phases: next });
+                            if (!plan.phases) return;
+                            const { [p]: _, ...rest } = plan.phases;
+                            onPlanChange({ ...plan, phases: Object.keys(rest).length ? rest : undefined });
                           }}
                           className="text-[9px] font-black uppercase text-arena-blood hover:underline"
                           aria-label={`Clear phase ${p}`}
@@ -57,14 +56,12 @@ export default function PhaseOverrides({ plan, onPlanChange }: PhaseOverridesPro
                     <div className="flex flex-wrap gap-1">
                       {plan.phases?.[p]?.offensiveTactic && (
                         <Badge className="bg-arena-blood/20 text-arena-blood border border-arena-blood/30 text-[9px] uppercase font-black px-1.5 py-0.5">
-                          {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-                          {plan.phases[p]!.offensiveTactic}
+                          {plan.phases[p]?.offensiveTactic}
                         </Badge>
                       )}
                       {plan.phases?.[p]?.defensiveTactic && (
                         <Badge className="bg-arena-gold/20 text-arena-gold border border-arena-gold/30 text-[9px] uppercase font-black px-1.5 py-0.5">
-                          {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-                          {plan.phases[p]!.defensiveTactic}
+                          {plan.phases[p]?.defensiveTactic}
                         </Badge>
                       )}
                     </div>

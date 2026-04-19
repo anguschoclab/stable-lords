@@ -32,23 +32,19 @@ export class TestRNGService implements IRNGService {
 
   next(): number {
     this.callCount++;
-    if (this.nextValues.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return this.nextValues.shift()!;
-    }
+    const v = this.nextValues.shift();
+    if (v !== undefined) return v;
     return 0.5; // Default deterministic value
   }
 
   pick<T>(array: T[]): T {
     this.callCount++;
-    if (this.nextValues.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const index = Math.floor(this.nextValues.shift()! * array.length);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return array[index]!;
+    const v = this.nextValues.shift();
+    if (v !== undefined) {
+      const index = Math.floor(v * array.length);
+      return array[index] || array[0];
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return array[0]!; // Default to first element
+    return array[0]; // Default to first element
   }
 
   uuid(prefix?: string): string {
@@ -58,10 +54,9 @@ export class TestRNGService implements IRNGService {
 
   roll(min: number, max: number): number {
     this.callCount++;
-    if (this.nextValues.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const value = this.nextValues.shift()!;
-      return min + Math.floor(value * (max - min));
+    const v = this.nextValues.shift();
+    if (v !== undefined) {
+      return min + Math.floor(v * (max - min));
     }
     return min; // Default to min
   }

@@ -2,14 +2,15 @@ import type { GameState, LedgerEntry, NewsletterItem, RivalStableData, RankingEn
 import type { Warrior } from "@/types/warrior.types";
 import type { FightSummary } from "@/types/combat.types";
 import type { PoolWarrior } from "@/engine/recruitment";
+import type { WarriorId, StableId, TournamentId } from "@/types/shared.types";
 
 export interface StateImpact {
   treasuryDelta?: number;
   fameDelta?: number;
   popularityDelta?: number;
-  rosterUpdates?: Map<string, Partial<Warrior>>;
-  rosterRemovals?: string[];
-  rivalsUpdates?: Map<string, Partial<RivalStableData>>;
+  rosterUpdates?: Map<WarriorId, Partial<Warrior>>;
+  rosterRemovals?: WarriorId[];
+  rivalsUpdates?: Map<StableId, Partial<RivalStableData>>;
   newsletterItems?: NewsletterItem[];
   ledgerEntries?: LedgerEntry[];
   seasonalGrowth?: SeasonalGrowth[];
@@ -17,7 +18,7 @@ export interface StateImpact {
   recruitPool?: PoolWarrior[];
   tournaments?: TournamentEntry[];
   isTournamentWeek?: boolean;
-  activeTournamentId?: string;
+  activeTournamentId?: TournamentId;
   day?: number;
   graveyard?: Warrior[];
   week?: number;
@@ -128,15 +129,15 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
 export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameState {
   const newState = { ...state };
   for (const impact of impacts) {
-    for (const key of Object.keys(impact) as Array<keyof StateImpact>) {
+    (Object.keys(impact) as Array<keyof StateImpact>).forEach(key => {
       const value = impact[key];
       if (value !== undefined) {
         const handler = impactHandlers[key] as ImpactHandler<typeof key>;
         if (handler) {
-          handler(newState, value as never); // Typesafe by construction, but TypeScript loses the generic linkage when iterating Object.keys
+          handler(newState, value as any); // Cast only here because of the generic key loss in forEach
         }
       }
-    }
+    });
   }
   return newState;
 }
@@ -144,7 +145,11 @@ export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameSt
 // Merge strategy configuration
 type MergeStrategy = 'accumulate' | 'append' | 'mapMerge' | 'replace';
 
-const MERGE_CONFIG: Record<keyof StateImpact, { strategy: MergeStrategy; defaultValue: any }> = {
+type MergeConfig = {
+  [K in keyof StateImpact]: { strategy: MergeStrategy; defaultValue: StateImpact[K] };
+};
+
+const MERGE_CONFIG: MergeConfig = {
   treasuryDelta: { strategy: 'accumulate', defaultValue: 0 },
   fameDelta: { strategy: 'accumulate', defaultValue: 0 },
   popularityDelta: { strategy: 'accumulate', defaultValue: 0 },
@@ -193,8 +198,9 @@ const MERGE_CONFIG: Record<keyof StateImpact, { strategy: MergeStrategy; default
 export function mergeImpacts(impacts: StateImpact[]): StateImpact {
   const merged: StateImpact = {} as StateImpact;
 
-  // Initialize merged with default values (create new instances to avoid reference sharing)
-  for (const [key, config] of Object.entries(MERGE_CONFIG)) {
+  // Initialize merged with default values
+  (Object.keys(MERGE_CONFIG) as Array<keyof StateImpact>).forEach(key => {
+    const config = MERGE_CONFIG[key];
     if (Array.isArray(config.defaultValue)) {
       (merged as any)[key] = [...config.defaultValue];
     } else if (config.defaultValue instanceof Map) {
@@ -202,27 +208,31 @@ export function mergeImpacts(impacts: StateImpact[]): StateImpact {
     } else {
       (merged as any)[key] = config.defaultValue;
     }
-  }
+  });
 
   for (const imp of impacts) {
-    for (const [key, config] of Object.entries(MERGE_CONFIG)) {
-      const value = imp[key as keyof StateImpact];
-      if (value === undefined || value === null) continue;
+    (Object.keys(MERGE_CONFIG) as Array<keyof StateImpact>).forEach(key => {
+      const config = MERGE_CONFIG[key];
+      const value = imp[key];
+      if (value === undefined || value === null) return;
 
       switch (config.strategy) {
         case 'accumulate':
-          (merged as any)[key] += value;
+          if (typeof value === 'number') {
+            (merged as any)[key] = ((merged as any)[key] || 0) + value;
+          }
           break;
         case 'append':
-          if (Array.isArray(value) && value.length > 0) {
-(merged as any)[key] = (merged as any)[key].concat(value);
+          if (Array.isArray(value)) {
+            (merged as any)[key] = ((merged as any)[key] || []).concat(value);
           }
           break;
         case 'mapMerge':
-          if (value instanceof Map && value.size > 0) {
-            value.forEach((val: any, mapKey: string) => {
-              const existing = (merged as any)[key].get(mapKey) || {};
-              (merged as any)[key].set(mapKey, { ...existing, ...val });
+          if (value instanceof Map) {
+            const targetMap = (merged as any)[key] as Map<string, object>;
+            value.forEach((val, mapKey) => {
+              const existing = targetMap.get(mapKey as any) || {};
+              targetMap.set(mapKey as any, { ...existing, ...val });
             });
           }
           break;
@@ -230,7 +240,7 @@ export function mergeImpacts(impacts: StateImpact[]): StateImpact {
           (merged as any)[key] = value;
           break;
       }
-    }
+    });
   }
 
   return merged;

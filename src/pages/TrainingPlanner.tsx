@@ -204,8 +204,7 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
       pot: warrior.potential?.[k],
       chance: computeGainChance(warrior, k, trainers),
       seasonGain: seasonalGains[k] ?? 0,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      capped: warrior.attributes[k] >= 25 || (warrior.potential?.[k] !== undefined && warrior.attributes[k] >= warrior.potential![k]),
+      capped: warrior.attributes[k] >= 25 || (warrior.potential?.[k] !== undefined && warrior.attributes[k] >= (warrior.potential?.[k] ?? 0)),
       seasonCapped: (seasonalGains[k] ?? 0) >= 3,
       drFactor: diminishingReturnsFactor(warrior.attributes[k], warrior.potential?.[k]),
     }))

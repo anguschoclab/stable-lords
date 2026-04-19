@@ -67,8 +67,9 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
   }
 
   function updateTrigger(idx: number, type: ConditionTriggerType) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const opt = TRIGGER_OPTIONS.find(o => o.type === type)!;
+    const opt = TRIGGER_OPTIONS.find(o => o.type === type);
+    if (!opt) return;
+
     let value: number | string;
     if (opt.inputType === "percent") value = 35;
     else if (opt.inputType === "integer") value = 2;
@@ -78,8 +79,9 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
 
   function updateTriggerValue(idx: number, raw: string) {
     const cond = conditions[idx];
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const opt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type)!;
+    const opt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type);
+    if (!opt) return;
+
     let value: number | string;
     if (opt.inputType === "phase") {
       value = raw;
@@ -92,26 +94,22 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
 
   function updateOverrideSlider(idx: number, key: "OE" | "AL" | "killDesire", val: number | undefined) {
     const cond = conditions[idx];
-    const override = { ...cond.override };
     if (val === undefined) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete override[key];
+      const { [key]: _, ...rest } = cond.override;
+      updateCondition(idx, { override: rest });
     } else {
-      override[key] = val;
+      updateCondition(idx, { override: { ...cond.override, [key]: val } });
     }
-    updateCondition(idx, { override });
   }
 
   function updateOverrideTactic(idx: number, key: "offensiveTactic" | "defensiveTactic", val: string) {
     const cond = conditions[idx];
-    const override = { ...cond.override };
     if (val === "none") {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete override[key];
+      const { [key]: _, ...rest } = cond.override;
+      updateCondition(idx, { override: rest });
     } else {
-      (override as Record<string, unknown>)[key] = val;
+      updateCondition(idx, { override: { ...cond.override, [key]: val } });
     }
-    updateCondition(idx, { override });
   }
 
   return (
@@ -123,8 +121,9 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
       )}
 
       {conditions.map((cond, idx) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const trigOpt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type)!;
+        const trigOpt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type);
+        if (!trigOpt) return null;
+
         return (
           <div key={idx} className="border border-white/10 bg-black/30 p-4 space-y-4">
             {/* Header row */}

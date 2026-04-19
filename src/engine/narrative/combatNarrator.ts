@@ -20,8 +20,8 @@ export interface WarriorIntroData {
  * CombatNarrator - Attack, parry, hit, and defense narration.
  * Handles all combat-related narrative generation.
  */
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class CombatNarrator {
+  private constructor() {}
   /**
    * Generates warrior introduction lines.
    */

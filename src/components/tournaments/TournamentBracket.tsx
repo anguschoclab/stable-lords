@@ -126,15 +126,11 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                           <BoutViewer
                             nameA={resolveWarriorName(state, fightSummary.warriorIdA, fightSummary.a)}
                             nameD={resolveWarriorName(state, fightSummary.warriorIdD, fightSummary.d)}
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            styleA={fightSummary.styleA!}
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            styleD={fightSummary.styleD!}
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            log={fightSummary.transcript!.map((text, idx) => ({ minute: idx + 1, text }))}
+                            styleA={fightSummary.styleA || ""}
+                            styleD={fightSummary.styleD || ""}
+                            log={(fightSummary.transcript || []).map((text, idx) => ({ minute: idx + 1, text }))}
                             winner={fightSummary.winner}
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            by={fightSummary.by!}
+                            by={fightSummary.by || ""}
                             isRivalry={fightSummary.isRivalry}
                           />
                         </div>

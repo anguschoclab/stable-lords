@@ -245,8 +245,7 @@ export function rollForTrainingInjury(warrior: Warrior, healingBonus: number, rn
   if (rng.next() < injuryChance) {
     const template = rng.pick(TRAINING_INJURIES);
     const [minW, maxW] = template.weeksRange;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const weeks = rng.roll(minW!, (maxW ?? minW!) + 1);
+    const weeks = rng.roll(minW || 1, (maxW ?? minW || 1) + 1);
     const injury: InjuryData = {
       id: generateId(),
       name: template.name,

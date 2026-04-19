@@ -4,9 +4,10 @@ import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import type { GameState } from "@/types/state.types";
 import { type BoutResult } from "@/engine/boutProcessor";
-import { createFreshState } from "@/engine/factories";
+import { createFreshState } from "@/engine/factories/gameStateFactory";
 import { engineProxy } from "@/engine/workerProxy";
 import { opfsArchive } from "@/engine/storage/opfsArchive";
+import { type WarriorId, type InjuryId } from "@/types/shared.types";
 
 // ─── Slices ────────────────────────────────────────────────────────────────
 import { createEconomySlice, EconomySlice } from "./slices/economySlice";
@@ -26,8 +27,8 @@ export interface GameStoreState {
 export interface GameStoreActions {
   setSimulating: (simulating: boolean) => void;
   toggleEventLog: () => void;
-  doAdvanceWeek: (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => Promise<void>;
-  doAdvanceDay: (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => Promise<void>;
+  doAdvanceWeek: (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => Promise<void>;
+  doAdvanceDay: (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => Promise<void>;
   initialize: () => void;
   loadGame: (slotId: string, gameState: GameState) => void;
   doReset: () => void;
@@ -271,7 +272,7 @@ export const useGameStore = create<GameStore>()(
         });
       },
 
-      doAdvanceWeek: async (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => {
+      doAdvanceWeek: async (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => {
         const store = get();
         const state = processedState || reconstructGameState(store);
         const currentWeek = state.week;
@@ -306,7 +307,7 @@ export const useGameStore = create<GameStore>()(
         }
       },
 
-      doAdvanceDay: async (processedState?: GameState, results?: BoutResult[], deaths?: string[], injuries?: string[]) => {
+      doAdvanceDay: async (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => {
         const store = get();
         const state = processedState || reconstructGameState(store);
         const currentWeek = state.week;

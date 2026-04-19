@@ -8,7 +8,11 @@ import {
   type OffensiveTactic, 
   type DefensiveTactic, 
   type PhaseStrategy,
-  type DeathEvent
+  type DeathEvent,
+  type WarriorId,
+  type StableId,
+  type FightId,
+  type TournamentId
 } from "./shared.types";
 import type { BoutResult } from "@/engine/boutProcessor";
 
@@ -101,8 +105,8 @@ export interface ExchangeLogEntry {
   exchangeIndex: number;
   minute: number;
   phase?: "OPENING" | "MID" | "LATE";
-  attackerId?: string;
-  defenderId?: string;
+  attackerId?: WarriorId;
+  defenderId?: WarriorId;
   iniWinner?: "A" | "D";
   attResult?: "hit" | "miss" | "crit" | "fumble";
   parResult?: "success" | "fail" | null;
@@ -142,7 +146,7 @@ export interface FightOutcome {
 }
 
 export interface FightSummary {
-  id: string;
+  id: FightId;
   week: number;
   phase?: "planning" | "resolution";
   pendingResolutionData?: {
@@ -152,16 +156,16 @@ export interface FightSummary {
     bouts: BoutResult[];
     promotions: string[];
   };
-  tournamentId?: string | null;
+  tournamentId?: TournamentId | null;
   title: string;
   a: string;
   d: string;
-  warriorIdA: string;
-  warriorIdD: string;
+  warriorIdA: WarriorId;
+  warriorIdD: WarriorId;
   stableA?: string;
   stableD?: string;
-  stableIdA?: string;
-  stableIdD?: string;
+  stableIdA?: StableId;
+  stableIdD?: StableId;
   winner: "A" | "D" | null;
   by: FightOutcomeBy;
   styleA: string;

@@ -43,8 +43,7 @@ export function growthNarrative(current: number, potential: number | undefined):
 /** Overall narrative assessment of a warrior's growth ceiling */
 export function overallGrowthNarrative(warrior: Warrior): string {
   if (!warrior.potential) return "This warrior's limits are unknown.";
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const gaps = ATTRIBUTE_KEYS.map(k => (warrior.potential![k] || 0) - warrior.attributes[k]);
+  const gaps = ATTRIBUTE_KEYS.map(k => ((warrior.potential ? warrior.potential[k] : 0) || 0) - warrior.attributes[k]);
   const totalGap = gaps.reduce((s, g) => s + Math.max(0, g), 0);
   const maxedCount = gaps.filter(g => g <= 0).length;
 

@@ -37,19 +37,16 @@ const RANK_REQUIREMENTS = {
 
 export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpact {
   const rngService = rng || new SeededRNGService(state.week * 881 + 17);
-  const newOffers: Record<string, BoutOffer> = { ...state.boutOffers };
   const rankings = state.realmRankings || {};
   
   // 0. Garbage Collection: Prune expired or stale bout offers
-  for (const [offerId, offer] of Object.entries(newOffers)) {
-    if (offer.boutWeek < state.week) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete newOffers[offerId]; // Past events
-    } else if (offer.expirationWeek < state.week && offer.status !== "Signed") {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete newOffers[offerId]; // Expired proposals
-    }
-  }
+  const newOffers = Object.fromEntries(
+    Object.entries(state.boutOffers || {}).filter(([_, offer]) => {
+      const isPast = offer.boutWeek < state.week;
+      const isExpired = offer.expirationWeek < state.week && offer.status !== "Signed";
+      return !isPast && !isExpired;
+    })
+  );
   
   // 1. Gather all active warriors using utility
   const allWarriors = collectAllActiveWarriors(state);

@@ -60,8 +60,8 @@ export function TrainingWidget() {
         ) : (
           <div className="space-y-4">
             {trainingWarriors.map(({ warriorId, attribute, warrior }) => {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              const w = warrior!;
+              if (!warrior) return null;
+              const w = warrior;
               const current = w.attributes[attribute as keyof typeof w.attributes] || 0;
               const potential = w.potential?.[attribute as keyof typeof w.attributes];
               const atCeiling = potential !== undefined && current >= potential;

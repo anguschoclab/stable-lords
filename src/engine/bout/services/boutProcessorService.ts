@@ -30,11 +30,11 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
     return { impact: {}, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as FightOutcome, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
   }
 
-  // After validation, cW and cO are guaranteed to be non-null
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const validCW = cW!;
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const validCO = cO!;
+  if (!cW || !cO) {
+    return { impact: {}, result: { a: warrior, d: opponent, outcome: { winner: null, by: "Error", minutes: 0, log: [] } as FightOutcome, isRivalry, rivalStable, contractId: contract?.id }, stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] } };
+  }
+  const validCW = cW;
+  const validCO = cO;
 
   const boutSeed = hashStr(`${week}|${validCW.id}|${validCO.id}`);
   const rng = new SeededRNGService(boutSeed);

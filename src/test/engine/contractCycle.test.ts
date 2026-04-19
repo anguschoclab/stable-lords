@@ -34,8 +34,9 @@ describe("Contract System Cycle", () => {
     const offer = offers.find(o => o.warriorIds.some(wId => stateWithOffers.roster.some(pW => pW.id === wId)));
     if (!offer) return; // Skip if no player offer in this seed
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const playerWarriorId = stateWithOffers.roster.find(w => offer.warriorIds.includes(w.id))!.id;
+    const playerWarrior = stateWithOffers.roster.find(w => offer.warriorIds.includes(w.id));
+    if (!playerWarrior) throw new Error("Player warrior not found for offer");
+    const playerWarriorId = playerWarrior.id;
     
     // Simulate accepting an offer
     const signedState = respondToBoutOffer(stateWithOffers, offer.id, playerWarriorId, "Accepted");
@@ -49,8 +50,9 @@ describe("Contract System Cycle", () => {
     
     if (!offer) return; // Skip if no player offer generated in this seed
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const playerWarriorId = s.roster.find(w => offer.warriorIds.includes(w.id))!.id;
+    const playerWarrior = s.roster.find(w => offer.warriorIds.includes(w.id));
+    if (!playerWarrior) throw new Error("Player warrior not found for offer in payout test");
+    const playerWarriorId = playerWarrior.id;
     const initialGold = s.treasury;
 
     // Sign the first offer for the player

@@ -14,8 +14,8 @@ interface LegacyCandidate {
   fightingStyle?: import("@/types/shared.types").FightingStyle;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class SeasonalRetirementService {
+  private constructor() {}
   /**
    * Processes seasonal retirement for all rival stables.
    * Handles legacy founders (retired warriors becoming owners).
