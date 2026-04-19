@@ -4,7 +4,7 @@ import { execSync } from "child_process";
 import { runSimulation } from "./simulation-harness";
 
 const WEEKS_TO_SIMULATE = 1000;
-const CONSTANTS_FILE = path.join(process.cwd(), "src/engine/combat/combatConstants.ts");
+const CONSTANTS_FILE = path.join(process.cwd(), "src/engine/combat/mechanics/combatConstants.ts");
 const REPORT_FILE = path.join(process.cwd(), "Autobalance_Report.md");
 
 interface MetricStats {
@@ -171,7 +171,7 @@ async function main() {
     console.log(commitMessage);
 
     try {
-        execSync("git add src/engine/combat/combatConstants.ts src/data/economyConstants.ts Autobalance_Report.md || true");
+        execSync("git add src/engine/combat/mechanics/combatConstants.ts src/data/economyConstants.ts Autobalance_Report.md || true");
         execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
         console.log("Committed to git successfully.");
     } catch (e: any) {

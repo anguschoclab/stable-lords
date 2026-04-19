@@ -1,4 +1,4 @@
-  type GameState, 
+import { type GameState,
   type AnnualAward,
   type RivalStableData 
 } from "@/types/state.types";
