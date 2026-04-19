@@ -99,6 +99,7 @@ export function generateRecommendations(style: FightingStyle, carryCap: number):
     const weapon = bestItem(weapons, w => scoreWeapon(w, style, profile));
     const isTwoHanded = weapon.twoHanded ?? false;
     const armor = bestItem(armors, a => scoreArmor(a, profile));
+    const shield = isTwoHanded
       ? (shields.find(s => s.id === "none_shield") ?? shields[0])
       : bestItem(shields, s => scoreShield(s, profile));
     const helm = bestItem(helms, h => scoreHelm(h, profile));
