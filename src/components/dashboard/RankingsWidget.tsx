@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Trophy, ChevronRight, Star, Award, Target, TrendingUp, Zap } from "lucide-react";
+import { Trophy, ChevronRight, Star, Award, Target, TrendingUp, Zap, Shield } from "lucide-react";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { selectActiveWarriors } from "@/state/selectors";
 import { Surface } from "@/components/ui/Surface";
@@ -22,6 +22,43 @@ export function RankingsWidget() {
       .slice(0, 5),
     [state]
   );
+
+  // ── Player standings summary ──────────────────────────────────────────────
+  const playerStanding = useMemo(() => {
+    const realmRankings = state.realmRankings ?? {};
+    const playerWarriorIds = new Set((state.roster ?? []).map(w => w.id));
+    const totalRivals = (state.rivals ?? []).length;
+    const totalStables = totalRivals + 1; // rivals + player
+
+    // Find the player's highest-ranked warrior (lowest overallRank number)
+    let bestWarriorName: string | null = null;
+    let bestRank: number | null = null;
+
+    for (const [id, entry] of Object.entries(realmRankings)) {
+      if (!playerWarriorIds.has(id)) continue;
+      if (bestRank === null || entry.overallRank < bestRank) {
+        bestRank = entry.overallRank;
+        const warrior = (state.roster ?? []).find(w => w.id === id);
+        bestWarriorName = warrior?.name ?? null;
+      }
+    }
+
+    // Stable position: count rivals whose best warrior rank is better than player's best
+    let stablePosition = 1;
+    if (bestRank !== null) {
+      for (const rival of state.rivals ?? []) {
+        const rivalIds = new Set((rival.roster ?? []).map((w: { id: string }) => w.id));
+        let rivalBest: number | null = null;
+        for (const [id, entry] of Object.entries(realmRankings)) {
+          if (!rivalIds.has(id)) continue;
+          if (rivalBest === null || entry.overallRank < rivalBest) rivalBest = entry.overallRank;
+        }
+        if (rivalBest !== null && rivalBest < bestRank) stablePosition++;
+      }
+    }
+
+    return { bestWarriorName, bestRank, stablePosition, totalStables };
+  }, [state.realmRankings, state.roster, state.rivals]);
 
   return (
     <Surface variant="glass" padding="none" className="md:col-span-2 border-border/10 group overflow-hidden relative flex flex-col">
