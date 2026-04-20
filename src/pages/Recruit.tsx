@@ -22,6 +22,7 @@ import { revealRecruitPotential, type PotentialScoutReport } from "@/engine/recr
 import WarriorBuilder from "@/components/WarriorBuilder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { StatBadge } from "@/components/ui/WarriorBadges";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -373,25 +374,23 @@ export default function Recruit() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/" })} className="gap-1.5 text-muted-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Button>
-          <h1 className="text-xl font-display font-bold">Recruit Warriors</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="gap-1.5 font-mono">
-            <Users className="h-3 w-3" />
-            {roster.length}/{MAX_ROSTER}
-          </Badge>
-          <Badge variant="outline" className="gap-1.5 font-mono">
-            <Coins className="h-3 w-3 text-arena-gold" />
-            {treasury}g
-          </Badge>
-        </div>
-      </div>
+      <PageHeader
+        icon={UserPlus}
+        title="Recruit Warriors"
+        subtitle="STABLE · RECRUITMENT · CONTRACT MARKET"
+        actions={
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="gap-1.5 font-mono">
+              <Users className="h-3 w-3" />
+              {roster.length}/{MAX_ROSTER}
+            </Badge>
+            <Badge variant="outline" className="gap-1.5 font-mono">
+              <Coins className="h-3 w-3 text-arena-gold" />
+              {treasury}g
+            </Badge>
+          </div>
+        }
+      />
 
       {rosterFull && (
         <div className="rounded-none border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
