@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { useGameStore, useWorldState, type GameStore } from "@/state/useGameStore";
 import { useShallow } from 'zustand/react/shallow';
 import {
@@ -9,7 +9,7 @@ import {
 import type { Warrior } from "@/types/state.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Heart, Activity, Target, Zap } from "lucide-react";
+import { Dumbbell, Heart, Activity, Target, Zap, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { WarriorTrainingCard } from "@/components/training/WarriorTrainingCard";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -79,7 +79,7 @@ export default function Training() {
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
-      <PageHeader 
+      <PageHeader
         title="Training Grounds"
         subtitle="ACADEMY // REGIMEN_CONTROL // POTENTIAL_UNLEASHED"
         icon={Dumbbell}
@@ -96,10 +96,20 @@ export default function Training() {
                 <span>RECOV: {recoveryCount}</span>
               </div>
             </div>
+            <Link to="/command/tactics">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-[10px] font-black tracking-widest uppercase border-white/5 bg-white/5 hover:bg-white/10 flex items-center gap-1"
+              >
+                TRAINING_PLANNER
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+            </Link>
             {assignedCount > 0 && (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleClearAll}
                 className="h-8 text-[10px] font-black tracking-widest uppercase border-white/5 bg-white/5 hover:bg-white/10"
               >

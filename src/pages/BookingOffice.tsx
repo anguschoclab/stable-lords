@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useGameStore, useWorldState, type GameStore } from "@/state/useGameStore";
 import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -34,13 +36,13 @@ import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import type { Warrior, PromoterPersonality, BoutOffer } from "@/types/state.types";
 import type { InjuryData } from "@/types/warrior.types";
 
-/** Personality badge colors and icons */
-const PERSONALITY_CONFIG: Record<PromoterPersonality, { color: string; icon: React.ReactNode; desc: string }> = {
-  Greedy: { color: "bg-amber-500/20 text-amber-600 border-amber-500/30", icon: <DollarSign className="h-3 w-3" />, desc: "High purse, lower hype" },
-  Honorable: { color: "bg-blue-500/20 text-blue-600 border-blue-500/30", icon: <Award className="h-3 w-3" />, desc: "Fair matches, +10% hype" },
-  Sadistic: { color: "bg-red-500/20 text-red-600 border-red-500/30", icon: <AlertTriangle className="h-3 w-3" />, desc: "High-kill matchups" },
-  Flashy: { color: "bg-purple-500/20 text-purple-600 border-purple-500/30", icon: <Zap className="h-3 w-3" />, desc: "Fame-focused, +20% purse" },
-  Corporate: { color: "bg-slate-500/20 text-slate-600 border-slate-500/30", icon: <TrendingUp className="h-3 w-3" />, desc: "Stable tier matching" },
+/** Personality badge colors, icons, and tooltip text */
+const PERSONALITY_CONFIG: Record<PromoterPersonality, { color: string; icon: React.ReactNode; desc: string; tooltip: string }> = {
+  Greedy:    { color: "bg-amber-500/20 text-amber-600 border-amber-500/30",  icon: <DollarSign className="h-3 w-3" />,    desc: "+15% purse · −10% hype",          tooltip: "Greedy: +15% purse · −10% hype · prefers mismatches (best for money)" },
+  Honorable: { color: "bg-blue-500/20 text-blue-600 border-blue-500/30",    icon: <Award className="h-3 w-3" />,          desc: "+10% hype · parity fights",        tooltip: "Honorable: +10% hype · baseline purse · prefers tight skill parity <10% gap (best for fame)" },
+  Sadistic:  { color: "bg-red-500/20 text-red-600 border-red-500/30",       icon: <AlertTriangle className="h-3 w-3" />,  desc: "+20% hype & purse · high danger",  tooltip: "Sadistic: +20% hype & +20% purse on risky fights · seeks high-kill/injury matchups (high drama)" },
+  Flashy:    { color: "bg-purple-500/20 text-purple-600 border-purple-500/30", icon: <Zap className="h-3 w-3" />,         desc: "+15% hype · +20% purse (fame>75)",  tooltip: "Flashy: +15% hype · +20% purse for fame>75 · prefers famous warriors & showy styles (spectacle)" },
+  Corporate: { color: "bg-slate-500/20 text-slate-600 border-slate-500/30", icon: <TrendingUp className="h-3 w-3" />,    desc: "+5% purse · tier-matched bouts",   tooltip: "Corporate: +5% purse · tier-boundary matching · balanced steady income (least volatile)" },
 };
 
 /** Get fatigue status for display */
@@ -169,15 +171,33 @@ export default function BookingOffice() {
                 </span>
                 <Badge variant="outline" className="text-[9px] uppercase font-black border-white/10">{promoter?.tier}</Badge>
                 {personalityConfig && (
-                  <Badge variant="outline" className={cn("text-[9px] uppercase font-black", personalityConfig.color)}>
-                    <span className="flex items-center gap-1">
-                      {personalityConfig.icon} {personality}
-                    </span>
-                  </Badge>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge variant="outline" className={cn("text-[9px] uppercase font-black cursor-help", personalityConfig.color)}>
+                        <span className="flex items-center gap-1">
+                          {personalityConfig.icon} {personality}
+                        </span>
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs text-[11px] font-semibold">
+                      {personalityConfig.tooltip}
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
-              <div className="text-[10px] font-black uppercase opacity-40 tracking-widest truncate">
-                {personalityConfig?.desc}
+              <div className="flex items-center gap-3">
+                <div className="text-[10px] font-black uppercase opacity-40 tracking-widest truncate">
+                  {personalityConfig?.desc}
+                </div>
+                {promoter && (
+                  <Link
+                    to="/ops/promoter/$id"
+                    params={{ id: promoter.id }}
+                    className="text-[9px] font-black uppercase tracking-widest text-primary/50 hover:text-primary transition-colors whitespace-nowrap ml-auto"
+                  >
+                    View Profile →
+                  </Link>
+                )}
               </div>
             </div>
             <div className="text-right pl-4">
@@ -269,6 +289,7 @@ export default function BookingOffice() {
   };
 
   return (
+    <TooltipProvider delayDuration={300}>
     <div className="space-y-8 pb-20 max-w-7xl mx-auto">
       <PageHeader
         icon={Briefcase}
@@ -376,5 +397,6 @@ export default function BookingOffice() {
         </div>
       </div>
     </div>
+    </TooltipProvider>
   );
 }

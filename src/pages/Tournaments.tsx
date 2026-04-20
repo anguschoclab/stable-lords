@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
-import { Trophy, Play, UserPlus, FastForward, Settings2 } from "lucide-react";
+import { Trophy, Play, UserPlus, FastForward, Settings2, Zap, AlertTriangle, Medal } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import { engineProxy } from "@/engine/workerProxy";
 import { Link } from "@tanstack/react-router";
@@ -42,6 +42,20 @@ const SEASON_ICONS: Record<string, string> = {
   Fall: "🍂",
   Winter: "❄️",
 };
+
+const TIER_PRIZES: Record<string, { first: number; second: number; third: number }> = {
+  Gold:   { first: 5000, second: 2500, third: 1200 },
+  Silver: { first: 2500, second: 1250, third: 600  },
+  Bronze: { first: 1200, second: 600,  third: 300  },
+  Iron:   { first: 600,  second: 300,  third: 150  },
+};
+
+function getFatigueLabel(fatigue: number | undefined): { label: string; color: string } {
+  const f = fatigue ?? 0;
+  if (f < 30) return { label: "Fresh",     color: "text-emerald-400" };
+  if (f < 60) return { label: "Tired",     color: "text-yellow-400" };
+  return        { label: "Exhausted",  color: "text-red-400"    };
+}
 
 export default function Tournaments() {
   const {
@@ -72,6 +86,14 @@ export default function Tournaments() {
   );
 
   const activeWarriors = useMemo(() => roster.filter((w) => w.status === "Active"), [roster]);
+
+  // Warriors belonging to the player that are in the active tournament
+  const playerWarriorsInTournament = useMemo(() => {
+    if (!currentTournament || !player) return [];
+    return currentTournament.participants.filter(
+      (w) => w.stableId === player.id
+    );
+  }, [currentTournament, player]);
 
   const pastTournaments = useMemo(
     () => tournaments.filter((t) => t.completed).reverse(),
@@ -141,9 +163,66 @@ export default function Tournaments() {
         }
       />
 
+      {/* ── Pre-tournament readiness banner ── */}
+      {currentTournament && playerWarriorsInTournament.length > 0 && (
+        <div className="rounded-lg border border-border/20 bg-secondary/10 px-5 py-4 space-y-3">
+          {/* Header row */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+              <Zap className="h-3.5 w-3.5 text-primary" />
+              OPERATIVE_READINESS
+            </div>
+            {/* Prizes pill */}
+            {(() => {
+              const prizes = TIER_PRIZES[currentTournament.tierId];
+              if (!prizes) return null;
+              return (
+                <div className="flex items-center gap-1.5 rounded-full border border-accent/25 bg-accent/5 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-accent">
+                  <Medal className="h-3 w-3" />
+                  <span>{prizes.first.toLocaleString()}g</span>
+                  <span className="opacity-40">/</span>
+                  <span className="opacity-70">{prizes.second.toLocaleString()}g</span>
+                  <span className="opacity-40">/</span>
+                  <span className="opacity-50">{prizes.third.toLocaleString()}g</span>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Per-warrior rows */}
+          <div className="flex flex-wrap gap-2">
+            {playerWarriorsInTournament.map((w) => {
+              const { label: fatigueLabel, color: fatigueColor } = getFatigueLabel(w.fatigue);
+              const hasInjuries = w.injuries && w.injuries.length > 0;
+              return (
+                <div
+                  key={w.id}
+                  className="flex items-center gap-2 rounded border border-border/15 bg-background/30 px-3 py-1.5 text-[11px]"
+                >
+                  <span className="font-semibold text-foreground/90 truncate max-w-[120px]">{w.name}</span>
+                  <span className={`font-black uppercase text-[9px] tracking-widest ${fatigueColor}`}>
+                    {fatigueLabel}
+                  </span>
+                  {hasInjuries && (
+                    <div className="flex items-center gap-1 text-red-400">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span className="text-[9px] font-black uppercase tracking-widest">
+                        {w.injuries.length === 1
+                          ? w.injuries[0].severity
+                          : `${w.injuries.length} INJURIES`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {currentTournament && (
-        <Surface 
-          variant="gold" 
+        <Surface
+          variant="gold"
           padding="none" className="border-accent/40 shadow-[0_0_50px_-10px_hsla(var(--accent),0.2)] overflow-hidden">
           <div className="pb-4 bg-accent/5 border-b border-border/10 p-6">
             <div className="font-display text-xl font-black flex items-center justify-between text-accent uppercase tracking-tighter">

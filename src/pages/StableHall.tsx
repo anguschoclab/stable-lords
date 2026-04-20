@@ -91,18 +91,17 @@ export default function StableHall() {
         </div>
       </div>
 
-      {pendingTokens > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 px-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400">PATRONAGE_AWARDS</span>
-            <Badge className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-[9px] font-black">
-              {pendingTokens} TOKEN{pendingTokens !== 1 ? "S" : ""} PENDING
-            </Badge>
-            <div className="h-px flex-1 bg-gradient-to-r from-yellow-400/20 via-border/20 to-transparent" />
-          </div>
-          <InsightManager />
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 px-1">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400">PATRONAGE_AWARDS</span>
+          {pendingTokens > 0
+            ? <Badge className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-[9px] font-black">{pendingTokens} TOKEN{pendingTokens !== 1 ? "S" : ""} PENDING</Badge>
+            : <Badge className="bg-white/5 text-muted-foreground border border-white/10 text-[9px] font-black">Place in tournaments to earn tokens</Badge>
+          }
+          <div className="h-px flex-1 bg-gradient-to-r from-yellow-400/20 via-border/20 to-transparent" />
         </div>
-      )}
+        <InsightManager />
+      </div>
     </div>
   );
 }

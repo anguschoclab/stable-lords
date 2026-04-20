@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Swords, Star, AlertTriangle, Lightbulb, Shirt, HardHat, Zap, Package } from "lucide-react";
+import { Shield, Swords, Star, AlertTriangle, Lightbulb, Shirt, HardHat, Zap, Package, HelpCircle } from "lucide-react";
 import { checkWeaponRequirements } from "@/data/equipment";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -15,6 +15,7 @@ import { Surface } from "@/components/ui/Surface";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Activity } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function StableEquipment() {
   const { roster, updateWarriorEquipment } = useGameStore();
@@ -186,16 +187,30 @@ export default function StableEquipment() {
 
                     <div className="space-y-2 pt-6 mt-auto">
                       <div className="flex justify-between text-[9px] font-black uppercase tracking-[0.3em] mb-1">
-                        <span className="text-muted-foreground/40 italic">System Encumbrance</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="flex items-center gap-1 text-muted-foreground/40 italic cursor-help">
+                                System Encumbrance
+                                <HelpCircle className="h-2.5 w-2.5 text-muted-foreground/30 shrink-0" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-[240px] text-[10px] leading-relaxed space-y-1.5 p-3">
+                              <p className="font-black uppercase tracking-wider text-foreground">Encumbrance</p>
+                              <p className="text-muted-foreground">Total weight of all equipped gear (weapon + armor + shield + helm). Exceeding a warrior's carry threshold reduces Speed (SP) and increases fatigue per bout.</p>
+                              <p className="text-muted-foreground">High-ST warriors tolerate heavier loads. Recommended: keep under {carryCap} units for balanced fighters.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         <span className={cn("font-mono font-black", rec.totalWeight > carryCap ? "text-destructive" : "text-primary")}>
                           {rec.totalWeight} / {carryCap}_UNIT
                         </span>
                       </div>
                       <div className="h-1 bg-white/5 overflow-hidden">
-                        <motion.div 
+                        <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${Math.min(100, (rec.totalWeight / carryCap) * 100)}%` }}
-                          className={cn("h-full", rec.totalWeight > carryCap ? "bg-destructive shadow-[0_0_10px_rgba(var(--destructive),0.5)]" : "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]")} 
+                          className={cn("h-full", rec.totalWeight > carryCap ? "bg-destructive shadow-[0_0_10px_rgba(var(--destructive),0.5)]" : "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]")}
                         />
                       </div>
                     </div>
