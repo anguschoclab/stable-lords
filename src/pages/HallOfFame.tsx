@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Crown, Star, Shield, Flame, Trophy, Users } from "lucide-react";
 import { InducteeCard } from "./HallOfFame/InducteeCard";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { motion } from "framer-motion";
 
 export default function HallOfFame() {
@@ -63,6 +64,11 @@ export default function HallOfFame() {
 
   return (
     <div className="space-y-8">
+      <PageHeader
+        icon={Crown}
+        title="Hall of Fame"
+        subtitle={`IMPERIAL · LEGENDS · YEAR ${currentYear}`}
+      />
       {/* Masthead */}
       <div className="text-center space-y-4 py-8 relative overflow-hidden bg-glass-card rounded-none border border-border/40">
         <div className="absolute inset-0 bg-gradient-to-b from-arena-gold/5 to-transparent pointer-events-none" />

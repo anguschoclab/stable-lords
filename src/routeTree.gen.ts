@@ -47,6 +47,7 @@ import { Route as CommandTrainingRouteImport } from './routes/command/training'
 import { Route as CommandTacticsRouteImport } from './routes/command/tactics'
 import { Route as CommandRosterRouteImport } from './routes/command/roster'
 import { Route as CommandCombatRouteImport } from './routes/command/combat'
+import { Route as CommandArenaRouteImport } from './routes/command/arena'
 import { Route as WorldStableIdRouteImport } from './routes/world/stable/$id'
 import { Route as OpsPromoterIdRouteImport } from './routes/ops/promoter.$id'
 
@@ -237,6 +238,11 @@ const CommandCombatRoute = CommandCombatRouteImport.update({
   path: '/command/combat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommandArenaRoute = CommandArenaRouteImport.update({
+  id: '/command/arena',
+  path: '/command/arena',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorldStableIdRoute = WorldStableIdRouteImport.update({
   id: '/world/stable/$id',
   path: '/world/stable/$id',
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/run-round': typeof RunRoundRoute
   '/welcome': typeof WelcomeRoute
   '/command': typeof Command_rootRoute
+  '/command/arena': typeof CommandArenaRoute
   '/command/combat': typeof CommandCombatRoute
   '/command/roster': typeof CommandRosterRoute
   '/command/tactics': typeof CommandTacticsRoute
@@ -298,6 +305,7 @@ export interface FileRoutesByTo {
   '/run-round': typeof RunRoundRoute
   '/welcome': typeof WelcomeRoute
   '/command': typeof CommandIndexRoute
+  '/command/arena': typeof CommandArenaRoute
   '/command/combat': typeof CommandCombatRoute
   '/command/roster': typeof CommandRosterRoute
   '/command/tactics': typeof CommandTacticsRoute
@@ -338,6 +346,7 @@ export interface FileRoutesById {
   '/run-round': typeof RunRoundRoute
   '/welcome': typeof WelcomeRoute
   '/command/__root': typeof Command_rootRoute
+  '/command/arena': typeof CommandArenaRoute
   '/command/combat': typeof CommandCombatRoute
   '/command/roster': typeof CommandRosterRoute
   '/command/tactics': typeof CommandTacticsRoute
@@ -382,6 +391,7 @@ export interface FileRouteTypes {
     | '/run-round'
     | '/welcome'
     | '/command'
+    | '/command/arena'
     | '/command/combat'
     | '/command/roster'
     | '/command/tactics'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/run-round'
     | '/welcome'
     | '/command'
+    | '/command/arena'
     | '/command/combat'
     | '/command/roster'
     | '/command/tactics'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/run-round'
     | '/welcome'
     | '/command/__root'
+    | '/command/arena'
     | '/command/combat'
     | '/command/roster'
     | '/command/tactics'
@@ -506,6 +518,7 @@ export interface RootRouteChildren {
   RunRoundRoute: typeof RunRoundRoute
   WelcomeRoute: typeof WelcomeRoute
   Command_rootRoute: typeof Command_rootRoute
+  CommandArenaRoute: typeof CommandArenaRoute
   CommandCombatRoute: typeof CommandCombatRoute
   CommandRosterRoute: typeof CommandRosterRoute
   CommandTacticsRoute: typeof CommandTacticsRoute
@@ -809,6 +822,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandCombatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/command/arena': {
+      id: '/command/arena'
+      path: '/command/arena'
+      fullPath: '/command/arena'
+      preLoaderRoute: typeof CommandArenaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/world/stable/$id': {
       id: '/world/stable/$id'
       path: '/world/stable/$id'
@@ -834,6 +854,7 @@ const rootRouteChildren: RootRouteChildren = {
   RunRoundRoute: RunRoundRoute,
   WelcomeRoute: WelcomeRoute,
   Command_rootRoute: Command_rootRoute,
+  CommandArenaRoute: CommandArenaRoute,
   CommandCombatRoute: CommandCombatRoute,
   CommandRosterRoute: CommandRosterRoute,
   CommandTacticsRoute: CommandTacticsRoute,

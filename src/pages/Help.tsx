@@ -2,16 +2,17 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { BookOpen } from "lucide-react";
 
 export default function Help() {
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Help & Strategy Guide</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Master the arena with these tips.
-        </p>
-      </div>
+      <PageHeader
+        icon={BookOpen}
+        title="Codex · Help"
+        subtitle="IMPERIAL · KNOWLEDGE · STRATEGY COMPENDIUM"
+      />
 
       <Accordion type="multiple" defaultValue={["strategy", "styles", "attributes", "equipment", "trainers", "combat", "moods"]}>
         <AccordionItem value="strategy">

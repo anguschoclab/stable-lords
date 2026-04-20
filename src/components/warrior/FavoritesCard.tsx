@@ -6,7 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getFavoritesDisplay, applyInsightToken } from "@/engine/favorites";
+import { getFavoritesDisplay } from "@/components/warrior/favoritesDisplay";
+import { applyInsightToken } from "@/engine/favorites";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { WarriorTrainingCard } from "@/components/training/WarriorTrainingCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
+import { StyleMeterTable } from "@/components/charts/StyleMeterTable";
 
 export default function Training() {
   const state = useWorldState();
@@ -107,7 +108,11 @@ export default function Training() {
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12 items-start">
+        <div className="lg:col-span-1">
+          <StyleMeterTable />
+        </div>
+        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
          <Surface variant="glass" className="p-6 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-primary">
               <Zap className="h-4 w-4" />
@@ -132,6 +137,7 @@ export default function Training() {
             <div className="text-3xl font-display font-black tracking-tighter">{state.roster.length - assignedCount}</div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Idle personnel available</div>
          </Surface>
+        </div>
       </div>
 
       {state.roster.length === 0 ? (

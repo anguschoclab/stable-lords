@@ -14,14 +14,14 @@ export default function Offseason() {
     <div className="space-y-8 max-w-7xl mx-auto">
       <PageHeader
         title="Offseason"
-        subtitle="Reflect on the year. Reload for the next."
+        subtitle="YEAR-END · RETROSPECTIVE · SEASON TRANSITION"
         icon={CalendarDays}
       />
 
       <YearEndRecap />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t border-white/5">
-        <Link to="/recruit">
+        <Link to="/stable/recruit">
           <Surface variant="glass" className="px-5 py-4 border-border/30 hover:border-primary/50 transition-all flex items-center gap-3">
             <UserPlus className="h-5 w-5 text-primary" />
             <div>
@@ -30,7 +30,7 @@ export default function Offseason() {
             </div>
           </Surface>
         </Link>
-        <Link to="/trainers">
+        <Link to="/ops/personnel">
           <Surface variant="glass" className="px-5 py-4 border-border/30 hover:border-primary/50 transition-all flex items-center gap-3">
             <GraduationCap className="h-5 w-5 text-arena-gold" />
             <div>
@@ -39,7 +39,7 @@ export default function Offseason() {
             </div>
           </Surface>
         </Link>
-        <Link to="/ledger">
+        <Link to="/ops/finance">
           <Surface variant="glass" className="px-5 py-4 border-border/30 hover:border-primary/50 transition-all flex items-center gap-3">
             <BookOpen className="h-5 w-5 text-muted-foreground" />
             <div>

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Swords, Users, Globe,
-  LayoutDashboard, BookUser, Dumbbell, Target, Cpu,
+  LayoutDashboard, BookUser, Dumbbell, Target, Cpu, Flame,
   Wrench, Coins, ScrollText, Building2, Sunset,
   Trophy, Radar, Newspaper, FileText,
   ChevronRight,
@@ -33,6 +33,7 @@ const HUBS = [
       { to: "/command/roster",   label: "Roster",        icon: BookUser },
       { to: "/command/training", label: "Training",      icon: Dumbbell },
       { to: "/command/tactics",  label: "Tactics",       icon: Target },
+      { to: "/command/arena",    label: "Arena",         icon: Flame },
       { to: "/command/combat",   label: "Combat",        icon: Cpu },
     ],
   },

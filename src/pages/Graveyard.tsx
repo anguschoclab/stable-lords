@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skull, Armchair, Zap, Crosshair, Swords, Trophy, Shield, Activity } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Link } from "@tanstack/react-router";
 import { WarriorLink } from "@/components/EntityLink";
 import { cn } from "@/lib/utils";
@@ -22,31 +23,24 @@ export default function Graveyard() {
 
   return (
     <div className="space-y-8 pb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-border/20 pb-6 gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-destructive/20 bg-destructive/5 text-destructive">
-               ARCHIVAL_RECORDS_ONLINE
-            </Badge>
-          </div>
-          <h1 className="text-4xl font-display font-black tracking-tighter uppercase flex items-center gap-4">
-            <Skull className="w-10 h-10 text-destructive shadow-[0_0_15px_rgba(var(--destructive-rgb),0.5)]" />
-            The Graveyard
-          </h1>
-          <p className="text-muted-foreground mt-2 text-sm font-bold uppercase tracking-widest opacity-60">"In the end, we all become dust on the arena floor."</p>
-        </div>
-        <div className="flex items-center gap-4 text-right">
-           <div className="flex flex-col">
+      <PageHeader
+        icon={Skull}
+        title="The Graveyard"
+        subtitle="IMPERIAL · FALLEN · MEMORIAL ARCHIVE"
+        actions={
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end">
               <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">WORLD_FALLEN</span>
               <span className="text-2xl font-mono font-black text-destructive">{worldFallen.length}</span>
-           </div>
-           <Separator orientation="vertical" className="h-10 bg-border/20" />
-           <div className="flex flex-col">
+            </div>
+            <Separator orientation="vertical" className="h-10 bg-border/20" />
+            <div className="flex flex-col items-end">
               <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">STABLE_MEMORIAL</span>
               <span className="text-2xl font-mono font-black text-primary">{myFallen.length}</span>
-           </div>
-        </div>
-      </div>
+            </div>
+          </div>
+        }
+      />
 
       <Tabs defaultValue="memorial" className="w-full">
         <TabsList className="bg-secondary/20 p-1 rounded-none h-12">

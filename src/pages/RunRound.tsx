@@ -13,6 +13,7 @@ import { runAutosim, type AutosimResult } from "@/engine/autosim";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Swords, Zap, Skull, Shield, FastForward, Trophy, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useShallow } from 'zustand/react/shallow';
@@ -97,29 +98,33 @@ export default function RunRound() {
 
   return (
     <div className="space-y-6 pb-20 max-w-5xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-           <h1 className="text-xl sm:text-3xl font-display font-black flex items-center gap-3 uppercase tracking-tighter text-foreground">
-            <div className="p-2 bg-primary/10 rounded-none border border-primary/20">
-              <Swords className="h-6 w-6 text-primary" />
+      <PageHeader
+        icon={Swords}
+        title="Engagement Console"
+        subtitle={`WEEK ${state.week} · ${state.season} · ${state.crowdMood} CROWD`}
+        actions={
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+              <span className="flex items-center gap-1.5">
+                <Heart className="h-3 w-3 text-primary" />{fightReady.length} READY
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Trophy className="h-3 w-3 text-arena-gold" />{matchCard.length} PAIRED
+              </span>
             </div>
-            Engagement Console
-          </h1>
-          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-60">
-            Current Temporal Sync: Week {state.week} // Mood: {state.crowdMood}
-          </p>
-        </div>
-
-        {!autosimming && !autosimResult && results.length === 0 && (
-          <Button 
-            onClick={handleExecuteCycle} 
-            disabled={running || (matchCard.length === 0 && fightReady.length < 2)}
-            className="h-12 px-8 gap-3 font-black uppercase text-[11px] tracking-[0.2em] shadow-lg data-[running=true]:animate-pulse"
-          >
-            <Zap className="h-4 w-4 fill-current" /> {state.isTournamentWeek ? `EXECUTE_DAY_${state.day + 1}_CYCLE` : `EXECUTE_WEEK_${state.week}_CYCLE`}
-          </Button>
-        )}
-      </div>
+            {!autosimming && !autosimResult && results.length === 0 && (
+              <Button
+                onClick={handleExecuteCycle}
+                disabled={running || (matchCard.length === 0 && fightReady.length < 2)}
+                className="h-9 px-6 gap-2 font-black uppercase text-[11px] tracking-[0.2em]"
+              >
+                <Zap className="h-3.5 w-3.5 fill-current" />
+                {state.isTournamentWeek ? `EXECUTE DAY ${state.day + 1} ›` : `EXECUTE WEEK ${state.week} ›`}
+              </Button>
+            )}
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

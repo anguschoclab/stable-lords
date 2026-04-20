@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { ScoutIntelTab } from "@/components/scouting/ScoutIntelTab";
 import { StableComparison } from "@/components/scouting/StableComparison";
 import { WarriorComparison } from "@/components/scouting/WarriorComparison";
+import { ReputationQuadrant } from "@/components/charts/ReputationQuadrant";
 
 export default function Scouting() {
   const { treasury, week, rivals, scoutReports, roster, setState } = useGameStore();
@@ -142,7 +143,12 @@ export default function Scouting() {
         </TabsContent>
 
         <TabsContent value="compare" className="mt-6">
-          <StableComparison rivals={rivals} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <StableComparison rivals={rivals} />
+            </div>
+            <ReputationQuadrant />
+          </div>
         </TabsContent>
 
         <TabsContent value="warriors" className="mt-6">

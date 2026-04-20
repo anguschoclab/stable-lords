@@ -16,6 +16,7 @@ import { getFightsForTournament } from "@/engine/core/historyUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Trophy, Play, UserPlus, FastForward, Settings2 } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import { engineProxy } from "@/engine/workerProxy";
@@ -122,29 +123,22 @@ export default function Tournaments() {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-           <h1 className="text-xl sm:text-3xl font-display font-black flex items-center gap-3 uppercase tracking-tighter text-foreground">
-            <div className="p-2 bg-accent/10 rounded-none border border-accent/20">
-              <Trophy className="h-6 w-6 text-accent shadow-glow" />
-            </div>
-            Seasonal Campaigns
-           </h1>
-          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-60">
-            Legendary tournaments for glory and absolute roster expansion
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-2">
+      <PageHeader
+        icon={Trophy}
+        title="Seasonal Campaigns"
+        subtitle={`IMPERIAL · TOURNAMENTS · ${season.toUpperCase()} SEASON`}
+        actions={
+          <div className="flex items-center gap-2">
           {!currentTournament && activeWarriors.length < 2 && (
              <Link to="/ops/personnel">
-              <Button variant="outline" className="h-11 font-black uppercase text-[10px] tracking-widest gap-2">
+              <Button variant="outline" className="h-9 font-black uppercase text-[10px] tracking-widest gap-2">
                 <UserPlus className="h-4 w-4" /> RECRUIT_OPERATIVES
               </Button>
             </Link>
           )}
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {currentTournament && (
         <Card className="border-accent/40 shadow-[0_0_30px_-10px_hsla(var(--accent),0.3)] bg-glass-card overflow-hidden">

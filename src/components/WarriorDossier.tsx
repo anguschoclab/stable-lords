@@ -14,7 +14,7 @@ import { StatBadge } from "@/components/ui/WarriorBadges";
 import WarriorPaperDoll from "@/components/WarriorPaperDoll";
 import { StatBattery } from "@/components/ui/StatBattery";
 import { cn } from "@/lib/utils";
-import { getFavoritesDisplay } from "@/engine/favorites";
+import { getFavoritesDisplay } from "@/components/warrior/favoritesDisplay";
 
 interface WarriorDossierProps {
   warriorId: string;

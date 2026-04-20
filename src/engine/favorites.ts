@@ -174,30 +174,3 @@ export function applyInsightToken(
   }
 }
 
-/** Get display info for warrior's favorites (respects discovery state) */
-export function getFavoritesDisplay(warrior: Warrior): {
-  weapon: string | null;
-  weaponHint: string | null;
-  rhythm: string | null;
-  rhythmHint: string | null;
-} {
-  const fav = warrior.favorites;
-  if (!fav) return { weapon: null, weaponHint: null, rhythm: null, rhythmHint: null };
-
-  const weaponItem = WEAPONS.find(w => w.id === fav.weaponId);
-
-  return {
-    weapon: fav.discovered.weapon ? (weaponItem?.name ?? fav.weaponId) : null,
-    weaponHint: !fav.discovered.weapon && fav.discovered.weaponHints > 0
-      ? fav.discovered.weaponHints >= 2
-        ? `Prefers ${(weaponItem?.weight ?? 3) <= 2 ? "light" : (weaponItem?.weight ?? 3) <= 4 ? "medium" : "heavy"} weapons`
-        : "Developing preference..."
-      : null,
-    rhythm: fav.discovered.rhythm ? `OE ${fav.rhythm.oe} / AL ${fav.rhythm.al}` : null,
-    rhythmHint: !fav.discovered.rhythm && fav.discovered.rhythmHints > 0
-      ? fav.discovered.rhythmHints >= 2
-        ? `Favors ${fav.rhythm.oe <= 4 ? "conservative" : fav.rhythm.oe >= 7 ? "aggressive" : "moderate"} offense`
-        : "Developing rhythm..."
-      : null,
-  };
-}
