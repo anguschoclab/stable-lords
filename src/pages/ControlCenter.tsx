@@ -437,7 +437,7 @@ function ReputationTab() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {dims.map(({ key, label, color, icon: Icon, desc }) => {
+      {dims.map(({ key, label, color, icon: Icon, desc, effect }) => {
         const val = rep[key] as number;
         return (
           <Surface key={key} variant="glass" className="p-5 flex flex-col gap-3">
@@ -456,6 +456,7 @@ function ReputationTab() {
               />
             </div>
             <p className="text-[9px] text-muted-foreground/40 leading-relaxed">{desc}</p>
+            <p className="text-[9px] text-muted-foreground/55 italic leading-relaxed">{effect}</p>
           </Surface>
         );
       })}
@@ -509,6 +510,9 @@ export default function ControlCenter() {
 
       {/* KPI bar */}
       <KpiBar />
+
+      {/* Rankings bar */}
+      <RankingsBar />
 
       {/* Tab nav */}
       <div className="flex items-center gap-1 border-b border-white/5 pb-0">
