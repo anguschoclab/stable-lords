@@ -29,7 +29,7 @@ export function RosterWall() {
   );
 
   return (
-    <Surface variant="glass" padding="none" className="border-border/10 overflow-hidden relative shadow-2xl">
+    <Surface variant="glass" padding="none" className="border-border/10 relative shadow-2xl">
       <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary/40 via-arena-gold/40 to-primary/40 opacity-30" />
       
       <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-neutral-900/40 backdrop-blur-md">
@@ -95,7 +95,7 @@ export function RosterWall() {
                       <Surface 
                         variant="paper" 
                         padding="none" 
-                        className="flex flex-col md:flex-row items-stretch border border-white/5 bg-neutral-900/60 transition-all duration-500 overflow-hidden group-hover:border-primary/40 group-hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.1)]"
+                        className="flex flex-col md:flex-row items-stretch border border-white/5 bg-neutral-900/60 transition-all duration-500 group-hover:border-primary/40 group-hover:shadow-[0_0_30px_rgba(var(--primary-rgb),0.1)]"
                       >
                          {/* Ranking Vertical Strip */}
                         <div className={cn(

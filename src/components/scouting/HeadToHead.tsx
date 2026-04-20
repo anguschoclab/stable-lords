@@ -73,21 +73,21 @@ export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) 
         {h2hLength === 0 ? (
           <div className="py-12 text-center flex flex-col items-center gap-4 opacity-20">
              <Swords className="h-10 w-10 text-muted-foreground" />
-             <p className="text-[10px] font-black uppercase tracking-widest">No_Historical_Matchups_Detected</p>
+             <p className="text-[10px] font-black uppercase tracking-widest">No Historical Matchups Detected</p>
           </div>
         ) : (
           <>
             <div className="space-y-4">
               <div className="flex items-center justify-between font-display">
                 <div className="text-left">
-                   <div className="text-[8px] font-black uppercase tracking-[0.3em] text-primary mb-1">Asset_Alpha</div>
+                   <div className="text-[8px] font-black uppercase tracking-[0.3em] text-primary mb-1">Asset Alpha</div>
                    <div className="text-lg font-black text-foreground leading-none">{winsA}W</div>
                 </div>
                 <div className="text-center opacity-20">
                    <Zap className="h-4 w-4 text-arena-gold" />
                 </div>
                 <div className="text-right">
-                   <div className="text-[8px] font-black uppercase tracking-[0.3em] text-accent mb-1">Asset_Beta</div>
+                   <div className="text-[8px] font-black uppercase tracking-[0.3em] text-accent mb-1">Asset Beta</div>
                    <div className="text-lg font-black text-foreground leading-none">{winsB}W</div>
                 </div>
               </div>

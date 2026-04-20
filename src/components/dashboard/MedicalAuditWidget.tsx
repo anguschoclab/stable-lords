@@ -37,13 +37,13 @@ export function MedicalAuditWidget() {
                <ShieldAlert className={cn("h-5 w-5 text-destructive", criticalCount > 0 && "animate-pulse")} />
             </div>
             <div>
-               <h3 className="font-display text-base font-black uppercase tracking-tight">Biological_Audit</h3>
-               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Nodal_Integrity_Monitor</p>
+               <h3 className="font-display text-base font-black uppercase tracking-tight">Biological Audit</h3>
+               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Nodal Integrity Monitor</p>
             </div>
          </div>
          {criticalCount > 0 && (
            <Badge variant="destructive" className="text-[8px] font-mono font-black h-5 px-2 animate-bounce">
-             CRITICAL_VAR
+             CRITICAL
            </Badge>
          )}
       </div>
@@ -52,7 +52,7 @@ export function MedicalAuditWidget() {
         {atRisk.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 opacity-20 group-hover:opacity-30 transition-opacity">
              <Activity className="h-12 w-12 mb-4" />
-             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-center italic">Roster_Integrity_Nominal</p>
+             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-center italic">Roster Integrity Nominal</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -67,7 +67,7 @@ export function MedicalAuditWidget() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex flex-col">
                        <WarriorLink name={w.name} id={w.id} className="text-xs font-black uppercase tracking-tight text-foreground/80 hover:text-primary transition-colors" />
-                       <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 mt-0.5">Operative_ID: {w.id.slice(0, 8)}</span>
+                       <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 mt-0.5">Operative ID: {w.id.slice(0, 8)}</span>
                     </div>
                     <div className="flex items-center gap-3">
                        {isInjured && (
@@ -76,7 +76,7 @@ export function MedicalAuditWidget() {
                                 <Skull className="h-3.5 w-3.5 text-destructive animate-pulse cursor-help" />
                              </TooltipTrigger>
                              <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black tracking-widest text-destructive">
-                               TRAUMATIC_TISSUE_FAILURE
+                               TRAUMATIC TISSUE FAILURE
                              </TooltipContent>
                           </Tooltip>
                        )}
@@ -110,7 +110,7 @@ export function MedicalAuditWidget() {
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
          <div className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 flex items-center gap-2">
-            Stable_Biometrics_Active <Activity className="h-3 w-3 text-destructive" />
+            Stable Biometrics Active <Activity className="h-3 w-3 text-destructive" />
          </div>
       </div>
     </Surface>

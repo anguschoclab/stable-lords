@@ -35,20 +35,20 @@ export function LethalityBadge({ wA, wB, crowdMood }: LethalityBadgeProps) {
   if (score >= 4) {
     return (
       <Badge variant="outline" className="border-destructive/50 text-destructive bg-destructive/5 gap-1.5 font-black uppercase text-[9px] tracking-widest px-2.5">
-        <Shield className="h-3 w-3" /> HIGH_LETHALITY_RISK
+        <Shield className="h-3 w-3" /> High Lethality Risk
       </Badge>
     );
   }
   if (score >= 2) {
     return (
       <Badge variant="outline" className="border-amber-500/50 text-amber-500 bg-amber-500/5 gap-1.5 font-black uppercase text-[9px] tracking-widest px-2.5">
-        <Shield className="h-3 w-3" /> MODERATE_DANGER
+        <Shield className="h-3 w-3" /> Moderate Danger
       </Badge>
     );
   }
   return (
     <Badge variant="outline" className="border-border/40 text-muted-foreground/60 gap-1.5 font-black uppercase text-[9px] tracking-widest px-2.5">
-      <Shield className="h-3 w-3" /> STANDARD_BOUT
+      <Shield className="h-3 w-3" /> Standard Bout
     </Badge>
   );
 }

@@ -255,7 +255,7 @@ export function ChampionDisplay({ championName, championId, tournamentName }: Ch
         <div className="flex flex-col items-center gap-4">
           <Crown className="h-16 w-16 text-arena-gold animate-bounce" />
           <div className="space-y-2">
-            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">Tournament_Supreme_Champion</p>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">Tournament Supreme Champion</p>
             <h3 className="text-4xl font-display font-black uppercase tracking-tighter text-foreground mt-2">{displayName}</h3>
             <div className="flex items-center justify-center gap-2">
                <div className="h-px w-8 bg-white/5" />
@@ -287,7 +287,7 @@ export function BronzeHighlight({ thirdPlaceName, thirdPlaceId }: BronzeHighligh
         <div className="flex items-center justify-center gap-4">
           <Medal className="h-6 w-6 text-amber-600" />
           <div className="text-left">
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-black">Third_Place_Medalist</p>
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-black">Third Place Medalist</p>
             <p className="text-lg font-display font-black text-amber-700 uppercase tracking-tight leading-none mt-1">{displayName}</p>
           </div>
         </div>

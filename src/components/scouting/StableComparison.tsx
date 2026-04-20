@@ -34,7 +34,7 @@ function StableSelector({
       <div className="space-y-4">
         <div className="flex items-center gap-3 px-2">
            <div className="p-1 px-2 rounded-none bg-primary/10 border border-primary/20">
-              <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Asset_Alpha</span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Asset Alpha</span>
            </div>
            <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
         </div>
@@ -72,7 +72,7 @@ function StableSelector({
                   </div>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="left" className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ASSIGN_ASSET_ALPHA</TooltipContent>
+              <TooltipContent side="left" className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ASSIGN ALPHA</TooltipContent>
             </Tooltip>
           ))}
         </div>
@@ -82,7 +82,7 @@ function StableSelector({
         <div className="flex items-center gap-3 px-2 text-right">
            <div className="h-px flex-1 bg-gradient-to-l from-accent/20 via-border/20 to-transparent" />
            <div className="p-1 px-2 rounded-none bg-accent/10 border border-accent/20">
-              <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em]">Asset_Beta</span>
+              <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em]">Asset Beta</span>
            </div>
         </div>
         <div className="grid grid-cols-1 gap-1.5 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
@@ -119,7 +119,7 @@ function StableSelector({
                   </div>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ASSIGN_ASSET_BETA</TooltipContent>
+              <TooltipContent side="right" className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ASSIGN BETA</TooltipContent>
             </Tooltip>
           ))}
         </div>
@@ -265,7 +265,7 @@ export function StableComparison({ rivals }: StableComparisonProps) {
                     )}>
                       {w ? (
                         <>
-                          <div className={cn("text-[8px] font-black uppercase tracking-widest mb-2 opacity-60", i === 0 ? "text-primary" : "text-accent")}>{i === 0 ? "ELITE_ALPHA" : "ELITE_BETA"}</div>
+                          <div className={cn("text-[8px] font-black uppercase tracking-widest mb-2 opacity-60", i === 0 ? "text-primary" : "text-accent")}>{i === 0 ? "ELITE ALPHA" : "ELITE BETA"}</div>
                           <div className="font-display text-lg font-black text-foreground mb-1 leading-none">{w.name}</div>
                           <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-4 opacity-40">
                             {STYLE_DISPLAY_NAMES[w.style as keyof typeof STYLE_DISPLAY_NAMES] ?? w.style}
@@ -294,7 +294,7 @@ export function StableComparison({ rivals }: StableComparisonProps) {
                       ) : (
                         <div className="py-10 text-center flex flex-col items-center gap-2 opacity-20">
                            <Hexagon className="h-8 w-8 text-muted-foreground" />
-                           <p className="text-[10px] font-black uppercase tracking-widest">No_Active_Signals</p>
+                           <p className="text-[10px] font-black uppercase tracking-widest">No Active Signals</p>
                         </div>
                       )}
                     </div>

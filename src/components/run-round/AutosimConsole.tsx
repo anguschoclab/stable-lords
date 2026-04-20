@@ -20,7 +20,7 @@ export function AutosimConsole({ isSimulating, progress, result, onStart }: Auto
       <CardHeader className="pb-3 border-b border-accent/10 bg-accent/5">
         <CardTitle className="font-display text-sm font-black uppercase tracking-widest flex items-center gap-2 text-accent">
           <FastForward className="h-4 w-4" /> 
-          Strategic_Autosim_Matrix
+          Strategic Autosim Matrix
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6 space-y-6">
@@ -30,9 +30,9 @@ export function AutosimConsole({ isSimulating, progress, result, onStart }: Auto
                Execute multiple combat cycles autonomously. The simulation will disengage if casualties or critical injuries are detected.
              </p>
              <div className="grid grid-cols-2 gap-3">
-               <Button variant="outline" onClick={() => onStart(4)} className="h-10 font-black uppercase text-[10px] tracking-widest">4_WKS (Short)</Button>
-               <Button variant="outline" onClick={() => onStart(8)} className="h-10 font-black uppercase text-[10px] tracking-widest">8_WKS (Medium)</Button>
-               <Button variant="default" onClick={() => onStart(13)} className="h-10 font-black uppercase text-[10px] tracking-widest col-span-2 shadow-[0_0_15px_-5px_rgba(var(--accent-rgb),0.5)]">13_WKS (Full Season)</Button>
+               <Button variant="outline" onClick={() => onStart(4)} className="h-10 font-black uppercase text-[10px] tracking-widest">4 Wks (Short)</Button>
+               <Button variant="outline" onClick={() => onStart(8)} className="h-10 font-black uppercase text-[10px] tracking-widest">8 Wks (Medium)</Button>
+               <Button variant="default" onClick={() => onStart(13)} className="h-10 font-black uppercase text-[10px] tracking-widest col-span-2 shadow-[0_0_15px_-5px_rgba(var(--accent-rgb),0.5)]">13 Wks (Full Season)</Button>
              </div>
           </div>
         )}
@@ -40,7 +40,7 @@ export function AutosimConsole({ isSimulating, progress, result, onStart }: Auto
         {isSimulating && progress && (
           <div className="space-y-4">
             <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-                <span className="text-accent animate-pulse">Processing_Cycle_{progress.current}_of_{progress.total}</span>
+                <span className="text-accent animate-pulse">Processing Cycle {progress.current} of {progress.total}</span>
                 <span className="text-foreground">{percent}%</span>
             </div>
             <Progress value={percent} className="h-2 bg-accent/10" />
@@ -88,7 +88,7 @@ export function AutosimConsole({ isSimulating, progress, result, onStart }: Auto
              </div>
 
              <Button variant="outline" onClick={() => window.location.reload()} className="w-full h-10 font-black uppercase text-[10px] tracking-widest">
-                Return_To_Console
+                Return to Console
              </Button>
           </div>
         )}

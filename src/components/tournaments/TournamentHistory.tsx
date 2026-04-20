@@ -35,7 +35,7 @@ export function TournamentHistory({ pastTournaments, seasonIcons, seasonNames, c
             <div className="p-5">
               {pastForSeason.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Champion_Archives</div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Champion Archives</div>
                   {pastForSeason.map((t) => (
                     <div key={t.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5">
                       <div className="flex items-center gap-3">
@@ -48,7 +48,7 @@ export function TournamentHistory({ pastTournaments, seasonIcons, seasonNames, c
                 </div>
               ) : (
                 <div className="py-8 text-center text-muted-foreground/20 border border-dashed border-white/5">
-                   <p className="text-[9px] font-black uppercase tracking-widest leading-relaxed">No_Champions_Recorded<br/>For_This_Season</p>
+                   <p className="text-[9px] font-black uppercase tracking-widest leading-relaxed">No Champions Recorded<br/>For This Season</p>
                 </div>
               )}
             </div>

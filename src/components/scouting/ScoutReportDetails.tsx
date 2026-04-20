@@ -32,7 +32,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
                <div className="p-2 rounded-none bg-primary/10 border border-primary/20">
                   <Terminal className="h-4 w-4 text-primary" />
                </div>
-               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary leading-none">Scouting_Protocol_Pending</h4>
+               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary leading-none">Scouting Protocol Pending</h4>
             </div>
             <p className="text-sm text-foreground/80 leading-relaxed font-display max-w-md">
               Establish a tactical deep-scan on <span className="text-white font-black uppercase tracking-tight decoration-primary/40 underline decoration-2 underline-offset-4">{warriorName}</span> to uncover their combat signatures and metabolic thresholds.
@@ -65,7 +65,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
                       <Eye className="h-4 w-4" />
                     </div>
                     <div className="text-left">
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em] block leading-none mb-1">{q} INFRARED_SCAN</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.2em] block leading-none mb-1">{q} SCAN</span>
                        <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Precision: {q === "Expert" ? "99.9%" : q === "Detailed" ? "85%" : "60%"}</span>
                     </div>
                   </div>
@@ -104,7 +104,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-none bg-primary/10 border border-primary/20">
                     <span className="text-[8px] font-black uppercase tracking-widest text-primary leading-none">{report.quality} SCAN COMPLETED</span>
                  </div>
-                 <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">PROTOCOL_ACTIVE</span>
+                 <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">ACTIVE</span>
               </div>
            </div>
         </div>
@@ -145,7 +145,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
 
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">ATTRIBUTE_MATRIX</span>
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">ATTRIBUTE MATRIX</span>
              <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
           </div>
           
@@ -199,7 +199,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
                    <div className="p-1 rounded bg-destructive/10 border border-destructive/20">
                       <ShieldAlert className="h-3 w-3 text-destructive" />
                    </div>
-                   <span className="text-[9px] font-black uppercase tracking-widest text-destructive/60">Documented_Tissue_Damage</span>
+                   <span className="text-[9px] font-black uppercase tracking-widest text-destructive/60">Documented Tissue Damage</span>
                 </div>
                 <div className="flex flex-wrap gap-2 ml-7">
                   {report.knownInjuries.map((injury, idx) => (
@@ -227,7 +227,7 @@ export function ScoutReportDetails({ report, warriorName, treasury, onScout }: S
           >
             <div className="flex items-center justify-center gap-3">
                <Eye className="h-4 w-4 group-hover/expand:scale-110 transition-transform" />
-               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Elevate_Tactical_Precision</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Elevate Tactical Precision</span>
             </div>
           </button>
         )}

@@ -20,7 +20,7 @@ export function RivalWarriorList({ warriors, selectedWarriorId, onSelectWarrior,
     <div className="space-y-6">
       <div className="flex items-center gap-3 px-2">
         <div className="p-1 px-2 rounded-none bg-primary/10 border border-primary/20">
-           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{stableName ? `${stableName}_ROSTER` : "Select_Stable"}</span>
+           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{stableName ? `${stableName} Roster` : "Select Stable"}</span>
         </div>
         <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
       </div>
@@ -57,7 +57,7 @@ export function RivalWarriorList({ warriors, selectedWarriorId, onSelectWarrior,
                            <WarriorNameTag id={w.id} name={w.name} useCrown={false} />
                            {hasReport && (
                              <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-none bg-primary/20 border border-primary/20 text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">
-                               <Eye className="h-2.5 w-2.5" /> INTEL_LOCKED
+                               <Eye className="h-2.5 w-2.5" /> INTEL
                              </div>
                            )}
                         </div>
@@ -83,7 +83,7 @@ export function RivalWarriorList({ warriors, selectedWarriorId, onSelectWarrior,
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-neutral-950 border-white/10">
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">SELECT_WARRIOR_PROTOCOL</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">SELECT WARRIOR</p>
               </TooltipContent>
             </Tooltip>
           );
@@ -93,7 +93,7 @@ export function RivalWarriorList({ warriors, selectedWarriorId, onSelectWarrior,
           <Surface variant="glass" className="py-16 text-center border-dashed border-border/30 flex flex-col items-center gap-4">
             <Swords className="h-12 w-12 text-muted-foreground opacity-20" />
             <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Select_Stable_To_Begin_Roster_Scan</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Select a Stable to Begin Roster Scan</p>
               <p className="text-[9px] text-muted-foreground/20 italic uppercase tracking-tighter">Awaiting host connection...</p>
             </div>
           </Surface>

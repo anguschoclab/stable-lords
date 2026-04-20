@@ -44,8 +44,8 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-8">
-        {[{ sel: wIdA, setSel: setWIdA, other: wIdB, label: "Asset_Alpha", color: "primary" },
-          { sel: wIdB, setSel: setWIdB, other: wIdA, label: "Asset_Beta", color: "accent" }].map(({ sel, setSel, other, label, color }) => (
+        {[{ sel: wIdA, setSel: setWIdA, other: wIdB, label: "Asset Alpha", color: "primary" },
+          { sel: wIdB, setSel: setWIdB, other: wIdA, label: "Asset Beta", color: "accent" }].map(({ sel, setSel, other, label, color }) => (
           <div key={label} className="space-y-4">
             <div className="flex items-center gap-3 px-2">
                <div className={cn(
@@ -89,8 +89,8 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
                       </div>
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side={label === "Asset_Alpha" ? "left" : "right"} className="bg-neutral-950 border-white/10">
-                    <p className="text-[10px] font-black uppercase tracking-widest">ASSIGN_TO_{label}</p>
+                  <TooltipContent side={label === "Asset Alpha" ? "left" : "right"} className="bg-neutral-950 border-white/10">
+                    <p className="text-[10px] font-black uppercase tracking-widest">ASSIGN {label}</p>
                   </TooltipContent>
                 </Tooltip>
               ))}
@@ -105,7 +105,7 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
             
             <div className="text-center flex-1 relative z-10 space-y-3">
-              <h4 className="text-[9px] font-black tracking-[0.4em] text-primary uppercase leading-none opacity-40">Personnel_Alpha</h4>
+              <h4 className="text-[9px] font-black tracking-[0.4em] text-primary uppercase leading-none opacity-40">Personnel Alpha</h4>
               <h3 className="font-display font-black uppercase text-xl tracking-tighter text-foreground leading-none">{entryA.warrior.name}</h3>
               <div className="flex flex-col items-center gap-1">
                  <span className="text-[9px] text-muted-foreground/60 font-black tracking-widest uppercase">{STYLE_DISPLAY_NAMES[entryA.warrior.style as keyof typeof STYLE_DISPLAY_NAMES] ?? entryA.warrior.style}</span>
@@ -121,7 +121,7 @@ export function WarriorComparison({ rivals, playerRoster }: WarriorComparisonPro
             </div>
 
             <div className="text-center flex-1 relative z-10 space-y-3">
-              <h4 className="text-[9px] font-black tracking-[0.4em] text-accent uppercase leading-none opacity-40">Personnel_Beta</h4>
+              <h4 className="text-[9px] font-black tracking-[0.4em] text-accent uppercase leading-none opacity-40">Personnel Beta</h4>
               <h3 className="font-display font-black uppercase text-xl tracking-tighter text-foreground leading-none">{entryB.warrior.name}</h3>
               <div className="flex flex-col items-center gap-1">
                  <span className="text-[9px] text-muted-foreground/60 font-black tracking-widest uppercase">{STYLE_DISPLAY_NAMES[entryB.warrior.style as keyof typeof STYLE_DISPLAY_NAMES] ?? entryB.warrior.style}</span>

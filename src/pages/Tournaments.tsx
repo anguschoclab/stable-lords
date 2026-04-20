@@ -155,7 +155,7 @@ export default function Tournaments() {
           {!currentTournament && activeWarriors.length < 2 && (
              <Link to="/ops/personnel">
               <Button variant="outline" className="h-9 font-black uppercase text-[10px] tracking-widest gap-2">
-                <UserPlus className="h-4 w-4" /> RECRUIT_OPERATIVES
+                <UserPlus className="h-4 w-4" /> RECRUIT OPERATIVES
               </Button>
             </Link>
           )}
@@ -170,7 +170,7 @@ export default function Tournaments() {
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
               <Zap className="h-3.5 w-3.5 text-primary" />
-              OPERATIVE_READINESS
+              OPERATIVE READINESS
             </div>
             {/* Prizes pill */}
             {(() => {
@@ -231,7 +231,7 @@ export default function Tournaments() {
                 {currentTournament.name}
               </span>
               <Badge className="bg-primary text-black font-black uppercase text-[9px] tracking-[0.2em] px-3 animate-pulse border-none">
-                PROTOCOL_LIVE
+                LIVE
               </Badge>
             </div>
           </div>
@@ -247,7 +247,7 @@ export default function Tournaments() {
               <div className="flex flex-col gap-4 p-8 border-t border-white/5 bg-secondary/10">
                 <div className="flex gap-4">
                   <Button onClick={handleExecuteRound} className="flex-1 h-14 font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl bg-primary text-black hover:bg-primary/90 transition-all">
-                    <Play className="h-4 w-4 mr-2 fill-current" /> EXECUTE_NEXT_BOUT
+                    <Play className="h-4 w-4 mr-2 fill-current" /> EXECUTE NEXT BOUT
                   </Button>
                 </div>
                 
@@ -257,7 +257,7 @@ export default function Tournaments() {
                     onClick={() => setIsPrepOpen(true)} 
                     className="w-full h-12 font-black uppercase text-[10px] tracking-widest gap-2 bg-accent/5 border-accent/20 hover:bg-accent/10 transition-colors"
                   >
-                    <Settings2 className="h-4 w-4" /> OPEN_PREP_CONSOLE
+                    <Settings2 className="h-4 w-4" /> OPEN PREP CONSOLE
                   </Button>
                 )}
               </div>
@@ -268,7 +268,7 @@ export default function Tournaments() {
 
       <div className="space-y-4">
         <div className="flex items-center gap-3 px-2">
-          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Tournament_History_Matrices</h3>
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Tournament History</h3>
           <div className="h-px flex-1 bg-border/20" />
         </div>
         <TournamentHistory

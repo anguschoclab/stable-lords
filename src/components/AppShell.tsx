@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
   Swords, RotateCcw, LogOut, Save,
@@ -39,8 +39,7 @@ import { CoachOverlay } from "@/components/ui/CoachOverlay";
 import EventLog from "@/components/EventLog";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-    const {
+  const {
     week, day, isTournamentWeek, treasury, fame, crowdMood, weather, roster,
     doReset, returnToTitle, lastSavedAt,
     isSimulating, isInitialized, eventLogOpen, initialize
@@ -181,7 +180,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <ChevronRight className="h-3.5 w-3.5" />
             {isTournamentWeek ? "Fight" : "Advance"}
           </Link>
-
           <Separator orientation="vertical" className="h-6 bg-white/5" />
           <Tooltip>
             <TooltipTrigger asChild>

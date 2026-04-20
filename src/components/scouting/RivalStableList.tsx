@@ -17,7 +17,7 @@ export function RivalStableList({ rivals, selectedRivalId, onSelectRival }: Riva
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 px-2">
-        <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Rival_Asset_Inventory</h3>
+        <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Rival Asset Inventory</h3>
         <div className="h-px flex-1 bg-border/20" />
       </div>
       
@@ -79,7 +79,7 @@ export function RivalStableList({ rivals, selectedRivalId, onSelectRival }: Riva
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-neutral-900 border-primary/20 shadow-2xl p-3 rounded-none">
-              <p className="text-[10px] font-black uppercase tracking-widest text-primary">SELECT_STABLE_ASSET</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary">SELECT STABLE</p>
             </TooltipContent>
           </Tooltip>
         ))}
