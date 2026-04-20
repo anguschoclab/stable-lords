@@ -24,6 +24,7 @@ import {
   Award,
   DollarSign
 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { toast } from "sonner";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import type { Warrior, PromoterPersonality, BoutOffer } from "@/types/state.types";
@@ -276,15 +277,18 @@ export default function BookingOffice() {
 
   return (
     <div className="container mx-auto p-6 space-y-8 max-w-6xl">
-      <header className="flex flex-col gap-2 border-b border-border/10 pb-6">
-        <h1 className="text-4xl font-black font-display tracking-tighter uppercase flex items-center gap-3">
-          <Briefcase className="h-10 w-10 text-primary" />
-          Booking Office
-        </h1>
-        <p className="text-muted-foreground uppercase text-[10px] tracking-[0.3em] font-bold opacity-60">
-          Week {week} — {thisWeekOffers.length + upcomingOffers.length} offers, {idleWarriors.length} warriors idle
-        </p>
-      </header>
+      <PageHeader
+        icon={Briefcase}
+        title="Booking Office"
+        subtitle={`OPS · CONTRACTS · WEEK ${week}`}
+        actions={
+          <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+            <span>{thisWeekOffers.length + upcomingOffers.length} OFFERS</span>
+            <span>·</span>
+            <span>{idleWarriors.length} IDLE</span>
+          </div>
+        }
+      />
 
       {/* Bulk Actions */}
       {thisWeekOffers.length > 0 && (
