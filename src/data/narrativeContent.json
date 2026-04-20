@@ -515,13 +515,13 @@
         "With an explosive surge of strength, {{attacker}} drives their fist into {{defender}}'s {{bodyPart}}, delivering a final, lethal strike."
       ]
     },
-    "blunt": {
+    "bashing": {
       "fatal": [
-        "With a sickening crunch, {{attacker}} caves in {{defender}}'s ribcage, sending shattered bone into their vitals.",
-        "{{attacker}} brings their weapon down like a thunderbolt on {{defender}}'s skull, instantly snuffing out their life.",
-        "A colossal swing from {{attacker}} obliterates {{defender}}'s knee, and as they fall, a follow-up blow to the temple finishes it.",
-        "The arena echoes with the awful sound of breaking bone as {{attacker}} turns {{defender}}'s chest plate into a deadly shrapnel trap.",
-        "{{attacker}} relentlessly hammers {{defender}} into the sand, striking again and again until the Arenamaster is forced to intervene."
+        "With a sickening crunch, {{attacker}} caves in {{defender}}'s {{bodyPart}}, sending shattered bone into their vitals.",
+        "{{attacker}} brings their weapon down like a thunderbolt on {{defender}}'s {{bodyPart}}, instantly snuffing out their life.",
+        "A colossal swing from {{attacker}} obliterates {{defender}}'s {{bodyPart}}, ending the bout instantly.",
+        "The arena echoes with the awful sound of breaking bone as {{attacker}} turns {{defender}}'s {{bodyPart}} into a deadly trap.",
+        "{{attacker}} relentlessly hammers {{defender}}'s {{bodyPart}} into the sand, striking again and again until the Arenamaster is forced to intervene."
       ]
     }
   },
