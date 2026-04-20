@@ -5,6 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Activity, Zap, Shield, Swords, Battery, AlertTriangle } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { FightingStyle, STYLE_DISPLAY_NAMES, STYLE_ABBREV } from '@/types/game';
 import { computeWarriorStats } from '@/engine/skillCalc';
 
@@ -90,14 +91,11 @@ export default function PhysicalsSimulator() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-display font-bold flex items-center gap-2">
-          <Activity className="h-6 w-6 text-primary" /> Physicals Simulator
-        </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Test attribute distributions against different styles to project endurance burn and damage exchange over 10 minutes.
-        </p>
-      </div>
+      <PageHeader
+        icon={Activity}
+        title="Physicals Simulator"
+        subtitle="TOOLS · SIMULATION · NO RECORDS KEPT"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {renderFighterConfig("Fighter A", styleA, setStyleA, statsA, setStatsA, "primary")}

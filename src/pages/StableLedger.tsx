@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, Coins, Sparkles, GraduationCap, ScrollText, Skull, CalendarDays } from "lucide-react";
+import { BookOpen, Coins, Sparkles, GraduationCap, ScrollText, Skull, CalendarDays, AlertCircle, Hourglass } from "lucide-react";
 import { useGameStore } from "@/state/useGameStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -11,9 +11,17 @@ import { ContractManager } from "@/components/ledger/ContractManager";
 import { Chronicle } from "@/components/ledger/Chronicle";
 import { HallOfWarriors } from "@/components/ledger/HallOfWarriors";
 import { YearEndRecap } from "@/components/ledger/YearEndRecap";
+import { Surface } from "@/components/ui/Surface";
+import { Badge } from "@/components/ui/badge";
+import { computeWeeklyBreakdown } from "@/engine/economy";
+import { cn } from "@/lib/utils";
 
 export default function StableLedger() {
-  const { season, week, treasury } = useGameStore();
+  const store = useGameStore();
+  const { season, week, treasury } = store;
+  const breakdown = computeWeeklyBreakdown(store);
+  const runway = breakdown.totalExpenses > 0 ? Math.floor(treasury / breakdown.totalExpenses) : 99;
+  const isEmergency = runway < 4;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -30,6 +38,38 @@ export default function StableLedger() {
           </div>
         }
       />
+
+      {/* Band 2 — Financial Runway Alert (Spec §6.4) */}
+      <Surface variant={isEmergency ? "blood" : "glass"} className="flex items-center justify-between p-5 border-l-4 border-l-primary/50">
+        <div className="flex items-center gap-4">
+           <div className={cn("p-2 rounded-none border", isEmergency ? "bg-destructive/20 border-destructive/40 animate-pulse" : "bg-primary/10 border-primary/30")}>
+              {isEmergency ? <AlertCircle className="h-5 w-5 text-destructive" /> : <Hourglass className="h-5 w-5 text-primary" />}
+           </div>
+           <div>
+              <div className="flex items-center gap-2">
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Fiscal_Runway_Projection</span>
+                 {isEmergency && <Badge className="bg-destructive text-white text-[8px] font-black h-4 px-1.5 animate-bounce">CRITICAL</Badge>}
+              </div>
+              <p className="text-xl font-display font-black uppercase tracking-tight text-foreground leading-none mt-1">
+                {runway === 99 ? "INFINITE" : `${runway} WEEKS`} REMAINING
+              </p>
+           </div>
+        </div>
+
+        <div className="flex items-center gap-8">
+           <div className="text-right">
+              <div className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1 text-right">Weekly Burn</div>
+              <div className="font-mono font-black text-destructive text-lg leading-none">-{breakdown.totalExpenses}G</div>
+           </div>
+           <div className="h-8 w-px bg-white/5" />
+           <div className="text-right">
+              <div className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1 text-right">Net Flow</div>
+              <div className={cn("font-mono font-black text-lg leading-none", breakdown.net >= 0 ? "text-primary" : "text-destructive")}>
+                 {breakdown.net >= 0 ? "+" : ""}{breakdown.net}G
+              </div>
+           </div>
+        </div>
+      </Surface>
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="w-full grid grid-cols-2 md:grid-cols-6 h-auto p-1 bg-secondary/20 border border-border/40 backdrop-blur-sm rounded-none mb-8">

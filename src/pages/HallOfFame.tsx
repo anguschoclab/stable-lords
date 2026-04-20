@@ -8,15 +8,15 @@ import { ArenaHistory } from "@/engine/history/arenaHistory";
 import type { Warrior, AnnualAward } from "@/types/game";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Crown, Star, Shield, Flame, Trophy, Users } from "lucide-react";
 import { InducteeCard } from "./HallOfFame/InducteeCard";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
 import { motion } from "framer-motion";
 
 export default function HallOfFame() {
   const { 
-    week, roster, graveyard, retired, rivals, awards, year, player 
+    roster, graveyard, retired, rivals, awards, year, player 
   } = useGameStore();
   const allFights = useMemo(() => ArenaHistory.all(), []);
 
@@ -69,35 +69,6 @@ export default function HallOfFame() {
         title="Hall of Fame"
         subtitle={`IMPERIAL · LEGENDS · YEAR ${currentYear}`}
       />
-      {/* Masthead */}
-      <div className="text-center space-y-4 py-8 relative overflow-hidden bg-glass-card rounded-none border border-border/40">
-        <div className="absolute inset-0 bg-gradient-to-b from-arena-gold/5 to-transparent pointer-events-none" />
-        <div className="flex items-center justify-center gap-4 relative z-10">
-          <Separator className="w-16 bg-arena-gold/20" />
-          <div className="p-3 rounded-full bg-arena-gold/10 border border-arena-gold/20 shadow-[0_0_20px_rgba(var(--arena-gold-rgb),0.2)]">
-            <Trophy className="h-8 w-8 text-arena-gold" />
-          </div>
-          <Separator className="w-16 bg-arena-gold/20" />
-        </div>
-        <div className="relative z-10">
-          <h1 className="font-display text-4xl sm:text-6xl font-black tracking-tighter text-foreground uppercase">
-            Hall of Fame
-          </h1>
-          <p className="text-[10px] text-muted-foreground font-black tracking-[0.4em] uppercase opacity-60 mt-2">
-            LEGENDS_OF_THE_ARENA · ETERNAL_CHRONICLE
-          </p>
-        </div>
-        <div className="flex items-center justify-center gap-3 relative z-10">
-          <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-arena-gold/20 bg-arena-gold/5 text-arena-gold">
-            YEAR {currentYear}
-          </Badge>
-          <Separator orientation="vertical" className="h-4 bg-border/20" />
-          <Badge variant="outline" className="text-[10px] font-black tracking-widest uppercase border-primary/20 bg-primary/5 text-primary">
-            WEEK {week}
-          </Badge>
-        </div>
-      </div>
-
       {/* Yearly Awards Section */}
       {yearlyAwards.length > 0 ? (
         yearlyAwards.map(({ year, awards }) => (
@@ -113,7 +84,7 @@ export default function HallOfFame() {
                 if (award.type === "STABLE_OF_YEAR") {
                   return (
                     <motion.div key={i} whileHover={{ y: -5 }}>
-                      <Card className="bg-glass-card border border-primary/40 overflow-hidden relative group h-full">
+                      <Surface variant="gold" padding="none" className="overflow-hidden relative group h-full">
                         <div className="absolute top-0 left-0 w-full h-1 bg-primary opacity-40" />
                         <CardContent className="p-6 space-y-4">
                           <div className="flex items-start justify-between">
@@ -138,7 +109,7 @@ export default function HallOfFame() {
                             "{award.reason}"
                           </p>
                         </CardContent>
-                      </Card>
+                      </Surface>
                     </motion.div>
                   );
                 }

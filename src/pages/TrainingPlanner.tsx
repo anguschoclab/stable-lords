@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import {
   Dumbbell, AlertTriangle, Lock, Star, BarChart3, Target,
 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { WarriorLink } from "@/components/EntityLink";
 
 /* ── Burn Risk Assessment ──────────────────────────────── */
@@ -300,34 +301,27 @@ export default function TrainingPlanner() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-none border border-border bg-gradient-to-br from-secondary via-card to-secondary p-6 sm:p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5" />
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <BarChart3 className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide">Training Planner</h1>
-          </div>
-          <p className="text-muted-foreground text-sm max-w-xl">
-            Analyze potential ceilings, identify training burn risks, and plan optimal attribute development.
-            <span className="text-foreground/70"> Green dots show seasonal cap progress (3/season).</span>
-          </p>
-          <div className="flex items-center gap-4 mt-4 flex-wrap">
+      <PageHeader
+        icon={BarChart3}
+        title="Training Planner"
+        subtitle="COMMAND · TACTICS · ATTRIBUTE DEVELOPMENT"
+        actions={
+          <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest">
             <div className="text-center">
-              <div className="text-2xl font-display font-bold text-primary">{avgTrainability}%</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Avg Trainability</div>
+              <div className="text-xl font-display font-black text-primary">{avgTrainability}%</div>
+              <div className="text-muted-foreground/50">AVG TRAINABILITY</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-display font-bold text-foreground">{activeWarriors.length}</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Active Warriors</div>
+              <div className="text-xl font-display font-black">{activeWarriors.length}</div>
+              <div className="text-muted-foreground/50">ACTIVE</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-display font-bold text-muted-foreground">{currentTrainers.filter(t => t.contractWeeksLeft > 0).length}</div>
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Active Trainers</div>
+              <div className="text-xl font-display font-black">{currentTrainers.filter(t => t.contractWeeksLeft > 0).length}</div>
+              <div className="text-muted-foreground/50">TRAINERS</div>
             </div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Legend */}
       <Card>

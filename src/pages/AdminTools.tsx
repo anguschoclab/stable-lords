@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Settings, Download, Upload, Trash2, FastForward, Activity, Zap } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { toast } from 'sonner';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
 import { computeNextSeason } from '@/engine/pipeline/passes/WorldPass';
@@ -109,22 +110,16 @@ export default function AdminTools() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-20">
-      <div className="flex items-center justify-between border-b border-border/10 pb-6">
-        <div>
-          <h1 className="text-xl sm:text-3xl font-display font-black flex items-center gap-3 uppercase tracking-tighter text-foreground">
-            <div className="p-2 bg-primary/10 rounded-none border border-primary/20">
-              <Settings className="h-6 w-6 text-primary" />
-            </div>
-            Admin_Interface
-          </h1>
-          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-60">
-            Advanced system overrides and telemetry management
-          </p>
-        </div>
-        <Badge variant={ftueComplete ? "outline" : "destructive"} className="font-black uppercase text-[10px] tracking-widest h-6 px-4">
-          SYSTEM_{ftueComplete ? "UNLOCKED" : "LOCKED"}
-        </Badge>
-      </div>
+      <PageHeader
+        icon={Settings}
+        title="Administration"
+        subtitle="IMPERIAL CENSOR · ADMIN · SYSTEM OVERRIDE"
+        actions={
+          <Badge variant={ftueComplete ? "outline" : "destructive"} className="font-black uppercase text-[10px] tracking-widest h-6 px-4">
+            SYSTEM_{ftueComplete ? "UNLOCKED" : "LOCKED"}
+          </Badge>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="border-primary/20 bg-glass-card shadow-lg hover:border-primary/40 transition-all">

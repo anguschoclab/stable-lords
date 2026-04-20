@@ -33,33 +33,32 @@ function CrowdMoodWidget() {
   const mods = getMoodModifiers(mood);
 
   return (
-    <Surface variant="glass" className="h-full flex flex-col p-5 border-l-4 border-l-accent/50 animate-in fade-in zoom-in-95 duration-500">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Eye className="h-4 w-4 text-accent" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Crowd_Temperament</span>
+    <Surface variant="glass" className="flex items-center gap-8 p-5 border-l-4 border-l-accent/50 animate-in fade-in zoom-in-95 duration-500">
+      <div className="flex items-center gap-4 shrink-0">
+        <span className="text-4xl drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">{MOOD_ICONS[mood]}</span>
+        <div>
+          <div className="flex items-center gap-2">
+            <Eye className="h-3 w-3 text-accent" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Crowd_Temperament</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground italic leading-tight max-w-[200px] mt-1">
+            {MOOD_DESCRIPTIONS[mood]}
+          </p>
         </div>
-        <Badge variant="outline" className="border-accent/40 bg-accent/5 text-accent text-[9px] font-black tracking-widest">{mood.toUpperCase()}</Badge>
       </div>
 
-      <div className="flex items-center justify-between mb-4">
-         <span className="text-4xl drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">{MOOD_ICONS[mood]}</span>
-         <div className="text-right">
-           <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Impact_Matrix</div>
-           <p className="text-[10px] text-muted-foreground italic leading-tight max-w-[140px] border-r-2 border-accent/20 pr-3">
-            {MOOD_DESCRIPTIONS[mood]}
-           </p>
-         </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-3 pt-2">
+      <div className="h-10 w-px bg-white/5 shrink-0" />
+
+      <div className="flex items-center gap-6 overflow-x-auto thin-scrollbar">
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="rounded-none border border-white/5 p-2 bg-white/[0.02] cursor-help transition-all hover:bg-white/[0.05] hover:border-white/10">
-              <div className={cn("text-lg font-display font-black tracking-tighter", mods.fameMultiplier > 1 ? "text-primary" : "text-muted-foreground")}>
-                ×{mods.fameMultiplier.toFixed(1)}
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/[0.02] border border-white/5 transition-all hover:bg-white/[0.05]">
+              <div className="text-right">
+                <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest leading-none mb-1">FAME_MULT</div>
+                <div className={cn("text-lg font-display font-black tracking-tighter leading-none", mods.fameMultiplier > 1 ? "text-primary" : "text-muted-foreground")}>
+                  ×{mods.fameMultiplier.toFixed(1)}
+                </div>
               </div>
-              <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">FAME_MULT</div>
             </div>
           </TooltipTrigger>
           <TooltipContent className="text-[10px] uppercase font-black tracking-widest">Multiplies all fame gains from this week's bouts.</TooltipContent>
@@ -67,16 +66,20 @@ function CrowdMoodWidget() {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="rounded-none border border-white/5 p-2 bg-white/[0.02] cursor-help transition-all hover:bg-white/[0.05] hover:border-white/10">
-              <div className={cn("text-lg font-display font-black tracking-tighter", mods.killChanceBonus > 0 ? "text-destructive" : "text-muted-foreground")}>
-                {mods.killChanceBonus > 0 ? "+" : ""}{(mods.killChanceBonus * 100).toFixed(0)}%
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/[0.02] border border-white/5 transition-all hover:bg-white/[0.05]">
+              <div className="text-right">
+                <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest leading-none mb-1">LETHALITY</div>
+                <div className={cn("text-lg font-display font-black tracking-tighter leading-none", mods.killChanceBonus > 0 ? "text-destructive" : "text-muted-foreground")}>
+                  {mods.killChanceBonus > 0 ? "+" : ""}{(mods.killChanceBonus * 100).toFixed(0)}%
+                </div>
               </div>
-              <div className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">LETHALITY</div>
             </div>
           </TooltipTrigger>
           <TooltipContent className="text-[10px] uppercase font-black tracking-widest">Probability bonus added to all fatal blow checks.</TooltipContent>
         </Tooltip>
       </div>
+      
+      <Badge variant="outline" className="ml-auto border-accent/40 bg-accent/5 text-accent text-[9px] font-black tracking-widest shrink-0">{mood.toUpperCase()}</Badge>
     </Surface>
   );
 }
@@ -211,6 +214,9 @@ export default function ArenaHub() {
         }
       />
 
+      {/* Band 2 — Crowd Mood full-width strip */}
+      <CrowdMoodWidget />
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Primary Intel Channel */}
         <div className="lg:col-span-8 space-y-8">
@@ -224,7 +230,6 @@ export default function ArenaHub() {
 
         {/* Tactical Feed Side Pane */}
         <div className="lg:col-span-4 space-y-8">
-           <CrowdMoodWidget />
            <WeatherWidget />
            <MetaDriftWidget />
            

@@ -15,6 +15,7 @@ import { computeMetaDrift } from "@/engine/metaDrift";
 import { getRecommendedChallenges, getMatchupsToAvoid } from "@/engine/schedulingAssistant";
 
 import { Surface } from "@/components/ui/Surface";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { SeasonWidget } from "@/components/dashboard/SeasonWidget";
 import { RecentBoutsWidget } from "@/components/dashboard/RecentBoutsWidget";
@@ -431,6 +432,11 @@ export default function ControlCenter() {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-20">
+      <PageHeader
+        icon={Swords}
+        title="Command Center"
+        subtitle="COMMAND · HQ · STRATEGIC OVERVIEW"
+      />
       {/* Hero panel */}
       <HeroPanel />
 

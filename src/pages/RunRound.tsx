@@ -97,51 +97,82 @@ export default function RunRound() {
   }, [state, setState, autosimming, setSimulating]);
 
   return (
-    <div className="space-y-6 pb-20 max-w-5xl mx-auto">
+    <div className="space-y-8 pb-20 max-w-5xl mx-auto">
       <PageHeader
         icon={Swords}
         title="Engagement Console"
         subtitle={`WEEK ${state.week} · ${state.season} · ${state.crowdMood} CROWD`}
-        actions={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-              <span className="flex items-center gap-1.5">
-                <Heart className="h-3 w-3 text-primary" />{fightReady.length} READY
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Trophy className="h-3 w-3 text-arena-gold" />{matchCard.length} PAIRED
-              </span>
-            </div>
-            {!autosimming && !autosimResult && results.length === 0 && (
-              <Button
-                onClick={handleExecuteCycle}
-                disabled={running || (matchCard.length === 0 && fightReady.length < 2)}
-                className="h-9 px-6 gap-2 font-black uppercase text-[11px] tracking-[0.2em]"
-              >
-                <Zap className="h-3.5 w-3.5 fill-current" />
-                {state.isTournamentWeek ? `EXECUTE DAY ${state.day + 1} ›` : `EXECUTE WEEK ${state.week} ›`}
-              </Button>
-            )}
-          </div>
-        }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {results.length > 0 ? (
-            <RunResults 
-              results={results} 
-              expandedId={expandedId} 
-              onToggleExpand={setExpandedId} 
-            />
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 px-2">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Active_Combat_Manifest</h3>
-                <div className="h-px flex-1 bg-border/20" />
+      {/* Band 2 — Stable Readiness Strip */}
+      <Surface variant="glass" className="flex items-center gap-12 p-5 border-l-4 border-l-primary/50">
+        <div className="flex items-center gap-3">
+          <Activity className="h-4 w-4 text-primary" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Stable_Readiness</span>
+        </div>
+        
+        <div className="flex items-center gap-10">
+           <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Mission_Ready</span>
+                <span className="font-display font-black text-xl text-primary leading-none mt-1">{fightReady.length}</span>
               </div>
+              <div className="h-8 w-px bg-white/5" />
+           </div>
+
+           <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Combat_Paired</span>
+                <span className="font-display font-black text-xl text-arena-gold leading-none mt-1">{matchCard.length}</span>
+              </div>
+              <div className="h-8 w-px bg-white/5" />
+           </div>
+
+           <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Injured_Medbay</span>
+                <span className="font-display font-black text-xl text-destructive leading-none mt-1">
+                  {state.roster.filter(w => w.fatigue > 70 || w.status === "Injured").length}
+                </span>
+              </div>
+           </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-3">
+          {!autosimming && !autosimResult && results.length === 0 && (
+            <Button
+              onClick={handleExecuteCycle}
+              disabled={running || (matchCard.length === 0 && fightReady.length < 2)}
+              className="h-10 px-8 gap-3 font-black uppercase text-[12px] tracking-[0.2em] bg-primary text-black hover:bg-primary/90"
+            >
+              <Zap className="h-4 w-4 fill-current" />
+              {state.isTournamentWeek ? `EXECUTE DAY ${state.day + 1} ›` : `EXECUTE WEEK ${state.week} ›`}
+            </Button>
+          )}
+        </div>
+      </Surface>
+
+      {/* Main Focus Canvas — Archetype F */}
+      <div className="max-w-3xl mx-auto space-y-8">
+        {results.length > 0 ? (
+          <RunResults 
+            results={results} 
+            expandedId={expandedId} 
+            onToggleExpand={setExpandedId} 
+          />
+        ) : (
+          <Surface variant="glass" className="p-0 border-accent/20">
+            <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-accent" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Active_Combat_Manifest</span>
+              </div>
+              <Badge variant="outline" className="text-[9px] font-mono border-white/10">{matchCard.length} PAIRINGS</Badge>
+            </div>
+            
+            <div className="p-6 space-y-4">
               {matchCard.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-4">
                   {matchCard.map((p, i) => (
                     <MatchCard 
                       key={i} 
@@ -156,22 +187,21 @@ export default function RunRound() {
                   ))}
                 </div>
               ) : (
-                <Card className="border-dashed bg-glass-card border-border/40">
-                  <CardContent className="py-20 text-center text-muted-foreground/30">
-                    <Skull className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    <p className="text-[11px] font-black uppercase tracking-widest leading-relaxed">
-                      Zero_Engagement_Pairs_Detected<br/>
-                      <span className="text-[9px] opacity-60">Warriors_May_Be_Resting_Or_In_Training</span>
-                    </p>
-                  </CardContent>
-                </Card>
+                <div className="py-20 text-center text-muted-foreground/30">
+                  <Skull className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <p className="text-[11px] font-black uppercase tracking-widest leading-relaxed">
+                    Zero_Engagement_Pairs_Detected<br/>
+                    <span className="text-[9px] opacity-60">Warriors_May_Be_Resting_Or_In_Training</span>
+                  </p>
+                </div>
               )}
             </div>
-          )}
-        </div>
+          </Surface>
+        )}
 
-        <div className="space-y-6">
-           <div className="flex items-center gap-3 px-2">
+        {/* Autosim moved below main content in Archetype F */}
+        <div className="pt-8 border-t border-white/5">
+          <div className="flex items-center gap-3 px-2 mb-6">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Auto_Simulation_Bridge</h3>
             <div className="h-px flex-1 bg-border/20" />
           </div>
@@ -181,26 +211,6 @@ export default function RunRound() {
             result={autosimResult}
             onStart={handleStartAutosim}
           />
-
-          <Card className="border-border/40 bg-glass-card overflow-hidden">
-            <CardHeader className="pb-3 border-b border-border/10 bg-secondary/10">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Stable_Readiness</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-3">
-               <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-foreground/80 flex items-center gap-2">
-                    <Heart className="h-3.5 w-3.5 text-primary" /> MISSION_READY
-                  </span>
-                  <Badge variant="outline" className="font-mono text-xs">{fightReady.length}</Badge>
-               </div>
-               <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-foreground/80 flex items-center gap-2">
-                    <Trophy className="h-3.5 w-3.5 text-arena-gold" /> COMBAT_PAIRED
-                  </span>
-                  <Badge variant="outline" className="font-mono text-xs">{matchCard.length}</Badge>
-               </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

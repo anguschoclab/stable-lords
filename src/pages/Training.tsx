@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useGameStore, useWorldState, type GameStore } from "@/state/useGameStore";
 import { useShallow } from 'zustand/react/shallow';
 import {
@@ -16,6 +17,7 @@ import { Surface } from "@/components/ui/Surface";
 import { StyleMeterTable } from "@/components/charts/StyleMeterTable";
 
 export default function Training() {
+  const navigate = useNavigate();
   const state = useWorldState();
   const { setState } = useGameStore();
 
@@ -145,7 +147,7 @@ export default function Training() {
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
             // NO_PERSONNEL_DETECTED // PLEASE_RECRUIT_WARRIORS_TO_COMMENCE_TRAINING
           </p>
-          <Button variant="link" className="mt-4 text-xs uppercase tracking-widest font-black" onClick={() => window.location.href = '/recruit'}>
+          <Button variant="link" className="mt-4 text-xs uppercase tracking-widest font-black" onClick={() => navigate({ to: '/stable/recruit' })}>
             Go to Recruitments
           </Button>
         </Surface>

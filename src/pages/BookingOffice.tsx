@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   Briefcase,
   User,
@@ -22,10 +26,10 @@ import {
   Users,
   TrendingUp,
   Award,
-  DollarSign
+  DollarSign,
+  Activity,
+  Target
 } from "lucide-react";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { toast } from "sonner";
 import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
 import type { Warrior, PromoterPersonality, BoutOffer } from "@/types/state.types";
 import type { InjuryData } from "@/types/warrior.types";
@@ -276,144 +280,112 @@ export default function BookingOffice() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-8 max-w-6xl">
+    <div className="space-y-8 pb-20 max-w-7xl mx-auto">
       <PageHeader
         icon={Briefcase}
         title="Booking Office"
         subtitle={`OPS · CONTRACTS · WEEK ${week}`}
-        actions={
-          <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-            <span>{thisWeekOffers.length + upcomingOffers.length} OFFERS</span>
-            <span>·</span>
-            <span>{idleWarriors.length} IDLE</span>
-          </div>
-        }
       />
 
-      {/* Bulk Actions */}
-      {thisWeekOffers.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-[10px] uppercase font-bold"
-            onClick={acceptAllHonorable}
-          >
-            <Award className="h-3 w-3 mr-1" /> Accept All Honorable (Healthy)
-          </Button>
-          {Object.values(promoters).map(p => (
-            <Button
-              key={p.id}
-              variant="outline"
-              size="sm"
-              className="text-[10px] uppercase font-bold"
-              onClick={() => declineAllFromPromoter(p.id)}
-            >
-              <Ban className="h-3 w-3 mr-1" /> Decline All {p.name}
-            </Button>
-          ))}
+      {/* Band 2 — Booking Intelligence Strip (Spec §6.4) */}
+      <Surface variant="glass" className="flex items-center gap-12 p-5 border-l-4 border-l-primary/50">
+        <div className="flex items-center gap-3">
+          <Target className="h-4 w-4 text-primary" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Market_Overview</span>
         </div>
-      )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="this-week" className="text-[10px] uppercase font-bold">
-            This Week ({thisWeekOffers.length})
-          </TabsTrigger>
-          <TabsTrigger value="upcoming" className="text-[10px] uppercase font-bold">
-            Upcoming ({upcomingOffers.length})
-          </TabsTrigger>
-          <TabsTrigger value="idle" className="text-[10px] uppercase font-bold">
-            Idle ({idleWarriors.length})
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center gap-10">
+           <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">Open Proposals</span>
+              <span className="font-display font-black text-xl text-primary leading-none mt-1">{thisWeekOffers.length + upcomingOffers.length}</span>
+           </div>
+           
+           <div className="h-8 w-px bg-white/5" />
 
-        <TabsContent value="this-week" className="mt-6">
-          {thisWeekOffers.length === 0 ? (
-            <Card className="border-dashed bg-secondary/5 border-border/20 py-20 text-center">
-              <CardContent className="flex flex-col items-center gap-4 text-muted-foreground/30">
-                <ShieldAlert className="h-16 w-16 opacity-10" />
-                <p className="font-display font-black uppercase tracking-widest text-sm">
-                  No_Proposals_For_Week_{week + 2}
-                </p>
-                <p className="text-[10px] uppercase tracking-wider opacity-60">
-                  Promoters are preparing their next slate of offers.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {thisWeekOffers.map(renderOfferCard)}
-            </div>
-          )}
-        </TabsContent>
+           <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">Highest Purse</span>
+              <span className="font-display font-black text-xl text-arena-gold leading-none mt-1">{(highestPurse || 0).toLocaleString()}G</span>
+           </div>
 
-        <TabsContent value="upcoming" className="mt-6">
-          {upcomingOffers.length === 0 ? (
-            <Card className="border-dashed bg-secondary/5 border-border/20 py-20 text-center">
-              <CardContent className="flex flex-col items-center gap-4 text-muted-foreground/30">
-                <Clock className="h-16 w-16 opacity-10" />
-                <p className="font-display font-black uppercase tracking-widest text-sm">
-                  No_Future_Proposals
-                </p>
-                <p className="text-[10px] uppercase tracking-wider opacity-60">
-                  Future offers will appear here as promoters announce.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="h-8 w-px bg-white/5" />
+
+           <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">Idle Warriors</span>
+              <span className={cn("font-display font-black text-xl leading-none mt-1", idleWarriors.length > 0 ? "text-destructive" : "text-muted-foreground")}>
+                {idleWarriors.length}
+              </span>
+           </div>
+        </div>
+
+        <div className="ml-auto flex gap-3">
+           <Button variant="outline" size="sm" className="h-9 px-4 text-[10px] font-black uppercase tracking-widest" onClick={acceptAllHonorable}>
+             <Award className="h-3.5 w-3.5 mr-2 text-primary" /> Accept All (Safe)
+           </Button>
+        </div>
+      </Surface>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Archetype D: Left Rail Roster (span-4) */}
+        <div className="lg:col-span-4 space-y-4 sticky top-6">
+          <div className="flex items-center gap-3 px-2">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Roster_Readiness</h3>
+          </div>
+          <Surface variant="glass" className="p-0 border-white/5 max-h-[700px] overflow-y-auto thin-scrollbar">
+            {roster.map(warrior => {
+              const hasAccepted = Object.values(boutOffers).some(o => o.warriorIds.includes(warrior.id) && o.status === "Accepted");
+              const hasProposed = Object.values(boutOffers).some(o => o.warriorIds.includes(warrior.id) && o.status === "Proposed");
+              const fatigueConfig = getFatigueStatus(warrior.fatigue ?? 0);
+
+              return (
+                <div key={warrior.id} className={cn(
+                  "p-4 border-b border-white/5 last:border-0 flex items-center gap-3 transition-colors",
+                  hasAccepted ? "bg-primary/[0.03]" : ""
+                )}>
+                  <div className={cn("h-1.5 w-1.5 rounded-full", hasAccepted ? "bg-primary" : hasProposed ? "bg-arena-gold" : "bg-white/10")} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black uppercase truncate">{warrior.name}</p>
+                    <p className="text-[9px] text-muted-foreground uppercase">{fatigueConfig.label} • {warrior.fatigue}% FATIGUE</p>
+                  </div>
+                  {hasAccepted && <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black px-1 h-4">BOOKED</Badge>}
+                </div>
+              );
+            })}
+          </Surface>
+        </div>
+
+        {/* Right Rail Viewport (span-8) */}
+        <div className="lg:col-span-8 space-y-6">
+           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full justify-start h-auto bg-transparent border-b border-white/10 rounded-none p-0 mb-6 flex gap-6">
+              <TabsTrigger value="this-week" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground data-[state=active]:text-primary">
+                Immediate Proposals ({thisWeekOffers.length})
+              </TabsTrigger>
+              <TabsTrigger value="upcoming" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground data-[state=active]:text-primary">
+                Future Slates ({upcomingOffers.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="this-week" className="mt-0 space-y-6">
+              {thisWeekOffers.length === 0 ? (
+                <Surface variant="glass" className="py-24 text-center">
+                  <ShieldAlert className="h-16 w-16 opacity-10 mx-auto mb-4" />
+                  <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">
+                    No_Proposals_Detected_Week_{week + 2}
+                  </p>
+                </Surface>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {thisWeekOffers.map(renderOfferCard)}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="upcoming" className="mt-0 space-y-6">
               {upcomingOffers.map(renderOfferCard)}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="idle" className="mt-6">
-          {idleWarriors.length === 0 ? (
-            <Card className="border-dashed bg-secondary/5 border-border/20 py-20 text-center">
-              <CardContent className="flex flex-col items-center gap-4 text-muted-foreground/30">
-                <Users className="h-16 w-16 opacity-10" />
-                <p className="font-display font-black uppercase tracking-widest text-sm">
-                  All_Warriors_Booked
-                </p>
-                <p className="text-[10px] uppercase tracking-wider opacity-60">
-                  Every active warrior has pending offers.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {idleWarriors.map(warrior => {
-                const fatigueStatus = getFatigueStatus(warrior.fatigue ?? 0);
-                const injuryBadge = getInjuryBadge(warrior.injuries || []);
-                return (
-                  <Card key={warrior.id} className="bg-secondary/5 border-border/20">
-                    <CardContent className="p-4 flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <User className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-black uppercase truncate">{warrior.name}</p>
-                        <p className="text-[9px] text-muted-foreground">{STYLE_DISPLAY_NAMES[warrior.style]}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        <Badge variant="outline" className={`text-[8px] ${fatigueStatus.color}`}>
-                          {fatigueStatus.label}
-                        </Badge>
-                        {injuryBadge && (
-                          <Badge variant="outline" className={`text-[8px] ${injuryBadge.color}`}>
-                            {injuryBadge.label}
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { useGameStore } from "@/state/useGameStore";
 import { Shield, Users, Crown, Medal, Award, Star } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
 import { ReputationSliders } from "@/components/stable/ReputationSliders";
 import { RosterWall } from "@/components/stable/RosterWall";
 import { TrainerTable } from "@/components/stable/TrainerTable";
@@ -16,23 +17,48 @@ export default function StableHall() {
         title={player.stableName}
         subtitle={`REPUTATION // ${player.name} // LEGACY OF THE ARENA`}
         icon={Shield}
-        actions={
-          <div className="flex flex-col md:flex-row items-center gap-6 bg-neutral-900/40 backdrop-blur-md px-6 py-3 rounded-none border border-white/5 shadow-inner">
-             <div className="flex flex-col items-center border-r border-white/10 pr-6">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Eminent Fame</span>
-                <span className="font-mono font-black text-arena-gold text-lg flex items-center gap-1.5 leading-none">
-                   {fame} <Star className="h-3.5 w-3.5" />
-                </span>
-             </div>
-             <div className="flex flex-col items-center">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Master Titles</span>
-                <span className="font-mono font-black text-arena-fame text-lg flex items-center gap-1.5 leading-none">
-                   {player.titles} <Crown className="h-3.5 w-3.5" />
-                </span>
-             </div>
-          </div>
-        }
       />
+
+      {/* Band 2 — Stable Hero Strip (Spec §6.5) */}
+      <Surface variant="gold" className="flex items-center gap-12 p-8 border-l-4 border-l-arena-gold/50">
+        <div className="flex items-center gap-6">
+           <div className="w-16 h-16 rounded-none bg-arena-gold/10 border border-arena-gold/30 flex items-center justify-center shadow-[0_0_20px_rgba(201,151,42,0.15)]">
+              <Shield className="h-8 w-8 text-arena-gold" />
+           </div>
+           <div>
+              <h2 className="font-display font-black text-3xl uppercase tracking-tighter text-foreground leading-none">
+                {player.stableName}
+              </h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 mt-1.5 flex items-center gap-2">
+                ESTABLISHED 410 AE <span className="opacity-30">·</span> {player.name}
+              </p>
+           </div>
+        </div>
+
+        <div className="h-12 w-px bg-white/5" />
+
+        <div className="flex items-center gap-10">
+           <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">Eminent Fame</span>
+              <div className="flex items-center gap-2 font-display font-black text-2xl text-arena-gold tracking-tighter leading-none">
+                {fame} <Star className="h-4 w-4" />
+              </div>
+           </div>
+
+           <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">Master Titles</span>
+              <div className="flex items-center gap-2 font-display font-black text-2xl text-arena-fame tracking-tighter leading-none">
+                {player.titles || 0} <Crown className="h-4 w-4" />
+              </div>
+           </div>
+        </div>
+
+        <div className="ml-auto hidden xl:block text-right">
+           <p className="text-[10px] italic text-muted-foreground/40 max-w-[200px] leading-relaxed">
+             "The sand remembers every drop of blood shed in the name of the {player.stableName.split(' ')[0]} legacy."
+           </p>
+        </div>
+      </Surface>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         <div className="lg:col-span-12">

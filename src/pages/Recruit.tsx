@@ -84,138 +84,139 @@ function RecruitCard({
   const isElite = warrior.tier === "Prodigy" || warrior.tier === "Exceptional";
 
   return (
-    <Card className={cn(
-      "bg-glass-card border overflow-hidden transition-all duration-300 group",
-      isElite ? "border-arena-gold/30 hover:border-arena-gold" : "border-border/40 hover:border-primary/50",
-      TIER_ACCENTS[warrior.tier]
-    )}>
-      <CardHeader className="pb-2 pt-5 px-5 relative">
-        <div className="flex items-center justify-between mb-2">
-          <CardTitle className="font-display font-black uppercase text-sm tracking-tight group-hover:text-primary transition-colors">
-            {warrior.name}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <TierBadge tier={warrior.tier} />
+    <motion.div whileHover={{ y: -5 }}>
+      <Surface 
+        variant="glass" 
+        padding="none" 
+        className={cn(
+          "overflow-hidden transition-all duration-300 group h-full",
+          isElite ? "border-arena-gold/30 hover:border-arena-gold" : "hover:border-primary/50",
+          TIER_ACCENTS[warrior.tier]
+        )}
+      >
+        <CardHeader className="pb-2 pt-5 px-5 relative">
+          <div className="flex items-center justify-between mb-2">
+            <CardTitle className="font-display font-black uppercase text-sm tracking-tight group-hover:text-primary transition-colors">
+              {warrior.name}
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <TierBadge tier={warrior.tier} />
+              {isScouted && (
+                <Badge variant="outline" className="gap-1 border-primary/50 bg-primary/10 text-[10px] px-2 py-0 h-5">
+                  <Eye className="h-3 w-3" /> Scouted
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
+            <StatBadge styleName={warrior.style} showFullName />
+            <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> AGE {warrior.age}</span>
             {isScouted && (
-              <Badge variant="outline" className="gap-1 border-primary/50 bg-primary/10 text-[10px] px-2 py-0 h-5">
-                <Eye className="h-3 w-3" /> Scouted
+              <Badge className={cn(
+                 "text-[10px] ml-auto font-black px-2 py-0 h-4",
+                 grade === 'S' || grade === 'A' ? 'bg-primary text-black' : 'bg-secondary text-muted-foreground'
+              )}>
+                POTENTIAL: {grade}
               </Badge>
             )}
           </div>
-        </div>
-        <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
-          <StatBadge styleName={warrior.style} showFullName />
-          <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> AGE {warrior.age}</span>
-          {isScouted && (
-            <Badge className={cn(
-               "text-[10px] ml-auto font-black px-2 py-0 h-4",
-               grade === 'S' || grade === 'A' ? 'bg-primary text-black' : 'bg-secondary text-muted-foreground'
-            )}>
-              POTENTIAL: {grade}
-            </Badge>
+        </CardHeader>
+        
+        <CardContent className="px-5 pb-5 space-y-4">
+          <div className="space-y-1.5 bg-background/20 p-3 rounded-none border border-border/20">
+            {ATTRIBUTE_KEYS.map(key => (
+              <StatBar key={key} label={key} value={warrior.attributes[key]} />
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 p-2 rounded-none bg-secondary/10 border border-border/10">
+              <Heart className="h-3.5 w-3.5 text-destructive" />
+              <div className="flex-1">
+                <p className="text-[9px] text-muted-foreground font-black uppercase">HIT POINTS</p>
+                <p className="text-xs font-mono font-bold">{warrior.derivedStats.hp}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2 rounded-none bg-secondary/10 border border-border/10">
+              <Zap className="h-3.5 w-3.5 text-arena-fame" />
+              <div className="flex-1">
+                <p className="text-[9px] text-muted-foreground font-black uppercase">ENDURANCE</p>
+                <p className="text-xs font-mono font-bold">{warrior.derivedStats.endurance}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative">
+             <Quote className="h-4 w-4 text-primary/20 absolute -top-2 -left-2" />
+             <p className="text-[11px] text-muted-foreground italic leading-relaxed pl-3 border-l-2 border-primary/20">
+               {warrior.lore}
+             </p>
+          </div>
+
+          {isScouted && scoutReport && Object.keys(scoutReport.revealed).length > 0 && (
+            <div className="p-3 border border-primary/30 bg-primary/5 rounded-none space-y-1.5">
+              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">
+                Scout_Report
+              </div>
+              <p className="text-[10px] text-muted-foreground italic">{scoutReport.summary}</p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {Object.entries(scoutReport.revealed).map(([k, v]) => (
+                  <span key={k} className="text-[10px] font-mono px-2 py-0.5 border border-primary/30 bg-black/40 text-primary">
+                    {k} ceiling: <span className="font-black">{v}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
-        </div>
-      </CardHeader>
-      
-      <CardContent className="px-5 pb-5 space-y-4">
-        {/* Attributes Grid */}
-        <div className="space-y-1.5 bg-background/20 p-3 rounded-none border border-border/20">
-          {ATTRIBUTE_KEYS.map(key => (
-            <StatBar key={key} label={key} value={warrior.attributes[key]} />
-          ))}
-        </div>
 
-        {/* Derived Stats Mini-Grid */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 p-2 rounded-none bg-secondary/10 border border-border/10">
-            <Heart className="h-3.5 w-3.5 text-destructive" />
-            <div className="flex-1">
-              <p className="text-[9px] text-muted-foreground font-black uppercase">HIT POINTS</p>
-              <p className="text-xs font-mono font-bold">{warrior.derivedStats.hp}</p>
+          <div className="flex items-center justify-between pt-2 border-t border-border/20">
+            <div className="flex flex-col">
+              <span className="text-[8px] text-muted-foreground font-black uppercase tracking-tighter">CONTRACT FEE</span>
+              <div className="flex items-center gap-1.5 text-base font-display font-black text-arena-gold">
+                <Coins className="h-4 w-4" />
+                {warrior.cost}G
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 rounded-none bg-secondary/10 border border-border/10">
-            <Zap className="h-3.5 w-3.5 text-arena-fame" />
-            <div className="flex-1">
-              <p className="text-[9px] text-muted-foreground font-black uppercase">ENDURANCE</p>
-              <p className="text-xs font-mono font-bold">{warrior.derivedStats.endurance}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Lore / Bio */}
-        <div className="relative">
-           <Quote className="h-4 w-4 text-primary/20 absolute -top-2 -left-2" />
-           <p className="text-[11px] text-muted-foreground italic leading-relaxed pl-3 border-l-2 border-primary/20">
-             {warrior.lore}
-           </p>
-        </div>
-
-        {/* Scouting partial-reveal — appears only when SCOUT [25G] has been used on this recruit. */}
-        {isScouted && scoutReport && Object.keys(scoutReport.revealed).length > 0 && (
-          <div className="p-3 border border-primary/30 bg-primary/5 rounded-none space-y-1.5">
-            <div className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">
-              Scout_Report
-            </div>
-            <p className="text-[10px] text-muted-foreground italic">{scoutReport.summary}</p>
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {Object.entries(scoutReport.revealed).map(([k, v]) => (
-                <span key={k} className="text-[10px] font-mono px-2 py-0.5 border border-primary/30 bg-black/40 text-primary">
-                  {k} ceiling: <span className="font-black">{v}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Cost & Action Buttons */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/20">
-          <div className="flex flex-col">
-            <span className="text-[8px] text-muted-foreground font-black uppercase tracking-tighter">CONTRACT FEE</span>
-            <div className="flex items-center gap-1.5 text-base font-display font-black text-arena-gold">
-              <Coins className="h-4 w-4" />
-              {warrior.cost}G
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {!isScouted && (
+            <div className="flex items-center gap-2">
+              {!isScouted && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 text-[10px] font-black uppercase tracking-widest px-3 border-border/40 hover:bg-primary/10"
+                  disabled={!canAffordScout}
+                  onClick={() => onScout(warrior)}
+                >
+                  <Eye className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                  SCOUT [25G]
+                </Button>
+              )}
+              <Button
+                size="sm"
+                className={cn(
+                  "h-9 px-4 font-black uppercase tracking-widest",
+                  isElite ? "bg-arena-gold text-black hover:bg-arena-gold/80" : "bg-primary text-black hover:bg-primary/80"
+                )}
+                disabled={!canAfford || rosterFull}
+                onClick={() => onRecruit(warrior, false)}
+              >
+                <UserPlus className="h-3.5 w-3.5 mr-1.5" />
+                HIRE
+              </Button>
               <Button
                 size="sm"
                 variant="outline"
-                className="h-9 text-[10px] font-black uppercase tracking-widest px-3 border-border/40 hover:bg-primary/10"
-                disabled={!canAffordScout}
-                onClick={() => onScout(warrior)}
+                className="h-9 px-3 font-black uppercase tracking-widest border-arena-gold/40 text-arena-gold hover:bg-arena-gold/10"
+                disabled={!canAffordBonus || rosterFull}
+                onClick={() => onRecruit(warrior, true)}
+                title="Pay a 50g signing bonus — warrior arrives eager (+2 XP) and gets a gazette mention."
               >
-                <Eye className="h-3.5 w-3.5 mr-1.5 text-primary" />
-                SCOUT [25G]
+                + BONUS [50G]
               </Button>
-            )}
-            <Button
-              size="sm"
-              className={cn(
-                "h-9 px-4 font-black uppercase tracking-widest",
-                isElite ? "bg-arena-gold text-black hover:bg-arena-gold/80" : "bg-primary text-black hover:bg-primary/80"
-              )}
-              disabled={!canAfford || rosterFull}
-              onClick={() => onRecruit(warrior, false)}
-            >
-              <UserPlus className="h-3.5 w-3.5 mr-1.5" />
-              HIRE
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-9 px-3 font-black uppercase tracking-widest border-arena-gold/40 text-arena-gold hover:bg-arena-gold/10"
-              disabled={!canAffordBonus || rosterFull}
-              onClick={() => onRecruit(warrior, true)}
-              title="Pay a 50g signing bonus — warrior arrives eager (+2 XP) and gets a gazette mention."
-            >
-              + BONUS [50G]
-            </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Surface>
+    </motion.div>
   );
 }
 

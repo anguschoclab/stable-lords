@@ -23,6 +23,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 /** Personality badge configuration */
 const PERSONALITY_CONFIG: Record<PromoterPersonality, { 
@@ -242,25 +243,19 @@ export default function PromoterDirectory() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
-      {/* Header */}
-      <div className="mb-8 space-y-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-black uppercase tracking-widest text-primary">
-              Promoter Directory
-            </h1>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">
-              Browse all promoters • Week {week}
-            </p>
-          </div>
-          <Button asChild variant="outline" className="text-[11px] uppercase font-bold">
+      <PageHeader
+        icon={Building2}
+        title="Promoter Directory"
+        subtitle={`OPS · PROMOTERS · WEEK ${week}`}
+        actions={
+          <Button asChild variant="outline" className="h-9 text-[11px] uppercase font-black tracking-widest gap-2">
             <Link to="/ops/contracts">
-              <Calendar className="h-4 w-4 mr-2" />
+              <Calendar className="h-3.5 w-3.5" />
               Booking Office
             </Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">

@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   Calendar, 
-  TrendingUp, 
   TrendingDown,
   Swords, 
   Trophy,
@@ -19,8 +18,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
-import type { FightSummary } from "@/types/game";
+import type { FightSummary, WarriorId } from "@/types/game";
 import type { BoutOffer } from "@/types/state.types";
+import { useGameStore } from "@/state/useGameStore";
 
 interface WeeklyDigestProps {
   week: number;
@@ -49,14 +49,38 @@ export function WeeklyDigestWidget({
   boutOffers,
   currentWeek 
 }: WeeklyDigestProps) {
+  const state = useGameStore();
+  
   const summary = useMemo<DigestSummary>(() => {
+    // Get player warrior IDs
+    const playerWarriorIds = new Set<WarriorId>(state.roster.map(w => w.id));
+    
     // Filter fights for current week
     const thisWeekFights = arenaHistory.filter(f => f.week === currentWeek);
     
-    const wins = thisWeekFights.filter(f => f.resultForPlayer === "win").length;
-    const losses = thisWeekFights.filter(f => f.resultForPlayer === "loss").length;
-    const kills = thisWeekFights.filter(f => f.by === "Kill" && f.resultForPlayer === "win").length;
-    const deaths = thisWeekFights.filter(f => f.by === "Kill" && f.resultForPlayer === "loss").length;
+    // Determine player wins/losses by checking if player warriors are winners
+    let wins = 0;
+    let losses = 0;
+    let kills = 0;
+    let deaths = 0;
+    
+    thisWeekFights.forEach(f => {
+      const playerIsA = playerWarriorIds.has(f.warriorIdA);
+      const playerIsD = playerWarriorIds.has(f.warriorIdD);
+      
+      if (!playerIsA && !playerIsD) return; // Skip fights without player warriors
+      
+      const playerWon = (playerIsA && f.winner === "A") || (playerIsD && f.winner === "D");
+      const playerLost = (playerIsA && f.winner === "D") || (playerIsD && f.winner === "A");
+      
+      if (playerWon) {
+        wins++;
+        if (f.by === "Kill") kills++;
+      } else if (playerLost) {
+        losses++;
+        if (f.by === "Kill") deaths++;
+      }
+    });
     
     // Count offers
     const offers = Object.values(boutOffers);
@@ -75,7 +99,7 @@ export function WeeklyDigestWidget({
       signedOffers: signed,
       tournamentActive: false // Set by parent if needed
     };
-  }, [arenaHistory, boutOffers, currentWeek]);
+  }, [arenaHistory, boutOffers, currentWeek, state.roster]);
 
   const hasActivity = summary.totalFights > 0 || summary.pendingOffers > 0 || summary.signedOffers > 0;
 
