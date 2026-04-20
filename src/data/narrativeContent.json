@@ -361,8 +361,8 @@
       "tears flesh from {{defender}}'s {{bodyPart}}",
       "smashes sickeningly into {{defender}}'s {{bodyPart}}",
       "{{attacker}} lands a punishing blow on {{defender}}'s {{bodyPart}}.",
-      "A brutal impact! {{attacker}} smashes into {{defender}}.",
-      "{{defender}} grunts as {{attacker}}'s strike connects solidly."
+      "A brutal impact! {{attacker}} smashes into {{defender}}'s {{bodyPart}}.",
+      "{{defender}} grunts as {{attacker}}'s strike connects solidly with the {{bodyPart}}."
     ],
     "slashing": {
       "glancing": [
