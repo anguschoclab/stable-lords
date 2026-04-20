@@ -3,18 +3,29 @@ import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Zap, 
-  Search, 
-  Swords, 
-  RotateCw, 
-  CheckCircle2, 
+import {
+  Zap,
+  Search,
+  Swords,
+  RotateCw,
+  CheckCircle2,
   AlertCircle,
   Sparkles,
-  Target
+  Target,
+  TrendingUp,
+  Brain,
 } from "lucide-react";
+import type { InsightTokenType } from "@/types/state.types";
 import { motion, AnimatePresence } from "framer-motion";
 import { FightingStyle } from "@/types/shared.types";
+
+const TOKEN_CFG: Record<InsightTokenType, { Icon: React.ElementType; color: string; label: string }> = {
+  Weapon:    { Icon: Swords,      color: "bg-orange-500/20 text-orange-500", label: "Weapon"    },
+  Rhythm:    { Icon: RotateCw,    color: "bg-cyan-500/20 text-cyan-500",     label: "Rhythm"    },
+  Style:     { Icon: Zap,         color: "bg-yellow-500/20 text-yellow-500", label: "Style"     },
+  Attribute: { Icon: TrendingUp,  color: "bg-green-500/20 text-green-500",   label: "Attribute" },
+  Tactic:    { Icon: Brain,       color: "bg-purple-500/20 text-purple-500", label: "Tactic"    },
+};
 
 export function InsightManager() {
   const state = useWorldState();
@@ -39,12 +50,18 @@ export function InsightManager() {
     setTimeout(() => {
       const type = selectedToken.type;
       let result = "Unknown";
-      
+
       if (type === "Weapon") {
         result = selectedWarrior.favorites?.weaponId || "Gladius";
-      } else {
-        const r = selectedWarrior.favorites?.rhythm || { oe: 0.5, al: 0.5 };
-        result = `OE:${Math.round(r.oe * 100)}% / AL:${Math.round(r.al * 100)}%`;
+      } else if (type === "Rhythm") {
+        const r = selectedWarrior.favorites?.rhythm || { oe: 5, al: 5 };
+        result = `OE:${r.oe} / AL:${r.al}`;
+      } else if (type === "Style") {
+        result = "+1 ATT Permanently Applied";
+      } else if (type === "Attribute") {
+        result = "Primary Attribute Enhanced (+1)";
+      } else if (type === "Tactic") {
+        result = "Tactical Insight Unlocked";
       }
 
       setRevealData({
@@ -101,11 +118,13 @@ export function InsightManager() {
                     className="w-full text-left p-4 outline-none"
                   >
                   <div className="flex items-center gap-3 relative z-10">
-                    <div className={`p-2 rounded-none ${token.type === "Weapon" ? "bg-orange-500/20 text-orange-500" : "bg-cyan-500/20 text-cyan-500"}`}>
-                       {token.type === "Weapon" ? <Swords className="h-4 w-4" /> : <RotateCw className="h-4 w-4" />}
-                    </div>
+                    {(() => { const cfg = TOKEN_CFG[token.type as InsightTokenType] ?? TOKEN_CFG.Weapon; const Icon = cfg.Icon; return (
+                      <div className={`p-2 rounded-none ${cfg.color}`}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                    ); })()}
                     <div>
-                       <span className="block text-[10px] font-black uppercase tracking-wider text-white">{token.type}_Insight</span>
+                       <span className="block text-[10px] font-black uppercase tracking-wider text-white">{token.type}_Token</span>
                        <span className="block text-[9px] text-muted-foreground uppercase tracking-widest font-mono opacity-60">WK_{token.discoveredWeek} // {token.id.slice(0, 8)}</span>
                     </div>
                   </div>
@@ -128,9 +147,11 @@ export function InsightManager() {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {roster.map((w: any) => {
-                    const isRevealed = selectedToken?.type === "Weapon" 
-                      ? w.favorites?.discovered.weapon 
-                      : w.favorites?.discovered.rhythm;
+                    const isRevealed = selectedToken?.type === "Weapon"
+                      ? w.favorites?.discovered.weapon
+                      : selectedToken?.type === "Rhythm"
+                        ? w.favorites?.discovered.rhythm
+                        : false; // Style/Attribute/Tactic are stat boosts — always applicable
 
                     return (
                       <Surface

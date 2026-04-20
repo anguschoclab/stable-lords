@@ -108,6 +108,14 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
           draft.favorites.discovered.weapon = true;
         } else if (token.type === "Rhythm") {
           draft.favorites.discovered.rhythm = true;
+        } else if (token.type === "Style") {
+          if (draft.baseSkills) draft.baseSkills = { ...draft.baseSkills, ATT: draft.baseSkills.ATT + 1 };
+        } else if (token.type === "Attribute") {
+          const primaries = ["ST", "WT", "SP", "DF"] as const;
+          const attrKey = primaries[Math.floor(Math.random() * primaries.length)]!;
+          draft.attributes = { ...draft.attributes, [attrKey]: (draft.attributes[attrKey] || 10) + 1 };
+        } else if (token.type === "Tactic") {
+          draft.flair = [...(draft.flair || []), "Tactical Insight"];
         }
 
         return draft;

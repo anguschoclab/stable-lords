@@ -40,7 +40,8 @@
       "Bash(bun scripts/validateNarrativeArchive.ts)",
       "Bash(find /Users/amauricia/Documents/GitHub/stable-lords/src/components/planBuilder -name \"*.tsx\" -exec basename {} \\\\;)",
       "Bash(find /Users/amauricia/Documents/GitHub/stable-lords/src/routes -name \"*.tsx\" -type f -exec grep -l \"createFileRoute\" {} \\\\;)",
-      "Bash(find /Users/amauricia/Documents/GitHub/stable-lords/src -type f -name \"*.ts\" -exec grep -l \"interface BoutResult\\\\|type BoutResult =\" {} \\\\;)"
+      "Bash(find /Users/amauricia/Documents/GitHub/stable-lords/src -type f -name \"*.ts\" -exec grep -l \"interface BoutResult\\\\|type BoutResult =\" {} \\\\;)",
+      "Bash(npx --yes tsc --noEmit)"
     ]
   }
 }

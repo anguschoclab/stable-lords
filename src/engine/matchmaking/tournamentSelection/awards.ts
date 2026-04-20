@@ -1,5 +1,5 @@
 
-import type { GameState, Warrior, TournamentEntry } from '@/types/state.types';
+import type { GameState, Warrior, TournamentEntry, InsightTokenType } from '@/types/state.types';
 import { SeededRNG } from '@/utils/random';
 import { PatronTokenService } from '@/engine/tokens/patronTokenService';
 import { findWarriorById } from './utils';
@@ -39,7 +39,17 @@ export function awardTournamentPrizes(tournament: TournamentEntry, state: GameSt
       draft.fame = (draft.fame || 0) + prizeFame;
     });
 
-    // 2. Financials & Specific Rewards
+    // 2. Financials & token awards
+    const tokenMap: Record<string, Partial<Record<1 | 2 | 3, InsightTokenType[]>>> = {
+      GOLD:   { 1: ["Weapon", "Rhythm", "Attribute"], 2: ["Weapon", "Style"], 3: ["Rhythm"] },
+      SILVER: { 1: ["Weapon", "Rhythm", "Style"],     2: ["Weapon"],          3: ["Style"]  },
+      BRONZE: { 1: ["Weapon", "Rhythm"],               2: ["Style"],           3: ["Rhythm"] },
+      IRON:   { 1: ["Weapon", "Rhythm"],               2: ["Style"],           3: []         },
+    };
+    const placeLabel = place === 1 ? "🥇" : place === 2 ? "🥈" : "🥉";
+    const source = `${tournament.name} (${placeLabel})`;
+    const tokens = (tokenMap[tier] ?? tokenMap.IRON)[place] ?? [];
+
     if (isPlayer) {
       updatedState.treasury += prizeGold;
       updatedState.ledger.push({
@@ -51,20 +61,30 @@ export function awardTournamentPrizes(tournament: TournamentEntry, state: GameSt
       });
       updatedState.fame = (updatedState.fame || 0) + prizeFame;
       updatedState.player = { ...updatedState.player, fame: (updatedState.player.fame || 0) + prizeFame };
-
-      if (place === 1) {
-        updatedState.rosterBonus = (updatedState.rosterBonus || 0) + 1;
-        updatedState = PatronTokenService.awardToken(updatedState, "Style", `${tournament.name} (🥇)`, awardRng);
-      } else if (place === 2) {
-        updatedState = PatronTokenService.awardToken(updatedState, "Weapon", `${tournament.name} (🥈)`, awardRng);
-      } else if (place === 3) {
-        updatedState = PatronTokenService.awardToken(updatedState, "Rhythm", `${tournament.name} (🥉)`, awardRng);
+      if (place === 1) updatedState.rosterBonus = (updatedState.rosterBonus || 0) + 1;
+      for (const tokenType of tokens) {
+        updatedState = PatronTokenService.awardToken(updatedState, tokenType, source, awardRng);
       }
     } else {
-      // Rival reward logic
       updatedState.rivals = updatedState.rivals.map(r =>
         r.owner.id === w.stableId ? { ...r, treasury: r.treasury + prizeGold, fame: (r.fame || 0) + prizeFame } : r
       );
+      // Apply token effects directly to rival warriors (no pool — rivals don't manage tokens via UI)
+      const primaries = ["ST", "WT", "SP", "DF"] as const;
+      for (const tokenType of tokens) {
+        updatedState = modifyWarrior(updatedState, w.id, (draft) => {
+          if (tokenType === "Weapon" && draft.favorites) {
+            draft.favorites.discovered.weapon = true;
+          } else if (tokenType === "Rhythm" && draft.favorites) {
+            draft.favorites.discovered.rhythm = true;
+          } else if (tokenType === "Style" && draft.baseSkills) {
+            draft.baseSkills.ATT = (draft.baseSkills.ATT || 0) + 1;
+          } else if (tokenType === "Attribute") {
+            const attrKey = awardRng.pick([...primaries]);
+            draft.attributes[attrKey] = (draft.attributes[attrKey] || 10) + 1;
+          }
+        });
+      }
     }
   };
 

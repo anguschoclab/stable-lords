@@ -1,15 +1,18 @@
 import React from "react";
 import { useGameStore } from "@/state/useGameStore";
-import { Shield, Users, Crown, Medal, Award, Star } from "lucide-react";
+import { Shield, Users, Crown, Medal, Award, Star, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Surface } from "@/components/ui/Surface";
+import { Badge } from "@/components/ui/badge";
 import { ReputationSliders } from "@/components/stable/ReputationSliders";
 import { RosterWall } from "@/components/stable/RosterWall";
 import { TrainerTable } from "@/components/stable/TrainerTable";
 import { StyleMeterTable } from "@/components/charts/StyleMeterTable";
+import { InsightManager } from "@/components/ledger/InsightManager";
 
 export default function StableHall() {
-  const { player, fame } = useGameStore();
+  const { player, fame, insightTokens } = useGameStore();
+  const pendingTokens = (insightTokens ?? []).length;
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
@@ -51,6 +54,15 @@ export default function StableHall() {
                 {player.titles || 0} <Crown className="h-4 w-4" />
               </div>
            </div>
+
+           {pendingTokens > 0 && (
+             <div className="flex flex-col">
+               <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">Patron Tokens</span>
+               <div className="flex items-center gap-2 font-display font-black text-2xl text-yellow-400 tracking-tighter leading-none">
+                 {pendingTokens} <Sparkles className="h-4 w-4 animate-pulse" />
+               </div>
+             </div>
+           )}
         </div>
 
         <div className="ml-auto hidden xl:block text-right">
@@ -78,6 +90,19 @@ export default function StableHall() {
            <RosterWall />
         </div>
       </div>
+
+      {pendingTokens > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 px-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400">PATRONAGE_AWARDS</span>
+            <Badge className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-[9px] font-black">
+              {pendingTokens} TOKEN{pendingTokens !== 1 ? "S" : ""} PENDING
+            </Badge>
+            <div className="h-px flex-1 bg-gradient-to-r from-yellow-400/20 via-border/20 to-transparent" />
+          </div>
+          <InsightManager />
+        </div>
+      )}
     </div>
   );
 }
