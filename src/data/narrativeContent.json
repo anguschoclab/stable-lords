@@ -480,11 +480,11 @@
         "{{attacker}} violently drives their point through {{defender}}'s {{bodyPart}}, lifting them momentarily off the ground.",
         "A blinding lunge from {{attacker}} catches {{defender}} perfectly in the {{bodyPart}}. The fight ends in a gurgling gasp.",
         "{{attacker}} pins {{defender}} against the metaphorical ropes, burying the blade to the hilt in their {{bodyPart}}.",
-        "{{attacker}}'s point finds a gap in the armor, driving deep into {{defender}}'s heart in a single, surgical motion.",
-        "With cruel precision, {{attacker}} impales {{defender}}, lifting them slightly off their feet before letting them slide to the bloody sand.",
-        "A lightning-fast lunge from {{attacker}} goes straight through {{defender}}'s throat. The crowd gasps at the sudden finality.",
-        "{{attacker}} traps {{defender}}'s weapon, steps in close, and buries their point into {{defender}}'s unarmored flank.",
-        "Several rapid, blinding thrusts from {{attacker}} turn {{defender}} into a pincushion. The final strike pierces an eye."
+        "{{attacker}}'s point finds a gap in the armor, driving deep into {{defender}}'s {{bodyPart}} in a single, surgical motion.",
+        "With cruel precision, {{attacker}} impales {{defender}} through the {{bodyPart}}, lifting them slightly off their feet before letting them slide to the bloody sand.",
+        "A lightning-fast lunge from {{attacker}} goes straight through {{defender}}'s {{bodyPart}}. The crowd gasps at the sudden finality.",
+        "{{attacker}} traps {{defender}}'s weapon, steps in close, and buries their point into {{defender}}'s {{bodyPart}}.",
+        "Several rapid, blinding thrusts from {{attacker}} turn {{defender}}'s {{bodyPart}} into a pincushion."
       ]
     },
     "fist": {
