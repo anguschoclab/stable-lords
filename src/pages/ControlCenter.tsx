@@ -83,6 +83,73 @@ function KpiBar() {
   );
 }
 
+// ─── Rankings Bar ─────────────────────────────────────────────────────────────
+
+function RankingsBar() {
+  const { roster, fame, rivals, realmRankings } = useGameStore(
+    useShallow((s) => ({
+      roster: s.roster,
+      fame: s.fame,
+      rivals: s.rivals,
+      realmRankings: s.realmRankings,
+    }))
+  );
+
+  const stableRank = useMemo(() => {
+    if (!rivals || rivals.length === 0) return null;
+    const higherCount = rivals.filter((r) => (r.fame ?? 0) > (fame ?? 0)).length;
+    return higherCount + 1;
+  }, [rivals, fame]);
+
+  const topWarriorRank = useMemo(() => {
+    if (!realmRankings || Object.keys(realmRankings).length === 0) return null;
+    let best: number | null = null;
+    for (const w of roster) {
+      const entry = realmRankings[w.id];
+      if (entry && entry.overallRank > 0) {
+        if (best === null || entry.overallRank < best) {
+          best = entry.overallRank;
+        }
+      }
+    }
+    return best;
+  }, [roster, realmRankings]);
+
+  const items = [
+    {
+      label: "Stable Rank",
+      value: stableRank !== null ? `#${stableRank}` : "—",
+      icon: Trophy,
+      color: stableRank === 1 ? "text-arena-gold" : "text-arena-fame",
+      glow: stableRank === 1 ? "shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "",
+      sub: stableRank !== null ? `of ${rivals.length + 1} stables` : "No rivals yet",
+    },
+    {
+      label: "Top Warrior Rank",
+      value: topWarriorRank !== null ? `#${topWarriorRank}` : "—",
+      icon: Star,
+      color: topWarriorRank !== null && topWarriorRank <= 10 ? "text-arena-gold" : "text-primary",
+      glow: topWarriorRank !== null && topWarriorRank <= 3 ? "shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "",
+      sub: topWarriorRank !== null ? "overall realm ranking" : "Rankings not yet set",
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {items.map(({ label, value, icon: Icon, color, glow, sub }) => (
+        <Surface key={label} variant="glass" className={cn("p-4 flex items-center gap-4", glow)}>
+          <Icon className={cn("h-5 w-5 shrink-0", color)} />
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{label}</span>
+            <span className={cn("font-display font-black text-2xl tracking-tighter leading-none", color)}>{value}</span>
+            <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-wider">{sub}</span>
+          </div>
+        </Surface>
+      ))}
+    </div>
+  );
+}
+
 // ─── Hero Panel ───────────────────────────────────────────────────────────────
 
 function HeroPanel() {
@@ -361,11 +428,11 @@ function ReputationTab() {
   const worldState = useWorldState();
   const rep = useMemo(() => computeStableReputation(worldState), [worldState]);
 
-  const dims: { key: keyof typeof rep; label: string; color: string; icon: React.ElementType; desc: string }[] = [
-    { key: "fame",         label: "Fame",          color: "text-arena-gold",  icon: Star,    desc: "Public acclaim from victories and showmanship." },
-    { key: "notoriety",    label: "Notoriety",     color: "text-destructive", icon: Skull,   desc: "Feared reputation built on kills and ruthlessness." },
-    { key: "honor",        label: "Honor",         color: "text-primary",     icon: Shield,  desc: "Moral standing and respect from arena elite." },
-    { key: "adaptability", label: "Adaptability",  color: "text-arena-pop",   icon: Zap,     desc: "Strategic response to the shifting combat meta." },
+  const dims: { key: keyof typeof rep; label: string; color: string; icon: React.ElementType; desc: string; effect: string }[] = [
+    { key: "fame",         label: "Fame",          color: "text-arena-gold",  icon: Star,    desc: "Public acclaim from victories and showmanship.",           effect: "Attracts better promoter offers and higher purses." },
+    { key: "notoriety",    label: "Notoriety",     color: "text-destructive", icon: Skull,   desc: "Feared reputation built on kills and ruthlessness.",        effect: "Rivals think twice before accepting your bouts." },
+    { key: "honor",        label: "Honor",         color: "text-primary",     icon: Shield,  desc: "Moral standing and respect from the arena elite.",          effect: "Unlocks Honorable promoter preference and trainer discounts." },
+    { key: "adaptability", label: "Adaptability",  color: "text-arena-pop",   icon: Zap,     desc: "Strategic responsiveness to the shifting combat meta.",     effect: "Earns higher hype bonuses in style-clash matchups." },
   ];
 
   return (
