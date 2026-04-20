@@ -78,7 +78,7 @@ export function RivalStableList({ rivals, selectedRivalId, onSelectRival }: Riva
                 </Surface>
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="bg-glass-card border-border/40 shadow-xl p-3">
+            <TooltipContent side="right" className="bg-neutral-900 border-primary/20 shadow-2xl p-3 rounded-none">
               <p className="text-[10px] font-black uppercase tracking-widest text-primary">SELECT_STABLE_ASSET</p>
             </TooltipContent>
           </Tooltip>

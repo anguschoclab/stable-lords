@@ -1,12 +1,12 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Swords, Flame } from "lucide-react";
 import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
 import { LethalityBadge } from "./LethalityBadge";
 import { StableLink } from "@/components/EntityLink";
+import { Badge } from "@/components/ui/badge";
 import { StableCrest } from "@/components/crest/StableCrest";
 import type { BoutPairing as MatchPairing } from "@/engine/boutProcessor";
+import { Surface } from "@/components/ui/Surface";
+import { cn } from "@/lib/utils";
 
 interface MatchCardProps {
   pairing: MatchPairing;
@@ -17,9 +17,8 @@ export function MatchCard({ pairing, crowdMood }: MatchCardProps) {
   const { a: wA, d: wB, rivalStable, isRivalry: isRivalryBout } = pairing;
 
   return (
-    <Card className="bg-glass-card border border-border/40 hover:border-primary/40 transition-all overflow-hidden group">
-      <CardContent className="p-0">
-        <div className="flex items-center justify-between px-4 py-2 bg-secondary/20 border-b border-border/10">
+    <Surface variant="glass" padding="none" className="border-white/5 hover:border-primary/40 transition-all overflow-hidden group">
+        <div className="flex items-center justify-between px-4 py-2 bg-secondary/20 border-b border-white/5">
           <div className="flex items-center gap-3">
             <Swords className="h-3.5 w-3.5 text-muted-foreground/60" />
             <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Engagement_Matchup</span>
@@ -31,43 +30,42 @@ export function MatchCard({ pairing, crowdMood }: MatchCardProps) {
           )}
         </div>
 
-        <div className="p-4 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-          <div className="space-y-2">
+        <div className="p-5 grid grid-cols-[1fr_auto_1fr] items-center gap-8">
+          <div className="space-y-3">
             <div className="flex items-center gap-3">
               <WarriorNameTag id={wA.id} name={wA.name} isChampion={wA.champion} />
               <StatBadge styleName={wA.style} />
             </div>
             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary/60">
-              <span className="px-1.5 py-0.5 rounded-none bg-primary/10">PLAYER_STABLE</span>
+              <span className="px-2 py-0.5 bg-primary/10 border border-primary/20">PLAYER_STABLE</span>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-1.5">
-            <div className="h-8 w-px bg-gradient-to-b from-transparent via-border/40 to-transparent" />
-            <span className="text-[10px] font-black text-muted-foreground/40 tracking-tighter italic font-display uppercase">VS</span>
-            <div className="h-8 w-px bg-gradient-to-b from-transparent via-border/40 to-transparent" />
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            <span className="text-[10px] font-black text-muted-foreground/40 tracking-[0.3em] italic font-display uppercase">VS</span>
+            <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
           </div>
 
-          <div className="space-y-2 text-right">
+          <div className="space-y-3 text-right">
             <div className="flex items-center justify-end gap-3">
                <StatBadge styleName={wB.style} />
                <WarriorNameTag id={wB.id} name={wB.name} isChampion={wB.champion} />
             </div>
             <div className="flex items-center justify-end gap-2 text-[9px] font-black uppercase tracking-widest text-accent/60">
-               <StableLink name={rivalStable || "Rival Stable"} className="hover:text-accent transition-colors" />
+               <StableLink name={rivalStable || "Rival Stable"} className="hover:text-accent transition-colors underline-offset-4 decoration-accent/30" />
             </div>
           </div>
         </div>
 
-        <div className="px-4 py-2 bg-secondary/5 border-t border-border/10 flex items-center justify-between">
+        <div className="px-4 py-3 bg-black/20 border-t border-white/5 flex items-center justify-between">
             <LethalityBadge wA={wA} wB={wB} crowdMood={crowdMood} />
-            <div className="flex items-center gap-4 text-[9px] font-mono font-black text-muted-foreground/40 uppercase tracking-widest">
-                <span>{wA.career.wins}w-{wA.career.losses}l</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-border/40" />
-                <span>{wB.career.wins}w-{wB.career.losses}l</span>
+            <div className="flex items-center gap-4 text-[9px] font-mono font-black text-muted-foreground/30 uppercase tracking-widest">
+                <span>{wA.career.wins}W-{wA.career.losses}L</span>
+                <span className="w-1.5 h-1.5 bg-white/10" />
+                <span>{wB.career.wins}W-{wB.career.losses}L</span>
             </div>
         </div>
-      </CardContent>
-    </Card>
+    </Surface>
   );
 }

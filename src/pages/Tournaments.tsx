@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
 import { Trophy, Play, UserPlus, FastForward, Settings2 } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import { engineProxy } from "@/engine/workerProxy";
@@ -141,17 +142,21 @@ export default function Tournaments() {
       />
 
       {currentTournament && (
-        <Card className="border-accent/40 shadow-[0_0_30px_-10px_hsla(var(--accent),0.3)] bg-glass-card overflow-hidden">
-          <CardHeader className="pb-4 bg-accent/5 border-b border-border/10">
-            <CardTitle className="font-display text-xl font-black flex items-center justify-between text-accent uppercase tracking-tighter">
+        <Surface 
+          variant="gold" 
+          padding="none" className="border-accent/40 shadow-[0_0_50px_-10px_hsla(var(--accent),0.2)] overflow-hidden">
+          <div className="pb-4 bg-accent/5 border-b border-border/10 p-6">
+            <div className="font-display text-xl font-black flex items-center justify-between text-accent uppercase tracking-tighter">
               <span className="flex items-center gap-3">
                 <span className="text-2xl drop-shadow-sm">{SEASON_ICONS[season]}</span>
                 {currentTournament.name}
               </span>
-              <Badge className="bg-primary text-primary-foreground font-black uppercase text-[9px] tracking-[0.2em] px-3 animate-pulse">PROTOCOL_LIVE</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
+              <Badge className="bg-primary text-black font-black uppercase text-[9px] tracking-[0.2em] px-3 animate-pulse border-none">
+                PROTOCOL_LIVE
+              </Badge>
+            </div>
+          </div>
+          <div className="p-0">
             <TournamentBracket
               bouts={currentTournament.bracket}
               arenaHistory={arenaHistory}
@@ -160,9 +165,9 @@ export default function Tournaments() {
             />
 
             {currentTournament.bracket.some((b) => b.winner === undefined) && (
-              <div className="flex flex-col gap-4 p-6 border-t border-border/10 bg-secondary/10">
+              <div className="flex flex-col gap-4 p-8 border-t border-white/5 bg-secondary/10">
                 <div className="flex gap-4">
-                  <Button onClick={handleExecuteRound} className="flex-1 h-12 font-black uppercase text-[11px] tracking-widest shadow-lg">
+                  <Button onClick={handleExecuteRound} className="flex-1 h-14 font-black uppercase text-[11px] tracking-[0.4em] shadow-2xl bg-primary text-black hover:bg-primary/90 transition-all">
                     <Play className="h-4 w-4 mr-2 fill-current" /> EXECUTE_NEXT_BOUT
                   </Button>
                 </div>
@@ -171,15 +176,15 @@ export default function Tournaments() {
                   <Button 
                     variant="outline" 
                     onClick={() => setIsPrepOpen(true)} 
-                    className="w-full h-11 font-black uppercase text-[10px] tracking-widest gap-2 bg-accent/5"
+                    className="w-full h-12 font-black uppercase text-[10px] tracking-widest gap-2 bg-accent/5 border-accent/20 hover:bg-accent/10 transition-colors"
                   >
                     <Settings2 className="h-4 w-4" /> OPEN_PREP_CONSOLE
                   </Button>
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </Surface>
       )}
 
       <div className="space-y-4">

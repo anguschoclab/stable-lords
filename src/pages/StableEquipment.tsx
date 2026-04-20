@@ -11,7 +11,10 @@ import { Shield, Swords, Star, AlertTriangle, Lightbulb, Shirt, HardHat, Zap, Pa
 import { checkWeaponRequirements } from "@/data/equipment";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { Activity } from "lucide-react";
 
 export default function StableEquipment() {
   const { roster, updateWarriorEquipment } = useGameStore();
@@ -43,93 +46,93 @@ export default function StableEquipment() {
     <div className="space-y-8 max-w-7xl mx-auto pb-20">
       <PageHeader 
         title="THE_ARMORY"
-        subtitle="Manage specialized loadouts and tactical equipment synergies for your roster."
+        subtitle="OPS · ARMORY · TACTICAL LOADOUTS"
         icon={Shield}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Style & Tips */}
-        <div className="lg:col-span-4 space-y-6">
-          <Card className="bg-glass-card border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
-                <Package className="h-4 w-4 text-primary" /> Tactical Style
-              </CardTitle>
-              <CardDescription className="text-[10px] uppercase font-bold opacity-60">Optimize gear for specific methodologies</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Selection_Matrix</label>
-                <Select value={selectedStyle} onValueChange={(v) => {
-                  setSelectedStyle(v as FightingStyle);
-                  const firstMatch = activeWarriors.find(w => w.style === v);
-                  if (firstMatch) setTargetWarriorId(firstMatch.id);
-                }}>
-                  <SelectTrigger className="h-12 bg-secondary/20 border-border/40 font-bold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(STYLE_DISPLAY_NAMES).map(([val, label]) => (
-                      <SelectItem key={val} value={val} className="font-bold">{label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Style & Tips (span-4) */}
+        <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-6">
+          <Surface variant="glass" className="space-y-6">
+            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+              <Package className="h-4 w-4 text-primary" />
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Tactical_Style</span>
+                <span className="text-[8px] uppercase font-bold text-muted-foreground/60 tracking-widest mt-0.5">Optimize Methodology</span>
               </div>
+            </div>
 
-              {tips.length > 0 && (
-                <div className="space-y-3 pt-4 border-t border-border/10">
-                  <div className="flex items-center gap-2 text-[10px] font-black uppercase text-accent tracking-widest">
-                    <Lightbulb className="h-3.5 w-3.5" /> Style Intelligence
+            <div className="space-y-3">
+              <label className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground/60">Selection_Matrix</label>
+              <Select value={selectedStyle} onValueChange={(v) => {
+                setSelectedStyle(v as FightingStyle);
+                const firstMatch = activeWarriors.find(w => w.style === v);
+                if (firstMatch) setTargetWarriorId(firstMatch.id);
+              }}>
+                <SelectTrigger className="h-10 bg-black/40 border-white/10 font-black text-[10px] uppercase tracking-widest px-4">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-neutral-900 border-white/10">
+                  {Object.entries(STYLE_DISPLAY_NAMES).map(([val, label]) => (
+                    <SelectItem key={val} value={val} className="font-black text-[10px] uppercase tracking-widest">{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {tips.length > 0 && (
+              <div className="space-y-4 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-2 text-[9px] font-black uppercase text-arena-gold tracking-[0.3em]">
+                  <Lightbulb className="h-3.5 w-3.5" /> Intelligence_Feed
+                </div>
+                <ul className="space-y-3">
+                  {tips.map((tip, i) => (
+                    <li key={i} className="text-[10px] text-muted-foreground leading-relaxed flex items-start gap-2 italic">
+                      <div className="h-1 w-1 bg-arena-gold shrink-0 mt-1.5" />
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </Surface>
+
+          <Surface variant="glass" className="space-y-4">
+            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground/60 px-1 mb-2">
+              <Star className="h-3 w-3 text-arena-gold" /> Style_Champions
+            </div>
+            <div className="space-y-2">
+              {activeWarriors.filter(w => w.style === selectedStyle).map(w => (
+                <button
+                  key={w.id}
+                  onClick={() => setTargetWarriorId(w.id)}
+                  className={cn(
+                    "w-full flex items-center justify-between p-3 border transition-all duration-300",
+                    targetWarriorId === w.id 
+                      ? "bg-primary/10 border-primary/30 shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]" 
+                      : "bg-white/[0.02] border-white/5 hover:border-white/10 opacity-70 hover:opacity-100"
+                  )}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", targetWarriorId === w.id ? "bg-primary animate-pulse" : "bg-white/20")} />
+                    <div className="flex flex-col items-start min-w-0">
+                      <span className={cn("text-[10px] font-black uppercase tracking-widest truncate", targetWarriorId === w.id ? "text-primary" : "text-foreground")}>{w.name}</span>
+                      <span className="text-[8px] font-mono text-muted-foreground/60 mt-0.5">FAME: {w.fame}</span>
+                    </div>
                   </div>
-                  <ul className="space-y-2">
-                    {tips.map((tip, i) => (
-                      <li key={i} className="text-[11px] text-muted-foreground leading-relaxed flex items-start gap-2">
-                        <span className="text-accent mt-0.5">•</span>
-                        {tip}
-                      </li>
-                    ))}
-                  </ul>
+                  {targetWarriorId === w.id && <Activity className="h-3 w-3 text-primary" />}
+                </button>
+              ))}
+              {activeWarriors.filter(w => w.style === selectedStyle).length === 0 && (
+                <div className="p-10 text-center border border-dashed border-white/10 opacity-30">
+                  <p className="text-[8px] font-black uppercase tracking-widest">Berths_Empty</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-glass-card border-border/10">
-            <CardHeader>
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
-                <Star className="h-4 w-4 text-arena-gold" /> Style Champions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {activeWarriors.filter(w => w.style === selectedStyle).map(w => (
-                  <Button
-                    key={w.id}
-                    variant={targetWarriorId === w.id ? "secondary" : "ghost"}
-                    className={cn(
-                      "w-full justify-start h-12 gap-3 transition-all",
-                      targetWarriorId === w.id ? "bg-primary/10 border-primary/20" : "opacity-60 grayscale hover:grayscale-0"
-                    )}
-                    onClick={() => setTargetWarriorId(w.id)}
-                  >
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                    <div className="flex flex-col items-start">
-                      <span className="text-xs font-black uppercase tracking-tight">{w.name}</span>
-                      <span className="text-[9px] font-mono opacity-50">Fame: {w.fame}</span>
-                    </div>
-                  </Button>
-                ))}
-                {activeWarriors.filter(w => w.style === selectedStyle).length === 0 && (
-                  <div className="p-8 text-center border-2 border-dashed border-border/20 rounded-none">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">No_Active_Operatives</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </Surface>
         </div>
 
-        {/* Right Column: Recommendations */}
+        {/* Right Column: Recommendations (span-8) */}
         <div className="lg:col-span-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {recs.map((rec, i) => {
@@ -138,71 +141,79 @@ export default function StableEquipment() {
                 : null;
               
               return (
-                <Card key={i} className={cn(
-                  "bg-glass-card transition-all group overflow-hidden",
-                  i === 0 ? "border-primary/40 shadow-[0_0_30px_-10px_rgba(var(--primary-rgb),0.3)]" : "border-border/10 hover:border-primary/20"
+                <Surface key={i} padding="none" className={cn(
+                  "transition-all group overflow-hidden flex flex-col",
+                  i === 0 ? "border-primary/40 shadow-[0_0_50px_-20px_rgba(var(--primary-rgb),0.3)] ring-1 ring-primary/20" : "border-white/5 hover:border-white/10"
                 )}>
-                  <CardHeader className="relative">
-                     <div className="flex items-center justify-between mb-2">
-                        <Badge className="bg-primary/20 text-primary border-primary/30 font-black uppercase text-[9px] tracking-widest">
-                           {rec.synergy}% Synergy
+                  <div className={cn("p-6 space-y-4 flex-1 flex flex-col", i === 0 ? "bg-primary/5" : "bg-black/20")}>
+                     <div className="flex items-center justify-between">
+                        <Badge className="bg-primary/20 text-primary border-primary/20 font-black uppercase text-[8px] tracking-[0.2em] px-2 py-0 border">
+                           {rec.synergy}%_INTELLIGENCE
                         </Badge>
-                        {i === 0 && <Badge className="bg-arena-gold text-black font-black uppercase text-[9px] tracking-widest">Primary_Rec</Badge>}
+                        {i === 0 && <Badge className="bg-arena-gold text-black font-black uppercase text-[8px] tracking-[0.2em] px-2 py-0 border-none">OPTIMAL_PATH</Badge>}
                      </div>
-                     <CardTitle className="font-display text-lg uppercase tracking-tight text-foreground group-hover:text-primary transition-colors">
-                        {rec.label}
-                     </CardTitle>
-                     <p className="text-[11px] text-muted-foreground leading-relaxed">{rec.description}</p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-3">
-                      <GearItem icon={Swords} name={rec.breakdown.weapon.item.name} weight={rec.breakdown.weapon.item.weight} error={!!(reqCheck && !reqCheck.met)} />
-                      <GearItem icon={Shirt} name={rec.breakdown.armor.item.name} weight={rec.breakdown.armor.item.weight} />
-                      <GearItem 
-                        icon={Shield} 
-                        name={rec.breakdown.shield.item.name} 
-                        weight={rec.breakdown.shield.item.weight} 
-                        blocked={rec.breakdown.shield.blocked}
-                      />
-                      <GearItem icon={HardHat} name={rec.breakdown.helm.item.name} weight={rec.breakdown.helm.item.weight} />
+                     
+                     <div className="space-y-1">
+                       <h3 className="font-display text-lg font-black uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors">
+                          {rec.label}
+                       </h3>
+                       <p className="text-[10px] text-muted-foreground/80 leading-relaxed italic pr-4">
+                        "{rec.description}"
+                       </p>
+                     </div>
+
+                    <div className="space-y-2.5 pt-4 border-t border-white/5">
+                      <GearRow icon={Swords} name={rec.breakdown.weapon.item.name} weight={rec.breakdown.weapon.item.weight} error={!!(reqCheck && !reqCheck.met)} high={i === 0} />
+                      <GearRow icon={Shirt} name={rec.breakdown.armor.item.name} weight={rec.breakdown.armor.item.weight} high={i === 0} />
+                      <GearRow icon={Shield} name={rec.breakdown.shield.item.name} weight={rec.breakdown.shield.item.weight} blocked={rec.breakdown.shield.blocked} high={i === 0} />
+                      <GearRow icon={HardHat} name={rec.breakdown.helm.item.name} weight={rec.breakdown.helm.item.weight} high={i === 0} />
                     </div>
 
                     {reqCheck && !reqCheck.met && (
-                      <div className="p-3 rounded-none bg-destructive/5 border border-destructive/20 space-y-2">
-                        <div className="flex items-center gap-2 text-[10px] font-black uppercase text-destructive tracking-widest">
-                          <AlertTriangle className="h-3.5 w-3.5" /> Requirement_Mismatch
+                      <div className="p-3 bg-destructive/10 border border-destructive/20 space-y-2 mt-4">
+                        <div className="flex items-center gap-2 text-[8px] font-black uppercase text-destructive tracking-[0.3em]">
+                          <AlertTriangle className="h-3 w-3" /> Hardware_Sync_Error
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {reqCheck.failures.map((f: any, fi: number) => (
-                            <Badge key={fi} variant="outline" className="text-[10px] font-mono border-destructive/30 text-destructive">
-                              {f.stat}: {f.current}/{f.required}
-                            </Badge>
+                            <div key={fi} className="text-[9px] font-mono font-black text-destructive/80 uppercase">
+                              [{f.stat}: {f.current} < {f.required}]
+                            </div>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    <div className="space-y-2 pt-4 border-t border-border/10">
-                      <div className="flex justify-between text-[11px] font-black uppercase tracking-widest mb-1">
-                        <span className="text-muted-foreground/60">Loadout Encumbrance</span>
-                        <span className={cn("font-mono font-bold", rec.totalWeight > carryCap ? "text-destructive" : "text-primary")}>
-                          {rec.totalWeight} / {carryCap}
+                    <div className="space-y-2 pt-6 mt-auto">
+                      <div className="flex justify-between text-[9px] font-black uppercase tracking-[0.3em] mb-1">
+                        <span className="text-muted-foreground/40 italic">System Encumbrance</span>
+                        <span className={cn("font-mono font-black", rec.totalWeight > carryCap ? "text-destructive" : "text-primary")}>
+                          {rec.totalWeight} / {carryCap}_UNIT
                         </span>
                       </div>
-                      <Progress value={Math.min(100, (rec.totalWeight / carryCap) * 100)} className={cn("h-1.5 bg-secondary/20", rec.totalWeight > carryCap ? "[&>div]:bg-destructive" : "[&>div]:bg-primary")} />
+                      <div className="h-1 bg-white/5 overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(100, (rec.totalWeight / carryCap) * 100)}%` }}
+                          className={cn("h-full", rec.totalWeight > carryCap ? "bg-destructive shadow-[0_0_10px_rgba(var(--destructive),0.5)]" : "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]")} 
+                        />
+                      </div>
                     </div>
+                  </div>
 
+                  <div className="p-4 bg-black/40 border-t border-white/5">
                     <Button 
-                      className="w-full h-11 border-primary/20 font-black uppercase text-[11px] tracking-[0.2em] shadow-lg group-hover:shadow-primary/20 transition-all"
-                      variant={i === 0 ? "default" : "secondary"}
+                      className={cn(
+                        "w-full h-12 font-black uppercase text-[10px] tracking-[0.4em] transition-all",
+                        i === 0 ? "bg-primary text-black hover:bg-primary/90" : "bg-white/[0.05] border-white/10 hover:bg-white/[0.1] text-foreground"
+                      )}
                       onClick={() => handleApply(rec.loadout, rec.label)}
                       disabled={!targetWarriorId}
                     >
-                      <Zap className="h-4 w-4 mr-2" />
-                      Commit_Loadout
+                      Initialize_Deployment
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </Surface>
               );
             })}
           </div>
@@ -212,18 +223,18 @@ export default function StableEquipment() {
   );
 }
 
-function GearItem({ icon: Icon, name, weight, error, blocked }: { icon: any, name: string, weight: number, error?: boolean, blocked?: boolean }) {
+function GearRow({ icon: Icon, name, weight, error, blocked, high }: { icon: any, name: string, weight: number, error?: boolean, blocked?: boolean, high?: boolean }) {
   return (
-    <div className="flex items-center gap-3 p-2 rounded-none bg-secondary/10 border border-transparent hover:border-border/20 transition-all">
-      <div className={cn("p-1.5 rounded-none", error ? "bg-destructive/10 text-destructive" : "bg-primary/5 text-primary/60")}>
-        <Icon className="h-4 w-4" />
+    <div className={cn("flex items-center gap-3 p-2.5 transition-all", high ? "bg-white/[0.03]" : "bg-black/20")}>
+      <div className={cn("p-1.5 rounded-none", error ? "bg-destructive/20 text-destructive" : "bg-white/5 text-muted-foreground/40")}>
+        <Icon className="h-3.5 w-3.5" />
       </div>
-      <div className="flex-1">
-        <div className={cn("text-xs font-black uppercase tracking-tight", error ? "text-destructive" : blocked ? "text-muted-foreground/40 line-through" : "text-foreground/80")}>
-          {name} {blocked && "(Blocked by 2H)"}
+      <div className="flex-1 min-w-0">
+        <div className={cn("text-[10px] font-black uppercase tracking-widest truncate", error ? "text-destructive" : blocked ? "text-muted-foreground/20 line-through" : "text-foreground/70")}>
+          {name} {blocked && "(CONFLICT)"}
         </div>
       </div>
-      <Badge variant="outline" className="font-mono text-[9px] opacity-40">+{weight} E</Badge>
+      <span className="font-mono text-[9px] text-muted-foreground/30">+{weight}E</span>
     </div>
   );
 }

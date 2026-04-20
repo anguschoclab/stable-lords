@@ -84,16 +84,22 @@ export function InsightManager() {
           ) : (
             <div className="space-y-2">
               {tokens.map((token: any) => (
-                <button
-                  aria-label={`Select ${token.type} Insight Token, discovered week ${token.discoveredWeek}`}
+                <Surface
                   key={token.id}
-                  onClick={() => setSelectedTokenId(token.id)}
-                  className={`w-full text-left p-4 rounded-none border transition-all relative overflow-hidden group ${
+                  variant={selectedTokenId === token.id ? "paper" : "glass"}
+                  padding="none"
+                  className={cn(
+                    "transition-all border overflow-hidden relative",
                     selectedTokenId === token.id 
-                    ? "bg-primary/10 border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]" 
-                    : "bg-glass-card border-border/40 hover:border-primary/40"
-                  }`}
+                    ? "border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] bg-primary/10" 
+                    : "border-white/5 hover:border-white/20"
+                  )}
                 >
+                  <button
+                    aria-label={`Select ${token.type} Insight Token, discovered week ${token.discoveredWeek}`}
+                    onClick={() => setSelectedTokenId(token.id)}
+                    className="w-full text-left p-4 outline-none"
+                  >
                   <div className="flex items-center gap-3 relative z-10">
                     <div className={`p-2 rounded-none ${token.type === "Weapon" ? "bg-orange-500/20 text-orange-500" : "bg-cyan-500/20 text-cyan-500"}`}>
                        {token.type === "Weapon" ? <Swords className="h-4 w-4" /> : <RotateCw className="h-4 w-4" />}
@@ -103,10 +109,11 @@ export function InsightManager() {
                        <span className="block text-[9px] text-muted-foreground uppercase tracking-widest font-mono opacity-60">WK_{token.discoveredWeek} // {token.id.slice(0, 8)}</span>
                     </div>
                   </div>
+                  </button>
                   {selectedTokenId === token.id && (
-                    <motion.div layoutId="token-active" className="absolute left-0 top-0 w-1 h-full bg-primary" />
+                    <motion.div layoutId="token-active" className="absolute left-0 top-0 w-1 h-full bg-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
                   )}
-                </button>
+                </Surface>
               ))}
             </div>
           )}
@@ -126,29 +133,38 @@ export function InsightManager() {
                       : w.favorites?.discovered.rhythm;
 
                     return (
-                      <button
-                        aria-label={`Select warrior ${w.name} for insight`}
+                      <Surface
                         key={w.id}
-                        disabled={isRevealed || isRevealing}
-                        onClick={() => setSelectedWarriorId(w.id)}
-                        className={`p-3 rounded-none border text-center transition-all group relative ${
+                        variant={selectedWarriorId === w.id ? "gold" : "glass"}
+                        padding="none"
+                        className={cn(
+                          "transition-all border text-center overflow-hidden relative",
                           selectedWarriorId === w.id 
-                          ? "bg-primary/20 border-primary" 
+                          ? "border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)] bg-primary/20" 
                           : isRevealed 
-                            ? "opacity-30 grayscale cursor-not-allowed bg-transparent border-white/5" 
-                            : "bg-glass-card border-border/40 hover:border-white/20"
-                        }`}
+                            ? "opacity-20 grayscale border-white/5 bg-transparent" 
+                            : "border-white/5 hover:border-white/20"
+                        )}
                       >
-                        <span className="block text-[10px] font-black uppercase tracking-wider mb-1 truncate">{w.name}</span>
-                        {isRevealed ? (
-                          <CheckCircle2 className="h-3 w-3 mx-auto text-primary" />
-                        ) : (
-                          <div className="text-[8px] font-black font-mono opacity-40 uppercase">{w.style.slice(0, 3)}</div>
-                        )}
+                        <button
+                          aria-label={`Select warrior ${w.name} for insight`}
+                          disabled={isRevealed || isRevealing}
+                          onClick={() => setSelectedWarriorId(w.id)}
+                          className="w-full p-3 outline-none"
+                        >
+                          <span className="block text-[10px] font-black uppercase tracking-widest mb-1 truncate">{w.name}</span>
+                          {isRevealed ? (
+                            <CheckCircle2 className="h-4 w-4 mx-auto text-primary" />
+                          ) : (
+                            <div className="text-[9px] font-black font-mono opacity-40 uppercase">{w.style.slice(0, 3)}</div>
+                          )}
+                        </button>
                         {selectedWarriorId === w.id && (
-                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),1)] animate-pulse" />
+                           <div className="absolute top-0 right-0 p-1">
+                              <Target className="h-3 w-3 text-primary animate-pulse" />
+                           </div>
                         )}
-                      </button>
+                      </Surface>
                     );
                   })}
                 </div>

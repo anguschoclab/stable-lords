@@ -10,11 +10,34 @@ import { FightingStyle, STYLE_DISPLAY_NAMES, STYLE_ABBREV } from '@/types/game';
 import { computeWarriorStats } from '@/engine/skillCalc';
 
 export default function PhysicalsSimulator() {
+  const { roster } = useGameStore();
+  const activeWarriors = roster.filter(w => w.status === "Active");
+
   const [styleA, setStyleA] = useState<FightingStyle>(FightingStyle.BashingAttack);
   const [styleB, setStyleB] = useState<FightingStyle>(FightingStyle.ParryRiposte);
 
   const [statsA, setStatsA] = useState({ strength: 10, quickness: 10, vitality: 10 });
   const [statsB, setStatsB] = useState({ strength: 10, quickness: 10, vitality: 10 });
+
+  const [fighterAId, setFighterAId] = useState<string | null>(null);
+  const [fighterBId, setFighterBId] = useState<string | null>(null);
+
+  const handleSelectWarrior = (warrior: Warrior) => {
+    // Toggle logic: first select fills A, second fills B if A is full
+    if (fighterAId === warrior.id) {
+       setFighterAId(null);
+    } else if (fighterBId === warrior.id) {
+       setFighterBId(null);
+    } else if (!fighterAId) {
+       setFighterAId(warrior.id);
+       setStatsA({ strength: warrior.attributes.ST, quickness: warrior.attributes.SP, vitality: warrior.attributes.CN });
+       setStyleA(warrior.style);
+    } else {
+       setFighterBId(warrior.id);
+       setStatsB({ strength: warrior.attributes.ST, quickness: warrior.attributes.SP, vitality: warrior.attributes.CN });
+       setStyleB(warrior.style);
+    }
+  };
 
   const simulation = useMemo(() => {
     const attrA = { ST: statsA.strength, SP: statsA.quickness, CN: statsA.vitality, SZ: 10, WL: 10, WT: 10, DF: 10 };
@@ -90,115 +113,153 @@ export default function PhysicalsSimulator() {
   );
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto pb-20">
       <PageHeader
         icon={Activity}
         title="Physicals Simulator"
         subtitle="TOOLS · SIMULATION · NO RECORDS KEPT"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {renderFighterConfig("Fighter A", styleA, setStyleA, statsA, setStatsA, "primary")}
-        {renderFighterConfig("Fighter B", styleB, setStyleB, statsB, setStatsB, "destructive")}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Archetype D: Left Rail Roster Pickers (span-3) */}
+        <aside className="lg:col-span-3 space-y-6 sticky top-6">
+          <div className="px-1 flex items-center justify-between">
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">DEPLOY_PILOTS</span>
+          </div>
+
+          <Surface variant="glass" className="p-0 border-white/5 max-h-[600px] overflow-y-auto thin-scrollbar">
+            {activeWarriors.map(warrior => {
+              const inA = fighterAId === warrior.id;
+              const inB = fighterBId === warrior.id;
+              
+              return (
+                <button
+                  key={warrior.id}
+                  onClick={() => handleSelectWarrior(warrior)}
+                  className={cn(
+                    "w-full text-left p-4 border-b border-white/5 last:border-0 flex items-center gap-3 transition-all",
+                    inA ? "bg-primary/10 border-l-4 border-l-primary" : inB ? "bg-destructive/10 border-l-4 border-l-destructive" : "hover:bg-white/[0.02]"
+                  )}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className={cn("text-xs font-black uppercase truncate", inA ? "text-primary" : inB ? "text-destructive" : "")}>{warrior.name}</p>
+                    <p className="text-[9px] text-muted-foreground uppercase mt-1">{STYLE_ABBREV[warrior.style] ?? warrior.style}</p>
+                  </div>
+                  {inA && <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black h-4 px-1">PILOT_A</Badge>}
+                  {inB && <Badge className="bg-destructive/20 text-destructive border-destructive/30 text-[8px] font-black h-4 px-1">PILOT_B</Badge>}
+                </button>
+              );
+            })}
+          </Surface>
+
+          <div className="p-4 bg-secondary/10 border border-white/5">
+             <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+               "Calculated risk is the bridge between a legend and a corpse. Run the numbers before you run the sand."
+             </p>
+          </div>
+        </aside>
+
+        {/* Right Rail Simulation Canvas (span-9) */}
+        <main className="lg:col-span-9 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {renderFighterConfig("Fighter A", styleA, setStyleA, statsA, setStatsA, "primary")}
+            {renderFighterConfig("Fighter B", styleB, setStyleB, statsB, setStatsB, "destructive")}
+          </div>
+
+          <Surface variant="glass" className="border-accent/40 bg-accent/5 p-0 overflow-hidden">
+            <div className="bg-accent/10 px-6 py-4 border-b border-accent/20 flex items-center gap-2">
+              <Zap className="h-4 w-4 text-accent" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-accent">Simulation_Results (10 MINUTES_ENGAGEMENT)</span>
+            </div>
+            
+            <div className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-primary border-b border-primary/20 pb-2">Fighter A Analysis</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">HP</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcA.hp}</div>
+                    </div>
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">ENDUR</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcA.endurance}</div>
+                    </div>
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">DMG</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcA.damage}</div>
+                    </div>
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">ENCUM</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcA.encumbrance}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center justify-center space-y-6">
+                  <Swords className="h-10 w-10 text-muted-foreground/20" />
+                  <div className="text-center">
+                    <span className="text-2xl font-display font-black text-foreground">{simulation.minutesPassed}M</span>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mt-1">Elapsed_Time</p>
+                  </div>
+                  {simulation.minutesPassed < 10 && (
+                    <Badge className="bg-destructive/20 text-destructive border-destructive/30 text-[9px] font-black uppercase h-6 px-3">
+                      <AlertTriangle className="h-3 w-3 mr-1.5" /> Early_Stoppage
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive border-b border-destructive/20 pb-2">Fighter B Analysis</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">HP</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcB.hp}</div>
+                    </div>
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">ENDUR</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcB.endurance}</div>
+                    </div>
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">DMG</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcB.damage}</div>
+                    </div>
+                    <div className="bg-black/20 p-3 border border-white/5">
+                      <div className="text-muted-foreground text-[8px] uppercase font-black">ENCUM</div>
+                      <div className="font-mono font-black text-lg">{simulation.calcB.encumbrance}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-2 gap-12">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Ending HP</span>
+                    <span className={cn("font-display font-black text-xl", simulation.hpA <= 0 ? "text-destructive" : "text-primary")}>
+                      {simulation.hpA}/{simulation.calcA.hp}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-white/5 rounded-none overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: `${Math.max(0, (simulation.hpA / simulation.calcA.hp) * 100)}%` }} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Ending HP</span>
+                    <span className={cn("font-display font-black text-xl", simulation.hpB <= 0 ? "text-destructive" : "text-primary")}>
+                      {simulation.hpB}/{simulation.calcB.hp}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-white/5 rounded-none overflow-hidden">
+                    <div className="h-full bg-destructive" style={{ width: `${Math.max(0, (simulation.hpB / simulation.calcB.hp) * 100)}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Surface>
+        </main>
       </div>
-
-      <Card className="border-accent/40 bg-accent/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="font-display text-lg flex items-center gap-2">
-            <Zap className="h-5 w-5 text-accent" /> Simulation Results (10 Minutes)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-3">
-              <h4 className="font-semibold text-sm text-primary">Fighter A Base Stats</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">HP</div>
-                  <div className="font-mono">{simulation.calcA.hp}</div>
-                </div>
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Endurance</div>
-                  <div className="font-mono">{simulation.calcA.endurance}</div>
-                </div>
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Damage</div>
-                  <div className="font-mono">{simulation.calcA.damage}</div>
-                </div>
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Encumbrance</div>
-                  <div className="font-mono">{simulation.calcA.encumbrance}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center justify-center space-y-4 py-4">
-              <Swords className="h-8 w-8 text-muted-foreground opacity-50" />
-              <Badge variant="outline" className="font-mono">
-                {simulation.minutesPassed} Minutes Simulated
-              </Badge>
-              {simulation.minutesPassed < 10 && (
-                <div className="text-xs text-destructive flex items-center gap-1 bg-destructive/10 px-2 py-1 rounded">
-                  <AlertTriangle className="h-3 w-3" /> Early Stoppage
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="font-semibold text-sm text-destructive">Fighter B Base Stats</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">HP</div>
-                  <div className="font-mono">{simulation.calcB.hp}</div>
-                </div>
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Endurance</div>
-                  <div className="font-mono">{simulation.calcB.endurance}</div>
-                </div>
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Damage</div>
-                  <div className="font-mono">{simulation.calcB.damage}</div>
-                </div>
-                <div className="bg-background p-2 rounded border">
-                  <div className="text-muted-foreground text-xs">Encumbrance</div>
-                  <div className="font-mono">{simulation.calcB.encumbrance}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-border/50 grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Ending HP</span>
-                <span className={`font-mono ${simulation.hpA <= 0 ? 'text-destructive font-bold' : ''}`}>
-                  {simulation.hpA} / {simulation.calcA.hp}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Ending Endurance</span>
-                <span className={`font-mono ${simulation.endA <= 0 ? 'text-destructive font-bold' : ''}`}>
-                  {simulation.endA} / {simulation.calcA.endurance}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Ending HP</span>
-                <span className={`font-mono ${simulation.hpB <= 0 ? 'text-destructive font-bold' : ''}`}>
-                  {simulation.hpB} / {simulation.calcB.hp}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Ending Endurance</span>
-                <span className={`font-mono ${simulation.endB <= 0 ? 'text-destructive font-bold' : ''}`}>
-                  {simulation.endB} / {simulation.calcB.endurance}
-                </span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

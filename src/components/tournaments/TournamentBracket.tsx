@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
-import { Trophy, ChevronUp, ChevronDown, Medal, Crown, StepForward } from "lucide-react";
+import { Trophy, ChevronUp, ChevronDown, Medal, Crown, StepForward, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BoutViewer from "@/components/BoutViewer";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Surface } from "@/components/ui/Surface";
 import { Button } from "@/components/ui/button";
 import { resolveWarriorName } from "@/utils/historyResolver";
 import { useGameStore } from "@/state/useGameStore";
@@ -196,14 +196,14 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
 
                   {isExpanded && hasTranscript && fightSummary && (
                     <div className="absolute top-0 left-full ml-4 z-50 w-full max-w-md animate-in fade-in slide-in-from-left-4 duration-300">
-                      <Card className="bg-glass-card border-primary/50 shadow-2xl overflow-hidden">
-                        <CardHeader className="p-4 border-b border-border/20 bg-secondary/40">
-                          <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center justify-between">
-                            <span>Bout Archive: {resolveWarriorName(state, bout.warriorIdA, bout.a)} vs {resolveWarriorName(state, bout.warriorIdD, bout.d)}</span>
-                            <Badge variant="outline" className="text-[10px]">{fightSummary.by || "Unknown"}</Badge>
-                          </CardTitle>
-                        </CardHeader>
-                        <div className="p-4 max-h-[500px] overflow-y-auto thin-scrollbar bg-background/60">
+                      <Surface variant="glass" padding="none" className="border-primary/50 shadow-2xl overflow-hidden">
+                        <div className="p-4 border-b border-white/5 bg-secondary/40 flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground truncate max-w-[80%]">
+                            Archive: {resolveWarriorName(state, bout.warriorIdA, bout.a)} vs {resolveWarriorName(state, bout.warriorIdD, bout.d)}
+                          </span>
+                          <Badge variant="outline" className="text-[9px] font-black uppercase border-white/10">{fightSummary.by || "???"}</Badge>
+                        </div>
+                        <div className="p-0 max-h-[500px] overflow-y-auto thin-scrollbar bg-background/60">
                           <BoutViewer
                             nameA={resolveWarriorName(state, fightSummary.warriorIdA, fightSummary.a)}
                             nameD={resolveWarriorName(state, fightSummary.warriorIdD, fightSummary.d)}
@@ -218,12 +218,12 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="w-full rounded-none border-t border-border/20"
+                          className="w-full rounded-none border-t border-white/5 h-10 text-[9px] font-black uppercase tracking-widest hover:bg-primary/5"
                           onClick={() => onToggleExpand(null)}
                         >
-                          Close Archive
+                          Deactivate Archive
                         </Button>
-                      </Card>
+                      </Surface>
                     </div>
                   )}
                 </div>
@@ -250,18 +250,22 @@ export function ChampionDisplay({ championName, championId, tournamentName }: Ch
     : championName;
 
   return (
-    <Card className="bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-transparent border-arena-gold/50 shadow-[0_0_30px_-10px_rgba(255,215,0,0.5)]">
-      <CardContent className="p-6 text-center">
-        <div className="flex flex-col items-center gap-3">
-          <Crown className="h-12 w-12 text-arena-gold animate-pulse" />
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-bold">Tournament Champion</p>
-            <h3 className="text-2xl font-black uppercase tracking-wider text-amber-700 mt-1">{displayName}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{tournamentName}</p>
+    <Surface variant="gold" className="bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-transparent border-arena-gold/50 shadow-[0_0_30px_-10px_rgba(255,215,0,0.5)]">
+      <div className="p-8 text-center space-y-4">
+        <div className="flex flex-col items-center gap-4">
+          <Crown className="h-16 w-16 text-arena-gold animate-bounce" />
+          <div className="space-y-2">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">Tournament_Supreme_Champion</p>
+            <h3 className="text-4xl font-display font-black uppercase tracking-tighter text-foreground mt-2">{displayName}</h3>
+            <div className="flex items-center justify-center gap-2">
+               <div className="h-px w-8 bg-white/5" />
+               <p className="text-[11px] font-black uppercase tracking-widest text-arena-gold/60">{tournamentName}</p>
+               <div className="h-px w-8 bg-white/5" />
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Surface>
   );
 }
 
@@ -278,17 +282,17 @@ export function BronzeHighlight({ thirdPlaceName, thirdPlaceId }: BronzeHighligh
     : thirdPlaceName;
 
   return (
-    <Card className="bg-gradient-to-br from-amber-600/10 to-transparent border-amber-500/30">
-      <CardContent className="p-4 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <Medal className="h-5 w-5 text-amber-600" />
-          <div>
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">3rd Place</p>
-            <p className="text-sm font-bold text-amber-700">{displayName}</p>
+    <Surface variant="glass" className="bg-gradient-to-br from-amber-600/10 to-transparent border-amber-500/30">
+      <div className="p-5 text-center">
+        <div className="flex items-center justify-center gap-4">
+          <Medal className="h-6 w-6 text-amber-600" />
+          <div className="text-left">
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-black">Third_Place_Medalist</p>
+            <p className="text-lg font-display font-black text-amber-700 uppercase tracking-tight leading-none mt-1">{displayName}</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Surface>
   );
 }
 

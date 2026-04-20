@@ -86,7 +86,7 @@ function RecruitCard({
   return (
     <motion.div whileHover={{ y: -5 }}>
       <Surface 
-        variant="glass" 
+        variant={isElite ? "gold" : "glass"} 
         padding="none" 
         className={cn(
           "overflow-hidden transition-all duration-300 group h-full",
@@ -234,6 +234,10 @@ export default function Recruit() {
   const [scoutReports, setScoutReports] = useState<Record<string, PotentialScoutReport>>({});
 
   const rosterFull = roster.length >= MAX_ROSTER;
+  const [activeTiers, setActiveTiers] = useState<Set<RecruitTier>>(new Set(["Common", "Promising", "Exceptional", "Prodigy"]));
+  const [activeStyle, setActiveStyle] = useState<FightingStyle | "all">("all");
+  const [sortBy, setSortBy] = useState<"cost-asc" | "cost-desc" | "potential-desc" | "age-asc">("potential-desc");
+
   const canRefresh = canTransact(treasury, REFRESH_COST);
 
   const handleRecruit = useCallback((w: PoolWarrior, bonus: boolean = false) => {
@@ -373,6 +377,38 @@ export default function Recruit() {
     [setState, navigate, MAX_ROSTER]
   );
 
+  const filteredPool = useMemo(() => {
+    let pool = [...(recruitPool ?? [])];
+    
+    // Filter by Tier
+    pool = pool.filter(w => activeTiers.has(w.tier));
+    
+    // Filter by Style
+    if (activeStyle !== "all") {
+      pool = pool.filter(w => w.style === activeStyle);
+    }
+    
+    // Sort
+    pool.sort((a, b) => {
+      switch (sortBy) {
+        case "cost-asc": return a.cost - b.cost;
+        case "cost-desc": return b.cost - a.cost;
+        case "potential-desc": return potentialRating(b.potential) - potentialRating(a.potential);
+        case "age-asc": return a.age - b.age;
+        default: return 0;
+      }
+    });
+    
+    return pool;
+  }, [recruitPool, activeTiers, activeStyle, sortBy]);
+
+  const toggleTier = (tier: RecruitTier) => {
+    const next = new Set(activeTiers);
+    if (next.has(tier)) next.delete(tier);
+    else next.add(tier);
+    setActiveTiers(next);
+  };
+
   return (
     <div className="space-y-4">
       <PageHeader
@@ -411,62 +447,126 @@ export default function Recruit() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Scout Pool Tab */}
-        <TabsContent value="scout" className="mt-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {recruitPool.length} warrior{recruitPool.length !== 1 ? "s" : ""} available · Pool refreshes weekly
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              onClick={handleRefresh}
-              disabled={!canRefresh}
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              Refresh ({REFRESH_COST}g)
-            </Button>
-          </div>
+        <TabsContent value="scout" className="mt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Archetype B: Left Filter Sidebar (span-3) */}
+            <aside className="lg:col-span-3 space-y-6 sticky top-6">
+               <div className="flex items-center gap-3 px-1">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">FILTER_ENGINE</span>
+               </div>
+               
+               <Surface variant="glass" className="space-y-6">
+                  {/* Tiers */}
+                  <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Market Tiers</label>
+                    <div className="space-y-3">
+                       {(["Common", "Promising", "Exceptional", "Prodigy"] as RecruitTier[]).map(tier => {
+                         const isActive = activeTiers.has(tier);
+                         return (
+                           <button
+                             key={tier}
+                             onClick={() => toggleTier(tier)}
+                             className={cn(
+                               "w-full flex items-center justify-between p-2 border transition-all",
+                               isActive ? "bg-white/[0.05] border-white/20" : "bg-transparent border-transparent opacity-40 grayscale hover:grayscale-0 hover:opacity-100"
+                             )}
+                           >
+                             <TierBadge tier={tier} />
+                             <span className="font-mono text-[10px] text-arena-gold">{TIER_COST[tier]}g</span>
+                           </button>
+                         );
+                       })}
+                    </div>
+                  </div>
 
-          <div className="flex flex-wrap gap-2">
-            {(["Common", "Promising", "Exceptional", "Prodigy"] as RecruitTier[]).map(tier => (
-              <div key={tier} className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <TierBadge tier={tier} />
-                <span>{TIER_COST[tier]}g</span>
-              </div>
-            ))}
-          </div>
+                  {/* Style */}
+                  <div className="space-y-3 pt-4 border-t border-white/5">
+                    <label className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Combat Style</label>
+                    <Select value={activeStyle} onValueChange={(v) => setActiveStyle(v as any)}>
+                      <SelectTrigger className="h-9 text-[10px] uppercase font-black tracking-widest bg-black/20 border-white/10">
+                        <SelectValue placeholder="All Styles" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">ALL_STYLES</SelectItem>
+                        {Object.entries(STYLE_DISPLAY_NAMES).map(([k, v]) => (
+                          <SelectItem key={k} value={k}>{v.toUpperCase()}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          {recruitPool.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {recruitPool.map(w => (
-                <RecruitCard
-                  key={w.id}
-                  warrior={w}
-                  canAfford={canTransact(treasury, w.cost)}
-                  rosterFull={rosterFull}
-                  onRecruit={handleRecruit}
-                  isScouted={scoutedIds.has(w.id)}
-                  onScout={handleScout}
-                  canAffordScout={canTransact(treasury, 25)}
-                  canAffordBonus={canTransact(treasury, w.cost + 50)}
-                  scoutReport={scoutReports[w.id]}
-                />
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No warriors in the scout pool. Refresh to find new recruits!</p>
-              </CardContent>
-            </Card>
-          )}
+                  {/* Sort */}
+                  <div className="space-y-3 pt-4 border-t border-white/5">
+                    <label className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Sequence Order</label>
+                    <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+                      <SelectTrigger className="h-9 text-[10px] uppercase font-black tracking-widest bg-black/20 border-white/10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="potential-desc">POTENTIAL_DESC</SelectItem>
+                        <SelectItem value="cost-asc">COST_ASCENDING</SelectItem>
+                        <SelectItem value="cost-desc">COST_DESCENDING</SelectItem>
+                        <SelectItem value="age-asc">AGE_ASCENDING</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Refresh */}
+                  <div className="space-y-3 pt-4 border-t border-white/5">
+                    <label className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Temporal Refresh</label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-between h-10 px-4 text-[10px] font-black uppercase tracking-widest border-primary/20 hover:bg-primary/10 transition-colors"
+                      onClick={handleRefresh}
+                      disabled={!canRefresh}
+                    >
+                      <span>REFRESH_LIST</span>
+                      <div className="flex items-center gap-1.5 text-arena-gold">
+                         <Coins className="h-3 w-3" />
+                         {REFRESH_COST}g
+                      </div>
+                    </Button>
+                  </div>
+               </Surface>
+            </aside>
+
+            {/* Right Result Grid (span-9) */}
+            <main className="lg:col-span-9 space-y-6">
+               <div className="flex items-center justify-between px-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                    {filteredPool.length} Profiles_Match_Criteria / {recruitPool.length} TOTAL
+                  </p>
+               </div>
+
+               {filteredPool.length > 0 ? (
+                 <div className="grid gap-6 sm:grid-cols-2">
+                   {filteredPool.map(w => (
+                     <RecruitCard
+                       key={w.id}
+                       warrior={w}
+                       canAfford={canTransact(treasury, w.cost)}
+                       rosterFull={rosterFull}
+                       onRecruit={handleRecruit}
+                       isScouted={scoutedIds.has(w.id)}
+                       onScout={handleScout}
+                       canAffordScout={canTransact(treasury, 25)}
+                       canAffordBonus={canTransact(treasury, w.cost + 50)}
+                       scoutReport={scoutReports[w.id]}
+                     />
+                   ))}
+                 </div>
+               ) : (
+                 <Surface variant="glass" className="py-48 text-center border-dashed opacity-50">
+                    <Search className="h-12 w-12 mx-auto mb-4 opacity-10" />
+                    <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">No_Matches_Detected</p>
+                 </Surface>
+               )}
+            </main>
+          </div>
         </TabsContent>
 
-        {/* Custom Build Tab */}
-        <TabsContent value="custom" className="mt-4 space-y-4">
+        <TabsContent value="custom" className="mt-8 space-y-4">
           <div className="rounded-none border border-border bg-secondary/30 p-3 text-sm text-muted-foreground">
             <Hammer className="h-4 w-4 inline mr-1.5" />
             Custom warriors cost <span className="font-semibold text-foreground">{CUSTOM_COST}g</span> and start with 66 total attribute points. You choose the distribution.

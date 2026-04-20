@@ -15,9 +15,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  Dumbbell, AlertTriangle, Lock, Star, BarChart3, Target,
+  Dumbbell, AlertTriangle, Lock, Star, BarChart3, Target, Activity
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { Surface } from "@/components/ui/Surface";
+import { cn } from "@/lib/utils";
 import { WarriorLink } from "@/components/EntityLink";
 
 /* ── Burn Risk Assessment ──────────────────────────────── */
@@ -278,7 +280,10 @@ function WarriorPlannerCard({ warrior, trainers, season, seasonalGains }: {
 export default function TrainingPlanner() {
   const { roster, trainers, seasonalGrowth, season } = useGameStore();
   const activeWarriors = roster.filter(w => w.status === "Active");
+  const [selectedId, setSelectedId] = React.useState<string | null>(activeWarriors[0]?.id || null);
+  
   const currentTrainers = useMemo(() => trainers ?? [], [trainers]);
+  const selectedWarrior = activeWarriors.find(w => w.id === selectedId);
 
   const seasonalGainsMap = useMemo(() => {
     const map = new Map<string, Partial<Record<keyof Attributes, number>>>();
@@ -300,22 +305,22 @@ export default function TrainingPlanner() {
   }, [activeWarriors, currentTrainers]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-20 max-w-7xl mx-auto">
       <PageHeader
         icon={BarChart3}
         title="Training Planner"
         subtitle="COMMAND · TACTICS · ATTRIBUTE DEVELOPMENT"
         actions={
-          <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest">
+          <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest bg-secondary/20 backdrop-blur-md px-6 py-3 border border-white/5">
             <div className="text-center">
               <div className="text-xl font-display font-black text-primary">{avgTrainability}%</div>
               <div className="text-muted-foreground/50">AVG TRAINABILITY</div>
             </div>
-            <div className="text-center">
+            <div className="text-center ml-6 border-l border-white/10 pl-6">
               <div className="text-xl font-display font-black">{activeWarriors.length}</div>
               <div className="text-muted-foreground/50">ACTIVE</div>
             </div>
-            <div className="text-center">
+            <div className="text-center ml-6 border-l border-white/10 pl-6">
               <div className="text-xl font-display font-black">{currentTrainers.filter(t => t.contractWeeksLeft > 0).length}</div>
               <div className="text-muted-foreground/50">TRAINERS</div>
             </div>
@@ -323,41 +328,81 @@ export default function TrainingPlanner() {
         }
       />
 
-      {/* Legend */}
-      <Card>
-        <CardContent className="p-3 flex flex-wrap gap-4 text-[10px] text-muted-foreground">
-          <span className="flex items-center gap-1"><div className="h-2 w-4 bg-primary rounded-full" /> Current</span>
-          <span className="flex items-center gap-1"><div className="h-2 w-0.5 border-r-2 border-arena-gold/50" /> Potential Ceiling</span>
-          <span className="flex items-center gap-1"><div className="h-2 w-4 bg-amber-500/70 rounded-full" /> Diminishing Returns</span>
-          <span className="flex items-center gap-1"><Target className="h-3 w-3 text-arena-pop" /> Recommended</span>
-          <span className="flex items-center gap-1">
-            <div className="flex gap-0.5">{[0,1,2].map(i => <div key={i} className="h-1.5 w-2 rounded-full bg-muted" />)}</div>
-            Season Progress (0/3)
-          </span>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Archetype D: Left Rail Roster (span-4) */}
+        <aside className="lg:col-span-4 space-y-4 sticky top-6">
+           <div className="flex items-center gap-3 px-2">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">STABLE_ROSTER</span>
+              <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent" />
+           </div>
+           
+           <Surface variant="glass" className="p-0 border-white/5 max-h-[700px] overflow-y-auto thin-scrollbar">
+              {activeWarriors.map(warrior => {
+                const isSelected = warrior.id === selectedId;
+                const trainability = computeTrainability(warrior, currentTrainers);
+                
+                return (
+                  <button
+                    key={warrior.id}
+                    onClick={() => setSelectedId(warrior.id)}
+                    className={cn(
+                      "w-full text-left p-4 border-b border-white/5 last:border-0 flex items-center gap-3 transition-all",
+                      isSelected ? "bg-primary/10 border-l-4 border-l-primary" : "hover:bg-white/[0.02]"
+                    )}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("text-xs font-black uppercase truncate", isSelected ? "text-primary" : "")}>{warrior.name}</p>
+                      <p className="text-[9px] text-muted-foreground uppercase mt-1">Trainability: {trainability}%</p>
+                    </div>
+                    {isSelected && <Activity className="h-3.5 w-3.5 text-primary animate-pulse" />}
+                  </button>
+                );
+              })}
+           </Surface>
+        </aside>
 
-      {/* Warrior Cards */}
-      {activeWarriors.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <Dumbbell className="h-10 w-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm">No active warriors. Recruit some first!</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {activeWarriors.map(warrior => (
-            <WarriorPlannerCard
-              key={warrior.id}
-              warrior={warrior}
-              trainers={currentTrainers}
-              season={season}
-              seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
-            />
-          ))}
-        </div>
-      )}
+        {/* Right Rail Viewport (span-8) */}
+        <main className="lg:col-span-8">
+           {selectedWarrior ? (
+             <div className="space-y-6">
+                <WarriorPlannerCard
+                  warrior={selectedWarrior}
+                  trainers={currentTrainers}
+                  season={season}
+                  seasonalGains={seasonalGainsMap.get(selectedWarrior.id) ?? {}}
+                />
+                
+                <Surface variant="glass" className="flex flex-wrap gap-8 p-6 bg-secondary/10">
+                   <div className="flex flex-col gap-2">
+                      <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Growth Markers</span>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase font-black tracking-widest">
+                          <div className="h-2 w-4 bg-primary" /> Current
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase font-black tracking-widest">
+                          <div className="h-2 w-0.5 border-r-2 border-arena-gold" /> Potential
+                        </div>
+                      </div>
+                   </div>
+                   
+                   <div className="h-10 w-px bg-white/5" />
+                   
+                   <div className="flex flex-col gap-2">
+                       <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest">Advisory</span>
+                       <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase font-black tracking-widest">
+                        <Target className="h-3.5 w-3.5 text-arena-pop" /> Optimized Gain Path
+                      </div>
+                   </div>
+                </Surface>
+             </div>
+           ) : (
+             <Surface variant="glass" className="py-32 text-center border-dashed">
+                <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-10" />
+                <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">Select_Warrior_To_Plan</p>
+             </Surface>
+           )}
+        </main>
+      </div>
     </div>
   );
 }

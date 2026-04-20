@@ -1,11 +1,10 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Trophy, Skull, Activity, Swords, ChevronDown, ChevronUp, Zap } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import BoutViewer from "@/components/BoutViewer";
+import { Badge } from "@/components/ui/badge";
 import type { BoutResult } from "@/engine/boutProcessor";
 import { cn } from "@/lib/utils";
+import { Surface } from "@/components/ui/Surface";
 
 interface RunResultsProps {
   results: BoutResult[];
@@ -39,41 +38,43 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
 
           return (
             <Collapsible key={id} open={isExpanded} onOpenChange={() => onToggleExpand(isExpanded ? null : id)}>
-              <Card className={cn(
-                "border-border/30 bg-glass-card shadow-sm transition-all overflow-hidden",
-                isExpanded ? "border-primary/40 ring-1 ring-primary/20 shadow-lg" : "hover:border-border/60"
+              <Surface variant="glass" padding="none" className={cn(
+                "border-white/5 transition-all overflow-hidden",
+                isExpanded ? "border-primary/40 shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]" : "hover:border-white/20"
               )}>
                 <CollapsibleTrigger asChild>
                   <div className="p-4 cursor-pointer flex items-center justify-between group">
                     <div className="flex items-center gap-6 flex-1">
                        <div className="flex items-center gap-3 min-w-36">
-                          <div className={cn("w-1.5 h-6 rounded-full", isWinnerA ? "bg-primary" : "bg-muted-foreground/20")} />
-                          <span className={cn("font-display font-black uppercase text-xs tracking-tight", isWinnerA ? "text-primary" : "text-muted-foreground")}>
+                          <div className={cn("w-1.5 h-6 rounded-none", isWinnerA ? "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" : "bg-white/5")} />
+                          <span className={cn("font-display font-black uppercase text-xs tracking-tight", isWinnerA ? "text-primary" : "text-muted-foreground/40")}>
                             {res.a.name}
                           </span>
                        </div>
                        
-                       <div className="flex flex-col items-center gap-0.5 px-4">
-                          <span className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-widest">VS</span>
-                          <Badge variant="outline" className="text-[7px] font-black uppercase tracking-widest h-4 bg-secondary/20 border-border/40">
+                       <div className="flex flex-col items-center gap-1.5 px-4">
+                          <span className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em]">VS</span>
+                          <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest h-4 bg-white/[0.02] border-white/5 px-2">
                             {res.outcome.by}
                           </Badge>
                        </div>
 
                        <div className="flex items-center gap-3 min-w-36 justify-end text-right">
-                          <span className={cn("font-display font-black uppercase text-xs tracking-tight", isWinnerD ? "text-primary" : "text-muted-foreground")}>
+                          <span className={cn("font-display font-black uppercase text-xs tracking-tight", isWinnerD ? "text-primary" : "text-muted-foreground/40")}>
                             {res.d.name}
                           </span>
-                          <div className={cn("w-1.5 h-6 rounded-full", isWinnerD ? "bg-primary" : "bg-muted-foreground/20")} />
+                          <div className={cn("w-1.5 h-6 rounded-none", isWinnerD ? "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" : "bg-white/5")} />
                        </div>
                     </div>
                     
                     <div className="flex items-center gap-4 ml-6">
-                       {res.outcome.by === "Kill" && <Skull className="h-4 w-4 text-destructive animate-pulse" />}
-                       {res.outcome.by === "KO" && <Zap className="h-4 w-4 text-amber-500" />}
+                       <div className="flex items-center gap-2">
+                         {res.outcome.by === "Kill" && <Skull className="h-4 w-4 text-destructive animate-pulse" />}
+                         {res.outcome.by === "KO" && <Zap className="h-4 w-4 text-amber-500" />}
+                       </div>
                        <div className={cn(
-                         "p-1.5 rounded-none border border-border/20 transition-colors",
-                         isExpanded ? "bg-primary/20 text-primary border-primary/20" : "bg-secondary/40 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                         "h-8 w-8 flex items-center justify-center border border-white/5 transition-colors",
+                         isExpanded ? "bg-primary/20 text-primary border-primary/40" : "bg-white/[0.02] text-muted-foreground/40 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20"
                        )}>
                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                        </div>
@@ -82,7 +83,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
                 </CollapsibleTrigger>
                 
                 <CollapsibleContent>
-                  <div className="px-4 pb-4 border-t border-border/10 bg-secondary/10 pt-4">
+                  <div className="px-4 pb-4 border-t border-white/5 bg-black/20 pt-4">
                     <BoutViewer
                       nameA={res.a.name}
                       nameD={res.d.name}
@@ -95,7 +96,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
                     />
                   </div>
                 </CollapsibleContent>
-              </Card>
+              </Surface>
             </Collapsible>
           );
         })}

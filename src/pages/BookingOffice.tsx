@@ -75,7 +75,7 @@ export default function BookingOffice() {
   const [activeTab, setActiveTab] = useState("this-week");
 
   // Group offers by week
-  const { thisWeekOffers, upcomingOffers, idleWarriors } = useMemo(() => {
+  const { thisWeekOffers, upcomingOffers, idleWarriors, highestPurse } = useMemo(() => {
     const playerOffers = Object.values(boutOffers).filter((offer: BoutOffer) =>
       offer.warriorIds.some((wId: string) => roster.some((playerW: Warrior) => playerW.id === wId)) &&
       offer.status === "Proposed"
@@ -88,10 +88,13 @@ export default function BookingOffice() {
     const warriorsWithOffers = new Set(playerOffers.flatMap(o => o.warriorIds));
     const idle = roster.filter(w => w.status === "Active" && !warriorsWithOffers.has(w.id));
 
+    const maxPurse = playerOffers.length > 0 ? Math.max(...playerOffers.map(o => o.purse)) : 0;
+
     return {
       thisWeekOffers: thisWeek.sort((a, b) => (promoters[b.promoterId]?.tier ?? "") > (promoters[a.promoterId]?.tier ?? "") ? 1 : -1),
       upcomingOffers: upcoming.sort((a, b) => a.boutWeek - b.boutWeek),
-      idleWarriors: idle
+      idleWarriors: idle,
+      highestPurse: maxPurse
     };
   }, [boutOffers, roster, week, promoters]);
 
@@ -99,7 +102,9 @@ export default function BookingOffice() {
     if (!warriorId) return;
     setState((s: GameStore) => {
       const next = respondToBoutOffer(state, offerId, warriorId, response);
-      s.boutOffers = next.boutOffers ?? {};
+      if (next.boutOffers) {
+        s.boutOffers = next.boutOffers;
+      }
     });
     toast.success(`Offer ${response === "Accepted" ? "accepted" : "declined"}.`);
   };
@@ -154,128 +159,112 @@ export default function BookingOffice() {
     const injuryBadge = getInjuryBadge(playerWarrior?.injuries || []);
 
     return (
-      <Card key={offer.id} className="bg-glass-card border-primary/20 overflow-hidden group hover:border-primary/40 transition-all duration-300">
-        <CardHeader className="bg-secondary/10 border-b border-border/10 pb-4">
+      <Surface key={offer.id} variant="glass" padding="none" className="border-border/10 overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-xl flex flex-col">
+        <div className="bg-white/[0.03] border-b border-white/5 p-6 pb-5">
           <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <CardTitle className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2 flex-wrap">
-                {promoter?.name || "Local Promoter"}
-                <Badge variant="outline" className="text-[9px] uppercase">{promoter?.tier}</Badge>
+            <div className="space-y-1.5 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-black uppercase tracking-widest text-primary truncate max-w-[150px]">
+                  {promoter?.name || "Local_Promoter"}
+                </span>
+                <Badge variant="outline" className="text-[9px] uppercase font-black border-white/10">{promoter?.tier}</Badge>
                 {personalityConfig && (
-                  <Badge variant="outline" className={`text-[9px] ${personalityConfig.color}`}>
+                  <Badge variant="outline" className={cn("text-[9px] uppercase font-black", personalityConfig.color)}>
                     <span className="flex items-center gap-1">
                       {personalityConfig.icon} {personality}
                     </span>
                   </Badge>
                 )}
-              </CardTitle>
-              <CardDescription className="text-[10px] font-mono uppercase opacity-70">
-                {personalityConfig?.desc} • {promoter?.biases.map(s => STYLE_DISPLAY_NAMES[s]).join(", ")}
-              </CardDescription>
-            </div>
-            <div className="text-right">
-              <div className="text-xl font-black text-foreground flex items-center gap-1 justify-end font-display">
-                <Coins className="h-4 w-4 text-arena-gold" />
-                {offer.purse}g
               </div>
-              <div className="text-[9px] font-bold text-muted-foreground uppercase">Guaranteed Purse</div>
+              <div className="text-[10px] font-black uppercase opacity-40 tracking-widest truncate">
+                {personalityConfig?.desc}
+              </div>
+            </div>
+            <div className="text-right pl-4">
+              <div className="text-2xl font-display font-black text-foreground flex items-center gap-1.5 justify-end leading-none">
+                <DollarSign className="h-4 w-4 text-arena-gold" />
+                {offer.purse}G
+              </div>
+              <div className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">Contract_Purse</div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="pt-6 space-y-6">
-          {/* Warrior Status Badges */}
+        </div>
+
+        <div className="p-8 flex-1 space-y-8">
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className={`text-[9px] ${fatigueStatus.color}`}>
-              <span className="flex items-center gap-1">
-                {fatigueStatus.icon} {fatigueStatus.label} ({fatigue}%)
+            <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-widest border-white/5", fatigueStatus.color)}>
+              <span className="flex items-center gap-1.5">
+                {fatigueStatus.icon} {fatigue} PERCENT_READY
               </span>
             </Badge>
             {injuryBadge && (
-              <Badge variant="outline" className={`text-[9px] ${injuryBadge.color}`}>
-                <span className="flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" /> {injuryBadge.label}
-                  {injuryBadge.count > 1 && ` (+${injuryBadge.count - 1})`}
+              <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-widest border-white/5", injuryBadge.color)}>
+                <span className="flex items-center gap-1.5">
+                  <AlertTriangle className="h-3 w-3" /> {injuryBadge.label}_WOUND
                 </span>
               </Badge>
             )}
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-center space-y-2 flex-1">
-              <div className="p-3 bg-primary/5 rounded-full mx-auto w-fit border border-primary/10">
-                <User className="h-6 w-6 text-primary" />
-              </div>
-              <div className="text-xs font-black uppercase tracking-tight">{playerWarrior?.name}</div>
-              <div className="flex flex-col gap-1">
-                <Badge className="text-[9px]">{STYLE_DISPLAY_NAMES[playerWarrior?.style as FightingStyle]}</Badge>
-              </div>
+          <div className="flex items-center justify-between gap-6 px-4 py-6 bg-black/20 border border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary/40" />
+            <div className="text-center space-y-3 flex-1 min-w-0">
+               <div className="text-[8px] font-black text-primary/40 uppercase tracking-[0.3em] mb-2">DEPLOYED</div>
+               <div className="text-xs font-black uppercase tracking-tight text-foreground truncate">{playerWarrior?.name}</div>
+               <div className="text-[9px] font-black text-muted-foreground/60 uppercase">{STYLE_DISPLAY_NAMES[playerWarrior?.style as FightingStyle]}</div>
             </div>
-            <div className="flex flex-col items-center gap-1 opacity-40">
-              <Zap className="h-5 w-5 text-arena-gold animate-pulse" />
-              <span className="text-[9px] font-black uppercase text-muted-foreground">VS</span>
+            
+            <div className="flex flex-col items-center gap-1 group-hover:scale-110 transition-transform">
+              <div className="h-px w-8 bg-white/10" />
+              <Zap className="h-4 w-4 text-arena-gold animate-pulse" />
+              <div className="h-px w-8 bg-white/10" />
             </div>
-            <div className="text-center space-y-2 flex-1">
-              <div className="p-3 bg-secondary/5 rounded-full mx-auto w-fit border border-border/10">
-                <Crown className="h-6 w-6 text-muted-foreground opacity-30" />
-              </div>
-              <div className="text-xs font-black uppercase tracking-tight text-muted-foreground">
-                {opponent?.name || "Ranked Opponent"}
-              </div>
-              <div className="flex flex-col gap-1">
-                {opponent ? (
-                  <>
-                    <Badge variant="secondary" className="text-[9px] opacity-60">
-                      {STYLE_DISPLAY_NAMES[opponent.style as FightingStyle]}
-                    </Badge>
-                    <span className="text-[9px] text-muted-foreground">{opponent.stableName}</span>
-                  </>
-                ) : (
-                  <Badge variant="secondary" className="text-[9px] opacity-40 text-muted-foreground">PRO_CIRCUIT</Badge>
-                )}
-              </div>
+
+            <div className="text-center space-y-3 flex-1 min-w-0">
+               <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-2">TARGET</div>
+               <div className="text-xs font-black uppercase tracking-tight text-muted-foreground/80 truncate">
+                  {opponent?.name || "??_UNKNOWN"}
+               </div>
+               <div className="text-[9px] font-black text-muted-foreground/40 uppercase">
+                  {opponent ? STYLE_DISPLAY_NAMES[opponent.style as FightingStyle] : "CLASSIFIED"}
+               </div>
             </div>
           </div>
 
-          <Separator className="bg-border/10" />
-
-          <div className="grid grid-cols-2 gap-4 h-12">
-            <div className="flex flex-col justify-center border-r border-border/10">
-              <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
-                <Clock className="h-3 w-3" /> Scheduled_For
+          <div className="grid grid-cols-2 gap-6 pt-2">
+            <div className="space-y-1">
+              <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-1.5">
+                <Clock className="h-3 w-3 opacity-40" /> SCHEDULE
               </div>
-              <div className="text-sm font-black">Week {offer.boutWeek}</div>
+              <div className="text-sm font-black uppercase">WEEK_{offer.boutWeek}</div>
             </div>
-            <div className="flex flex-col justify-center pl-2">
-              <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
-                <Zap className="h-3 w-3 text-arena-gold" /> Hype_Matrix
+            <div className="space-y-1">
+              <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-1.5">
+                <Target className="h-3 w-3 opacity-40 text-arena-gold" /> HYPE_EST
               </div>
-              <div className="text-sm font-black text-arena-gold">{offer.hype}%</div>
+              <div className="text-sm font-black text-arena-gold">{offer.hype}%_INDEX</div>
             </div>
           </div>
+        </div>
 
-          <div className="flex gap-3 pt-2">
-            <Button
-              className="flex-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 gap-2 font-black uppercase text-[10px] tracking-widest"
-              onClick={() => handleResponse(offer.id, playerWarriorId, "Accepted")}
-              disabled={!!injuryBadge || fatigue > 60}
-            >
-              <CheckCircle2 className="h-4 w-4" /> Sign_Contract
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive gap-2 font-black uppercase text-[10px] tracking-widest"
-              onClick={() => handleResponse(offer.id, playerWarriorId, "Declined")}
-            >
-              <XCircle className="h-4 w-4" /> Decline
-            </Button>
-          </div>
-          {(!!injuryBadge || fatigue > 60) && (
-            <p className="text-[9px] text-destructive text-center">
-              {injuryBadge ? "Warrior has blocking injuries" : "Warrior is too fatigued"}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+        <div className="p-6 bg-black/40 border-t border-white/5 flex gap-3">
+          <Button
+            className="flex-1 h-12 bg-primary text-black hover:bg-primary/90 gap-2 font-black uppercase text-[10px] tracking-[0.2em] transition-all"
+            onClick={() => handleResponse(offer.id, playerWarriorId, "Accepted")}
+            disabled={!!injuryBadge || fatigue > 60}
+          >
+            Sign_Protocol
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-12 h-12 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors"
+            onClick={() => handleResponse(offer.id, playerWarriorId, "Declined")}
+            title="Decline Offer"
+          >
+            <Ban className="h-5 w-5" />
+          </Button>
+        </div>
+      </Surface>
     );
   };
 
