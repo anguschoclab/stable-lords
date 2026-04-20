@@ -1333,5 +1333,28 @@
       "There is no recovering from that. {{attacker}} cleaves through {{defender}} in a horrific display of power.",
       "Blood sprays in a wide arc! {{attacker}}'s {{weapon}} causes catastrophic, irreparable damage to {{defender}}."
     ]
+  },
+  "offseason_events": {
+    "festival_of_blades": {
+      "title": "Festival of Blades",
+      "effectType": "fame_boost",
+      "newsletter": [
+        "During the annual Festival of Blades, {{name}} was paraded through the streets, greatly boosting their fame! (+{{fame}} Fame)"
+      ]
+    },
+    "harsh_winter": {
+      "title": "A Bitter Winter",
+      "effectType": "winter_chill",
+      "newsletter": [
+        "A sudden, freezing wind swept through the stable grounds. We had to spend {{gold}} gold on extra heating and supplies."
+      ]
+    },
+    "merchant_blessing": {
+      "title": "Wandering Merchant's Favor",
+      "effectType": "merchant_blessing",
+      "newsletter": [
+        "A wealthy traveling merchant, impressed by our past victories, has sponsored the stable with a generous gift of {{gold}} gold."
+      ]
+    }
   }
 }

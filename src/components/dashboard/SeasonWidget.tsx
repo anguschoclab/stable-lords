@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim, Moon } from "lucide-react";
+import { Calendar, Clock, Trophy, MapPin, Gauge, Activity, Sparkles, Hexagon, CloudRain, Sun, Cloud, Wind, SunDim, Moon, PartyPopper } from "lucide-react";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Progress } from "@/components/ui/progress";
@@ -24,6 +24,12 @@ export function SeasonWidget() {
   const phaseDesc = week <= 4 ? "Early season scouting and roster consolidation." : 
                     week <= 9 ? "Intense divisional rivalries and meta-drift analysis." : 
                     "Final championship qualification and legendary bouts.";
+
+  // Offseason Event Check (Week 1 only)
+  const isOffseason = week === 1;
+  const latestOffseasonEvent = state.newsletter
+    ?.filter(item => item.week === state.week && ["Festival of Blades", "A Bitter Winter", "Wandering Merchant's Favor"].includes(item.title))
+    .pop();
 
   const weather = state.weather || "Clear";
   let WeatherIcon = Sun;
@@ -102,6 +108,20 @@ export function SeasonWidget() {
                 </div>
              </div>
           </div>
+
+          {isOffseason && latestOffseasonEvent && (
+             <div className="flex items-center gap-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-md animate-in fade-in slide-in-from-top-2 duration-700">
+                <PartyPopper className="h-5 w-5 text-indigo-400" />
+                <div className="flex flex-col">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300">
+                      {latestOffseasonEvent.title}
+                   </span>
+                   <span className="text-[9px] font-medium text-indigo-200/70 leading-tight">
+                      {latestOffseasonEvent.items[0]}
+                   </span>
+                </div>
+             </div>
+          )}
 
           <div className="space-y-3">
              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
