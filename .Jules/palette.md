@@ -10,3 +10,6 @@
 ## 2024-03-24 - Progress Bar Standardization
 **Learning:** Hardcoded pixel widths and inline styles like `style={{ width: \`\${val}%\` }}` clutter UI code and hinder responsive scaling.
 **Action:** Always leverage the generic `StatBattery` component (`src/components/ui/StatBattery.tsx`) instead of raw `div` styles or `<Progress>` bars for displaying stats or condition progress bars to ensure consistent styling and logic.
+## 2024-05-20 - [A11y attributes on functional divs]
+**Learning:** React toggles built with `div` instead of `button` require explicitly `role="button"`, `tabIndex`, keyboard handler (`onKeyDown`) and proper `aria` attributes to be accessible. Icon-only buttons must have `aria-label` to be usable by screen readers.
+**Action:** When inspecting components, identify actionable non-button elements and convert them to semantic buttons or add correct ARIA attributes and keyboard event handlers.

@@ -57,12 +57,22 @@ export default function MiniCombatLog({
     >
       {/* Header */}
       <div 
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        aria-label={isExpanded ? "Collapse combat log" : "Expand combat log"}
         className={cn(
           "flex items-center justify-between gap-2 px-3 py-2",
           "bg-neutral-950/95 border border-white/10 backdrop-blur-md",
           "rounded-none cursor-pointer hover:border-white/20 transition-colors"
         )}
         onClick={() => setIsExpanded(!isExpanded)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(!isExpanded);
+          }
+        }}
       >
         <div className="flex items-center gap-2">
           <History className="h-3.5 w-3.5 text-arena-gold" />
@@ -81,6 +91,7 @@ export default function MiniCombatLog({
           )}
           {onClose && (
             <button
+              aria-label="Close combat log"
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();
