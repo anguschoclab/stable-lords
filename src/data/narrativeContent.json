@@ -693,7 +693,7 @@
       },
       "dodge": {
         "success": [
-          "{{defender}} twists his body with prideful grace, allowing the attack to pass harmlessly by.",
+          "{{defender}} twists their body with prideful grace, allowing the attack to pass harmlessly by.",
           "{{defender}} weaves backward gracefully, letting the attack whistle past.",
           "With feline agility, {{defender}} sidesteps the incoming blow.",
           "{{attacker}} swings at empty air as {{defender}} ducks underneath.",
