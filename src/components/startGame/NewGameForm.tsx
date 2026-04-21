@@ -99,7 +99,7 @@ export default function NewGameForm({
               <h2 className="text-2xl font-display font-bold text-foreground">
                 Forge Your Stable
               </h2>
-              <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-xs mx-auto">
+              <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-[280px] mx-auto">
                 The orphanage doors creak open. Beyond them lies the roar of the crowd, the clash of steel, and a chance to forge legends.
               </p>
             </div>
