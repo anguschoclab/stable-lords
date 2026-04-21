@@ -712,7 +712,7 @@
       },
       "shield": {
         "success": [
-          "{{defender}} catches the blow on his SHIELD.",
+          "{{defender}} catches the blow on their SHIELD.",
           "{{defender}} raises their shield at the last second, taking the brunt of the heavy impact.",
           "The strike clangs loudly against {{defender}}'s shield, leaving a fresh dent but no blood.",
           "{{defender}} braces themselves, using their shield to expertly deflect the attack.",
