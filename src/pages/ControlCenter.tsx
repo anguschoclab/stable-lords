@@ -11,35 +11,27 @@ import { cn } from "@/lib/utils";
 
 import { calculateStableStats } from "@/engine/stats/stableStats";
 import { computeStableReputation } from "@/engine/stableReputation";
-import { computeMetaDrift } from "@/engine/metaDrift";
-import { getRecommendedChallenges, getMatchupsToAvoid } from "@/engine/schedulingAssistant";
 
 import { Surface } from "@/components/ui/Surface";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { SeasonWidget } from "@/components/dashboard/SeasonWidget";
 import { RecentBoutsWidget } from "@/components/dashboard/RecentBoutsWidget";
-import { MedicalAuditWidget } from "@/components/dashboard/MedicalAuditWidget";
 import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
-import { NextBoutWidget } from "@/components/widgets/NextBoutWidget";
 import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
-import { WeatherWidget } from "@/components/widgets/WeatherWidget";
 import { FormSparkline } from "@/components/charts/FormSparkline";
 import { ReputationQuadrant } from "@/components/charts/ReputationQuadrant";
-import { TreasurySparkline } from "@/components/charts/TreasurySparkline";
-import { StyleMeterTable } from "@/components/charts/StyleMeterTable";
 import { STYLE_ABBREV } from "@/types/shared.types";
 
 import {
   Swords, Crown, Coins, Star, Skull, TrendingUp,
   Shield, Activity, ChevronRight, Zap, Users,
-  BarChart3, Target, AlertTriangle,
-  Trophy, Eye, Flame,
+  Trophy, Flame,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TabId = "overview" | "roster" | "intel" | "meta" | "ops" | "rep";
+type TabId = "overview" | "roster" | "rep";
 
 // ─── KPI Bar ──────────────────────────────────────────────────────────────────
 
@@ -289,139 +281,6 @@ function RosterSnapshot() {
   );
 }
 
-// ─── Intel Tab ────────────────────────────────────────────────────────────────
-
-function IntelTab() {
-  const worldState = useWorldState();
-  const { roster } = useGameStore(useShallow((s) => ({ roster: s.roster })));
-
-  const topWarrior = useMemo(() => {
-    const active = roster.filter((w) => w.status === "Active");
-    return active.sort((a, b) => (b.fame ?? 0) - (a.fame ?? 0))[0] ?? null;
-  }, [roster]);
-
-  const recommended = useMemo(
-    () => (topWarrior ? getRecommendedChallenges(worldState, topWarrior, 4) : []),
-    [worldState, topWarrior]
-  );
-
-  const avoid = useMemo(
-    () => (topWarrior ? getMatchupsToAvoid(worldState, topWarrior, 3) : []),
-    [worldState, topWarrior]
-  );
-
-  if (!topWarrior) return (
-    <div className="text-center py-12 text-muted-foreground/40 text-sm font-black uppercase tracking-widest">
-      No active warriors for matchup analysis
-    </div>
-  );
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 mb-1">
-          <Target className="h-3.5 w-3.5 text-primary" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-primary">Recommended Challenges</span>
-          <span className="text-[9px] text-muted-foreground/40 ml-1">for {topWarrior.name}</span>
-        </div>
-        {recommended.map((m, i) => (
-          <Surface key={i} variant="glass" className="p-3 flex items-center justify-between gap-3">
-            <div>
-              <div className="font-display font-black text-sm uppercase tracking-tight">{m.rivalWarrior.name}</div>
-              <div className="text-[9px] text-muted-foreground/50 font-black uppercase tracking-widest">
-                {m.rivalStableName} · {STYLE_ABBREV[m.rivalWarrior.style] ?? m.rivalWarrior.style}
-              </div>
-              {m.notes[0] && (
-                <div className="text-[9px] text-arena-gold mt-1">{m.notes[0]}</div>
-              )}
-            </div>
-            <div className="text-right shrink-0">
-              <div className={cn(
-                "font-display font-black text-lg tracking-tighter",
-                m.score >= 110 ? "text-primary" : m.score >= 90 ? "text-arena-gold" : "text-muted-foreground/60"
-              )}>{m.score}</div>
-              <div className="text-[9px] text-muted-foreground/40 font-black uppercase">Score</div>
-            </div>
-          </Surface>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 mb-1">
-          <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-destructive">Matchups to Avoid</span>
-        </div>
-        {avoid.map((m, i) => (
-          <Surface key={i} variant="glass" className="p-3 flex items-center justify-between gap-3">
-            <div>
-              <div className="font-display font-black text-sm uppercase tracking-tight">{m.rivalWarrior.name}</div>
-              <div className="text-[9px] text-muted-foreground/50 font-black uppercase tracking-widest">
-                {m.rivalStableName} · {STYLE_ABBREV[m.rivalWarrior.style] ?? m.rivalWarrior.style}
-              </div>
-              {m.notes[0] && (
-                <div className="text-[9px] text-destructive mt-1">{m.notes[0]}</div>
-              )}
-            </div>
-            <div className="text-right shrink-0">
-              <div className="font-display font-black text-lg tracking-tighter text-destructive">{m.score}</div>
-              <div className="text-[9px] text-muted-foreground/40 font-black uppercase">Score</div>
-            </div>
-          </Surface>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Meta Tab ─────────────────────────────────────────────────────────────────
-
-function MetaTab() {
-  const { arenaHistory } = useGameStore(useShallow((s) => ({ arenaHistory: s.arenaHistory })));
-  const drift = useMemo(() => computeMetaDrift(arenaHistory), [arenaHistory]);
-
-  const sorted = useMemo(
-    () => Object.entries(drift).sort((a, b) => b[1] - a[1]),
-    [drift]
-  );
-
-  const max = Math.max(...Object.values(drift).map(Math.abs), 1);
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 mb-1">
-          <BarChart3 className="h-3.5 w-3.5 text-arena-fame" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-arena-fame">Style Meta Drift</span>
-        </div>
-        {sorted.map(([style, score]) => {
-          const pct = Math.abs(score) / max;
-          const isUp = score >= 0;
-          return (
-            <div key={style} className="flex items-center gap-3">
-              <div className="w-28 text-[10px] font-black uppercase tracking-wider text-muted-foreground/60 shrink-0 truncate">
-                {STYLE_ABBREV[style as keyof typeof STYLE_ABBREV] ?? style}
-              </div>
-              <div className="flex-1 h-1.5 bg-white/5 rounded-none overflow-hidden">
-                <div
-                  className={cn("h-full rounded-none transition-all", isUp ? "bg-primary" : "bg-destructive")}
-                  style={{ width: `${pct * 100}%` }}
-                />
-              </div>
-              <div className={cn("w-10 text-right font-mono font-black text-xs shrink-0", isUp ? "text-primary" : "text-destructive")}>
-                {score > 0 ? "+" : ""}{score.toFixed(1)}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <MetaDriftWidget />
-      </div>
-    </div>
-  );
-}
-
 // ─── Reputation Tab ───────────────────────────────────────────────────────────
 
 function ReputationTab() {
@@ -464,33 +323,12 @@ function ReputationTab() {
   );
 }
 
-// ─── Ops Tab ──────────────────────────────────────────────────────────────────
-
-function OpsTab() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TreasurySparkline />
-        <StyleMeterTable />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <MedicalAuditWidget />
-        <NextBoutWidget />
-        <WeatherWidget />
-      </div>
-    </div>
-  );
-}
-
 // ─── Tab Bar ──────────────────────────────────────────────────────────────────
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: "overview", label: "Overview",   icon: Activity },
   { id: "roster",   label: "Roster",     icon: Users },
-  { id: "intel",    label: "Intel",      icon: Eye },
-  { id: "meta",     label: "Meta",       icon: BarChart3 },
   { id: "rep",      label: "Reputation", icon: Crown },
-  { id: "ops",      label: "Operations", icon: Zap },
 ];
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -548,15 +386,12 @@ export default function ControlCenter() {
           </div>
         )}
         {activeTab === "roster"   && <RosterSnapshot />}
-        {activeTab === "intel"    && <IntelTab />}
-        {activeTab === "meta"     && <MetaTab />}
         {activeTab === "rep"      && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ReputationQuadrant />
             <ReputationTab />
           </div>
         )}
-        {activeTab === "ops"      && <OpsTab />}
       </div>
     </div>
   );

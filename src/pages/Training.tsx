@@ -7,9 +7,10 @@ import {
   type TrainingAssignment, type Attributes,
 } from "@/types/game";
 import type { Warrior } from "@/types/state.types";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Heart, Activity, Target, Zap, ChevronRight } from "lucide-react";
+import { Dumbbell, Heart, Activity, Target, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { WarriorTrainingCard } from "@/components/training/WarriorTrainingCard";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -96,16 +97,6 @@ export default function Training() {
                 <span>RECOV: {recoveryCount}</span>
               </div>
             </div>
-            <Link to="/command/tactics">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 text-[10px] font-black tracking-widest uppercase border-white/5 bg-white/5 hover:bg-white/10 flex items-center gap-1"
-              >
-                TRAINING PLANNER
-                <ChevronRight className="h-3 w-3" />
-              </Button>
-            </Link>
             {assignedCount > 0 && (
               <Button
                 variant="outline"
@@ -119,6 +110,27 @@ export default function Training() {
           </div>
         }
       />
+
+      {/* Training Tab Bar */}
+      <div className="flex items-center border-b border-white/5 -mt-8">
+        <Link
+          to="/command/training"
+          className={cn(
+            "flex items-center gap-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider border-b-2 -mb-px transition-colors",
+            "text-foreground border-primary"
+          )}
+        >
+          <Dumbbell className="h-3.5 w-3.5 text-primary" />
+          Assignments
+        </Link>
+        <Link
+          to="/command/tactics"
+          className="flex items-center gap-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider border-b-2 border-transparent -mb-px text-muted-foreground/50 hover:text-foreground transition-colors"
+        >
+          <Target className="h-3.5 w-3.5" />
+          Planning
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12 items-start">
         <div className="lg:col-span-1">

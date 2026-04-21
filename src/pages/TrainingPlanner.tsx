@@ -3,6 +3,7 @@
  * burn warnings, and seasonal cap visualization.
  */
 import React, { useMemo } from "react";
+import { Link } from "@tanstack/react-router";
 import { useGameStore } from "@/state/useGameStore";
 import {
   ATTRIBUTE_KEYS, ATTRIBUTE_LABELS, STYLE_DISPLAY_NAMES,
@@ -318,7 +319,7 @@ export default function TrainingPlanner() {
       <PageHeader
         icon={BarChart3}
         title="Training Planner"
-        subtitle="COMMAND · TACTICS · ATTRIBUTE DEVELOPMENT"
+        subtitle="COMMAND · TRAINING · ATTRIBUTE DEVELOPMENT"
         actions={
           <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest bg-secondary/20 backdrop-blur-md px-6 py-3 border border-white/5">
             <div className="text-center">
@@ -336,6 +337,27 @@ export default function TrainingPlanner() {
           </div>
         }
       />
+
+      {/* Training Tab Bar */}
+      <div className="flex items-center border-b border-white/5 -mt-4">
+        <Link
+          to="/command/training"
+          className="flex items-center gap-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider border-b-2 border-transparent -mb-px text-muted-foreground/50 hover:text-foreground transition-colors"
+        >
+          <Dumbbell className="h-3.5 w-3.5" />
+          Assignments
+        </Link>
+        <Link
+          to="/command/tactics"
+          className={cn(
+            "flex items-center gap-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider border-b-2 -mb-px transition-colors",
+            "text-foreground border-primary"
+          )}
+        >
+          <Target className="h-3.5 w-3.5 text-primary" />
+          Planning
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Archetype D: Left Rail Roster (span-4) */}

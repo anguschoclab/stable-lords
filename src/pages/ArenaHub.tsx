@@ -1,10 +1,13 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useGameStore } from "@/state/useGameStore";
+import { useShallow } from "zustand/react/shallow";
 import { calculateStableStats } from "@/engine/stats/stableStats";
 import type { Warrior } from "@/types/warrior.types";
 import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/shared.types";
 import { MOOD_DESCRIPTIONS, MOOD_ICONS, getMoodModifiers, type CrowdMood } from "@/engine/crowdMood";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { WarriorNameTag } from "@/components/ui/WarriorBadges";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -192,13 +195,17 @@ function ArenaLeaderboard() {
 
 export default function ArenaHub() {
   const { roster, player } = useGameStore();
+  const { week, isTournamentWeek } = useGameStore(
+    useShallow((s) => ({ week: s.week, isTournamentWeek: s.isTournamentWeek }))
+  );
+  const navigate = useNavigate();
 
   const lifetimeKills = useMemo(() => roster.reduce((s,w)=>s+(w.career?.kills || 0),0), [roster]);
   const stableStats = useMemo(() => calculateStableStats(roster), [roster]);
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
-      <PageHeader 
+      <PageHeader
         title="Arena Command Hub"
         subtitle="ARENA \u00b7 SPECTACLE ENGINE \u00b7 WORLD STATE"
         icon={Swords}
@@ -213,6 +220,25 @@ export default function ArenaHub() {
 
       {/* Band 2 — Crowd Mood full-width strip */}
       <CrowdMoodWidget />
+
+      {/* Execute Week CTA */}
+      <Surface variant="glass" className="flex flex-row items-center gap-6 p-5 border-l-4 border-l-primary/50">
+        <div className="flex-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+            {isTournamentWeek ? "Tournament Day" : `Week ${week}`}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Execute all bouts for this week
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate({ to: "/command/combat" })}
+          className="bg-primary text-black font-black uppercase tracking-widest shrink-0"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          {isTournamentWeek ? "EXECUTE TOURNAMENT DAY →" : `EXECUTE WEEK ${week} →`}
+        </Button>
+      </Surface>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Primary Intel Channel */}
