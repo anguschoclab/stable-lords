@@ -14,13 +14,13 @@ export function ConditionBattery({ value, className, showText = false }: Conditi
 
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
-      <div className="relative w-8 h-4 border border-muted-foreground/30 rounded-[2px] p-[1px] bg-background/50 overflow-hidden">
+      <div className="relative w-8 h-4 border border-muted-foreground/30 rounded-none p-[1px] bg-background/50 overflow-hidden">
         {/* Battery Top Notch */}
-        <div className="absolute right-[-2px] top-1/2 -translate-y-1/2 w-[2px] h-2 bg-muted-foreground/30 rounded-r-[1px]" />
-        
+        <div className="absolute right-[-2px] top-1/2 -translate-y-1/2 w-[2px] h-2 bg-muted-foreground/30 rounded-none" />
+
         {/* Fill */}
-        <div 
-          className={cn("h-full rounded-[1px] transition-all duration-500", color, opacity)}
+        <div
+          className={cn("h-full rounded-none transition-all duration-500", color, opacity)}
           style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
         />
       </div>

@@ -28,7 +28,7 @@ export function StatBattery({
       <div className="flex-1 relative">
         <Progress
           value={pct}
-          className={cn("h-2 rounded-full overflow-hidden shadow-[0_0_5px_currentColor]", colorClass)}
+          className={cn("h-2 overflow-hidden shadow-[0_0_5px_currentColor]", colorClass)}
         />
       </div>
       <span className="text-sm font-mono font-semibold w-6 text-right">{displayValue}</span>
