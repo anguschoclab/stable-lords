@@ -1372,7 +1372,7 @@
       "The bitter feud ends here! {{attacker}} delivers a spiteful, final blow to their hated rival, {{defender}}.",
       "The long-standing grudge is settled in a spray of crimson. {{attacker}} stands over the broken remains of their nemesis.",
       "{{attacker}} doesn't just kill {{defender}}; they destroy their legacy, ending the rivalry in a shower of gore.",
-      "With a scream of pure hatred, {{attacker}} buries their weapon into {{defender}}, finishing the blood feud once and for all."
+      "With a scream of pure hatred, {{attacker}} buries their {{weapon}} into {{defender}}, finishing the blood feud once and for all."
     ],
     "fatal_damage": [
       "A catastrophic impact! {{attacker}} unleashes a monstrous blow that utterly destroys {{defender}}.",
