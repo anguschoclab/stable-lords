@@ -92,7 +92,18 @@ export function narrateHit(
     audioManager.play("crit");
   }
 
-  const template = getFromArchive(rng, ["strikes", wType, severity]) || getFromArchive(rng, ["strikes", "generic"]);
+  let template = "";
+  if (isFatal) {
+    template = getFromArchive(rng, ["pbp", "executions"]);
+  }
+
+  if (!template || template === "A fierce exchange occurs.") {
+     template = getFromArchive(rng, ["strikes", wType, severity]);
+  }
+
+  if (!template || template === "A fierce exchange occurs.") {
+     template = getFromArchive(rng, ["strikes", "generic"]) || getFromArchive(rng, ["pbp", "hits", "generic"]);
+  }
 
   return interpolateTemplate(template, {
     attacker: attackerName,
