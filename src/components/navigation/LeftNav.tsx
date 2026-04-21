@@ -91,10 +91,17 @@ function useNavAlerts() {
   ).length;
 
   return {
-    command: untrainedCount > 0 ? untrainedCount : 0,
-    ops: pendingOffers > 0 ? pendingOffers : 0,
-    world: isTournamentWeek ? 1 : 0,
-  } as Record<HubId, number>;
+    counts: {
+      command: untrainedCount > 0 ? untrainedCount : 0,
+      ops: pendingOffers > 0 ? pendingOffers : 0,
+      world: isTournamentWeek ? 1 : 0,
+    } as Record<HubId, number>,
+    links: {
+      command: "/command/training",
+      ops: "/ops/contracts",
+      world: "/world/tournaments",
+    } as Record<HubId, string>,
+  };
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -106,7 +113,7 @@ interface LeftNavProps {
 export function LeftNav({ className }: LeftNavProps) {
   const location = useLocation();
   const currentPath = location.pathname;
-  const alerts = useNavAlerts();
+  const { counts: alerts, links: alertLinks } = useNavAlerts();
 
   const activeHubId = (HUBS.find(
     (h) => currentPath === h.to || currentPath.startsWith(`${h.to}/`)
@@ -126,6 +133,7 @@ export function LeftNav({ className }: LeftNavProps) {
           const isActive = activeHubId === hub.id;
           const Icon = hub.icon;
           const alertCount = alerts[hub.id as HubId] ?? 0;
+          const alertLink = alertLinks[hub.id as HubId];
 
           return (
             <Link
@@ -142,9 +150,13 @@ export function LeftNav({ className }: LeftNavProps) {
               <Icon className="h-3.5 w-3.5 shrink-0" />
               <span className="flex-1">{hub.label}</span>
               {alertCount > 0 && (
-                <span className="flex items-center justify-center h-4 min-w-4 px-1 rounded-none bg-arena-blood text-white text-[8px] font-black">
+                <Link
+                  to={alertLink}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center justify-center h-4 min-w-4 px-1 rounded-none bg-arena-blood text-white text-[8px] font-black hover:bg-destructive transition-colors"
+                >
                   {alertCount}
-                </span>
+                </Link>
               )}
               {isActive && (
                 <ChevronRight className="h-3 w-3 text-primary/60 shrink-0" />
@@ -236,13 +248,14 @@ function AlertStrip() {
     o.status === "Proposed" && o.warriorIds.some((id) => rosterIds.has(id))
   ).length;
 
-  const alerts: { icon: React.ElementType; label: string; color: string }[] = [];
+  const alerts: { icon: React.ElementType; label: string; color: string; to: string }[] = [];
 
   if (untrainedCount > 0)
     alerts.push({
       icon: ShieldAlert,
       label: `${untrainedCount} unassigned`,
       color: "text-arena-gold",
+      to: "/command/training",
     });
 
   if (pendingOffers > 0)
@@ -250,6 +263,7 @@ function AlertStrip() {
       icon: ScrollText,
       label: `${pendingOffers} offers`,
       color: "text-arena-pop",
+      to: "/ops/contracts",
     });
 
   if (isTournamentWeek)
@@ -257,6 +271,7 @@ function AlertStrip() {
       icon: AlertCircle,
       label: "Tournament week",
       color: "text-arena-blood",
+      to: "/world/tournaments",
     });
 
   if (alerts.length === 0) return null;
@@ -266,16 +281,17 @@ function AlertStrip() {
       {alerts.map((a, i) => {
         const Icon = a.icon;
         return (
-          <div
+          <Link
             key={i}
+            to={a.to}
             className={cn(
-              "flex items-center gap-2 px-2 py-1 text-[9px] font-black uppercase tracking-widest",
+              "flex items-center gap-2 px-2 py-1 text-[9px] font-black uppercase tracking-widest transition-opacity hover:opacity-70",
               a.color
             )}
           >
             <Icon className="h-3 w-3 shrink-0" />
             <span>{a.label}</span>
-          </div>
+          </Link>
         );
       })}
     </div>

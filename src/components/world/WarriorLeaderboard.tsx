@@ -116,7 +116,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                 : "bg-white/5 text-muted-foreground/50 border-white/10 hover:text-foreground hover:border-white/20"
             )}
           >
-            {f === "winRate" ? "Efficiency" : f === "kills" ? "Kills" : "Wins"}
+            {f === "winRate" ? "W%" : f === "kills" ? "Kills" : "Wins"}
           </button>
         ))}
 
@@ -153,13 +153,13 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                 <SortHeader label="Fame" active={sort.field === "fame"} dir={sort.dir} onClick={() => onSort("fame")} />
               </TableHead>
               <TableHead className="text-center">
-                <SortHeader label="W" active={sort.field === "wins"} dir={sort.dir} onClick={() => onSort("wins")} />
+                <SortHeader label="Wins" active={sort.field === "wins"} dir={sort.dir} onClick={() => onSort("wins")} />
               </TableHead>
               <TableHead className="text-center hidden sm:table-cell">
-                <SortHeader label="Efficiency" active={sort.field === "winRate"} dir={sort.dir} onClick={() => onSort("winRate")} />
+                <SortHeader label="W%" active={sort.field === "winRate"} dir={sort.dir} onClick={() => onSort("winRate")} />
               </TableHead>
               <TableHead className="text-center">
-                <SortHeader label="K" active={sort.field === "kills"} dir={sort.dir} onClick={() => onSort("kills")} />
+                <SortHeader label="Kills" active={sort.field === "kills"} dir={sort.dir} onClick={() => onSort("kills")} />
               </TableHead>
             </TableRow>
           </TableHeader>

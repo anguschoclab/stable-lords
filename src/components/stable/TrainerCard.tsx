@@ -55,7 +55,7 @@ export function TrainerCard({
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-6">
               {/* Visual Avatar Container */}
-              <div className="relative group-hover:scale-105 transition-transform duration-500">
+              <div className="relative group-hover:scale-105 transition-transform duration-500 overflow-visible">
                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="w-16 h-16 rounded-none bg-neutral-900 border border-white/5 flex items-center justify-center relative z-10 shadow-inner text-3xl">
                   {icon}
@@ -127,7 +127,7 @@ export function TrainerCard({
                      </div>
                      <div>
                         <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest block leading-none mb-1">Impact Bonus</span>
-                        <span className="text-[11px] font-black text-primary uppercase tracking-tight">+{bonus} {trainer.focus} GRC</span>
+                        <span className="text-[11px] font-black text-primary uppercase tracking-tight">+{bonus} {trainer.focus} pts/wk</span>
                      </div>
                   </div>
                   {trainer.styleBonusStyle && (

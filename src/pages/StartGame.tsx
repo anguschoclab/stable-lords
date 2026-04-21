@@ -31,6 +31,9 @@ import { toast } from "sonner";
 import { generateCrest } from "@/engine/crest/crestGenerator";
 import type { CrestData } from "@/types/crest.types";
 import { applyBackstoryToPlayer, type BackstoryId } from "@/data/backstories";
+import { runRankingsPass } from "@/engine/pipeline/passes/RankingsPass";
+import { runPromoterPass } from "@/engine/pipeline/passes/PromoterPass";
+import { resolveImpacts } from "@/engine/impacts";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import ColomseumArch from "@/components/startGame/ColomseumArch";
 import NewGameForm from "@/components/startGame/NewGameForm";
@@ -94,7 +97,7 @@ export default function StartGame() {
 
   const handleNewGame = useCallback(() => {
     if (!backstoryId) return;
-    const fresh = createFreshState("alpha-prime-10");
+    let fresh = createFreshState("alpha-prime-10");
     fresh.player.name = ownerName.trim();
     fresh.player.stableName = stableName.trim();
     fresh.player.crest = playerCrest; // 🛡️ Store the selected heraldic crest
@@ -102,6 +105,8 @@ export default function StartGame() {
     const slotId = newSlotId();
     const identitySeed = slotId.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
     applyBackstoryToPlayer(fresh, backstoryId, new SeededRNGService(identitySeed));
+    // Seed initial rankings and bout offers so Booking Office is populated from day 1
+    fresh = resolveImpacts(fresh, [runRankingsPass(fresh), runPromoterPass(fresh)]);
     saveToSlot(slotId, fresh.player.stableName, fresh);
     loadGame(slotId, fresh);
   }, [ownerName, stableName, playerCrest, backstoryId, loadGame]);

@@ -9,6 +9,11 @@ import { makeWarrior } from "@/engine/factories";
 import { simulateFight, defaultPlanForWarrior } from "@/engine";
 import { generateRivalStables } from "@/engine/rivals";
 import { generateRecruitPool } from "@/engine/recruitment";
+import { generatePromoters } from "@/engine/promoters/promoterGenerator";
+import { runRankingsPass } from "@/engine/pipeline/passes/RankingsPass";
+import { runPromoterPass } from "@/engine/pipeline/passes/PromoterPass";
+import { resolveImpacts } from "@/engine/impacts";
+import type { Promoter, GameState } from "@/types/state.types";
 import type { Warrior, FightSummary } from "@/types/game";
 import { generatePotential } from "@/engine/potential";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
@@ -183,6 +188,23 @@ export default function Orphanage() {
       new SeededRNGService(poolSeedValue + 888)
     );
 
+    const promotersArray = generatePromoters(30, poolSeedValue + 999);
+    const promoters: Record<string, Promoter> = {};
+    promotersArray.forEach(p => { promoters[p.id] = p; });
+
+    // Build a minimal state snapshot to seed rankings + offers
+    const seedState: GameState = {
+      ...(state as unknown as GameState),
+      isFTUE: false,
+      ftueComplete: true,
+      roster: aliveWarriors,
+      rivals,
+      promoters,
+      boutOffers: {},
+      realmRankings: {},
+    };
+    const seeded = resolveImpacts(seedState, [runRankingsPass(seedState), runPromoterPass(seedState)]);
+
     setState((draft: GameStore) => {
       draft.isFTUE = false;
       draft.ftueComplete = true;
@@ -191,6 +213,9 @@ export default function Orphanage() {
       draft.rivals = rivals;
       draft.recruitPool = recruitPool;
       draft.arenaHistory = boutResult ? [boutResult.summary] : [];
+      draft.promoters = seeded.promoters;
+      draft.boutOffers = seeded.boutOffers;
+      draft.realmRankings = seeded.realmRankings;
     });
     saveCurrentState();
   }, [state, setState, selectedWarriors, boutResult, poolSeedValue, saveCurrentState]);

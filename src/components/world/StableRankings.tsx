@@ -77,7 +77,7 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                 <SortHeader label="Losses" active={sort.field === "losses"} dir={sort.dir} onClick={() => onSort("losses")} />
               </TableHead>
               <TableHead className="text-right hidden sm:table-cell">
-                <SortHeader label="Efficiency" active={sort.field === "winRate"} dir={sort.dir} onClick={() => onSort("winRate")} />
+                <SortHeader label="W%" active={sort.field === "winRate"} dir={sort.dir} onClick={() => onSort("winRate")} />
               </TableHead>
               <TableHead className="text-right">
                 <SortHeader label="Fatalities" active={sort.field === "kills"} dir={sort.dir} onClick={() => onSort("kills")} />

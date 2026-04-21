@@ -312,7 +312,7 @@ export default function Trainers() {
               className="flex items-center gap-2.5 bg-neutral-950 border border-white/10 hover:border-primary/50 px-5 py-2.5 rounded-none transition-all group/refresh"
             >
               <RefreshCw className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:rotate-180 transition-all duration-700" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Update_Registry</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Update Registry</span>
             </button>
           </div>
 
@@ -345,7 +345,7 @@ export default function Trainers() {
                           )}
                        >
                           <UserPlus className="h-4 w-4" />
-                          {!canHire ? "CAPACITY_FULL" : !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50) ? "FUNDS_LOCKED" : "Secure_Contract"}
+                          {!canHire ? "CAPACITY FULL" : !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50) ? "FUNDS LOCKED" : "Secure Contract"}
                        </button>
                     </div>
                   }
@@ -355,14 +355,14 @@ export default function Trainers() {
           ) : (
             <Surface variant="glass" className="py-24 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
               <RefreshCw className="h-12 w-12 text-muted-foreground opacity-20 animate-spin duration-3000" />
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">Waiting_for_Connection...</p>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">Waiting for Connection...</p>
             </Surface>
           )}
         </TabsContent>
 
         <TabsContent value="mentors" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center gap-3 px-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">TOP_MENTORS</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">TOP MENTORS</span>
             <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
           </div>
           {(() => {

@@ -3,6 +3,7 @@
  * Modularized for better maintainability and strict type safety.
  */
 import React, { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useGameStore, reconstructGameState, type GameStore } from "@/state/useGameStore";
 import { type GameState, type Warrior, type RivalStableData } from "@/types/game";
 
@@ -27,6 +28,7 @@ import { RunResults } from "@/components/run-round/RunResults";
 export default function RunRound() {
   const store = useGameStore();
   const { setState, doAdvanceDay, doAdvanceWeek, setSimulating } = store;
+  const navigate = useNavigate();
   const state = useMemo(() => reconstructGameState(store), [store]);
   const [results, setResults] = useState<BoutResult[]>([]);
   const [running, setRunning] = useState(false);
@@ -71,7 +73,8 @@ export default function RunRound() {
 
     setRunning(false);
     setExpandedId(null);
-  }, [state, running, matchCard, fightReady.length, doAdvanceDay, doAdvanceWeek]);
+    setTimeout(() => navigate({ to: "/command" }), 1200);
+  }, [state, running, matchCard, fightReady.length, doAdvanceDay, doAdvanceWeek, navigate]);
 
   const handleStartAutosim = useCallback(async (weeks: number) => {
     if (autosimming) return;
