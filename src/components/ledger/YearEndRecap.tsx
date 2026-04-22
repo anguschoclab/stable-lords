@@ -13,13 +13,26 @@ export function YearEndRecap() {
   const { roster, graveyard, retired, ledger, rivalries, season, week } = useGameStore();
 
   const recap = useMemo(() => {
-    const topWarrior = [...roster].sort((a, b) => (b.fame ?? 0) - (a.fame ?? 0))[0];
-    const mostKills = [...roster].sort((a, b) => (b.career?.kills ?? 0) - (a.career?.kills ?? 0))[0];
+    // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan for finding max values. Avoids extra array allocations.
+    let topWarrior = roster[0];
+    let mostKills = roster[0];
+    for (const w of roster) {
+      if ((w.fame ?? 0) > (topWarrior?.fame ?? 0)) topWarrior = w;
+      if ((w.career?.kills ?? 0) > (mostKills?.career?.kills ?? 0)) mostKills = w;
+    }
+
     const totalKills = roster.reduce((s, w) => s + (w.career?.kills ?? 0), 0)
       + graveyard.reduce((s, w) => s + (w.career?.kills ?? 0), 0);
     const net = (ledger ?? []).reduce((s, e) => s + e.amount, 0);
     const memorials = graveyard.slice(-5);
-    const topRivalry = [...(rivalries ?? [])].sort((a, b) => (b.intensity ?? 0) - (a.intensity ?? 0))[0];
+
+    let topRivalry = rivalries?.[0];
+    if (rivalries) {
+      for (const r of rivalries) {
+        if ((r.intensity ?? 0) > (topRivalry?.intensity ?? 0)) topRivalry = r;
+      }
+    }
+
     return { topWarrior, mostKills, totalKills, net, memorials, topRivalry };
   }, [roster, graveyard, ledger, rivalries]);
 
