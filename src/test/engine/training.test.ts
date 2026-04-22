@@ -309,8 +309,8 @@ describe("Training System", () => {
         result: { type: "injury", warriorId: "w1", message: "Ouch" } as any
       });
 
-      const rng = new SeededRNG(1);
-      const impact = computeTrainingImpact(state as any, rng as any);
+      const rng = new SeededRNGService(1);
+      const impact = computeTrainingImpact(state as any, rng);
 
       expect(impact.results.some(r => r.message === "Sharpened")).toBe(true);
       expect(impact.results.some(r => r.message === "Ouch")).toBe(true);
