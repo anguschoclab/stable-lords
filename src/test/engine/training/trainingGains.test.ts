@@ -236,7 +236,7 @@ describe("trainingGains", () => {
   describe("computeSkillDrillChance", () => {
     it("should compute base skill drill chance correctly", () => {
       const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 10, WL: 12, SP: 12, DF: 12 }, { skillDrills: {} });
-      const chance = computeSkillDrillChance(warrior, "Punching", []);
+      const chance = computeSkillDrillChance(warrior, "ATT", []);
       // With WT=10, age=20, drills=0, trainerBonus=0
       // raw = (0.4 + 0 + 0 - 0) * 1 = 0.4
       expect(chance).toBeCloseTo(0.4);
