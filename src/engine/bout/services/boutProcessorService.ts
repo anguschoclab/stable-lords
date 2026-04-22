@@ -32,7 +32,7 @@ function getValidatedCombatants(ctx: BoutContext): { cW: Warrior; cO: Warrior } 
 function handleInvalidBout(ctx: BoutContext): BoutImpact {
   return {
     impact: {},
-    result: { a: ctx.warrior, d: ctx.opponent, outcome: { winner: null, by: "Error", minutes: 0, log: [] } as FightOutcome, isRivalry: ctx.isRivalry, rivalStable: ctx.rivalStable, contractId: ctx.contract?.id },
+    result: { a: ctx.warrior, d: ctx.opponent, outcome: { winner: null, by: "Draw", minutes: 0, log: [] } as FightOutcome, isRivalry: ctx.isRivalry, rivalStable: ctx.rivalStable, contractId: ctx.contract?.id },
     stats: { death: false, playerDeath: false, injured: false, deathNames: [], injuredNames: [] }
   };
 }
