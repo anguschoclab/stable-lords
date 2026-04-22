@@ -291,6 +291,62 @@ describe("Training System", () => {
 
   describe("computeTrainingImpact edge cases", () => {
 
+    it("should process skillDrill assignments correctly and roll for injury", () => {
+      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 }, { skillDrills: { Punching: 1 } });
+      const state = makeState({
+        roster: [warrior],
+        trainingAssignments: [{ warriorId: "w1", type: "skillDrill", skill: "Punching" }] as any
+      });
+
+      const processSpy = vi.spyOn(trainingGains, 'processSkillDrillTraining').mockReturnValue({
+        updatedWarrior: { ...warrior, skillDrills: { Punching: 2 } },
+        result: { type: "gain", warriorId: "w1", message: "Sharpened" } as any,
+        hardCapped: false
+      });
+
+      const injurySpy = vi.spyOn(trainingGains, 'rollForTrainingInjury').mockReturnValue({
+        injury: { id: "i1", name: "Sprain", description: "", severity: "Minor", weeksRemaining: 1, penalties: {} } as any,
+        result: { type: "injury", warriorId: "w1", message: "Ouch" } as any
+      });
+
+      const rng = new SeededRNG(1);
+      const impact = computeTrainingImpact(state as any, rng as any);
+
+      expect(impact.results.some(r => r.message === "Sharpened")).toBe(true);
+      expect(impact.results.some(r => r.message === "Ouch")).toBe(true);
+      expect(impact.updatedRoster[0].skillDrills?.["Punching"]).toBe(2);
+      expect(impact.updatedRoster[0].injuries.length).toBe(1);
+
+      processSpy.mockRestore();
+      injurySpy.mockRestore();
+    });
+
+    it("should skip skillDrill injury roll if hard capped", () => {
+      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 }, { skillDrills: { Punching: 3 } });
+      const state = makeState({
+        roster: [warrior],
+        trainingAssignments: [{ warriorId: "w1", type: "skillDrill", skill: "Punching" }] as any
+      });
+
+      const processSpy = vi.spyOn(trainingGains, 'processSkillDrillTraining').mockReturnValue({
+        updatedWarrior: null,
+        result: { type: "blocked", warriorId: "w1", message: "Capped" } as any,
+        hardCapped: true
+      });
+
+      const injurySpy = vi.spyOn(trainingGains, 'rollForTrainingInjury');
+
+      const rng = new SeededRNG(1);
+      const impact = computeTrainingImpact(state as any, rng as any);
+
+      expect(injurySpy).not.toHaveBeenCalled();
+      expect(impact.results.some(r => r.message === "Capped")).toBe(true);
+
+      processSpy.mockRestore();
+      injurySpy.mockRestore();
+    });
+
+
     it("should handle missing seasonal growth during training assignment loop", () => {
       const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 });
       const state = makeState({
