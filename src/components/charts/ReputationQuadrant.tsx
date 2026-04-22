@@ -2,13 +2,13 @@
  * ReputationQuadrant — 2D scatter: Fame (X) vs Notoriety (Y)
  * Shows player stable vs rival stables in reputation space.
  */
-import { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { useShallow } from "zustand/react/shallow";
-import { cn } from "@/lib/utils";
-import { computeStableReputation, computeRivalReputation } from "@/engine/stableReputation";
-import { Surface } from "@/components/ui/Surface";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useMemo } from 'react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { useShallow } from 'zustand/react/shallow';
+import { cn } from '@/lib/utils';
+import { computeStableReputation, computeRivalReputation } from '@/engine/stableReputation';
+import { Surface } from '@/components/ui/Surface';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface QuadrantDot {
   label: string;
@@ -25,7 +25,7 @@ export function ReputationQuadrant({ className }: { className?: string }) {
     const playerRep = computeStableReputation(worldState);
     const result: QuadrantDot[] = [
       {
-        label: worldState.player?.stableName ?? "Your Stable",
+        label: worldState.player?.stableName ?? 'Your Stable',
         fame: playerRep.fame,
         notoriety: playerRep.notoriety,
         isPlayer: true,
@@ -48,14 +48,18 @@ export function ReputationQuadrant({ className }: { className?: string }) {
   }, [worldState, rivals]);
 
   return (
-    <Surface variant="glass" className={cn("p-4 flex flex-col gap-3", className)}>
+    <Surface variant="glass" className={cn('p-4 flex flex-col gap-3', className)}>
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
           Reputation Quadrant
         </span>
         <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-none bg-primary inline-block" /> You</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-none bg-white/20 inline-block" /> Rivals</span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-none bg-primary inline-block" /> You
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-none bg-white/20 inline-block" /> Rivals
+          </span>
         </div>
       </div>
 
@@ -71,16 +75,23 @@ export function ReputationQuadrant({ className }: { className?: string }) {
         <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
           Fame →
         </span>
-        <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase tracking-widest text-muted-foreground/30"
-          style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>
+        <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 [writing-mode:vertical-rl] rotate-180">
           Notoriety →
         </span>
 
         {/* Quadrant labels */}
-        <span className="absolute top-2 left-2 text-[7px] font-black uppercase tracking-widest text-destructive/30">Feared</span>
-        <span className="absolute top-2 right-2 text-[7px] font-black uppercase tracking-widest text-arena-gold/30">Legendary</span>
-        <span className="absolute bottom-2 left-2 text-[7px] font-black uppercase tracking-widest text-muted-foreground/20">Unknown</span>
-        <span className="absolute bottom-2 right-2 text-[7px] font-black uppercase tracking-widest text-primary/30">Celebrated</span>
+        <span className="absolute top-2 left-2 text-[7px] font-black uppercase tracking-widest text-destructive/30">
+          Feared
+        </span>
+        <span className="absolute top-2 right-2 text-[7px] font-black uppercase tracking-widest text-arena-gold/30">
+          Legendary
+        </span>
+        <span className="absolute bottom-2 left-2 text-[7px] font-black uppercase tracking-widest text-muted-foreground/20">
+          Unknown
+        </span>
+        <span className="absolute bottom-2 right-2 text-[7px] font-black uppercase tracking-widest text-primary/30">
+          Celebrated
+        </span>
 
         {/* Dots */}
         <TooltipProvider>
@@ -93,15 +104,18 @@ export function ReputationQuadrant({ className }: { className?: string }) {
                 <TooltipTrigger asChild>
                   <div
                     className={cn(
-                      "absolute w-3 h-3 rounded-none -translate-x-1/2 -translate-y-1/2 cursor-default transition-transform hover:scale-150",
+                      'absolute w-3 h-3 rounded-none -translate-x-1/2 -translate-y-1/2 cursor-default transition-transform hover:scale-150',
                       dot.isPlayer
-                        ? "bg-primary shadow-[0_0_8px_rgba(255,0,0,0.6)] z-10"
-                        : "bg-white/30 hover:bg-white/50"
+                        ? 'bg-primary shadow-[0_0_8px_rgba(255,0,0,0.6)] z-10'
+                        : 'bg-white/30 hover:bg-white/50'
                     )}
                     style={{ left: `${x}%`, top: `${y}%` }}
                   />
                 </TooltipTrigger>
-                <TooltipContent side="top" className="text-[9px] font-black uppercase tracking-widest bg-neutral-950 border-white/10 rounded-none">
+                <TooltipContent
+                  side="top"
+                  className="text-[9px] font-black uppercase tracking-widest bg-neutral-950 border-white/10 rounded-none"
+                >
                   <div className="font-black text-foreground">{dot.label}</div>
                   <div className="text-muted-foreground/60 mt-0.5">
                     Fame {dot.fame} · Notoriety {dot.notoriety}
