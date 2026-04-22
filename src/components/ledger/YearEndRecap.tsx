@@ -14,8 +14,8 @@ export function YearEndRecap() {
 
   const recap = useMemo(() => {
     // ⚡ Bolt: Reduced O(N log N) sort to O(N) linear scan for finding max values. Avoids extra array allocations.
-    let topWarrior = roster[0];
-    let mostKills = roster[0];
+    let topWarrior = roster?.[0];
+    let mostKills = roster?.[0];
     for (const w of roster) {
       if ((w.fame ?? 0) > (topWarrior?.fame ?? 0)) topWarrior = w;
       if ((w.career?.kills ?? 0) > (mostKills?.career?.kills ?? 0)) mostKills = w;
