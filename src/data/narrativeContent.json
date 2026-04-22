@@ -1489,6 +1489,16 @@
       "newsletter": [
         "A wealthy traveling merchant, impressed by our past victories, has sponsored the stable with a generous gift of {{gold}} gold."
       ]
+    },
+    "tavern_brawl": {
+      "title": "Tavern Brawl!",
+      "effectType": "tavern_brawl",
+      "newsletter": [
+        "{{name}} got into a wild tavern brawl last night! They gained +{{fame}} Fame but suffered a minor injury.",
+        "A massive bar fight broke out, and {{name}} was right in the middle! They gained +{{fame}} Fame but walked away with a bruised ego and a bruised body."
+      ],
+      "injury_name": "Black Eye",
+      "injury_desc": "Caught a nasty right hook in the tavern."
     }
   },
   "crowd_reactions": {

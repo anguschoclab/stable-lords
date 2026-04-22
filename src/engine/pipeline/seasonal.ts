@@ -26,7 +26,9 @@ function t(template: string, data: Record<string, string | number>): string {
 
 interface OffseasonEventNarrative {
   title: string;
-  effectType: "fame_boost" | "winter_chill" | "merchant_blessing";
+  effectType: "fame_boost" | "winter_chill" | "merchant_blessing" | "tavern_brawl";
+  injury_name?: string;
+  injury_desc?: string;
   newsletter: string[];
 }
 
@@ -105,6 +107,25 @@ export function runSeasonalPass(state: GameState, nextWeek: number, rootRng?: IR
       title: e.title,
       items: [t(seasonRng.pick(e.newsletter) || "", { gold })]
     });
+  } else if (e.effectType === "tavern_brawl" && state.roster.length > 0) {
+    const activeWarriors = state.roster.filter(w => w.status === "Active");
+    if (activeWarriors.length > 0) {
+      const chosen = activeWarriors[Math.floor(seasonRng.next() * activeWarriors.length)];
+      rosterUpdates.set(chosen.id, {
+        fame: (chosen.fame || 0) + 15,
+        injuries: [...(chosen.injuries || []), {
+          name: e.injury_name || "Bruised Ego",
+          description: e.injury_desc || "Got beaten up in a tavern brawl.",
+          recoveryTime: 1
+        }]
+      });
+      newsletterItems.push({
+        id: generateId(seasonRng, "newsletter"),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || "", { name: chosen.name, fame: 15 })]
+      });
+    }
   }
 
   // Record this event in the State so the UI can pick it up
