@@ -20,3 +20,6 @@
 ## 2023-10-27 - [Recent Bouts Widget Filtering]
 **Learning:** React components that render recent history (like RecentBoutsWidget) can cause major performance degradation if they filter the entire unbounded `arenaHistory` array and then slice it. Not only is it an O(N) operation over a potentially massive array, but if done with `.slice(0, 5)` after filtering, it returns the oldest matching elements instead of the most recent if not careful (or requires a reverse).
 **Action:** Replace `array.filter(condition).slice()` on large chronological history arrays with bounded linear scans (O(1) iterations scaling by max requested size) in `useMemo` hooks.
+## 2026-04-22 - Optimize max-value lookups in useMemo
+**Learning:** Using `[...array].sort()[0]` inside frequently executed React hooks like `useMemo` creates unnecessary shallow copies and runs in O(N log N) time, which degrades render performance for large lists.
+**Action:** Always use an O(N) linear scan (`for...of` or `reduce`) when searching for maximum or minimum values in arrays or maps, especially within React render cycles or heavy data processing pipelines.
