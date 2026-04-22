@@ -24,7 +24,7 @@ jobs:
         run: bun install
 
       - name: Run Simulation Oracle
-        run: bun run run_balance_report.ts
+        run: bun run src/scripts/daily_oracle.ts
 
       - name: Commit and Push Report
         run: |

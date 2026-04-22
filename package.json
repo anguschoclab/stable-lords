@@ -27,7 +27,7 @@
     "e2e:debug": "playwright test --debug",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "oracle:daily": "bun run scripts/daily_oracle.ts",
+    "oracle:daily": "bun run src/scripts/daily_oracle.ts",
     "bard:daily": "bunx tsx src/scripts/daily_bard.ts"
   },
   "dependencies": {
