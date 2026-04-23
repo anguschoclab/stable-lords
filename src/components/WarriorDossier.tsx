@@ -14,6 +14,7 @@ import { StatBadge } from "@/components/ui/WarriorBadges";
 import WarriorPaperDoll from "@/components/WarriorPaperDoll";
 import { StatBattery } from "@/components/ui/StatBattery";
 import { cn } from "@/lib/utils";
+import { TRAIT_DATA } from "@/data/orphanPool";
 import { getFavoritesDisplay } from "@/components/warrior/favoritesDisplay";
 
 interface WarriorDossierProps {
@@ -75,6 +76,28 @@ export const WarriorDossier = React.memo(function WarriorDossier({ warriorId }: 
               )}
             </div>
           </div>
+          
+          {(warrior.origin || (warrior.traits && warrior.traits.length > 0)) && (
+            <div className="p-3 bg-white/5 border border-white/5 rounded-sm space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {warrior.traits?.map(t => (
+                  <Badge key={t} variant="secondary" className="text-[9px] font-black uppercase tracking-widest bg-arena-gold/10 text-arena-gold border-arena-gold/20">
+                    {t}
+                  </Badge>
+                ))}
+              </div>
+              {warrior.origin && (
+                <p className="text-[11px] font-medium text-muted-foreground/90 uppercase tracking-wider leading-tight">
+                  {warrior.origin}
+                </p>
+              )}
+              {warrior.lore && (
+                <p className="text-xs text-muted-foreground/60 italic leading-relaxed border-l border-white/10 pl-3">
+                  "{warrior.lore}"
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
