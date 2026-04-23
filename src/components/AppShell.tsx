@@ -40,6 +40,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { DeathModal } from '@/components/modals/DeathModal';
 import { CoachOverlay } from '@/components/ui/CoachOverlay';
+import { TacticalBar } from '@/components/navigation/TacticalBar';
 import EventLog from '@/components/EventLog';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
