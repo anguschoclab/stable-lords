@@ -1,23 +1,23 @@
 /**
  * Aging System — warriors age each week and may face forced retirement at old age.
- * 
+ *
  * - Warriors age +1 year every 52 weeks (1 game year)
  * - At age 30+, each week there's a growing chance of forced retirement
  * - At age 40, forced retirement is guaranteed
  * - Aging penalties apply to SP and DF after age 28
  */
-import type { GameState } from "@/types/state.types";
-import type { Warrior, WarriorStatus } from "@/types/warrior.types";
-import { computeWarriorStats } from "./skillCalc";
+import type { GameState } from '@/types/state.types';
+import type { Warrior, WarriorStatus } from '@/types/warrior.types';
+import { computeWarriorStats } from './skillCalc';
 
 const WEEKS_PER_YEAR = 52;
 const AGING_PENALTY_START = 28;
 const FORCED_RETIRE_MIN = 30;
 const FORCED_RETIRE_MAX = 40;
 
-import { type StateImpact } from "./impacts";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import { type StateImpact } from './impacts';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 /** Compute the aging impact of the current week. */
 export function computeAgingImpact(state: GameState, rng: IRNGService): StateImpact {
@@ -35,13 +35,14 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
       if (newAge > AGING_PENALTY_START) {
         const penalty = Math.floor((newAge - AGING_PENALTY_START) / 3);
         if (penalty > 0) {
-           const newAttrs = { ...w.attributes, 
-             SP: Math.max(3, w.attributes.SP - 1), 
-             DF: Math.max(3, w.attributes.DF - 1) 
-           };
-           const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, w.style);
-           Object.assign(update, { attributes: newAttrs, baseSkills, derivedStats });
-           ageEvents.push(`${w.name} shows signs of aging (SP/DF declining).`);
+          const newAttrs = {
+            ...w.attributes,
+            SP: Math.max(3, w.attributes.SP - 1),
+            DF: Math.max(3, w.attributes.DF - 1),
+          };
+          const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, w.style);
+          Object.assign(update, { attributes: newAttrs, baseSkills, derivedStats });
+          ageEvents.push(`${w.name} shows signs of aging (SP/DF declining).`);
         }
       }
       rosterUpdates.set(w.id, update);
@@ -50,16 +51,22 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
 
   // Check for forced retirement
   for (const w of state.roster) {
-    const age = (rosterUpdates.get(w.id)?.age ?? w.age) ?? 18;
+    const age = rosterUpdates.get(w.id)?.age ?? w.age ?? 18;
     if (age >= FORCED_RETIRE_MAX) {
       toRetire.push(w.id);
-      retiredWarriors.push({ ...w, age, status: "Retired" as any, retiredWeek: state.week } as any);
+      retiredWarriors.push({ ...w, age, status: 'Retired' as any, retiredWeek: state.week } as any);
       ageEvents.push(`${w.name} (age ${age}) has been forced to retire — too old to fight.`);
     } else if (age >= FORCED_RETIRE_MIN) {
-      const retireChance = (age - FORCED_RETIRE_MIN) / (FORCED_RETIRE_MAX - FORCED_RETIRE_MIN) * 0.15;
+      const retireChance =
+        ((age - FORCED_RETIRE_MIN) / (FORCED_RETIRE_MAX - FORCED_RETIRE_MIN)) * 0.15;
       if (rng.next() < retireChance) {
         toRetire.push(w.id);
-        retiredWarriors.push({ ...w, age, status: "Retired" as any, retiredWeek: state.week } as any);
+        retiredWarriors.push({
+          ...w,
+          age,
+          status: 'Retired' as any,
+          retiredWeek: state.week,
+        } as any);
         ageEvents.push(`${w.name} (age ${age}) has decided to hang up the blade.`);
       }
     }
@@ -69,6 +76,9 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
     rosterUpdates,
     rosterRemovals: toRetire,
     retired: retiredWarriors,
-    newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid(), week: state.week, title: "Aging Report", items: ageEvents }] : []
+    newsletterItems:
+      ageEvents.length > 0
+        ? [{ id: rng.uuid(), week: state.week, title: 'Aging Report', items: ageEvents }]
+        : [],
   };
 }

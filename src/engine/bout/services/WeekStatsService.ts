@@ -3,7 +3,7 @@
  * Accumulates bout statistics for weekly summary
  * Extracted from boutProcessorService.ts to enforce SRP
  */
-import type { WeekBoutSummary, BoutImpact } from "@/engine/bout/services/boutProcessorService";
+import type { WeekBoutSummary, BoutImpact } from '@/engine/bout/services/boutProcessorService';
 
 /**
  * Creates a fresh week bout summary
@@ -24,10 +24,7 @@ export function createWeekBoutSummary(): WeekBoutSummary {
  * Accumulates bout results into week summary
  * Mutates summary for performance (internal accumulator pattern)
  */
-export function accumulateWeekStats(
-  summary: WeekBoutSummary,
-  res: BoutImpact
-): void {
+export function accumulateWeekStats(summary: WeekBoutSummary, res: BoutImpact): void {
   summary.bouts++;
   if (res.stats.death) {
     summary.deaths += res.stats.deathNames.length;

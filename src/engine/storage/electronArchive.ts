@@ -1,10 +1,16 @@
-import type { GameState } from "@/types/state.types";
+import type { GameState } from '@/types/state.types';
 
 export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (year: number, season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
+  archiveBoutLog: (
+    year: number,
+    season: number,
+    boutId: string,
+    logData: string[],
+    overwrite?: boolean
+  ) => Promise<void>;
   retrieveBoutLog: (year: number, season: number, boutId: string) => Promise<string[] | null>;
 
   // Gazettes (Markdown)
@@ -42,7 +48,7 @@ export class ElectronArchiveService implements ArchiveService {
   async archiveHotState(slotId: string, stateData: GameState): Promise<void> {
     return this.enqueue(async () => {
       if (!this.isSupported() || !window.electronAPI) return;
-      
+
       try {
         const result = await window.electronAPI.saveGame(slotId, stateData);
         if (!result.success) {
@@ -56,7 +62,7 @@ export class ElectronArchiveService implements ArchiveService {
 
   async retrieveHotState(slotId: string): Promise<GameState | null> {
     if (!this.isSupported() || !window.electronAPI) return null;
-    
+
     try {
       const result = await window.electronAPI.loadGame(slotId);
       if (result.success && result.data) {
@@ -69,10 +75,16 @@ export class ElectronArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(year: number, season: number, boutId: string, logData: string[], _overwrite?: boolean): Promise<void> {
+  async archiveBoutLog(
+    year: number,
+    season: number,
+    boutId: string,
+    logData: string[],
+    _overwrite?: boolean
+  ): Promise<void> {
     return this.enqueue(async () => {
       if (!this.isSupported() || !window.electronAPI) return;
-      
+
       try {
         const result = await window.electronAPI.archiveBoutLog(year, season, boutId, logData);
         if (!result.success) {
@@ -86,7 +98,7 @@ export class ElectronArchiveService implements ArchiveService {
 
   async retrieveBoutLog(year: number, season: number, boutId: string): Promise<string[] | null> {
     if (!this.isSupported() || !window.electronAPI) return null;
-    
+
     try {
       const result = await window.electronAPI.retrieveBoutLog(year, season, boutId);
       if (result.success && result.data) {
@@ -102,7 +114,7 @@ export class ElectronArchiveService implements ArchiveService {
   async archiveGazette(season: number, week: number, markdown: string): Promise<void> {
     return this.enqueue(async () => {
       if (!this.isSupported() || !window.electronAPI) return;
-      
+
       try {
         const result = await window.electronAPI.archiveGazette(season, week, markdown);
         if (!result.success) {
@@ -116,7 +128,7 @@ export class ElectronArchiveService implements ArchiveService {
 
   async retrieveGazette(season: number, week: number): Promise<string | null> {
     if (!this.isSupported() || !window.electronAPI) return null;
-    
+
     try {
       const result = await window.electronAPI.retrieveGazette(season, week);
       if (result.success && result.data) {

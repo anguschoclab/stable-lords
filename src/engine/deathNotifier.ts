@@ -10,8 +10,8 @@
  * This module is intentionally UI/presentation-layer friendly: callers can
  * attach handlers once at boot and tear them down in tests via `clearDeathHandlers`.
  */
-import { engineEventBus, type EngineEvent } from "@/engine/core/EventBus";
-import { logger } from "@/utils/logger";
+import { engineEventBus, type EngineEvent } from '@/engine/core/EventBus';
+import { logger } from '@/utils/logger';
 
 export interface DeathNotification {
   warriorId: string;
@@ -26,18 +26,18 @@ let busSubscription: (() => void) | null = null;
 function ensureSubscribed(): void {
   if (busSubscription) return;
   busSubscription = engineEventBus.subscribe((event: EngineEvent) => {
-    if (event.type !== "WARRIOR_DEATH") return;
+    if (event.type !== 'WARRIOR_DEATH') return;
     const payload: DeathNotification = {
       warriorId: event.payload.warriorId,
       name: event.payload.name,
     };
-    handlers.forEach(h => {
+    handlers.forEach((h) => {
       try {
         h(payload);
       } catch (err) {
         // Handlers are side-effect sinks (UI toasts, chronicle writers, etc.) —
         // a failing handler must not block the others from firing.
-        logger.error("[deathNotifier] handler threw:", err);
+        logger.error('[deathNotifier] handler threw:', err);
       }
     });
   });

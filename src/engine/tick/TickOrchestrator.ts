@@ -1,7 +1,7 @@
-import type { GameState } from "@/types/state.types";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { advanceWeek as runWeeklyPipeline } from "@/engine/pipeline/services/weekPipelineService";
-import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelection";
+import type { GameState } from '@/types/state.types';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { advanceWeek as runWeeklyPipeline } from '@/engine/pipeline/services/weekPipelineService';
+import { TournamentSelectionService } from '@/engine/matchmaking/tournamentSelection';
 
 /**
  * Stable Lords — Unified Tick Orchestrator
@@ -14,7 +14,7 @@ export const TickOrchestrator = {
   advanceDay(state: GameState): GameState {
     const currentDay = state.day || 0;
     const nextDay = currentDay + 1;
-    const rng = new SeededRNGService((state.week * 100) + nextDay);
+    const rng = new SeededRNGService(state.week * 100 + nextDay);
 
     // 1. Weekly Transition (Day 7)
     if (nextDay >= 7) {
@@ -23,27 +23,30 @@ export const TickOrchestrator = {
         ...finalState,
         day: 0,
         isTournamentWeek: false,
-        activeTournamentId: undefined
+        activeTournamentId: undefined,
       };
     }
 
     // 2. Tournament Day (Skip to End Mode not active)
     if (state.isTournamentWeek && state.activeTournamentId) {
       const { updatedState, roundResults } = TournamentSelectionService.resolveRound(
-        state, 
-        state.activeTournamentId, 
-        (state.week * 100) + nextDay
+        state,
+        state.activeTournamentId,
+        state.week * 100 + nextDay
       );
-      
+
       const nextState = { ...updatedState, day: nextDay };
-      
+
       if (roundResults.length > 0) {
-        nextState.newsletter = [...(nextState.newsletter || []), {
-          id: rng.uuid(),
-          week: state.week,
-          title: `Empire Day ${nextDay}: Tournament Results`,
-          items: roundResults
-        }];
+        nextState.newsletter = [
+          ...(nextState.newsletter || []),
+          {
+            id: rng.uuid(),
+            week: state.week,
+            title: `Empire Day ${nextDay}: Tournament Results`,
+            items: roundResults,
+          },
+        ];
       }
       return nextState;
     }
@@ -67,22 +70,25 @@ export const TickOrchestrator = {
         const { updatedState, roundResults } = TournamentSelectionService.resolveRound(
           currentState,
           state.activeTournamentId,
-          (state.week * 100) + day
+          state.week * 100 + day
         );
         currentState = updatedState;
-        weeklyNewsItems.push(...roundResults.map(r => `[Day ${day}] ${r}`));
+        weeklyNewsItems.push(...roundResults.map((r) => `[Day ${day}] ${r}`));
       }
     }
 
     // 2. Collect Batched Summary (Already done by resolving rounds sequentially in a loop)
     // Add the batched newsletter item
     if (weeklyNewsItems.length > 0) {
-      currentState.newsletter = [...(currentState.newsletter || []), {
-        id: new SeededRNGService(state.week).uuid(),
-        week: state.week,
-        title: `Empire News: Tournament Week ${state.week} Recap`,
-        items: weeklyNewsItems
-      }];
+      currentState.newsletter = [
+        ...(currentState.newsletter || []),
+        {
+          id: new SeededRNGService(state.week).uuid(),
+          week: state.week,
+          title: `Empire News: Tournament Week ${state.week} Recap`,
+          items: weeklyNewsItems,
+        },
+      ];
     }
 
     // 3. Run final weekly pipeline
@@ -91,7 +97,7 @@ export const TickOrchestrator = {
       ...finalState,
       day: 0,
       isTournamentWeek: false,
-      activeTournamentId: undefined
+      activeTournamentId: undefined,
     };
-  }
-}
+  },
+};

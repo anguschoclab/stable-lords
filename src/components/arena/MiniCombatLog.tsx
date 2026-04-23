@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { X, History, ChevronUp, ChevronDown } from "lucide-react";
-import type { MinuteEvent } from "@/types/combat.types";
-import { classifyEvent } from "@/lib/boutUtils";
+import React, { useRef, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import { X, History, ChevronUp, ChevronDown } from 'lucide-react';
+import type { MinuteEvent } from '@/types/combat.types';
+import { classifyEvent } from '@/lib/boutUtils';
 
 interface MiniCombatLogProps {
   events: MinuteEvent[];
@@ -12,19 +12,19 @@ interface MiniCombatLogProps {
   onClose?: () => void;
 }
 
-export default function MiniCombatLog({ 
-  events, 
-  visibleCount, 
-  isPlaying, 
+export default function MiniCombatLog({
+  events,
+  visibleCount,
+  isPlaying,
   className,
-  onClose 
+  onClose,
 }: MiniCombatLogProps) {
   const logEndRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = React.useState(true);
 
   useEffect(() => {
     if (isExpanded && logEndRef.current?.scrollIntoView) {
-      logEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      logEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [visibleCount, isExpanded]);
 
@@ -33,38 +33,43 @@ export default function MiniCombatLog({
 
   const getEventIcon = (type: ReturnType<typeof classifyEvent>) => {
     switch (type) {
-      case "hit": return "⚔️";
-      case "crit": return "⚡";
-      case "death": return "💀";
-      case "ko": return "😵";
-      case "miss": return "🛡️";
-      case "riposte": return "↩️";
-      case "initiative": return "⚡";
-      case "exhaust": return "😮‍💨";
-      case "phase": return "◆";
-      case "spatial": return "↔";
-      default: return "•";
+      case 'hit':
+        return '⚔️';
+      case 'crit':
+        return '⚡';
+      case 'death':
+        return '💀';
+      case 'ko':
+        return '😵';
+      case 'miss':
+        return '🛡️';
+      case 'riposte':
+        return '↩️';
+      case 'initiative':
+        return '⚡';
+      case 'exhaust':
+        return '😮‍💨';
+      case 'phase':
+        return '◆';
+      case 'spatial':
+        return '↔';
+      default:
+        return '•';
     }
   };
 
   return (
-    <div
-      className={cn(
-        "absolute bottom-4 left-4 z-30",
-        "transition-all duration-300",
-        className
-      )}
-    >
+    <div className={cn('absolute bottom-4 left-4 z-30', 'transition-all duration-300', className)}>
       {/* Header */}
-      <div 
+      <div
         role="button"
         tabIndex={0}
         aria-expanded={isExpanded}
-        aria-label={isExpanded ? "Collapse combat log" : "Expand combat log"}
+        aria-label={isExpanded ? 'Collapse combat log' : 'Expand combat log'}
         className={cn(
-          "flex items-center justify-between gap-2 px-3 py-2",
-          "bg-neutral-950/95 border border-white/10 backdrop-blur-md",
-          "rounded-none cursor-pointer hover:border-white/20 transition-colors"
+          'flex items-center justify-between gap-2 px-3 py-2',
+          'bg-neutral-950/95 border border-white/10 backdrop-blur-md',
+          'rounded-none cursor-pointer hover:border-white/20 transition-colors'
         )}
         onClick={() => setIsExpanded(!isExpanded)}
         onKeyDown={(e) => {
@@ -79,9 +84,7 @@ export default function MiniCombatLog({
           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             Combat Log
           </span>
-          {isPlaying && (
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          )}
+          {isPlaying && <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
         </div>
         <div className="flex items-center gap-1">
           {isExpanded ? (
@@ -108,9 +111,9 @@ export default function MiniCombatLog({
       {isExpanded && (
         <div
           className={cn(
-            "w-64 max-h-48 overflow-y-auto",
-            "bg-neutral-950/90 border border-white/10 border-t-0",
-            "backdrop-blur-md scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
+            'w-64 max-h-48 overflow-y-auto',
+            'bg-neutral-950/90 border border-white/10 border-t-0',
+            'backdrop-blur-md scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent'
           )}
         >
           {visibleCount === 0 ? (
@@ -124,30 +127,27 @@ export default function MiniCombatLog({
               {recentEvents.map((event, idx) => {
                 const type = classifyEvent(event);
                 const isLatest = idx === recentEvents.length - 1;
-                
+
                 return (
                   <div
                     key={idx}
                     className={cn(
-                      "px-3 py-1.5 flex items-start gap-2",
-                      "transition-all duration-300",
-                      isLatest && "bg-white/5"
+                      'px-3 py-1.5 flex items-start gap-2',
+                      'transition-all duration-300',
+                      isLatest && 'bg-white/5'
                     )}
                   >
-                    <span className="text-[10px] shrink-0 mt-0.5">
-                      {getEventIcon(type)}
-                    </span>
+                    <span className="text-[10px] shrink-0 mt-0.5">{getEventIcon(type)}</span>
                     <div className="flex-1 min-w-0">
-                      <p className={cn(
-                        "text-[10px] leading-tight",
-                        isLatest ? "text-foreground font-medium" : "text-muted-foreground/60",
-                        type === "death" && "text-arena-blood font-black",
-                        type === "crit" && "text-destructive font-black"
-                      )}>
-                        {event.text.length > 60 
-                          ? event.text.substring(0, 60) + "..."
-                          : event.text
-                        }
+                      <p
+                        className={cn(
+                          'text-[10px] leading-tight',
+                          isLatest ? 'text-foreground font-medium' : 'text-muted-foreground/60',
+                          type === 'death' && 'text-arena-blood font-black',
+                          type === 'crit' && 'text-destructive font-black'
+                        )}
+                      >
+                        {event.text.length > 60 ? event.text.substring(0, 60) + '...' : event.text}
                       </p>
                     </div>
                   </div>

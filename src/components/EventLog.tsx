@@ -3,10 +3,10 @@
  * Derives events from game state (fights, deaths, recruits, newsletters, training, injuries).
  * Entity names are rendered as clickable links via WarriorLink.
  */
-import React, { useMemo } from "react";
-import { useWorldState } from "@/state/useGameStore";
-import { useNavigate } from "@tanstack/react-router";
-import { cn } from "@/lib/utils";
+import React, { useMemo } from 'react';
+import { useWorldState } from '@/state/useGameStore';
+import { useNavigate } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 import {
   Swords,
   Skull,
@@ -19,12 +19,22 @@ import {
   Dumbbell,
   Heart,
   ChevronRight,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { WarriorLink } from "@/components/EntityLink";
+} from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { WarriorLink } from '@/components/EntityLink';
 
-type EventType = "fight" | "kill" | "death" | "recruit" | "tournament" | "news" | "injury" | "retirement" | "training" | "recovery";
+type EventType =
+  | 'fight'
+  | 'kill'
+  | 'death'
+  | 'recruit'
+  | 'tournament'
+  | 'news'
+  | 'injury'
+  | 'retirement'
+  | 'training'
+  | 'recovery';
 
 interface GameEvent {
   id: string;
@@ -40,16 +50,16 @@ interface GameEvent {
 }
 
 const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }> = {
-  fight:      { icon: Swords,        color: "text-primary" },
-  kill:       { icon: Skull,         color: "text-arena-blood" },
-  death:      { icon: Skull,         color: "text-destructive" },
-  recruit:    { icon: UserPlus,      color: "text-arena-pop" },
-  tournament: { icon: Trophy,        color: "text-arena-gold" },
-  news:       { icon: Newspaper,     color: "text-muted-foreground" },
-  injury:     { icon: AlertTriangle, color: "text-amber-400" },
-  retirement: { icon: Star,          color: "text-arena-fame" },
-  training:   { icon: Dumbbell,      color: "text-primary" },
-  recovery:   { icon: Heart,         color: "text-arena-pop" },
+  fight: { icon: Swords, color: 'text-primary' },
+  kill: { icon: Skull, color: 'text-arena-blood' },
+  death: { icon: Skull, color: 'text-destructive' },
+  recruit: { icon: UserPlus, color: 'text-arena-pop' },
+  tournament: { icon: Trophy, color: 'text-arena-gold' },
+  news: { icon: Newspaper, color: 'text-muted-foreground' },
+  injury: { icon: AlertTriangle, color: 'text-amber-400' },
+  retirement: { icon: Star, color: 'text-arena-fame' },
+  training: { icon: Dumbbell, color: 'text-primary' },
+  recovery: { icon: Heart, color: 'text-arena-pop' },
 };
 
 /**
@@ -69,8 +79,8 @@ function LinkifiedText({ text, names }: { text: string; names: string[] }) {
     // Sort longest first to avoid partial matches
     const sorted = [...names].sort((a, b) => b.length - a.length);
     // Escape regex special chars in names
-    const escaped = sorted.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-    const pattern = new RegExp(`(${escaped.join("|")})`, "g");
+    const escaped = sorted.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const pattern = new RegExp(`(${escaped.join('|')})`, 'g');
 
     return {
       parts: text.split(pattern),
@@ -115,17 +125,19 @@ export default function EventLog() {
 
     // Fight results
     state.arenaHistory.forEach((f) => {
-      const isKill = f.by === "Kill";
-      const winnerName = f.winner === "A" ? f.a : f.winner === "D" ? f.d : null;
+      const isKill = f.by === 'Kill';
+      const winnerName = f.winner === 'A' ? f.a : f.winner === 'D' ? f.d : null;
       all.push({
         id: `fight-${f.id}`,
         week: f.week,
-        type: isKill ? "kill" : "fight",
-        title: winnerName ? `${winnerName} defeats ${f.winner === "A" ? f.d : f.a}` : `${f.a} vs ${f.d} — Draw`,
-        subtitle: isKill ? `Killed in combat` : `Victory by ${f.by ?? "decision"}`,
-        icon: EVENT_ICONS[isKill ? "kill" : "fight"].icon,
-        iconColor: EVENT_ICONS[isKill ? "kill" : "fight"].color,
-        linkTo: "/world/chronicle",
+        type: isKill ? 'kill' : 'fight',
+        title: winnerName
+          ? `${winnerName} defeats ${f.winner === 'A' ? f.d : f.a}`
+          : `${f.a} vs ${f.d} — Draw`,
+        subtitle: isKill ? `Killed in combat` : `Victory by ${f.by ?? 'decision'}`,
+        icon: EVENT_ICONS[isKill ? 'kill' : 'fight'].icon,
+        iconColor: EVENT_ICONS[isKill ? 'kill' : 'fight'].color,
+        linkTo: '/world/chronicle',
         entityNames: [f.a, f.d],
       });
     });
@@ -137,9 +149,9 @@ export default function EventLog() {
       all.push({
         id: `death-${w.id}`,
         week: w.deathWeek ?? 0,
-        type: "death",
+        type: 'death',
         title: `${w.name} Slain`,
-        subtitle: w.killedBy ? `Killed by ${w.killedBy}` : w.deathCause ?? "Died in combat",
+        subtitle: w.killedBy ? `Killed by ${w.killedBy}` : (w.deathCause ?? 'Died in combat'),
         icon: EVENT_ICONS.death.icon,
         iconColor: EVENT_ICONS.death.color,
         linkTo: `/warrior/${w.id}`,
@@ -152,7 +164,7 @@ export default function EventLog() {
       all.push({
         id: `retire-${w.id}`,
         week: w.retiredWeek ?? 0,
-        type: "retirement",
+        type: 'retirement',
         title: `${w.name} Retired`,
         subtitle: `${w.career.wins}W-${w.career.losses}L career`,
         icon: EVENT_ICONS.retirement.icon,
@@ -166,11 +178,11 @@ export default function EventLog() {
     state.roster.forEach((w) => {
       if (!w.injuries || w.injuries.length === 0) return;
       w.injuries.forEach((inj, idx) => {
-        if (typeof inj === "string") return;
+        if (typeof inj === 'string') return;
         all.push({
           id: `injury-${w.id}-${inj.id ?? idx}`,
           week: state.week,
-          type: "injury",
+          type: 'injury',
           title: `${w.name} — ${inj.name}`,
           subtitle: `${inj.severity} · ${inj.weeksRemaining}w recovery`,
           icon: EVENT_ICONS.injury.icon,
@@ -185,16 +197,18 @@ export default function EventLog() {
     (state.trainingAssignments ?? []).forEach((a) => {
       const w = state.roster.find((w) => w.id === a.warriorId);
       if (!w) return;
-      const isRecovery = a.type === "recovery";
+      const isRecovery = a.type === 'recovery';
       all.push({
         id: `train-${a.warriorId}`,
         week: state.week,
-        type: isRecovery ? "recovery" : "training",
-        title: isRecovery ? `${w.name} recovering` : `${w.name} training${a.attribute ? ` ${a.attribute}` : ""}`,
-        subtitle: isRecovery ? "Active recovery from injuries" : "Assigned to training grounds",
-        icon: EVENT_ICONS[isRecovery ? "recovery" : "training"].icon,
-        iconColor: EVENT_ICONS[isRecovery ? "recovery" : "training"].color,
-        linkTo: "/command/training",
+        type: isRecovery ? 'recovery' : 'training',
+        title: isRecovery
+          ? `${w.name} recovering`
+          : `${w.name} training${a.attribute ? ` ${a.attribute}` : ''}`,
+        subtitle: isRecovery ? 'Active recovery from injuries' : 'Assigned to training grounds',
+        icon: EVENT_ICONS[isRecovery ? 'recovery' : 'training'].icon,
+        iconColor: EVENT_ICONS[isRecovery ? 'recovery' : 'training'].color,
+        linkTo: '/command/training',
         entityNames: [w.name],
       });
     });
@@ -204,35 +218,46 @@ export default function EventLog() {
       all.push({
         id: `news-${n.week}-${n.title}`,
         week: n.week,
-        type: "news",
+        type: 'news',
         title: n.title,
-        subtitle: n.items[0]?.slice(0, 60) ?? "",
+        subtitle: n.items[0]?.slice(0, 60) ?? '',
         icon: EVENT_ICONS.news.icon,
         iconColor: EVENT_ICONS.news.color,
-        linkTo: "/world/chronicle",
+        linkTo: '/world/chronicle',
       });
     });
 
     // Tournaments
-    state.tournaments.filter((t) => t.completed).forEach((t) => {
-      const names: string[] = [];
-      if (t.champion) names.push(t.champion);
-      all.push({
-        id: `tourney-${t.id}`,
-        week: t.week,
-        type: "tournament",
-        title: t.name,
-        subtitle: t.champion ? `Champion: ${t.champion}` : "Tournament completed",
-        icon: EVENT_ICONS.tournament.icon,
-        iconColor: EVENT_ICONS.tournament.color,
-        linkTo: "/world/tournaments",
-        entityNames: names,
+    state.tournaments
+      .filter((t) => t.completed)
+      .forEach((t) => {
+        const names: string[] = [];
+        if (t.champion) names.push(t.champion);
+        all.push({
+          id: `tourney-${t.id}`,
+          week: t.week,
+          type: 'tournament',
+          title: t.name,
+          subtitle: t.champion ? `Champion: ${t.champion}` : 'Tournament completed',
+          icon: EVENT_ICONS.tournament.icon,
+          iconColor: EVENT_ICONS.tournament.color,
+          linkTo: '/world/tournaments',
+          entityNames: names,
+        });
       });
-    });
 
     all.sort((a, b) => b.week - a.week || b.id.localeCompare(a.id));
     return all;
-  }, [state.arenaHistory, state.graveyard, state.retired, state.newsletter, state.tournaments, state.roster, state.trainingAssignments, state.week]);
+  }, [
+    state.arenaHistory,
+    state.graveyard,
+    state.retired,
+    state.newsletter,
+    state.tournaments,
+    state.roster,
+    state.trainingAssignments,
+    state.week,
+  ]);
 
   // Group by week
   const grouped = useMemo(() => {
@@ -283,20 +308,26 @@ export default function EventLog() {
                       key={event.id}
                       onClick={() => navigate({ to: event.linkTo })}
                       className={cn(
-                        "w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors border-b border-border/30",
-                        "hover:bg-secondary/60 cursor-pointer group",
+                        'w-full text-left px-4 py-2.5 flex items-start gap-3 transition-colors border-b border-border/30',
+                        'hover:bg-secondary/60 cursor-pointer group'
                       )}
                     >
-                      <div className={cn("mt-0.5 shrink-0", event.iconColor)}>
+                      <div className={cn('mt-0.5 shrink-0', event.iconColor)}>
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-xs font-medium text-foreground leading-tight truncate">
-                          <LinkifiedText text={event.title} names={event.entityNames ?? allWarriorNames} />
+                          <LinkifiedText
+                            text={event.title}
+                            names={event.entityNames ?? allWarriorNames}
+                          />
                         </div>
                         {event.subtitle && (
                           <div className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">
-                            <LinkifiedText text={event.subtitle} names={event.entityNames ?? allWarriorNames} />
+                            <LinkifiedText
+                              text={event.subtitle}
+                              names={event.entityNames ?? allWarriorNames}
+                            />
                           </div>
                         )}
                       </div>

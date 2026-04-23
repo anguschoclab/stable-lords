@@ -2,19 +2,19 @@
  * Hall of Fights — displays arena history and crowd-remembered epics.
  * Uses the main game state arenaHistory and LoreArchive for hall entries.
  */
-import React, { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { LoreArchive } from "./LoreArchive";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Swords, Skull, Sparkles, ScrollText, Zap, Newspaper } from "lucide-react";
-import { STYLE_DISPLAY_NAMES } from "@/types/game";
-import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { WarriorLink } from "@/components/EntityLink";
-import Gazette from "@/pages/Gazette";
-import Graveyard from "@/pages/Graveyard";
+import React, { useMemo } from 'react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { LoreArchive } from './LoreArchive';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Trophy, Swords, Skull, Sparkles, ScrollText, Zap, Newspaper } from 'lucide-react';
+import { STYLE_DISPLAY_NAMES } from '@/types/game';
+import { Link } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { WarriorLink } from '@/components/EntityLink';
+import Gazette from '@/pages/Gazette';
+import Graveyard from '@/pages/Graveyard';
 
 export const HallOfFights: React.FC = () => {
   const state = useWorldState();
@@ -41,12 +41,12 @@ export const HallOfFights: React.FC = () => {
       groups.set(f.week, list);
     }
     return [...groups.entries()].sort(([a], [b]) => b - a);
-
   }, [state]);
 
   // Style stats from all history
   const styleStats = useMemo(() => {
-    const stats: Record<string, { wins: number; losses: number; kills: number; fights: number }> = {};
+    const stats: Record<string, { wins: number; losses: number; kills: number; fights: number }> =
+      {};
     for (const f of state.arenaHistory) {
       const ensure = (s: string) => {
         if (!stats[s]) stats[s] = { wins: 0, losses: 0, kills: 0, fights: 0 };
@@ -55,15 +55,25 @@ export const HallOfFights: React.FC = () => {
       ensure(f.styleD);
       stats[f.styleA].fights++;
       stats[f.styleD].fights++;
-      if (f.winner === "A") { stats[f.styleA].wins++; stats[f.styleD].losses++; }
-      if (f.winner === "D") { stats[f.styleD].wins++; stats[f.styleA].losses++; }
-      if (f.by === "Kill") {
-        if (f.winner === "A") stats[f.styleA].kills++;
-        if (f.winner === "D") stats[f.styleD].kills++;
+      if (f.winner === 'A') {
+        stats[f.styleA].wins++;
+        stats[f.styleD].losses++;
+      }
+      if (f.winner === 'D') {
+        stats[f.styleD].wins++;
+        stats[f.styleA].losses++;
+      }
+      if (f.by === 'Kill') {
+        if (f.winner === 'A') stats[f.styleA].kills++;
+        if (f.winner === 'D') stats[f.styleD].kills++;
       }
     }
     return Object.entries(stats)
-      .map(([style, s]) => ({ style, ...s, winRate: s.fights ? Math.round((s.wins / s.fights) * 100) : 0 }))
+      .map(([style, s]) => ({
+        style,
+        ...s,
+        winRate: s.fights ? Math.round((s.wins / s.fights) * 100) : 0,
+      }))
       .sort((a, b) => b.winRate - a.winRate);
   }, [state.arenaHistory]);
 
@@ -101,7 +111,9 @@ export const HallOfFights: React.FC = () => {
             <Card>
               <CardContent className="p-8 text-center space-y-3">
                 <ScrollText className="h-10 w-10 mx-auto text-muted-foreground/50" />
-                <p className="text-muted-foreground">No fights recorded yet. Run some rounds to fill the archives.</p>
+                <p className="text-muted-foreground">
+                  No fights recorded yet. Run some rounds to fill the archives.
+                </p>
                 <Link to="/command/combat">
                   <Button variant="outline" className="gap-2 mt-2">
                     <Zap className="h-4 w-4" /> Run a Round
@@ -119,8 +131,8 @@ export const HallOfFights: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {fights.map((f) => {
-                    const isKill = f.by === "Kill";
-                    const isKO = f.by === "KO";
+                    const isKill = f.by === 'Kill';
+                    const isKO = f.by === 'KO';
                     return (
                       <div
                         key={f.id}
@@ -143,12 +155,10 @@ export const HallOfFights: React.FC = () => {
                             </Badge>
                           ))}
                           <Badge
-                            variant={isKill ? "destructive" : isKO ? "default" : "outline"}
+                            variant={isKill ? 'destructive' : isKO ? 'default' : 'outline'}
                             className="text-xs whitespace-nowrap"
                           >
-                            {f.winner
-                              ? `${f.winner === "A" ? f.a : f.d} — ${f.by}`
-                              : "Draw"}
+                            {f.winner ? `${f.winner === 'A' ? f.a : f.d} — ${f.by}` : 'Draw'}
                           </Badge>
                         </div>
                       </div>
@@ -175,14 +185,16 @@ export const HallOfFights: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <Trophy className="h-5 w-5 text-arena-gold" />
                         <span className="font-display font-semibold text-sm">{h.label}</span>
-                        <Badge variant="outline" className="text-xs">Week {h.week}</Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Week {h.week}
+                        </Badge>
                       </div>
                     </div>
                     <div className="text-sm">
                       <WarriorLink name={f.a} className="font-medium" />
-                      {" vs "}
+                      {' vs '}
                       <WarriorLink name={f.d} className="font-medium" />
-                      {f.by && ` — ${f.winner === "A" ? f.a : f.d} by ${f.by}`}
+                      {f.by && ` — ${f.winner === 'A' ? f.a : f.d} by ${f.by}`}
                     </div>
                     {f.flashyTags && f.flashyTags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
@@ -223,13 +235,20 @@ export const HallOfFights: React.FC = () => {
                       {styleStats.map((s) => (
                         <tr key={s.style} className="border-t border-border">
                           <td className="px-4 py-2.5 font-medium">
-                            {STYLE_DISPLAY_NAMES[s.style as keyof typeof STYLE_DISPLAY_NAMES] ?? s.style}
+                            {STYLE_DISPLAY_NAMES[s.style as keyof typeof STYLE_DISPLAY_NAMES] ??
+                              s.style}
                           </td>
                           <td className="px-4 py-2.5 text-right font-mono">{s.fights}</td>
-                          <td className="px-4 py-2.5 text-right font-mono text-arena-pop">{s.wins}</td>
-                          <td className="px-4 py-2.5 text-right font-mono text-destructive">{s.losses}</td>
+                          <td className="px-4 py-2.5 text-right font-mono text-arena-pop">
+                            {s.wins}
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-destructive">
+                            {s.losses}
+                          </td>
                           <td className="px-4 py-2.5 text-right font-mono">{s.kills}</td>
-                          <td className="px-4 py-2.5 text-right font-mono font-semibold">{s.winRate}%</td>
+                          <td className="px-4 py-2.5 text-right font-mono font-semibold">
+                            {s.winRate}%
+                          </td>
                         </tr>
                       ))}
                     </tbody>

@@ -13,13 +13,16 @@ export function handleLocalStorageQuotaError(operation: string, data: any): void
     localStorage.setItem(operation, JSON.stringify(data));
   } catch (error) {
     console.error(`localStorage quota exceeded when saving ${operation}`, error);
-    
+
     // Attempt to recover by clearing old data
     try {
       const keys = Object.keys(localStorage);
       // Remove oldest entries (assuming keys are timestamps)
-      keys.sort().slice(0, keys.length / 2).forEach(key => localStorage.removeItem(key));
-      
+      keys
+        .sort()
+        .slice(0, keys.length / 2)
+        .forEach((key) => localStorage.removeItem(key));
+
       // Retry after clearing space
       localStorage.setItem(operation, JSON.stringify(data));
     } catch (retryError) {

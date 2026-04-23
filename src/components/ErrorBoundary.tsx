@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface State {
   hasError: boolean;
@@ -16,7 +16,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren, Stat
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error("[ErrorBoundary] Unhandled render error:", error, info.componentStack);
+    console.error('[ErrorBoundary] Unhandled render error:', error, info.componentStack);
   }
 
   render() {

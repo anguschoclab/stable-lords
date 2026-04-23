@@ -1,6 +1,6 @@
-import { IRNGContext } from "./IRNGContext";
-import { IRNGService } from "./IRNGService";
-import { SeededRNGService } from "./SeededRNGService";
+import { IRNGContext } from './IRNGContext';
+import { IRNGService } from './IRNGService';
+import { SeededRNGService } from './SeededRNGService';
 
 /**
  * RNG Context Implementation

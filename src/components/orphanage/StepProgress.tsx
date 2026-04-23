@@ -1,15 +1,10 @@
-const STEP_LABELS = [
-  "Establish Identity",
-  "Choose Warriors",
-  "First Blood",
-  "Your Story Begins",
-];
+const STEP_LABELS = ['Establish Identity', 'Choose Warriors', 'First Blood', 'Your Story Begins'];
 
 const STEP_SUBTITLES = [
-  "Register your name in the Imperial Ledger",
-  "Select three gladiators from the intake pool",
-  "Witness the first trial of steel",
-  "Your dynasty of blood begins now",
+  'Register your name in the Imperial Ledger',
+  'Select three gladiators from the intake pool',
+  'Witness the first trial of steel',
+  'Your dynasty of blood begins now',
 ];
 
 interface StepProgressProps {
@@ -39,8 +34,8 @@ export default function StepProgress({ step, total }: StepProgressProps) {
           style={{
             width: `${((step + 1) / total) * 100}%`,
             background:
-              "linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--accent)/0.8) 100%)",
-            boxShadow: "0 0 8px hsl(var(--accent)/0.3)",
+              'linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--accent)/0.8) 100%)',
+            boxShadow: '0 0 8px hsl(var(--accent)/0.3)',
           }}
         />
       </div>

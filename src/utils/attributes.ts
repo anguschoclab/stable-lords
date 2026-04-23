@@ -3,8 +3,8 @@
  * Provides common operations for warrior attribute calculations
  * Eliminates DRY violations of attribute reduce patterns
  */
-import type { Attributes } from "@/types/shared.types";
-import { ATTRIBUTE_KEYS } from "@/types/shared.types";
+import type { Attributes } from '@/types/shared.types';
+import { ATTRIBUTE_KEYS } from '@/types/shared.types';
 
 /**
  * Sums all attribute values

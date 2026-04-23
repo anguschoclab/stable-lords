@@ -1,11 +1,7 @@
-import React from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import React from 'react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface SubNavTab {
   id: string;
@@ -33,24 +29,26 @@ export default function SubNav({ tabs, activeTab, onTabChange }: SubNavProps) {
               <button
                 aria-label={`Switch to ${tab.label} tab`}
                 onClick={() => onTabChange(tab.id)}
-                aria-current={activeTab === tab.id ? "page" : undefined}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-4 text-xs font-black uppercase tracking-widest transition-all relative group",
+                  'flex items-center gap-2 px-4 py-4 text-xs font-black uppercase tracking-widest transition-all relative group',
                   activeTab === tab.id
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground/80"
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground/80'
                 )}
               >
                 {tab.icon && (
-                  <span className={cn(
-                    "transition-transform duration-300 group-hover:scale-110",
-                    activeTab === tab.id ? "text-primary" : "text-muted-foreground/50"
-                  )}>
+                  <span
+                    className={cn(
+                      'transition-transform duration-300 group-hover:scale-110',
+                      activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/50'
+                    )}
+                  >
                     {tab.icon}
                   </span>
                 )}
                 {tab.label}
-                
+
                 {activeTab === tab.id && (
                   <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-none shadow-[0_-4px_10px_rgba(var(--arena-blood-rgb),0.5)]" />
                 )}

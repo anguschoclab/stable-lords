@@ -1,6 +1,6 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Zap, Swords } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Badge } from '@/components/ui/badge';
+import { ChevronDown, Zap, Swords } from 'lucide-react';
 
 export interface UpsetEntry {
   winner: string;
@@ -24,13 +24,20 @@ export default function UpsetsList({ upsets }: { upsets: UpsetEntry[] }) {
       <CollapsibleContent>
         <div className="mt-2 space-y-1.5">
           {upsets.map((u, i) => (
-            <div key={i} className="flex items-center justify-between py-1.5 px-3 rounded-none bg-secondary/40 border border-border/30">
+            <div
+              key={i}
+              className="flex items-center justify-between py-1.5 px-3 rounded-none bg-secondary/40 border border-border/30"
+            >
               <div className="flex items-center gap-2 text-xs">
                 <Swords className="h-3 w-3 text-muted-foreground" />
                 <span className="font-display font-semibold">{u.winner}</span>
                 <span className="text-muted-foreground">def.</span>
                 <span className="font-display text-muted-foreground">{u.loser}</span>
-                {u.by && <Badge variant="outline" className="text-[8px]">{u.by}</Badge>}
+                {u.by && (
+                  <Badge variant="outline" className="text-[8px]">
+                    {u.by}
+                  </Badge>
+                )}
               </div>
               <div className="flex items-center gap-2 text-[10px] font-mono">
                 <span className="text-accent">Δ{u.fameDiff} fame</span>

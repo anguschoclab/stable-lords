@@ -1,7 +1,12 @@
-import { GameState } from "@/types/state.types";
-import { StateImpact } from "@/engine/impacts";
+import { GameState } from '@/types/state.types';
+import { StateImpact } from '@/engine/impacts';
 
-export function respondToBoutOffer(state: GameState, offerId: string, warriorId: string, response: "Accepted" | "Declined"): StateImpact {
+export function respondToBoutOffer(
+  state: GameState,
+  offerId: string,
+  warriorId: string,
+  response: 'Accepted' | 'Declined'
+): StateImpact {
   const offer = state.boutOffers[offerId];
   if (!offer) return {};
 
@@ -13,11 +18,15 @@ export function respondToBoutOffer(state: GameState, offerId: string, warriorId:
   // Check if all parties have responded
   let newStatus = offer.status;
   const allParticipatingWarriors = offer.warriorIds;
-  const allResponded = allParticipatingWarriors.every((wid: string) => newResponses[wid] && newResponses[wid] !== "Pending");
+  const allResponded = allParticipatingWarriors.every(
+    (wid: string) => newResponses[wid] && newResponses[wid] !== 'Pending'
+  );
 
   if (allResponded) {
-    const anyDeclined = allParticipatingWarriors.some((wid: string) => newResponses[wid] === "Declined");
-    newStatus = anyDeclined ? "Rejected" : "Signed";
+    const anyDeclined = allParticipatingWarriors.some(
+      (wid: string) => newResponses[wid] === 'Declined'
+    );
+    newStatus = anyDeclined ? 'Rejected' : 'Signed';
   }
 
   return {

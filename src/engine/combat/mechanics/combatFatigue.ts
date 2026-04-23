@@ -3,11 +3,11 @@
  * Single source of truth for fatigue mechanics used by simulate.ts.
  */
 
-import { getWeatherEffect } from "./weatherEffects";
-import type { WeatherType } from "@/types/shared.types";
+import { getWeatherEffect } from './weatherEffects';
+import type { WeatherType } from '@/types/shared.types';
 
 // Endurance scaling — tuned so OE=8 fighters (END≈25) last ~20-25 exchanges before exhaustion
-const ENDURANCE_OE_SCALING = 0.10;
+const ENDURANCE_OE_SCALING = 0.1;
 const ENDURANCE_AL_SCALING = 0.05;
 
 // Fatigue thresholds (fighters need to be genuinely exhausted before penalties kick in)
@@ -20,7 +20,7 @@ const FATIGUE_HEAVY_PENALTY = -8;
 
 export function enduranceCost(oe: number, al: number, weather?: WeatherType | string): number {
   const baseCost = oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING;
-  const weatherMod = getWeatherEffect((weather as WeatherType) ?? "Clear").staminaMult;
+  const weatherMod = getWeatherEffect((weather as WeatherType) ?? 'Clear').staminaMult;
   return Math.floor(baseCost * weatherMod);
 }
 
@@ -28,7 +28,11 @@ export function enduranceCost(oe: number, al: number, weather?: WeatherType | st
  * Returns the skill roll penalty for the fighter's current fatigue level.
  * @param penaltyReduction Optional fraction to reduce the penalty (0 = no reduction, 0.5 = halved). From RopeADope trainer specialty.
  */
-export function fatiguePenalty(endurance: number, maxEndurance: number, penaltyReduction: number = 0): number {
+export function fatiguePenalty(
+  endurance: number,
+  maxEndurance: number,
+  penaltyReduction: number = 0
+): number {
   const ratio = endurance / Math.max(1, maxEndurance);
   let base = 0;
   if (ratio <= FATIGUE_HEAVY_THRESHOLD) base = FATIGUE_HEAVY_PENALTY;

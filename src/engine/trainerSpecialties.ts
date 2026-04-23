@@ -1,6 +1,6 @@
-import type { Trainer } from "@/types/shared.types";
-import type { FighterState, ResolutionContext } from "@/engine/combat/resolution";
-import { TIER_BONUS } from "@/engine/trainers";
+import type { Trainer } from '@/types/shared.types';
+import type { FighterState, ResolutionContext } from '@/engine/combat/resolution';
+import { TIER_BONUS } from '@/engine/trainers';
 
 /**
  * Specialty modifiers that stack on top of the base getTrainingBonus() values.
@@ -13,9 +13,9 @@ export interface SpecialtyMods {
   iniMod: number;
   decMod: number;
   endMod: number;
-  killWindowBonus: number;      // added to kill threshold probability
-  damageReceivedMult: number;   // multiplier on incoming damage (< 1.0 = reduction)
-  riposteDamageMult: number;    // multiplier on outgoing riposte damage
+  killWindowBonus: number; // added to kill threshold probability
+  damageReceivedMult: number; // multiplier on incoming damage (< 1.0 = reduction)
+  riposteDamageMult: number; // multiplier on outgoing riposte damage
   fatiguePenaltyReduction: number; // fraction to reduce the fatigue skill penalty (0 = no change)
 }
 
@@ -48,55 +48,57 @@ export function getSpecialtyMods(
   const mods = defaultSpecialtyMods();
   if (!trainers) return mods;
 
-  const hasKillerInstinct = trainers.some(t => t.contractWeeksLeft > 0 && t.specialty === "KillerInstinct");
-  const hasFinisher = trainers.some(t => t.contractWeeksLeft > 0 && t.specialty === "Finisher");
+  const hasKillerInstinct = trainers.some(
+    (t) => t.contractWeeksLeft > 0 && t.specialty === 'KillerInstinct'
+  );
+  const hasFinisher = trainers.some((t) => t.contractWeeksLeft > 0 && t.specialty === 'Finisher');
 
   for (const trainer of trainers) {
     if (trainer.contractWeeksLeft <= 0 || !trainer.specialty) continue;
     const tier = TIER_BONUS[trainer.tier] ?? 1;
 
     switch (trainer.specialty) {
-      case "KillerInstinct":
+      case 'KillerInstinct':
         // Kill-window bonus when enemy HP < 40%
         if (opponent.hp / opponent.maxHp < 0.4) {
           mods.killWindowBonus += 0.02 * tier;
         }
         break;
 
-      case "IronConditioning":
+      case 'IronConditioning':
         // Stamina drain reduced in LATE phase — applied via endMod bonus
-        if (ctx.phase === "LATE") {
+        if (ctx.phase === 'LATE') {
           mods.endMod += 0.1 * tier;
         }
         break;
 
-      case "CounterFighter":
+      case 'CounterFighter':
         // Riposte damage amplified (conditional: always active once trained)
         mods.riposteDamageMult += 0.15 * tier;
         break;
 
-      case "Footwork":
+      case 'Footwork':
         // Initiative bonus in MID/LATE phase
-        if (ctx.phase !== "OPENING") {
+        if (ctx.phase !== 'OPENING') {
           mods.iniMod += 3 * tier;
         }
         break;
 
-      case "IronGuard":
+      case 'IronGuard':
         // Damage reduction while endurance is above 60%
         if (self.endurance / self.maxEndurance > 0.6) {
-          mods.damageReceivedMult *= (1 - 0.1 * tier);
+          mods.damageReceivedMult *= 1 - 0.1 * tier;
         }
         break;
 
-      case "Finisher":
+      case 'Finisher':
         // ATT bonus when fighter has momentum advantage
         if (self.momentum >= 2) {
           mods.attMod += 0.1 * tier;
         }
         break;
 
-      case "RopeADope":
+      case 'RopeADope':
         // Reduce fatigue penalty (caps at 50% reduction)
         mods.fatiguePenaltyReduction = Math.min(0.5, mods.fatiguePenaltyReduction + 0.3 * tier);
         break;
@@ -104,7 +106,12 @@ export function getSpecialtyMods(
   }
 
   // Chemistry combo: KillerInstinct + Finisher together → extra kill window bonus
-  if (hasKillerInstinct && hasFinisher && opponent.hp / opponent.maxHp < 0.4 && self.momentum >= 2) {
+  if (
+    hasKillerInstinct &&
+    hasFinisher &&
+    opponent.hp / opponent.maxHp < 0.4 &&
+    self.momentum >= 2
+  ) {
     mods.killWindowBonus += 0.01;
   }
 

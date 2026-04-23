@@ -1,15 +1,18 @@
-import type { GameState, Trainer } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import type { GameState, Trainer } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 /**
  * Trainer Aging System
- * 
+ *
  * - Trainers age +1 year every 52 weeks.
  * - Legend Protection: High fame and retired warriors stay longer.
  * - Base retirement chance starts at age 65.
  */
-export function computeTrainerAging(state: GameState, rng?: IRNGService): { updatedTrainers: Trainer[]; news: string[]; updatedHiringPool: Trainer[] } {
+export function computeTrainerAging(
+  state: GameState,
+  rng?: IRNGService
+): { updatedTrainers: Trainer[]; news: string[]; updatedHiringPool: Trainer[] } {
   const rngService = rng || new SeededRNGService(state.week * 1337 + 7);
   const news: string[] = [];
   const WEEKS_PER_YEAR = 52;
@@ -18,7 +21,7 @@ export function computeTrainerAging(state: GameState, rng?: IRNGService): { upda
   // Process all trainers in the world (active & hiring pool)
   const processAging = (trainers: Trainer[], isActive: boolean) => {
     const kept: Trainer[] = [];
-    for (let t of (trainers || [])) {
+    for (let t of trainers || []) {
       let currentAge = t.age ?? 45;
       if (isAgingWeek) currentAge++;
 
@@ -38,7 +41,7 @@ export function computeTrainerAging(state: GameState, rng?: IRNGService): { upda
         const baseChance = 0.05 + (currentAge - 65) * 0.02;
 
         // 🛡️ Legend Protection: -1% per 10 Fame (max -10%)
-        const fameDiscount = Math.min(0.10, (t.fame || 0) * 0.001);
+        const fameDiscount = Math.min(0.1, (t.fame || 0) * 0.001);
 
         // 🛡️ Retired Warrior Protection: -5% flat
         const legacyDiscount = t.retiredFromWarrior ? 0.05 : 0;
@@ -47,7 +50,7 @@ export function computeTrainerAging(state: GameState, rng?: IRNGService): { upda
 
         if (rngService.next() < finalChance) {
           retired = true;
-          const verb = currentAge > 80 ? "passed away peacefully" : "retired to the countryside";
+          const verb = currentAge > 80 ? 'passed away peacefully' : 'retired to the countryside';
           news.push(`🏠 LEGACY: ${t.name} (${t.focus} Trainer) has ${verb} at age ${currentAge}.`);
         }
       }

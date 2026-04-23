@@ -1,9 +1,14 @@
-import { StateCreator } from "zustand";
-import { LedgerEntry, Promoter, BoutOffer, RankingEntry, AnnualAward } from "@/types/state.types";
-import { canTransact as _canTransact } from "@/utils/economyUtils";
-import type { GameStore } from "@/state/useGameStore";
-import { hashStr } from "@/utils/random";
-import { type PromoterId, type BoutOfferId, type WarriorId, type LedgerEntryId } from "@/types/shared.types";
+import { StateCreator } from 'zustand';
+import { LedgerEntry, Promoter, BoutOffer, RankingEntry, AnnualAward } from '@/types/state.types';
+import { canTransact as _canTransact } from '@/utils/economyUtils';
+import type { GameStore } from '@/state/useGameStore';
+import { hashStr } from '@/utils/random';
+import {
+  type PromoterId,
+  type BoutOfferId,
+  type WarriorId,
+  type LedgerEntryId,
+} from '@/types/shared.types';
 
 export interface EconomySlice {
   treasury: number;
@@ -15,8 +20,8 @@ export interface EconomySlice {
   realmRankings: Record<WarriorId, RankingEntry>;
   awards: AnnualAward[];
   rosterBonus: number;
-  addFunds: (amount: number, label: string, category: LedgerEntry["category"]) => void;
-  deductFunds: (amount: number, label: string, category: LedgerEntry["category"]) => boolean;
+  addFunds: (amount: number, label: string, category: LedgerEntry['category']) => void;
+  deductFunds: (amount: number, label: string, category: LedgerEntry['category']) => boolean;
 }
 
 export const createEconomySlice: StateCreator<GameStore, [], [], EconomySlice> = (set, get) => ({
@@ -35,8 +40,14 @@ export const createEconomySlice: StateCreator<GameStore, [], [], EconomySlice> =
       treasury: state.treasury + amount,
       ledger: [
         ...state.ledger,
-        { id: String(hashStr(`${state.week}-${label}-${Date.now()}`)) as LedgerEntryId, week: state.week, label, amount, category }
-      ]
+        {
+          id: String(hashStr(`${state.week}-${label}-${Date.now()}`)) as LedgerEntryId,
+          week: state.week,
+          label,
+          amount,
+          category,
+        },
+      ],
     }));
   },
 
@@ -49,9 +60,15 @@ export const createEconomySlice: StateCreator<GameStore, [], [], EconomySlice> =
       treasury: state.treasury - amount,
       ledger: [
         ...state.ledger,
-        { id: String(hashStr(`${state.week}-${label}-${Date.now()}`)) as LedgerEntryId, week: state.week, label, amount: -amount, category }
-      ]
+        {
+          id: String(hashStr(`${state.week}-${label}-${Date.now()}`)) as LedgerEntryId,
+          week: state.week,
+          label,
+          amount: -amount,
+          category,
+        },
+      ],
     }));
     return true;
-  }
+  },
 });

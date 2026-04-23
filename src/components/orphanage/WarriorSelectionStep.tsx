@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Swords, ArrowLeft, RefreshCw } from "lucide-react";
-import WarriorCard from "@/components/orphanage/WarriorCard";
+import { Button } from '@/components/ui/button';
+import { Swords, ArrowLeft, RefreshCw } from 'lucide-react';
+import WarriorCard from '@/components/orphanage/WarriorCard';
 
 interface WarriorSelectionStepProps {
-  orphanPool: ReturnType<typeof import("@/data/orphanPool").generateOrphanPool>;
+  orphanPool: ReturnType<typeof import('@/data/orphanPool').generateOrphanPool>;
   selected: Set<string>;
   onToggleWarrior: (id: string) => void;
   onRerollPool: () => void;
@@ -24,26 +24,23 @@ export default function WarriorSelectionStep({
       <div
         className="px-5 py-4 flex items-center justify-between"
         style={{
-          background: "#110C07",
-          border: "1px solid rgba(60,42,22,0.7)",
-          borderTopColor: "rgba(100,70,36,0.35)",
+          background: '#110C07',
+          border: '1px solid rgba(60,42,22,0.7)',
+          borderTopColor: 'rgba(100,70,36,0.35)',
         }}
       >
         <div>
           <p className="text-xs text-muted-foreground/70 leading-relaxed">
-            Choose{" "}
-            <strong className="text-foreground">3 gladiators</strong> from
-            the intake pool to form your starting stable.
+            Choose <strong className="text-foreground">3 gladiators</strong> from the intake pool to
+            form your starting stable.
           </p>
           <div className="flex items-center gap-2 mt-2">
             <div
               className="px-2.5 py-0.5 text-[10px] font-mono font-black"
               style={{
-                background: "rgba(20,15,8,0.8)",
-                border: "1px solid rgba(60,42,22,0.6)",
-                color: selected.size === 3
-                  ? "hsl(var(--accent))"
-                  : "hsl(var(--muted-foreground))",
+                background: 'rgba(20,15,8,0.8)',
+                border: '1px solid rgba(60,42,22,0.6)',
+                color: selected.size === 3 ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))',
               }}
             >
               {selected.size}/3 SELECTED

@@ -1,26 +1,26 @@
-import type { GameState, Warrior, RivalStableData } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { archiveWeekLogs } from "../adapters/opfsArchiver";
-import { computeMetaDrift } from "@/engine/metaDrift";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { resolveImpacts, StateImpact } from "@/engine/impacts";
+import type { GameState, Warrior, RivalStableData } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { archiveWeekLogs } from '../adapters/opfsArchiver';
+import { computeMetaDrift } from '@/engine/metaDrift';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { resolveImpacts, StateImpact } from '@/engine/impacts';
 
 // 🌩️ Modular Pipeline Passes
-import { runBoutSimulationPass } from "../passes/BoutSimulationPass";
-import { runWarriorPass } from "../passes/WarriorPass";
-import { runEconomyPass } from "../passes/EconomyPass";
-import { runEquipmentPass } from "../passes/EquipmentPass";
-import { runWorldPass } from "../passes/WorldPass";
-import { runRecruitmentPass } from "../passes/RecruitmentPass";
-import { runSystemPass } from "../passes/SystemPass";
-import { runRankingsPass } from "../passes/RankingsPass";
-import { runPromoterPass } from "../passes/PromoterPass";
-import { runPromoterLifecyclePass } from "../passes/PromoterLifecyclePass";
-import { runTrainerPass } from "../passes/TrainerPass";
-import { runRivalStrategyPass } from "../passes/RivalStrategyPass";
-import { runEventPass } from "../passes/EventPass";
-import { runNarrativePass } from "../passes/NarrativePass";
-import { runSeasonalPass } from "../seasonal";
+import { runBoutSimulationPass } from '../passes/BoutSimulationPass';
+import { runWarriorPass } from '../passes/WarriorPass';
+import { runEconomyPass } from '../passes/EconomyPass';
+import { runEquipmentPass } from '../passes/EquipmentPass';
+import { runWorldPass } from '../passes/WorldPass';
+import { runRecruitmentPass } from '../passes/RecruitmentPass';
+import { runSystemPass } from '../passes/SystemPass';
+import { runRankingsPass } from '../passes/RankingsPass';
+import { runPromoterPass } from '../passes/PromoterPass';
+import { runPromoterLifecyclePass } from '../passes/PromoterLifecyclePass';
+import { runTrainerPass } from '../passes/TrainerPass';
+import { runRivalStrategyPass } from '../passes/RivalStrategyPass';
+import { runEventPass } from '../passes/EventPass';
+import { runNarrativePass } from '../passes/NarrativePass';
+import { runSeasonalPass } from '../seasonal';
 
 interface WeekContext {
   currentWeek: number;
@@ -33,8 +33,16 @@ function prepareWeekContext(state: GameState): WeekContext {
   const currentWeek = state.week;
   let nextWeek = currentWeek + 1;
   let nextYear = state.year || 1;
-  if (nextWeek > 52) { nextWeek = 1; nextYear++; }
-  return { currentWeek, nextWeek, nextYear, rootRng: new SeededRNGService(nextYear * 52 + nextWeek * 7919 + 101) };
+  if (nextWeek > 52) {
+    nextWeek = 1;
+    nextYear++;
+  }
+  return {
+    currentWeek,
+    nextWeek,
+    nextYear,
+    rootRng: new SeededRNGService(nextYear * 52 + nextWeek * 7919 + 101),
+  };
 }
 
 function runBoutPhase(state: GameState, ctx: WeekContext): GameState {
@@ -44,8 +52,8 @@ function runBoutPhase(state: GameState, ctx: WeekContext): GameState {
   settledState.cachedMetaDrift = metaDrift;
 
   const warriorMap = new Map<string, Warrior>();
-  settledState.roster.forEach(w => warriorMap.set(w.id, w));
-  (settledState.rivals || []).forEach(r => r.roster.forEach(w => warriorMap.set(w.id, w)));
+  settledState.roster.forEach((w) => warriorMap.set(w.id, w));
+  (settledState.rivals || []).forEach((r) => r.roster.forEach((w) => warriorMap.set(w.id, w)));
   settledState.warriorMap = warriorMap;
 
   return settledState;
@@ -55,12 +63,12 @@ function collectCoreImpacts(state: GameState, ctx: WeekContext): StateImpact[] {
   return [
     runWarriorPass(state, ctx.rootRng),
     runEconomyPass(state, ctx.rootRng),
-    runEquipmentPass(state)
+    runEquipmentPass(state),
   ];
 }
 
 function checkBankruptcy(state: GameState, coreImpacts: StateImpact[]): boolean {
-  const economyImpact = coreImpacts.find(i => i.treasuryDelta !== undefined);
+  const economyImpact = coreImpacts.find((i) => i.treasuryDelta !== undefined);
   const estimatedTreasury = state.treasury + (economyImpact?.treasuryDelta || 0);
   return estimatedTreasury < -500;
 }
@@ -77,7 +85,7 @@ function collectRemainingImpacts(state: GameState, ctx: WeekContext): StateImpac
     runRivalStrategyPass(state, ctx.nextWeek, ctx.rootRng),
     runEventPass(state, ctx.nextWeek, ctx.rootRng),
     runNarrativePass(state, ctx.currentWeek, ctx.nextWeek, ctx.rootRng),
-    runSeasonalPass(state, ctx.nextWeek, ctx.rootRng)
+    runSeasonalPass(state, ctx.nextWeek, ctx.rootRng),
   ];
 }
 
@@ -88,7 +96,7 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext):
   state.trainingAssignments = [];
 
   if (state.season !== oldState.season) {
-    state.seasonalGrowth = (state.seasonalGrowth ?? []).filter(sg => sg.season === state.season);
+    state.seasonalGrowth = (state.seasonalGrowth ?? []).filter((sg) => sg.season === state.season);
   }
 
   return archiveWeekLogs(state);

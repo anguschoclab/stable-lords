@@ -1,7 +1,7 @@
-import { StateCreator } from "zustand";
-import { TournamentEntry } from "@/types/state.types";
-import { type TournamentId } from "@/types/shared.types";
-import type { GameStore } from "@/state/useGameStore";
+import { StateCreator } from 'zustand';
+import { TournamentEntry } from '@/types/state.types';
+import { type TournamentId } from '@/types/shared.types';
+import type { GameStore } from '@/state/useGameStore';
 
 export interface TournamentSlice {
   tournaments: TournamentEntry[];

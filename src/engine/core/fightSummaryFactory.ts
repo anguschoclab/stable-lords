@@ -2,10 +2,10 @@
  * FightSummary Factory
  * Eliminates DRY violation of FightSummary object construction in tournament resolvers
  */
-import type { Warrior } from "@/types/warrior.types";
-import type { FightOutcome } from "@/types/combat.types";
-import type { FightSummary } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import type { Warrior } from '@/types/warrior.types';
+import type { FightOutcome } from '@/types/combat.types';
+import type { FightSummary } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 export interface FightSummaryParams {
   warriorA: Warrior;
@@ -22,21 +22,10 @@ export interface FightSummaryParams {
  * Used by both tournament resolution systems to ensure consistency
  */
 export function createFightSummary(params: FightSummaryParams): FightSummary {
-  const {
-    warriorA,
-    warriorD,
-    outcome,
-    week,
-    tournamentId,
-    tournamentName,
-    rng,
-  } = params;
+  const { warriorA, warriorD, outcome, week, tournamentId, tournamentName, rng } = params;
 
   // Generate unique ID
-  const id =
-    typeof rng.uuid === "function"
-      ? rng.uuid("bout")
-      : (rng as IRNGService).uuid();
+  const id = typeof rng.uuid === 'function' ? rng.uuid('bout') : (rng as IRNGService).uuid();
 
   // Build title
   const title = tournamentName
@@ -44,12 +33,12 @@ export function createFightSummary(params: FightSummaryParams): FightSummary {
     : `${warriorA.name} vs ${warriorD.name}`;
 
   // Extract transcript from outcome log
-  const transcript = outcome.log?.map((e) => e.text || "") || [];
+  const transcript = outcome.log?.map((e) => e.text || '') || [];
 
   return {
     id,
     week,
-    phase: "resolution",
+    phase: 'resolution',
     tournamentId,
     title,
     a: warriorA.name,
@@ -93,20 +82,17 @@ export function createBoutSummary(
 export function createMinimalFightSummary(
   warriorA: Warrior,
   warriorD: Warrior,
-  winner: "A" | "D" | null,
-  by: FightOutcome["by"],
+  winner: 'A' | 'D' | null,
+  by: FightOutcome['by'],
   week: number,
   rng: { uuid: (prefix?: string) => string } | IRNGService
 ): FightSummary {
-  const id =
-    typeof rng.uuid === "function"
-      ? rng.uuid("bout")
-      : (rng as IRNGService).uuid();
+  const id = typeof rng.uuid === 'function' ? rng.uuid('bout') : (rng as IRNGService).uuid();
 
   return {
     id,
     week,
-    phase: "resolution",
+    phase: 'resolution',
     title: `${warriorA.name} vs ${warriorD.name}`,
     a: warriorA.name,
     d: warriorD.name,

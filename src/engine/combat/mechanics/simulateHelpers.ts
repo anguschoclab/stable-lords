@@ -1,23 +1,22 @@
-import { FightingStyle } from "@/types/shared.types";
-import type { FightOutcome } from "@/types/combat.types";
-import type { Trainer } from "@/types/state.types";
-import { type ResolutionContext, type FighterState } from "@/engine/combat/resolution";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { getTrainingBonus } from "@/engine/trainers";
-import { getSpecialtyMods } from "@/engine/trainerSpecialties";
+import { FightingStyle } from '@/types/shared.types';
+import type { FightOutcome } from '@/types/combat.types';
+import type { Trainer } from '@/types/state.types';
+import { type ResolutionContext, type FighterState } from '@/engine/combat/resolution';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { getTrainingBonus } from '@/engine/trainers';
+import { getSpecialtyMods } from '@/engine/trainerSpecialties';
 
 export function createRNGForContext(seed: number, rng?: IRNGService): IRNGService {
   return rng || new SeededRNGService(seed);
 }
 
 export function setupRng(providedRng?: (() => number) | number): () => number {
-  if (typeof providedRng === "function") {
+  if (typeof providedRng === 'function') {
     return providedRng;
   }
-  const seed = typeof providedRng === "number"
-    ? providedRng
-    : crypto.getRandomValues(new Uint32Array(1))[0];
+  const seed =
+    typeof providedRng === 'number' ? providedRng : crypto.getRandomValues(new Uint32Array(1))[0];
   const sRng = new SeededRNGService(seed);
   return () => sRng.next();
 }
@@ -30,7 +29,19 @@ export function getTrainerMods(
   ctx?: ResolutionContext
 ) {
   if (!trainers) {
-    return { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0, killWindowBonus: 0, damageReceivedMult: 1.0, riposteDamageMult: 1.0, fatiguePenaltyReduction: 0 };
+    return {
+      attMod: 0,
+      defMod: 0,
+      iniMod: 0,
+      parMod: 0,
+      decMod: 0,
+      endMod: 0,
+      healMod: 0,
+      killWindowBonus: 0,
+      damageReceivedMult: 1.0,
+      riposteDamageMult: 1.0,
+      fatiguePenaltyReduction: 0,
+    };
   }
   const bonus = getTrainingBonus(trainers, style);
   const base = {
@@ -60,23 +71,29 @@ export function getTrainerMods(
     };
   }
 
-  return { ...base, killWindowBonus: 0, damageReceivedMult: 1.0, riposteDamageMult: 1.0, fatiguePenaltyReduction: 0 };
+  return {
+    ...base,
+    killWindowBonus: 0,
+    damageReceivedMult: 1.0,
+    riposteDamageMult: 1.0,
+    fatiguePenaltyReduction: 0,
+  };
 }
 
 export function processOutcomeTags(
-  winner: "A" | "D",
-  by: FightOutcome["by"],
+  winner: 'A' | 'D',
+  by: FightOutcome['by'],
   fA: FighterState,
   fD: FighterState
 ): string[] {
   const tags = new Set<string>();
-  const w = winner === "A" ? fA : fD;
-  const l = winner === "A" ? fD : fA;
+  const w = winner === 'A' ? fA : fD;
+  const l = winner === 'A' ? fD : fA;
 
-  if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) tags.add("Comeback");
-  if (w.hitsLanded >= 5) tags.add("Dominance");
-  if (by === "KO") tags.add("KO");
-  if (by === "Kill") tags.add("Kill");
+  if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) tags.add('Comeback');
+  if (w.hitsLanded >= 5) tags.add('Dominance');
+  if (by === 'KO') tags.add('KO');
+  if (by === 'Kill') tags.add('Kill');
 
   return Array.from(tags);
 }

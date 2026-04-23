@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import { createWorldSlice, WorldSlice } from "@/state/slices/worldSlice";
-import { createEconomySlice, EconomySlice } from "@/state/slices/economySlice";
-import { act } from "@testing-library/react";
-import type { FightSummary } from "@/types/combat.types";
+import { describe, it, expect, beforeEach } from 'vitest';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { createWorldSlice, WorldSlice } from '@/state/slices/worldSlice';
+import { createEconomySlice, EconomySlice } from '@/state/slices/economySlice';
+import { act } from '@testing-library/react';
+import type { FightSummary } from '@/types/combat.types';
 
-const createTestStore = () => 
+const createTestStore = () =>
   create<WorldSlice & EconomySlice>()(
     immer((set, get, ...args) => ({
       ...createWorldSlice(set, get, ...args),
@@ -14,26 +14,30 @@ const createTestStore = () =>
     }))
   );
 
-describe("WorldSlice", () => {
+describe('WorldSlice', () => {
   let useTestStore: ReturnType<typeof createTestStore>;
 
   beforeEach(() => {
     useTestStore = createTestStore();
   });
 
-  it("should initialize a stable with starting capital", () => {
+  it('should initialize a stable with starting capital', () => {
     act(() => {
-      useTestStore.getState().initializeStable("Amau", "The Gilded Lions");
+      useTestStore.getState().initializeStable('Amau', 'The Gilded Lions');
     });
 
     const { player, treasury } = useTestStore.getState();
-    expect(player.name).toBe("Amau");
-    expect(player.stableName).toBe("The Gilded Lions");
+    expect(player.name).toBe('Amau');
+    expect(player.stableName).toBe('The Gilded Lions');
     expect(treasury).toBe(500);
   });
 
-  it("should append a fight to the arena history", () => {
-    const mockFight = { id: "f1", winner: "a", transcript: [{ text: "Clang!" }] } as unknown as FightSummary;
+  it('should append a fight to the arena history', () => {
+    const mockFight = {
+      id: 'f1',
+      winner: 'a',
+      transcript: [{ text: 'Clang!' }],
+    } as unknown as FightSummary;
 
     act(() => {
       useTestStore.getState().appendFight(mockFight);
@@ -42,13 +46,13 @@ describe("WorldSlice", () => {
     expect(useTestStore.getState().arenaHistory).toHaveLength(1);
   });
 
-  it("should truncate arena history and remove old transcripts", () => {
+  it('should truncate arena history and remove old transcripts', () => {
     // Fill history with 25 fights
     act(() => {
       for (let i = 0; i < 25; i++) {
-        const fight = { 
-          id: `f${i}`, 
-          transcript: [{ text: "Heavy breathing..." }] 
+        const fight = {
+          id: `f${i}`,
+          transcript: [{ text: 'Heavy breathing...' }],
         } as unknown as FightSummary;
         useTestStore.getState().appendFight(fight);
       }
@@ -56,7 +60,7 @@ describe("WorldSlice", () => {
 
     const history = useTestStore.getState().arenaHistory;
     expect(history).toHaveLength(25);
-    
+
     // The 0th fight (oldest) should have NO transcript if we keep only last 20
     expect(history[0].transcript).toBeUndefined();
     // The 24th fight (newest) SHOULD have a transcript

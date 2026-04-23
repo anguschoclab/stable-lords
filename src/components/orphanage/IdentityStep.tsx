@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface IdentityStepProps {
   ownerInput: string;
@@ -22,18 +22,15 @@ export default function IdentityStep({
     <div
       className="p-7 space-y-6"
       style={{
-        background: "linear-gradient(145deg, #150F08 0%, #110C07 60%, #140E08 100%)",
-        border: "1px solid rgba(60,42,22,0.9)",
-        borderTopColor: "rgba(100,70,36,0.5)",
+        background: 'linear-gradient(145deg, #150F08 0%, #110C07 60%, #140E08 100%)',
+        border: '1px solid rgba(60,42,22,0.9)',
+        borderTopColor: 'rgba(100,70,36,0.5)',
       }}
     >
       <div>
-        <h2 className="font-display text-xl font-bold text-foreground">
-          Establish Your Identity
-        </h2>
+        <h2 className="font-display text-xl font-bold text-foreground">Establish Your Identity</h2>
         <p className="text-xs text-muted-foreground/60 mt-1 leading-relaxed">
-          Your name and stable name will be recorded in the Imperial Ledger
-          for all time.
+          Your name and stable name will be recorded in the Imperial Ledger for all time.
         </p>
       </div>
 
@@ -49,10 +46,10 @@ export default function IdentityStep({
             className="w-full h-10 px-3 text-sm"
             placeholder="e.g. Master Thorne"
             style={{
-              background: "#0A0705",
-              border: "1px solid rgba(60,42,22,0.8)",
-              color: "hsl(var(--foreground))",
-              outline: "none",
+              background: '#0A0705',
+              border: '1px solid rgba(60,42,22,0.8)',
+              color: 'hsl(var(--foreground))',
+              outline: 'none',
             }}
           />
         </div>
@@ -67,10 +64,10 @@ export default function IdentityStep({
             className="w-full h-10 px-3 text-sm"
             placeholder="e.g. The Iron Sentinels"
             style={{
-              background: "#0A0705",
-              border: "1px solid rgba(60,42,22,0.8)",
-              color: "hsl(var(--foreground))",
-              outline: "none",
+              background: '#0A0705',
+              border: '1px solid rgba(60,42,22,0.8)',
+              color: 'hsl(var(--foreground))',
+              outline: 'none',
             }}
           />
         </div>

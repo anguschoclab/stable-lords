@@ -1,13 +1,13 @@
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 export interface StatBatteryProps {
   label: string;
   value: number;
   max?: number;
   labelValue?: string | number; // Optional explicit display string for the value
-  colorClass?: string;          // Tailwind class for the progress bar color
-  className?: string;           // Optional wrapper class
+  colorClass?: string; // Tailwind class for the progress bar color
+  className?: string; // Optional wrapper class
 }
 
 export function StatBattery({
@@ -22,12 +22,12 @@ export function StatBattery({
   const displayValue = labelValue !== undefined ? labelValue : value;
 
   return (
-    <div className={cn("flex items-center gap-3", className)}>
+    <div className={cn('flex items-center gap-3', className)}>
       <span className="text-xs text-muted-foreground w-8 font-mono">{label}</span>
       <div className="flex-1 relative">
         <Progress
           value={pct}
-          className={cn("h-2 overflow-hidden shadow-[0_0_5px_currentColor]", colorClass)}
+          className={cn('h-2 overflow-hidden shadow-[0_0_5px_currentColor]', colorClass)}
         />
       </div>
       <span className="text-sm font-mono font-semibold w-6 text-right">{displayValue}</span>

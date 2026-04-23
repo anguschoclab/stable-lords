@@ -1,15 +1,15 @@
 /**
  * Lore Archive — persists fight summaries and Hall of Fights entries.
  */
-import type { FightSummary, HallEntry } from "@/types/game";
+import type { FightSummary, HallEntry } from '@/types/game';
 
-const KEY_FIGHTS = "sl.lore.fights";
-const KEY_HALL = "sl.lore.hall";
+const KEY_FIGHTS = 'sl.lore.fights';
+const KEY_HALL = 'sl.lore.hall';
 
 function loadArray<T>(key: string): T[] {
   if (typeof localStorage === 'undefined') return [];
   try {
-    return JSON.parse(localStorage.getItem(key) || "[]");
+    return JSON.parse(localStorage.getItem(key) || '[]');
   } catch {
     return [];
   }
@@ -65,20 +65,16 @@ export const LoreArchive = {
   },
 
   markFightOfWeek(week: number, fightId: string) {
-    const label = "Fight of the Week";
-    const hall = LoreArchive.allHall().filter(
-      (h) => !(h.label === label && h.week === week)
-    );
-    hall.push({ id: `hall-${week}-${label.replace(/ /g, "-")}`, week, label, fightId });
+    const label = 'Fight of the Week';
+    const hall = LoreArchive.allHall().filter((h) => !(h.label === label && h.week === week));
+    hall.push({ id: `hall-${week}-${label.replace(/ /g, '-')}`, week, label, fightId });
     saveArray(KEY_HALL, hall);
   },
 
   markFightOfTournament(week: number, fightId: string) {
-    const label = "Fight of the Tournament";
-    const hall = LoreArchive.allHall().filter(
-      (h) => !(h.label === label && h.week === week)
-    );
-    hall.push({ id: `hall-${week}-${label.replace(/ /g, "-")}`, week, label, fightId });
+    const label = 'Fight of the Tournament';
+    const hall = LoreArchive.allHall().filter((h) => !(h.label === label && h.week === week));
+    hall.push({ id: `hall-${week}-${label.replace(/ /g, '-')}`, week, label, fightId });
     saveArray(KEY_HALL, hall);
   },
 };

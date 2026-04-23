@@ -1,6 +1,6 @@
-import { GameState, RivalStableData } from "@/types/state.types";
-import { checkWeaponRequirements, DEFAULT_LOADOUT } from "@/data/equipment";
-import { StateImpact } from "@/engine/impacts";
+import { GameState, RivalStableData } from '@/types/state.types';
+import { checkWeaponRequirements, DEFAULT_LOADOUT } from '@/data/equipment';
+import { StateImpact } from '@/engine/impacts';
 
 /**
  * Stable Lords — Equipment Pipeline Pass
@@ -24,7 +24,7 @@ export function runEquipmentPass(state: GameState): StateImpact {
       if (currentEquip.weapon === favId) return warrior;
 
       const req = checkWeaponRequirements(favId, warrior.attributes);
-      if (req.attPenalty < -4) return warrior; 
+      if (req.attPenalty < -4) return warrior;
 
       changed = true;
       return { ...warrior, equipment: { ...currentEquip, weapon: favId } };

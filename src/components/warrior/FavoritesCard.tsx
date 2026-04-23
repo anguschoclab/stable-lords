@@ -1,15 +1,15 @@
-import React, { useMemo } from "react";
-import { Eye, Lightbulb, Swords, Zap, Activity, Download } from "lucide-react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { type Warrior } from "@/types/game";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getFavoritesDisplay } from "@/components/warrior/favoritesDisplay";
-import { applyInsightToken } from "@/engine/favorites";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import React, { useMemo } from 'react';
+import { Eye, Lightbulb, Swords, Zap, Activity, Download } from 'lucide-react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { type Warrior } from '@/types/game';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { getFavoritesDisplay } from '@/components/warrior/favoritesDisplay';
+import { applyInsightToken } from '@/engine/favorites';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 /** Discovery progress thresholds */
 const WEAPON_HINT_FIGHTS = 5;
@@ -21,18 +21,18 @@ const RHYTHM_REVEAL_FIGHTS = 18;
 function getDiscoveryProgress(totalFights: number): {
   weaponProgress: number;
   rhythmProgress: number;
-  weaponStage: "hidden" | "hint1" | "hint2" | "revealed";
-  rhythmStage: "hidden" | "hint1" | "hint2" | "revealed";
+  weaponStage: 'hidden' | 'hint1' | 'hint2' | 'revealed';
+  rhythmStage: 'hidden' | 'hint1' | 'hint2' | 'revealed';
 } {
-  let weaponStage: "hidden" | "hint1" | "hint2" | "revealed" = "hidden";
-  if (totalFights >= WEAPON_REVEAL_FIGHTS) weaponStage = "revealed";
-  else if (totalFights >= WEAPON_HINT_FIGHTS * 2) weaponStage = "hint2";
-  else if (totalFights >= WEAPON_HINT_FIGHTS) weaponStage = "hint1";
+  let weaponStage: 'hidden' | 'hint1' | 'hint2' | 'revealed' = 'hidden';
+  if (totalFights >= WEAPON_REVEAL_FIGHTS) weaponStage = 'revealed';
+  else if (totalFights >= WEAPON_HINT_FIGHTS * 2) weaponStage = 'hint2';
+  else if (totalFights >= WEAPON_HINT_FIGHTS) weaponStage = 'hint1';
 
-  let rhythmStage: "hidden" | "hint1" | "hint2" | "revealed" = "hidden";
-  if (totalFights >= RHYTHM_REVEAL_FIGHTS) rhythmStage = "revealed";
-  else if (totalFights >= RHYTHM_HINT_FIGHTS * 2) rhythmStage = "hint2";
-  else if (totalFights >= RHYTHM_HINT_FIGHTS) rhythmStage = "hint1";
+  let rhythmStage: 'hidden' | 'hint1' | 'hint2' | 'revealed' = 'hidden';
+  if (totalFights >= RHYTHM_REVEAL_FIGHTS) rhythmStage = 'revealed';
+  else if (totalFights >= RHYTHM_HINT_FIGHTS * 2) rhythmStage = 'hint2';
+  else if (totalFights >= RHYTHM_HINT_FIGHTS) rhythmStage = 'hint1';
 
   return {
     weaponProgress: Math.min(100, (totalFights / WEAPON_REVEAL_FIGHTS) * 100),
@@ -55,7 +55,7 @@ function DiscoveryProgressBar({
   revealAt,
 }: {
   progress: number;
-  stage: "hidden" | "hint1" | "hint2" | "revealed";
+  stage: 'hidden' | 'hint1' | 'hint2' | 'revealed';
   label: string;
   hint1Label: string;
   hint2Label: string;
@@ -65,24 +65,26 @@ function DiscoveryProgressBar({
   revealAt: number;
 }) {
   const stageLabels: Record<string, string> = {
-    hidden: "Unknown",
+    hidden: 'Unknown',
     hint1: hint1Label,
     hint2: hint2Label,
     revealed: revealLabel,
   };
 
   const stageColors: Record<string, string> = {
-    hidden: "bg-muted",
-    hint1: "bg-primary/60",
-    hint2: "bg-primary/80",
-    revealed: "bg-accent",
+    hidden: 'bg-muted',
+    hint1: 'bg-primary/60',
+    hint2: 'bg-primary/80',
+    revealed: 'bg-accent',
   };
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">{label}</span>
-        <span className={`text-xs font-medium ${stage === "revealed" ? "text-accent" : "text-muted-foreground"}`}>
+        <span
+          className={`text-xs font-medium ${stage === 'revealed' ? 'text-accent' : 'text-muted-foreground'}`}
+        >
           {stageLabels[stage]}
         </span>
       </div>
@@ -118,17 +120,17 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
   const state = useWorldState();
   const setState = useGameStore((s) => s.setState);
   const favDisplay = getFavoritesDisplay(warrior);
-  
+
   const isWeaponDiscovered = !!warrior.favorites?.discovered.weapon;
   const isRhythmDiscovered = !!warrior.favorites?.discovered.rhythm;
 
   const weaponHints = warrior.favorites?.discovered.weaponHints ?? 0;
   const rhythmHints = warrior.favorites?.discovered.rhythmHints ?? 0;
-  
+
   const weaponProgress = isWeaponDiscovered ? 100 : (weaponHints / 2) * 100;
   const rhythmProgress = isRhythmDiscovered ? 100 : (rhythmHints / 2) * 100;
 
-  const handleInsight = (type: "weapon" | "rhythm") => {
+  const handleInsight = (type: 'weapon' | 'rhythm') => {
     const msg = applyInsightToken(warrior, type);
     setState((s) => {
       const w = s.roster.find((x) => x.id === warrior.id);
@@ -151,7 +153,9 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
         }
       }
     });
-    toast.success(`${warrior.name}'s strategy updated — OE ${fav.rhythm.oe} / AL ${fav.rhythm.al} locked in.`);
+    toast.success(
+      `${warrior.name}'s strategy updated — OE ${fav.rhythm.oe} / AL ${fav.rhythm.al} locked in.`
+    );
     onUpdate();
   };
 
@@ -161,7 +165,13 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
     setState((s) => {
       const w = s.roster.find((x) => x.id === warrior.id);
       if (w) {
-        if (!w.equipment) w.equipment = { weapon: fav.weaponId, armor: "none_armor", shield: "none_shield", helm: "none_helm" };
+        if (!w.equipment)
+          w.equipment = {
+            weapon: fav.weaponId,
+            armor: 'none_armor',
+            shield: 'none_shield',
+            helm: 'none_helm',
+          };
         else w.equipment.weapon = fav.weaponId;
       }
     });
@@ -187,20 +197,26 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
               <Swords className="h-3 w-3" /> Favorite Weapon
             </div>
             {isWeaponDiscovered && (
-              <Badge className="bg-arena-gold text-black font-black text-[9px] px-1.5 py-0 h-4">MASTERY ✨</Badge>
+              <Badge className="bg-arena-gold text-black font-black text-[9px] px-1.5 py-0 h-4">
+                MASTERY ✨
+              </Badge>
             )}
           </div>
-          
+
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1">
               {isWeaponDiscovered ? (
                 <div className="space-y-0.5">
-                  <div className="text-sm font-bold text-white uppercase tracking-tight">{favDisplay.weapon}</div>
-                  <div className="text-[9px] font-mono text-arena-gold font-bold">+2 ATT / +1 DAMAGE</div>
+                  <div className="text-sm font-bold text-white uppercase tracking-tight">
+                    {favDisplay.weapon}
+                  </div>
+                  <div className="text-[9px] font-mono text-arena-gold font-bold">
+                    +2 ATT / +1 DAMAGE
+                  </div>
                 </div>
               ) : (
                 <div className="text-sm text-muted-foreground italic font-medium opacity-60">
-                   {weaponHints > 0 ? favDisplay.weaponHint : "Preference hidden..."}
+                  {weaponHints > 0 ? favDisplay.weaponHint : 'Preference hidden...'}
                 </div>
               )}
             </div>
@@ -209,11 +225,19 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={handleEquipFavoriteWeapon} className="h-7 px-2 border-arena-gold/30 hover:bg-arena-gold/20 text-arena-gold text-[9px] font-black uppercase gap-1" aria-label="Equip favorite weapon">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleEquipFavoriteWeapon}
+                        className="h-7 px-2 border-arena-gold/30 hover:bg-arena-gold/20 text-arena-gold text-[9px] font-black uppercase gap-1"
+                        aria-label="Equip favorite weapon"
+                      >
                         <Download className="h-3 w-3" /> Equip
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent className="bg-black text-[10px]">Switch to soul-bond weapon</TooltipContent>
+                    <TooltipContent className="bg-black text-[10px]">
+                      Switch to soul-bond weapon
+                    </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
@@ -221,19 +245,30 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={() => handleInsight("weapon")} className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20" aria-label="Reveal favorite weapon insight">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleInsight('weapon')}
+                        className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20"
+                        aria-label="Reveal favorite weapon insight"
+                      >
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent className="bg-black text-[10px]">Use Insight Token</TooltipContent>
+                    <TooltipContent className="bg-black text-[10px]">
+                      Use Insight Token
+                    </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
             </div>
           </div>
           <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div 
-              className={cn("h-full transition-all duration-1000", isWeaponDiscovered ? "bg-arena-gold" : "bg-arena-gold/30")}
+            <div
+              className={cn(
+                'h-full transition-all duration-1000',
+                isWeaponDiscovered ? 'bg-arena-gold' : 'bg-arena-gold/30'
+              )}
               style={{ width: `${weaponProgress}%` }}
             />
           </div>
@@ -246,60 +281,89 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
               <Activity className="h-3 w-3" /> Natural Rhythm
             </div>
             {isRhythmDiscovered && (
-              <Badge className="bg-arena-gold text-black font-black text-[9px] px-1.5 py-0 h-4">SYNERGY ✨</Badge>
+              <Badge className="bg-arena-gold text-black font-black text-[9px] px-1.5 py-0 h-4">
+                SYNERGY ✨
+              </Badge>
             )}
           </div>
-          
+
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1">
               {isRhythmDiscovered ? (
                 <div className="space-y-0.5">
-                  <div className="text-sm font-bold text-white uppercase tracking-tight">{favDisplay.rhythm}</div>
-                  <div className="text-[9px] font-mono text-arena-gold font-bold">+2 INI / +2 DEF (BONUS)</div>
+                  <div className="text-sm font-bold text-white uppercase tracking-tight">
+                    {favDisplay.rhythm}
+                  </div>
+                  <div className="text-[9px] font-mono text-arena-gold font-bold">
+                    +2 INI / +2 DEF (BONUS)
+                  </div>
                 </div>
               ) : (
                 <div className="text-sm text-muted-foreground italic font-medium opacity-60">
-                   {rhythmHints > 0 ? favDisplay.rhythmHint : "Rhythm hidden..."}
+                  {rhythmHints > 0 ? favDisplay.rhythmHint : 'Rhythm hidden...'}
                 </div>
               )}
             </div>
             <div className="flex items-center gap-1.5">
-              {isRhythmDiscovered && (() => {
-                const fav = warrior.favorites!;
-                const plan = warrior.plan;
-                const alreadyApplied = plan && plan.OE === fav.rhythm.oe && plan.AL === fav.rhythm.al;
-                return !alreadyApplied ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={handleApplyRhythm} className="h-7 px-2 border-arena-gold/30 hover:bg-arena-gold/20 text-arena-gold text-[9px] font-black uppercase gap-1" aria-label="Apply favorite rhythm to strategy">
-                          <Download className="h-3 w-3" /> Apply
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-black text-[10px]">Lock soul-rhythm into strategy sheet</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : (
-                  <Badge className="bg-arena-gold/10 text-arena-gold border border-arena-gold/20 text-[9px] font-black px-1.5">Active</Badge>
-                );
-              })()}
+              {isRhythmDiscovered &&
+                (() => {
+                  const fav = warrior.favorites!;
+                  const plan = warrior.plan;
+                  const alreadyApplied =
+                    plan && plan.OE === fav.rhythm.oe && plan.AL === fav.rhythm.al;
+                  return !alreadyApplied ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleApplyRhythm}
+                            className="h-7 px-2 border-arena-gold/30 hover:bg-arena-gold/20 text-arena-gold text-[9px] font-black uppercase gap-1"
+                            aria-label="Apply favorite rhythm to strategy"
+                          >
+                            <Download className="h-3 w-3" /> Apply
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-black text-[10px]">
+                          Lock soul-rhythm into strategy sheet
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    <Badge className="bg-arena-gold/10 text-arena-gold border border-arena-gold/20 text-[9px] font-black px-1.5">
+                      Active
+                    </Badge>
+                  );
+                })()}
               {!isRhythmDiscovered && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={() => handleInsight("rhythm")} className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20" aria-label="Reveal favorite rhythm insight">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleInsight('rhythm')}
+                        className="h-7 w-7 p-0 border-white/10 hover:bg-arena-gold/20"
+                        aria-label="Reveal favorite rhythm insight"
+                      >
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent className="bg-black text-[10px]">Use Insight Token</TooltipContent>
+                    <TooltipContent className="bg-black text-[10px]">
+                      Use Insight Token
+                    </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
             </div>
           </div>
           <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div 
-              className={cn("h-full transition-all duration-1000", isRhythmDiscovered ? "bg-arena-gold" : "bg-arena-gold/30")}
+            <div
+              className={cn(
+                'h-full transition-all duration-1000',
+                isRhythmDiscovered ? 'bg-arena-gold' : 'bg-arena-gold/30'
+              )}
               style={{ width: `${rhythmProgress}%` }}
             />
           </div>

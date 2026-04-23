@@ -1,7 +1,7 @@
-import type { GameState, RivalStableData } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import { updateEntityInList } from "@/utils/stateUtils";
-import { StateImpact } from "@/engine/impacts";
+import type { GameState, RivalStableData } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import { updateEntityInList } from '@/utils/stateUtils';
+import { StateImpact } from '@/engine/impacts';
 
 export interface EntityUpdateMaps {
   rosterUpdates: Map<string, Partial<Warrior>>;
@@ -28,16 +28,19 @@ export function updateEntity(
   maps: EntityUpdateMaps,
   rivalStableId?: string
 ): void {
-  const isPlayer = state.roster.some(w => w.id === warriorId);
-  
+  const isPlayer = state.roster.some((w) => w.id === warriorId);
+
   if (isPlayer) {
     const existing = maps.rosterUpdates.get(warriorId) || {};
     maps.rosterUpdates.set(warriorId, { ...existing, ...update });
   } else if (rivalStableId) {
-    const rival = (state.rivals || []).find(r => r.owner.id === rivalStableId);
+    const rival = (state.rivals || []).find((r) => r.owner.id === rivalStableId);
     if (rival) {
       const existingRivalUpdate = maps.rivalsUpdates.get(rivalStableId) || {};
-      const updatedRoster = updateEntityInList(rival.roster, warriorId, w => ({ ...w, ...update }));
+      const updatedRoster = updateEntityInList(rival.roster, warriorId, (w) => ({
+        ...w,
+        ...update,
+      }));
       maps.rivalsUpdates.set(rivalStableId, { ...existingRivalUpdate, roster: updatedRoster });
     }
   }

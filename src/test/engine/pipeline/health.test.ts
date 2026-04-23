@@ -1,26 +1,24 @@
-import { vi } from "vitest";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { computeHealthImpact, applyHealthUpdates } from "@/engine/health";
-import { type GameState, type Warrior, type InjuryData } from "@/types/game";
-import * as injuriesModule from "@/engine/injuries";
-import * as matchmakingModule from "@/engine/matchmaking/historyLogic";
+import { vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { computeHealthImpact, applyHealthUpdates } from '@/engine/health';
+import { type GameState, type Warrior, type InjuryData } from '@/types/game';
+import * as injuriesModule from '@/engine/injuries';
+import * as matchmakingModule from '@/engine/matchmaking/historyLogic';
 
-
-
-describe("pipeline/health", () => {
+describe('pipeline/health', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("computeHealthImpact", () => {
-    it("should handle warriors with missing, null, or string-only injuries gracefully", () => {
-      vi.spyOn(injuriesModule, "tickInjuries");
+  describe('computeHealthImpact', () => {
+    it('should handle warriors with missing, null, or string-only injuries gracefully', () => {
+      vi.spyOn(injuriesModule, 'tickInjuries');
       const mockState = {
         week: 5,
         roster: [
-          { id: "w1", name: "Warrior 1" }, // missing injuries
-          { id: "w2", name: "Warrior 2", injuries: null }, // null injuries
-          { id: "w3", name: "Warrior 3", injuries: ["string_injury"] }, // string-only injuries
+          { id: 'w1', name: 'Warrior 1' }, // missing injuries
+          { id: 'w2', name: 'Warrior 2', injuries: null }, // null injuries
+          { id: 'w3', name: 'Warrior 3', injuries: ['string_injury'] }, // string-only injuries
         ],
       } as unknown as GameState;
 
@@ -31,20 +29,27 @@ describe("pipeline/health", () => {
       expect(impact.newsletterItems).toEqual([]);
     });
 
-    it("should process injuries and return updates", () => {
-      const mockInjury = { id: "i1", name: "cut", description: "cut", severity: "Minor", weeksRemaining: 2, penalties: {} } as InjuryData;
+    it('should process injuries and return updates', () => {
+      const mockInjury = {
+        id: 'i1',
+        name: 'cut',
+        description: 'cut',
+        severity: 'Minor',
+        weeksRemaining: 2,
+        penalties: {},
+      } as InjuryData;
       const mockState = {
         week: 5,
         roster: [
-          { id: "w1", name: "Warrior 1", injuries: [mockInjury] },
-          { id: "w2", name: "Warrior 2", injuries: [] },
-          { id: "w3", name: "Warrior 3", injuries: ["old_format"] },
+          { id: 'w1', name: 'Warrior 1', injuries: [mockInjury] },
+          { id: 'w2', name: 'Warrior 2', injuries: [] },
+          { id: 'w3', name: 'Warrior 3', injuries: ['old_format'] },
         ],
       } as unknown as GameState;
 
-      vi.spyOn(injuriesModule, "tickInjuries").mockReturnValue({
+      vi.spyOn(injuriesModule, 'tickInjuries').mockReturnValue({
         active: [{ ...mockInjury, weeksRemaining: 1 }],
-        healed: ["sprain"],
+        healed: ['sprain'],
       });
 
       const impact = computeHealthImpact(mockState);
@@ -53,22 +58,22 @@ describe("pipeline/health", () => {
       expect(injuriesModule.tickInjuries).toHaveBeenCalledWith([mockInjury]);
 
       expect(impact.rosterUpdates?.size).toBe(1);
-      expect(impact.rosterUpdates?.get("w1")).toMatchObject({ injuries: [{ ...mockInjury, weeksRemaining: 1 }] });
+      expect(impact.rosterUpdates?.get('w1')).toMatchObject({
+        injuries: [{ ...mockInjury, weeksRemaining: 1 }],
+      });
 
       expect(impact.newsletterItems?.length).toBe(1);
       expect(impact.newsletterItems?.[0]).toMatchObject({
         week: 5,
-        title: "Medical Report",
-        items: ["Warrior 1 recovered from sprain."],
+        title: 'Medical Report',
+        items: ['Warrior 1 recovered from sprain.'],
       });
     });
 
-    it("should return empty updates if no injuries to process", () => {
+    it('should return empty updates if no injuries to process', () => {
       const mockState = {
         week: 5,
-        roster: [
-          { id: "w2", name: "Warrior 2", injuries: [] },
-        ],
+        roster: [{ id: 'w2', name: 'Warrior 2', injuries: [] }],
       } as unknown as GameState;
 
       const impact = computeHealthImpact(mockState);
@@ -78,16 +83,21 @@ describe("pipeline/health", () => {
       expect(impact.newsletterItems).toEqual([]);
     });
 
-    it("should omit newsletter if no injuries healed", () => {
-      const mockInjury = { id: "i1", name: "cut", description: "cut", severity: "Minor", weeksRemaining: 2, penalties: {} } as InjuryData;
+    it('should omit newsletter if no injuries healed', () => {
+      const mockInjury = {
+        id: 'i1',
+        name: 'cut',
+        description: 'cut',
+        severity: 'Minor',
+        weeksRemaining: 2,
+        penalties: {},
+      } as InjuryData;
       const mockState = {
         week: 5,
-        roster: [
-          { id: "w1", name: "Warrior 1", injuries: [mockInjury] },
-        ],
+        roster: [{ id: 'w1', name: 'Warrior 1', injuries: [mockInjury] }],
       } as unknown as GameState;
 
-      vi.spyOn(injuriesModule, "tickInjuries").mockReturnValue({
+      vi.spyOn(injuriesModule, 'tickInjuries').mockReturnValue({
         active: [{ ...mockInjury, weeksRemaining: 1 }],
         healed: [],
       });
@@ -98,51 +108,65 @@ describe("pipeline/health", () => {
     });
   });
 
-  describe("applyHealthUpdates", () => {
-    it("should apply computed impacts to the state", () => {
-      const mockInjury = { id: "i1", name: "cut", description: "cut", severity: "Minor", weeksRemaining: 2, penalties: {} } as InjuryData;
+  describe('applyHealthUpdates', () => {
+    it('should apply computed impacts to the state', () => {
+      const mockInjury = {
+        id: 'i1',
+        name: 'cut',
+        description: 'cut',
+        severity: 'Minor',
+        weeksRemaining: 2,
+        penalties: {},
+      } as InjuryData;
       const mockState = {
         week: 5,
         roster: [
-          { id: "w1", name: "Warrior 1", injuries: [mockInjury] },
-          { id: "w2", name: "Warrior 2", injuries: [] },
+          { id: 'w1', name: 'Warrior 1', injuries: [mockInjury] },
+          { id: 'w2', name: 'Warrior 2', injuries: [] },
         ],
-        restStates: [{ warriorId: "w1", restUntilWeek: 4 }],
+        restStates: [{ warriorId: 'w1', restUntilWeek: 4 }],
         newsletter: [],
       } as unknown as GameState;
 
-      vi.spyOn(injuriesModule, "tickInjuries").mockReturnValue({
+      vi.spyOn(injuriesModule, 'tickInjuries').mockReturnValue({
         active: [{ ...mockInjury, weeksRemaining: 1 }],
-        healed: ["sprain"],
+        healed: ['sprain'],
       });
 
-      vi.spyOn(matchmakingModule, "clearExpiredRest").mockReturnValue([]);
+      vi.spyOn(matchmakingModule, 'clearExpiredRest').mockReturnValue([]);
 
       const newState = applyHealthUpdates(mockState);
 
       expect(matchmakingModule.clearExpiredRest).toHaveBeenCalledWith(mockState.restStates, 5);
 
-      expect(newState.roster.find(w => w.id === "w1")?.injuries).toEqual([{ ...mockInjury, weeksRemaining: 1 }]);
-      expect(newState.roster.find(w => w.id === "w2")?.injuries).toEqual([]);
+      expect(newState.roster.find((w) => w.id === 'w1')?.injuries).toEqual([
+        { ...mockInjury, weeksRemaining: 1 },
+      ]);
+      expect(newState.roster.find((w) => w.id === 'w2')?.injuries).toEqual([]);
       expect(newState.restStates).toEqual([]);
       expect(newState.newsletter?.length).toBe(1);
     });
 
-    it("should handle state with undefined restStates and newsletter", () => {
-      const mockInjury = { id: "i1", name: "cut", description: "cut", severity: "Minor", weeksRemaining: 2, penalties: {} } as InjuryData;
+    it('should handle state with undefined restStates and newsletter', () => {
+      const mockInjury = {
+        id: 'i1',
+        name: 'cut',
+        description: 'cut',
+        severity: 'Minor',
+        weeksRemaining: 2,
+        penalties: {},
+      } as InjuryData;
       const mockState = {
         week: 5,
-        roster: [
-          { id: "w1", name: "Warrior 1", injuries: [mockInjury] },
-        ],
+        roster: [{ id: 'w1', name: 'Warrior 1', injuries: [mockInjury] }],
       } as unknown as GameState;
 
-      vi.spyOn(injuriesModule, "tickInjuries").mockReturnValue({
+      vi.spyOn(injuriesModule, 'tickInjuries').mockReturnValue({
         active: [],
-        healed: ["sprain"],
+        healed: ['sprain'],
       });
 
-      vi.spyOn(matchmakingModule, "clearExpiredRest").mockReturnValue([]);
+      vi.spyOn(matchmakingModule, 'clearExpiredRest').mockReturnValue([]);
 
       const newState = applyHealthUpdates(mockState);
 

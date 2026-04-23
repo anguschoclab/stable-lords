@@ -1,10 +1,10 @@
-import type { GameState, SeasonalGrowth } from "@/types/state.types";
-import type { Warrior, InjuryData } from "@/types/warrior.types";
-import { tickInjuries } from "@/engine/injuries";
-import { clearExpiredRest } from "@/engine/matchmaking/historyLogic";
-import type { StateImpact } from "./impacts";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import type { GameState, SeasonalGrowth } from '@/types/state.types';
+import type { Warrior, InjuryData } from '@/types/warrior.types';
+import { tickInjuries } from '@/engine/injuries';
+import { clearExpiredRest } from '@/engine/matchmaking/historyLogic';
+import type { StateImpact } from './impacts';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 /**
  * Health Impact calculation — extracted from the legacy pipeline.
@@ -26,16 +26,16 @@ export function computeHealthImpact(state: GameState, rngService?: IRNGService):
     }
 
     // ── Injury Ticking ──
-    const injuryObjects = (w.injuries || []).filter((i): i is InjuryData => typeof i !== "string");
+    const injuryObjects = (w.injuries || []).filter((i): i is InjuryData => typeof i !== 'string');
     if (injuryObjects.length > 0) {
       const result = tickInjuries(injuryObjects);
       if (result.healed.length > 0) {
-        injuryNews.push(`${w.name} recovered from ${result.healed.join(", ")}.`);
+        injuryNews.push(`${w.name} recovered from ${result.healed.join(', ')}.`);
       }
       updates.injuries = result.active;
       changed = true;
     }
-    
+
     if (changed) {
       rosterUpdates.set(w.id, updates);
     }
@@ -43,24 +43,30 @@ export function computeHealthImpact(state: GameState, rngService?: IRNGService):
 
   return {
     rosterUpdates,
-    newsletterItems: injuryNews.length > 0 ? [{ id: rng.uuid(), week: state.week, title: "Medical Report", items: injuryNews }] : []
+    newsletterItems:
+      injuryNews.length > 0
+        ? [{ id: rng.uuid(), week: state.week, title: 'Medical Report', items: injuryNews }]
+        : [],
   };
 }
 
-export const applyHealthUpdates: (state: GameState, rng?: IRNGService) => GameState = (state, rng) => {
+export const applyHealthUpdates: (state: GameState, rng?: IRNGService) => GameState = (
+  state,
+  rng
+) => {
   const impact = computeHealthImpact(state, rng);
   let roster = [...state.roster];
-  
+
   if (impact.rosterUpdates) {
     impact.rosterUpdates.forEach((update, id) => {
-      roster = roster.map(w => w.id === id ? { ...w, ...update } : w);
+      roster = roster.map((w) => (w.id === id ? { ...w, ...update } : w));
     });
   }
 
-  const s = { 
-    ...state, 
+  const s = {
+    ...state,
     roster,
-    restStates: clearExpiredRest(state.restStates || [], state.week)
+    restStates: clearExpiredRest(state.restStates || [], state.week),
   };
 
   if (impact.newsletterItems && impact.newsletterItems.length > 0) {

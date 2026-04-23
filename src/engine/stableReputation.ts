@@ -2,14 +2,14 @@
  * Stable Reputation System — computes Fame, Notoriety, Honor, Adaptability.
  * Per Design Bible v3.0 §9.2
  */
-import type { GameState } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightSummary } from "@/types/combat.types";
+import type { GameState } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { FightSummary } from '@/types/combat.types';
 
 export interface StableReputation {
-  fame: number;       // 0-100: public acclaim
-  notoriety: number;  // 0-100: feared reputation
-  honor: number;      // 0-100: moral standing
+  fame: number; // 0-100: public acclaim
+  notoriety: number; // 0-100: feared reputation
+  honor: number; // 0-100: moral standing
   adaptability: number; // 0-100: strategic responsiveness
 }
 
@@ -29,7 +29,7 @@ export function computeStableReputation(state: GameState): StableReputation {
   // ⚡ Bolt: Single pass over roster to collect active warriors, total kills, and unique styles
   for (let i = 0; i < state.roster.length; i++) {
     const w = state.roster[i];
-    if (w.status === "Active") {
+    if (w.status === 'Active') {
       activeWarriors.push(w);
       uniqueStyles.add(w.style);
       totalKills += w.career?.kills || 0;
@@ -47,7 +47,7 @@ export function computeStableReputation(state: GameState): StableReputation {
   // ⚡ Bolt: Single pass over arena history to collect bout stats
   for (let i = 0; i < state.arenaHistory.length; i++) {
     const f = state.arenaHistory[i];
-    if (f.by === "Kill") {
+    if (f.by === 'Kill') {
       killBouts++;
     } else if (f.winner !== null) {
       cleanBouts++;
@@ -90,11 +90,14 @@ export function computeStableReputation(state: GameState): StableReputation {
   }
   const avgFame = topFame.length > 0 ? topFameSum / topFame.length : 0;
   // Reduced average fame multiplier and scaled down carryover fame to prevent early-game snowballing
-  const fame = Math.min(100, Math.round(avgFame * 2.0 + gazetteMentions * 1.0 + (state.fame ?? 0) * 0.85));
+  const fame = Math.min(
+    100,
+    Math.round(avgFame * 2.0 + gazetteMentions * 1.0 + (state.fame ?? 0) * 0.85)
+  );
 
   // ── Notoriety ──
   // Make recent kills and historical lethality impact reputation more quickly
-  const notorietyRaw = (totalKills * 4) + (graveyardKills * 2) + (killBouts * 5);
+  const notorietyRaw = totalKills * 4 + graveyardKills * 2 + killBouts * 5;
   const notoriety = Math.min(100, Math.round(notorietyRaw * 2));
 
   // ── Honor ──
@@ -127,7 +130,7 @@ export function computeRivalReputation(
   // ⚡ Bolt: Single pass over roster to compute stats instead of multiple filters and reduce
   for (let i = 0; i < roster.length; i++) {
     const w = roster[i];
-    if (w.status === "Active") {
+    if (w.status === 'Active') {
       activeWarriors.push(w);
       uniqueStyles.add(w.style);
     }

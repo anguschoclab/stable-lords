@@ -2,24 +2,32 @@
  * Stable Lords — The Arena Gazette
  * Codex Sanguis design: Roman acta diurna / historical broadsheet aesthetic
  */
-import { useMemo, useState, useCallback } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { ArenaHistory } from "@/engine/history/arenaHistory";
+import { useMemo, useState, useCallback } from 'react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { ArenaHistory } from '@/engine/history/arenaHistory';
 import {
-  Newspaper, Terminal, BarChart3, Radio, History,
-  ChevronDown, Sparkles, Scroll,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+  Newspaper,
+  Terminal,
+  BarChart3,
+  Radio,
+  History,
+  ChevronDown,
+  Sparkles,
+  Scroll,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-import { Surface } from "@/components/ui/Surface";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { GazetteArticle } from "@/components/gazette/GazetteArticle";
-import { TacticalStyleAnalysis, StyleMatchupHeatmap } from "@/components/gazette/MetaAnalytics";
-import { GazetteLeaderboard, BestByStyle, RisingStars } from "@/components/gazette/GazetteLeaderboards";
+import { Surface } from '@/components/ui/Surface';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { GazetteArticle } from '@/components/gazette/GazetteArticle';
+import { TacticalStyleAnalysis, StyleMatchupHeatmap } from '@/components/gazette/MetaAnalytics';
 import {
-  Tooltip, TooltipContent, TooltipTrigger,
-} from "@/components/ui/tooltip";
+  GazetteLeaderboard,
+  BestByStyle,
+  RisingStars,
+} from '@/components/gazette/GazetteLeaderboards';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 // ─── Gazette Masthead ──────────────────────────────────────────────────────────
 
@@ -86,44 +94,54 @@ function GazetteSectionHeader({
   title,
   subtitle,
   badge,
-  badgeStyle = "primary",
+  badgeStyle = 'primary',
 }: {
   icon: React.ElementType;
   title: string;
   subtitle: string;
   badge: string;
-  badgeStyle?: "primary" | "gold";
+  badgeStyle?: 'primary' | 'gold';
 }) {
   return (
     <div className="flex items-center justify-between px-1">
       <div className="flex items-center gap-4">
-        <div className={cn(
-          "p-2.5 border rounded-none",
-          badgeStyle === "gold" ? "bg-arena-gold/10 border-arena-gold/20" : "bg-arena-blood/10 border-arena-blood/20"
-        )}>
-          <Icon className={cn(
-            "h-4 w-4",
-            badgeStyle === "gold" ? "text-arena-gold" : "text-arena-blood"
-          )} />
+        <div
+          className={cn(
+            'p-2.5 border rounded-none',
+            badgeStyle === 'gold'
+              ? 'bg-arena-gold/10 border-arena-gold/20'
+              : 'bg-arena-blood/10 border-arena-blood/20'
+          )}
+        >
+          <Icon
+            className={cn(
+              'h-4 w-4',
+              badgeStyle === 'gold' ? 'text-arena-gold' : 'text-arena-blood'
+            )}
+          />
         </div>
         <div>
-          <h3 className="text-base font-display font-black uppercase tracking-tight">
-            {title}
-          </h3>
+          <h3 className="text-base font-display font-black uppercase tracking-tight">{title}</h3>
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">
             {subtitle}
           </p>
         </div>
       </div>
-      <div className={cn(
-        "hidden md:block flex-1 h-px mx-8",
-        badgeStyle === "gold" ? "bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" : "bg-gradient-to-r from-arena-blood/20 via-border/20 to-transparent"
-      )} />
+      <div
+        className={cn(
+          'hidden md:block flex-1 h-px mx-8',
+          badgeStyle === 'gold'
+            ? 'bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent'
+            : 'bg-gradient-to-r from-arena-blood/20 via-border/20 to-transparent'
+        )}
+      />
       <Badge
         variant="outline"
         className={cn(
-          "hidden md:flex text-[9px] font-mono font-black tracking-widest px-3 h-7 rounded-none",
-          badgeStyle === "gold" ? "border-arena-gold/25 bg-arena-gold/5 text-arena-gold" : "border-arena-blood/25 bg-arena-blood/5 text-arena-blood"
+          'hidden md:flex text-[9px] font-mono font-black tracking-widest px-3 h-7 rounded-none',
+          badgeStyle === 'gold'
+            ? 'border-arena-gold/25 bg-arena-gold/5 text-arena-gold'
+            : 'border-arena-blood/25 bg-arena-blood/5 text-arena-blood'
         )}
       >
         {badge}
@@ -136,7 +154,10 @@ function GazetteSectionHeader({
 
 function GazetteEmptyState() {
   return (
-    <Surface variant="glass" className="py-32 flex flex-col items-center gap-6 relative overflow-hidden border-dashed opacity-50">
+    <Surface
+      variant="glass"
+      className="py-32 flex flex-col items-center gap-6 relative overflow-hidden border-dashed opacity-50"
+    >
       <div className="absolute inset-0 opacity-50 bg-radial-at-center from-arena-blood/5 to-transparent" />
       <div className="relative">
         <div className="absolute inset-0 blur-2xl rounded-none bg-arena-blood/10" />
@@ -147,8 +168,8 @@ function GazetteEmptyState() {
           The Presses Are Silent
         </p>
         <p className="text-xs text-muted-foreground/35 italic max-w-sm mx-auto leading-relaxed">
-          No arena records have been stylized by our chroniclers yet. Proceed
-          to combat to generate headlines and synchronize the archive.
+          No arena records have been stylized by our chroniclers yet. Proceed to combat to generate
+          headlines and synchronize the archive.
         </p>
       </div>
     </Surface>
@@ -175,9 +196,7 @@ export default function Gazette() {
   const hasContent = weeklyIssues.length > 0;
 
   return (
-    <div
-      className="space-y-16 max-w-7xl mx-auto pb-32 animate-in fade-in duration-700"
-    >
+    <div className="space-y-16 max-w-7xl mx-auto pb-32 animate-in fade-in duration-700">
       {/* ── Masthead ──────────────────────────────────────────────────────────── */}
       <GazetteMasthead season={season} week={week} />
 
@@ -213,8 +232,7 @@ export default function Gazette() {
             <div
               className="flex-1 h-px"
               style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(201,151,42,0.25))",
+                background: 'linear-gradient(90deg, transparent, rgba(201,151,42,0.25))',
               }}
             />
             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.5em] text-muted-foreground/30">
@@ -225,8 +243,7 @@ export default function Gazette() {
             <div
               className="flex-1 h-px"
               style={{
-                background:
-                  "linear-gradient(90deg, rgba(201,151,42,0.25), transparent)",
+                background: 'linear-gradient(90deg, rgba(201,151,42,0.25), transparent)',
               }}
             />
           </div>
@@ -250,12 +267,12 @@ export default function Gazette() {
             <AnimatePresence mode="popLayout">
               {visibleIssues.map((issue, idx) => {
                 const paragraphs = issue.body
-                  .split("\n\n")
+                  .split('\n\n')
                   .filter((p: string) => p.trim().length > 0);
                 const mappedIssue = {
                   week: issue.week,
                   mainHeadline: issue.headline,
-                  mainStory: paragraphs[0] || "",
+                  mainStory: paragraphs[0] || '',
                   sideStories: paragraphs.slice(1),
                 };
 
@@ -282,7 +299,7 @@ export default function Gazette() {
                   className="absolute inset-x-0 top-0 h-px"
                   style={{
                     background:
-                      "linear-gradient(90deg, transparent, rgba(201,151,42,0.15) 30%, rgba(201,151,42,0.15) 70%, transparent)",
+                      'linear-gradient(90deg, transparent, rgba(201,151,42,0.15) 30%, rgba(201,151,42,0.15) 70%, transparent)',
                   }}
                 />
 
@@ -308,7 +325,7 @@ export default function Gazette() {
                 <div className="flex items-center gap-2 mt-4 opacity-20">
                   <Sparkles
                     className="h-3 w-3 text-primary"
-                    style={{ animation: "livePulse 2s ease-in-out infinite" }}
+                    style={{ animation: 'livePulse 2s ease-in-out infinite' }}
                   />
                   <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">
                     Deep Storage Synchronization Ready

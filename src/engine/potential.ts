@@ -8,23 +8,23 @@
  *
  * See: Docs/Stable_Lords_Warrior_Potential_Spec_v1.0.md
  */
-import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes } from "@/types/shared.types";
-import type { AttributePotential } from "@/types/warrior.types";
-import type { GameState } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightSummary } from "@/types/combat.types";
-import { FightingStyle } from "@/types/shared.types";
-import type { RecruitTier } from "./recruitment";
+import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes } from '@/types/shared.types';
+import type { AttributePotential } from '@/types/warrior.types';
+import type { GameState } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { FightSummary } from '@/types/combat.types';
+import { FightingStyle } from '@/types/shared.types';
+import type { RecruitTier } from './recruitment';
 
 // ─── Potential Range by Tier ──────────────────────────────────────────────
 // [headroom_min, headroom_max] added ON TOP of the warrior's starting attribute.
 // E.g., a Common warrior with ST=10 gets potential ST of 10 + rand(2..5) = 12-15.
 
 const TIER_HEADROOM: Record<RecruitTier, [number, number]> = {
-  Common:      [2, 5],
-  Promising:   [3, 7],
+  Common: [2, 5],
+  Promising: [3, 7],
   Exceptional: [5, 9],
-  Prodigy:     [7, 12],
+  Prodigy: [7, 12],
 };
 
 // Absolute floor/ceiling for potential values
@@ -55,10 +55,7 @@ export function generatePotential(
 /**
  * Check if an attribute can still grow (hasn't hit potential ceiling).
  */
-export function canGrow(
-  current: number,
-  potential: number | undefined
-): boolean {
+export function canGrow(current: number, potential: number | undefined): boolean {
   if (potential === undefined) return current < ATTRIBUTE_MAX;
   return current < potential;
 }
@@ -72,10 +69,7 @@ export function canGrow(
  * - Within 1 point → 0.25
  * - At ceiling → 0.0
  */
-export function diminishingReturnsFactor(
-  current: number,
-  potential: number | undefined
-): number {
+export function diminishingReturnsFactor(current: number, potential: number | undefined): number {
   if (potential === undefined) return 1.0;
   const gap = potential - current;
   if (gap <= 0) return 0;
@@ -107,9 +101,9 @@ export function potentialRating(potential: AttributePotential): number {
 
 /** Human-readable potential grade */
 export function potentialGrade(rating: number): string {
-  if (rating >= 85) return "S";
-  if (rating >= 70) return "A";
-  if (rating >= 55) return "B";
-  if (rating >= 40) return "C";
-  return "D";
+  if (rating >= 85) return 'S';
+  if (rating >= 70) return 'A';
+  if (rating >= 55) return 'B';
+  if (rating >= 40) return 'C';
+  return 'D';
 }

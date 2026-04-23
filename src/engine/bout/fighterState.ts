@@ -1,14 +1,17 @@
+import { FightingStyle, type BaseSkills } from '@/types/shared.types';
+import { type Warrior } from '@/types/warrior.types';
+import { type FightPlan } from '@/types/combat.types';
+import { type Trainer } from '@/types/state.types';
 import {
-  FightingStyle,
-  type BaseSkills,
-} from "@/types/shared.types";
-import { type Warrior } from "@/types/warrior.types";
-import { type FightPlan } from "@/types/combat.types";
-import { type Trainer } from "@/types/state.types";
-import { DEFAULT_LOADOUT, getClassicWeaponBonus, checkWeaponRequirements, getLoadoutWeight, isOverEncumbered } from "@/data/equipment";
-import { getTrainingBonus } from "@/engine/trainers";
-import { getFavoriteWeaponBonus } from "@/engine/favorites";
-import { type FighterState } from "../combat/resolution";
+  DEFAULT_LOADOUT,
+  getClassicWeaponBonus,
+  checkWeaponRequirements,
+  getLoadoutWeight,
+  isOverEncumbered,
+} from '@/data/equipment';
+import { getTrainingBonus } from '@/engine/trainers';
+import { getFavoriteWeaponBonus } from '@/engine/favorites';
+import { type FighterState } from '../combat/resolution';
 
 function getTrainerMods(trainers: Trainer[], style: FightingStyle) {
   const bonus = getTrainingBonus(trainers, style);
@@ -27,7 +30,7 @@ function getTrainerMods(trainers: Trainer[], style: FightingStyle) {
  * Prepares the combat state for a single fighter.
  */
 export function createFighterState(
-  label: "A" | "D",
+  label: 'A' | 'D',
   plan: FightPlan,
   warrior?: Warrior,
   trainers?: Trainer[]
@@ -35,16 +38,16 @@ export function createFighterState(
   const attrs = warrior?.attributes ?? { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
   const skills = warrior?.baseSkills ?? { ATT: 5, PAR: 5, DEF: 5, INI: 5, RIP: 5, DEC: 5 };
   const derived = warrior?.derivedStats ?? { hp: 100, endurance: 100, damage: 5, encumbrance: 0 };
-  
+
   const equip = warrior?.equipment ?? DEFAULT_LOADOUT;
   const trainerMods = trainers ? getTrainerMods(trainers, plan.style) : null;
   const favWeapon = warrior ? getFavoriteWeaponBonus(warrior) : 0;
   const isMastered = favWeapon > 0;
 
   const getShieldBonus = (id: string) => {
-    if (id === "small_shield") return { def: 1, att: 0 };
-    if (id === "medium_shield") return { def: 2, att: 0 };
-    if (id === "large_shield") return { def: 3, att: -1 };
+    if (id === 'small_shield') return { def: 1, att: 0 };
+    if (id === 'medium_shield') return { def: 2, att: 0 };
+    if (id === 'large_shield') return { def: 3, att: -1 };
     return { def: 0, att: 0 };
   };
   const wShield = getShieldBonus(equip.weapon);
@@ -52,10 +55,12 @@ export function createFighterState(
   const totalShieldDef = wShield.def + oShield.def;
   const totalShieldAtt = wShield.att + oShield.att;
 
-  const weaponReq = checkWeaponRequirements(
-    equip.weapon,
-    { ST: attrs.ST, SZ: attrs.SZ, WT: attrs.WT, DF: attrs.DF }
-  );
+  const weaponReq = checkWeaponRequirements(equip.weapon, {
+    ST: attrs.ST,
+    SZ: attrs.SZ,
+    WT: attrs.WT,
+    DF: attrs.DF,
+  });
 
   const overweight = isOverEncumbered(equip, derived.encumbrance);
   const encumbranceIniPenalty = overweight ? -2 : 0;
@@ -67,7 +72,14 @@ export function createFighterState(
   const drills = warrior?.skillDrills ?? {};
 
   const effSkills: BaseSkills = {
-    ATT: skills.ATT + (trainerMods?.attMod ?? 0) + favWeapon + classicBonus + weaponReq.attPenalty + totalShieldAtt + (drills.ATT ?? 0),
+    ATT:
+      skills.ATT +
+      (trainerMods?.attMod ?? 0) +
+      favWeapon +
+      classicBonus +
+      weaponReq.attPenalty +
+      totalShieldAtt +
+      (drills.ATT ?? 0),
     PAR: skills.PAR + (trainerMods?.parMod ?? 0) + totalShieldDef + (drills.PAR ?? 0),
     DEF: skills.DEF + (trainerMods?.defMod ?? 0) + totalShieldDef + (drills.DEF ?? 0),
     INI: skills.INI + (trainerMods?.iniMod ?? 0) + encumbranceIniPenalty + (drills.INI ?? 0),
@@ -83,7 +95,7 @@ export function createFighterState(
     derived: { ...derived, damage: derived.damage + (isMastered ? 1 : 0) },
     plan,
     activePlan: plan,
-    psychState: "Neutral",
+    psychState: 'Neutral',
     hp: derived.hp,
     maxHp: derived.hp,
     endurance: derived.endurance + (trainerMods?.endMod ?? 0),
@@ -95,7 +107,7 @@ export function createFighterState(
     armHits: 0,
     legHits: 0,
     favorites: warrior?.favorites,
-    totalFights: warrior?.career ? (warrior.career.wins + warrior.career.losses) : 0,
+    totalFights: warrior?.career ? warrior.career.wins + warrior.career.losses : 0,
     encumbrancePenalty: { iniPenalty: encumbranceIniPenalty, enduranceMult: encumbranceEndMult },
     weaponId: equip.weapon,
     armorId: equip.armor,

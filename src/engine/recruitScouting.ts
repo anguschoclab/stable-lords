@@ -12,12 +12,12 @@
  * week must always yield the same reveal so save/load doesn't spring
  * surprises on the player.
  */
-import type { AttributePotential } from "@/types/warrior.types";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { hashStr } from "@/utils/random";
+import type { AttributePotential } from '@/types/warrior.types';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { hashStr } from '@/utils/random';
 
-const ATTRIBUTE_KEYS = ["ST", "CN", "SZ", "WT", "WL", "SP", "DF"] as const;
-type AttrKey = typeof ATTRIBUTE_KEYS[number];
+const ATTRIBUTE_KEYS = ['ST', 'CN', 'SZ', 'WT', 'WL', 'SP', 'DF'] as const;
+type AttrKey = (typeof ATTRIBUTE_KEYS)[number];
 
 export interface PotentialScoutReport {
   recruitId: string;
@@ -39,7 +39,9 @@ export function revealRecruitPotential(
 ): PotentialScoutReport {
   if (!potential) {
     return {
-      recruitId, week, revealed: {},
+      recruitId,
+      week,
+      revealed: {},
       summary: "Scouts couldn't get close enough for specifics.",
     };
   }
@@ -63,8 +65,8 @@ export function revealRecruitPotential(
   const sorted = Object.entries(revealed).sort((a, b) => (b[1] as number) - (a[1] as number));
   const top = sorted[0];
   const summary = top
-    ? `Scouts confirm a ${top[0]} ceiling of ${top[1]}${sorted.length > 1 ? ` (+${sorted.length - 1} more noted)` : ""}.`
-    : "Scouts returned empty-handed.";
+    ? `Scouts confirm a ${top[0]} ceiling of ${top[1]}${sorted.length > 1 ? ` (+${sorted.length - 1} more noted)` : ''}.`
+    : 'Scouts returned empty-handed.';
 
   return { recruitId, week, revealed, summary };
 }

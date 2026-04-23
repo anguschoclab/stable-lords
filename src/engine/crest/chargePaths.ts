@@ -416,13 +416,20 @@ export const MYTHICAL_PATHS: Record<string, ChargePath> = {
 // Helper to get all charge paths by type
 export function getChargePathsByType(type: ChargeType): Record<string, ChargePath> {
   switch (type) {
-    case 'beast': return BEAST_PATHS;
-    case 'weapon': return WEAPON_PATHS;
-    case 'symbol': return SYMBOL_PATHS;
-    case 'nature': return NATURE_PATHS;
-    case 'celestial': return CELESTIAL_PATHS;
-    case 'mythical': return MYTHICAL_PATHS;
-    default: return BEAST_PATHS;
+    case 'beast':
+      return BEAST_PATHS;
+    case 'weapon':
+      return WEAPON_PATHS;
+    case 'symbol':
+      return SYMBOL_PATHS;
+    case 'nature':
+      return NATURE_PATHS;
+    case 'celestial':
+      return CELESTIAL_PATHS;
+    case 'mythical':
+      return MYTHICAL_PATHS;
+    default:
+      return BEAST_PATHS;
   }
 }
 

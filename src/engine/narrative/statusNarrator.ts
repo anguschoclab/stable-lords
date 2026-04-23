@@ -1,5 +1,5 @@
-import { NarrativeTemplateEngine } from "./narrativeTemplateEngine";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { NarrativeTemplateEngine } from './narrativeTemplateEngine';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 /**
  * StatusNarrator - Damage, fatigue, state change, and crowd reaction narration.
@@ -13,25 +13,41 @@ export class StatusNarrator {
   static damageSeverityLine(rng: IRNGService, damage: number, maxHp: number): string | null {
     const ratio = damage / maxHp;
     if (ratio >= 0.35) {
-      const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "damage_severity", "deadly"]);
+      const template = NarrativeTemplateEngine.getFromArchive(rng, [
+        'pbp',
+        'damage_severity',
+        'deadly',
+      ]);
       if (!template) return null;
       const templateStr = Array.isArray(template) ? template[0] : template;
       return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
     }
     if (ratio >= 0.25) {
-      const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "damage_severity", "terrific"]);
+      const template = NarrativeTemplateEngine.getFromArchive(rng, [
+        'pbp',
+        'damage_severity',
+        'terrific',
+      ]);
       if (!template) return null;
       const templateStr = Array.isArray(template) ? template[0] : template;
       return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
     }
     if (ratio >= 0.15) {
-      const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "damage_severity", "powerful"]);
+      const template = NarrativeTemplateEngine.getFromArchive(rng, [
+        'pbp',
+        'damage_severity',
+        'powerful',
+      ]);
       if (!template) return null;
       const templateStr = Array.isArray(template) ? template[0] : template;
       return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
     }
     if (ratio <= 0.05) {
-      const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "damage_severity", "glancing"]);
+      const template = NarrativeTemplateEngine.getFromArchive(rng, [
+        'pbp',
+        'damage_severity',
+        'glancing',
+      ]);
       if (!template) return null;
       const templateStr = Array.isArray(template) ? template[0] : template;
       return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
@@ -42,14 +58,19 @@ export class StatusNarrator {
   /**
    * Generates state change line when HP drops below thresholds.
    */
-  static stateChangeLine(rng: IRNGService, name: string, hpRatio: number, prevHpRatio: number): string | null {
-    let cat = "";
-    if (hpRatio <= 0.2 && prevHpRatio > 0.2) cat = "severe";
-    else if (hpRatio <= 0.4 && prevHpRatio > 0.4) cat = "desperate";
-    else if (hpRatio <= 0.6 && prevHpRatio > 0.6) cat = "serious";
+  static stateChangeLine(
+    rng: IRNGService,
+    name: string,
+    hpRatio: number,
+    prevHpRatio: number
+  ): string | null {
+    let cat = '';
+    if (hpRatio <= 0.2 && prevHpRatio > 0.2) cat = 'severe';
+    else if (hpRatio <= 0.4 && prevHpRatio > 0.4) cat = 'desperate';
+    else if (hpRatio <= 0.6 && prevHpRatio > 0.6) cat = 'serious';
 
     if (cat) {
-      const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "status_changes", cat]);
+      const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'status_changes', cat]);
       if (!template) return null;
       // Handle case where template might be an array
       const templateStr = Array.isArray(template) ? template[0] : template;
@@ -70,10 +91,15 @@ export class StatusNarrator {
   /**
    * Generates crowd reaction line.
    */
-  static crowdReaction(rng: IRNGService, loserName: string, winnerName: string, hpRatio: number): string | null {
+  static crowdReaction(
+    rng: IRNGService,
+    loserName: string,
+    winnerName: string,
+    hpRatio: number
+  ): string | null {
     if (rng.next() > 0.25) return null;
-    const mood = hpRatio <= 0.3 ? "encourage" : rng.next() < 0.5 ? "negative" : "positive";
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "reactions", mood]);
+    const mood = hpRatio <= 0.3 ? 'encourage' : rng.next() < 0.5 ? 'negative' : 'positive';
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'reactions', mood]);
     if (!template) return null;
     // Handle case where template might be an array
     const templateStr = Array.isArray(template) ? template[0] : template;
@@ -83,11 +109,18 @@ export class StatusNarrator {
   /**
    * Generates minute status line showing who's winning.
    */
-  static minuteStatusLine(rng: IRNGService, minute: number, nameA: string, nameD: string, hitsA: number, hitsD: number): string {
+  static minuteStatusLine(
+    rng: IRNGService,
+    minute: number,
+    nameA: string,
+    nameD: string,
+    hitsA: number,
+    hitsD: number
+  ): string {
     if (hitsA > hitsD + 3) return `${nameA} is beating his opponent!`;
     if (hitsD > hitsA + 3) return `${nameD} is beating his opponent!`;
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "pacing", "stalemate"]);
-    if (!template) return "The bout is evenly matched.";
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'pacing', 'stalemate']);
+    if (!template) return 'The bout is evenly matched.';
     // Handle case where template might be an array
     const templateStr = Array.isArray(template) ? template[0] : template;
     return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
@@ -97,9 +130,14 @@ export class StatusNarrator {
    * Generates popularity gain line.
    */
   static popularityLine(rng: IRNGService, name: string, popDelta: number): string | null {
-    const cat = popDelta >= 3 ? "great" : popDelta >= 1 ? "normal" : "";
+    const cat = popDelta >= 3 ? 'great' : popDelta >= 1 ? 'normal' : '';
     if (!cat) return null;
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "meta", "popularity", cat]);
+    const template = NarrativeTemplateEngine.getFromArchive(rng, [
+      'pbp',
+      'meta',
+      'popularity',
+      cat,
+    ]);
     return NarrativeTemplateEngine.interpolateTemplate(template, { name });
   }
 
@@ -107,8 +145,8 @@ export class StatusNarrator {
    * Generates skill learn line.
    */
   static skillLearnLine(rng: IRNGService, name: string): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "meta", "skill_learns"]);
-    if (!template) return "A fierce exchange occurs.";
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'meta', 'skill_learns']);
+    if (!template) return 'A fierce exchange occurs.';
     // Handle case where template might be an array
     const templateStr = Array.isArray(template) ? template[0] : template;
     return NarrativeTemplateEngine.interpolateTemplate(templateStr, { attacker: name });
@@ -118,8 +156,12 @@ export class StatusNarrator {
    * Generates trading blows line.
    */
   static tradingBlowsLine(rng: IRNGService): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "pacing", "trading_blows"]);
-    if (!template) return "A fierce exchange occurs.";
+    const template = NarrativeTemplateEngine.getFromArchive(rng, [
+      'pbp',
+      'pacing',
+      'trading_blows',
+    ]);
+    if (!template) return 'A fierce exchange occurs.';
     const templateStr = Array.isArray(template) ? template[0] : template;
     return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
   }
@@ -128,8 +170,8 @@ export class StatusNarrator {
    * Generates stalemate line.
    */
   static stalemateLine(rng: IRNGService): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "pacing", "stalemate"]);
-    if (!template) return "A fierce exchange occurs.";
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'pacing', 'stalemate']);
+    if (!template) return 'A fierce exchange occurs.';
     const templateStr = Array.isArray(template) ? template[0] : template;
     return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});
   }
@@ -139,8 +181,8 @@ export class StatusNarrator {
    */
   static tauntLine(rng: IRNGService, name: string, isWinner: boolean): string | null {
     if (rng.next() > 0.2) return null;
-    const cat = isWinner ? "winner" : "loser";
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "taunts", cat]);
+    const cat = isWinner ? 'winner' : 'loser';
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'taunts', cat]);
     if (!template) return null;
     // Handle case where template might be an array
     const templateStr = Array.isArray(template) ? template[0] : template;
@@ -158,8 +200,8 @@ export class StatusNarrator {
    * Generates pressing attack line.
    */
   static pressingLine(rng: IRNGService, name: string): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "pacing", "pressing"]);
-    if (!template) return "A fierce exchange occurs.";
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'pacing', 'pressing']);
+    if (!template) return 'A fierce exchange occurs.';
     const templateStr = Array.isArray(template) ? template[0] : template;
     return NarrativeTemplateEngine.interpolateTemplate(templateStr, { attacker: name });
   }
@@ -168,8 +210,8 @@ export class StatusNarrator {
    * Generates insight hint line.
    */
   static narrateInsightHint(rng: IRNGService, attribute: string): string | null {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "insights", attribute]);
-    if (!template || template === "A fierce exchange occurs.") return null;
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'insights', attribute]);
+    if (!template || template === 'A fierce exchange occurs.') return null;
     // Handle case where template might be an array
     const templateStr = Array.isArray(template) ? template[0] : template;
     return NarrativeTemplateEngine.interpolateTemplate(templateStr, {});

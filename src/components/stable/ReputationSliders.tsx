@@ -1,18 +1,53 @@
-import React, { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { computeStableReputation } from "@/engine/stableReputation";
-import { Surface } from "@/components/ui/Surface";
-import { Badge } from "@/components/ui/badge";
-import { StatBattery } from "@/components/ui/StatBattery";
-import { Shield, Skull, Sparkles, Star, Eye, Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import React, { useMemo } from 'react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { computeStableReputation } from '@/engine/stableReputation';
+import { Surface } from '@/components/ui/Surface';
+import { Badge } from '@/components/ui/badge';
+import { StatBattery } from '@/components/ui/StatBattery';
+import { Shield, Skull, Sparkles, Star, Eye, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
-const REP_LABELS: { key: keyof ReturnType<typeof computeStableReputation>; label: string; icon: React.ElementType; color: string; glow: string; desc: string }[] = [
-  { key: "fame", label: "Fame", icon: Star, color: "text-arena-gold", glow: "bg-arena-gold", desc: "Public acclaim derived from victories and showmanship. Higher fame attracts wealthier patrons and more talented recruits." },
-  { key: "notoriety", label: "Notoriety", icon: Skull, color: "text-destructive", glow: "bg-destructive", desc: "A feared reputation built on fatalities and ruthless rivalries. High notoriety intimidates opponents but may unsettle certain sponsors." },
-  { key: "honor", label: "Honor", icon: Shield, color: "text-primary", glow: "bg-primary", desc: "Moral standing and respect from the arena elite. Honorable stables are often favored in governance decisions." },
-  { key: "adaptability", label: "Adaptability", icon: Sparkles, color: "text-arena-pop", glow: "bg-arena-pop", desc: "Strategic responsiveness to the shifting combat meta. High adaptability allows your warriors to better capitalize on tactical openings." },
+const REP_LABELS: {
+  key: keyof ReturnType<typeof computeStableReputation>;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+  glow: string;
+  desc: string;
+}[] = [
+  {
+    key: 'fame',
+    label: 'Fame',
+    icon: Star,
+    color: 'text-arena-gold',
+    glow: 'bg-arena-gold',
+    desc: 'Public acclaim derived from victories and showmanship. Higher fame attracts wealthier patrons and more talented recruits.',
+  },
+  {
+    key: 'notoriety',
+    label: 'Notoriety',
+    icon: Skull,
+    color: 'text-destructive',
+    glow: 'bg-destructive',
+    desc: 'A feared reputation built on fatalities and ruthless rivalries. High notoriety intimidates opponents but may unsettle certain sponsors.',
+  },
+  {
+    key: 'honor',
+    label: 'Honor',
+    icon: Shield,
+    color: 'text-primary',
+    glow: 'bg-primary',
+    desc: 'Moral standing and respect from the arena elite. Honorable stables are often favored in governance decisions.',
+  },
+  {
+    key: 'adaptability',
+    label: 'Adaptability',
+    icon: Sparkles,
+    color: 'text-arena-pop',
+    glow: 'bg-arena-pop',
+    desc: 'Strategic responsiveness to the shifting combat meta. High adaptability allows your warriors to better capitalize on tactical openings.',
+  },
 ];
 
 export function ReputationSliders() {
@@ -27,8 +62,12 @@ export function ReputationSliders() {
             <Eye className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-display text-sm font-black uppercase tracking-tight">Stable Presence</h3>
-            <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-60">Reputation Matrix // External Influence</p>
+            <h3 className="font-display text-sm font-black uppercase tracking-tight">
+              Stable Presence
+            </h3>
+            <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-60">
+              Reputation Matrix // External Influence
+            </p>
           </div>
         </div>
       </div>
@@ -38,26 +77,33 @@ export function ReputationSliders() {
           <div key={key} className="space-y-3 group">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Icon className={cn("h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity", color)} />
-                <span className="text-xs font-display font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">{label}</span>
+                <Icon
+                  className={cn(
+                    'h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity',
+                    color
+                  )}
+                />
+                <span className="text-xs font-display font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">
+                  {label}
+                </span>
               </div>
               <div className="flex items-center gap-3 w-full max-w-xs ml-auto">
                 <div className="w-full">
                   <StatBattery
-                     label=""
-                     value={rep[key]}
-                     max={100}
-                     labelValue={`${rep[key]}%`}
-                     colorClass={glow}
+                    label=""
+                    value={rep[key]}
+                    max={100}
+                    labelValue={`${rep[key]}%`}
+                    colorClass={glow}
                   />
                 </div>
                 <Tooltip>
-                   <TooltipTrigger asChild>
-                      <Info className="h-3 w-3 text-muted-foreground/30 hover:text-muted-foreground transition-colors cursor-help shrink-0" />
-                   </TooltipTrigger>
-                   <TooltipContent className="w-full max-w-xs text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10">
-                      {desc}
-                   </TooltipContent>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3 w-3 text-muted-foreground/30 hover:text-muted-foreground transition-colors cursor-help shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent className="w-full max-w-xs text-[10px] font-medium leading-relaxed bg-neutral-950 border-white/10">
+                    {desc}
+                  </TooltipContent>
                 </Tooltip>
               </div>
             </div>

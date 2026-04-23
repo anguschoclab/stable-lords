@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import { createEconomySlice, EconomySlice } from "@/state/slices/economySlice";
-import { act } from "@testing-library/react";
+import { describe, it, expect, beforeEach } from 'vitest';
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { createEconomySlice, EconomySlice } from '@/state/slices/economySlice';
+import { act } from '@testing-library/react';
 
 // Mock store for testing the slice in isolation
-const createTestStore = () => 
+const createTestStore = () =>
   create<EconomySlice>()(
     immer((set, get, ...args) => ({
       ...createEconomySlice(set, get, ...args),
@@ -14,22 +14,22 @@ const createTestStore = () =>
     }))
   );
 
-describe("EconomySlice", () => {
+describe('EconomySlice', () => {
   let useTestStore: ReturnType<typeof createTestStore>;
 
   beforeEach(() => {
     useTestStore = createTestStore();
   });
 
-  it("should initialize with zero treasury and empty ledger", () => {
+  it('should initialize with zero treasury and empty ledger', () => {
     const { treasury, ledger } = useTestStore.getState();
     expect(treasury).toBe(0);
     expect(ledger).toEqual([]);
   });
 
-  it("should add funds correctly", () => {
+  it('should add funds correctly', () => {
     act(() => {
-      useTestStore.getState().addFunds(100, "Prize Money", "prize");
+      useTestStore.getState().addFunds(100, 'Prize Money', 'prize');
     });
 
     const { treasury, ledger } = useTestStore.getState();
@@ -37,20 +37,20 @@ describe("EconomySlice", () => {
     expect(ledger).toHaveLength(1);
     expect(ledger[0]).toMatchObject({
       amount: 100,
-      label: "Prize Money",
-      category: "prize",
-      week: 1
+      label: 'Prize Money',
+      category: 'prize',
+      week: 1,
     });
   });
 
-  it("should deduct funds correctly when treasury is sufficient", () => {
+  it('should deduct funds correctly when treasury is sufficient', () => {
     act(() => {
-      useTestStore.getState().addFunds(500, "Initial", "other");
+      useTestStore.getState().addFunds(500, 'Initial', 'other');
     });
 
     let result: boolean = false;
     act(() => {
-      result = useTestStore.getState().deductFunds(200, "Recruitment", "recruit");
+      result = useTestStore.getState().deductFunds(200, 'Recruitment', 'recruit');
     });
 
     const { treasury, ledger } = useTestStore.getState();
@@ -59,15 +59,15 @@ describe("EconomySlice", () => {
     expect(ledger).toHaveLength(2);
     expect(ledger[1]).toMatchObject({
       amount: -200,
-      label: "Recruitment",
-      category: "recruit"
+      label: 'Recruitment',
+      category: 'recruit',
     });
   });
 
-  it("should fail to deduct funds when treasury is insufficient", () => {
+  it('should fail to deduct funds when treasury is insufficient', () => {
     let result: boolean = true;
     act(() => {
-      result = useTestStore.getState().deductFunds(100, "Greedy Merchant", "other");
+      result = useTestStore.getState().deductFunds(100, 'Greedy Merchant', 'other');
     });
 
     const { treasury, ledger } = useTestStore.getState();

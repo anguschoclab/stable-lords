@@ -1,8 +1,8 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
-import { useGameStore } from "@/state/useGameStore";
-import type { GameState } from "@/types/state.types";
-import type { Trainer } from "@/types/shared.types";
-import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/shared.types";
+import { useMemo, useCallback, useState, useEffect } from 'react';
+import { useGameStore } from '@/state/useGameStore';
+import type { GameState } from '@/types/state.types';
+import type { Trainer } from '@/types/shared.types';
+import { STYLE_DISPLAY_NAMES, FightingStyle } from '@/types/shared.types';
 import {
   TRAINER_FOCUSES,
   TRAINER_MAX_PER_STABLE,
@@ -12,39 +12,43 @@ import {
   generateHiringPool,
   convertRetiredToTrainer,
   type TrainerTier,
-} from "@/engine/trainers";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/engine/trainers';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { WarriorNameTag, StatBadge } from '@/components/ui/WarriorBadges';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { GraduationCap, UserPlus, RefreshCw, Armchair, Zap, Users, Coins, ChevronRight, Award, Skull } from "lucide-react";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dialog';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Surface } from "@/components/ui/Surface";
-import { TrainerCard } from "@/components/stable/TrainerCard";
-import { canTransact } from "@/utils/economyUtils";
-import { generateId } from "@/utils/idUtils";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { toast } from "sonner";
+  GraduationCap,
+  UserPlus,
+  RefreshCw,
+  Armchair,
+  Zap,
+  Users,
+  Coins,
+  ChevronRight,
+  Award,
+  Skull,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Surface } from '@/components/ui/Surface';
+import { TrainerCard } from '@/components/stable/TrainerCard';
+import { canTransact } from '@/utils/economyUtils';
+import { generateId } from '@/utils/idUtils';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { toast } from 'sonner';
 
 export default function Trainers() {
   // Flat destructuring from 1.0 store
-  const { 
-    trainers, hiringPool, week, retired, graveyard, treasury,
-    setState
-  } = useGameStore();
+  const { trainers, hiringPool, week, retired, graveyard, treasury, setState } = useGameStore();
 
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
@@ -68,7 +72,7 @@ export default function Trainers() {
     setState((draft: GameState) => {
       draft.hiringPool = pool;
     });
-    toast.success("Personnel registry updated. New candidates available.");
+    toast.success('Personnel registry updated. New candidates available.');
   }, [week, setState]);
 
   const hireTrainer = useCallback(
@@ -87,7 +91,7 @@ export default function Trainers() {
           week: draft.week,
           label: `Acquisition: ${trainer.name}`,
           amount: -cost,
-          category: "trainer",
+          category: 'trainer',
         });
       });
       toast.success(`${trainer.name} has signed with your stable. Personnel synchronized.`);
@@ -105,9 +109,7 @@ export default function Trainers() {
   );
 
   const convertableRetired = useMemo(
-    () => retired.filter(
-      (w) => !currentTrainers.some((t) => t.retiredFromWarrior === w.name)
-    ),
+    () => retired.filter((w) => !currentTrainers.some((t) => t.retiredFromWarrior === w.name)),
     [retired, currentTrainers]
   );
 
@@ -119,7 +121,9 @@ export default function Trainers() {
       setState((draft: GameState) => {
         draft.trainers.push(trainer);
       });
-      toast.success(`${warrior.name} confirmed for the retirement-to-trainer protocol. Tactical specialization: ${trainer.focus}.`);
+      toast.success(
+        `${warrior.name} confirmed for the retirement-to-trainer protocol. Tactical specialization: ${trainer.focus}.`
+      );
       setConvertDialogOpen(false);
     },
     [retired, setState]
@@ -127,70 +131,95 @@ export default function Trainers() {
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
-      <PageHeader 
+      <PageHeader
         title="Personnel Management"
         subtitle="OPS · PERSONNEL · TACTICAL MASTERY"
         icon={Users}
         actions={
           <div className="flex flex-col md:flex-row items-center gap-6 bg-neutral-900/40 backdrop-blur-md px-6 py-3 rounded-none border border-white/5 shadow-inner">
-             <div className="flex flex-col items-center border-r border-white/10 pr-6">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Staff Capacity</span>
-                <span className="font-mono font-black text-primary text-lg flex items-center gap-1.5 leading-none">
-                   {currentTrainers.length} <span className="opacity-20">/</span> {TRAINER_MAX_PER_STABLE} <Users className="h-3.5 w-3.5" />
-                </span>
-             </div>
-             <div className="flex flex-col items-center">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Personnel Budget</span>
-                <span className="font-mono font-black text-arena-gold text-lg flex items-center gap-1.5 leading-none">
-                   {treasury} <Coins className="h-3.5 w-3.5" />
-                </span>
-             </div>
+            <div className="flex flex-col items-center border-r border-white/10 pr-6">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
+                Staff Capacity
+              </span>
+              <span className="font-mono font-black text-primary text-lg flex items-center gap-1.5 leading-none">
+                {currentTrainers.length} <span className="opacity-20">/</span>{' '}
+                {TRAINER_MAX_PER_STABLE} <Users className="h-3.5 w-3.5" />
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
+                Personnel Budget
+              </span>
+              <span className="font-mono font-black text-arena-gold text-lg flex items-center gap-1.5 leading-none">
+                {treasury} <Coins className="h-3.5 w-3.5" />
+              </span>
+            </div>
           </div>
         }
       />
 
       <Tabs defaultValue="current" className="space-y-8">
         <TabsList className="bg-neutral-900/60 border border-white/5 p-1 h-12 rounded-none">
-          <TabsTrigger value="current" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
+          <TabsTrigger
+            value="current"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+          >
             <GraduationCap className="h-3.5 w-3.5" /> Stability Staff
           </TabsTrigger>
-          <TabsTrigger value="hire" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
+          <TabsTrigger
+            value="hire"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+          >
             <UserPlus className="h-3.5 w-3.5" /> Tactical Hire
           </TabsTrigger>
-          <TabsTrigger value="mentors" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
+          <TabsTrigger
+            value="mentors"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+          >
             <Award className="h-3.5 w-3.5" /> Top Mentors
           </TabsTrigger>
-          <TabsTrigger value="legends" className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest">
+          <TabsTrigger
+            value="legends"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+          >
             <Skull className="h-3.5 w-3.5" /> Departed Legends
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="current" className="mt-0 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <TabsContent
+          value="current"
+          className="mt-0 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
             {currentTrainers.length === 0 ? (
-               <Surface variant="glass" className="py-24 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
-                  <GraduationCap className="h-12 w-12 text-muted-foreground opacity-20" />
-                  <div className="space-y-1 text-center">
-                    <p className="text-sm font-display font-black uppercase tracking-tight text-muted-foreground">Personnel Database Empty</p>
-                    <p className="text-xs text-muted-foreground/60 italic max-w-xs mx-auto text-center">Establish your training core by recruiting specialists from the tactical hire registry.</p>
-                  </div>
-               </Surface>
+              <Surface
+                variant="glass"
+                className="py-24 text-center border-dashed border-border/40 flex flex-col items-center gap-4"
+              >
+                <GraduationCap className="h-12 w-12 text-muted-foreground opacity-20" />
+                <div className="space-y-1 text-center">
+                  <p className="text-sm font-display font-black uppercase tracking-tight text-muted-foreground">
+                    Personnel Database Empty
+                  </p>
+                  <p className="text-xs text-muted-foreground/60 italic max-w-xs mx-auto text-center">
+                    Establish your training core by recruiting specialists from the tactical hire
+                    registry.
+                  </p>
+                </div>
+              </Surface>
             ) : (
               <div className="space-y-4">
-                 <div className="flex items-center gap-3 px-1 mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">STAFF PERSONNEL</span>
-                    <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
-                 </div>
-                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                    {currentTrainers.map((t) => (
-                      <TrainerCard
-                        key={t.id}
-                        trainer={t}
-                        owned
-                        onFire={() => fireTrainer(t.id)}
-                      />
-                    ))}
-                 </div>
+                <div className="flex items-center gap-3 px-1 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">
+                    STAFF PERSONNEL
+                  </span>
+                  <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
+                </div>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  {currentTrainers.map((t) => (
+                    <TrainerCard key={t.id} trainer={t} owned onFire={() => fireTrainer(t.id)} />
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -198,30 +227,52 @@ export default function Trainers() {
           {currentTrainers.length > 0 && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 px-1">
-                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">AGGREGATED SYSTEM BONUSES</span>
-                 <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">
+                  AGGREGATED SYSTEM BONUSES
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
               </div>
-              <Surface variant="glass" padding="none" className="border-border/40 shadow-2xl relative overflow-hidden">
+              <Surface
+                variant="glass"
+                padding="none"
+                className="border-border/40 shadow-2xl relative overflow-hidden"
+              >
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-arena-gold opacity-40 shadow-[0_0_15px_rgba(255,215,0,0.5)]" />
                 <div className="p-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
                   {TRAINER_FOCUSES.map((focus) => {
                     const total = currentTrainers
                       .filter((t) => t.focus === focus && t.contractWeeksLeft > 0)
                       .reduce((sum, t) => sum + (TIER_BONUS[t.tier as TrainerTier] ?? 1), 0);
-                    
-                    return total > 0 && (
-                      <div key={focus} className="group relative flex flex-col items-center gap-6 p-4 rounded-none hover:bg-white/5 transition-all">
-                        <div className="text-4xl filter group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500">
-                          {FOCUS_ICONS[focus]}
+
+                    return (
+                      total > 0 && (
+                        <div
+                          key={focus}
+                          className="group relative flex flex-col items-center gap-6 p-4 rounded-none hover:bg-white/5 transition-all"
+                        >
+                          <div className="text-4xl filter group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500">
+                            {FOCUS_ICONS[focus]}
+                          </div>
+                          <div className="text-center relative">
+                            <div className="flex items-center justify-center gap-1.5 mb-1">
+                              <span className="text-3xl font-display font-black text-white leading-none">
+                                +{total}
+                              </span>
+                              <Zap
+                                className={cn(
+                                  'h-4 w-4 transition-all duration-500',
+                                  total > 0
+                                    ? 'text-arena-gold animate-pulse'
+                                    : 'text-muted-foreground/20'
+                                )}
+                              />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors">
+                              {focus} PROTOCOL
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-center relative">
-                           <div className="flex items-center justify-center gap-1.5 mb-1">
-                              <span className="text-3xl font-display font-black text-white leading-none">+{total}</span>
-                              <Zap className={cn("h-4 w-4 transition-all duration-500", total > 0 ? "text-arena-gold animate-pulse" : "text-muted-foreground/20")} />
-                           </div>
-                           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors">{focus} PROTOCOL</span>
-                        </div>
-                      </div>
+                      )
                     );
                   })}
                 </div>
@@ -235,27 +286,32 @@ export default function Trainers() {
                 <DialogTrigger asChild>
                   <button className="w-full h-16 rounded-none bg-primary/10 border border-primary/30 flex items-center justify-center gap-4 group hover:bg-primary/20 hover:border-primary transition-all">
                     <div className="p-2 rounded-none bg-primary/20 group-hover:bg-primary transition-colors">
-                       <Armchair className="h-5 w-5 text-white" />
+                      <Armchair className="h-5 w-5 text-white" />
                     </div>
                     <div className="text-left">
-                       <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary block leading-none mb-1">Veteran Restoration Protocol</span>
-                       <span className="text-[9px] text-muted-foreground/60 uppercase tracking-widest leading-none italic">{convertableRetired.length} Retired Assets Ready for Re-acquisition</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary block leading-none mb-1">
+                        Veteran Restoration Protocol
+                      </span>
+                      <span className="text-[9px] text-muted-foreground/60 uppercase tracking-widest leading-none italic">
+                        {convertableRetired.length} Retired Assets Ready for Re-acquisition
+                      </span>
                     </div>
                   </button>
                 </DialogTrigger>
                 <DialogContent className="bg-neutral-950/95 backdrop-blur-2xl border-white/10 sm:max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
                   <DialogHeader className="p-6 border-b border-white/5 flex flex-col gap-4">
                     <DialogTitle className="font-display text-2xl font-black uppercase tracking-tight flex items-center gap-4">
-                       <div className="p-2 rounded-none bg-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
-                          <GraduationCap className="h-6 w-6" />
-                       </div>
-                       Retired_to_Staff_Sync
+                      <div className="p-2 rounded-none bg-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
+                        <GraduationCap className="h-6 w-6" />
+                      </div>
+                      Retired_to_Staff_Sync
                     </DialogTitle>
                     <p className="text-xs text-muted-foreground/60 leading-relaxed uppercase tracking-widest font-medium border-l-2 border-primary/20 pl-4 italic">
-                       Confirmed veterans are eligible for immediate tactical reassignment. This protocol restores legendary combat signatures as specialized staff assets.
+                      Confirmed veterans are eligible for immediate tactical reassignment. This
+                      protocol restores legendary combat signatures as specialized staff assets.
                     </p>
                   </DialogHeader>
-                  
+
                   <div className="p-6 space-y-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {convertableRetired.map((w) => {
                       const preview = convertRetiredToTrainer(w);
@@ -266,23 +322,31 @@ export default function Trainers() {
                         >
                           <div className="flex items-center gap-6">
                             <div>
-                               <div className="flex items-center gap-3 mb-2">
-                                  <WarriorNameTag id={w.id} name={w.name} isChampion={w.champion} useCrown={w.champion} />
-                                  <StatBadge styleName={w.style as FightingStyle} />
-                                </div>
-                               <div className="flex items-center gap-2">
-                                  <ChevronRight className="h-3 w-3 text-primary" />
-                                  <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest border-primary/20 bg-primary/5 text-primary rounded-none">
-                                     {preview.tier} {preview.focus} SPECIALIST
-                                  </Badge>
-                               </div>
+                              <div className="flex items-center gap-3 mb-2">
+                                <WarriorNameTag
+                                  id={w.id}
+                                  name={w.name}
+                                  isChampion={w.champion}
+                                  useCrown={w.champion}
+                                />
+                                <StatBadge styleName={w.style as FightingStyle} />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <ChevronRight className="h-3 w-3 text-primary" />
+                                <Badge
+                                  variant="outline"
+                                  className="text-[9px] font-black uppercase tracking-widest border-primary/20 bg-primary/5 text-primary rounded-none"
+                                >
+                                  {preview.tier} {preview.focus} SPECIALIST
+                                </Badge>
+                              </div>
                             </div>
                           </div>
-                          <button 
+                          <button
                             onClick={() => convertWarrior(w.id)}
                             className="bg-primary text-white px-6 py-2.5 rounded-none font-black uppercase text-[10px] tracking-widest shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all"
                           >
-                             ESTABLISH_Staff
+                            ESTABLISH_Staff
                           </button>
                         </div>
                       );
@@ -294,113 +358,163 @@ export default function Trainers() {
           )}
         </TabsContent>
 
-        <TabsContent value="hire" className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <TabsContent
+          value="hire"
+          className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+        >
           <div className="flex flex-col sm:flex-row items-center justify-between bg-neutral-900/60 p-6 rounded-none border border-white/5 gap-6">
             <div className="flex items-center gap-4">
-               <div className="p-3 rounded-none bg-primary/10 border border-primary/20">
-                  <RefreshCw className="h-6 w-6 text-primary" />
-               </div>
-               <div>
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground leading-none mb-1.5">Candidate Database</h3>
-                  <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest leading-none">
-                    {currentHiringPool.length > 0 ? `Confirmed Search Result: ${currentHiringPool.length} Candidates Located` : "Scanning Personnel Database..."}
-                  </p>
-               </div>
+              <div className="p-3 rounded-none bg-primary/10 border border-primary/20">
+                <RefreshCw className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-foreground leading-none mb-1.5">
+                  Candidate Database
+                </h3>
+                <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest leading-none">
+                  {currentHiringPool.length > 0
+                    ? `Confirmed Search Result: ${currentHiringPool.length} Candidates Located`
+                    : 'Scanning Personnel Database...'}
+                </p>
+              </div>
             </div>
-            <button 
-              onClick={refreshPool} 
+            <button
+              onClick={refreshPool}
               className="flex items-center gap-2.5 bg-neutral-950 border border-white/10 hover:border-primary/50 px-5 py-2.5 rounded-none transition-all group/refresh"
             >
               <RefreshCw className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:rotate-180 transition-all duration-700" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Update Registry</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Update Registry
+              </span>
             </button>
           </div>
 
           {currentHiringPool.length > 0 ? (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               {currentHiringPool.map((t) => (
-                <TrainerCard 
-                  key={t.id} 
-                  trainer={t} 
-                  owned={false} 
+                <TrainerCard
+                  key={t.id}
+                  trainer={t}
+                  owned={false}
                   action={
                     <div className="flex items-center gap-3">
-                       <Tooltip>
-                          <TooltipTrigger asChild>
-                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-black border border-white/5 font-mono font-black text-xs text-arena-gold shadow-inner">
-                                <Coins className="h-3.5 w-3.5" /> {TIER_COST[t.tier as TrainerTier] ?? 50}G
-                             </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ACQUISITION CREDITS</TooltipContent>
-                       </Tooltip>
-                       
-                        <button
-                          disabled={!canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)}
-                          onClick={() => hireTrainer(t)}
-                          className={cn(
-                            "flex items-center gap-2 px-5 py-1.5 rounded-none font-black uppercase text-[10px] tracking-widest transition-all",
-                            !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
-                              ? "bg-neutral-900 border border-white/5 text-muted-foreground/40 cursor-not-allowed"
-                              : "bg-primary text-white border border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95"
-                          )}
-                       >
-                          <UserPlus className="h-4 w-4" />
-                          {!canHire ? "CAPACITY FULL" : !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50) ? "FUNDS LOCKED" : "Secure Contract"}
-                       </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-black border border-white/5 font-mono font-black text-xs text-arena-gold shadow-inner">
+                            <Coins className="h-3.5 w-3.5" />{' '}
+                            {TIER_COST[t.tier as TrainerTier] ?? 50}G
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">
+                          ACQUISITION CREDITS
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <button
+                        disabled={
+                          !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
+                        }
+                        onClick={() => hireTrainer(t)}
+                        className={cn(
+                          'flex items-center gap-2 px-5 py-1.5 rounded-none font-black uppercase text-[10px] tracking-widest transition-all',
+                          !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
+                            ? 'bg-neutral-900 border border-white/5 text-muted-foreground/40 cursor-not-allowed'
+                            : 'bg-primary text-white border border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95'
+                        )}
+                      >
+                        <UserPlus className="h-4 w-4" />
+                        {!canHire
+                          ? 'CAPACITY FULL'
+                          : !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
+                            ? 'FUNDS LOCKED'
+                            : 'Secure Contract'}
+                      </button>
                     </div>
                   }
                 />
               ))}
             </div>
           ) : (
-            <Surface variant="glass" className="py-24 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
+            <Surface
+              variant="glass"
+              className="py-24 text-center border-dashed border-border/40 flex flex-col items-center gap-4"
+            >
               <RefreshCw className="h-12 w-12 text-muted-foreground opacity-20 animate-spin duration-3000" />
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">Waiting for Connection...</p>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">
+                Waiting for Connection...
+              </p>
             </Surface>
           )}
         </TabsContent>
 
-        <TabsContent value="mentors" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <TabsContent
+          value="mentors"
+          className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
+        >
           <div className="flex items-center gap-3 px-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">TOP MENTORS</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">
+              TOP MENTORS
+            </span>
             <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
           </div>
           {(() => {
             const ranked = [...currentTrainers]
-              .map(t => ({ t, score: (t.legacyWins ?? 0) * 2 + (t.legacyKills ?? 0) * 3 + (t.fame ?? 0) }))
-              .filter(x => x.score > 0)
+              .map((t) => ({
+                t,
+                score: (t.legacyWins ?? 0) * 2 + (t.legacyKills ?? 0) * 3 + (t.fame ?? 0),
+              }))
+              .filter((x) => x.score > 0)
               .sort((a, b) => b.score - a.score)
               .slice(0, 8);
             if (ranked.length === 0) {
               return (
-                <Surface variant="glass" className="py-20 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
+                <Surface
+                  variant="glass"
+                  className="py-20 text-center border-dashed border-border/40 flex flex-col items-center gap-4"
+                >
                   <Award className="h-10 w-10 text-muted-foreground opacity-20" />
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">No mentor legacy recorded yet.</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">
+                    No mentor legacy recorded yet.
+                  </p>
                 </Surface>
               );
             }
             return (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                 {ranked.map(({ t, score }, i) => (
-                  <Surface key={t.id} variant="glass" className="px-5 py-4 border-border/30 flex items-center justify-between">
+                  <Surface
+                    key={t.id}
+                    variant="glass"
+                    className="px-5 py-4 border-border/30 flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-4">
-                      <span className="text-2xl font-display font-black text-arena-gold w-8 text-center">#{i + 1}</span>
+                      <span className="text-2xl font-display font-black text-arena-gold w-8 text-center">
+                        #{i + 1}
+                      </span>
                       <div>
                         <div className="text-sm font-black uppercase tracking-tight">{t.name}</div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{t.tier} · {t.focus}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                          {t.tier} · {t.focus}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-5 text-[10px] font-mono font-black">
                       <div className="text-center">
-                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">Wins</div>
+                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">
+                          Wins
+                        </div>
                         <div className="text-primary">{t.legacyWins ?? 0}</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">Kills</div>
+                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">
+                          Kills
+                        </div>
                         <div className="text-destructive">{t.legacyKills ?? 0}</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">Score</div>
+                        <div className="text-muted-foreground/50 uppercase tracking-widest text-[8px]">
+                          Score
+                        </div>
                         <div className="text-arena-gold">{score}</div>
                       </div>
                     </div>
@@ -411,45 +525,84 @@ export default function Trainers() {
           })()}
         </TabsContent>
 
-        <TabsContent value="legends" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <TabsContent
+          value="legends"
+          className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
+        >
           <div className="flex items-center gap-3 px-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-destructive">DEPARTED LEGENDS</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-destructive">
+              DEPARTED LEGENDS
+            </span>
             <div className="h-px flex-1 bg-gradient-to-r from-destructive/20 via-border/20 to-transparent" />
           </div>
           {(() => {
             const fallen = [
-              ...((graveyard ?? []).map(w => ({ name: w.name, style: w.style, kind: "fallen" as const, fame: w.fame ?? 0, week: (w as any).deathWeek }))),
-              ...((retired ?? []).map(w => ({ name: w.name, style: w.style, kind: "retired" as const, fame: w.fame ?? 0, week: (w as any).retiredWeek ?? 0 }))),
-            ].sort((a, b) => b.fame - a.fame).slice(0, 12);
+              ...(graveyard ?? []).map((w) => ({
+                name: w.name,
+                style: w.style,
+                kind: 'fallen' as const,
+                fame: w.fame ?? 0,
+                week: (w as any).deathWeek,
+              })),
+              ...(retired ?? []).map((w) => ({
+                name: w.name,
+                style: w.style,
+                kind: 'retired' as const,
+                fame: w.fame ?? 0,
+                week: (w as any).retiredWeek ?? 0,
+              })),
+            ]
+              .sort((a, b) => b.fame - a.fame)
+              .slice(0, 12);
             if (fallen.length === 0) {
               return (
-                <Surface variant="glass" className="py-20 text-center border-dashed border-border/40 flex flex-col items-center gap-4">
+                <Surface
+                  variant="glass"
+                  className="py-20 text-center border-dashed border-border/40 flex flex-col items-center gap-4"
+                >
                   <Skull className="h-10 w-10 text-muted-foreground opacity-20" />
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">No legends to memorialise.</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">
+                    No legends to memorialise.
+                  </p>
                 </Surface>
               );
             }
             return (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                 {fallen.map((w, i) => (
-                  <Surface key={`${w.kind}-${w.name}-${i}`} variant="glass" className="px-5 py-4 border-border/30 flex items-center justify-between">
+                  <Surface
+                    key={`${w.kind}-${w.name}-${i}`}
+                    variant="glass"
+                    className="px-5 py-4 border-border/30 flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-4">
-                      <div className={cn(
-                        "p-2 rounded-none border",
-                        w.kind === "fallen" ? "bg-destructive/10 border-destructive/30 text-destructive" : "bg-muted/10 border-white/10 text-muted-foreground"
-                      )}>
-                        {w.kind === "fallen" ? <Skull className="h-4 w-4" /> : <Armchair className="h-4 w-4" />}
+                      <div
+                        className={cn(
+                          'p-2 rounded-none border',
+                          w.kind === 'fallen'
+                            ? 'bg-destructive/10 border-destructive/30 text-destructive'
+                            : 'bg-muted/10 border-white/10 text-muted-foreground'
+                        )}
+                      >
+                        {w.kind === 'fallen' ? (
+                          <Skull className="h-4 w-4" />
+                        ) : (
+                          <Armchair className="h-4 w-4" />
+                        )}
                       </div>
                       <div>
                         <div className="text-sm font-black uppercase tracking-tight">{w.name}</div>
                         <div className="text-[10px] text-muted-foreground uppercase tracking-widest">
-                          {STYLE_DISPLAY_NAMES[w.style as FightingStyle] ?? w.style} · {w.kind === "fallen" ? "Fallen in the arena" : "Retired"}
-                          {w.week ? ` · Wk ${w.week}` : ""}
+                          {STYLE_DISPLAY_NAMES[w.style as FightingStyle] ?? w.style} ·{' '}
+                          {w.kind === 'fallen' ? 'Fallen in the arena' : 'Retired'}
+                          {w.week ? ` · Wk ${w.week}` : ''}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[8px] text-muted-foreground/50 uppercase tracking-widest">Fame</div>
+                      <div className="text-[8px] text-muted-foreground/50 uppercase tracking-widest">
+                        Fame
+                      </div>
                       <div className="font-mono font-black text-arena-gold">{w.fame}</div>
                     </div>
                   </Surface>

@@ -1,15 +1,15 @@
-import type { GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { RNGContext } from "@/engine/core/rng/RNGContext";
-import { StateImpact } from "@/engine/impacts";
-import { processHallOfFame } from "../core/hallOfFame";
-import { processTierProgression } from "../core/tierProgression";
-import { WorldManagementService } from "@/engine/ai/worldManagement";
-import { evolvePhilosophies } from "@/engine/ownerPhilosophy";
-import { generateOwnerNarratives } from "@/engine/ownerNarrative";
-import { BankruptcyService } from "@/engine/ai/bankruptcyService";
-import { computeNextSeason } from "./WorldPass";
+import type { GameState } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { RNGContext } from '@/engine/core/rng/RNGContext';
+import { StateImpact } from '@/engine/impacts';
+import { processHallOfFame } from '../core/hallOfFame';
+import { processTierProgression } from '../core/tierProgression';
+import { WorldManagementService } from '@/engine/ai/worldManagement';
+import { evolvePhilosophies } from '@/engine/ownerPhilosophy';
+import { generateOwnerNarratives } from '@/engine/ownerNarrative';
+import { BankruptcyService } from '@/engine/ai/bankruptcyService';
+import { computeNextSeason } from './WorldPass';
 
 /**
  * Stable Lords — System & Season Pipeline Pass
@@ -48,11 +48,15 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
     const rngContext = new RNGContext(seasonSeed + 55);
     const { news } = WorldManagementService.processSeasonalChurn(state, rngContext);
 
-    const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(state, nextSeason, rngContext.getRNG());
+    const { updatedRivals: philRivals, gazetteItems } = evolvePhilosophies(
+      state,
+      nextSeason,
+      rngContext.getRNG()
+    );
     const narrGazette = generateOwnerNarratives(state, nextSeason, rngContext.getRNG());
 
     impact.rivalsUpdates = new Map();
-    philRivals.forEach(r => {
+    philRivals.forEach((r) => {
       if (impact.rivalsUpdates) impact.rivalsUpdates.set(r.owner.id, r);
     });
 
@@ -62,11 +66,11 @@ export function runSystemPass(state: GameState, rootRng?: IRNGService): StateImp
       impact.newsletterItems = [
         ...existingItems,
         {
-          id: rng.uuid("newsletter"),
+          id: rng.uuid('newsletter'),
           week: nextWeek,
           title: `${state.season} Season Summary`,
-          items: combinedNews
-        }
+          items: combinedNews,
+        },
       ];
     }
   }

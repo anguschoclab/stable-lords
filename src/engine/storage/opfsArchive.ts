@@ -1,11 +1,17 @@
-import type { GameState } from "@/types/state.types";
-import type { FightSummary } from "@/types/combat.types";
+import type { GameState } from '@/types/state.types';
+import type { FightSummary } from '@/types/combat.types';
 
 export interface ArchiveService {
   isSupported: () => boolean;
 
   // Bout Logs (JSON)
-  archiveBoutLog: (year: number, season: number, boutId: string, logData: string[], overwrite?: boolean) => Promise<void>;
+  archiveBoutLog: (
+    year: number,
+    season: number,
+    boutId: string,
+    logData: string[],
+    overwrite?: boolean
+  ) => Promise<void>;
   retrieveBoutLog: (year: number, season: number, boutId: string) => Promise<string[] | null>;
 
   // Gazettes (Markdown)
@@ -37,20 +43,30 @@ export class OPFSArchiveService implements ArchiveService {
   }
 
   isSupported(): boolean {
-    return typeof navigator !== 'undefined' &&
-           typeof navigator.storage !== 'undefined' &&
-           typeof navigator.storage.getDirectory === 'function';
+    return (
+      typeof navigator !== 'undefined' &&
+      typeof navigator.storage !== 'undefined' &&
+      typeof navigator.storage.getDirectory === 'function'
+    );
   }
 
-  private async getDirectory(season: number, type: 'bouts' | 'gazettes'): Promise<FileSystemDirectoryHandle | null> {
+  private async getDirectory(
+    season: number,
+    type: 'bouts' | 'gazettes'
+  ): Promise<FileSystemDirectoryHandle | null> {
     if (!this.isSupported()) return null;
 
     try {
       const rootHandle = await navigator.storage.getDirectory();
-      const seasonHandle = await rootHandle.getDirectoryHandle(`season_${season}`, { create: true });
+      const seasonHandle = await rootHandle.getDirectoryHandle(`season_${season}`, {
+        create: true,
+      });
       return await seasonHandle.getDirectoryHandle(type, { create: true });
     } catch (error) {
-      console.warn('Failed to get directory handle (OPFS may be restricted in this environment):', error);
+      console.warn(
+        'Failed to get directory handle (OPFS may be restricted in this environment):',
+        error
+      );
       return null;
     }
   }
@@ -61,7 +77,10 @@ export class OPFSArchiveService implements ArchiveService {
       const rootHandle = await navigator.storage.getDirectory();
       return await rootHandle.getDirectoryHandle('hot_state', { create: true });
     } catch (error) {
-      console.warn('Failed to get hot_state directory handle (OPFS may be restricted in this environment):', error);
+      console.warn(
+        'Failed to get hot_state directory handle (OPFS may be restricted in this environment):',
+        error
+      );
       return null;
     }
   }
@@ -77,9 +96,14 @@ export class OPFSArchiveService implements ArchiveService {
       await writable.write(JSON.stringify(stateData));
     } catch (error) {
       if ((error as Error)?.name === 'QuotaExceededError') {
-         console.error('OPFS Quota Exceeded during hot state archival', error);
-         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-         return;
+        console.error('OPFS Quota Exceeded during hot state archival', error);
+        if (typeof window !== 'undefined')
+          window.dispatchEvent(
+            new CustomEvent('OPFS_QUOTA_EXCEEDED', {
+              detail: 'Storage Quota Exceeded: Archival failed.',
+            })
+          );
+        return;
       }
     } finally {
       if (writable) {
@@ -100,8 +124,8 @@ export class OPFSArchiveService implements ArchiveService {
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: false });
       const file = await fileHandle.getFile();
       if (typeof file.text === 'function') {
-         const text = await file.text();
-         return JSON.parse(text);
+        const text = await file.text();
+        return JSON.parse(text);
       }
       return null;
     } catch (error) {
@@ -113,7 +137,13 @@ export class OPFSArchiveService implements ArchiveService {
     }
   }
 
-  async archiveBoutLog(year: number, season: number, boutId: string, logData: string[], overwrite = false): Promise<void> {
+  async archiveBoutLog(
+    year: number,
+    season: number,
+    boutId: string,
+    logData: string[],
+    overwrite = false
+  ): Promise<void> {
     let writable: FileSystemWritableFileStream | null = null;
     try {
       const dirHandle = await this.getDirectory(season, 'bouts');
@@ -128,16 +158,15 @@ export class OPFSArchiveService implements ArchiveService {
           throw new ArchiveConflictError(`Bout log ${boutId} already exists in archive.`);
         }
       } catch (error: any) {
-         if (error instanceof ArchiveConflictError) {
-             throw error;
-         }
-         // File doesn't exist, proceed
-         fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        if (error instanceof ArchiveConflictError) {
+          throw error;
+        }
+        // File doesn't exist, proceed
+        fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
       }
 
-        writable = await fileHandle.createWritable();
-        await writable.write(JSON.stringify(logData));
-
+      writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(logData));
     } catch (error) {
       if (error instanceof ArchiveConflictError) {
         throw error;
@@ -145,7 +174,12 @@ export class OPFSArchiveService implements ArchiveService {
       if ((error as Error)?.name === 'QuotaExceededError') {
         console.error('OPFS Quota Exceeded during bout log archival', error);
         // Dispatch to Zustand to show Toast
-        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
+        if (typeof window !== 'undefined')
+          window.dispatchEvent(
+            new CustomEvent('OPFS_QUOTA_EXCEEDED', {
+              detail: 'Storage Quota Exceeded: Archival failed.',
+            })
+          );
         return;
       }
       if ((error as Error)?.name === 'NoModificationAllowedError') {
@@ -173,8 +207,8 @@ export class OPFSArchiveService implements ArchiveService {
       const file = await fileHandle.getFile();
 
       if (typeof file.text === 'function') {
-         const text = await file.text();
-         return JSON.parse(text);
+        const text = await file.text();
+        return JSON.parse(text);
       }
 
       return null;
@@ -198,13 +232,17 @@ export class OPFSArchiveService implements ArchiveService {
         const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
         writable = await fileHandle.createWritable();
         await writable.write(markdown);
-
       } catch (error) {
         if ((error as Error)?.name === 'QuotaExceededError') {
-           console.error('OPFS Quota Exceeded during gazette archival', error);
-           // Dispatch to Zustand to show Toast
-           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('OPFS_QUOTA_EXCEEDED', { detail: 'Storage Quota Exceeded: Archival failed.' }));
-           return;
+          console.error('OPFS Quota Exceeded during gazette archival', error);
+          // Dispatch to Zustand to show Toast
+          if (typeof window !== 'undefined')
+            window.dispatchEvent(
+              new CustomEvent('OPFS_QUOTA_EXCEEDED', {
+                detail: 'Storage Quota Exceeded: Archival failed.',
+              })
+            );
+          return;
         }
       } finally {
         if (writable) {
@@ -228,7 +266,7 @@ export class OPFSArchiveService implements ArchiveService {
       const file = await fileHandle.getFile();
 
       if (typeof file.text === 'function') {
-          return await file.text();
+        return await file.text();
       }
       return null;
     } catch (error) {
@@ -241,22 +279,22 @@ export class OPFSArchiveService implements ArchiveService {
   }
 
   async getArchivedBoutIdsForSeason(season: number): Promise<string[]> {
-     try {
-       const dirHandle = await this.getDirectory(season, 'bouts');
-       if (!dirHandle) return [];
+    try {
+      const dirHandle = await this.getDirectory(season, 'bouts');
+      if (!dirHandle) return [];
 
-       const boutIds: string[] = [];
-       // @ts-expect-error - async iterator type issue
-       for await (const entry of dirHandle.values()) {
-         if (entry.kind === 'file' && entry.name.endsWith('.json')) {
-           boutIds.push(entry.name.replace('.json', ''));
-         }
-       }
-       return boutIds;
-     } catch (error) {
-       console.warn('Error getting archived bout ids:', error);
-       return [];
-     }
+      const boutIds: string[] = [];
+      // @ts-expect-error - async iterator type issue
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+          boutIds.push(entry.name.replace('.json', ''));
+        }
+      }
+      return boutIds;
+    } catch (error) {
+      console.warn('Error getting archived bout ids:', error);
+      return [];
+    }
   }
 }
 

@@ -1,6 +1,6 @@
-import type { GameState } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightSummary } from "@/types/combat.types";
+import type { GameState } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { FightSummary } from '@/types/combat.types';
 
 /**
  * Prunes historical data to keep the save file size manageable.

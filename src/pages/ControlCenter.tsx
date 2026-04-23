@@ -3,35 +3,45 @@
  * Phase 2: Replaces the draggable Dashboard with a fixed Command Grid.
  * Archetype: Command Grid — Hero KPI bar + 5 tabbed sections + 6-card grid.
  */
-import React, { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { useShallow } from "zustand/react/shallow";
-import { cn } from "@/lib/utils";
+import React, { useMemo, useState } from 'react';
+import { Link } from '@tanstack/react-router';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { useShallow } from 'zustand/react/shallow';
+import { cn } from '@/lib/utils';
 
-import { calculateStableStats } from "@/engine/stats/stableStats";
-import { computeStableReputation } from "@/engine/stableReputation";
+import { calculateStableStats } from '@/engine/stats/stableStats';
+import { computeStableReputation } from '@/engine/stableReputation';
 
-import { Surface } from "@/components/ui/Surface";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Badge } from "@/components/ui/badge";
-import { SeasonWidget } from "@/components/dashboard/SeasonWidget";
-import { RecentBoutsWidget } from "@/components/dashboard/RecentBoutsWidget";
-import { RivalryWidget } from "@/components/dashboard/RivalryWidget";
-import { MetaDriftWidget } from "@/components/widgets/MetaDriftWidget";
-import { FormSparkline } from "@/components/charts/FormSparkline";
-import { ReputationQuadrant } from "@/components/charts/ReputationQuadrant";
-import { STYLE_ABBREV } from "@/types/shared.types";
+import { Surface } from '@/components/ui/Surface';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Badge } from '@/components/ui/badge';
+import { SeasonWidget } from '@/components/dashboard/SeasonWidget';
+import { RecentBoutsWidget } from '@/components/dashboard/RecentBoutsWidget';
+import { RivalryWidget } from '@/components/dashboard/RivalryWidget';
+import { MetaDriftWidget } from '@/components/widgets/MetaDriftWidget';
+import { FormSparkline } from '@/components/charts/FormSparkline';
+import { ReputationQuadrant } from '@/components/charts/ReputationQuadrant';
+import { STYLE_ABBREV } from '@/types/shared.types';
 
 import {
-  Swords, Crown, Coins, Star, Skull, TrendingUp,
-  Shield, Activity, ChevronRight, Zap, Users,
-  Trophy, Flame,
-} from "lucide-react";
+  Swords,
+  Crown,
+  Coins,
+  Star,
+  Skull,
+  TrendingUp,
+  Shield,
+  Activity,
+  ChevronRight,
+  Zap,
+  Users,
+  Trophy,
+  Flame,
+} from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TabId = "overview" | "roster" | "rep";
+type TabId = 'overview' | 'roster' | 'rep';
 
 // ─── KPI Bar ──────────────────────────────────────────────────────────────────
 
@@ -47,28 +57,62 @@ function KpiBar() {
 
   const stats = useMemo(() => calculateStableStats(roster), [roster]);
   const totalBouts = arenaHistory.length;
-  const killRate = totalBouts > 0
-    ? Math.round((stats.totalKills / totalBouts) * 100)
-    : 0;
+  const killRate = totalBouts > 0 ? Math.round((stats.totalKills / totalBouts) * 100) : 0;
 
   const kpis = [
-    { label: "Treasury",    value: `${(treasury ?? 0).toLocaleString()}g`, icon: Coins,    color: "text-arena-gold",  glow: "shadow-[0_0_10px_rgba(212,175,55,0.2)]" },
-    { label: "Influence",   value: String(fame),                           icon: Crown,    color: "text-arena-fame",  glow: "shadow-[0_0_10px_rgba(180,100,220,0.2)]" },
-    { label: "Roster",      value: String(stats.activeCount),              icon: Users,    color: "text-arena-pop",   glow: "" },
-    { label: "Win Rate",    value: `${stats.winRate}%`,                    icon: TrendingUp, color: "text-primary",   glow: "shadow-[0_0_10px_rgba(255,0,0,0.2)]" },
-    { label: "Total Kills", value: String(stats.totalKills),               icon: Skull,    color: "text-destructive", glow: "" },
-    { label: "Kill Rate",   value: `${killRate}%`,                         icon: Flame,    color: "text-orange-400",  glow: "" },
+    {
+      label: 'Treasury',
+      value: `${(treasury ?? 0).toLocaleString()}g`,
+      icon: Coins,
+      color: 'text-arena-gold',
+      glow: 'shadow-[0_0_10px_rgba(212,175,55,0.2)]',
+    },
+    {
+      label: 'Influence',
+      value: String(fame),
+      icon: Crown,
+      color: 'text-arena-fame',
+      glow: 'shadow-[0_0_10px_rgba(180,100,220,0.2)]',
+    },
+    {
+      label: 'Roster',
+      value: String(stats.activeCount),
+      icon: Users,
+      color: 'text-arena-pop',
+      glow: '',
+    },
+    {
+      label: 'Win Rate',
+      value: `${stats.winRate}%`,
+      icon: TrendingUp,
+      color: 'text-primary',
+      glow: 'shadow-[0_0_10px_rgba(255,0,0,0.2)]',
+    },
+    {
+      label: 'Total Kills',
+      value: String(stats.totalKills),
+      icon: Skull,
+      color: 'text-destructive',
+      glow: '',
+    },
+    { label: 'Kill Rate', value: `${killRate}%`, icon: Flame, color: 'text-orange-400', glow: '' },
   ];
 
   return (
     <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
       {kpis.map(({ label, value, icon: Icon, color, glow }) => (
-        <Surface key={label} variant="glass" className={cn("p-4 flex flex-col gap-2", glow)}>
+        <Surface key={label} variant="glass" className={cn('p-4 flex flex-col gap-2', glow)}>
           <div className="flex items-center gap-2">
-            <Icon className={cn("h-3.5 w-3.5", color)} />
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{label}</span>
+            <Icon className={cn('h-3.5 w-3.5', color)} />
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">
+              {label}
+            </span>
           </div>
-          <span className={cn("font-display font-black text-2xl tracking-tighter leading-none", color)}>{value}</span>
+          <span
+            className={cn('font-display font-black text-2xl tracking-tighter leading-none', color)}
+          >
+            {value}
+          </span>
         </Surface>
       ))}
     </div>
@@ -109,32 +153,46 @@ function RankingsBar() {
 
   const items = [
     {
-      label: "Stable Rank",
-      value: stableRank !== null ? `#${stableRank}` : "—",
+      label: 'Stable Rank',
+      value: stableRank !== null ? `#${stableRank}` : '—',
       icon: Trophy,
-      color: stableRank === 1 ? "text-arena-gold" : "text-arena-fame",
-      glow: stableRank === 1 ? "shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "",
-      sub: stableRank !== null ? `of ${rivals.length + 1} stables` : "No rivals yet",
+      color: stableRank === 1 ? 'text-arena-gold' : 'text-arena-fame',
+      glow: stableRank === 1 ? 'shadow-[0_0_10px_rgba(212,175,55,0.15)]' : '',
+      sub: stableRank !== null ? `of ${rivals.length + 1} stables` : 'No rivals yet',
     },
     {
-      label: "Top Warrior Rank",
-      value: topWarriorRank !== null ? `#${topWarriorRank}` : "—",
+      label: 'Top Warrior Rank',
+      value: topWarriorRank !== null ? `#${topWarriorRank}` : '—',
       icon: Star,
-      color: topWarriorRank !== null && topWarriorRank <= 10 ? "text-arena-gold" : "text-primary",
-      glow: topWarriorRank !== null && topWarriorRank <= 3 ? "shadow-[0_0_10px_rgba(212,175,55,0.15)]" : "",
-      sub: topWarriorRank !== null ? "overall realm ranking" : "Rankings not yet set",
+      color: topWarriorRank !== null && topWarriorRank <= 10 ? 'text-arena-gold' : 'text-primary',
+      glow:
+        topWarriorRank !== null && topWarriorRank <= 3
+          ? 'shadow-[0_0_10px_rgba(212,175,55,0.15)]'
+          : '',
+      sub: topWarriorRank !== null ? 'overall realm ranking' : 'Rankings not yet set',
     },
   ];
 
   return (
     <div className="grid grid-cols-2 gap-3">
       {items.map(({ label, value, icon: Icon, color, glow, sub }) => (
-        <Surface key={label} variant="glass" className={cn("p-4 flex items-center gap-4", glow)}>
-          <Icon className={cn("h-5 w-5 shrink-0", color)} />
+        <Surface key={label} variant="glass" className={cn('p-4 flex items-center gap-4', glow)}>
+          <Icon className={cn('h-5 w-5 shrink-0', color)} />
           <div className="flex flex-col gap-0.5 min-w-0">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{label}</span>
-            <span className={cn("font-display font-black text-2xl tracking-tighter leading-none", color)}>{value}</span>
-            <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-wider">{sub}</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">
+              {label}
+            </span>
+            <span
+              className={cn(
+                'font-display font-black text-2xl tracking-tighter leading-none',
+                color
+              )}
+            >
+              {value}
+            </span>
+            <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-wider">
+              {sub}
+            </span>
           </div>
         </Surface>
       ))}
@@ -159,7 +217,10 @@ function HeroPanel() {
   const seasonName = `Season ${season}`;
 
   return (
-    <Surface variant="glass" className="p-6 flex items-start justify-between gap-6 border-primary/10">
+    <Surface
+      variant="glass"
+      className="p-6 flex items-start justify-between gap-6 border-primary/10"
+    >
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.2)]">
@@ -167,10 +228,10 @@ function HeroPanel() {
           </div>
           <div>
             <h1 className="font-display font-black text-2xl tracking-tighter uppercase leading-none">
-              {player?.stableName ?? "Your Stable"}
+              {player?.stableName ?? 'Your Stable'}
             </h1>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 mt-0.5">
-              {player?.name ?? "Commander"} · {seasonName} · Week {week}
+              {player?.name ?? 'Commander'} · {seasonName} · Week {week}
             </p>
           </div>
         </div>
@@ -181,11 +242,17 @@ function HeroPanel() {
               <Trophy className="h-2.5 w-2.5 mr-1" /> Tournament Week
             </Badge>
           )}
-          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest rounded-none border-white/10">
+          <Badge
+            variant="outline"
+            className="text-[9px] font-black uppercase tracking-widest rounded-none border-white/10"
+          >
             {stats.activeCount} Active Warriors
           </Badge>
           {stats.topWarrior && (
-            <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest rounded-none border-primary/20 text-primary">
+            <Badge
+              variant="outline"
+              className="text-[9px] font-black uppercase tracking-widest rounded-none border-primary/20 text-primary"
+            >
               <Star className="h-2.5 w-2.5 mr-1" />
               {stats.topWarrior.name} — Top Fighter
             </Badge>
@@ -194,13 +261,17 @@ function HeroPanel() {
       </div>
 
       <div className="hidden lg:flex flex-col items-end gap-1">
-        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Overall Record</span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+          Overall Record
+        </span>
         <span className="font-display font-black text-4xl tracking-tighter leading-none">
           <span className="text-primary">{stats.totalWins}</span>
           <span className="text-muted-foreground/30 mx-1">—</span>
           <span className="text-muted-foreground/60">{stats.totalLosses}</span>
         </span>
-        <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest">W — L</span>
+        <span className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest">
+          W — L
+        </span>
       </div>
     </Surface>
   );
@@ -209,11 +280,9 @@ function HeroPanel() {
 // ─── Roster Snapshot Tab ──────────────────────────────────────────────────────
 
 function RosterSnapshot() {
-  const { roster } = useGameStore(
-    useShallow((s) => ({ roster: s.roster }))
-  );
+  const { roster } = useGameStore(useShallow((s) => ({ roster: s.roster })));
 
-  const active = useMemo(() => roster.filter((w) => w.status === "Active"), [roster]);
+  const active = useMemo(() => roster.filter((w) => w.status === 'Active'), [roster]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -245,7 +314,9 @@ function RosterSnapshot() {
 
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right hidden sm:block">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Record</div>
+                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                      Record
+                    </div>
                     <div className="font-mono font-black text-xs">
                       <span className="text-primary">{w.career?.wins ?? 0}</span>
                       <span className="text-muted-foreground/30 mx-0.5">-</span>
@@ -258,11 +329,19 @@ function RosterSnapshot() {
 
                   {w.fatigue !== undefined && (
                     <div className="text-right hidden md:block">
-                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Fatigue</div>
-                      <div className={cn(
-                        "font-mono font-black text-xs",
-                        w.fatigue > 70 ? "text-destructive" : w.fatigue > 40 ? "text-arena-gold" : "text-primary"
-                      )}>
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                        Fatigue
+                      </div>
+                      <div
+                        className={cn(
+                          'font-mono font-black text-xs',
+                          w.fatigue > 70
+                            ? 'text-destructive'
+                            : w.fatigue > 40
+                              ? 'text-arena-gold'
+                              : 'text-primary'
+                        )}
+                      >
                         {w.fatigue}%
                       </div>
                     </div>
@@ -287,11 +366,46 @@ function ReputationTab() {
   const worldState = useWorldState();
   const rep = useMemo(() => computeStableReputation(worldState), [worldState]);
 
-  const dims: { key: keyof typeof rep; label: string; color: string; icon: React.ElementType; desc: string; effect: string }[] = [
-    { key: "fame",         label: "Fame",          color: "text-arena-gold",  icon: Star,    desc: "Public acclaim from victories and showmanship.",           effect: "Attracts better promoter offers and higher purses." },
-    { key: "notoriety",    label: "Notoriety",     color: "text-destructive", icon: Skull,   desc: "Feared reputation built on kills and ruthlessness.",        effect: "Rivals think twice before accepting your bouts." },
-    { key: "honor",        label: "Honor",         color: "text-primary",     icon: Shield,  desc: "Moral standing and respect from the arena elite.",          effect: "Unlocks Honorable promoter preference and trainer discounts." },
-    { key: "adaptability", label: "Adaptability",  color: "text-arena-pop",   icon: Zap,     desc: "Strategic responsiveness to the shifting combat meta.",     effect: "Earns higher hype bonuses in style-clash matchups." },
+  const dims: {
+    key: keyof typeof rep;
+    label: string;
+    color: string;
+    icon: React.ElementType;
+    desc: string;
+    effect: string;
+  }[] = [
+    {
+      key: 'fame',
+      label: 'Fame',
+      color: 'text-arena-gold',
+      icon: Star,
+      desc: 'Public acclaim from victories and showmanship.',
+      effect: 'Attracts better promoter offers and higher purses.',
+    },
+    {
+      key: 'notoriety',
+      label: 'Notoriety',
+      color: 'text-destructive',
+      icon: Skull,
+      desc: 'Feared reputation built on kills and ruthlessness.',
+      effect: 'Rivals think twice before accepting your bouts.',
+    },
+    {
+      key: 'honor',
+      label: 'Honor',
+      color: 'text-primary',
+      icon: Shield,
+      desc: 'Moral standing and respect from the arena elite.',
+      effect: 'Unlocks Honorable promoter preference and trainer discounts.',
+    },
+    {
+      key: 'adaptability',
+      label: 'Adaptability',
+      color: 'text-arena-pop',
+      icon: Zap,
+      desc: 'Strategic responsiveness to the shifting combat meta.',
+      effect: 'Earns higher hype bonuses in style-clash matchups.',
+    },
   ];
 
   return (
@@ -301,16 +415,23 @@ function ReputationTab() {
         return (
           <Surface key={key} variant="glass" className="p-5 flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <Icon className={cn("h-4 w-4", color)} />
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{label}</span>
+              <Icon className={cn('h-4 w-4', color)} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                {label}
+              </span>
             </div>
-            <div className={cn("font-display font-black text-4xl tracking-tighter leading-none", color)}>
+            <div
+              className={cn(
+                'font-display font-black text-4xl tracking-tighter leading-none',
+                color
+              )}
+            >
               {val}
               <span className="text-lg text-muted-foreground/30 ml-1">/100</span>
             </div>
             <div className="h-1 bg-white/5 rounded-none overflow-hidden">
               <div
-                className={cn("h-full rounded-none transition-all", color.replace("text-", "bg-"))}
+                className={cn('h-full rounded-none transition-all', color.replace('text-', 'bg-'))}
                 style={{ width: `${val}%` }}
               />
             </div>
@@ -326,15 +447,15 @@ function ReputationTab() {
 // ─── Tab Bar ──────────────────────────────────────────────────────────────────
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: "overview", label: "Overview",   icon: Activity },
-  { id: "roster",   label: "Roster",     icon: Users },
-  { id: "rep",      label: "Reputation", icon: Crown },
+  { id: 'overview', label: 'Overview', icon: Activity },
+  { id: 'roster', label: 'Roster', icon: Users },
+  { id: 'rep', label: 'Reputation', icon: Crown },
 ];
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function ControlCenter() {
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-20">
@@ -359,10 +480,10 @@ export default function ControlCenter() {
             key={id}
             onClick={() => setActiveTab(id)}
             className={cn(
-              "relative flex items-center gap-2 px-4 py-2.5 text-[11px] font-black uppercase tracking-wider transition-all duration-150",
+              'relative flex items-center gap-2 px-4 py-2.5 text-[11px] font-black uppercase tracking-wider transition-all duration-150',
               activeTab === id
-                ? "text-primary border-b-2 border-primary -mb-px"
-                : "text-muted-foreground/50 hover:text-foreground border-b-2 border-transparent -mb-px"
+                ? 'text-primary border-b-2 border-primary -mb-px'
+                : 'text-muted-foreground/50 hover:text-foreground border-b-2 border-transparent -mb-px'
             )}
           >
             <Icon className="h-3.5 w-3.5" />
@@ -373,7 +494,7 @@ export default function ControlCenter() {
 
       {/* Tab content */}
       <div className="min-h-[400px]">
-        {activeTab === "overview" && (
+        {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="flex flex-col gap-6">
               <SeasonWidget />
@@ -385,8 +506,8 @@ export default function ControlCenter() {
             </div>
           </div>
         )}
-        {activeTab === "roster"   && <RosterSnapshot />}
-        {activeTab === "rep"      && (
+        {activeTab === 'roster' && <RosterSnapshot />}
+        {activeTab === 'rep' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ReputationQuadrant />
             <ReputationTab />

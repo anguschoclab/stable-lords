@@ -1,10 +1,6 @@
-import type {
-  Warrior,
-  TournamentEntry,
-  Season
-} from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import type { Warrior, TournamentEntry, Season } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 export interface TournamentBracketConfig {
   tierId: string;
@@ -38,19 +34,19 @@ export function buildTournament(config: TournamentBracketConfig): TournamentEntr
   const id = `t-${tierId.toLowerCase()}-${season.toLowerCase()}-${week}`;
   const shuffled = rngService.shuffle([...warriors]);
   const bracket: BracketMatch[] = [];
-  
+
   for (let i = 0; i < 64; i += 2) {
     bracket.push({
       round: 1,
       matchIndex: i / 2,
       a: shuffled[i].name,
-      d: shuffled[i+1].name,
+      d: shuffled[i + 1].name,
       warriorIdA: shuffled[i].id,
-      warriorIdD: shuffled[i+1].id,
+      warriorIdD: shuffled[i + 1].id,
       stableIdA: shuffled[i].stableId,
-      stableIdD: shuffled[i+1].stableId,
+      stableIdD: shuffled[i + 1].stableId,
       stableA: shuffled[i].stableId,
-      stableD: shuffled[i+1].stableId,
+      stableD: shuffled[i + 1].stableId,
     });
   }
 
@@ -62,6 +58,6 @@ export function buildTournament(config: TournamentBracketConfig): TournamentEntr
     name: tierName,
     bracket,
     participants: warriors,
-    completed: false
+    completed: false,
   };
 }

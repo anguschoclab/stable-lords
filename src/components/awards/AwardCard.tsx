@@ -1,7 +1,7 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export interface AwardEntry {
   name: string;
@@ -14,19 +14,31 @@ export interface AwardEntry {
   isPlayer: boolean;
 }
 
-export default function AwardCard({ entry, title, icon, accentClass }: {
+export default function AwardCard({
+  entry,
+  title,
+  icon,
+  accentClass,
+}: {
   entry: AwardEntry | null;
   title: string;
   icon: React.ReactNode;
   accentClass: string;
 }) {
   if (!entry) return null;
-  const winRate = (entry.wins + entry.losses) > 0
-    ? Math.round((entry.wins / (entry.wins + entry.losses)) * 100) : 0;
+  const winRate =
+    entry.wins + entry.losses > 0
+      ? Math.round((entry.wins / (entry.wins + entry.losses)) * 100)
+      : 0;
 
   return (
-    <Card className={cn("relative overflow-hidden border-border/60", entry.isPlayer && "ring-1 ring-primary/30")}>
-      <div className={cn("absolute top-0 left-0 right-0 h-1", accentClass)} />
+    <Card
+      className={cn(
+        'relative overflow-hidden border-border/60',
+        entry.isPlayer && 'ring-1 ring-primary/30'
+      )}
+    >
+      <div className={cn('absolute top-0 left-0 right-0 h-1', accentClass)} />
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -39,9 +51,13 @@ export default function AwardCard({ entry, title, icon, accentClass }: {
               </p>
             </div>
           </div>
-          <Badge variant="outline" className="text-[9px] font-mono shrink-0">{title}</Badge>
+          <Badge variant="outline" className="text-[9px] font-mono shrink-0">
+            {title}
+          </Badge>
         </div>
-        <div className={`grid ${entry.fameGained !== undefined ? "grid-cols-4" : "grid-cols-3"} gap-2 text-center`}>
+        <div
+          className={`grid ${entry.fameGained !== undefined ? 'grid-cols-4' : 'grid-cols-3'} gap-2 text-center`}
+        >
           <div>
             <p className="text-base font-bold font-display">{entry.wins}</p>
             <p className="text-[9px] text-muted-foreground">Wins</p>
@@ -52,7 +68,9 @@ export default function AwardCard({ entry, title, icon, accentClass }: {
           </div>
           {entry.fameGained !== undefined && (
             <div>
-              <p className="text-base font-bold font-display text-arena-fame">{entry.fameGained > 0 ? `+${entry.fameGained}` : entry.fameGained}</p>
+              <p className="text-base font-bold font-display text-arena-fame">
+                {entry.fameGained > 0 ? `+${entry.fameGained}` : entry.fameGained}
+              </p>
               <p className="text-[9px] text-muted-foreground">Fame</p>
             </div>
           )}

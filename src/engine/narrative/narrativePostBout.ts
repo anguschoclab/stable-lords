@@ -2,9 +2,9 @@
  * Narrative Post-Bout - Post-bout narration functions
  * Extracted from narrativePBP.ts to follow SRP
  */
-import { getWeaponDisplayName, getWeaponType, pick } from "./narrativeUtils";
-import { getFromArchive, interpolateTemplate, peekArchive } from "./narrativePBPUtils";
-import { audioManager } from "@/lib/AudioManager";
+import { getWeaponDisplayName, getWeaponType, pick } from './narrativeUtils';
+import { getFromArchive, interpolateTemplate, peekArchive } from './narrativePBPUtils';
+import { audioManager } from '@/lib/AudioManager';
 
 type RNG = () => number;
 
@@ -18,19 +18,19 @@ type RNG = () => number;
  * keep working unchanged.
  */
 export interface BoutEndContext {
-  cause?: string;    // DeathCauseBucket: EXECUTION | CRITICAL_CHAIN | ARMOR_FAILURE | FATIGUE_COLLAPSE | RIVALRY_FINISH | FATAL_DAMAGE
-  style?: string;    // Winner's fighting style — drives tonal selection (e.g. AimedBlow → "precise")
-  mood?: string;     // CrowdMood — Calm/Bloodthirsty/Theatrical/Solemn/Festive
+  cause?: string; // DeathCauseBucket: EXECUTION | CRITICAL_CHAIN | ARMOR_FAILURE | FATIGUE_COLLAPSE | RIVALRY_FINISH | FATAL_DAMAGE
+  style?: string; // Winner's fighting style — drives tonal selection (e.g. AimedBlow → "precise")
+  mood?: string; // CrowdMood — Calm/Bloodthirsty/Theatrical/Solemn/Festive
 }
 
 // Map DeathCauseBucket → archive subpath. Missing paths fall through to generic.
 const CAUSE_ARCHIVE_PATH: Record<string, string> = {
-  EXECUTION:        "execution",
-  CRITICAL_CHAIN:   "critical_chain",
-  ARMOR_FAILURE:    "armor_failure",
-  FATIGUE_COLLAPSE: "fatigue_collapse",
-  RIVALRY_FINISH:   "rivalry_finish",
-  FATAL_DAMAGE:     "fatal_damage",
+  EXECUTION: 'execution',
+  CRITICAL_CHAIN: 'critical_chain',
+  ARMOR_FAILURE: 'armor_failure',
+  FATIGUE_COLLAPSE: 'fatigue_collapse',
+  RIVALRY_FINISH: 'rivalry_finish',
+  FATAL_DAMAGE: 'fatal_damage',
 };
 
 export function narrateBoutEnd(
@@ -45,19 +45,23 @@ export function narrateBoutEnd(
   const wType = getWeaponType(weaponId);
 
   const categoryMap: Record<string, string> = {
-    "Kill": "Kill",
-    "KO": "KO",
-    "Stoppage": "Stoppage",
-    "Exhaustion": "Exhaustion"
+    Kill: 'Kill',
+    KO: 'KO',
+    Stoppage: 'Stoppage',
+    Exhaustion: 'Exhaustion',
   };
 
-  const cat = categoryMap[by] || "KO";
-  const conclusionTemplate = getFromArchive(rng, ["conclusions", cat]);
-  const conclusion = interpolateTemplate(conclusionTemplate, { attacker: winnerName, defender: loserName, weapon: wName });
+  const cat = categoryMap[by] || 'KO';
+  const conclusionTemplate = getFromArchive(rng, ['conclusions', cat]);
+  const conclusion = interpolateTemplate(conclusionTemplate, {
+    attacker: winnerName,
+    defender: loserName,
+    weapon: wName,
+  });
 
-  if (cat === "Kill") audioManager.play("death");
+  if (cat === 'Kill') audioManager.play('death');
 
-  if (cat === "Kill") {
+  if (cat === 'Kill') {
     // Tiered lookup for kill-text:
     //   1) kill_text.<cause>.<style>.<mood>  (most specific)
     //   2) kill_text.<cause>.<style>
@@ -70,14 +74,15 @@ export function narrateBoutEnd(
     const moodSlug = ctx.mood ? ctx.mood.toLowerCase() : undefined;
 
     const candidatePaths: string[][] = [];
-    if (causeSlug && styleSlug && moodSlug) candidatePaths.push(["kill_text", causeSlug, styleSlug, moodSlug]);
-    if (causeSlug && styleSlug)             candidatePaths.push(["kill_text", causeSlug, styleSlug]);
-    if (causeSlug)                          candidatePaths.push(["kill_text", causeSlug]);
-    candidatePaths.push(["strikes", wType, "fatal"]);
-    candidatePaths.push(["strikes", "generic"]);
+    if (causeSlug && styleSlug && moodSlug)
+      candidatePaths.push(['kill_text', causeSlug, styleSlug, moodSlug]);
+    if (causeSlug && styleSlug) candidatePaths.push(['kill_text', causeSlug, styleSlug]);
+    if (causeSlug) candidatePaths.push(['kill_text', causeSlug]);
+    candidatePaths.push(['strikes', wType, 'fatal']);
+    candidatePaths.push(['strikes', 'generic']);
 
-    let fatalBlowTemplate = "";
-    const fallbackMarker = "A fierce exchange occurs.";
+    let fatalBlowTemplate = '';
+    const fallbackMarker = 'A fierce exchange occurs.';
     for (const path of candidatePaths) {
       // Silent peek first — avoids console.error spam for expected misses in
       // the tiered cause/style/mood cascade.
@@ -104,9 +109,9 @@ export function narrateBoutEnd(
  * Generates popularity line.
  */
 export function popularityLine(rng: RNG, name: string, popDelta: number): string | null {
-  const cat = popDelta >= 3 ? "great" : popDelta >= 1 ? "normal" : "";
+  const cat = popDelta >= 3 ? 'great' : popDelta >= 1 ? 'normal' : '';
   if (!cat) return null;
-  const template = getFromArchive(rng, ["pbp", "meta", "popularity", cat]);
+  const template = getFromArchive(rng, ['pbp', 'meta', 'popularity', cat]);
   return interpolateTemplate(template, { name });
 }
 
@@ -114,7 +119,7 @@ export function popularityLine(rng: RNG, name: string, popDelta: number): string
  * Generates skill learn line.
  */
 export function skillLearnLine(rng: RNG, name: string): string {
-  const template = getFromArchive(rng, ["pbp", "meta", "skill_learns"]);
+  const template = getFromArchive(rng, ['pbp', 'meta', 'skill_learns']);
   return interpolateTemplate(template, { attacker: name });
 }
 
@@ -122,14 +127,14 @@ export function skillLearnLine(rng: RNG, name: string): string {
  * Generates trading blows line.
  */
 export function tradingBlowsLine(rng: RNG): string {
-  return getFromArchive(rng, ["pbp", "pacing", "trading_blows"]);
+  return getFromArchive(rng, ['pbp', 'pacing', 'trading_blows']);
 }
 
 /**
  * Generates stalemate line.
  */
 export function stalemateLine(rng: RNG): string {
-  return getFromArchive(rng, ["pbp", "pacing", "stalemate"]);
+  return getFromArchive(rng, ['pbp', 'pacing', 'stalemate']);
 }
 
 /**
@@ -138,10 +143,10 @@ export function stalemateLine(rng: RNG): string {
 export function tauntLine(rng: RNG, name: string, isWinner: boolean): string | null {
   // Fire ~40% of the time (was 20%) — taunts are flavour, not signal, so they
   // should feel present rather than rare. Winners taunt more than losers.
-  const threshold = isWinner ? 0.45 : 0.30;
+  const threshold = isWinner ? 0.45 : 0.3;
   if (rng() > threshold) return null;
-  const cat = isWinner ? "winner" : "loser";
-  const template = getFromArchive(rng, ["pbp", "taunts", cat]);
+  const cat = isWinner ? 'winner' : 'loser';
+  const template = getFromArchive(rng, ['pbp', 'taunts', cat]);
   return interpolateTemplate(template, { attacker: name });
 }
 

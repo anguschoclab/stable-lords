@@ -1,10 +1,10 @@
-import { type GameState } from "@/types/state.types";
-import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
-import { processWeekBouts } from "@/engine/boutProcessor";
-import { populateInitialWorld } from "@/engine/core/worldSeeder";
-import { createFreshState } from "@/engine/factories";
-import { collectPulse, type SimPulse } from "@/engine/stats/simulationMetrics";
-import { resolveImpacts } from "@/engine/impacts";
+import { type GameState } from '@/types/state.types';
+import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
+import { processWeekBouts } from '@/engine/boutProcessor';
+import { populateInitialWorld } from '@/engine/core/worldSeeder';
+import { createFreshState } from '@/engine/factories';
+import { collectPulse, type SimPulse } from '@/engine/stats/simulationMetrics';
+import { resolveImpacts } from '@/engine/impacts';
 
 export interface SimulationConfig {
   weeks: number;
@@ -23,7 +23,7 @@ export interface SimulationResult {
  */
 export function runSimulation(config: SimulationConfig): SimulationResult {
   const { weeks, seed, logFrequency = 1 } = config;
-  
+
   // 1. Initialize State
   const seedStr = seed.toString();
   let state = populateInitialWorld(createFreshState(seedStr), seed);
@@ -31,7 +31,7 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
 
   // 2. Main Loop
   console.log(`[Harness] Starting simulation for ${weeks} weeks...`);
-  
+
   for (let w = 1; w <= weeks; w++) {
     // A. Weekly Decision Logic (AI/Player)
     state.boutOffers = {}; // Clear old offers
@@ -42,12 +42,14 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
 
     const boutResult = processWeekBouts(state);
     state = resolveImpacts(state, [boutResult.impact]);
-    
+
     let totalWarriors = 0;
-    state.rivals.forEach(r => totalWarriors += r.roster.length);
-    
+    state.rivals.forEach((r) => (totalWarriors += r.roster.length));
+
     if (w % logFrequency === 0) {
-      console.log(`[Harness] Week ${state.week} | Roster: ${state.roster.length} | Treasury: ${state.treasury}`);
+      console.log(
+        `[Harness] Week ${state.week} | Roster: ${state.roster.length} | Treasury: ${state.treasury}`
+      );
       pulses.push(collectPulse(state));
     }
 
@@ -60,6 +62,6 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
 
   return {
     finalState: state,
-    pulses
+    pulses,
   };
 }

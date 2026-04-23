@@ -1,6 +1,11 @@
-import type { GameState, RivalStableData, OwnerPersonality, OwnerGrudge } from "@/types/state.types";
-import { getRecentFights } from "@/engine/core/historyUtils";
-import { PERSONALITY_CLASH } from "@/data/ownerData";
+import type {
+  GameState,
+  RivalStableData,
+  OwnerPersonality,
+  OwnerGrudge,
+} from '@/types/state.types';
+import { getRecentFights } from '@/engine/core/historyUtils';
+import { PERSONALITY_CLASH } from '@/data/ownerData';
 
 /**
  * Detect and escalate owner-to-owner grudges based on personality clashes
@@ -10,7 +15,7 @@ export function processOwnerGrudges(
   state: GameState,
   existingGrudges: OwnerGrudge[]
 ): { grudges: OwnerGrudge[]; gazetteItems: string[] } {
-  const grudges = existingGrudges.map(g => ({ ...g }));
+  const grudges = existingGrudges.map((g) => ({ ...g }));
   const gazetteItems: string[] = [];
   const rivals = state.rivals || [];
 
@@ -26,12 +31,13 @@ export function processOwnerGrudges(
       if (!persA || !persB) continue;
 
       // Check if personalities naturally clash
-      const clash = PERSONALITY_CLASH[persA]?.includes(persB) || PERSONALITY_CLASH[persB]?.includes(persA);
+      const clash =
+        PERSONALITY_CLASH[persA]?.includes(persB) || PERSONALITY_CLASH[persB]?.includes(persA);
       if (!clash) continue;
 
       // Check if they've had kills against each other recently
-      const aNamesSet = new Set(rA.roster.map(w => w.name));
-      const bNamesSet = new Set(rB.roster.map(w => w.name));
+      const aNamesSet = new Set(rA.roster.map((w) => w.name));
+      const bNamesSet = new Set(rB.roster.map((w) => w.name));
 
       let hasCrossFight = false;
       let hasKill = false;
@@ -39,23 +45,23 @@ export function processOwnerGrudges(
       for (let k = 0; k < recentFights.length; k++) {
         const f = recentFights[k];
         const isCrossFight =
-          (aNamesSet.has(f.a) && bNamesSet.has(f.d)) ||
-          (bNamesSet.has(f.a) && aNamesSet.has(f.d));
+          (aNamesSet.has(f.a) && bNamesSet.has(f.d)) || (bNamesSet.has(f.a) && aNamesSet.has(f.d));
 
         if (isCrossFight) {
           hasCrossFight = true;
-          if (f.by === "Kill") {
+          if (f.by === 'Kill') {
             hasKill = true;
-            break; 
+            break;
           }
         }
       }
 
       if (!hasCrossFight) continue;
 
-      const existing = grudges.find(g =>
-        (g.ownerIdA === rA.owner.id && g.ownerIdB === rB.owner.id) ||
-        (g.ownerIdB === rA.owner.id && g.ownerIdA === rB.owner.id)
+      const existing = grudges.find(
+        (g) =>
+          (g.ownerIdA === rA.owner.id && g.ownerIdB === rB.owner.id) ||
+          (g.ownerIdB === rA.owner.id && g.ownerIdA === rB.owner.id)
       );
 
       if (existing) {
@@ -91,7 +97,7 @@ export function processOwnerGrudges(
     }
   }
 
-  return { grudges: grudges.filter(g => g.intensity > 0), gazetteItems };
+  return { grudges: grudges.filter((g) => g.intensity > 0), gazetteItems };
 }
 
 /**

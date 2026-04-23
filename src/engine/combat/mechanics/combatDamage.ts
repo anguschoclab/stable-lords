@@ -3,9 +3,24 @@
  * Single source of truth for damage mechanics used by simulate.ts.
  */
 
-export type HitLocation = "head" | "chest" | "abdomen" | "right arm" | "left arm" | "right leg" | "left leg";
+export type HitLocation =
+  | 'head'
+  | 'chest'
+  | 'abdomen'
+  | 'right arm'
+  | 'left arm'
+  | 'right leg'
+  | 'left leg';
 
-export const HIT_LOCATIONS = ["head", "chest", "abdomen", "right arm", "left arm", "right leg", "left leg"] as const;
+export const HIT_LOCATIONS = [
+  'head',
+  'chest',
+  'abdomen',
+  'right arm',
+  'left arm',
+  'right leg',
+  'left leg',
+] as const;
 
 // Target & Protect constants
 // Target & Protect constants
@@ -16,82 +31,99 @@ const PROTECT_DAMAGE_PENALTY = 1.1;
 
 // Damage constants
 const DAMAGE_BASE_MIN = 4;
-const DAMAGE_VARIANCE_MIN = 0.70;
-const DAMAGE_VARIANCE_MAX = 1.30;
+const DAMAGE_VARIANCE_MIN = 0.7;
+const DAMAGE_VARIANCE_MAX = 1.3;
 
 const LOCATION_DAMAGE_MULT: Record<HitLocation, number> = {
   head: 1.5,
   chest: 1.2,
   abdomen: 1.1,
-  "right arm": 1.0,
-  "left arm": 1.0,
-  "right leg": 1.0,
-  "left leg": 1.0,
+  'right arm': 1.0,
+  'left arm': 1.0,
+  'right leg': 1.0,
+  'left leg': 1.0,
 };
 
 const LOCATION_KILL_MULT: Record<HitLocation, number> = {
   head: 6.0,
   chest: 3.5,
   abdomen: 3.5,
-  "right arm": 0.1,
-  "left arm": 0.1,
-  "right leg": 0.1,
-  "left leg": 0.1,
+  'right arm': 0.1,
+  'left arm': 0.1,
+  'right leg': 0.1,
+  'left leg': 0.1,
 };
 
 // ─── Weapon/Armor Type Interactions ─────────────────────────────────────────
 
-type DamageType = "slash" | "bash" | "pierce" | "none";
+type DamageType = 'slash' | 'bash' | 'pierce' | 'none';
 
 const WEAPON_DAMAGE_TYPE: Record<string, DamageType> = {
   // Pierce
-  dagger: "pierce", epee: "pierce", short_spear: "pierce", long_spear: "pierce",
+  dagger: 'pierce',
+  epee: 'pierce',
+  short_spear: 'pierce',
+  long_spear: 'pierce',
   // Slash
-  hatchet: "slash", short_sword: "slash", scimitar: "slash", longsword: "slash",
-  battle_axe: "slash", broadsword: "slash", greatsword: "slash", great_axe: "slash",
+  hatchet: 'slash',
+  short_sword: 'slash',
+  scimitar: 'slash',
+  longsword: 'slash',
+  battle_axe: 'slash',
+  broadsword: 'slash',
+  greatsword: 'slash',
+  great_axe: 'slash',
   // Bash
-  war_hammer: "bash", mace: "bash", morning_star: "bash", war_flail: "bash",
-  maul: "bash", halberd: "bash", quarterstaff: "bash",
+  war_hammer: 'bash',
+  mace: 'bash',
+  morning_star: 'bash',
+  war_flail: 'bash',
+  maul: 'bash',
+  halberd: 'bash',
+  quarterstaff: 'bash',
   // Shields deal blunt but negligible — no interaction
-  small_shield: "none", medium_shield: "none", large_shield: "none",
+  small_shield: 'none',
+  medium_shield: 'none',
+  large_shield: 'none',
 };
 
 // Multiplier on incoming damage: < 1.0 = armor resists, > 1.0 = armor is weak
 const ARMOR_TYPE_MULT: Record<string, Partial<Record<DamageType, number>>> = {
-  none_armor:     {},
-  leather:        { slash: 0.95 },
-  padded_leather: { bash: 0.80, pierce: 1.10 },
-  ring_mail:      { slash: 0.90, pierce: 0.90, bash: 1.10 },
-  scale_mail:     { slash: 0.80, pierce: 1.15 },
-  chain_mail:     { pierce: 0.80, slash: 1.10 },
-  plate_mail:     { slash: 0.85, bash: 0.85, pierce: 0.85 },
+  none_armor: {},
+  leather: { slash: 0.95 },
+  padded_leather: { bash: 0.8, pierce: 1.1 },
+  ring_mail: { slash: 0.9, pierce: 0.9, bash: 1.1 },
+  scale_mail: { slash: 0.8, pierce: 1.15 },
+  chain_mail: { pierce: 0.8, slash: 1.1 },
+  plate_mail: { slash: 0.85, bash: 0.85, pierce: 0.85 },
 };
 
 export function applyArmorTypeMod(damage: number, weaponId?: string, armorId?: string): number {
   if (!weaponId || !armorId) return damage;
   const dtype = WEAPON_DAMAGE_TYPE[weaponId];
-  if (!dtype || dtype === "none") return damage;
+  if (!dtype || dtype === 'none') return damage;
   const mult = ARMOR_TYPE_MULT[armorId]?.[dtype] ?? 1.0;
   return Math.round(damage * mult);
 }
 
 export function protectCovers(protect?: string): string[] {
-  if (!protect || protect === "Any" || protect === "none_armor" || protect === "none_helm") return [];
+  if (!protect || protect === 'Any' || protect === 'none_armor' || protect === 'none_helm')
+    return [];
   const p = protect.toLowerCase();
-  
+
   // Specific IDs or categories from tests and equipment data
-  if (p.includes("helm") || p.includes("cap") || p === "head") return ["head"];
-  if (p.includes("armor") || p.includes("mail") || p === "body") return ["chest", "abdomen"];
-  if (p === "arms") return ["right arm", "left arm"];
-  if (p === "legs") return ["right leg", "left leg"];
-  
+  if (p.includes('helm') || p.includes('cap') || p === 'head') return ['head'];
+  if (p.includes('armor') || p.includes('mail') || p === 'body') return ['chest', 'abdomen'];
+  if (p === 'arms') return ['right arm', 'left arm'];
+  if (p === 'legs') return ['right leg', 'left leg'];
+
   return [];
 }
 
 export function rollHitLocation(rng: () => number, target?: string, protect?: string): HitLocation {
   const covered = protectCovers(protect);
 
-  if (target && target !== "Any") {
+  if (target && target !== 'Any') {
     const t = target.toLowerCase() as HitLocation;
     if ((HIT_LOCATIONS as readonly string[]).includes(t)) {
       const hitChance = covered.includes(t) ? TARGET_MISS_CHANCE : TARGET_HIT_CHANCE;
@@ -126,21 +158,21 @@ export function applyProtectMod(damage: number, location: HitLocation, protect?:
 // Shields cover specific location bands. Hits inside a shield's coverage take
 // additional mitigation on top of armor. Kept small so the ~10% mortality
 // baseline holds even when a Large Shield + High-zone hit stack.
-const SHIELD_ZONE_LOCATIONS: Record<"LOW" | "MEDIUM" | "HIGH", HitLocation[]> = {
-  LOW:    ["right leg", "left leg"],
-  MEDIUM: ["chest", "abdomen", "right arm", "left arm"],
-  HIGH:   ["head", "chest", "right arm", "left arm"],
+const SHIELD_ZONE_LOCATIONS: Record<'LOW' | 'MEDIUM' | 'HIGH', HitLocation[]> = {
+  LOW: ['right leg', 'left leg'],
+  MEDIUM: ['chest', 'abdomen', 'right arm', 'left arm'],
+  HIGH: ['head', 'chest', 'right arm', 'left arm'],
 };
-const SHIELD_ZONE_MITIGATION: Record<"LOW" | "MEDIUM" | "HIGH", number> = {
-  LOW:    0.92, // 8% reduction
+const SHIELD_ZONE_MITIGATION: Record<'LOW' | 'MEDIUM' | 'HIGH', number> = {
+  LOW: 0.92, // 8% reduction
   MEDIUM: 0.88, // 12% reduction
-  HIGH:   0.85, // 15% reduction
+  HIGH: 0.85, // 15% reduction
 };
 
 export function applyShieldZoneMod(
   damage: number,
   location: HitLocation,
-  coverage?: "LOW" | "MEDIUM" | "HIGH"
+  coverage?: 'LOW' | 'MEDIUM' | 'HIGH'
 ): number {
   if (!coverage) return damage;
   const zones = SHIELD_ZONE_LOCATIONS[coverage];
@@ -148,7 +180,11 @@ export function applyShieldZoneMod(
   return Math.floor(damage * SHIELD_ZONE_MITIGATION[coverage]);
 }
 
-export function computeHitDamage(rng: () => number, damageClass: number, location: HitLocation): number {
+export function computeHitDamage(
+  rng: () => number,
+  damageClass: number,
+  location: HitLocation
+): number {
   const base = damageClass + DAMAGE_BASE_MIN;
   const locMult = LOCATION_DAMAGE_MULT[location] ?? 1.0;
   const variance = DAMAGE_VARIANCE_MIN + rng() * (DAMAGE_VARIANCE_MAX - DAMAGE_VARIANCE_MIN);
@@ -180,7 +216,7 @@ export function calculateKillWindow(
 
   // Base threshold (lethal hits are rare but possible)
   // Target: ~10% overall mortality across the league (Unified 1.0 Gold Baseline)
-  let threshold = 0.010;
+  let threshold = 0.01;
 
   // HP factor: higher chance if HP is low (below 30%)
   if (hpRatio < 0.3) threshold += 0.004;

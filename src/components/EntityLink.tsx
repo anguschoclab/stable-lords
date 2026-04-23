@@ -2,27 +2,17 @@
  * Entity Links — Warriors and Stables.
  * Now triggers a side-panel <Sheet> (flyout) with full dossiers.
  */
-import React from "react";
-import { Link } from "@tanstack/react-router";
-import { useWorldState } from "@/state/useGameStore";
-import { cn } from "@/lib/utils";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { WarriorDossier } from "@/components/WarriorDossier";
-import { StableDossier } from "@/components/StableDossier";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, User, Landmark } from "lucide-react";
-import type { GameState, Warrior } from "@/types/game";
+import React from 'react';
+import { Link } from '@tanstack/react-router';
+import { useWorldState } from '@/state/useGameStore';
+import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { WarriorDossier } from '@/components/WarriorDossier';
+import { StableDossier } from '@/components/StableDossier';
+import { Button } from '@/components/ui/button';
+import { ExternalLink, User, Landmark } from 'lucide-react';
+import type { GameState, Warrior } from '@/types/game';
 
 // ─── Warrior Link ──────────────────────────────────────────────────────────
 
@@ -48,7 +38,7 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
           <SheetTrigger asChild>
             <button
               className={cn(
-                "text-primary hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold",
+                'text-primary hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold',
                 className
               )}
               onClick={(e) => e.stopPropagation()}
@@ -66,7 +56,13 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
                 </div>
                 {resolvedId && (
                   <Link to={`/warrior/$id`} params={{ id: resolvedId }}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full profile" aria-label="View full warrior profile">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground"
+                      title="View full profile"
+                      aria-label="View full warrior profile"
+                    >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -111,11 +107,11 @@ interface StableLinkProps {
 
 export function StableLink({ name, className, children }: StableLinkProps) {
   const state = useWorldState();
-  
+
   // Resolve stable name to owner ID
   const rival = (state.rivals ?? []).find((r: any) => r.owner.stableName === name);
   const isPlayer = state.player.stableName === name;
-  const stableId = isPlayer ? "player" : rival?.owner.id;
+  const stableId = isPlayer ? 'player' : rival?.owner.id;
 
   if (!stableId) {
     return <span className={className}>{children ?? name}</span>;
@@ -128,7 +124,7 @@ export function StableLink({ name, className, children }: StableLinkProps) {
           <SheetTrigger asChild>
             <button
               className={cn(
-                "text-arena-gold hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold",
+                'text-arena-gold hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold',
                 className
               )}
               onClick={(e) => e.stopPropagation()}
@@ -146,13 +142,25 @@ export function StableLink({ name, className, children }: StableLinkProps) {
                 </div>
                 {isPlayer ? (
                   <Link to="/command/roster">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground"
+                      title="View full stable"
+                      aria-label="View full stable"
+                    >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>
                 ) : stableId ? (
                   <Link to="/world/stable/$id" params={{ id: stableId }}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" title="View full stable" aria-label="View full stable">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground"
+                      title="View full stable"
+                      aria-label="View full stable"
+                    >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>

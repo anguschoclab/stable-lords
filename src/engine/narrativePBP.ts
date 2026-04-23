@@ -9,13 +9,13 @@ export {
   getStrikeSeverity,
   getFromArchive,
   richHitLocation,
-  type CombatContext
-} from "./narrative/narrativePBPUtils";
+  type CombatContext,
+} from './narrative/narrativePBPUtils';
 export {
   generateWarriorIntro,
   battleOpener,
-  type WarriorIntroData
-} from "./narrative/narrativeIntro";
+  type WarriorIntroData,
+} from './narrative/narrativeIntro';
 export {
   narrateAttack,
   narratePassive,
@@ -24,15 +24,15 @@ export {
   narrateCounterstrike,
   narrateHit,
   narrateParryBreak,
-  narrateInitiative
-} from "./narrative/narrativeCombat";
+  narrateInitiative,
+} from './narrative/narrativeCombat';
 export {
   damageSeverityLine,
   stateChangeLine,
   fatigueLine,
   crowdReaction,
-  minuteStatusLine
-} from "./narrative/narrativeStatus";
+  minuteStatusLine,
+} from './narrative/narrativeStatus';
 export {
   narrateBoutEnd,
   popularityLine,
@@ -40,8 +40,8 @@ export {
   tradingBlowsLine,
   stalemateLine,
   tauntLine,
-  conservingLine
-} from "./narrative/narrativePostBout";
+  conservingLine,
+} from './narrative/narrativePostBout';
 export {
   RANGE_NAMES,
   narrateRangeShift,
@@ -50,5 +50,5 @@ export {
   arenaIntroLine,
   tacticStreakLine,
   pressingLine,
-  narrateInsightHint
-} from "./narrative/narrativePositioning";
+  narrateInsightHint,
+} from './narrative/narrativePositioning';

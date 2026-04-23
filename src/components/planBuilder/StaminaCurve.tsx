@@ -2,10 +2,10 @@
  * StaminaCurve — tiny SVG sparkline visualising estimated endurance over a
  * 20-minute bout for the current plan. Deterministic preview, not a full sim.
  */
-import { useMemo } from "react";
-import type { FightPlan } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import { estimateStaminaCurve } from "@/engine/strategyValidator";
+import { useMemo } from 'react';
+import type { FightPlan } from '@/types/shared.types';
+import type { Warrior } from '@/types/warrior.types';
+import { estimateStaminaCurve } from '@/engine/strategyValidator';
 
 interface Props {
   plan: FightPlan;
@@ -22,13 +22,13 @@ export default function StaminaCurve({ plan, warrior, width = 240, height = 56 }
     const pts = series.map((v, i) => {
       const x = i * step;
       const y = height - (v / max) * (height - 4) - 2;
-      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
     });
     const last = series[series.length - 1] ?? 0;
-    return { path: pts.join(" "), lastPct: Math.round((last / max) * 100) };
+    return { path: pts.join(' '), lastPct: Math.round((last / max) * 100) };
   }, [plan, warrior, width, height]);
 
-  const stroke = lastPct >= 40 ? "#4ade80" : lastPct >= 20 ? "#facc15" : "#ef4444";
+  const stroke = lastPct >= 40 ? '#4ade80' : lastPct >= 20 ? '#facc15' : '#ef4444';
 
   return (
     <div className="flex items-center gap-3">

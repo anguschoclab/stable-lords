@@ -1,7 +1,11 @@
-import * as Comlink from "comlink";
-import type { EngineWorker } from "./worker";
+import * as Comlink from 'comlink';
+import type { EngineWorker } from './worker';
 
-type AsyncEngine = { [K in keyof EngineWorker]: (...args: Parameters<EngineWorker[K]>) => Promise<ReturnType<EngineWorker[K]>> };
+type AsyncEngine = {
+  [K in keyof EngineWorker]: (
+    ...args: Parameters<EngineWorker[K]>
+  ) => Promise<ReturnType<EngineWorker[K]>>;
+};
 
 /**
  * Stable Lords — Engine Worker Proxy
@@ -14,17 +18,24 @@ function buildProxy(): AsyncEngine {
     let cached: EngineWorker | null = null;
     const load = async (): Promise<EngineWorker> => {
       if (cached) return cached;
-      const [{ advanceWeek }, { advanceDay }, { createFreshState }, { TournamentSelectionService }] = await Promise.all([
-        import("./pipeline/services/weekPipelineService"),
-        import("./dayPipeline"),
-        import("./factories"),
-        import("./matchmaking/tournamentSelection"),
+      const [
+        { advanceWeek },
+        { advanceDay },
+        { createFreshState },
+        { TournamentSelectionService },
+      ] = await Promise.all([
+        import('./pipeline/services/weekPipelineService'),
+        import('./dayPipeline'),
+        import('./factories'),
+        import('./matchmaking/tournamentSelection'),
       ]);
       cached = {
         advanceWeek,
         advanceDay,
         createFreshState,
-        resolveTournamentRound: TournamentSelectionService.resolveRound.bind(TournamentSelectionService),
+        resolveTournamentRound: TournamentSelectionService.resolveRound.bind(
+          TournamentSelectionService
+        ),
       };
       return cached;
     };
@@ -36,7 +47,7 @@ function buildProxy(): AsyncEngine {
     };
   }
 
-  const worker = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
+  const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
   return Comlink.wrap<EngineWorker>(worker) as unknown as AsyncEngine;
 }
 

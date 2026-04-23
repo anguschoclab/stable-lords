@@ -1,55 +1,59 @@
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Plus, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Plus, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type {
   PlanCondition,
   ConditionTriggerType,
   OffensiveTactic,
   DefensiveTactic,
-} from "@/types/game";
+} from '@/types/game';
 
 interface ConditionEditorProps {
   conditions: PlanCondition[];
   onChange: (conditions: PlanCondition[]) => void;
 }
 
-const TRIGGER_OPTIONS: { label: string; type: ConditionTriggerType; inputType: "percent" | "integer" | "phase" }[] = [
-  { label: "HP Below",          type: "HP_BELOW",          inputType: "percent" },
-  { label: "HP Above",          type: "HP_ABOVE",           inputType: "percent" },
-  { label: "Endurance Below",   type: "ENDURANCE_BELOW",   inputType: "percent" },
-  { label: "Momentum Lead",     type: "MOMENTUM_LEAD",     inputType: "integer" },
-  { label: "Momentum Deficit",  type: "MOMENTUM_DEFICIT",  inputType: "integer" },
-  { label: "Phase Is",          type: "PHASE_IS",          inputType: "phase" },
+const TRIGGER_OPTIONS: {
+  label: string;
+  type: ConditionTriggerType;
+  inputType: 'percent' | 'integer' | 'phase';
+}[] = [
+  { label: 'HP Below', type: 'HP_BELOW', inputType: 'percent' },
+  { label: 'HP Above', type: 'HP_ABOVE', inputType: 'percent' },
+  { label: 'Endurance Below', type: 'ENDURANCE_BELOW', inputType: 'percent' },
+  { label: 'Momentum Lead', type: 'MOMENTUM_LEAD', inputType: 'integer' },
+  { label: 'Momentum Deficit', type: 'MOMENTUM_DEFICIT', inputType: 'integer' },
+  { label: 'Phase Is', type: 'PHASE_IS', inputType: 'phase' },
 ];
 
 const OFFENSIVE_TACTICS: { label: string; value: OffensiveTactic }[] = [
-  { label: "—",           value: "none" },
-  { label: "Lunge",       value: "Lunge" },
-  { label: "Slash",       value: "Slash" },
-  { label: "Bash",        value: "Bash" },
-  { label: "Decisiveness",value: "Decisiveness" },
+  { label: '—', value: 'none' },
+  { label: 'Lunge', value: 'Lunge' },
+  { label: 'Slash', value: 'Slash' },
+  { label: 'Bash', value: 'Bash' },
+  { label: 'Decisiveness', value: 'Decisiveness' },
 ];
 
 const DEFENSIVE_TACTICS: { label: string; value: DefensiveTactic }[] = [
-  { label: "—",             value: "none" },
-  { label: "Dodge",         value: "Dodge" },
-  { label: "Parry",         value: "Parry" },
-  { label: "Riposte",       value: "Riposte" },
-  { label: "Responsiveness",value: "Responsiveness" },
+  { label: '—', value: 'none' },
+  { label: 'Dodge', value: 'Dodge' },
+  { label: 'Parry', value: 'Parry' },
+  { label: 'Riposte', value: 'Riposte' },
+  { label: 'Responsiveness', value: 'Responsiveness' },
 ];
 
 const DEFAULT_CONDITION: PlanCondition = {
-  trigger: { type: "HP_BELOW", value: 35 },
+  trigger: { type: 'HP_BELOW', value: 35 },
   override: { OE: 4 },
 };
 
 function triggerDisplayValue(cond: PlanCondition): string {
-  const opt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type);
+  const opt = TRIGGER_OPTIONS.find((o) => o.type === cond.trigger.type);
   if (!opt) return String(cond.trigger.value);
-  if (opt.inputType === "percent") return `${cond.trigger.value}%`;
-  if (opt.inputType === "phase") return String(cond.trigger.value);
+  if (opt.inputType === 'percent') return `${cond.trigger.value}%`;
+  if (opt.inputType === 'phase') return String(cond.trigger.value);
   return String(cond.trigger.value);
 }
 
@@ -63,27 +67,27 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
   }
 
   function updateCondition(idx: number, partial: Partial<PlanCondition>) {
-    onChange(conditions.map((c, i) => i === idx ? { ...c, ...partial } : c));
+    onChange(conditions.map((c, i) => (i === idx ? { ...c, ...partial } : c)));
   }
 
   function updateTrigger(idx: number, type: ConditionTriggerType) {
-    const opt = TRIGGER_OPTIONS.find(o => o.type === type);
+    const opt = TRIGGER_OPTIONS.find((o) => o.type === type);
     if (!opt) return;
 
     let value: number | string;
-    if (opt.inputType === "percent") value = 35;
-    else if (opt.inputType === "integer") value = 2;
-    else value = "Mid";
+    if (opt.inputType === 'percent') value = 35;
+    else if (opt.inputType === 'integer') value = 2;
+    else value = 'Mid';
     updateCondition(idx, { trigger: { type, value } });
   }
 
   function updateTriggerValue(idx: number, raw: string) {
     const cond = conditions[idx];
-    const opt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type);
+    const opt = TRIGGER_OPTIONS.find((o) => o.type === cond.trigger.type);
     if (!opt) return;
 
     let value: number | string;
-    if (opt.inputType === "phase") {
+    if (opt.inputType === 'phase') {
       value = raw;
     } else {
       const n = parseFloat(raw);
@@ -92,7 +96,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
     updateCondition(idx, { trigger: { ...cond.trigger, value } });
   }
 
-  function updateOverrideSlider(idx: number, key: "OE" | "AL" | "killDesire", val: number | undefined) {
+  function updateOverrideSlider(
+    idx: number,
+    key: 'OE' | 'AL' | 'killDesire',
+    val: number | undefined
+  ) {
     const cond = conditions[idx];
     if (val === undefined) {
       const { [key]: _, ...rest } = cond.override;
@@ -102,9 +110,13 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
     }
   }
 
-  function updateOverrideTactic(idx: number, key: "offensiveTactic" | "defensiveTactic", val: string) {
+  function updateOverrideTactic(
+    idx: number,
+    key: 'offensiveTactic' | 'defensiveTactic',
+    val: string
+  ) {
     const cond = conditions[idx];
-    if (val === "none") {
+    if (val === 'none') {
       const { [key]: _, ...rest } = cond.override;
       updateCondition(idx, { override: rest });
     } else {
@@ -121,7 +133,7 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
       )}
 
       {conditions.map((cond, idx) => {
-        const trigOpt = TRIGGER_OPTIONS.find(o => o.type === cond.trigger.type);
+        const trigOpt = TRIGGER_OPTIONS.find((o) => o.type === cond.trigger.type);
         if (!trigOpt) return null;
 
         return (
@@ -149,32 +161,36 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
 
             {/* WHEN row */}
             <div className="space-y-2">
-              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">When</div>
+              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
+                When
+              </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <select
                   value={cond.trigger.type}
-                  onChange={e => updateTrigger(idx, e.target.value as ConditionTriggerType)}
+                  onChange={(e) => updateTrigger(idx, e.target.value as ConditionTriggerType)}
                   className="bg-black/60 border border-white/10 text-[10px] font-black uppercase tracking-wide text-foreground px-2 py-1.5 focus:outline-none focus:border-arena-gold/40 appearance-none"
                 >
-                  {TRIGGER_OPTIONS.map(o => (
-                    <option key={o.type} value={o.type}>{o.label}</option>
+                  {TRIGGER_OPTIONS.map((o) => (
+                    <option key={o.type} value={o.type}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
 
-                {trigOpt.inputType === "phase" ? (
+                {trigOpt.inputType === 'phase' ? (
                   <select
                     value={String(cond.trigger.value)}
-                    onChange={e => updateTriggerValue(idx, e.target.value)}
+                    onChange={(e) => updateTriggerValue(idx, e.target.value)}
                     className="bg-black/60 border border-white/10 text-[10px] font-black uppercase tracking-wide text-foreground px-2 py-1.5 focus:outline-none focus:border-arena-gold/40 appearance-none"
                   >
                     <option value="Opening">Opening</option>
                     <option value="Mid">Mid</option>
                     <option value="Late">Late</option>
                   </select>
-                ) : trigOpt.inputType === "integer" ? (
+                ) : trigOpt.inputType === 'integer' ? (
                   <select
                     value={String(cond.trigger.value)}
-                    onChange={e => updateTriggerValue(idx, e.target.value)}
+                    onChange={(e) => updateTriggerValue(idx, e.target.value)}
                     className="bg-black/60 border border-white/10 text-[10px] font-black uppercase tracking-wide text-foreground px-2 py-1.5 focus:outline-none focus:border-arena-gold/40 appearance-none"
                   >
                     <option value="1">1</option>
@@ -189,7 +205,7 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       max={100}
                       step={5}
                       value={Number(cond.trigger.value)}
-                      onChange={e => updateTriggerValue(idx, e.target.value)}
+                      onChange={(e) => updateTriggerValue(idx, e.target.value)}
                       className="w-16 bg-black/60 border border-white/10 text-[10px] font-mono font-bold text-arena-gold px-2 py-1.5 focus:outline-none focus:border-arena-gold/40 text-center"
                     />
                     <span className="text-[10px] text-muted-foreground/60 font-bold">%</span>
@@ -204,24 +220,38 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
 
             {/* THEN row */}
             <div className="space-y-3">
-              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">Then Override</div>
+              <div className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
+                Then Override
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* OE override */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className={cn(
-                      "text-[9px] font-black uppercase tracking-widest",
-                      cond.override.OE !== undefined ? "text-arena-gold" : "text-muted-foreground/40"
-                    )}>
-                      OE {cond.override.OE !== undefined ? cond.override.OE : "—"}
+                    <Label
+                      className={cn(
+                        'text-[9px] font-black uppercase tracking-widest',
+                        cond.override.OE !== undefined
+                          ? 'text-arena-gold'
+                          : 'text-muted-foreground/40'
+                      )}
+                    >
+                      OE {cond.override.OE !== undefined ? cond.override.OE : '—'}
                     </Label>
                     {cond.override.OE !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Clear OE override">
+                      <button
+                        onClick={() => updateOverrideSlider(idx, 'OE', undefined)}
+                        className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive"
+                        aria-label="Clear OE override"
+                      >
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold" aria-label="Set OE override">
+                      <button
+                        onClick={() => updateOverrideSlider(idx, 'OE', 5)}
+                        className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold"
+                        aria-label="Set OE override"
+                      >
                         set
                       </button>
                     )}
@@ -229,8 +259,10 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                   {cond.override.OE !== undefined && (
                     <Slider
                       value={[cond.override.OE]}
-                      onValueChange={([v]) => updateOverrideSlider(idx, "OE", v)}
-                      min={1} max={10} step={1}
+                      onValueChange={([v]) => updateOverrideSlider(idx, 'OE', v)}
+                      min={1}
+                      max={10}
+                      step={1}
                     />
                   )}
                 </div>
@@ -238,18 +270,30 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                 {/* AL override */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className={cn(
-                      "text-[9px] font-black uppercase tracking-widest",
-                      cond.override.AL !== undefined ? "text-arena-fame" : "text-muted-foreground/40"
-                    )}>
-                      AL {cond.override.AL !== undefined ? cond.override.AL : "—"}
+                    <Label
+                      className={cn(
+                        'text-[9px] font-black uppercase tracking-widest',
+                        cond.override.AL !== undefined
+                          ? 'text-arena-fame'
+                          : 'text-muted-foreground/40'
+                      )}
+                    >
+                      AL {cond.override.AL !== undefined ? cond.override.AL : '—'}
                     </Label>
                     {cond.override.AL !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Clear AL override">
+                      <button
+                        onClick={() => updateOverrideSlider(idx, 'AL', undefined)}
+                        className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive"
+                        aria-label="Clear AL override"
+                      >
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame" aria-label="Set AL override">
+                      <button
+                        onClick={() => updateOverrideSlider(idx, 'AL', 5)}
+                        className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame"
+                        aria-label="Set AL override"
+                      >
                         set
                       </button>
                     )}
@@ -257,8 +301,10 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                   {cond.override.AL !== undefined && (
                     <Slider
                       value={[cond.override.AL]}
-                      onValueChange={([v]) => updateOverrideSlider(idx, "AL", v)}
-                      min={1} max={10} step={1}
+                      onValueChange={([v]) => updateOverrideSlider(idx, 'AL', v)}
+                      min={1}
+                      max={10}
+                      step={1}
                     />
                   )}
                 </div>
@@ -266,18 +312,30 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                 {/* KD override */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className={cn(
-                      "text-[9px] font-black uppercase tracking-widest",
-                      cond.override.killDesire !== undefined ? "text-destructive" : "text-muted-foreground/40"
-                    )}>
-                      KD {cond.override.killDesire !== undefined ? cond.override.killDesire : "—"}
+                    <Label
+                      className={cn(
+                        'text-[9px] font-black uppercase tracking-widest',
+                        cond.override.killDesire !== undefined
+                          ? 'text-destructive'
+                          : 'text-muted-foreground/40'
+                      )}
+                    >
+                      KD {cond.override.killDesire !== undefined ? cond.override.killDesire : '—'}
                     </Label>
                     {cond.override.killDesire !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Clear Kill Desire override">
+                      <button
+                        onClick={() => updateOverrideSlider(idx, 'killDesire', undefined)}
+                        className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive"
+                        aria-label="Clear Kill Desire override"
+                      >
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Set Kill Desire override">
+                      <button
+                        onClick={() => updateOverrideSlider(idx, 'killDesire', 5)}
+                        className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive"
+                        aria-label="Set Kill Desire override"
+                      >
                         set
                       </button>
                     )}
@@ -285,8 +343,10 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                   {cond.override.killDesire !== undefined && (
                     <Slider
                       value={[cond.override.killDesire]}
-                      onValueChange={([v]) => updateOverrideSlider(idx, "killDesire", v)}
-                      min={1} max={10} step={1}
+                      onValueChange={([v]) => updateOverrideSlider(idx, 'killDesire', v)}
+                      min={1}
+                      max={10}
+                      step={1}
                     />
                   )}
                 </div>
@@ -295,26 +355,34 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
               {/* Tactic overrides */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Off. Tactic</div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    Off. Tactic
+                  </div>
                   <select
-                    value={cond.override.offensiveTactic ?? "none"}
-                    onChange={e => updateOverrideTactic(idx, "offensiveTactic", e.target.value)}
+                    value={cond.override.offensiveTactic ?? 'none'}
+                    onChange={(e) => updateOverrideTactic(idx, 'offensiveTactic', e.target.value)}
                     className="w-full bg-black/60 border border-white/10 text-[10px] font-bold uppercase tracking-wide text-foreground px-2 py-1.5 focus:outline-none focus:border-arena-blood/40 appearance-none"
                   >
-                    {OFFENSIVE_TACTICS.map(t => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
+                    {OFFENSIVE_TACTICS.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Def. Tactic</div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    Def. Tactic
+                  </div>
                   <select
-                    value={cond.override.defensiveTactic ?? "none"}
-                    onChange={e => updateOverrideTactic(idx, "defensiveTactic", e.target.value)}
+                    value={cond.override.defensiveTactic ?? 'none'}
+                    onChange={(e) => updateOverrideTactic(idx, 'defensiveTactic', e.target.value)}
                     className="w-full bg-black/60 border border-white/10 text-[10px] font-bold uppercase tracking-wide text-foreground px-2 py-1.5 focus:outline-none focus:border-arena-gold/40 appearance-none"
                   >
-                    {DEFENSIVE_TACTICS.map(t => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
+                    {DEFENSIVE_TACTICS.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -322,13 +390,15 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
 
               {/* Label */}
               <div className="space-y-1.5">
-                <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Label (optional)</div>
+                <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                  Label (optional)
+                </div>
                 <input
                   type="text"
                   placeholder="e.g. Survival Mode"
                   maxLength={32}
-                  value={cond.label ?? ""}
-                  onChange={e => updateCondition(idx, { label: e.target.value || undefined })}
+                  value={cond.label ?? ''}
+                  onChange={(e) => updateCondition(idx, { label: e.target.value || undefined })}
                   className="w-full bg-black/60 border border-white/10 text-[10px] font-bold text-foreground placeholder:text-muted-foreground/20 px-2 py-1.5 focus:outline-none focus:border-arena-gold/40"
                 />
               </div>

@@ -4,17 +4,17 @@
  * (pending Wave-1 structured ExchangeLog); kills, KO, fatigue, big hits
  * surface with distinct glyphs.
  */
-import { useMemo } from "react";
-import type { MinuteEvent } from "@/types/combat.types";
-import { cn } from "@/lib/utils";
-import { Skull, Zap, Activity, Shield, Swords, Flame } from "lucide-react";
+import { useMemo } from 'react';
+import type { MinuteEvent } from '@/types/combat.types';
+import { cn } from '@/lib/utils';
+import { Skull, Zap, Activity, Shield, Swords, Flame } from 'lucide-react';
 
 interface Props {
   log: MinuteEvent[];
   visibleCount?: number;
 }
 
-type Kind = "kill" | "ko" | "fatigue" | "bighit" | "armor" | "momentum";
+type Kind = 'kill' | 'ko' | 'fatigue' | 'bighit' | 'armor' | 'momentum';
 
 interface Highlight {
   minute: number;
@@ -23,22 +23,72 @@ interface Highlight {
 }
 
 const KIND_META: Record<Kind, { label: string; color: string; icon: React.ReactNode }> = {
-  kill:     { label: "KILL",       color: "text-arena-blood border-arena-blood/40 bg-arena-blood/10", icon: <Skull className="h-3 w-3" /> },
-  ko:       { label: "KO",         color: "text-arena-gold border-arena-gold/40 bg-arena-gold/10",   icon: <Zap className="h-3 w-3" /> },
-  fatigue:  { label: "COLLAPSE",   color: "text-muted-foreground border-white/10 bg-black",          icon: <Activity className="h-3 w-3" /> },
-  bighit:   { label: "BIG HIT",    color: "text-destructive border-destructive/40 bg-destructive/10",icon: <Flame className="h-3 w-3" /> },
-  armor:    { label: "ARMOR",      color: "text-primary border-primary/30 bg-primary/10",            icon: <Shield className="h-3 w-3" /> },
-  momentum: { label: "SWING",      color: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",icon: <Swords className="h-3 w-3" /> },
+  kill: {
+    label: 'KILL',
+    color: 'text-arena-blood border-arena-blood/40 bg-arena-blood/10',
+    icon: <Skull className="h-3 w-3" />,
+  },
+  ko: {
+    label: 'KO',
+    color: 'text-arena-gold border-arena-gold/40 bg-arena-gold/10',
+    icon: <Zap className="h-3 w-3" />,
+  },
+  fatigue: {
+    label: 'COLLAPSE',
+    color: 'text-muted-foreground border-white/10 bg-black',
+    icon: <Activity className="h-3 w-3" />,
+  },
+  bighit: {
+    label: 'BIG HIT',
+    color: 'text-destructive border-destructive/40 bg-destructive/10',
+    icon: <Flame className="h-3 w-3" />,
+  },
+  armor: {
+    label: 'ARMOR',
+    color: 'text-primary border-primary/30 bg-primary/10',
+    icon: <Shield className="h-3 w-3" />,
+  },
+  momentum: {
+    label: 'SWING',
+    color: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10',
+    icon: <Swords className="h-3 w-3" />,
+  },
 };
 
 function classify(evt: MinuteEvent): Kind | null {
-  const t = (evt.text || "").toLowerCase();
-  if (t.includes("kill") || t.includes("slain") || t.includes("fatal") || t.includes("death blow") || t.includes("lifeless")) return "kill";
-  if (t.includes("knocks out") || t.includes("knocked out") || t.includes(" ko ") || t.includes("unconscious")) return "ko";
-  if (t.includes("collaps") || t.includes("exhaust") || t.includes("gasping") || t.includes("drained")) return "fatigue";
-  if (t.includes("critical") || t.includes("devastat") || t.includes("shattering") || t.includes("crushing")) return "bighit";
-  if (t.includes("armor") || t.includes("helm") || t.includes("shield")) return "armor";
-  if (t.includes("reversal") || t.includes("turns the tide") || t.includes("riposte")) return "momentum";
+  const t = (evt.text || '').toLowerCase();
+  if (
+    t.includes('kill') ||
+    t.includes('slain') ||
+    t.includes('fatal') ||
+    t.includes('death blow') ||
+    t.includes('lifeless')
+  )
+    return 'kill';
+  if (
+    t.includes('knocks out') ||
+    t.includes('knocked out') ||
+    t.includes(' ko ') ||
+    t.includes('unconscious')
+  )
+    return 'ko';
+  if (
+    t.includes('collaps') ||
+    t.includes('exhaust') ||
+    t.includes('gasping') ||
+    t.includes('drained')
+  )
+    return 'fatigue';
+  if (
+    t.includes('critical') ||
+    t.includes('devastat') ||
+    t.includes('shattering') ||
+    t.includes('crushing')
+  )
+    return 'bighit';
+  if (t.includes('armor') || t.includes('helm') || t.includes('shield')) return 'armor';
+  if (t.includes('reversal') || t.includes('turns the tide') || t.includes('riposte'))
+    return 'momentum';
   return null;
 }
 
@@ -53,7 +103,7 @@ export function HighlightLog({ log, visibleCount }: Props) {
       const kind = classify(e);
       if (!kind) continue;
       // Dedup kill lines occurring on the same minute.
-      if (kind === "kill") {
+      if (kind === 'kill') {
         if (seenKills.has(e.minute)) continue;
         seenKills.add(e.minute);
       }
@@ -78,11 +128,11 @@ export function HighlightLog({ log, visibleCount }: Props) {
           return (
             <li key={idx} className="flex items-start gap-3 text-[12px] leading-snug">
               <span className="font-mono text-[10px] text-muted-foreground/50 w-8 shrink-0 pt-0.5">
-                {String(h.minute).padStart(2, "0")}:00
+                {String(h.minute).padStart(2, '0')}:00
               </span>
               <span
                 className={cn(
-                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-none border shrink-0 text-[9px] font-black uppercase tracking-widest",
+                  'inline-flex items-center gap-1 px-2 py-0.5 rounded-none border shrink-0 text-[9px] font-black uppercase tracking-widest',
                   meta.color
                 )}
               >

@@ -1,4 +1,4 @@
-import { IRNGService } from "./IRNGService";
+import { IRNGService } from './IRNGService';
 
 /**
  * Test RNG Service Implementation

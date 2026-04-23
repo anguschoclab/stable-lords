@@ -1,23 +1,46 @@
-import { createFighterState } from "./bout/fighterState";
-import { resolveDecision } from "./bout/decisionLogic";
-import { defaultPlanForWarrior } from "./bout/planDefaults";
-import { getPhase as getCombatPhase } from "./combat/mechanics/combatMath";
-import { DEFAULT_LOADOUT, checkWeaponRequirements } from "@/data/equipment";
-import { getMatchupBonus, MAX_EXCHANGES, EXCHANGES_PER_MINUTE } from "./combat/mechanics/combatConstants";
-import { resolveEffectiveTactics, resolveExchange, type ResolutionContext } from "./combat/resolution/resolution";
-import { narrateEvents, NarrationContext } from "./combat/narrative/narrator";
-import { generateWarriorIntro, battleOpener, minuteStatusLine, narrateBoutEnd, conservingLine, tacticStreakLine, arenaIntroLine } from "./narrativePBP";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import type { Trainer, FightOutcomeBy } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightPlan, FightOutcome, MinuteEvent, DeathCauseBucket, ExchangeLogEntry, CombatEvent } from "@/types/combat.types";
-import type { WeatherType, DistanceRange, ArenaZone } from "@/types/shared.types";
-import { getTrainerMods } from "./combat/mechanics/simulateHelpers";
-import { getWeatherEffect, weatherOpeningLine } from "./combat/mechanics/weatherEffects";
-import { getArenaById } from "@/data/arenas";
-import { getFeatureFlags } from "@/engine/featureFlags";
-import type { CrowdMood } from "@/engine/crowdMood";
+import { createFighterState } from './bout/fighterState';
+import { resolveDecision } from './bout/decisionLogic';
+import { defaultPlanForWarrior } from './bout/planDefaults';
+import { getPhase as getCombatPhase } from './combat/mechanics/combatMath';
+import { DEFAULT_LOADOUT, checkWeaponRequirements } from '@/data/equipment';
+import {
+  getMatchupBonus,
+  MAX_EXCHANGES,
+  EXCHANGES_PER_MINUTE,
+} from './combat/mechanics/combatConstants';
+import {
+  resolveEffectiveTactics,
+  resolveExchange,
+  type ResolutionContext,
+} from './combat/resolution/resolution';
+import { narrateEvents, NarrationContext } from './combat/narrative/narrator';
+import {
+  generateWarriorIntro,
+  battleOpener,
+  minuteStatusLine,
+  narrateBoutEnd,
+  conservingLine,
+  tacticStreakLine,
+  arenaIntroLine,
+} from './narrativePBP';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import type { Trainer, FightOutcomeBy } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import type {
+  FightPlan,
+  FightOutcome,
+  MinuteEvent,
+  DeathCauseBucket,
+  ExchangeLogEntry,
+  CombatEvent,
+} from '@/types/combat.types';
+import type { WeatherType, DistanceRange, ArenaZone } from '@/types/shared.types';
+import { getTrainerMods } from './combat/mechanics/simulateHelpers';
+import { getWeatherEffect, weatherOpeningLine } from './combat/mechanics/weatherEffects';
+import { getArenaById } from '@/data/arenas';
+import { getFeatureFlags } from '@/engine/featureFlags';
+import type { CrowdMood } from '@/engine/crowdMood';
 
 /**
  * Per-mood kill-window deltas. Magnitudes are intentionally tiny so the 8%
@@ -35,7 +58,7 @@ const CROWD_KILL_BONUS: Record<CrowdMood, number> = {
 // ─── Exports from sub-modules for backward compatibility ───
 export { createFighterState, resolveDecision, defaultPlanForWarrior };
 
-type Phase = "OPENING" | "MID" | "LATE";
+type Phase = 'OPENING' | 'MID' | 'LATE';
 
 function getPhase(exchange: number, maxExchanges: number): Phase {
   const p = getCombatPhase(exchange, maxExchanges);
@@ -58,28 +81,32 @@ function buildExchangeLogEntry(
   const reasonCodes: string[] = [];
   for (const e of events) {
     switch (e.type) {
-      case "INITIATIVE":
+      case 'INITIATIVE':
         entry.iniWinner = e.actor;
         break;
-      case "ATTACK":
-        if (e.result === "WHIFF") entry.attResult = "miss";
-        else if (e.metadata?.crit) entry.attResult = "crit";
-        else if (e.result === "FUMBLE") entry.attResult = "fumble";
+      case 'ATTACK':
+        if (e.result === 'WHIFF') entry.attResult = 'miss';
+        else if (e.metadata?.crit) entry.attResult = 'crit';
+        else if (e.result === 'FUMBLE') entry.attResult = 'fumble';
         break;
-      case "DEFENSE":
-        if (e.result === "PARRY") { entry.parResult = "success"; entry.attResult ??= "miss"; }
-        else if (e.result === "DODGE") { entry.defResult = "dodge"; entry.attResult ??= "miss"; }
-        else if (e.result === "RIPOSTE") entry.ripResult = "hit";
+      case 'DEFENSE':
+        if (e.result === 'PARRY') {
+          entry.parResult = 'success';
+          entry.attResult ??= 'miss';
+        } else if (e.result === 'DODGE') {
+          entry.defResult = 'dodge';
+          entry.attResult ??= 'miss';
+        } else if (e.result === 'RIPOSTE') entry.ripResult = 'hit';
         break;
-      case "HIT":
-        entry.attResult ??= (e.metadata?.crit ? "crit" : "hit");
-        if (typeof e.value === "number") entry.damage = (entry.damage ?? 0) + e.value;
+      case 'HIT':
+        entry.attResult ??= e.metadata?.crit ? 'crit' : 'hit';
+        if (typeof e.value === 'number') entry.damage = (entry.damage ?? 0) + e.value;
         if (e.location) entry.hitLocation = e.location;
         break;
-      case "BOUT_END":
+      case 'BOUT_END':
         if (e.metadata?.cause) reasonCodes.push(`CAUSE_${String(e.metadata.cause)}`);
-        entry.executionFlag = e.result === "Kill";
-        entry.killWindow ??= e.result === "Kill";
+        entry.executionFlag = e.result === 'Kill';
+        entry.killWindow ??= e.result === 'Kill';
         break;
     }
   }
@@ -89,7 +116,7 @@ function buildExchangeLogEntry(
 
 /**
  * Simulates a fight between two plans/warriors.
- * 
+ *
  * @param planA - Strategy for fighter A
  * @param planD - Strategy for fighter D
  * @param warriorA - Warrior data for A (optional)
@@ -104,48 +131,60 @@ export function simulateFight(
   warriorD?: Warrior,
   providedRng?: (() => number) | number,
   trainers?: Trainer[],
-  weather: WeatherType = "Clear",
-  arenaId: string = "standard_arena",
+  weather: WeatherType = 'Clear',
+  arenaId: string = 'standard_arena',
   crowdMood?: CrowdMood
 ): FightOutcome {
   // 1. Deterministic RNG setup
   let rngService: IRNGService;
   let rng: () => number;
-  if (typeof providedRng === "function") {
+  if (typeof providedRng === 'function') {
     rng = providedRng;
     // Create a wrapper service for functions that need IRNGService
-    rngService = { next: rng, pick: <T>(arr: T[]) => arr[Math.floor(rng() * arr.length)] } as IRNGService;
+    rngService = {
+      next: rng,
+      pick: <T>(arr: T[]) => arr[Math.floor(rng() * arr.length)],
+    } as IRNGService;
   } else {
-    const seed = typeof providedRng === "number" 
-      ? providedRng 
-      : crypto.getRandomValues(new Uint32Array(1))[0];
+    const seed =
+      typeof providedRng === 'number' ? providedRng : crypto.getRandomValues(new Uint32Array(1))[0];
     rngService = new SeededRNGService(seed);
     rng = () => rngService.next();
   }
 
-  const nameA = warriorA?.name ?? "Attacker";
-  const nameD = warriorD?.name ?? "Defender";
+  const nameA = warriorA?.name ?? 'Attacker';
+  const nameD = warriorD?.name ?? 'Defender';
   const weaponA = (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon;
   const weaponD = (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon;
 
-  const fA = createFighterState("A", planA, warriorA, trainers);
-  const fD = createFighterState("D", planD, warriorD, trainers);
+  const fA = createFighterState('A', planA, warriorA, trainers);
+  const fD = createFighterState('D', planD, warriorD, trainers);
 
-  if (weather === "Blood Moon") {
+  if (weather === 'Blood Moon') {
     // Blood Moon drives fighters to a frenzy
     fA.plan = { ...fA.plan, killDesire: Math.min(10, (fA.plan.killDesire ?? 5) + 3) };
     fD.plan = { ...fD.plan, killDesire: Math.min(10, (fD.plan.killDesire ?? 5) + 3) };
   }
 
-  const modsA = trainers ? getTrainerMods(trainers, planA.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
-  const modsD = trainers ? getTrainerMods(trainers, planD.style) : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
+  const modsA = trainers
+    ? getTrainerMods(trainers, planA.style)
+    : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
+  const modsD = trainers
+    ? getTrainerMods(trainers, planD.style)
+    : { attMod: 0, defMod: 0, iniMod: 0, parMod: 0, decMod: 0, endMod: 0, healMod: 0 };
 
-  const weaponReqA = checkWeaponRequirements(weaponA, warriorA?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
-  const weaponReqD = checkWeaponRequirements(weaponD, warriorD?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 });
+  const weaponReqA = checkWeaponRequirements(
+    weaponA,
+    warriorA?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 }
+  );
+  const weaponReqD = checkWeaponRequirements(
+    weaponD,
+    warriorD?.attributes ?? { ST: 10, SZ: 10, WT: 10, DF: 10 }
+  );
 
   const resCtx: ResolutionContext = {
     rng,
-    phase: "OPENING",
+    phase: 'OPENING',
     exchange: 0,
     weather,
     weatherEffect: getWeatherEffect(weather),
@@ -154,16 +193,23 @@ export function simulateFight(
     trainerModsA: modsA,
     trainerModsD: modsD,
     trainers: trainers ?? [],
-    weaponReqA: { endurancePenalty: weaponReqA.endurancePenalty, attPenalty: weaponReqA.attPenalty },
-    weaponReqD: { endurancePenalty: weaponReqD.endurancePenalty, attPenalty: weaponReqD.attPenalty },
+    weaponReqA: {
+      endurancePenalty: weaponReqA.endurancePenalty,
+      attPenalty: weaponReqA.attPenalty,
+    },
+    weaponReqD: {
+      endurancePenalty: weaponReqD.endurancePenalty,
+      attPenalty: weaponReqD.attPenalty,
+    },
     tacticStreakA: 0,
     tacticStreakD: 0,
-    range: "Striking" as DistanceRange,
-    zone: "Center" as ArenaZone,
+    range: 'Striking' as DistanceRange,
+    zone: 'Center' as ArenaZone,
     arenaConfig: getArenaById(arenaId),
     surfaceMod: getArenaById(arenaId).surfaceMod,
     pushedFighter: undefined,
-    crowdKillBonus: (getFeatureFlags().crowdMoodLethality && crowdMood) ? CROWD_KILL_BONUS[crowdMood] : 0,
+    crowdKillBonus:
+      getFeatureFlags().crowdMoodLethality && crowdMood ? CROWD_KILL_BONUS[crowdMood] : 0,
   };
 
   const log: MinuteEvent[] = [];
@@ -171,46 +217,54 @@ export function simulateFight(
   const tags = new Set<string>();
   let prevHpRatioA = 1.0;
   let prevHpRatioD = 1.0;
-  let winner: "A" | "D" | null = null;
-  let by: FightOutcome["by"] = null;
+  let winner: 'A' | 'D' | null = null;
+  let by: FightOutcome['by'] = null;
   let lastPhase: string | null = null;
   let lastMinuteMarker = 0;
-  
+
   let causeBucket: DeathCauseBucket | undefined;
   let fatalHitLocation: string | undefined;
   let fatalExchangeIndex: number | undefined;
 
   // ── 1. Introductions ──
-  const introA = generateWarriorIntro(rng, {
-    name: nameA,
-    style: planA.style,
-    weaponId: weaponA,
-    armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor,
-    helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm,
-    attributes: warriorA?.attributes,
-    backupWeaponId: (warriorA?.equipment as { backup?: string } | undefined)?.backup,
-  }, warriorA?.attributes?.SZ);
-  const introD = generateWarriorIntro(rng, {
-    name: nameD,
-    style: planD.style,
-    weaponId: weaponD,
-    armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor,
-    helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
-    attributes: warriorD?.attributes,
-    backupWeaponId: (warriorD?.equipment as { backup?: string } | undefined)?.backup,
-  }, warriorD?.attributes?.SZ);
-  
-  introA.forEach(line => log.push({ minute: 0, text: line }));
-  log.push({ minute: 0, text: "" });
-  introD.forEach(line => log.push({ minute: 0, text: line }));
-  log.push({ minute: 0, text: "" });
+  const introA = generateWarriorIntro(
+    rng,
+    {
+      name: nameA,
+      style: planA.style,
+      weaponId: weaponA,
+      armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor,
+      helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm,
+      attributes: warriorA?.attributes,
+      backupWeaponId: (warriorA?.equipment as { backup?: string } | undefined)?.backup,
+    },
+    warriorA?.attributes?.SZ
+  );
+  const introD = generateWarriorIntro(
+    rng,
+    {
+      name: nameD,
+      style: planD.style,
+      weaponId: weaponD,
+      armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor,
+      helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
+      attributes: warriorD?.attributes,
+      backupWeaponId: (warriorD?.equipment as { backup?: string } | undefined)?.backup,
+    },
+    warriorD?.attributes?.SZ
+  );
+
+  introA.forEach((line) => log.push({ minute: 0, text: line }));
+  log.push({ minute: 0, text: '' });
+  introD.forEach((line) => log.push({ minute: 0, text: line }));
+  log.push({ minute: 0, text: '' });
 
   // Emit weather opening line with explicit type name (skipped for Clear/Overcast)
   const weatherLine = weatherOpeningLine(weather);
   if (weatherLine) log.push({ minute: 0, text: `☁ ${weather.toUpperCase()} — ${weatherLine}` });
 
   // Emit arena intro line for non-default arenas
-  if (arenaId !== "standard_arena") {
+  if (arenaId !== 'standard_arena') {
     log.push({ minute: 0, text: arenaIntroLine(resCtx.arenaConfig) });
   }
 
@@ -228,24 +282,27 @@ export function simulateFight(
     // Phase Change & Tactic Reveal
     if (phase !== lastPhase) {
       lastPhase = phase;
-      const phaseKey = phase.toLowerCase() as "opening" | "mid" | "late";
+      const phaseKey = phase.toLowerCase() as 'opening' | 'mid' | 'late';
       const tacticsA = resolveEffectiveTactics(fA.plan, phaseKey);
       const tacticsD = resolveEffectiveTactics(fD.plan, phaseKey);
       log.push({
         minute: min,
         text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,
         phase,
-        offTacticA: tacticsA.offTactic !== "none" ? tacticsA.offTactic : undefined,
-        defTacticA: tacticsA.defTactic !== "none" ? tacticsA.defTactic : undefined,
-        offTacticD: tacticsD.offTactic !== "none" ? tacticsD.offTactic : undefined,
-        defTacticD: tacticsD.defTactic !== "none" ? tacticsD.defTactic : undefined,
+        offTacticA: tacticsA.offTactic !== 'none' ? tacticsA.offTactic : undefined,
+        defTacticA: tacticsA.defTactic !== 'none' ? tacticsA.defTactic : undefined,
+        offTacticD: tacticsD.offTactic !== 'none' ? tacticsD.offTactic : undefined,
+        defTacticD: tacticsD.defTactic !== 'none' ? tacticsD.defTactic : undefined,
       });
     }
 
     if (min > lastMinuteMarker && min > 1) {
       lastMinuteMarker = min;
       log.push({ minute: min, text: `MINUTE ${min}.` });
-      log.push({ minute: min, text: minuteStatusLine(rng, min, nameA, nameD, fA.hitsLanded, fD.hitsLanded) });
+      log.push({
+        minute: min,
+        text: minuteStatusLine(rng, min, nameA, nameD, fA.hitsLanded, fD.hitsLanded),
+      });
     }
 
     // A. Resolve Math (Dice)
@@ -254,14 +311,21 @@ export function simulateFight(
 
     // B. Resolve Narration (Drama)
     const narCtx: NarrationContext = {
-      rng, nameA, nameD, weaponA, weaponD,
-      styleA: fA.style, styleD: fD.style,
-      maxHpA: fA.maxHp, maxHpD: fD.maxHp,
-      prevHpRatioA, prevHpRatioD,
+      rng,
+      nameA,
+      nameD,
+      weaponA,
+      weaponD,
+      styleA: fA.style,
+      styleD: fD.style,
+      maxHpA: fA.maxHp,
+      maxHpD: fD.maxHp,
+      prevHpRatioA,
+      prevHpRatioD,
       fameA: warriorA?.fame ?? 0,
       fameD: warriorD?.fame ?? 0,
-      isFavoriteA: !!(warriorA?.favorites?.discovered?.weapon),
-      isFavoriteD: !!(warriorD?.favorites?.discovered?.weapon)
+      isFavoriteA: !!warriorA?.favorites?.discovered?.weapon,
+      isFavoriteD: !!warriorD?.favorites?.discovered?.weapon,
     };
     const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
     log.push(...newLines);
@@ -279,7 +343,7 @@ export function simulateFight(
     }
 
     // C. Check for End Events
-    const boutEnd = events.find(e => e.type === "BOUT_END");
+    const boutEnd = events.find((e) => e.type === 'BOUT_END');
     if (boutEnd) {
       by = boutEnd.result as FightOutcomeBy;
       fatalHitLocation = boutEnd.metadata?.location as string;
@@ -289,27 +353,39 @@ export function simulateFight(
       // Kill/KO: actor = who scored it (winner)
       // Stoppage: actor = who ran out of endurance (loser) → other fighter wins
       // Exhaustion: both ran out simultaneously → draw
-      if (by === "Stoppage") {
-        winner = boutEnd.actor === "A" ? "D" : "A";
-      } else if (by === "Exhaustion") {
+      if (by === 'Stoppage') {
+        winner = boutEnd.actor === 'A' ? 'D' : 'A';
+      } else if (by === 'Exhaustion') {
         winner = null;
       } else {
-        winner = boutEnd.actor === "A" ? "A" : "D";
+        winner = boutEnd.actor === 'A' ? 'A' : 'D';
       }
 
       // For narration: winnerName first, loserName second
-      const boutActorIsWinner = by !== "Stoppage";
-      const narWinner = boutActorIsWinner ? (boutEnd.actor === "A" ? nameA : nameD) : (boutEnd.actor === "A" ? nameD : nameA);
-      const narLoser  = boutActorIsWinner ? (boutEnd.actor === "A" ? nameD : nameA) : (boutEnd.actor === "A" ? nameA : nameD);
+      const boutActorIsWinner = by !== 'Stoppage';
+      const narWinner = boutActorIsWinner
+        ? boutEnd.actor === 'A'
+          ? nameA
+          : nameD
+        : boutEnd.actor === 'A'
+          ? nameD
+          : nameA;
+      const narLoser = boutActorIsWinner
+        ? boutEnd.actor === 'A'
+          ? nameD
+          : nameA
+        : boutEnd.actor === 'A'
+          ? nameA
+          : nameD;
       // Pass kill-cause, winner's style, and crowd mood so narrativePostBout can
       // pick from tiered archive paths (cause × style × mood → cause × style → cause → generic).
-      const winnerStyle = boutEnd.actor === "A" ? planA.style : planD.style;
+      const winnerStyle = boutEnd.actor === 'A' ? planA.style : planD.style;
       const boutEndLines = narrateBoutEnd(rng, by as string, narWinner, narLoser, undefined, {
         cause: causeBucket,
         style: winnerStyle,
         mood: crowdMood,
       });
-      boutEndLines.forEach(line => log.push({ minute: min, text: line }));
+      boutEndLines.forEach((line) => log.push({ minute: min, text: line }));
       break;
     }
   }
@@ -319,23 +395,26 @@ export function simulateFight(
     const finalOutcome = resolveDecision(fA, fD, nameA, nameD, rng);
     winner = finalOutcome.winner;
     by = finalOutcome.by;
-    log.push({ minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE), text: finalOutcome.narrative });
+    log.push({
+      minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE),
+      text: finalOutcome.narrative,
+    });
   }
 
   // Outcome Tags & Postprocessing
   const fightMinutes = Math.max(1, log[log.length - 1]?.minute ?? 1);
-  if (fightMinutes <= 3) tags.add("Quick");
-  if (fightMinutes >= 8) tags.add("Epic");
+  if (fightMinutes <= 3) tags.add('Quick');
+  if (fightMinutes >= 8) tags.add('Epic');
 
   if (winner) {
-    const w = winner === "A" ? fA : fD;
-    const l = winner === "A" ? fD : fA;
-    if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) tags.add("Comeback");
-    if (w.hitsLanded >= 5) tags.add("Dominance");
-    if (by === "KO") tags.add("KO");
-    if (by === "Kill") tags.add("Kill");
-    if (w.ripostes >= 3) tags.add("RiposteChain");
-    if (w.ripostes >= 2 || w.hitsLanded >= 6) tags.add("Flashy");
+    const w = winner === 'A' ? fA : fD;
+    const l = winner === 'A' ? fD : fA;
+    if (w.hp < w.maxHp * 0.3 && w.hitsLanded > l.hitsLanded) tags.add('Comeback');
+    if (w.hitsLanded >= 5) tags.add('Dominance');
+    if (by === 'KO') tags.add('KO');
+    if (by === 'Kill') tags.add('Kill');
+    if (w.ripostes >= 3) tags.add('RiposteChain');
+    if (w.ripostes >= 2 || w.hitsLanded >= 6) tags.add('Flashy');
   }
 
   return {
@@ -345,12 +424,12 @@ export function simulateFight(
     log,
     exchangeLog,
     post: {
-      xpA: winner === "A" ? 2 : 1,
-      xpD: winner === "D" ? 2 : 1,
+      xpA: winner === 'A' ? 2 : 1,
+      xpD: winner === 'D' ? 2 : 1,
       hitsA: fA.hitsLanded,
       hitsD: fD.hitsLanded,
-      gotKillA: winner === "A" && by === "Kill",
-      gotKillD: winner === "D" && by === "Kill",
+      gotKillA: winner === 'A' && by === 'Kill',
+      gotKillD: winner === 'D' && by === 'Kill',
       tags: Array.from(tags),
       causeBucket,
       fatalHitLocation,

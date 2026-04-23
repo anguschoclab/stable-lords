@@ -1,5 +1,5 @@
-import { Howl } from "howler";
-import { STORE_KEYS } from "@/constants/storeKeys";
+import { Howl } from 'howler';
+import { STORE_KEYS } from '@/constants/storeKeys';
 
 /**
  * AudioManager — Central sound controller for the stable.
@@ -13,7 +13,15 @@ declare global {
   }
 }
 
-export type SfxType = "ui_click" | "hit" | "crit" | "clash" | "death" | "recovery" | "coin" | "arena_ambient";
+export type SfxType =
+  | 'ui_click'
+  | 'hit'
+  | 'crit'
+  | 'clash'
+  | 'death'
+  | 'recovery'
+  | 'coin'
+  | 'arena_ambient';
 
 class AudioManager {
   private static instance: AudioManager;
@@ -29,15 +37,15 @@ class AudioManager {
   }
 
   private async loadMuteState() {
-    if (typeof window !== "undefined" && window.electronAPI) {
+    if (typeof window !== 'undefined' && window.electronAPI) {
       try {
         const muted = await window.electronAPI.storeGet(STORE_KEYS.AUDIO_MUTED);
-        this.muted = muted === "true";
+        this.muted = muted === 'true';
       } catch {
         this.muted = false;
       }
-    } else if (typeof localStorage !== "undefined") {
-      this.muted = localStorage.getItem(STORE_KEYS.AUDIO_MUTED) === "true";
+    } else if (typeof localStorage !== 'undefined') {
+      this.muted = localStorage.getItem(STORE_KEYS.AUDIO_MUTED) === 'true';
     }
   }
 
@@ -56,13 +64,13 @@ class AudioManager {
 
   public async setMuted(muted: boolean) {
     this.muted = muted;
-    if (typeof window !== "undefined" && window.electronAPI) {
+    if (typeof window !== 'undefined' && window.electronAPI) {
       try {
         await window.electronAPI.storeSet(STORE_KEYS.AUDIO_MUTED, String(muted));
       } catch (error) {
         console.error('Failed to save mute state to electron-store', error);
       }
-    } else if (typeof localStorage !== "undefined") {
+    } else if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(STORE_KEYS.AUDIO_MUTED, String(muted));
       } catch (error) {

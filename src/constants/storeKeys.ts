@@ -10,4 +10,4 @@ export const STORE_KEYS = {
   WINDOW_BOUNDS: 'windowBounds',
 } as const;
 
-export type StoreKey = typeof STORE_KEYS[keyof typeof STORE_KEYS];
+export type StoreKey = (typeof STORE_KEYS)[keyof typeof STORE_KEYS];

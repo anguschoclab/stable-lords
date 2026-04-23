@@ -1,20 +1,20 @@
-import { 
-  FightingStyle, 
-  type Attributes, 
-  ATTRIBUTE_KEYS, 
-  ATTRIBUTE_MAX 
-} from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { CombatEvent } from "@/types/combat.types";
-import type { Trainer, GameState, Promoter } from "@/types/state.types";
-import { createFreshState, makeWarrior } from "@/engine/factories";
-import { generateRivalStables } from "@/engine/rivals";
-import { generateRecruitPool } from "@/engine/recruitment";
-import { generateHiringPool } from "@/engine/trainers";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import {
+  FightingStyle,
+  type Attributes,
+  ATTRIBUTE_KEYS,
+  ATTRIBUTE_MAX,
+} from '@/types/shared.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { CombatEvent } from '@/types/combat.types';
+import type { Trainer, GameState, Promoter } from '@/types/state.types';
+import { createFreshState, makeWarrior } from '@/engine/factories';
+import { generateRivalStables } from '@/engine/rivals';
+import { generateRecruitPool } from '@/engine/recruitment';
+import { generateHiringPool } from '@/engine/trainers';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
-import { generatePromoters } from "@/engine/promoters/promoterGenerator";
+import { generatePromoters } from '@/engine/promoters/promoterGenerator';
 
 /**
  * Seed the world with initial rivals, recruits, and a starter player roster.
@@ -26,12 +26,12 @@ export function populateInitialWorld(state: GameState, seed: number, rng?: IRNGS
 
   // 1. Generate Rivals (45 stables for the fluid population target)
   const rivals = generateRivalStables(45, seed + 1);
-  rivals.forEach(r => r.roster.forEach(w => usedNames.add(w.name)));
+  rivals.forEach((r) => r.roster.forEach((w) => usedNames.add(w.name)));
 
   // 1.1 Generate Promoters (30 for the tiered system)
   const promotersArray = generatePromoters(30, seed + 3, rngService);
   const promoters: Record<string, Promoter> = {};
-  promotersArray.forEach(p => promoters[p.id] = p);
+  promotersArray.forEach((p) => (promoters[p.id] = p));
 
   // 2. Generate Initial Recruit Pool
   const recruitPool = generateRecruitPool(12, 1, usedNames, new SeededRNGService(seed + 2));
@@ -41,7 +41,7 @@ export function populateInitialWorld(state: GameState, seed: number, rng?: IRNGS
     FightingStyle.StrikingAttack,
     FightingStyle.WallOfSteel,
     FightingStyle.ParryRiposte,
-    FightingStyle.LungingAttack
+    FightingStyle.LungingAttack,
   ];
 
   const playerRoster: Warrior[] = styles.map((style, i) => {
@@ -52,7 +52,7 @@ export function populateInitialWorld(state: GameState, seed: number, rng?: IRNGS
       WT: 10,
       WL: 10,
       SP: 8 + Math.floor(rngService.next() * 4),
-      DF: 8 + Math.floor(rngService.next() * 4)
+      DF: 8 + Math.floor(rngService.next() * 4),
     };
     const w = makeWarrior(undefined, `Starter_${i}`, style, attrs, {}, rngService);
     usedNames.add(w.name);

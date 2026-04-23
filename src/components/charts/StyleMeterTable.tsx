@@ -2,12 +2,12 @@
  * StyleMeterTable — win rate per fighting style for the player's roster.
  * Horizontal bar chart ranked by win rate.
  */
-import { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
-import { useShallow } from "zustand/react/shallow";
-import { cn } from "@/lib/utils";
-import { Surface } from "@/components/ui/Surface";
-import { STYLE_ABBREV } from "@/types/shared.types";
+import { useMemo } from 'react';
+import { useGameStore } from '@/state/useGameStore';
+import { useShallow } from 'zustand/react/shallow';
+import { cn } from '@/lib/utils';
+import { Surface } from '@/components/ui/Surface';
+import { STYLE_ABBREV } from '@/types/shared.types';
 
 interface StyleMeterTableProps {
   className?: string;
@@ -48,7 +48,7 @@ export function StyleMeterTable({ className }: StyleMeterTableProps) {
   }, [roster]);
 
   return (
-    <Surface variant="glass" className={cn("p-4 flex flex-col gap-3", className)}>
+    <Surface variant="glass" className={cn('p-4 flex flex-col gap-3', className)}>
       <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
         Style Win Rates
       </span>
@@ -63,9 +63,7 @@ export function StyleMeterTable({ className }: StyleMeterTableProps) {
         {rows.map((row) => {
           const pct = Math.round(row.winRate * 100);
           const barColor =
-            pct >= 60 ? "bg-primary" :
-            pct >= 45 ? "bg-arena-gold" :
-            "bg-destructive";
+            pct >= 60 ? 'bg-primary' : pct >= 45 ? 'bg-arena-gold' : 'bg-destructive';
 
           return (
             <div key={row.style} className="flex items-center gap-3">
@@ -74,14 +72,16 @@ export function StyleMeterTable({ className }: StyleMeterTableProps) {
               </div>
               <div className="flex-1 h-1.5 bg-white/5 rounded-none overflow-hidden">
                 <div
-                  className={cn("h-full rounded-none transition-all duration-500", barColor)}
+                  className={cn('h-full rounded-none transition-all duration-500', barColor)}
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <div className={cn(
-                "w-10 text-right font-mono font-black text-[10px] shrink-0",
-                pct >= 60 ? "text-primary" : pct >= 45 ? "text-arena-gold" : "text-destructive"
-              )}>
+              <div
+                className={cn(
+                  'w-10 text-right font-mono font-black text-[10px] shrink-0',
+                  pct >= 60 ? 'text-primary' : pct >= 45 ? 'text-arena-gold' : 'text-destructive'
+                )}
+              >
                 {pct}%
               </div>
               <div className="w-12 text-right text-[8px] text-muted-foreground/30 font-mono shrink-0">

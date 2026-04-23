@@ -3,7 +3,7 @@
  * Comprehensive TypeScript interfaces for narrativeContent.json
  */
 
-import type { CrowdMoodType } from "./shared.types";
+import type { CrowdMoodType } from './shared.types';
 
 // ─── UX Metadata ────────────────────────────────────────────────────────
 
@@ -81,10 +81,10 @@ export interface HitLocations {
   head: string[];
   chest: string[];
   abdomen: string[];
-  "right arm": string[];
-  "left arm": string[];
-  "right leg": string[];
-  "left leg": string[];
+  'right arm': string[];
+  'left arm': string[];
+  'right leg': string[];
+  'left leg': string[];
 }
 
 export interface DamageSeverity {

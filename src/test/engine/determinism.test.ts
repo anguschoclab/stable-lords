@@ -1,26 +1,34 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { advanceWeek } from "@/engine/pipeline/services/weekPipelineService";
-import { createFreshState } from "@/engine/factories";
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
+import { createFreshState } from '@/engine/factories';
 
 // Mock the archive service to avoid disk I/O during tests
-vi.mock("@/engine/storage/opfsArchive", () => {
+vi.mock('@/engine/storage/opfsArchive', () => {
   return {
     OPFSArchiveService: class {
-      isSupported() { return false; }
-      archiveHotState() { return Promise.resolve(); }
-      retrieveHotState() { return Promise.resolve(null); }
-      archiveBoutLog() { return Promise.resolve(); }
-    }
+      isSupported() {
+        return false;
+      }
+      archiveHotState() {
+        return Promise.resolve();
+      }
+      retrieveHotState() {
+        return Promise.resolve(null);
+      }
+      archiveBoutLog() {
+        return Promise.resolve();
+      }
+    },
   };
 });
 
-describe("Simulation Determinism", () => {
+describe('Simulation Determinism', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it.skip("should produce identical results from a fresh state over 5 weeks", () => {
+  it.skip('should produce identical results from a fresh state over 5 weeks', () => {
     // SKIPPED: This test requires proper deep cloning of Map objects (warriorMap)
     // which JSON.stringify/JSON.parse doesn't handle. Fix requires implementing
     // a proper deep clone function or restructuring the state to avoid Maps.
@@ -28,8 +36,8 @@ describe("Simulation Determinism", () => {
 
     // 1. Setup two identical states
     // Pass a fixed timestamp to ensure meta.createdAt remains stable
-    const stateA = createFreshState("test-seed-1", "2026-04-11T09:00:00Z");
-    const stateB = createFreshState("test-seed-1", "2026-04-11T09:00:00Z");
+    const stateA = createFreshState('test-seed-1', '2026-04-11T09:00:00Z');
+    const stateB = createFreshState('test-seed-1', '2026-04-11T09:00:00Z');
 
     // 2. Advance both states 5 weeks
     let currentA = stateA;
@@ -67,17 +75,17 @@ describe("Simulation Determinism", () => {
     expect(strA).toBe(strB);
   });
 
-  it("should remain deterministic even when branching (recreating RNG)", () => {
+  it('should remain deterministic even when branching (recreating RNG)', () => {
     const rng1 = new SeededRNGService(12345);
     const rng2 = new SeededRNGService(12345);
 
     for (let i = 0; i < 100; i++) {
-        expect(rng1.next()).toBe(rng2.next());
+      expect(rng1.next()).toBe(rng2.next());
     }
   });
 
-  it("should produce different results for different seeds", () => {
-    const stateA = createFreshState("seed-a");
+  it('should produce different results for different seeds', () => {
+    const stateA = createFreshState('seed-a');
 
     // Manually skew one state's week or a seed-relevant property if needed,
     // but here we just verify that they are deterministic based on the week index.
@@ -89,7 +97,7 @@ describe("Simulation Determinism", () => {
     // Actually, just changing the starting week will change the seed.
     const stateC = { ...stateA, week: 10 };
     const week11C = advanceWeek(stateC);
-    
+
     expect(JSON.stringify(week1A)).not.toBe(JSON.stringify(week11C));
   });
 });

@@ -1,5 +1,5 @@
-import type { SaveSlotMeta } from "@/state/saveSlots";
-import SaveSlotCard from "./SaveSlotCard";
+import type { SaveSlotMeta } from '@/state/saveSlots';
+import SaveSlotCard from './SaveSlotCard';
 
 interface SavedGamesSectionProps {
   slots: SaveSlotMeta[];
@@ -29,7 +29,7 @@ export default function SavedGamesSection({
         <div
           className="flex-1 h-px"
           style={{
-            background: "linear-gradient(90deg, rgba(201,151,42,0.15), transparent)",
+            background: 'linear-gradient(90deg, rgba(201,151,42,0.15), transparent)',
           }}
         />
         <span className="text-[9px] font-mono text-muted-foreground/30">
@@ -39,11 +39,7 @@ export default function SavedGamesSection({
 
       <div className="space-y-2">
         {slots
-          .sort(
-            (a, b) =>
-              new Date(b.timestamp).getTime() -
-              new Date(a.timestamp).getTime()
-          )
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
           .map((slot) => (
             <SaveSlotCard
               key={slot.id}

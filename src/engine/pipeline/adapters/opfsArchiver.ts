@@ -1,22 +1,26 @@
-import type { GameState } from "@/types/state.types";
-import { type Season, FightingStyle } from "@/types/shared.types";
-import { OPFSArchiveService } from "@/engine/storage/opfsArchive";
+import type { GameState } from '@/types/state.types';
+import { type Season, FightingStyle } from '@/types/shared.types';
+import { OPFSArchiveService } from '@/engine/storage/opfsArchive';
 
-const SEASONS: Season[] = ["Spring", "Summer", "Fall", "Winter"];
-export function seasonToNumber(season: Season): number { return SEASONS.indexOf(season); }
+const SEASONS: Season[] = ['Spring', 'Summer', 'Fall', 'Winter'];
+export function seasonToNumber(season: Season): number {
+  return SEASONS.indexOf(season);
+}
 
 export function archiveWeekLogs(state: GameState): GameState {
   const opfs = new OPFSArchiveService();
   if (!opfs.isSupported()) return state;
 
   let stateModified = false;
-  const newArenaHistory = state.arenaHistory.map(summary => {
+  const newArenaHistory = state.arenaHistory.map((summary) => {
     if (summary.transcript && summary.transcript.length > 0) {
       stateModified = true;
       const seasonNum = seasonToNumber(state.season);
-      opfs.archiveBoutLog(state.year, seasonNum, summary.id, summary.transcript, true).catch(err => {
-        console.error(`Failed to background archive bout ${summary.id}:`, err);
-      });
+      opfs
+        .archiveBoutLog(state.year, seasonNum, summary.id, summary.transcript, true)
+        .catch((err) => {
+          console.error(`Failed to background archive bout ${summary.id}:`, err);
+        });
       return { ...summary, transcript: undefined };
     }
     return summary;

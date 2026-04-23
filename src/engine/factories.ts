@@ -4,6 +4,6 @@
  */
 
 // Re-export from split modules
-export { makeWarrior } from "./factories/warriorFactory";
-export { createFreshState } from "./factories/gameStateFactory";
-export { makeFightSummary } from "./factories/combatFactory";
+export { makeWarrior } from './factories/warriorFactory';
+export { createFreshState } from './factories/gameStateFactory';
+export { makeFightSummary } from './factories/combatFactory';

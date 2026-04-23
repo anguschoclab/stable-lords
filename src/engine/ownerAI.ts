@@ -1,11 +1,11 @@
-import { FightingStyle } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightPlan } from "@/types/combat.types";
-import type { OwnerPersonality, AIIntent } from "@/types/state.types";
-import { defaultPlanForWarrior } from "./simulate";
-import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from "@/data/ownerData";
-import { computeStrategyScore } from "./strategyAnalysis";
-import { clamp } from "@/utils/math";
+import { FightingStyle } from '@/types/shared.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { FightPlan } from '@/types/combat.types';
+import type { OwnerPersonality, AIIntent } from '@/types/state.types';
+import { defaultPlanForWarrior } from './simulate';
+import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from '@/data/ownerData';
+import { computeStrategyScore } from './strategyAnalysis';
+import { clamp } from '@/utils/math';
 
 /**
  * Generate a personality-, philosophy-, meta-, and matchup-aware fight plan for an AI warrior.
@@ -28,11 +28,11 @@ export function aiPlanForWarrior(
   let intentAL = 0;
   let intentKD = 0;
 
-  if (intent === "RECOVERY") {
+  if (intent === 'RECOVERY') {
     intentOE = -2; // Defensive to minimize damage
     intentAL = -1;
     intentKD = -2;
-  } else if (intent === "VENDETTA") {
+  } else if (intent === 'VENDETTA') {
     intentAL = 2; // Relentless
     intentKD = 2;
   }
@@ -42,14 +42,29 @@ export function aiPlanForWarrior(
   const grudgeAL = Math.floor(grudgeIntensity / 2);
 
   // Per-style matchup heuristics
-  const matchup = opponentStyle ? getStyleMatchupMods(w.style, opponentStyle) : { oe: 0, al: 0, kd: 0 };
+  const matchup = opponentStyle
+    ? getStyleMatchupMods(w.style, opponentStyle)
+    : { oe: 0, al: 0, kd: 0 };
 
   // Generate initial plan
   const plan: FightPlan = {
     ...base,
     OE: clamp((base.OE ?? 5) + (pMod.OE ?? 0) + (phMod.OE ?? 0) + matchup.oe + intentOE, 1, 10),
-    AL: clamp((base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0) + matchup.al + intentAL + grudgeAL, 1, 10),
-    killDesire: clamp((base.killDesire ?? 5) + (pMod.killDesire ?? 0) + (phMod.killDesire ?? 0) + matchup.kd + intentKD + grudgeKD, 1, 10),
+    AL: clamp(
+      (base.AL ?? 5) + (pMod.AL ?? 0) + (phMod.AL ?? 0) + matchup.al + intentAL + grudgeAL,
+      1,
+      10
+    ),
+    killDesire: clamp(
+      (base.killDesire ?? 5) +
+        (pMod.killDesire ?? 0) +
+        (phMod.killDesire ?? 0) +
+        matchup.kd +
+        intentKD +
+        grudgeKD,
+      1,
+      10
+    ),
   };
 
   // Strategy score validation with retry logic
@@ -108,44 +123,58 @@ export function aiPlanForWarrior(
 function getPersonalityAdaptations(
   personality: OwnerPersonality,
   plan: FightPlan
-): import("@/types/shared.types").PlanCondition[] {
+): import('@/types/shared.types').PlanCondition[] {
   const bounded = (v: number, delta: number) => clamp(v + delta, 1, 10);
   switch (personality) {
-    case "Aggressive":
+    case 'Aggressive':
       // When ahead on momentum, press harder.
-      return [{
-        trigger: { type: "MOMENTUM_LEAD", value: 2 },
-        override: { OE: bounded(plan.OE, +1), killDesire: bounded(plan.killDesire ?? 5, +1) },
-        label: "Aggressive: press the advantage",
-      }];
-    case "Methodical":
+      return [
+        {
+          trigger: { type: 'MOMENTUM_LEAD', value: 2 },
+          override: { OE: bounded(plan.OE, +1), killDesire: bounded(plan.killDesire ?? 5, +1) },
+          label: 'Aggressive: press the advantage',
+        },
+      ];
+    case 'Methodical':
       // Losing ground on momentum → tighten defence.
-      return [{
-        trigger: { type: "MOMENTUM_DEFICIT", value: 2 },
-        override: { AL: bounded(plan.AL, +1), OE: bounded(plan.OE, -1) },
-        label: "Methodical: disengage and reset",
-      }];
-    case "Showman":
+      return [
+        {
+          trigger: { type: 'MOMENTUM_DEFICIT', value: 2 },
+          override: { AL: bounded(plan.AL, +1), OE: bounded(plan.OE, -1) },
+          label: 'Methodical: disengage and reset',
+        },
+      ];
+    case 'Showman':
       // Late-phase flourish: drama sells tickets, lethality sells legends.
-      return [{
-        trigger: { type: "PHASE_IS", value: "LATE" },
-        override: { killDesire: bounded(plan.killDesire ?? 5, +1), OE: bounded(plan.OE, +1) },
-        label: "Showman: late-phase flourish",
-      }];
-    case "Pragmatic":
+      return [
+        {
+          trigger: { type: 'PHASE_IS', value: 'LATE' },
+          override: { killDesire: bounded(plan.killDesire ?? 5, +1), OE: bounded(plan.OE, +1) },
+          label: 'Showman: late-phase flourish',
+        },
+      ];
+    case 'Pragmatic':
       // Below 30% HP: survive the round first, win the campaign second.
-      return [{
-        trigger: { type: "HP_BELOW", value: 30 },
-        override: { OE: bounded(plan.OE, -1), AL: bounded(plan.AL, +2), killDesire: bounded(plan.killDesire ?? 5, -1) },
-        label: "Pragmatic: preservation",
-      }];
-    case "Tactician":
+      return [
+        {
+          trigger: { type: 'HP_BELOW', value: 30 },
+          override: {
+            OE: bounded(plan.OE, -1),
+            AL: bounded(plan.AL, +2),
+            killDesire: bounded(plan.killDesire ?? 5, -1),
+          },
+          label: 'Pragmatic: preservation',
+        },
+      ];
+    case 'Tactician':
       // Endurance under 40%: conserve, outlast.
-      return [{
-        trigger: { type: "ENDURANCE_BELOW", value: 40 },
-        override: { OE: bounded(plan.OE, -1), AL: bounded(plan.AL, +1) },
-        label: "Tactician: conserve pace",
-      }];
+      return [
+        {
+          trigger: { type: 'ENDURANCE_BELOW', value: 40 },
+          override: { OE: bounded(plan.OE, -1), AL: bounded(plan.AL, +1) },
+          label: 'Tactician: conserve pace',
+        },
+      ];
     default:
       return [];
   }
@@ -180,20 +209,26 @@ export function getStyleMatchupMods(
   oppStyle: FightingStyle
 ): { oe: number; al: number; kd: number } {
   // Map myStyle to its counter logic
-  const matchers: Partial<Record<FightingStyle, (opp: FightingStyle) => { oe: number; al: number; kd: number } | null>> = {
+  const matchers: Partial<
+    Record<FightingStyle, (opp: FightingStyle) => { oe: number; al: number; kd: number } | null>
+  > = {
     [FightingStyle.AimedBlow]: (opp) => {
-      if (opp === FightingStyle.BashingAttack || opp === FightingStyle.SlashingAttack) return { oe: -1, al: 0, kd: 0 };
-      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte) return { oe: 1, al: 1, kd: 0 };
+      if (opp === FightingStyle.BashingAttack || opp === FightingStyle.SlashingAttack)
+        return { oe: -1, al: 0, kd: 0 };
+      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte)
+        return { oe: 1, al: 1, kd: 0 };
       return null;
     },
     [FightingStyle.BashingAttack]: (opp) => {
-      if (opp === FightingStyle.LungingAttack || opp === FightingStyle.WallOfSteel) return { oe: 2, al: 1, kd: 1 };
+      if (opp === FightingStyle.LungingAttack || opp === FightingStyle.WallOfSteel)
+        return { oe: 2, al: 1, kd: 1 };
       if (opp === FightingStyle.TotalParry) return { oe: 1, al: 0, kd: 1 };
       return null;
     },
     [FightingStyle.LungingAttack]: (opp) => {
       if (opp === FightingStyle.BashingAttack) return { oe: -1, al: 2, kd: 0 };
-      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte) return { oe: -2, al: 1, kd: -1 };
+      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte)
+        return { oe: -2, al: 1, kd: -1 };
       return null;
     },
     [FightingStyle.ParryLunge]: (opp) => {
@@ -202,7 +237,8 @@ export function getStyleMatchupMods(
       return null;
     },
     [FightingStyle.ParryRiposte]: (opp) => {
-      if (opp === FightingStyle.BashingAttack || opp === FightingStyle.SlashingAttack) return { oe: -2, al: 0, kd: 0 };
+      if (opp === FightingStyle.BashingAttack || opp === FightingStyle.SlashingAttack)
+        return { oe: -2, al: 0, kd: 0 };
       if (opp === FightingStyle.TotalParry) return { oe: 1, al: 0, kd: 0 };
       return null;
     },
@@ -214,16 +250,19 @@ export function getStyleMatchupMods(
     [FightingStyle.StrikingAttack]: (opp) => {
       if (opp === FightingStyle.BashingAttack) return { oe: 0, al: 1, kd: 0 };
       if (opp === FightingStyle.WallOfSteel) return { oe: 2, al: 0, kd: 1 };
-      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte) return { oe: -1, al: 0, kd: 0 };
+      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte)
+        return { oe: -1, al: 0, kd: 0 };
       return null;
     },
     [FightingStyle.SlashingAttack]: (opp) => {
-      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte) return { oe: 1, al: 0, kd: 0 };
+      if (opp === FightingStyle.TotalParry || opp === FightingStyle.ParryRiposte)
+        return { oe: 1, al: 0, kd: 0 };
       if (opp === FightingStyle.ParryStrike) return { oe: 0, al: 0, kd: 1 };
       return null;
     },
     [FightingStyle.TotalParry]: (opp) => {
-      if (opp === FightingStyle.LungingAttack || opp === FightingStyle.WallOfSteel) return { oe: -2, al: -1, kd: -1 };
+      if (opp === FightingStyle.LungingAttack || opp === FightingStyle.WallOfSteel)
+        return { oe: -2, al: -1, kd: -1 };
       if (opp === FightingStyle.AimedBlow) return { oe: -1, al: 0, kd: 0 };
       return null;
     },

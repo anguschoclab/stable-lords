@@ -1,178 +1,155 @@
 /**
  * Plan Bias Tests
  */
-import { describe, it, expect } from "vitest";
-import { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from "@/engine/planBias";
-import { FightingStyle, type FightPlan } from "@/types/game";
+import { describe, it, expect } from 'vitest';
+import { autoTuneFromBias, reconcileGearTwoHanded, type Bias } from '@/engine/planBias';
+import { FightingStyle, type FightPlan } from '@/types/game';
 
-describe("Plan Bias", () => {
-  describe("autoTuneFromBias", () => {
+describe('Plan Bias', () => {
+  describe('autoTuneFromBias', () => {
     const basePlan: FightPlan = {
       OE: 5,
       AL: 5,
       killDesire: 5,
       style: FightingStyle.StrikingAttack,
-      target: "Any",
-      offensiveTactic: "none",
-      defensiveTactic: "none",
+      target: 'Any',
+      offensiveTactic: 'none',
+      defensiveTactic: 'none',
     };
 
-    it("should set head targeting for head-hunt bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "head-hunt");
-      expect(tuned.target).toBe("Head");
+    it('should set head targeting for head-hunt bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'head-hunt');
+      expect(tuned.target).toBe('Head');
     });
 
-    it("should increase kill desire for head-hunt bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "head-hunt");
+    it('should increase kill desire for head-hunt bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'head-hunt');
       expect(tuned.killDesire).toBeGreaterThanOrEqual(7);
     });
 
-    it("should set leg targeting for hamstring bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "hamstring");
-      expect(tuned.target).toBe("Right Leg");
+    it('should set leg targeting for hamstring bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'hamstring');
+      expect(tuned.target).toBe('Right Leg');
     });
 
-    it("should increase AL for hamstring bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "hamstring");
+    it('should increase AL for hamstring bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'hamstring');
       expect(tuned.AL).toBeGreaterThanOrEqual(7);
     });
 
-    it("should set abdomen targeting for gut bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "gut");
-      expect(tuned.target).toBe("Abdomen");
+    it('should set abdomen targeting for gut bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'gut');
+      expect(tuned.target).toBe('Abdomen');
     });
 
-    it("should increase OE for gut bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "gut");
+    it('should increase OE for gut bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'gut');
       expect(tuned.OE).toBeGreaterThanOrEqual(7);
     });
 
-    it("should set arm targeting for guard-break bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "guard-break");
-      expect(tuned.target).toBe("Right Arm");
+    it('should set arm targeting for guard-break bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'guard-break');
+      expect(tuned.target).toBe('Right Arm');
     });
 
-    it("should increase OE for guard-break bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "guard-break");
+    it('should increase OE for guard-break bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'guard-break');
       expect(tuned.OE).toBeGreaterThanOrEqual(8);
     });
 
-    it("should set Any target for balanced bias", () => {
-      const tuned = autoTuneFromBias(basePlan, "balanced");
-      expect(tuned.target).toBe("Any");
+    it('should set Any target for balanced bias', () => {
+      const tuned = autoTuneFromBias(basePlan, 'balanced');
+      expect(tuned.target).toBe('Any');
     });
 
-    it("should detect lunging styles via regex but plan.style might not match expected format", () => {
+    it('should detect lunging styles via regex but plan.style might not match expected format', () => {
       const lungePlan: FightPlan = { ...basePlan, style: FightingStyle.LungingAttack };
-      const tuned = autoTuneFromBias(lungePlan, "balanced");
+      const tuned = autoTuneFromBias(lungePlan, 'balanced');
       // Note: This test reveals that the regex pattern may not work as expected with enum values
       // The function expects string matching but FightingStyle enum values may differ
       // Just verify it doesn't crash and returns partial plan
       expect(tuned).toBeDefined();
     });
 
-    it("should suggest Bash for bashing styles", () => {
+    it('should suggest Bash for bashing styles', () => {
       const bashPlan: FightPlan = { ...basePlan, style: FightingStyle.BashingAttack };
-      const tuned = autoTuneFromBias(bashPlan, "balanced");
+      const tuned = autoTuneFromBias(bashPlan, 'balanced');
       // FightingStyle.BashingAttack = "BASHING ATTACK" matches /BASHING/
-      expect(tuned.offensiveTactic).toBe("Bash");
+      expect(tuned.offensiveTactic).toBe('Bash');
     });
 
-    it("should not suggest Riposte for parry-riposte due to hyphen mismatch", () => {
+    it('should not suggest Riposte for parry-riposte due to hyphen mismatch', () => {
       const ripostePlan: FightPlan = { ...basePlan, style: FightingStyle.ParryRiposte };
-      const tuned = autoTuneFromBias(ripostePlan, "balanced");
+      const tuned = autoTuneFromBias(ripostePlan, 'balanced');
       // FightingStyle.ParryRiposte = "PARRY-RIPOSTE" doesn't match /PARRY\s*RIPOSTE/i (hyphen vs space)
       // This is a known limitation of the regex pattern matching
       expect(tuned.defensiveTactic).toBeUndefined();
     });
 
-    it("should not suggest Parry for total parry due to hyphen in enum", () => {
+    it('should not suggest Parry for total parry due to hyphen in enum', () => {
       const parryPlan: FightPlan = { ...basePlan, style: FightingStyle.TotalParry };
-      const tuned = autoTuneFromBias(parryPlan, "balanced");
+      const tuned = autoTuneFromBias(parryPlan, 'balanced');
       // FightingStyle.TotalParry = "TOTAL PARRY" should match /TOTAL\s*PARRY/i
-      expect(tuned.defensiveTactic).toBe("Parry");
+      expect(tuned.defensiveTactic).toBe('Parry');
     });
 
-    it("should not override existing high values", () => {
+    it('should not override existing high values', () => {
       const highKDPlan: FightPlan = { ...basePlan, killDesire: 9 };
-      const tuned = autoTuneFromBias(highKDPlan, "head-hunt");
+      const tuned = autoTuneFromBias(highKDPlan, 'head-hunt');
       expect(tuned.killDesire).toBeGreaterThanOrEqual(9);
     });
 
-    it("should not override existing high AL", () => {
+    it('should not override existing high AL', () => {
       const highALPlan: FightPlan = { ...basePlan, AL: 9 };
-      const tuned = autoTuneFromBias(highALPlan, "hamstring");
+      const tuned = autoTuneFromBias(highALPlan, 'hamstring');
       expect(tuned.AL).toBeGreaterThanOrEqual(9);
     });
 
-    it("should not override existing high OE", () => {
+    it('should not override existing high OE', () => {
       const highOEPlan: FightPlan = { ...basePlan, OE: 9 };
-      const tuned = autoTuneFromBias(highOEPlan, "gut");
+      const tuned = autoTuneFromBias(highOEPlan, 'gut');
       expect(tuned.OE).toBeGreaterThanOrEqual(9);
     });
   });
 
-  describe("reconcileGearTwoHanded", () => {
-    it("should remove shield when weapon is two-handed", () => {
+  describe('reconcileGearTwoHanded', () => {
+    it('should remove shield when weapon is two-handed', () => {
       const plan: FightPlan = {
         OE: 5,
         AL: 5,
         killDesire: 5,
         style: FightingStyle.StrikingAttack,
-        target: "Any",
-        offensiveTactic: "none",
-        defensiveTactic: "none",
+        target: 'Any',
+        offensiveTactic: 'none',
+        defensiveTactic: 'none',
         gear: {
-          weapon: { name: "Greatsword", twoHanded: true },
-          shield: "Large",
-          armor: "Leather",
-          helm: "None",
+          weapon: { name: 'Greatsword', twoHanded: true },
+          shield: 'Large',
+          armor: 'Leather',
+          helm: 'None',
         },
       };
 
       const draft: Partial<FightPlan> = {};
       reconcileGearTwoHanded(plan, draft);
 
-      expect(draft.gear?.shield).toBe("None");
+      expect(draft.gear?.shield).toBe('None');
     });
 
-    it("should not modify gear if weapon is one-handed", () => {
+    it('should not modify gear if weapon is one-handed', () => {
       const plan: FightPlan = {
         OE: 5,
         AL: 5,
         killDesire: 5,
         style: FightingStyle.StrikingAttack,
-        target: "Any",
-        offensiveTactic: "none",
-        defensiveTactic: "none",
+        target: 'Any',
+        offensiveTactic: 'none',
+        defensiveTactic: 'none',
         gear: {
-          weapon: { name: "Sword", twoHanded: false },
-          shield: "Medium",
-          armor: "Leather",
-          helm: "None",
-        },
-      };
-
-      const draft: Partial<FightPlan> = {};
-      reconcileGearTwoHanded(plan, draft);
-
-      expect(draft.gear).toBeUndefined();
-    });
-
-    it("should not modify gear if no shield equipped", () => {
-      const plan: FightPlan = {
-        OE: 5,
-        AL: 5,
-        killDesire: 5,
-        style: FightingStyle.StrikingAttack,
-        target: "Any",
-        offensiveTactic: "none",
-        defensiveTactic: "none",
-        gear: {
-          weapon: { name: "Greatsword", twoHanded: true },
-          shield: "None",
-          armor: "Leather",
-          helm: "None",
+          weapon: { name: 'Sword', twoHanded: false },
+          shield: 'Medium',
+          armor: 'Leather',
+          helm: 'None',
         },
       };
 
@@ -182,43 +159,66 @@ describe("Plan Bias", () => {
       expect(draft.gear).toBeUndefined();
     });
 
-    it("should handle missing gear gracefully", () => {
+    it('should not modify gear if no shield equipped', () => {
       const plan: FightPlan = {
         OE: 5,
         AL: 5,
         killDesire: 5,
         style: FightingStyle.StrikingAttack,
-        target: "Any",
-        offensiveTactic: "none",
-        defensiveTactic: "none",
+        target: 'Any',
+        offensiveTactic: 'none',
+        defensiveTactic: 'none',
+        gear: {
+          weapon: { name: 'Greatsword', twoHanded: true },
+          shield: 'None',
+          armor: 'Leather',
+          helm: 'None',
+        },
+      };
+
+      const draft: Partial<FightPlan> = {};
+      reconcileGearTwoHanded(plan, draft);
+
+      expect(draft.gear).toBeUndefined();
+    });
+
+    it('should handle missing gear gracefully', () => {
+      const plan: FightPlan = {
+        OE: 5,
+        AL: 5,
+        killDesire: 5,
+        style: FightingStyle.StrikingAttack,
+        target: 'Any',
+        offensiveTactic: 'none',
+        defensiveTactic: 'none',
       };
 
       const draft: Partial<FightPlan> = {};
       expect(() => reconcileGearTwoHanded(plan, draft)).not.toThrow();
     });
 
-    it("should preserve other gear properties when removing shield", () => {
+    it('should preserve other gear properties when removing shield', () => {
       const plan: FightPlan = {
         OE: 5,
         AL: 5,
         killDesire: 5,
         style: FightingStyle.StrikingAttack,
-        target: "Any",
-        offensiveTactic: "none",
-        defensiveTactic: "none",
+        target: 'Any',
+        offensiveTactic: 'none',
+        defensiveTactic: 'none',
         gear: {
-          weapon: { name: "Greatsword", twoHanded: true },
-          shield: "Large",
-          armor: "Plate",
-          helm: "None",
+          weapon: { name: 'Greatsword', twoHanded: true },
+          shield: 'Large',
+          armor: 'Plate',
+          helm: 'None',
         },
       };
 
       const draft: Partial<FightPlan> = {};
       reconcileGearTwoHanded(plan, draft);
 
-      expect(draft.gear?.weapon?.name).toBe("Greatsword");
-      expect(draft.gear?.armor).toBe("Plate");
+      expect(draft.gear?.weapon?.name).toBe('Greatsword');
+      expect(draft.gear?.armor).toBe('Plate');
     });
   });
 });

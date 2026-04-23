@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import HallOfFame from "@/pages/HallOfFame";
+import { createFileRoute } from '@tanstack/react-router';
+import HallOfFame from '@/pages/HallOfFame';
 
-export const Route = createFileRoute("/world/history")({
+export const Route = createFileRoute('/world/history')({
   component: HallOfFame,
 });

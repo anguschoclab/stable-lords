@@ -1,21 +1,18 @@
-import { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
-import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/game";
-import { computeMetaDrift, getMetaLabel, getMetaColor } from "@/engine/metaDrift";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Activity, TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useMemo } from 'react';
+import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { FightingStyle, STYLE_DISPLAY_NAMES } from '@/types/game';
+import { computeMetaDrift, getMetaLabel, getMetaColor } from '@/engine/metaDrift';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Activity, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function MetaDriftWidget() {
   const state = useWorldState();
-  
-  const meta = useMemo(() => 
-    computeMetaDrift(state.arenaHistory || []), 
-    [state.arenaHistory]
-  );
+
+  const meta = useMemo(() => computeMetaDrift(state.arenaHistory || []), [state.arenaHistory]);
 
   const sortedStyles = useMemo(() => {
     return Object.entries(meta)
@@ -23,7 +20,7 @@ export function MetaDriftWidget() {
         style: style as FightingStyle,
         drift,
         label: getMetaLabel(drift),
-        color: getMetaColor(drift)
+        color: getMetaColor(drift),
       }))
       .sort((a, b) => b.drift - a.drift);
   }, [meta]);
@@ -41,7 +38,8 @@ export function MetaDriftWidget() {
                 <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
               </TooltipTrigger>
               <TooltipContent className="w-full max-w-xs text-[10px] leading-relaxed">
-                Tracks winning/losing trends over the last 20 bouts. Dominant styles gain subtle momentum bonuses.
+                Tracks winning/losing trends over the last 20 bouts. Dominant styles gain subtle
+                momentum bonuses.
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -70,17 +68,22 @@ export function MetaDriftWidget() {
                       {STYLE_DISPLAY_NAMES[item.style]}
                     </span>
                   </div>
-                  <Badge variant="outline" className={cn("text-[8px] font-black uppercase py-0 px-1.5 h-4", item.color)}>
+                  <Badge
+                    variant="outline"
+                    className={cn('text-[8px] font-black uppercase py-0 px-1.5 h-4', item.color)}
+                  >
                     {item.label}
                   </Badge>
                 </div>
                 <div className="relative h-1 w-full bg-secondary/50 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className={cn(
-                      "absolute h-full transition-all duration-1000",
-                      isPositive ? "bg-arena-gold right-1/2 mr-0" :
-                      isNeutral ? "bg-muted-foreground left-1/2 ml-0 w-0" :
-                      "bg-destructive left-1/2 ml-0"
+                      'absolute h-full transition-all duration-1000',
+                      isPositive
+                        ? 'bg-arena-gold right-1/2 mr-0'
+                        : isNeutral
+                          ? 'bg-muted-foreground left-1/2 ml-0 w-0'
+                          : 'bg-destructive left-1/2 ml-0'
                     )}
                     style={{ width: `${percentage / 2}%` }}
                   />

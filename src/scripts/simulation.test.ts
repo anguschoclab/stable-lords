@@ -1,11 +1,11 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { runSimulation } from "./simulation-harness";
-import { formatPulseTable } from "@/engine/stats/simulationMetrics";
-import { setMockIdGenerator } from "@/utils/idUtils";
-import { engineEventBus } from "@/engine/core/EventBus";
-import { NewsletterFeed } from "@/engine/newsletter/feed";
+import { describe, test, expect, vi, beforeEach } from 'vitest';
+import { runSimulation } from './simulation-harness';
+import { formatPulseTable } from '@/engine/stats/simulationMetrics';
+import { setMockIdGenerator } from '@/utils/idUtils';
+import { engineEventBus } from '@/engine/core/EventBus';
+import { NewsletterFeed } from '@/engine/newsletter/feed';
 
-vi.mock("@/engine/storage/opfsArchive", () => ({
+vi.mock('@/engine/storage/opfsArchive', () => ({
   OPFSArchiveService: class {
     isSupported = () => true;
     archiveBoutLog = vi.fn().mockResolvedValue(undefined);
@@ -15,7 +15,7 @@ vi.mock("@/engine/storage/opfsArchive", () => ({
     archiveHotState = vi.fn().mockResolvedValue(undefined);
     retrieveHotState = vi.fn().mockResolvedValue(null);
     getArchivedBoutIdsForSeason = vi.fn().mockResolvedValue([]);
-  }
+  },
 }));
 
 function resetGlobalState() {
@@ -25,12 +25,12 @@ function resetGlobalState() {
   NewsletterFeed.clear();
 }
 
-describe("Headless Simulation Harness", () => {
+describe('Headless Simulation Harness', () => {
   beforeEach(() => {
     resetGlobalState();
   }, 300000);
 
-  test("runs a long-term balance check (104 weeks)", () => {
+  test('runs a long-term balance check (104 weeks)', () => {
     const seed = 999;
     const config = {
       weeks: 104,
@@ -40,7 +40,7 @@ describe("Headless Simulation Harness", () => {
 
     console.log(`\n[Sim] Starting 104-week balance check with seed: ${seed}`);
     const result = runSimulation(config);
-    
-    console.log("SUCCESS");
+
+    console.log('SUCCESS');
   }, 300000);
 });

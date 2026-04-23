@@ -2,8 +2,8 @@
  * Warrior Collection Utilities
  * Eliminates DRY violation of "gather all active warriors" pattern across pipeline passes
  */
-import type { GameState } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
+import type { GameState } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
 
 export interface WarriorWithStable {
   warrior: Warrior;
@@ -55,7 +55,7 @@ export function collectAllWarriors(
  * Most common use case - eliminates the repeated filtering pattern
  */
 export function collectAllActiveWarriors(state: GameState): WarriorWithStable[] {
-  return collectAllWarriors(state, (w) => w.status === "Active");
+  return collectAllWarriors(state, (w) => w.status === 'Active');
 }
 
 /**
@@ -70,7 +70,7 @@ export function collectAvailableWarriors(
   const bookedWarriorIds = new Set<string>();
 
   for (const offer of Object.values(state.boutOffers || {})) {
-    if (offer.status === "Signed" && offer.boutWeek === targetWeek) {
+    if (offer.status === 'Signed' && offer.boutWeek === targetWeek) {
       for (const warriorId of offer.warriorIds || []) {
         bookedWarriorIds.add(warriorId);
       }
@@ -78,19 +78,14 @@ export function collectAvailableWarriors(
   }
 
   // Return active warriors who aren't booked
-  return collectAllWarriors(
-    state,
-    (w) => w.status === "Active" && !bookedWarriorIds.has(w.id)
-  );
+  return collectAllWarriors(state, (w) => w.status === 'Active' && !bookedWarriorIds.has(w.id));
 }
 
 /**
  * Builds a Map for O(1) warrior lookups by ID
  * Includes stable information for each warrior
  */
-export function buildWarriorMap(
-  state: GameState
-): Map<string, WarriorWithStable> {
+export function buildWarriorMap(state: GameState): Map<string, WarriorWithStable> {
   const map = new Map<string, WarriorWithStable>();
 
   for (const item of collectAllWarriors(state)) {

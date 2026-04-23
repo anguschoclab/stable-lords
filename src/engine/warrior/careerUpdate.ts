@@ -2,8 +2,8 @@
  * Warrior Career Update Logic
  * Consolidates career stat updates to eliminate DRY violations across tournament resolvers
  */
-import type { Warrior } from "@/types/warrior.types";
-import type { WarriorStatus, CareerRecord } from "@/types/warrior.types";
+import type { Warrior } from '@/types/warrior.types';
+import type { WarriorStatus, CareerRecord } from '@/types/warrior.types';
 
 export interface CareerUpdateInput {
   isWinner: boolean;
@@ -32,7 +32,14 @@ export function calculateCareerUpdate(
   warrior: Warrior,
   input: CareerUpdateInput
 ): CareerUpdateResult {
-  const { isWinner, isKill, isVictim, fameDelta = 0, popularityDelta = 0, skipFatigue = false } = input;
+  const {
+    isWinner,
+    isKill,
+    isVictim,
+    fameDelta = 0,
+    popularityDelta = 0,
+    skipFatigue = false,
+  } = input;
   const didKill = isWinner && isKill;
 
   // Calculate new career stats
@@ -47,14 +54,15 @@ export function calculateCareerUpdate(
   const fame = Math.max(0, (warrior.fame || 0) + fameGain + fameDelta);
 
   // Calculate new status
-  const status: WarriorStatus = isVictim ? "Dead" : "Active";
+  const status: WarriorStatus = isVictim ? 'Dead' : 'Active';
 
   // Calculate fatigue: reset to 0 if dead, otherwise +25 (capped at 100)
   // 🔒 Skip fatigue accrual for tournament participants during tournament week
-  const fatigue = isVictim ? 0 : (skipFatigue
-    ? (warrior.fatigue || 0)  // Keep current fatigue (no accrual)
-    : Math.min(100, (warrior.fatigue || 0) + 25)  // Normal +25 fatigue
-  );
+  const fatigue = isVictim
+    ? 0
+    : skipFatigue
+      ? warrior.fatigue || 0 // Keep current fatigue (no accrual)
+      : Math.min(100, (warrior.fatigue || 0) + 25); // Normal +25 fatigue
 
   const result: CareerUpdateResult = {
     status,
@@ -75,10 +83,7 @@ export function calculateCareerUpdate(
  * Applies a pre-calculated career update to a warrior
  * Returns a new warrior object (immutable update)
  */
-export function applyCareerUpdate(
-  warrior: Warrior,
-  result: CareerUpdateResult
-): Warrior {
+export function applyCareerUpdate(warrior: Warrior, result: CareerUpdateResult): Warrior {
   const update: Partial<Warrior> = {
     status: result.status,
     fatigue: result.fatigue,
@@ -120,8 +125,8 @@ export function updateWarriorAfterBout(
   const result = calculateCareerUpdate(warrior, input);
 
   // Add "Flashy" flair tag if applicable
-  if (isWinner && tags.includes("Flashy")) {
-    result.flair = Array.from(new Set([...(warrior.flair || []), "Flashy"]));
+  if (isWinner && tags.includes('Flashy')) {
+    result.flair = Array.from(new Set([...(warrior.flair || []), 'Flashy']));
   }
 
   return applyCareerUpdate(warrior, result);
@@ -134,12 +139,12 @@ export function updateWarriorAfterBout(
 export function updateWarriorFromBoutOutcome(
   warrior: Warrior,
   isAttacker: boolean,
-  winnerSide: "A" | "D" | null,
+  winnerSide: 'A' | 'D' | null,
   isKill: boolean,
   /** If true, skip fatigue accrual (for tournament participants during tournament week) */
   skipFatigue?: boolean
 ): Warrior {
-  const isWinner = (isAttacker && winnerSide === "A") || (!isAttacker && winnerSide === "D");
+  const isWinner = (isAttacker && winnerSide === 'A') || (!isAttacker && winnerSide === 'D');
   const isVictim = !isWinner && isKill;
 
   const input: CareerUpdateInput = {

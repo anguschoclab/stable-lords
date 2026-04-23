@@ -1,12 +1,12 @@
-import { Badge } from "@/components/ui/badge";
-import { Trophy, ChevronUp, ChevronDown, Medal, Crown, StepForward, Activity } from "lucide-react";
-import { cn } from "@/lib/utils";
-import BoutViewer from "@/components/BoutViewer";
-import { Surface } from "@/components/ui/Surface";
-import { Button } from "@/components/ui/button";
-import { resolveWarriorName } from "@/utils/historyResolver";
-import { useGameStore } from "@/state/useGameStore";
-import type { TournamentBout, FightSummary } from "@/types/game";
+import { Badge } from '@/components/ui/badge';
+import { Trophy, ChevronUp, ChevronDown, Medal, Crown, StepForward, Activity } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import BoutViewer from '@/components/BoutViewer';
+import { Surface } from '@/components/ui/Surface';
+import { Button } from '@/components/ui/button';
+import { resolveWarriorName } from '@/utils/historyResolver';
+import { useGameStore } from '@/state/useGameStore';
+import type { TournamentBout, FightSummary } from '@/types/game';
 
 /** Check if bout is a bronze match (round 6, matchIndex 1) */
 function isBronzeMatch(bout: TournamentBout): boolean {
@@ -25,7 +25,12 @@ interface TournamentBracketProps {
   onToggleExpand: (key: string | null) => void;
 }
 
-export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleExpand }: TournamentBracketProps) {
+export function TournamentBracket({
+  bouts,
+  arenaHistory,
+  expandedBout,
+  onToggleExpand,
+}: TournamentBracketProps) {
   const state = useGameStore();
   const roundsMap = new Map<number, TournamentBout[]>();
   bouts.forEach((b) => {
@@ -33,7 +38,7 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
     arr.push(b);
     roundsMap.set(b.round, arr);
   });
-  
+
   const sortedRounds = Array.from(roundsMap.entries()).sort(([a], [b]) => a - b);
   const totalRounds = sortedRounds.length;
 
@@ -44,7 +49,7 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
           <div key={round} className="flex flex-col justify-around gap-8 relative py-4">
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">
-                {round === totalRounds && totalRounds > 1 ? "Championship" : `Round ${round}`}
+                {round === totalRounds && totalRounds > 1 ? 'Championship' : `Round ${round}`}
               </span>
             </div>
 
@@ -55,26 +60,25 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                 ? arenaHistory.find((f) => f.id === bout.fightId)
                 : null;
               const hasTranscript = fightSummary?.transcript && fightSummary.transcript.length > 0;
-              
-              const isAChosen = bout.winner === "A";
-              const isDChosen = bout.winner === "D";
+
+              const isAChosen = bout.winner === 'A';
+              const isDChosen = bout.winner === 'D';
               const isPending = bout.winner === undefined;
-              const isBye = bout.d === "(bye)" || bout.warriorIdD === "bye";
+              const isBye = bout.d === '(bye)' || bout.warriorIdD === 'bye';
               const bronze = isBronzeMatch(bout);
               const championship = isChampionshipFinal(bout, totalRounds);
 
               return (
-                <div key={bIdx} className={cn(
-                  "relative group",
-                  bronze && "opacity-90"
-                )}>
+                <div key={bIdx} className={cn('relative group', bronze && 'opacity-90')}>
                   {/* Connection lines to previous round */}
                   {rIdx > 0 && !isBye && (
-                    <svg className={cn(
-                      "absolute -left-16 top-1/2 -translate-y-1/2 w-16 h-16 pointer-events-none fill-none overflow-visible",
-                      isPending ? "stroke-border/10" : "stroke-primary/30",
-                      bronze && "stroke-amber-500/30"
-                    )}>
+                    <svg
+                      className={cn(
+                        'absolute -left-16 top-1/2 -translate-y-1/2 w-16 h-16 pointer-events-none fill-none overflow-visible',
+                        isPending ? 'stroke-border/10' : 'stroke-primary/30',
+                        bronze && 'stroke-amber-500/30'
+                      )}
+                    >
                       <path d="M 0 -12 L 24 -12 L 24 0 L 48 0" className="stroke-1" />
                       <path d="M 0 12 L 24 12 L 24 0 L 48 0" className="stroke-1" />
                     </svg>
@@ -86,73 +90,118 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                     </svg>
                   )}
 
-                  <div className={cn(
-                    "w-64 rounded-none border transition-all duration-300 relative z-10",
-                    isPending ? "bg-background/20 border-border/40" : "bg-secondary/10 border-primary/30 shadow-[0_0_15px_-5px_rgba(0,0,0,0.5)]",
-                    isExpanded && "ring-2 ring-primary/50 border-primary shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)]",
-                    bronze && "border-amber-500/40 bg-amber-500/5",
-                    championship && !isPending && "border-arena-gold/50 bg-amber-500/10 shadow-[0_0_20px_-5px_rgba(255,215,0,0.3)]",
-                    isBye && "border-dashed border-border/30 bg-muted/10"
-                  )}>
-                    <div className={cn(
-                      "px-3 py-1 border-b border-border/20 flex items-center justify-between bg-secondary/20",
-                      bronze && "bg-amber-500/10 border-amber-500/20",
-                      championship && !isPending && "bg-amber-500/20 border-amber-500/30"
-                    )}>
+                  <div
+                    className={cn(
+                      'w-64 rounded-none border transition-all duration-300 relative z-10',
+                      isPending
+                        ? 'bg-background/20 border-border/40'
+                        : 'bg-secondary/10 border-primary/30 shadow-[0_0_15px_-5px_rgba(0,0,0,0.5)]',
+                      isExpanded &&
+                        'ring-2 ring-primary/50 border-primary shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)]',
+                      bronze && 'border-amber-500/40 bg-amber-500/5',
+                      championship &&
+                        !isPending &&
+                        'border-arena-gold/50 bg-amber-500/10 shadow-[0_0_20px_-5px_rgba(255,215,0,0.3)]',
+                      isBye && 'border-dashed border-border/30 bg-muted/10'
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'px-3 py-1 border-b border-border/20 flex items-center justify-between bg-secondary/20',
+                        bronze && 'bg-amber-500/10 border-amber-500/20',
+                        championship && !isPending && 'bg-amber-500/20 border-amber-500/30'
+                      )}
+                    >
                       <div className="flex items-center gap-1">
                         <span className="text-[8px] font-black text-muted-foreground/60 tracking-widest uppercase">
-                          {bronze ? "BRONZE" : championship ? "FINAL" : `MATCH ${bout.matchIndex + 1}`}
+                          {bronze
+                            ? 'BRONZE'
+                            : championship
+                              ? 'FINAL'
+                              : `MATCH ${bout.matchIndex + 1}`}
                         </span>
                         {bronze && <Medal className="h-3 w-3 text-amber-600" />}
-                        {championship && !isPending && <Crown className="h-3 w-3 text-arena-gold" />}
+                        {championship && !isPending && (
+                          <Crown className="h-3 w-3 text-arena-gold" />
+                        )}
                       </div>
                       {isPending ? (
                         isBye ? (
-                          <Badge className="h-3 px-1.5 text-[7px] bg-stone-500/20 text-stone-400 border-none">BYE</Badge>
+                          <Badge className="h-3 px-1.5 text-[7px] bg-stone-500/20 text-stone-400 border-none">
+                            BYE
+                          </Badge>
                         ) : (
-                          <Badge className="h-3 px-1.5 text-[7px] bg-stone-500/20 text-stone-400 border-none">PENDING</Badge>
+                          <Badge className="h-3 px-1.5 text-[7px] bg-stone-500/20 text-stone-400 border-none">
+                            PENDING
+                          </Badge>
                         )
                       ) : championship ? (
-                        <Badge className="h-3 px-1.5 text-[7px] bg-arena-gold/30 text-amber-700 border-amber-500/30">CHAMPION</Badge>
+                        <Badge className="h-3 px-1.5 text-[7px] bg-arena-gold/30 text-amber-700 border-amber-500/30">
+                          CHAMPION
+                        </Badge>
                       ) : bronze ? (
-                        <Badge className="h-3 px-1.5 text-[7px] bg-amber-500/30 text-amber-700 border-amber-500/30">BRONZE</Badge>
+                        <Badge className="h-3 px-1.5 text-[7px] bg-amber-500/30 text-amber-700 border-amber-500/30">
+                          BRONZE
+                        </Badge>
                       ) : (
-                        <Badge className="h-3 px-1.5 text-[7px] bg-primary/20 text-primary border-none">RESOLVED</Badge>
+                        <Badge className="h-3 px-1.5 text-[7px] bg-primary/20 text-primary border-none">
+                          RESOLVED
+                        </Badge>
                       )}
                     </div>
 
                     <div className="p-3 space-y-1">
                       {/* Warrior A */}
-                      <div className={cn(
-                        "flex items-center justify-between p-2 rounded-none transition-colors",
-                        isAChosen ? "bg-primary/10 text-primary font-bold shadow-inner" : isDChosen ? "opacity-30 grayscale" : "bg-background/40",
-                        isBye && "bg-muted/30",
-                        isAChosen && championship && "bg-arena-gold/20 text-amber-700"
-                      )}>
+                      <div
+                        className={cn(
+                          'flex items-center justify-between p-2 rounded-none transition-colors',
+                          isAChosen
+                            ? 'bg-primary/10 text-primary font-bold shadow-inner'
+                            : isDChosen
+                              ? 'opacity-30 grayscale'
+                              : 'bg-background/40',
+                          isBye && 'bg-muted/30',
+                          isAChosen && championship && 'bg-arena-gold/20 text-amber-700'
+                        )}
+                      >
                         <div className="flex items-center gap-2 truncate">
-                          <div className={cn(
-                            "w-1 h-4 rounded-full",
-                            isAChosen ? (championship ? "bg-arena-gold" : "bg-primary") : "bg-muted-foreground/20"
-                          )} />
-                          <span className="text-xs truncate">{resolveWarriorName(state, bout.warriorIdA, bout.a)}</span>
+                          <div
+                            className={cn(
+                              'w-1 h-4 rounded-full',
+                              isAChosen
+                                ? championship
+                                  ? 'bg-arena-gold'
+                                  : 'bg-primary'
+                                : 'bg-muted-foreground/20'
+                            )}
+                          />
+                          <span className="text-xs truncate">
+                            {resolveWarriorName(state, bout.warriorIdA, bout.a)}
+                          </span>
                           {isBye && <StepForward className="h-3 w-3 text-muted-foreground/50" />}
                         </div>
-                        {isAChosen && championship && <Crown className="h-3 w-3 text-arena-gold animate-pulse" />}
-                        {isAChosen && !championship && <Trophy className="h-3 w-3 animate-bounce shadow-glow text-arena-gold" />}
+                        {isAChosen && championship && (
+                          <Crown className="h-3 w-3 text-arena-gold animate-pulse" />
+                        )}
+                        {isAChosen && !championship && (
+                          <Trophy className="h-3 w-3 animate-bounce shadow-glow text-arena-gold" />
+                        )}
                       </div>
 
                       {/* VS indicator - hide for byes */}
                       {!isBye && (
                         <div className="flex justify-center -my-2 relative z-10">
-                          <div className={cn(
-                            "bg-secondary px-2 rounded-full border border-border/20 text-[8px] font-black text-muted-foreground",
-                            bronze && "bg-amber-500/20 border-amber-500/30 text-amber-600"
-                          )}>
-                            {bronze ? "3RD PLACE" : "VS"}
+                          <div
+                            className={cn(
+                              'bg-secondary px-2 rounded-full border border-border/20 text-[8px] font-black text-muted-foreground',
+                              bronze && 'bg-amber-500/20 border-amber-500/30 text-amber-600'
+                            )}
+                          >
+                            {bronze ? '3RD PLACE' : 'VS'}
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Bye indicator */}
                       {isBye && (
                         <div className="flex justify-center -my-1 relative z-10">
@@ -163,61 +212,106 @@ export function TournamentBracket({ bouts, arenaHistory, expandedBout, onToggleE
                       )}
 
                       {/* Warrior D */}
-                      <div className={cn(
-                        "flex items-center justify-between p-2 rounded-none transition-colors",
-                        isDChosen ? "bg-primary/10 text-primary font-bold shadow-inner" : isAChosen ? "opacity-30 grayscale" : "bg-background/40",
-                        isBye && "opacity-50 italic text-muted-foreground"
-                      )}>
+                      <div
+                        className={cn(
+                          'flex items-center justify-between p-2 rounded-none transition-colors',
+                          isDChosen
+                            ? 'bg-primary/10 text-primary font-bold shadow-inner'
+                            : isAChosen
+                              ? 'opacity-30 grayscale'
+                              : 'bg-background/40',
+                          isBye && 'opacity-50 italic text-muted-foreground'
+                        )}
+                      >
                         <div className="flex items-center gap-2 truncate">
-                          <div className={cn(
-                            "w-1 h-4 rounded-full",
-                            isDChosen ? (championship ? "bg-arena-gold" : "bg-primary") : "bg-muted-foreground/20"
-                          )} />
+                          <div
+                            className={cn(
+                              'w-1 h-4 rounded-full',
+                              isDChosen
+                                ? championship
+                                  ? 'bg-arena-gold'
+                                  : 'bg-primary'
+                                : 'bg-muted-foreground/20'
+                            )}
+                          />
                           <span className="text-xs truncate">
-                            {isBye ? "(bye)" : resolveWarriorName(state, bout.warriorIdD, bout.d)}
+                            {isBye ? '(bye)' : resolveWarriorName(state, bout.warriorIdD, bout.d)}
                           </span>
                         </div>
-                        {isDChosen && championship && <Crown className="h-3 w-3 text-arena-gold animate-pulse" />}
-                        {isDChosen && !championship && <Trophy className="h-3 w-3 animate-bounce shadow-glow text-arena-gold" />}
+                        {isDChosen && championship && (
+                          <Crown className="h-3 w-3 text-arena-gold animate-pulse" />
+                        )}
+                        {isDChosen && !championship && (
+                          <Trophy className="h-3 w-3 animate-bounce shadow-glow text-arena-gold" />
+                        )}
                       </div>
                     </div>
 
                     {hasTranscript && (
                       <button
-                        aria-label={isExpanded ? "Collapse Engagement Log" : "Expand Engagement Log"}
+                        aria-label={
+                          isExpanded ? 'Collapse Engagement Log' : 'Expand Engagement Log'
+                        }
                         onClick={() => onToggleExpand(isExpanded ? null : boutKey)}
                         className="w-full py-1.5 px-3 border-t border-border/10 flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-colors group"
                       >
-                        <span className="text-[9px] font-black uppercase text-muted-foreground group-hover:text-primary">Engagement Log</span>
-                        {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3 text-primary animate-pulse" />}
+                        <span className="text-[9px] font-black uppercase text-muted-foreground group-hover:text-primary">
+                          Engagement Log
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUp className="h-3 w-3" />
+                        ) : (
+                          <ChevronDown className="h-3 w-3 text-primary animate-pulse" />
+                        )}
                       </button>
                     )}
                   </div>
 
                   {isExpanded && hasTranscript && fightSummary && (
                     <div className="absolute top-0 left-full ml-4 z-50 w-full max-w-md animate-in fade-in slide-in-from-left-4 duration-300">
-                      <Surface variant="glass" padding="none" className="border-primary/50 shadow-2xl overflow-hidden">
+                      <Surface
+                        variant="glass"
+                        padding="none"
+                        className="border-primary/50 shadow-2xl overflow-hidden"
+                      >
                         <div className="p-4 border-b border-white/5 bg-secondary/40 flex items-center justify-between">
                           <span className="text-[10px] font-black uppercase tracking-widest text-foreground truncate max-w-[80%]">
-                            Archive: {resolveWarriorName(state, bout.warriorIdA, bout.a)} vs {resolveWarriorName(state, bout.warriorIdD, bout.d)}
+                            Archive: {resolveWarriorName(state, bout.warriorIdA, bout.a)} vs{' '}
+                            {resolveWarriorName(state, bout.warriorIdD, bout.d)}
                           </span>
-                          <Badge variant="outline" className="text-[9px] font-black uppercase border-white/10">{fightSummary.by || "???"}</Badge>
+                          <Badge
+                            variant="outline"
+                            className="text-[9px] font-black uppercase border-white/10"
+                          >
+                            {fightSummary.by || '???'}
+                          </Badge>
                         </div>
                         <div className="p-0 max-h-[500px] overflow-y-auto thin-scrollbar bg-background/60">
                           <BoutViewer
-                            nameA={resolveWarriorName(state, fightSummary.warriorIdA, fightSummary.a)}
-                            nameD={resolveWarriorName(state, fightSummary.warriorIdD, fightSummary.d)}
-                            styleA={fightSummary.styleA || ""}
-                            styleD={fightSummary.styleD || ""}
-                            log={(fightSummary.transcript || []).map((text, idx) => ({ minute: idx + 1, text }))}
+                            nameA={resolveWarriorName(
+                              state,
+                              fightSummary.warriorIdA,
+                              fightSummary.a
+                            )}
+                            nameD={resolveWarriorName(
+                              state,
+                              fightSummary.warriorIdD,
+                              fightSummary.d
+                            )}
+                            styleA={fightSummary.styleA || ''}
+                            styleD={fightSummary.styleD || ''}
+                            log={(fightSummary.transcript || []).map((text, idx) => ({
+                              minute: idx + 1,
+                              text,
+                            }))}
                             winner={fightSummary.winner}
                             by={fightSummary.by ?? null}
                             isRivalry={fightSummary.isRivalry}
                           />
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="w-full rounded-none border-t border-white/5 h-10 text-[9px] font-black uppercase tracking-widest hover:bg-primary/5"
                           onClick={() => onToggleExpand(null)}
                         >
@@ -243,24 +337,37 @@ interface ChampionDisplayProps {
   tournamentName: string;
 }
 
-export function ChampionDisplay({ championName, championId, tournamentName }: ChampionDisplayProps) {
+export function ChampionDisplay({
+  championName,
+  championId,
+  tournamentName,
+}: ChampionDisplayProps) {
   const state = useGameStore();
-  const displayName = championId 
+  const displayName = championId
     ? resolveWarriorName(state, championId, championName)
     : championName;
 
   return (
-    <Surface variant="gold" className="bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-transparent border-arena-gold/50 shadow-[0_0_30px_-10px_rgba(255,215,0,0.5)]">
+    <Surface
+      variant="gold"
+      className="bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-transparent border-arena-gold/50 shadow-[0_0_30px_-10px_rgba(255,215,0,0.5)]"
+    >
       <div className="p-8 text-center space-y-4">
         <div className="flex flex-col items-center gap-4">
           <Crown className="h-16 w-16 text-arena-gold animate-bounce" />
           <div className="space-y-2">
-            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">Tournament Supreme Champion</p>
-            <h3 className="text-4xl font-display font-black uppercase tracking-tighter text-foreground mt-2">{displayName}</h3>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">
+              Tournament Supreme Champion
+            </p>
+            <h3 className="text-4xl font-display font-black uppercase tracking-tighter text-foreground mt-2">
+              {displayName}
+            </h3>
             <div className="flex items-center justify-center gap-2">
-               <div className="h-px w-8 bg-white/5" />
-               <p className="text-[11px] font-black uppercase tracking-widest text-arena-gold/60">{tournamentName}</p>
-               <div className="h-px w-8 bg-white/5" />
+              <div className="h-px w-8 bg-white/5" />
+              <p className="text-[11px] font-black uppercase tracking-widest text-arena-gold/60">
+                {tournamentName}
+              </p>
+              <div className="h-px w-8 bg-white/5" />
             </div>
           </div>
         </div>
@@ -282,13 +389,20 @@ export function BronzeHighlight({ thirdPlaceName, thirdPlaceId }: BronzeHighligh
     : thirdPlaceName;
 
   return (
-    <Surface variant="glass" className="bg-gradient-to-br from-amber-600/10 to-transparent border-amber-500/30">
+    <Surface
+      variant="glass"
+      className="bg-gradient-to-br from-amber-600/10 to-transparent border-amber-500/30"
+    >
       <div className="p-5 text-center">
         <div className="flex items-center justify-center gap-4">
           <Medal className="h-6 w-6 text-amber-600" />
           <div className="text-left">
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-black">Third Place Medalist</p>
-            <p className="text-lg font-display font-black text-amber-700 uppercase tracking-tight leading-none mt-1">{displayName}</p>
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-black">
+              Third Place Medalist
+            </p>
+            <p className="text-lg font-display font-black text-amber-700 uppercase tracking-tight leading-none mt-1">
+              {displayName}
+            </p>
           </div>
         </div>
       </div>
@@ -304,22 +418,24 @@ interface TournamentProgressProps {
   totalMatches: number;
 }
 
-export function TournamentProgress({ 
-  currentRound, 
-  totalRounds, 
-  completedMatches, 
-  totalMatches 
+export function TournamentProgress({
+  currentRound,
+  totalRounds,
+  completedMatches,
+  totalMatches,
 }: TournamentProgressProps) {
   const progress = Math.round((completedMatches / totalMatches) * 100);
-  
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
-        <span className="text-muted-foreground">Round {currentRound} of {totalRounds}</span>
+        <span className="text-muted-foreground">
+          Round {currentRound} of {totalRounds}
+        </span>
         <span className="font-mono font-bold">{progress}%</span>
       </div>
       <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div 
+        <div
           className="h-full bg-gradient-to-r from-primary to-amber-500 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
         />

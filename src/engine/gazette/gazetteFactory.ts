@@ -2,13 +2,13 @@
  * Gazette Factory - Main factory functions for gazette generation
  * Extracted from gazetteNarrative.ts to follow SRP
  */
-import type { FightSummary } from "@/types/combat.types";
-import type { CrowdMoodType } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { GazetteStory } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { MOOD_TONE } from "./gazetteTemplateHelpers";
+import type { FightSummary } from '@/types/combat.types';
+import type { CrowdMoodType } from '@/types/shared.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { GazetteStory } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { MOOD_TONE } from './gazetteTemplateHelpers';
 import {
   computeStreaks,
   detectRivalryMatchup,
@@ -17,9 +17,13 @@ import {
   detectRisingStars,
   detectUpsets,
   detectDebuts,
-  type GazetteDetections
-} from "./gazetteDetections";
-import { generateGazetteHeadline, generateGazetteBody, generateSeasonSummary } from "./gazetteNarrative";
+  type GazetteDetections,
+} from './gazetteDetections';
+import {
+  generateGazetteHeadline,
+  generateGazetteBody,
+  generateSeasonSummary,
+} from './gazetteNarrative';
 
 /**
  * Generates a weekly gazette from fight data.
@@ -34,7 +38,7 @@ export function generateWeeklyGazette(
 ): GazetteStory {
   const rngService = rng || new SeededRNGService(week * 7919 + 55);
   const storyId = rngService.uuid();
-  const moodKey = mood && MOOD_TONE[mood] ? mood : "Calm";
+  const moodKey = mood && MOOD_TONE[mood] ? mood : 'Calm';
   const tone = MOOD_TONE[moodKey];
 
   // Run all detections

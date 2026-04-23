@@ -17,7 +17,10 @@ interface MockWritableStream {
 interface MockDirectoryHandle {
   kind: 'directory';
   name: string;
-  getDirectoryHandle: (name: string, options?: { create?: boolean }) => Promise<MockDirectoryHandle>;
+  getDirectoryHandle: (
+    name: string,
+    options?: { create?: boolean }
+  ) => Promise<MockDirectoryHandle>;
   getFileHandle: (name: string, options?: { create?: boolean }) => Promise<MockFileHandle>;
   values: () => AsyncIterableIterator<MockFileHandle | MockDirectoryHandle>;
 }
@@ -35,15 +38,15 @@ describe('OPFS Archival System', () => {
       name: 'root',
       getDirectoryHandle: vi.fn(),
       getFileHandle: vi.fn(),
-      values: vi.fn()
+      values: vi.fn(),
     };
 
     // Setup mock navigator
     Object.defineProperty(global.navigator, 'storage', {
       value: {
-        getDirectory: vi.fn().mockResolvedValue(rootHandle)
+        getDirectory: vi.fn().mockResolvedValue(rootHandle),
       },
-      configurable: true
+      configurable: true,
     });
   });
 
@@ -56,7 +59,7 @@ describe('OPFS Archival System', () => {
     it('Test 1.2: isSupported() returns false when API is missing', () => {
       Object.defineProperty(global.navigator, 'storage', {
         value: undefined,
-        configurable: true
+        configurable: true,
       });
       const service = new OPFSArchiveService();
       expect(service.isSupported()).toBe(false);
@@ -70,7 +73,7 @@ describe('OPFS Archival System', () => {
         name: 'season_1',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       };
 
       const boutsHandle = {
@@ -78,7 +81,7 @@ describe('OPFS Archival System', () => {
         name: 'bouts',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       };
 
       const fileHandle = {
@@ -87,13 +90,15 @@ describe('OPFS Archival System', () => {
         getFile: vi.fn(),
         createWritable: vi.fn().mockResolvedValue({
           write: vi.fn(),
-          close: vi.fn()
-        })
+          close: vi.fn(),
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
-      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+      boutsHandle.getFileHandle
+        .mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError'))
+        .mockResolvedValueOnce(fileHandle);
 
       const service = new OPFSArchiveService();
       await service.archiveBoutLog(1, 1, 'b-123', []);
@@ -109,7 +114,7 @@ describe('OPFS Archival System', () => {
         name: 'season_1',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const boutsHandle = {
@@ -117,7 +122,7 @@ describe('OPFS Archival System', () => {
         name: 'bouts',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const writeMock = vi.fn();
@@ -125,13 +130,15 @@ describe('OPFS Archival System', () => {
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
           write: writeMock,
-          close: closeMock
-        })
+          close: closeMock,
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
-      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+      boutsHandle.getFileHandle
+        .mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError'))
+        .mockResolvedValueOnce(fileHandle);
 
       const service = new OPFSArchiveService();
       const payload = [{ action: 'slash', damage: 15 }];
@@ -147,7 +154,7 @@ describe('OPFS Archival System', () => {
         name: 'season_1',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const boutsHandle = {
@@ -155,7 +162,7 @@ describe('OPFS Archival System', () => {
         name: 'bouts',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn().mockResolvedValue({}), // Resolves meaning file exists
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
@@ -175,8 +182,8 @@ describe('OPFS Archival System', () => {
       const mockData = [{ action: 'hit' }];
       const fileHandle = {
         getFile: vi.fn().mockResolvedValue({
-          text: vi.fn().mockResolvedValue(JSON.stringify(mockData))
-        })
+          text: vi.fn().mockResolvedValue(JSON.stringify(mockData)),
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
@@ -192,7 +199,9 @@ describe('OPFS Archival System', () => {
     it('Test 3.2: retrieveBoutLog handles missing files gracefully', async () => {
       const seasonHandle = { getDirectoryHandle: vi.fn() } as unknown as FileSystemDirectoryHandle;
       const boutsHandle = {
-        getFileHandle: vi.fn().mockRejectedValue(new DOMException('File not found', 'NotFoundError'))
+        getFileHandle: vi
+          .fn()
+          .mockRejectedValue(new DOMException('File not found', 'NotFoundError')),
       } as unknown;
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
@@ -215,8 +224,8 @@ describe('OPFS Archival System', () => {
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
           write: writeMock,
-          close: closeMock
-        })
+          close: closeMock,
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
@@ -243,7 +252,7 @@ describe('OPFS Archival System', () => {
         name: 'season_1',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const boutsHandle = {
@@ -251,19 +260,23 @@ describe('OPFS Archival System', () => {
         name: 'bouts',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
-          write: vi.fn().mockRejectedValue(new DOMException('Quota Exceeded', 'QuotaExceededError')),
-          close: vi.fn()
-        })
+          write: vi
+            .fn()
+            .mockRejectedValue(new DOMException('Quota Exceeded', 'QuotaExceededError')),
+          close: vi.fn(),
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
-      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+      boutsHandle.getFileHandle
+        .mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError'))
+        .mockResolvedValueOnce(fileHandle);
 
       // Assuming we inject a store or emit an event later, we just ensure it doesn't throw unhandled
       const service = new OPFSArchiveService();
@@ -279,7 +292,7 @@ describe('OPFS Archival System', () => {
         name: 'season_1',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const boutsHandle = {
@@ -287,19 +300,25 @@ describe('OPFS Archival System', () => {
         name: 'bouts',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
-          write: vi.fn().mockRejectedValue(new DOMException('No Modification Allowed', 'NoModificationAllowedError')),
-          close: vi.fn()
-        })
+          write: vi
+            .fn()
+            .mockRejectedValue(
+              new DOMException('No Modification Allowed', 'NoModificationAllowedError')
+            ),
+          close: vi.fn(),
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
-      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+      boutsHandle.getFileHandle
+        .mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError'))
+        .mockResolvedValueOnce(fileHandle);
 
       const service = new OPFSArchiveService();
 
@@ -313,7 +332,7 @@ describe('OPFS Archival System', () => {
         name: 'season_1',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const boutsHandle = {
@@ -321,19 +340,21 @@ describe('OPFS Archival System', () => {
         name: 'bouts',
         getDirectoryHandle: vi.fn(),
         getFileHandle: vi.fn(),
-        values: vi.fn()
+        values: vi.fn(),
       } as unknown as FileSystemDirectoryHandle;
 
       const fileHandle = {
         createWritable: vi.fn().mockResolvedValue({
           write: vi.fn().mockRejectedValue(new Error('Generic fallback error')),
-          close: vi.fn()
-        })
+          close: vi.fn(),
+        }),
       };
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(seasonHandle);
       seasonHandle.getDirectoryHandle.mockResolvedValueOnce(boutsHandle);
-      boutsHandle.getFileHandle.mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError')).mockResolvedValueOnce(fileHandle);
+      boutsHandle.getFileHandle
+        .mockRejectedValueOnce(new DOMException('Not found', 'NotFoundError'))
+        .mockResolvedValueOnce(fileHandle);
 
       const service = new OPFSArchiveService();
 
@@ -349,7 +370,9 @@ describe('OPFS Archival System', () => {
     it('Test 6.1: retrieveHotState handles missing files gracefully', async () => {
       const hotStateHandle = {
         getDirectoryHandle: vi.fn(),
-        getFileHandle: vi.fn().mockRejectedValue(new DOMException('File not found', 'NotFoundError'))
+        getFileHandle: vi
+          .fn()
+          .mockRejectedValue(new DOMException('File not found', 'NotFoundError')),
       } as unknown;
 
       rootHandle.getDirectoryHandle.mockResolvedValueOnce(hotStateHandle);

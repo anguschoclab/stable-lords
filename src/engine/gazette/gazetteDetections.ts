@@ -2,7 +2,7 @@
  * Gazette Detection Functions - Detects patterns in fight data for gazette generation
  * Extracted from gazetteNarrative.ts to follow SRP
  */
-import type { FightSummary } from "@/types/combat.types";
+import type { FightSummary } from '@/types/combat.types';
 
 export interface GazetteDetections {
   tags: string[];
@@ -19,10 +19,7 @@ export interface GazetteDetections {
  * `weekFights` but have no earlier appearance in `allFights`. `allFights` is
  * assumed to be ordered chronologically, with `weekFights` forming its tail.
  */
-export function detectDebuts(
-  weekFights: FightSummary[],
-  allFights: FightSummary[]
-): string[] {
+export function detectDebuts(weekFights: FightSummary[], allFights: FightSummary[]): string[] {
   const priorCount = Math.max(0, allFights.length - weekFights.length);
   const priorNames = new Set<string>();
   for (let i = 0; i < priorCount; i++) {
@@ -47,12 +44,12 @@ export function computeStreaks(allFights: FightSummary[]): Map<string, number> {
   for (let i = 0; i < allFights.length; i++) {
     const f = allFights[i];
     if (!f) continue;
-    if (f.winner === "A") {
+    if (f.winner === 'A') {
       const aStreak = streaks.get(f.a) ?? 0;
       const dStreak = streaks.get(f.d) ?? 0;
       streaks.set(f.a, aStreak >= 0 ? aStreak + 1 : 1);
       streaks.set(f.d, dStreak <= 0 ? dStreak - 1 : -1);
-    } else if (f.winner === "D") {
+    } else if (f.winner === 'D') {
       const aStreak = streaks.get(f.a) ?? 0;
       const dStreak = streaks.get(f.d) ?? 0;
       streaks.set(f.d, dStreak >= 0 ? dStreak + 1 : 1);
@@ -116,17 +113,17 @@ export function detectRivalryMatchup(
  */
 export function detectGazetteTags(fights: FightSummary[], detections: GazetteDetections): string[] {
   const tags: string[] = [];
-  const kills = fights.filter(f => f.by === "Kill");
-  const knockouts = fights.filter(f => f.by === "KO");
+  const kills = fights.filter((f) => f.by === 'Kill');
+  const knockouts = fights.filter((f) => f.by === 'KO');
 
-  if (kills.length >= 2) tags.push("Bloodbath");
-  if (fights.some(f => f.flashyTags?.includes("Comeback"))) tags.push("Comeback");
-  if (fights.some(f => f.flashyTags?.includes("Dominance"))) tags.push("Dominance");
-  if (knockouts.length >= 3) tags.push("KO Fest");
-  if (detections.hotStreakers.length > 0) tags.push("Hot Streak");
-  if (detections.rivalryPair) tags.push("Rivalry");
-  if (detections.risingStars.length > 0) tags.push("Rising Star");
-  if (detections.upsets.length > 0) tags.push("Upset");
+  if (kills.length >= 2) tags.push('Bloodbath');
+  if (fights.some((f) => f.flashyTags?.includes('Comeback'))) tags.push('Comeback');
+  if (fights.some((f) => f.flashyTags?.includes('Dominance'))) tags.push('Dominance');
+  if (knockouts.length >= 3) tags.push('KO Fest');
+  if (detections.hotStreakers.length > 0) tags.push('Hot Streak');
+  if (detections.rivalryPair) tags.push('Rivalry');
+  if (detections.risingStars.length > 0) tags.push('Rising Star');
+  if (detections.upsets.length > 0) tags.push('Upset');
 
   return tags;
 }
@@ -134,11 +131,14 @@ export function detectGazetteTags(fights: FightSummary[], detections: GazetteDet
 /**
  * Detect warriors on hot streaks.
  */
-export function detectHotStreakers(fights: FightSummary[], streaks: Map<string, number>): { name: string; streak: number }[] {
+export function detectHotStreakers(
+  fights: FightSummary[],
+  streaks: Map<string, number>
+): { name: string; streak: number }[] {
   const hotStreakers: { name: string; streak: number }[] = [];
   for (const f of fights) {
     if (!f.winner) continue;
-    const winnerName = f.winner === "A" ? f.a : f.d;
+    const winnerName = f.winner === 'A' ? f.a : f.d;
     const s = streaks.get(winnerName) ?? 0;
     if (s >= 5) hotStreakers.push({ name: winnerName, streak: s });
   }
@@ -155,7 +155,7 @@ export function detectRisingStars(fights: FightSummary[], allFights: FightSummar
   const candidates = new Set<string>();
   for (const f of fights) {
     if (f.winner) {
-      candidates.add(f.winner === "A" ? f.a : f.d);
+      candidates.add(f.winner === 'A' ? f.a : f.d);
     }
   }
 
@@ -168,12 +168,12 @@ export function detectRisingStars(fights: FightSummary[], allFights: FightSummar
     if (candidates.has(af.a)) {
       const s = stats.get(af.a)!;
       s.total++;
-      if (af.winner === "A") s.wins++;
+      if (af.winner === 'A') s.wins++;
     }
     if (candidates.has(af.d)) {
       const s = stats.get(af.d)!;
       s.total++;
-      if (af.winner === "D") s.wins++;
+      if (af.winner === 'D') s.wins++;
     }
   }
 
@@ -190,14 +190,16 @@ export function detectRisingStars(fights: FightSummary[], allFights: FightSummar
 /**
  * Detect upset victories.
  */
-export function detectUpsets(fights: FightSummary[]): { winner: string; loser: string; winnerFame: number; loserFame: number }[] {
+export function detectUpsets(
+  fights: FightSummary[]
+): { winner: string; loser: string; winnerFame: number; loserFame: number }[] {
   const upsets: { winner: string; loser: string; winnerFame: number; loserFame: number }[] = [];
   for (const f of fights) {
     if (!f.winner || f.fameA == null || f.fameD == null) continue;
-    const winnerFame = f.winner === "A" ? f.fameA : f.fameD;
-    const loserFame = f.winner === "A" ? f.fameD : f.fameA;
-    const winnerName = f.winner === "A" ? f.a : f.d;
-    const loserName = f.winner === "A" ? f.d : f.a;
+    const winnerFame = f.winner === 'A' ? f.fameA : f.fameD;
+    const loserFame = f.winner === 'A' ? f.fameD : f.fameA;
+    const winnerName = f.winner === 'A' ? f.a : f.d;
+    const loserName = f.winner === 'A' ? f.d : f.a;
     if (loserFame >= winnerFame + 10 && loserFame >= winnerFame * 2) {
       upsets.push({ winner: winnerName, loser: loserName, winnerFame, loserFame });
     }

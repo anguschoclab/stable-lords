@@ -1,6 +1,6 @@
-import type { GameState, Warrior, NewsletterItem } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import type { StateImpact } from "@/engine/impacts";
+import type { GameState, Warrior, NewsletterItem } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import type { StateImpact } from '@/engine/impacts';
 
 /**
  * BankruptcyService - Handles bankruptcy detection and processing.
@@ -12,12 +12,15 @@ export class BankruptcyService {
    * Processes bankruptcy for all rival stables.
    * Removes stables that have gone bankrupt.
    */
-  static processBankruptcy(state: GameState, _rng: IRNGService): { updatedState: GameState; bankruptStables: string[] } {
+  static processBankruptcy(
+    state: GameState,
+    _rng: IRNGService
+  ): { updatedState: GameState; bankruptStables: string[] } {
     const BANKRUPTCY_THRESHOLD = -500;
     const updatedState = { ...state };
     const bankruptStables: string[] = [];
 
-    updatedState.rivals = updatedState.rivals.filter(rival => {
+    updatedState.rivals = updatedState.rivals.filter((rival) => {
       if (rival.treasury < BANKRUPTCY_THRESHOLD) {
         bankruptStables.push(rival.owner.stableName);
         return false;
@@ -33,7 +36,10 @@ export class BankruptcyService {
    * If treasury < -500, force sell highest-fame warrior, reduce reputation, generate newsletter.
    * Returns StateImpact for integration with the pipeline.
    */
-  static processPlayerBankruptcy(state: GameState, rng: IRNGService): { bankrupt: boolean; impact: StateImpact; soldWarrior?: Warrior } {
+  static processPlayerBankruptcy(
+    state: GameState,
+    rng: IRNGService
+  ): { bankrupt: boolean; impact: StateImpact; soldWarrior?: Warrior } {
     const BANKRUPTCY_THRESHOLD = -500;
 
     if (state.treasury >= BANKRUPTCY_THRESHOLD) {
@@ -62,14 +68,14 @@ export class BankruptcyService {
 
       // Generate newsletter item
       const newsletterItem: NewsletterItem = {
-        id: rng.uuid("newsletter"),
+        id: rng.uuid('newsletter'),
         week: state.week,
-        title: "Bankruptcy Crisis",
+        title: 'Bankruptcy Crisis',
         items: [
           `Your stable has gone bankrupt with treasury at ${state.treasury}g.`,
           `${highestFameWarrior.name} has been sold for ${sellValue}g to cover debts.`,
-          `Your reputation has suffered (-50 popularity).`
-        ]
+          `Your reputation has suffered (-50 popularity).`,
+        ],
       };
 
       impact.treasuryDelta = sellValue;
@@ -81,14 +87,14 @@ export class BankruptcyService {
 
     // No warriors to sell - just reduce reputation
     const newsletterItem: NewsletterItem = {
-      id: rng.uuid("newsletter"),
+      id: rng.uuid('newsletter'),
       week: state.week,
-      title: "Bankruptcy Crisis",
+      title: 'Bankruptcy Crisis',
       items: [
         `Your stable has gone bankrupt with treasury at ${state.treasury}g.`,
         `With no warriors to sell, your reputation has suffered (-50 popularity).`,
-        `Consider taking a loan to avoid future bankruptcy.`
-      ]
+        `Consider taking a loan to avoid future bankruptcy.`,
+      ],
     };
 
     impact.popularityDelta = -50;

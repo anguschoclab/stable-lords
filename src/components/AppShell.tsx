@@ -1,17 +1,25 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 import {
-  Swords, RotateCcw, LogOut, Save,
-  Activity, Volume2, VolumeX,
-  Coins, Crown, Cloud, ChevronRight
-} from "lucide-react";
-import { audioManager } from "@/lib/AudioManager";
-import { Button } from "@/components/ui/button";
-import { useGameStore, type GameStore } from "@/state/useGameStore";
-import { Separator } from "@/components/ui/separator";
-import { MOOD_ICONS } from "@/engine/crowdMood";
-import type { Warrior } from "@/types/state.types";
+  Swords,
+  RotateCcw,
+  LogOut,
+  Save,
+  Activity,
+  Volume2,
+  VolumeX,
+  Coins,
+  Crown,
+  Cloud,
+  ChevronRight,
+} from 'lucide-react';
+import { audioManager } from '@/lib/AudioManager';
+import { Button } from '@/components/ui/button';
+import { useGameStore, type GameStore } from '@/state/useGameStore';
+import { Separator } from '@/components/ui/separator';
+import { MOOD_ICONS } from '@/engine/crowdMood';
+import type { Warrior } from '@/types/state.types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,28 +29,36 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { motion, AnimatePresence } from "framer-motion";
+} from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { motion, AnimatePresence } from 'framer-motion';
 
-import { useRivalryAlerts } from "@/hooks/useRivalryAlerts";
-import { LeftNav } from "@/components/navigation/LeftNav";
+import { useRivalryAlerts } from '@/hooks/useRivalryAlerts';
+import { LeftNav } from '@/components/navigation/LeftNav';
 
 import { useShallow } from 'zustand/react/shallow';
 
-import { DeathModal } from "@/components/modals/DeathModal";
-import { CoachOverlay } from "@/components/ui/CoachOverlay";
-import EventLog from "@/components/EventLog";
+import { DeathModal } from '@/components/modals/DeathModal';
+import { CoachOverlay } from '@/components/ui/CoachOverlay';
+import EventLog from '@/components/EventLog';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const {
-    week, day, isTournamentWeek, treasury, fame, crowdMood, weather, roster,
-    doReset, returnToTitle, lastSavedAt,
-    isSimulating, isInitialized, eventLogOpen, initialize
+    week,
+    day,
+    isTournamentWeek,
+    treasury,
+    fame,
+    crowdMood,
+    weather,
+    roster,
+    doReset,
+    returnToTitle,
+    lastSavedAt,
+    isSimulating,
+    isInitialized,
+    eventLogOpen,
+    initialize,
   } = useGameStore(
     useShallow((s: GameStore) => ({
       week: s.week,
@@ -59,12 +75,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       isSimulating: s.isSimulating,
       isInitialized: s.isInitialized,
       eventLogOpen: s.eventLogOpen,
-      initialize: s.initialize
+      initialize: s.initialize,
     }))
   );
   const navigate = useNavigate();
   const activePath = location.pathname;
-  const moodIcon = MOOD_ICONS[crowdMood as keyof typeof MOOD_ICONS] ?? "😐";
+  const moodIcon = MOOD_ICONS[crowdMood as keyof typeof MOOD_ICONS] ?? '😐';
   const [resetOpen, setResetOpen] = useState(false);
   const [saveFlash, setSaveFlash] = useState(false);
   const [isMuted, setIsMuted] = useState(audioManager.isMuted());
@@ -82,13 +98,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Only check for "Orphan" status if we are in the main game loops
-    const exemptPaths = ["/welcome", "/ops/", "/admin", "/help"];
-    if (exemptPaths.some(p => activePath.startsWith(p))) return;
+    const exemptPaths = ['/welcome', '/ops/', '/admin', '/help'];
+    if (exemptPaths.some((p) => activePath.startsWith(p))) return;
 
-    const activeWarriors = roster.filter((w: Warrior) => w.status === "Active");
+    const activeWarriors = roster.filter((w: Warrior) => w.status === 'Active');
     if (activeWarriors.length < 3) {
-      console.warn("Personnel deficit detected. Redirecting to recruitment protocol.");
-      navigate({ to: "/welcome" });
+      console.warn('Personnel deficit detected. Redirecting to recruitment protocol.');
+      navigate({ to: '/welcome' });
     }
   }, [roster, activePath, navigate]);
 
@@ -102,8 +118,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const formatSaveTime = (iso: string) => {
     try {
       const d = new Date(iso);
-      return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-    } catch { return ""; }
+      return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
+    }
   };
 
   // const activePath = location.pathname;
@@ -113,16 +131,23 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* ─── Global Status Header ─── */}
       <header className="h-14 border-b border-white/5 bg-[#080604]/85 backdrop-blur-xl z-50 flex items-center justify-between px-6 sticky top-0 flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-3 group active:scale-95 transition-transform">
-            <motion.div 
+          <Link
+            to="/"
+            className="flex items-center gap-3 group active:scale-95 transition-transform"
+          >
+            <motion.div
               whileHover={{ rotate: 15 }}
               className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
               <Swords className="h-5 w-5 text-white" />
             </motion.div>
             <div className="flex flex-col">
-              <span className="font-display font-black text-sm tracking-tighter uppercase leading-none group-hover:text-primary transition-colors">Stable Lords</span>
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">CODEX SANGUIS · MMCDXII</span>
+              <span className="font-display font-black text-sm tracking-tighter uppercase leading-none group-hover:text-primary transition-colors">
+                Stable Lords
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">
+                CODEX SANGUIS · MMCDXII
+              </span>
             </div>
           </Link>
 
@@ -130,37 +155,51 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="hidden lg:flex items-center gap-8">
             <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Arena Time</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                Arena Time
+              </span>
               <span className="font-mono font-black text-xs text-foreground bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                {isSimulating ? <span className="animate-pulse opacity-40">W—</span> : `W${week}${isTournamentWeek ? ` • D${day + 1}` : ""}`}
+                {isSimulating ? (
+                  <span className="animate-pulse opacity-40">W—</span>
+                ) : (
+                  `W${week}${isTournamentWeek ? ` • D${day + 1}` : ''}`
+                )}
               </span>
             </div>
-            
+
             <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Treasury</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                Treasury
+              </span>
               <span className="font-mono font-black text-xs text-arena-gold flex items-center gap-1">
                 {(treasury ?? 0).toLocaleString()} <Coins className="h-3 w-3 opacity-60" />
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Influence</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                Influence
+              </span>
               <span className="font-mono font-black text-xs text-arena-fame flex items-center gap-1">
                 {fame} <Crown className="h-3 w-3 opacity-60" />
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Crowd Mood</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                Crowd Mood
+              </span>
               <span className="font-mono font-black text-xs text-arena-pop flex items-center gap-1">
                 {moodIcon} <Activity className="h-3 w-3 opacity-60" />
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Weather</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                Weather
+              </span>
               <span className="font-mono font-black text-xs text-sky-400 flex items-center gap-1">
-                <Cloud className="h-3 w-3 opacity-60" /> {weather || "Clear"}
+                <Cloud className="h-3 w-3 opacity-60" /> {weather || 'Clear'}
               </span>
             </div>
           </div>
@@ -170,10 +209,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Link
             to="/command/combat"
             className={cn(
-              "flex items-center gap-2 h-9 px-4 font-black text-[11px] uppercase tracking-widest transition-all duration-150",
+              'flex items-center gap-2 h-9 px-4 font-black text-[11px] uppercase tracking-widest transition-all duration-150',
               isSimulating
-                ? "bg-white/5 text-muted-foreground/40 pointer-events-none"
-                : "bg-primary text-white shadow-[0_0_16px_rgba(255,0,0,0.35)] hover:bg-primary/90 hover:shadow-[0_0_24px_rgba(255,0,0,0.5)] active:scale-95"
+                ? 'bg-white/5 text-muted-foreground/40 pointer-events-none'
+                : 'bg-primary text-white shadow-[0_0_16px_rgba(255,0,0,0.35)] hover:bg-primary/90 hover:shadow-[0_0_24px_rgba(255,0,0,0.5)] active:scale-95'
             )}
           >
             {isSimulating ? (
@@ -185,7 +224,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <>
                 {isTournamentWeek ? `Day ${day + 1}` : `Week ${week}`}
                 <ChevronRight className="h-3.5 w-3.5" />
-                {isTournamentWeek ? "Fight" : "Advance"}
+                {isTournamentWeek ? 'Fight' : 'Advance'}
               </>
             )}
           </Link>
@@ -197,15 +236,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 size="icon"
                 className="h-9 w-9 rounded-none hover:bg-white/5 transition-colors"
                 onClick={toggleMute}
-                title={isMuted ? "Unmute audio" : "Mute audio"}
-                aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+                title={isMuted ? 'Unmute audio' : 'Mute audio'}
+                aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
                 aria-pressed={!isMuted}
               >
-                {isMuted ? <VolumeX className="h-4 w-4 text-destructive" /> : <Volume2 className="h-4 w-4 text-primary" />}
+                {isMuted ? (
+                  <VolumeX className="h-4 w-4 text-destructive" />
+                ) : (
+                  <Volume2 className="h-4 w-4 text-primary" />
+                )}
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
-              Toggle Acoustic Signal ({isMuted ? "Muted" : "Active"})
+            <TooltipContent
+              side="bottom"
+              className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10"
+            >
+              Toggle Acoustic Signal ({isMuted ? 'Muted' : 'Active'})
             </TooltipContent>
           </Tooltip>
 
@@ -215,8 +261,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-9 w-9 rounded-none transition-all",
-                  saveFlash ? "bg-primary/20 text-primary scale-110" : "hover:bg-white/5"
+                  'h-9 w-9 rounded-none transition-all',
+                  saveFlash ? 'bg-primary/20 text-primary scale-110' : 'hover:bg-white/5'
                 )}
                 title="Save status"
                 aria-label="Save status"
@@ -224,8 +270,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <Save className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
-              {lastSavedAt ? `Auto-Saved: ${formatSaveTime(lastSavedAt)}` : "Registry Idle"}
+            <TooltipContent
+              side="bottom"
+              className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10"
+            >
+              {lastSavedAt ? `Auto-Saved: ${formatSaveTime(lastSavedAt)}` : 'Registry Idle'}
             </TooltipContent>
           </Tooltip>
 
@@ -242,7 +291,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
+            <TooltipContent
+              side="bottom"
+              className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10"
+            >
               Expunge Ledger (Delete Save)
             </TooltipContent>
           </Tooltip>
@@ -263,7 +315,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <LogOut className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10">
+            <TooltipContent
+              side="bottom"
+              className="text-[10px] font-black uppercase tracking-widest bg-neutral-950 border-white/10"
+            >
               Exit to Command Center
             </TooltipContent>
           </Tooltip>
@@ -277,18 +332,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {/* ─── Main Content Area ─── */}
         <main className="flex-1 flex flex-col relative bg-[#0C0806] overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
-          
+
           <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                transition={{ 
-                  type: "spring",
+                initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                transition={{
+                  type: 'spring',
                   stiffness: 260,
-                  damping: 20
+                  damping: 20,
                 }}
                 className="relative z-10"
               >
@@ -301,8 +356,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           <AnimatePresence>
             {!isInitialized && (
-
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -325,7 +379,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 320, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="flex-shrink-0 border-l border-white/10 bg-[#08090b] overflow-hidden flex flex-col"
             >
               <EventLog />
@@ -339,24 +393,32 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
         <AlertDialogContent className="bg-neutral-900 border-destructive/20 scale-105">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-display font-black text-2xl uppercase tracking-tighter text-destructive">Expunge the Record</AlertDialogTitle>
+            <AlertDialogTitle className="font-display font-black text-2xl uppercase tracking-tighter text-destructive">
+              Expunge the Record
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground font-medium selection:bg-destructive/20">
-              You are about to seal and destroy this ledger. All combat history, stable roster, and financial records will be permanently struck from the archive.
-              <br/><br/>
-              <span className="text-destructive font-black uppercase tracking-widest text-[10px]">This act cannot be undone. Proceed?</span>
+              You are about to seal and destroy this ledger. All combat history, stable roster, and
+              financial records will be permanently struck from the archive.
+              <br />
+              <br />
+              <span className="text-destructive font-black uppercase tracking-widest text-[10px]">
+                This act cannot be undone. Proceed?
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6">
-            <AlertDialogCancel className="bg-secondary/40 border-white/5 hover:bg-white/10 hover:text-foreground">Preserve the Record</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-black uppercase text-[11px] tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.3)]"
-                onClick={() => {
-                  doReset();
-                  setResetOpen(false);
-                }}
-              >
-                Expunge
-              </AlertDialogAction>
+            <AlertDialogCancel className="bg-secondary/40 border-white/5 hover:bg-white/10 hover:text-foreground">
+              Preserve the Record
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-black uppercase text-[11px] tracking-widest shadow-[0_0_20px_rgba(255,0,0,0.3)]"
+              onClick={() => {
+                doReset();
+                setResetOpen(false);
+              }}
+            >
+              Expunge
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

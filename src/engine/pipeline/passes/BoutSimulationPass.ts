@@ -1,10 +1,10 @@
-import type { GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { processWeekBouts } from "@/engine/bout/services/boutProcessorService";
-import { generateId } from "@/utils/idUtils";
-import { StateImpact } from "@/engine/impacts";
-import { planWeeklyMatches } from "@/engine/weeklyMatchmaking";
-import { getFeatureFlags } from "@/engine/featureFlags";
+import type { GameState } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { processWeekBouts } from '@/engine/bout/services/boutProcessorService';
+import { generateId } from '@/utils/idUtils';
+import { StateImpact } from '@/engine/impacts';
+import { planWeeklyMatches } from '@/engine/weeklyMatchmaking';
+import { getFeatureFlags } from '@/engine/featureFlags';
 
 /**
  * Stable Lords — Bout Simulation Pass
@@ -24,15 +24,15 @@ export function runBoutSimulationPass(state: GameState, _rng: IRNGService): Stat
   const flags = getFeatureFlags();
   if (flags.weeklyMatchmaker && _rng) {
     const plan = planWeeklyMatches(state, _rng);
-    if (plan.reasons.length > 0 && typeof console !== "undefined" && console.debug) {
-      console.debug("[weeklyMatchmaker]", { week: state.week, ...plan });
+    if (plan.reasons.length > 0 && typeof console !== 'undefined' && console.debug) {
+      console.debug('[weeklyMatchmaker]', { week: state.week, ...plan });
     }
   }
 
   // Although processWeekBouts uses its own deterministic seeds via hashStr,
   // we wrap it here to maintain pipeline consistency for the 1.0 release.
   const { impact: boutImpact, summary } = processWeekBouts(state);
-  
+
   // Attach the summary to the state for use in later narrative or event passes if needed
   boutImpact.lastSimulationReport = {
     id: _rng.uuid(),
@@ -42,7 +42,7 @@ export function runBoutSimulationPass(state: GameState, _rng: IRNGService): Stat
     agingEvents: [],
     healthEvents: [],
     ...state.lastSimulationReport,
-    bouts: summary
+    bouts: summary,
   } as any;
 
   return boutImpact;

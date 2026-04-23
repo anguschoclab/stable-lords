@@ -1,7 +1,7 @@
 /**
  * Newsletter feed — collects fight cards per week and generates issues.
  */
-import type { FightSummary } from "@/types/combat.types";
+import type { FightSummary } from '@/types/combat.types';
 
 export interface FightCard {
   summary: FightSummary;
@@ -16,25 +16,25 @@ export interface NewsletterIssue {
     fightOfTheWeekId?: string | null;
     topMovers?: { name: string; fameDelta: number; popDelta: number }[];
   };
-  styleRollups: Record<
-    string,
-    { w: number; l: number; k: number; pct: number; fights: number }
-  >;
+  styleRollups: Record<string, { w: number; l: number; k: number; pct: number; fights: number }>;
   createdAt: string;
 }
 
 function scoreFight(f: FightSummary): number {
   let s = 0;
-  if (f.flashyTags?.includes("Comeback")) s += 3;
-  if (f.flashyTags?.includes("Flashy")) s += 2;
-  if (f.by === "KO") s += 2;
-  if (f.by === "Kill") s += 3;
-  if (f.by === "Draw") s += 1;
+  if (f.flashyTags?.includes('Comeback')) s += 3;
+  if (f.flashyTags?.includes('Flashy')) s += 2;
+  if (f.by === 'KO') s += 2;
+  if (f.by === 'Kill') s += 3;
+  if (f.by === 'Draw') s += 1;
   return s;
 }
 
-function computeStyleRollups(fights: FightCard[]): Record<string, { w: number; l: number; k: number; pct: number; fights: number }> {
-  const rollups: Record<string, { w: number; l: number; k: number; pct: number; fights: number }> = {};
+function computeStyleRollups(
+  fights: FightCard[]
+): Record<string, { w: number; l: number; k: number; pct: number; fights: number }> {
+  const rollups: Record<string, { w: number; l: number; k: number; pct: number; fights: number }> =
+    {};
   const ensure = (s: string) => {
     if (!rollups[s]) rollups[s] = { w: 0, l: 0, k: 0, pct: 0, fights: 0 };
   };
@@ -46,17 +46,17 @@ function computeStyleRollups(fights: FightCard[]): Record<string, { w: number; l
     rollups[f.styleA].fights++;
     rollups[f.styleD].fights++;
 
-    if (f.winner === "A") {
+    if (f.winner === 'A') {
       rollups[f.styleA].w++;
       rollups[f.styleD].l++;
-    } else if (f.winner === "D") {
+    } else if (f.winner === 'D') {
       rollups[f.styleD].w++;
       rollups[f.styleA].l++;
     }
 
-    if (f.by === "Kill") {
-      if (f.winner === "A") rollups[f.styleA].k++;
-      else if (f.winner === "D") rollups[f.styleD].k++;
+    if (f.by === 'Kill') {
+      if (f.winner === 'A') rollups[f.styleA].k++;
+      else if (f.winner === 'D') rollups[f.styleD].k++;
     }
   }
 
@@ -69,7 +69,9 @@ function computeStyleRollups(fights: FightCard[]): Record<string, { w: number; l
   return rollups;
 }
 
-function computeTopMovers(fights: FightCard[]): { name: string; fameDelta: number; popDelta: number }[] {
+function computeTopMovers(
+  fights: FightCard[]
+): { name: string; fameDelta: number; popDelta: number }[] {
   const movers = new Map<string, { name: string; fameDelta: number; popDelta: number }>();
 
   for (const card of fights) {
@@ -88,7 +90,7 @@ function computeTopMovers(fights: FightCard[]): { name: string; fameDelta: numbe
   }
 
   return [...movers.values()]
-    .sort((a, b) => (b.fameDelta + b.popDelta) - (a.fameDelta + a.popDelta))
+    .sort((a, b) => b.fameDelta + b.popDelta - (a.fameDelta + a.popDelta))
     .slice(0, 5);
 }
 
@@ -110,7 +112,6 @@ export const NewsletterFeed = {
   },
 
   generateIssue(week: number, fights: FightCard[]): NewsletterIssue {
-
     let bestId: string | null = null;
     let best = -1;
     for (const c of fights) {

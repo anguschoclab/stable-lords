@@ -1,4 +1,4 @@
-import type { Warrior } from "@/types/warrior.types";
+import type { Warrior } from '@/types/warrior.types';
 
 export interface StableStats {
   activeCount: number;
@@ -13,7 +13,7 @@ export interface StableStats {
   topWarrior: Warrior | null;
 }
 
-const ATTRIBUTE_KEYS = ["ST", "CN", "SZ", "WT", "WL", "SP", "DF"] as const;
+const ATTRIBUTE_KEYS = ['ST', 'CN', 'SZ', 'WT', 'WL', 'SP', 'DF'] as const;
 
 /**
  * Standardized O(N) calculation for a stable's performance metrics.
@@ -32,18 +32,18 @@ export function calculateStableStats(roster: Warrior[]): StableStats {
 
   for (let i = 0; i < roster.length; i++) {
     const w = roster[i];
-    if (w.status !== "Active") continue;
+    if (w.status !== 'Active') continue;
 
     active.push(w);
-    totalWins += (w.career?.wins ?? 0);
-    totalLosses += (w.career?.losses ?? 0);
-    totalKills += (w.career?.kills ?? 0);
-    totalFame += (w.fame ?? 0);
+    totalWins += w.career?.wins ?? 0;
+    totalLosses += w.career?.losses ?? 0;
+    totalKills += w.career?.kills ?? 0;
+    totalFame += w.fame ?? 0;
 
     styleCounts[w.style] = (styleCounts[w.style] ?? 0) + 1;
 
     for (const key of ATTRIBUTE_KEYS) {
-      sumAttrs[key] += (w.attributes[key] ?? 0);
+      sumAttrs[key] += w.attributes[key] ?? 0;
     }
 
     if (!topWarrior || (w.fame ?? 0) > (topWarrior.fame ?? 0)) {

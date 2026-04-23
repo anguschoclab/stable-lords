@@ -2,10 +2,10 @@
  * A lightweight Event Bus to decouple the engine from reporting and narrative side-effects.
  */
 
-import type { GameState } from "@/types/state.types";
-import type { FightSummary } from "@/types/combat.types";
+import type { GameState } from '@/types/state.types';
+import type { FightSummary } from '@/types/combat.types';
 
-export type EngineEvent = 
+export type EngineEvent =
   | { type: 'WEEK_ADVANCED'; payload: { week: number; state: GameState } }
   | { type: 'BOUT_COMPLETED'; payload: { summary: FightSummary; transcript?: string[] } }
   | { type: 'WARRIOR_DEATH'; payload: { warriorId: string; name: string } }
@@ -32,7 +32,7 @@ class EventBus {
    * Emit an event to all subscribers.
    */
   emit(event: EngineEvent): void {
-    this.handlers.forEach(handler => handler(event));
+    this.handlers.forEach((handler) => handler(event));
   }
 
   /**

@@ -1,17 +1,26 @@
-import { FightingStyle, type Attributes, type BaseSkills, type DerivedStats } from "@/types/shared.types";
-import { type StyleMeta } from "./metaDrift";
-import { type AttributePotential, type WarriorFavorites, type WarriorLineage } from "@/types/warrior.types";
-import { computeWarriorStats } from "./skillCalc";
-import { generatePotential } from "./potential";
-import { generateFavorites } from "./favorites";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import narrativeContent from "@/data/narrativeContent.json";
-import type { NarrativeContent } from "@/types/narrative.types";
+import {
+  FightingStyle,
+  type Attributes,
+  type BaseSkills,
+  type DerivedStats,
+} from '@/types/shared.types';
+import { type StyleMeta } from './metaDrift';
+import {
+  type AttributePotential,
+  type WarriorFavorites,
+  type WarriorLineage,
+} from '@/types/warrior.types';
+import { computeWarriorStats } from './skillCalc';
+import { generatePotential } from './potential';
+import { generateFavorites } from './favorites';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import narrativeContent from '@/data/narrativeContent.json';
+import type { NarrativeContent } from '@/types/narrative.types';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
-export type RecruitTier = "Common" | "Promising" | "Exceptional" | "Prodigy";
+export type RecruitTier = 'Common' | 'Promising' | 'Exceptional' | 'Prodigy';
 
 export interface PoolWarrior {
   id: string;
@@ -33,7 +42,8 @@ export interface PoolWarrior {
 // ─── Constants ────────────────────────────────────────────────────────────
 
 // TIER data is now fetched from narrativeContent.json
-const getTierData = (tier: RecruitTier) => (narrativeContent as NarrativeContent).recruitment.tiers[tier];
+const getTierData = (tier: RecruitTier) =>
+  (narrativeContent as NarrativeContent).recruitment.tiers[tier];
 
 export const TIER_COST: Record<RecruitTier, number> = {
   Common: (narrativeContent as NarrativeContent).recruitment.tiers.Common.cost,
@@ -63,16 +73,16 @@ const NAME_POOL = (narrativeContent as NarrativeContent).recruitment.names;
 // ─── Generation ───────────────────────────────────────────────────────────
 
 function rollTier(rng: IRNGService): RecruitTier {
-  if (rng.next() < 0.05) return "Prodigy";
-  if (rng.next() < 0.20) return "Exceptional";
-  if (rng.next() < 0.50) return "Promising";
-  return "Common";
+  if (rng.next() < 0.05) return 'Prodigy';
+  if (rng.next() < 0.2) return 'Exceptional';
+  if (rng.next() < 0.5) return 'Promising';
+  return 'Common';
 }
 
 function distributeAttributes(rng: IRNGService, total: number): Attributes {
   const attrs: Attributes = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };
   let pool = total - 21; // 21 is base (7 × 3)
-  const keys: (keyof Attributes)[] = ["ST", "CN", "SZ", "WT", "WL", "SP", "DF"];
+  const keys: (keyof Attributes)[] = ['ST', 'CN', 'SZ', 'WT', 'WL', 'SP', 'DF'];
 
   while (pool > 0) {
     const key = rng.pick(keys);
@@ -88,7 +98,7 @@ function distributeAttributes(rng: IRNGService, total: number): Attributes {
 function generateLore(rng: IRNGService, style: FightingStyle): string {
   const recruitment = (narrativeContent as NarrativeContent).recruitment;
   const origin = rng.pick(recruitment.origin);
-  const blurbs = recruitment.style_blurbs?.[style] || ["A fighter with something to prove."];
+  const blurbs = recruitment.style_blurbs?.[style] || ['A fighter with something to prove.'];
   const blurb = rng.pick(blurbs);
   return `${origin} ${blurb}`;
 }
@@ -99,7 +109,7 @@ export function generateRecruit(
   week: number,
   forceTier?: RecruitTier,
   meta?: StyleMeta,
-  legacyCandidates: import("@/types/warrior.types").Warrior[] = []
+  legacyCandidates: import('@/types/warrior.types').Warrior[] = []
 ): PoolWarrior {
   const tier = forceTier ?? rollTier(rng);
   const tierData = getTierData(tier);
@@ -110,7 +120,7 @@ export function generateRecruit(
 
   const styles = Object.values(FightingStyle);
   let style: FightingStyle;
-  let lineage: import("@/types/warrior.types").WarriorLineage | undefined;
+  let lineage: import('@/types/warrior.types').WarriorLineage | undefined;
 
   // 🧬 Genetic Bloodlines: 5% chance to be a Legacy recruit
   const isLegacy = rng.next() < 0.05 && legacyCandidates.length > 0;
@@ -120,7 +130,7 @@ export function generateRecruit(
     lineage = {
       parentId: parent.id,
       generation: (parent.lineage?.generation ?? 1) + 1,
-      pedigree: parent.fame > 2000 ? "Noble Blood" : "Legacy",
+      pedigree: parent.fame > 2000 ? 'Noble Blood' : 'Legacy',
       mentorName: parent.name,
     };
   } else if (meta) {
@@ -174,14 +184,32 @@ export function generateRecruitPool(
   usedNames: Set<string>,
   rng?: IRNGService,
   meta?: StyleMeta,
-  legacyCandidates: import("@/types/warrior.types").Warrior[] = []
+  legacyCandidates: import('@/types/warrior.types').Warrior[] = []
 ): PoolWarrior[] {
   const rngService = rng || new SeededRNGService(week * 9973 + 42);
   const pool: PoolWarrior[] = [];
 
   // Guarantee at least two Promising+ warriors in a larger pool
-  pool.push(generateRecruit(rngService, usedNames, week, rngService.next() < 0.3 ? "Exceptional" : "Promising", meta, legacyCandidates));
-  pool.push(generateRecruit(rngService, usedNames, week, rngService.next() < 0.1 ? "Prodigy" : "Promising", meta, legacyCandidates));
+  pool.push(
+    generateRecruit(
+      rngService,
+      usedNames,
+      week,
+      rngService.next() < 0.3 ? 'Exceptional' : 'Promising',
+      meta,
+      legacyCandidates
+    )
+  );
+  pool.push(
+    generateRecruit(
+      rngService,
+      usedNames,
+      week,
+      rngService.next() < 0.1 ? 'Prodigy' : 'Promising',
+      meta,
+      legacyCandidates
+    )
+  );
 
   while (pool.length < count) {
     pool.push(generateRecruit(rngService, usedNames, week, undefined, meta, legacyCandidates));
@@ -197,16 +225,17 @@ export function partialRefreshPool(
   usedNames: Set<string>,
   rng?: IRNGService,
   meta?: StyleMeta,
-  legacyCandidates: import("@/types/warrior.types").Warrior[] = []
+  legacyCandidates: import('@/types/warrior.types').Warrior[] = []
 ): PoolWarrior[] {
-  if (currentPool.length === 0) return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames, rng, meta, legacyCandidates);
+  if (currentPool.length === 0)
+    return generateRecruitPool(DEFAULT_POOL_SIZE, week, usedNames, rng, meta, legacyCandidates);
 
   const sorted = [...currentPool].sort((a, b) => a.addedWeek - b.addedWeek);
   const removeCount = Math.min(4, Math.max(2, Math.floor(currentPool.length * 0.3)));
   const remaining = sorted.slice(removeCount);
 
   // Rebuild used names from remaining
-  const remainingNames = new Set(remaining.map(w => w.name));
+  const remainingNames = new Set(remaining.map((w) => w.name));
   const allUsed = new Set([...usedNames, ...remainingNames]);
 
   const rngService = rng || new SeededRNGService(week * 7919 + 31);

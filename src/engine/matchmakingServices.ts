@@ -1,5 +1,5 @@
-import type { Warrior } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import type { Warrior } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 /**
  * Matchmaking Scoring Service - handles the weights and logic for pairing warriors.
@@ -23,10 +23,17 @@ export const MatchScoringService = {
     rng: () => number;
     rivalIntent?: string;
   }): number {
-    const { 
-      p_fame, r_fame, rivalryIntensity, 
-      lastMatchWeek, isRecentStyleMatch, isChallenged, 
-      isAvoided, week, rng, rivalIntent
+    const {
+      p_fame,
+      r_fame,
+      rivalryIntensity,
+      lastMatchWeek,
+      isRecentStyleMatch,
+      isChallenged,
+      isAvoided,
+      week,
+      rng,
+      rivalIntent,
     } = params;
 
     let score = 100;
@@ -36,16 +43,16 @@ export const MatchScoringService = {
 
     // 2. Rivalry & Strategic Intent
     if (rivalryIntensity !== undefined) {
-      score += (rivalryIntensity >= 4) ? 200 : 50;
+      score += rivalryIntensity >= 4 ? 200 : 50;
     }
 
     // VENDETTA: If intentional targeting of the player
-    if (rivalIntent === "VENDETTA") {
+    if (rivalIntent === 'VENDETTA') {
       score += 300;
     }
 
     // RECOVERY: Avoid high-risk bouts
-    if (rivalIntent === "RECOVERY" && p_fame > r_fame + 20) {
+    if (rivalIntent === 'RECOVERY' && p_fame > r_fame + 20) {
       score -= 200;
     }
 
@@ -65,8 +72,8 @@ export const MatchScoringService = {
     score += Math.floor(rng() * 16);
 
     return score;
-  }
-}
+  },
+};
 
 /**
  * AI Bout Service - handles automatic background resolution of rival-vs-rival fights.
@@ -76,13 +83,8 @@ export const AIBoutService = {
    * Updates a rival warrior's record after a background bout.
    * This is a pure-ish helper that returns the updated roster.
    */
-  updateWarriorRecord(
-    roster: Warrior[],
-    wId: string,
-    won: boolean,
-    killed: boolean
-  ): Warrior[] {
-    return roster.map(w => {
+  updateWarriorRecord(roster: Warrior[], wId: string, won: boolean, killed: boolean): Warrior[] {
+    return roster.map((w) => {
       if (w.id !== wId) return w;
       return {
         ...w,
@@ -99,12 +101,18 @@ export const AIBoutService = {
   /**
    * Generates a narrative line for a rival rivalry bout.
    */
-  generateRivalryNarrative(stableA: string, stableB: string, warriorA: string, warriorB: string, rng: IRNGService): string {
+  generateRivalryNarrative(
+    stableA: string,
+    stableB: string,
+    warriorA: string,
+    warriorB: string,
+    rng: IRNGService
+  ): string {
     const templates = [
       `🔥 RIVALRY REPORT: The feud between ${stableA} and ${stableB} rages on — ${warriorA} faced ${warriorB} in a grudge match!`,
       `⚔️ VENDETTA IN THE PITS: ${stableA} vs ${stableB} — ${warriorA} and ${warriorB} settled scores in the arena!`,
       `🏟️ BAD BLOOD: ${stableA} and ${stableB} clashed again as ${warriorA} took on ${warriorB}!`,
     ];
     return rng.pick(templates);
-  }
-}
+  },
+};

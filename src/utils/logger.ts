@@ -13,5 +13,5 @@ export const logger = {
   warn: (...args: unknown[]) => {
     // eslint-disable-next-line no-console
     console.warn(...args);
-  }
+  },
 };

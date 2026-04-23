@@ -1,6 +1,6 @@
-import type { GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { TickOrchestrator } from "@/engine/tick/TickOrchestrator";
+import type { GameState } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { TickOrchestrator } from '@/engine/tick/TickOrchestrator';
 
 /**
  * Stable Lords — Daily Progression Pipeline

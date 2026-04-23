@@ -1,33 +1,95 @@
-import { Promoter, PromoterPersonality } from "@/types/state.types";
-import { FightingStyle } from "@/types/shared.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import { Promoter, PromoterPersonality } from '@/types/state.types';
+import { FightingStyle } from '@/types/shared.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 const PROMOTER_FIRST_NAMES = [
-  "Silas", "Cassian", "Vesper", "Theron", "Marius", "Lucia", "Octavia", "Titus",
-  "Flavia", "Gaius", "Livia", "Decimus", "Rufus", "Aurelia", "Quintilla", "Faustus",
-  "Sextus", "Servius", "Manlius", "Vibius", "Spurius", "Appius", "Proculus", "Kaeso",
-  "Tullia", "Hostia", "Graecina", "Claudia", "Fabia", "Junia", "Marcia", "Pomponia"
+  'Silas',
+  'Cassian',
+  'Vesper',
+  'Theron',
+  'Marius',
+  'Lucia',
+  'Octavia',
+  'Titus',
+  'Flavia',
+  'Gaius',
+  'Livia',
+  'Decimus',
+  'Rufus',
+  'Aurelia',
+  'Quintilla',
+  'Faustus',
+  'Sextus',
+  'Servius',
+  'Manlius',
+  'Vibius',
+  'Spurius',
+  'Appius',
+  'Proculus',
+  'Kaeso',
+  'Tullia',
+  'Hostia',
+  'Graecina',
+  'Claudia',
+  'Fabia',
+  'Junia',
+  'Marcia',
+  'Pomponia',
 ];
 
 const PROMOTER_LAST_NAMES = [
-  "Vane", "Blackwood", "Ironheart", "Sands", "Goldfinger", "Thorn", "Cross", "Bloodwell",
-  "Shadowstep", "Stormborn", "Wolf", "Crow", "Vulture", "Serpent", "Lion", "Eagle",
-  "Hawk", "Bear", "Boar", "Stag", "Raven", "Falcon", "Owl", "Drake",
-  "Gale", "Frost", "Flint", "Steel", "Stone", "Ash", "Embers", "Pyre"
+  'Vane',
+  'Blackwood',
+  'Ironheart',
+  'Sands',
+  'Goldfinger',
+  'Thorn',
+  'Cross',
+  'Bloodwell',
+  'Shadowstep',
+  'Stormborn',
+  'Wolf',
+  'Crow',
+  'Vulture',
+  'Serpent',
+  'Lion',
+  'Eagle',
+  'Hawk',
+  'Bear',
+  'Boar',
+  'Stag',
+  'Raven',
+  'Falcon',
+  'Owl',
+  'Drake',
+  'Gale',
+  'Frost',
+  'Flint',
+  'Steel',
+  'Stone',
+  'Ash',
+  'Embers',
+  'Pyre',
 ];
 
-const PERSONALITIES: PromoterPersonality[] = ["Greedy", "Honorable", "Sadistic", "Flashy", "Corporate"];
+const PERSONALITIES: PromoterPersonality[] = [
+  'Greedy',
+  'Honorable',
+  'Sadistic',
+  'Flashy',
+  'Corporate',
+];
 
 export function generatePromoters(count: number, seed: number, rng?: IRNGService): Promoter[] {
   const rngService = rng || new SeededRNGService(seed);
   const promoters: Promoter[] = [];
 
-  const tiers: ("Local" | "Regional" | "National" | "Legendary")[] = [
-    ...Array(15).fill("Local"),
-    ...Array(8).fill("Regional"),
-    ...Array(5).fill("National"),
-    ...Array(2).fill("Legendary")
+  const tiers: ('Local' | 'Regional' | 'National' | 'Legendary')[] = [
+    ...Array(15).fill('Local'),
+    ...Array(8).fill('Regional'),
+    ...Array(5).fill('National'),
+    ...Array(2).fill('Legendary'),
   ];
 
   for (let i = 0; i < count; i++) {
@@ -42,13 +104,13 @@ export function generatePromoters(count: number, seed: number, rng?: IRNGService
       age: 35 + Math.floor(rngService.next() * 31),
       personality: rngService.pick(PERSONALITIES),
       tier,
-      capacity: tier === "Legendary" ? 2 : tier === "National" ? 4 : tier === "Regional" ? 6 : 10,
+      capacity: tier === 'Legendary' ? 2 : tier === 'National' ? 4 : tier === 'Regional' ? 6 : 10,
       biases: rngService.shuffle(Object.values(FightingStyle)).slice(0, 2),
       history: {
         totalPursePaid: 0,
         notableBouts: [],
-        legacyFame: 0
-      }
+        legacyFame: 0,
+      },
     });
   }
 

@@ -3,8 +3,8 @@
  * Separated from engine/favorites.ts to respect SRP:
  * the engine computes state, this module formats it for display.
  */
-import type { Warrior } from "@/types/warrior.types";
-import { WEAPONS } from "@/data/equipment";
+import type { Warrior } from '@/types/warrior.types';
+import { WEAPONS } from '@/data/equipment';
 
 export interface FavoritesDisplayInfo {
   weapon: string | null;
@@ -21,12 +21,10 @@ export function getFavoritesDisplay(warrior: Warrior): FavoritesDisplayInfo {
   const weaponItem = WEAPONS.find((w) => w.id === fav.weaponId);
 
   const weaponWeight = weaponItem?.weight ?? 3;
-  const weightLabel =
-    weaponWeight <= 2 ? "light" : weaponWeight <= 4 ? "medium" : "heavy";
+  const weightLabel = weaponWeight <= 2 ? 'light' : weaponWeight <= 4 ? 'medium' : 'heavy';
 
   const oeValue = fav.rhythm.oe;
-  const offenseLabel =
-    oeValue <= 4 ? "conservative" : oeValue >= 7 ? "aggressive" : "moderate";
+  const offenseLabel = oeValue <= 4 ? 'conservative' : oeValue >= 7 ? 'aggressive' : 'moderate';
 
   return {
     weapon: fav.discovered.weapon ? (weaponItem?.name ?? fav.weaponId) : null,
@@ -34,16 +32,14 @@ export function getFavoritesDisplay(warrior: Warrior): FavoritesDisplayInfo {
       !fav.discovered.weapon && fav.discovered.weaponHints > 0
         ? fav.discovered.weaponHints >= 2
           ? `Prefers ${weightLabel} weapons`
-          : "Developing preference..."
+          : 'Developing preference...'
         : null,
-    rhythm: fav.discovered.rhythm
-      ? `OE ${fav.rhythm.oe} / AL ${fav.rhythm.al}`
-      : null,
+    rhythm: fav.discovered.rhythm ? `OE ${fav.rhythm.oe} / AL ${fav.rhythm.al}` : null,
     rhythmHint:
       !fav.discovered.rhythm && fav.discovered.rhythmHints > 0
         ? fav.discovered.rhythmHints >= 2
           ? `Favors ${offenseLabel} offense`
-          : "Developing rhythm..."
+          : 'Developing rhythm...'
         : null,
   };
 }

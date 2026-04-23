@@ -1,25 +1,25 @@
 /**
  * Warrior Skill Progression — XP and learn-by-doing
- * 
+ *
  * Warriors gain XP from fights:
  * - 2 XP for a win
  * - 1 XP for a loss or draw
  * - +1 bonus XP for a kill
  * - +1 bonus XP for flashy tags
- * 
+ *
  * Every 5 XP, a warrior gains +1 to a random relevant skill or attribute,
  * subject to their per-attribute potential ceiling. Diminishing returns
  * apply as attributes approach their potential.
  *
  * Fights also progressively reveal hidden potential.
  */
-import type { Warrior } from "@/types/warrior.types";
-import type { FightOutcome } from "@/types/combat.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from "@/types/shared.types";
-import { computeWarriorStats } from "./skillCalc";
-import { canGrow, diminishingReturnsFactor, revealPotential } from "./potential";
+import type { Warrior } from '@/types/warrior.types';
+import type { FightOutcome } from '@/types/combat.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from '@/types/shared.types';
+import { computeWarriorStats } from './skillCalc';
+import { canGrow, diminishingReturnsFactor, revealPotential } from './potential';
 
 const XP_PER_LEVEL = 5;
 const TOTAL_ATTR_CAP = 80;
@@ -38,24 +38,24 @@ export interface XPGain {
 }
 
 /** Calculate XP gain from a fight outcome */
-export function calculateXP(
-  outcome: FightOutcome,
-  side: "A" | "D",
-  tags: string[]
-): number {
+export function calculateXP(outcome: FightOutcome, side: 'A' | 'D', tags: string[]): number {
   const won = outcome.winner === side;
   const draw = outcome.winner === null;
   let xp = won ? 2 : draw ? 1 : 1;
-  
-  if (won && outcome.by === "Kill") xp += 1;
-  if (tags.includes("Flashy")) xp += 1;
-  if (tags.includes("Comeback") && won) xp += 1;
-  
+
+  if (won && outcome.by === 'Kill') xp += 1;
+  if (tags.includes('Flashy')) xp += 1;
+  if (tags.includes('Comeback') && won) xp += 1;
+
   return xp;
 }
 
 /** Apply XP to a warrior, potentially triggering a level-up improvement */
-export function applyXP(warrior: Warrior, xpGained: number, rng?: IRNGService): { warrior: Warrior; gain: XPGain } {
+export function applyXP(
+  warrior: Warrior,
+  xpGained: number,
+  rng?: IRNGService
+): { warrior: Warrior; gain: XPGain } {
   const rngService = rng || new SeededRNGService(xpGained * 7919 + 42);
   const currentXp = (warrior as Warrior).xp ?? 0;
   const newXp = currentXp + xpGained;
@@ -88,7 +88,10 @@ export function applyXP(warrior: Warrior, xpGained: number, rng?: IRNGService): 
         let chosen = improvableAttrs[0];
         for (let i = 0; i < improvableAttrs.length; i++) {
           roll -= weights[i];
-          if (roll <= 0) { chosen = improvableAttrs[i]; break; }
+          if (roll <= 0) {
+            chosen = improvableAttrs[i];
+            break;
+          }
         }
 
         const newAttrs = { ...updated.attributes, [chosen]: updated.attributes[chosen] + 1 };

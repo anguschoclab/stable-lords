@@ -1,5 +1,5 @@
-import { SeededRNG } from "@/utils/random";
-import { IRNGService } from "./IRNGService";
+import { SeededRNG } from '@/utils/random';
+import { IRNGService } from './IRNGService';
 
 /**
  * SeededRNG Service Implementation

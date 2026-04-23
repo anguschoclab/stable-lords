@@ -1,4 +1,4 @@
-import { GameState, Warrior } from "@/types/state.types";
+import { GameState, Warrior } from '@/types/state.types';
 
 interface NameResolutionState {
   player: { id: string; stableName: string; name: string };
@@ -20,20 +20,20 @@ export function resolveWarriorName(
   if (!warriorId) return legacyName;
 
   // Search active roster
-  const w = state.roster.find(w => w.id === warriorId);
+  const w = state.roster.find((w) => w.id === warriorId);
   if (w) return w.name;
 
   // Search graveyard
-  const dead = state.graveyard.find(w => w.id === warriorId);
+  const dead = state.graveyard.find((w) => w.id === warriorId);
   if (dead) return dead.name;
 
   // Search retired
-  const retired = state.retired.find(w => w.id === warriorId);
+  const retired = state.retired.find((w) => w.id === warriorId);
   if (retired) return retired.name;
 
   // Search rival rosters
   for (const rival of state.rivals) {
-    const rw = rival.roster?.find(w => w.id === warriorId);
+    const rw = rival.roster?.find((w) => w.id === warriorId);
     if (rw) return rw.name;
   }
 
@@ -55,7 +55,7 @@ export function resolveStableName(
   if (state.player.id === stableId) return state.player.stableName;
 
   // Check rival stables
-  const rival = state.rivals.find(r => r.id === stableId);
+  const rival = state.rivals.find((r) => r.id === stableId);
   if (rival) return rival.owner.stableName;
 
   return legacyName;
@@ -64,31 +64,29 @@ export function resolveStableName(
 /**
  * Resolves a warrior object by ID or Name.
  */
-export function findWarrior(
-  state: GameState,
-  id?: string,
-  name?: string
-): Warrior | undefined {
+export function findWarrior(state: GameState, id?: string, name?: string): Warrior | undefined {
   if (id) {
-    const w = state.roster.find(w => w.id === id) || 
-              state.graveyard.find(w => w.id === id) ||
-              state.retired.find(w => w.id === id);
+    const w =
+      state.roster.find((w) => w.id === id) ||
+      state.graveyard.find((w) => w.id === id) ||
+      state.retired.find((w) => w.id === id);
     if (w) return w;
 
     for (const rival of state.rivals) {
-      const rw = rival.roster.find(w => w.id === id);
+      const rw = rival.roster.find((w) => w.id === id);
       if (rw) return rw;
     }
   }
 
   if (name) {
-    const w = state.roster.find(w => w.name === name) || 
-              state.graveyard.find(w => w.name === name) ||
-              state.retired.find(w => w.name === name);
+    const w =
+      state.roster.find((w) => w.name === name) ||
+      state.graveyard.find((w) => w.name === name) ||
+      state.retired.find((w) => w.name === name);
     if (w) return w;
 
     for (const rival of state.rivals) {
-      const rw = rival.roster.find(w => w.name === name);
+      const rw = rival.roster.find((w) => w.name === name);
       if (rw) return rw;
     }
   }

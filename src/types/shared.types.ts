@@ -2,62 +2,62 @@
 /** Branded ID pattern to prevent mixing different ID types at compile time. */
 export type Brand<T, TBrand extends string> = T & { readonly __brand: TBrand };
 
-export type WarriorId = Brand<string, "WarriorId">;
-export type StableId = Brand<string, "StableId">;
-export type PromoterId = Brand<string, "PromoterId">;
-export type TrainerId = Brand<string, "TrainerId">;
-export type FightId = Brand<string, "FightId">;
-export type TournamentId = Brand<string, "TournamentId">;
-export type BoutOfferId = Brand<string, "BoutOfferId">;
-export type InjuryId = Brand<string, "InjuryId">;
-export type LedgerEntryId = Brand<string, "LedgerEntryId">;
-export type ScoutReportId = Brand<string, "ScoutReportId">;
-export type NewsId = Brand<string, "NewsId">;
-export type GrudgeId = Brand<string, "GrudgeId">;
-export type RivalryId = Brand<string, "RivalryId">;
-export type InsightId = Brand<string, "InsightId">;
-export type HallEntryId = Brand<string, "HallEntryId">;
-export type SimulationReportId = Brand<string, "SimulationReportId">;
+export type WarriorId = Brand<string, 'WarriorId'>;
+export type StableId = Brand<string, 'StableId'>;
+export type PromoterId = Brand<string, 'PromoterId'>;
+export type TrainerId = Brand<string, 'TrainerId'>;
+export type FightId = Brand<string, 'FightId'>;
+export type TournamentId = Brand<string, 'TournamentId'>;
+export type BoutOfferId = Brand<string, 'BoutOfferId'>;
+export type InjuryId = Brand<string, 'InjuryId'>;
+export type LedgerEntryId = Brand<string, 'LedgerEntryId'>;
+export type ScoutReportId = Brand<string, 'ScoutReportId'>;
+export type NewsId = Brand<string, 'NewsId'>;
+export type GrudgeId = Brand<string, 'GrudgeId'>;
+export type RivalryId = Brand<string, 'RivalryId'>;
+export type InsightId = Brand<string, 'InsightId'>;
+export type HallEntryId = Brand<string, 'HallEntryId'>;
+export type SimulationReportId = Brand<string, 'SimulationReportId'>;
 
 // ─── Fighting Styles ────────────────────────────────────────────────────────
 
 export enum FightingStyle {
-  AimedBlow = "AIMED BLOW",
-  BashingAttack = "BASHING ATTACK",
-  LungingAttack = "LUNGING ATTACK",
-  ParryLunge = "PARRY-LUNGE",
-  ParryRiposte = "PARRY-RIPOSTE",
-  ParryStrike = "PARRY-STRIKE",
-  SlashingAttack = "SLASHING ATTACK",
-  StrikingAttack = "STRIKING ATTACK",
-  TotalParry = "TOTAL PARRY",
-  WallOfSteel = "WALL OF STEEL",
+  AimedBlow = 'AIMED BLOW',
+  BashingAttack = 'BASHING ATTACK',
+  LungingAttack = 'LUNGING ATTACK',
+  ParryLunge = 'PARRY-LUNGE',
+  ParryRiposte = 'PARRY-RIPOSTE',
+  ParryStrike = 'PARRY-STRIKE',
+  SlashingAttack = 'SLASHING ATTACK',
+  StrikingAttack = 'STRIKING ATTACK',
+  TotalParry = 'TOTAL PARRY',
+  WallOfSteel = 'WALL OF STEEL',
 }
 
 export const STYLE_DISPLAY_NAMES: Record<FightingStyle, string> = {
-  [FightingStyle.AimedBlow]: "Aimed-Blow",
-  [FightingStyle.BashingAttack]: "Basher",
-  [FightingStyle.LungingAttack]: "Lunger",
-  [FightingStyle.ParryLunge]: "Parry-Lunger",
-  [FightingStyle.ParryRiposte]: "Parry-Riposte",
-  [FightingStyle.ParryStrike]: "Parry-Striker",
-  [FightingStyle.SlashingAttack]: "Slasher",
-  [FightingStyle.StrikingAttack]: "Striker",
-  [FightingStyle.TotalParry]: "Total-Parry",
-  [FightingStyle.WallOfSteel]: "Wall of Steel",
+  [FightingStyle.AimedBlow]: 'Aimed-Blow',
+  [FightingStyle.BashingAttack]: 'Basher',
+  [FightingStyle.LungingAttack]: 'Lunger',
+  [FightingStyle.ParryLunge]: 'Parry-Lunger',
+  [FightingStyle.ParryRiposte]: 'Parry-Riposte',
+  [FightingStyle.ParryStrike]: 'Parry-Striker',
+  [FightingStyle.SlashingAttack]: 'Slasher',
+  [FightingStyle.StrikingAttack]: 'Striker',
+  [FightingStyle.TotalParry]: 'Total-Parry',
+  [FightingStyle.WallOfSteel]: 'Wall of Steel',
 };
 
 export const STYLE_ABBREV: Record<FightingStyle, string> = {
-  [FightingStyle.AimedBlow]: "AB",
-  [FightingStyle.BashingAttack]: "BA",
-  [FightingStyle.LungingAttack]: "LU",
-  [FightingStyle.ParryLunge]: "PL",
-  [FightingStyle.ParryRiposte]: "PR",
-  [FightingStyle.ParryStrike]: "PS",
-  [FightingStyle.SlashingAttack]: "SL",
-  [FightingStyle.StrikingAttack]: "ST",
-  [FightingStyle.TotalParry]: "TP",
-  [FightingStyle.WallOfSteel]: "WS",
+  [FightingStyle.AimedBlow]: 'AB',
+  [FightingStyle.BashingAttack]: 'BA',
+  [FightingStyle.LungingAttack]: 'LU',
+  [FightingStyle.ParryLunge]: 'PL',
+  [FightingStyle.ParryRiposte]: 'PR',
+  [FightingStyle.ParryStrike]: 'PS',
+  [FightingStyle.SlashingAttack]: 'SL',
+  [FightingStyle.StrikingAttack]: 'ST',
+  [FightingStyle.TotalParry]: 'TP',
+  [FightingStyle.WallOfSteel]: 'WS',
 };
 
 // ─── Attributes ─────────────────────────────────────────────────────────────
@@ -72,16 +72,16 @@ export interface Attributes {
   DF: number; // Deftness (3-25)
 }
 
-export const ATTRIBUTE_KEYS: (keyof Attributes)[] = ["ST", "CN", "SZ", "WT", "WL", "SP", "DF"];
+export const ATTRIBUTE_KEYS: (keyof Attributes)[] = ['ST', 'CN', 'SZ', 'WT', 'WL', 'SP', 'DF'];
 
 export const ATTRIBUTE_LABELS: Record<keyof Attributes, string> = {
-  ST: "Strength",
-  CN: "Constitution",
-  SZ: "Size",
-  WT: "Wit",
-  WL: "Will",
-  SP: "Speed",
-  DF: "Deftness",
+  ST: 'Strength',
+  CN: 'Constitution',
+  SZ: 'Size',
+  WT: 'Wit',
+  WL: 'Will',
+  SP: 'Speed',
+  DF: 'Deftness',
 };
 
 export const ATTRIBUTE_MIN = 3;
@@ -110,8 +110,8 @@ export interface DerivedStats {
 
 // ─── Global Enums/Constants ─────────────────────────────────────────────────
 
-export type Season = "Spring" | "Summer" | "Fall" | "Winter";
-export type CrowdMoodType = "Calm" | "Bloodthirsty" | "Theatrical" | "Solemn" | "Festive";
+export type Season = 'Spring' | 'Summer' | 'Fall' | 'Winter';
+export type CrowdMoodType = 'Calm' | 'Bloodthirsty' | 'Theatrical' | 'Solemn' | 'Festive';
 
 export interface NewsletterItem {
   id: string; // Could be branded but loosely used in many places for now
@@ -122,7 +122,7 @@ export interface NewsletterItem {
 
 // ─── Equipment ──────────────────────────────────────────────────────────────
 
-export type ShieldSize = "None" | "Small" | "Medium" | "Large";
+export type ShieldSize = 'None' | 'Small' | 'Medium' | 'Large';
 
 export interface Weapon {
   name: string;
@@ -138,10 +138,18 @@ export interface Gear {
 
 // ─── Fight Plan ─────────────────────────────────────────────────────────────
 
-export type AttackTarget = "Head" | "Chest" | "Abdomen" | "Right Arm" | "Left Arm" | "Right Leg" | "Left Leg" | "Any";
-export type ProtectTarget = "Head" | "Body" | "Arms" | "Legs" | "Any";
-export type OffensiveTactic = "Lunge" | "Slash" | "Bash" | "Decisiveness" | "none";
-export type DefensiveTactic = "Dodge" | "Parry" | "Riposte" | "Responsiveness" | "none";
+export type AttackTarget =
+  | 'Head'
+  | 'Chest'
+  | 'Abdomen'
+  | 'Right Arm'
+  | 'Left Arm'
+  | 'Right Leg'
+  | 'Left Leg'
+  | 'Any';
+export type ProtectTarget = 'Head' | 'Body' | 'Arms' | 'Legs' | 'Any';
+export type OffensiveTactic = 'Lunge' | 'Slash' | 'Bash' | 'Decisiveness' | 'none';
+export type DefensiveTactic = 'Dodge' | 'Parry' | 'Riposte' | 'Responsiveness' | 'none';
 
 export interface PhaseStrategy {
   OE: number;
@@ -169,8 +177,8 @@ export interface FightPlan {
   AL: number;
   killDesire?: number;
   aggressionBias?: number;
-  openingMove?: "Safe" | "Aggressive" | "Measured";
-  fallbackCondition?: "FLEE" | "TURTLE" | "BERZERK" | "None";
+  openingMove?: 'Safe' | 'Aggressive' | 'Measured';
+  fallbackCondition?: 'FLEE' | 'TURTLE' | 'BERZERK' | 'None';
   target?: AttackTarget;
   protect?: ProtectTarget;
   offensiveTactic?: OffensiveTactic;
@@ -190,38 +198,46 @@ export interface FightPlan {
   /** Preferred range — influences Approach roll motivation bonus (+2 when contesting toward this range) */
   rangePreference?: DistanceRange;
   /** Stable owner's personality — drives in-bout adaptation conditions (see ownerAI.ts). Undefined for player-authored plans. */
-  ownerPersonality?: "Aggressive" | "Methodical" | "Showman" | "Pragmatic" | "Tactician";
+  ownerPersonality?: 'Aggressive' | 'Methodical' | 'Showman' | 'Pragmatic' | 'Tactician';
 }
 
 // ─── Conditional Fight Plans ─────────────────────────────────────────────────
 
 export type ConditionTriggerType =
-  | "HP_BELOW"
-  | "HP_ABOVE"
-  | "MOMENTUM_LEAD"
-  | "MOMENTUM_DEFICIT"
-  | "PHASE_IS"
-  | "ENDURANCE_BELOW";
+  | 'HP_BELOW'
+  | 'HP_ABOVE'
+  | 'MOMENTUM_LEAD'
+  | 'MOMENTUM_DEFICIT'
+  | 'PHASE_IS'
+  | 'ENDURANCE_BELOW';
 
 export interface PlanCondition {
   trigger: { type: ConditionTriggerType; value: number | string };
-  override: Partial<Pick<FightPlan, "OE" | "AL" | "killDesire" | "offensiveTactic" | "defensiveTactic">>;
+  override: Partial<
+    Pick<FightPlan, 'OE' | 'AL' | 'killDesire' | 'offensiveTactic' | 'defensiveTactic'>
+  >;
   label?: string;
 }
 
-export type PsychState = "Neutral" | "InTheZone" | "Rattled" | "Desperate" | "Cruising" | "FatiguePanic";
+export type PsychState =
+  | 'Neutral'
+  | 'InTheZone'
+  | 'Rattled'
+  | 'Desperate'
+  | 'Cruising'
+  | 'FatiguePanic';
 
 // ─── Spatial / Distance System ─────────────────────────────────────────────
 
-export type DistanceRange = "Grapple" | "Tight" | "Striking" | "Extended";
-export type ArenaZone     = "Center" | "Edge" | "Corner" | "Obstacle";
-export type CommitLevel   = "Cautious" | "Standard" | "Full";
-export type ArenaTag      = "outdoor" | "indoor" | "elevated" | "water" | "cramped" | "open" | "premium";
+export type DistanceRange = 'Grapple' | 'Tight' | 'Striking' | 'Extended';
+export type ArenaZone = 'Center' | 'Edge' | 'Corner' | 'Obstacle';
+export type CommitLevel = 'Cautious' | 'Standard' | 'Full';
+export type ArenaTag = 'outdoor' | 'indoor' | 'elevated' | 'water' | 'cramped' | 'open' | 'premium';
 
 export interface SurfaceMod {
-  initiativeMod: number;   // flat bonus/penalty to INI rolls each exchange
-  enduranceMult: number;   // multiplier on endurance costs (1.0 = baseline)
-  riposteMod: number;      // flat bonus/penalty to riposte checks
+  initiativeMod: number; // flat bonus/penalty to INI rolls each exchange
+  enduranceMult: number; // multiplier on endurance costs (1.0 = baseline)
+  riposteMod: number; // flat bonus/penalty to riposte checks
 }
 
 export interface ArenaWeatherMod {
@@ -234,7 +250,7 @@ export interface ArenaConfig {
   id: string;
   name: string;
   tags: ArenaTag[];
-  tier: 1 | 2 | 3;          // 1=common, 2=prestigious, 3=special event
+  tier: 1 | 2 | 3; // 1=common, 2=prestigious, 3=special event
   description: string;
   /** DEF penalty per zone (negative = penalty). E.g. Edge: -2, Corner: -4 */
   zoneDef: Partial<Record<ArenaZone, number>>;
@@ -245,25 +261,34 @@ export interface ArenaConfig {
 
 // ─── Trainer Types ────────────────────────────────────────────────────────
 
-export type TrainerTier = "Novice" | "Seasoned" | "Master";
-export type TrainerFocus = "Aggression" | "Defense" | "Endurance" | "Mind" | "Healing";
+export type TrainerTier = 'Novice' | 'Seasoned' | 'Master';
+export type TrainerFocus = 'Aggression' | 'Defense' | 'Endurance' | 'Mind' | 'Healing';
 
 export type TrainerSpecialty =
-  | "KillerInstinct"    // Aggression: kill-window bonus when enemy HP < 40%
-  | "IronConditioning"  // Endurance: stamina drain −10% in LATE phase
-  | "CounterFighter"    // Defense: riposte damage +15% after successful parry
-  | "Footwork"          // Defense: initiative +3 in MID/LATE phase
-  | "IronGuard"         // Defense: damage taken −10% while endurance > 60%
-  | "Finisher"          // Aggression: ATT +10% when momentum >= 2
-  | "RopeADope";        // Endurance: fatigue penalty reduced 30%
+  | 'KillerInstinct' // Aggression: kill-window bonus when enemy HP < 40%
+  | 'IronConditioning' // Endurance: stamina drain −10% in LATE phase
+  | 'CounterFighter' // Defense: riposte damage +15% after successful parry
+  | 'Footwork' // Defense: initiative +3 in MID/LATE phase
+  | 'IronGuard' // Defense: damage taken −10% while endurance > 60%
+  | 'Finisher' // Aggression: ATT +10% when momentum >= 2
+  | 'RopeADope'; // Endurance: fatigue penalty reduced 30%
 
 // ─── Scouting Types ───────────────────────────────────────────────────────
 
-export type ScoutQuality = "Basic" | "Detailed" | "Expert";
+export type ScoutQuality = 'Basic' | 'Detailed' | 'Expert';
 
 // ─── Weather Types ────────────────────────────────────────────────────────
 
-export type WeatherType = "Clear" | "Rainy" | "Sweltering" | "Breezy" | "Overcast" | "Blazing Sun" | "Gale" | "Blood Moon" | "Eclipse";
+export type WeatherType =
+  | 'Clear'
+  | 'Rainy'
+  | 'Sweltering'
+  | 'Breezy'
+  | 'Overcast'
+  | 'Blazing Sun'
+  | 'Gale'
+  | 'Blood Moon'
+  | 'Eclipse';
 
 export interface DeathEvent {
   boutId: string;

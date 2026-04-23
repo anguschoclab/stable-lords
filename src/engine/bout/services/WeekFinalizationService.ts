@@ -3,15 +3,15 @@
  * Handles post-bout side effects: crowd mood, gazette, rivalries
  * Extracted from boutProcessorService.ts to enforce SRP
  */
-import type { GameState } from "@/types/state.types";
-import type { StateImpact } from "@/engine/impacts";
-import type { BoutResult } from "./boutProcessorService";
-import { computeCrowdMood } from "@/engine/crowdMood";
-import { updateRivalriesFromBouts } from "@/engine/matchmaking/rivalryLogic";
-import { generateWeeklyGazette } from "@/engine/gazetteNarrative";
-import { getFightsForWeek } from "@/engine/core/historyUtils";
-import { NewsletterFeed } from "@/engine/newsletter/feed";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import type { GameState } from '@/types/state.types';
+import type { StateImpact } from '@/engine/impacts';
+import type { BoutResult } from './boutProcessorService';
+import { computeCrowdMood } from '@/engine/crowdMood';
+import { updateRivalriesFromBouts } from '@/engine/matchmaking/rivalryLogic';
+import { generateWeeklyGazette } from '@/engine/gazetteNarrative';
+import { getFightsForWeek } from '@/engine/core/historyUtils';
+import { NewsletterFeed } from '@/engine/newsletter/feed';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 /**
  * Finalizes week side effects into StateImpact
@@ -21,9 +21,7 @@ export function finalizeWeekSideEffectsToImpact(
   state: GameState,
   results: BoutResult[]
 ): StateImpact {
-  const playerFameGain = results.filter(
-    (r) => r.outcome.winner === "A" && !r.rivalStable
-  ).length;
+  const playerFameGain = results.filter((r) => r.outcome.winner === 'A' && !r.rivalStable).length;
   const newMood = computeCrowdMood(state.arenaHistory);
   const oldMood = state.crowdMood;
 
@@ -31,10 +29,7 @@ export function finalizeWeekSideEffectsToImpact(
   const impact: StateImpact = {
     fameDelta: playerFameGain,
     crowdMood: newMood,
-    moodHistory: [
-      ...(state.moodHistory || []).slice(-19),
-      { week: state.week, mood: newMood },
-    ],
+    moodHistory: [...(state.moodHistory || []).slice(-19), { week: state.week, mood: newMood }],
   };
 
   // Add mood change notification if mood changed significantly
@@ -64,12 +59,7 @@ export function finalizeWeekSideEffectsToImpact(
     ),
   ];
   const rng = new SeededRNGService(state.week * 13);
-  impact.rivalries = updateRivalriesFromBouts(
-    state.rivalries || [],
-    weekFights,
-    state.week,
-    rng
-  );
+  impact.rivalries = updateRivalriesFromBouts(state.rivalries || [], weekFights, state.week, rng);
 
   NewsletterFeed.closeWeekToIssue(state.week);
 

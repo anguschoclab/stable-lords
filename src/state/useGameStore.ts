@@ -1,19 +1,19 @@
-import { create } from "zustand";
-import { shallow } from "zustand/shallow";
-import { immer } from "zustand/middleware/immer";
-import { subscribeWithSelector } from "zustand/middleware";
-import type { GameState } from "@/types/state.types";
-import { type BoutResult } from "@/engine/boutProcessor";
-import { createFreshState } from "@/engine/factories/gameStateFactory";
-import { engineProxy } from "@/engine/workerProxy";
-import { opfsArchive } from "@/engine/storage/opfsArchive";
-import { type WarriorId, type InjuryId } from "@/types/shared.types";
+import { create } from 'zustand';
+import { shallow } from 'zustand/shallow';
+import { immer } from 'zustand/middleware/immer';
+import { subscribeWithSelector } from 'zustand/middleware';
+import type { GameState } from '@/types/state.types';
+import { type BoutResult } from '@/engine/boutProcessor';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { engineProxy } from '@/engine/workerProxy';
+import { opfsArchive } from '@/engine/storage/opfsArchive';
+import { type WarriorId, type InjuryId } from '@/types/shared.types';
 
 // ─── Slices ────────────────────────────────────────────────────────────────
-import { createEconomySlice, EconomySlice } from "./slices/economySlice";
-import { createRosterSlice, RosterSlice } from "./slices/rosterSlice";
-import { createWorldSlice, WorldSlice } from "./slices/worldSlice";
-import { createTournamentSlice, TournamentSlice } from "./slices/tournamentSlice";
+import { createEconomySlice, EconomySlice } from './slices/economySlice';
+import { createRosterSlice, RosterSlice } from './slices/rosterSlice';
+import { createWorldSlice, WorldSlice } from './slices/worldSlice';
+import { createTournamentSlice, TournamentSlice } from './slices/tournamentSlice';
 
 export interface GameStoreState {
   atTitleScreen: boolean;
@@ -27,8 +27,18 @@ export interface GameStoreState {
 export interface GameStoreActions {
   setSimulating: (simulating: boolean) => void;
   toggleEventLog: () => void;
-  doAdvanceWeek: (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => Promise<void>;
-  doAdvanceDay: (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => Promise<void>;
+  doAdvanceWeek: (
+    processedState?: GameState,
+    results?: BoutResult[],
+    deaths?: WarriorId[],
+    injuries?: InjuryId[]
+  ) => Promise<void>;
+  doAdvanceDay: (
+    processedState?: GameState,
+    results?: BoutResult[],
+    deaths?: WarriorId[],
+    injuries?: InjuryId[]
+  ) => Promise<void>;
   initialize: () => void;
   loadGame: (slotId: string, gameState: GameState) => void;
   doReset: () => void;
@@ -37,7 +47,12 @@ export interface GameStoreActions {
   setState: (fn: (state: GameStore) => void) => void;
 }
 
-export type GameStore = GameStoreState & GameStoreActions & EconomySlice & RosterSlice & WorldSlice & TournamentSlice;
+export type GameStore = GameStoreState &
+  GameStoreActions &
+  EconomySlice &
+  RosterSlice &
+  WorldSlice &
+  TournamentSlice;
 
 let lastResult: GameState | null = null;
 
@@ -161,8 +176,8 @@ export function reconstructGameState(store: GameStore): GameState {
 
   const result: GameState = {
     meta: {
-      gameName: "Stable Lords",
-      version: "2.1.0-hardened",
+      gameName: 'Stable Lords',
+      version: '2.1.0-hardened',
       createdAt: store.lastSavedAt || new Date().toISOString(),
     },
     ...currentValues,
@@ -170,7 +185,7 @@ export function reconstructGameState(store: GameStore): GameState {
     rivalries: store.rivalries || [],
     matchHistory: store.matchHistory || [],
     ownerGrudges: store.ownerGrudges || [],
-    phase: store.phase || "planning",
+    phase: store.phase || 'planning',
     playerChallenges: store.playerChallenges || [],
     playerAvoids: store.playerAvoids || [],
   };
@@ -198,7 +213,9 @@ export const useGameStore = create<GameStore>()(
       eventLogOpen: false,
 
       toggleEventLog: () => {
-        set((draft) => { draft.eventLogOpen = !draft.eventLogOpen; });
+        set((draft) => {
+          draft.eventLogOpen = !draft.eventLogOpen;
+        });
       },
 
       initialize: () => {
@@ -233,7 +250,7 @@ export const useGameStore = create<GameStore>()(
           draft.isTournamentWeek = state.isTournamentWeek || false;
           draft.activeTournamentId = state.activeTournamentId;
           draft.year = state.year || 1;
-          
+
           draft.popularity = state.popularity || 0;
           draft.fame = state.fame || 0;
           draft.realmRankings = state.realmRankings || {};
@@ -243,11 +260,13 @@ export const useGameStore = create<GameStore>()(
           draft.trainingAssignments = state.trainingAssignments || [];
           draft.seasonalGrowth = state.seasonalGrowth || [];
           draft.restStates = state.restStates || [];
-          draft.crowdMood = state.crowdMood || "Neutral";
+          draft.crowdMood = state.crowdMood || 'Neutral';
           draft.moodHistory = state.moodHistory || [];
           draft.newsletter = state.newsletter || [];
           draft.hallOfFame = state.hallOfFame || [];
-          draft.settings = state.settings || { featureFlags: { tournaments: true, scouting: true } };
+          draft.settings = state.settings || {
+            featureFlags: { tournaments: true, scouting: true },
+          };
           draft.isFTUE = state.isFTUE || false;
           draft.ftueStep = state.ftueStep || 0;
           draft.ftueComplete = state.ftueComplete || false;
@@ -255,10 +274,10 @@ export const useGameStore = create<GameStore>()(
           draft.rivalries = state.rivalries || [];
           draft.matchHistory = state.matchHistory || [];
           draft.ownerGrudges = state.ownerGrudges || [];
-          draft.phase = state.phase || "planning";
+          draft.phase = state.phase || 'planning';
           draft.playerChallenges = state.playerChallenges || [];
           draft.playerAvoids = state.playerAvoids || [];
-          
+
           draft.activeSlotId = slotId;
           draft.atTitleScreen = false;
           draft.lastSavedAt = new Date().toISOString();
@@ -272,7 +291,12 @@ export const useGameStore = create<GameStore>()(
         });
       },
 
-      doAdvanceWeek: async (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => {
+      doAdvanceWeek: async (
+        processedState?: GameState,
+        results?: BoutResult[],
+        deaths?: WarriorId[],
+        injuries?: InjuryId[]
+      ) => {
         const store = get();
         const raw = processedState || reconstructGameState(store);
         // In DEV mode (main thread), deep-clone to unfreeze immer's frozen objects
@@ -283,10 +307,12 @@ export const useGameStore = create<GameStore>()(
         const { warriorMap: _wm, cachedMetaDrift: _cmd, ...cleanState } = state as any;
         const currentWeek = cleanState.week;
 
-        set((draft) => { draft.isSimulating = true; });
+        set((draft) => {
+          draft.isSimulating = true;
+        });
 
         const timeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Worker timeout after 15s")), 15000)
+          setTimeout(() => reject(new Error('Worker timeout after 15s')), 15000)
         );
 
         try {
@@ -299,51 +325,66 @@ export const useGameStore = create<GameStore>()(
           } else {
             next = await Promise.race([engineProxy.advanceWeek(cleanState), timeout]);
           }
-          
-          next.phase = "resolution";
+
+          next.phase = 'resolution';
           next.pendingResolutionData = {
             bouts: results || [],
             deaths: deaths || [],
             injuries: injuries || [],
             promotions: [],
-            gazette: next.newsletter.filter(n => n.week === currentWeek),
+            gazette: next.newsletter.filter((n) => n.week === currentWeek),
           };
 
-          store.loadGame(store.activeSlotId || "autosave", next);
-          set((draft) => { draft.isSimulating = false; });
+          store.loadGame(store.activeSlotId || 'autosave', next);
+          set((draft) => {
+            draft.isSimulating = false;
+          });
         } catch (err) {
-          console.error("Worker advancement failed:", err);
-          set((draft) => { draft.isSimulating = false; });
+          console.error('Worker advancement failed:', err);
+          set((draft) => {
+            draft.isSimulating = false;
+          });
         }
       },
 
-      doAdvanceDay: async (processedState?: GameState, results?: BoutResult[], deaths?: WarriorId[], injuries?: InjuryId[]) => {
+      doAdvanceDay: async (
+        processedState?: GameState,
+        results?: BoutResult[],
+        deaths?: WarriorId[],
+        injuries?: InjuryId[]
+      ) => {
         const store = get();
         const raw = processedState || reconstructGameState(store);
         const state = import.meta.env.DEV ? JSON.parse(JSON.stringify(raw)) : raw;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { warriorMap: _wm, cachedMetaDrift: _cmd, ...cleanState } = state as any;
         const currentWeek = cleanState.week;
-        
-        set((draft) => { draft.isSimulating = true; });
+
+        set((draft) => {
+          draft.isSimulating = true;
+        });
 
         try {
           const next = await engineProxy.advanceDay(cleanState);
-          
-          next.phase = "resolution";
+
+          next.phase = 'resolution';
           next.pendingResolutionData = {
             bouts: results || [],
             deaths: deaths || [],
             injuries: injuries || [],
             promotions: [],
-            gazette: next.newsletter.filter(n => n.week === currentWeek),
+            gazette: next.newsletter.filter((n) => n.week === currentWeek),
           };
 
-          store.loadGame(store.activeSlotId || "autosave", next);
-          set((draft) => { draft.isSimulating = false; });
+          store.loadGame(store.activeSlotId || 'autosave', next);
+          set((draft) => {
+            draft.isSimulating = false;
+          });
         } catch (err) {
-          console.error("Worker advancement failed:", err);
-          set((draft) => { draft.isSimulating = false; });
+          console.error('Worker advancement failed:', err);
+          set((draft) => {
+            draft.isSimulating = false;
+          });
         }
       },
 
@@ -358,8 +399,8 @@ export const useGameStore = create<GameStore>()(
 
       doReset: () => {
         // Deterministic reset: If no seed provided, use a stable one for 1.0 stability
-        const fresh = createFreshState("alpha-prime-10");
-        get().loadGame("autosave", fresh);
+        const fresh = createFreshState('alpha-prime-10');
+        get().loadGame('autosave', fresh);
         set({ atTitleScreen: true });
       },
 
@@ -380,10 +421,10 @@ export const useGameStore = create<GameStore>()(
 
 /** --- Fine-Grained Selectors (v4.1: Source from Slice only) --- */
 export const useWorldState = () => useGameStore(reconstructGameState, shallow);
-export const usePlayer = () => useGameStore(s => s.player);
-export const useRoster = () => useGameStore(s => s.roster);
-export const useRivals = () => useGameStore(s => s.rivals);
-export const useTreasury = () => useGameStore(s => s.treasury);
-export const useWeek = () => useGameStore(s => s.week);
-export const useIsSimulating = () => useGameStore(s => s.isSimulating);
+export const usePlayer = () => useGameStore((s) => s.player);
+export const useRoster = () => useGameStore((s) => s.roster);
+export const useRivals = () => useGameStore((s) => s.rivals);
+export const useTreasury = () => useGameStore((s) => s.treasury);
+export const useWeek = () => useGameStore((s) => s.week);
+export const useIsSimulating = () => useGameStore((s) => s.isSimulating);
 export const useGame = useGameStore;

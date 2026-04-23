@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { audioManager } from "@/lib/AudioManager";
-import type { CrowdState } from "../crowd/CrowdReactions";
+import { useEffect, useRef, useState } from 'react';
+import { audioManager } from '@/lib/AudioManager';
+import type { CrowdState } from '../crowd/CrowdReactions';
 
 interface CrowdAudioProps {
   state: CrowdState;
@@ -13,20 +13,20 @@ interface CrowdAudioProps {
 const CROWD_SOUNDS: Record<CrowdState, string | null> = {
   idle: null,
   anticipation: null,
-  cheer: "crowd-cheer-hit",
-  roar: "crowd-roar-crit",
-  gasp: "crowd-gasp",
+  cheer: 'crowd-cheer-hit',
+  roar: 'crowd-roar-crit',
+  gasp: 'crowd-gasp',
   silence: null,
-  chant: "crowd-blood-moon",
+  chant: 'crowd-blood-moon',
 };
 
-export default function CrowdAudio({ 
-  state, 
-  volume, 
+export default function CrowdAudio({
+  state,
+  volume,
   enabled,
-  isBloodMoon = false 
+  isBloodMoon = false,
 }: CrowdAudioProps) {
-  const lastStateRef = useRef<CrowdState>("idle");
+  const lastStateRef = useRef<CrowdState>('idle');
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {

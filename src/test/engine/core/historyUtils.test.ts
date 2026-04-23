@@ -10,7 +10,7 @@ describe('getRecentFightsForWarrior', () => {
     warriorIdA: 'Attacker',
     warriorIdD: 'Defender',
     winner: 'A',
-    by: "KO",
+    by: 'KO',
     styleA: FightingStyle.StrikingAttack,
     styleD: FightingStyle.ParryRiposte,
     week: 1,
@@ -42,7 +42,7 @@ describe('getRecentFightsForWarrior', () => {
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toHaveLength(2);
-    expect(result.map(f => f.week)).toEqual([1, 3]); // Expect chronological order
+    expect(result.map((f) => f.week)).toEqual([1, 3]); // Expect chronological order
   });
 
   it('finds fights where warrior is defender', () => {
@@ -53,7 +53,7 @@ describe('getRecentFightsForWarrior', () => {
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toHaveLength(2);
-    expect(result.map(f => f.week)).toEqual([1, 3]);
+    expect(result.map((f) => f.week)).toEqual([1, 3]);
   });
 
   it('finds fights where warrior is both attacker and defender across different fights', () => {
@@ -64,7 +64,7 @@ describe('getRecentFightsForWarrior', () => {
     ];
     const result = getRecentFightsForWarrior(history, 'Hero');
     expect(result).toHaveLength(2);
-    expect(result.map(f => f.week)).toEqual([1, 2]);
+    expect(result.map((f) => f.week)).toEqual([1, 2]);
   });
 
   it('limits the results and returns the most recent fights chronologically', () => {
@@ -81,7 +81,7 @@ describe('getRecentFightsForWarrior', () => {
 
     expect(result).toHaveLength(3);
     // Should get weeks 3, 4, 5, returned in chronological order
-    expect(result.map(f => f.week)).toEqual([3, 4, 5]);
+    expect(result.map((f) => f.week)).toEqual([3, 4, 5]);
   });
 
   it('uses the default limit of 10', () => {
@@ -93,6 +93,6 @@ describe('getRecentFightsForWarrior', () => {
 
     expect(result).toHaveLength(10);
     // Should get the last 10 weeks (weeks 6 through 15) in chronological order
-    expect(result.map(f => f.week)).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+    expect(result.map((f) => f.week)).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
   });
 });

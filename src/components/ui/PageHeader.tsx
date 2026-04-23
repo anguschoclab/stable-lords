@@ -1,8 +1,8 @@
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import * as React from 'react';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
-interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   actions?: React.ReactNode;
@@ -12,11 +12,7 @@ interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "ti
 const PageHeader = React.forwardRef<HTMLDivElement, PageHeaderProps>(
   ({ className, title, subtitle, actions, icon: Icon, ...props }, ref) => {
     return (
-      <div
-        ref={ref}
-        className={cn("relative space-y-6 pb-6", className)}
-        {...props}
-      >
+      <div ref={ref} className={cn('relative space-y-6 pb-6', className)} {...props}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center gap-4">
@@ -70,16 +66,15 @@ const PageHeader = React.forwardRef<HTMLDivElement, PageHeaderProps>(
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, hsl(var(--primary) / 0.5) 0%, hsl(var(--accent) / 0.3) 30%, hsl(var(--border)) 70%, transparent 100%)",
+                'linear-gradient(90deg, hsl(var(--primary) / 0.5) 0%, hsl(var(--accent) / 0.3) 30%, hsl(var(--border)) 70%, transparent 100%)',
             }}
           />
           {/* Secondary inset line for depth */}
           <div
             className="absolute top-[2px] left-4 right-0"
             style={{
-              height: "1px",
-              background:
-                "linear-gradient(90deg, hsl(var(--accent) / 0.12) 0%, transparent 60%)",
+              height: '1px',
+              background: 'linear-gradient(90deg, hsl(var(--accent) / 0.12) 0%, transparent 60%)',
             }}
           />
         </div>
@@ -88,6 +83,6 @@ const PageHeader = React.forwardRef<HTMLDivElement, PageHeaderProps>(
   }
 );
 
-PageHeader.displayName = "PageHeader";
+PageHeader.displayName = 'PageHeader';
 
 export { PageHeader };

@@ -1,11 +1,11 @@
-import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
-import { getItemById } from "@/data/equipment";
-import { audioManager } from "@/lib/AudioManager";
-import narrativeContent from "@/data/narrativeContent.json";
-import type { NarrativeContent } from "@/types/narrative.types";
-import { NarrativeTemplateEngine } from "./narrativeTemplateEngine";
-import { szToHeight, getWeaponDisplayName, getWeaponType } from "./narrativeUtils";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { FightingStyle, STYLE_DISPLAY_NAMES } from '@/types/shared.types';
+import { getItemById } from '@/data/equipment';
+import { audioManager } from '@/lib/AudioManager';
+import narrativeContent from '@/data/narrativeContent.json';
+import type { NarrativeContent } from '@/types/narrative.types';
+import { NarrativeTemplateEngine } from './narrativeTemplateEngine';
+import { szToHeight, getWeaponDisplayName, getWeaponType } from './narrativeUtils';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 export interface WarriorIntroData {
   name: string;
@@ -31,30 +31,37 @@ export class CombatNarrator {
 
     if (sz) lines.push(`${n} is ${szToHeight(sz)}.`);
 
-    const hand = rng.next() < 0.85 ? "right handed" : rng.next() < 0.5 ? "left handed" : "ambidextrous";
+    const hand =
+      rng.next() < 0.85 ? 'right handed' : rng.next() < 0.5 ? 'left handed' : 'ambidextrous';
     lines.push(`${n} is ${hand}.`);
 
     // Armor & Helm
     const armorItem = data.armorId ? getItemById(data.armorId) : null;
-    if (armorItem && armorItem.id !== "none_armor") {
-      const verb = NarrativeTemplateEngine.getFromArchive(rng, ["fanfare", "armor_intro_verbs"]) || "is wearing";
+    if (armorItem && armorItem.id !== 'none_armor') {
+      const verb =
+        NarrativeTemplateEngine.getFromArchive(rng, ['fanfare', 'armor_intro_verbs']) ||
+        'is wearing';
       lines.push(`${n} ${verb} ${armorItem.name.toUpperCase()} armor.`);
     } else {
       lines.push(`${n} has chosen to fight without body armor.`);
     }
 
     const helmItem = data.helmId ? getItemById(data.helmId) : null;
-    if (helmItem && helmItem.id !== "none_helm") {
+    if (helmItem && helmItem.id !== 'none_helm') {
       lines.push(`And will wear a ${helmItem.name.toUpperCase()}.`);
     }
 
     // Weapon & Style
     const weaponName = getWeaponDisplayName(data.weaponId);
-    if (weaponName === "OPEN HAND") {
+    if (weaponName === 'OPEN HAND') {
       lines.push(`${n} will fight using his OPEN HAND.`);
     } else {
-      const verb = NarrativeTemplateEngine.getFromArchive(rng, ["fanfare", "weapon_intro_verbs"]) || "is armed with {{weapon}}";
-      lines.push(NarrativeTemplateEngine.interpolateTemplate(verb, { attacker: n, weapon: weaponName }));
+      const verb =
+        NarrativeTemplateEngine.getFromArchive(rng, ['fanfare', 'weapon_intro_verbs']) ||
+        'is armed with {{weapon}}';
+      lines.push(
+        NarrativeTemplateEngine.interpolateTemplate(verb, { attacker: n, weapon: weaponName })
+      );
     }
 
     lines.push(`${n} uses the ${STYLE_DISPLAY_NAMES[data.style]} style.`);
@@ -67,19 +74,24 @@ export class CombatNarrator {
    * Generates battle opener text.
    */
   static battleOpener(rng: IRNGService): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "openers"]);
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'openers']);
     return NarrativeTemplateEngine.interpolateTemplate(template, {});
   }
 
   /**
    * Narrates an attack (whiff).
    */
-  static narrateAttack(rng: IRNGService, attackerName: string, weaponId?: string, _isMastery?: boolean): string {
+  static narrateAttack(
+    rng: IRNGService,
+    attackerName: string,
+    weaponId?: string,
+    _isMastery?: boolean
+  ): string {
     const wName = getWeaponDisplayName(weaponId);
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "whiffs"]);
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'whiffs']);
     return NarrativeTemplateEngine.interpolateTemplate(template, {
       attacker: attackerName,
-      weapon: wName
+      weapon: wName,
     });
   }
 
@@ -87,7 +99,7 @@ export class CombatNarrator {
    * Narrates a passive style activation.
    */
   static narratePassive(rng: IRNGService, style: FightingStyle, actorName: string): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["passives", style]);
+    const template = NarrativeTemplateEngine.getFromArchive(rng, ['passives', style]);
     return NarrativeTemplateEngine.interpolateTemplate(template, { attacker: actorName });
   }
 
@@ -96,18 +108,32 @@ export class CombatNarrator {
    */
   static narrateParry(rng: IRNGService, defenderName: string, weaponId?: string): string {
     const wName = getWeaponDisplayName(weaponId);
-    const isShield = weaponId && ["small_shield", "medium_shield", "large_shield"].includes(weaponId);
-    const type = isShield ? "shield" : "parry";
+    const isShield =
+      weaponId && ['small_shield', 'medium_shield', 'large_shield'].includes(weaponId);
+    const type = isShield ? 'shield' : 'parry';
 
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "defenses", type, "success"]);
-    return NarrativeTemplateEngine.interpolateTemplate(template, { defender: defenderName, weapon: wName });
+    const template = NarrativeTemplateEngine.getFromArchive(rng, [
+      'pbp',
+      'defenses',
+      type,
+      'success',
+    ]);
+    return NarrativeTemplateEngine.interpolateTemplate(template, {
+      defender: defenderName,
+      weapon: wName,
+    });
   }
 
   /**
    * Narrates a successful dodge.
    */
   static narrateDodge(rng: IRNGService, defenderName: string): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "defenses", "dodge", "success"]);
+    const template = NarrativeTemplateEngine.getFromArchive(rng, [
+      'pbp',
+      'defenses',
+      'dodge',
+      'success',
+    ]);
     return NarrativeTemplateEngine.interpolateTemplate(template, { defender: defenderName });
   }
 
@@ -115,7 +141,9 @@ export class CombatNarrator {
    * Narrates a counterstrike.
    */
   static narrateCounterstrike(rng: IRNGService, name: string): string {
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "defenses", "counterstrike"]) || "{{attacker}} counters!";
+    const template =
+      NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'defenses', 'counterstrike']) ||
+      '{{attacker}} counters!';
     return NarrativeTemplateEngine.interpolateTemplate(template, { attacker: name });
   }
 
@@ -141,25 +169,27 @@ export class CombatNarrator {
     const wType = getWeaponType(weaponId);
 
     const severity = this.getStrikeSeverity(
-      damage || 0, 
-      maxHp || 100, 
-      isFatal || false, 
-      isSuperFlashy || false, 
+      damage || 0,
+      maxHp || 100,
+      isFatal || false,
+      isSuperFlashy || false,
       isFavorite || false,
       attackerFame || 0
     );
 
-    if (severity === "critical_human" || severity === "critical_supernatural") {
-      audioManager.play("crit");
+    if (severity === 'critical_human' || severity === 'critical_supernatural') {
+      audioManager.play('crit');
     }
 
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["strikes", wType, severity]) || NarrativeTemplateEngine.getFromArchive(rng, ["strikes", "generic"]);
+    const template =
+      NarrativeTemplateEngine.getFromArchive(rng, ['strikes', wType, severity]) ||
+      NarrativeTemplateEngine.getFromArchive(rng, ['strikes', 'generic']);
 
     return NarrativeTemplateEngine.interpolateTemplate(template, {
       attacker: attackerName,
       defender: defenderName,
       weapon: wName,
-      bodyPart: richLoc
+      bodyPart: richLoc,
     });
   }
 
@@ -168,41 +198,71 @@ export class CombatNarrator {
    */
   static narrateParryBreak(rng: IRNGService, attackerName: string, weaponId?: string): string {
     const wName = getWeaponDisplayName(weaponId);
-    const template = NarrativeTemplateEngine.getFromArchive(rng, ["pbp", "defenses", "parry_break"]) || "{{attacker}} breaks the guard!";
-    return NarrativeTemplateEngine.interpolateTemplate(template, { attacker: attackerName, weapon: wName });
+    const template =
+      NarrativeTemplateEngine.getFromArchive(rng, ['pbp', 'defenses', 'parry_break']) ||
+      '{{attacker}} breaks the guard!';
+    return NarrativeTemplateEngine.interpolateTemplate(template, {
+      attacker: attackerName,
+      weapon: wName,
+    });
   }
 
   /**
    * Narrates initiative winner.
    */
-  static narrateInitiative(rng: IRNGService, winnerName: string, isFeint: boolean, defenderName?: string): string {
-    const path = isFeint ? ["pbp", "feints"] : ["pbp", "initiative"];
+  static narrateInitiative(
+    rng: IRNGService,
+    winnerName: string,
+    isFeint: boolean,
+    defenderName?: string
+  ): string {
+    const path = isFeint ? ['pbp', 'feints'] : ['pbp', 'initiative'];
     const template = NarrativeTemplateEngine.getFromArchive(rng, path);
-    return NarrativeTemplateEngine.interpolateTemplate(template, { attacker: winnerName, defender: defenderName });
+    return NarrativeTemplateEngine.interpolateTemplate(template, {
+      attacker: winnerName,
+      defender: defenderName,
+    });
   }
 
   /**
    * Narrates bout conclusion.
    */
-  static narrateBoutEnd(rng: IRNGService, by: string, winnerName: string, loserName: string, weaponId?: string): string[] {
+  static narrateBoutEnd(
+    rng: IRNGService,
+    by: string,
+    winnerName: string,
+    loserName: string,
+    weaponId?: string
+  ): string[] {
     const wName = getWeaponDisplayName(weaponId);
     const wType = getWeaponType(weaponId);
 
     const categoryMap: Record<string, string> = {
-      "Kill": "Kill",
-      "KO": "KO",
-      "Stoppage": "Stoppage",
-      "Exhaustion": "Exhaustion"
+      Kill: 'Kill',
+      KO: 'KO',
+      Stoppage: 'Stoppage',
+      Exhaustion: 'Exhaustion',
     };
 
-    const category = categoryMap[by] || "KO";
-    const conclusionPath = ["conclusions", category];
-    const conclusion = NarrativeTemplateEngine.getFromArchive(rng, conclusionPath) || "{{winner}} defeats {{loser}}.";
-    const conclusionText = NarrativeTemplateEngine.interpolateTemplate(conclusion, { winner: winnerName, loser: loserName });
+    const category = categoryMap[by] || 'KO';
+    const conclusionPath = ['conclusions', category];
+    const conclusion =
+      NarrativeTemplateEngine.getFromArchive(rng, conclusionPath) ||
+      '{{winner}} defeats {{loser}}.';
+    const conclusionText = NarrativeTemplateEngine.interpolateTemplate(conclusion, {
+      winner: winnerName,
+      loser: loserName,
+    });
 
-    if (by === "Kill") {
-      const fatalBlowTemplate = NarrativeTemplateEngine.getFromArchive(rng, ["strikes", wType, "fatal"]) || NarrativeTemplateEngine.getFromArchive(rng, ["strikes", "generic"]);
-      const fatalBlow = NarrativeTemplateEngine.interpolateTemplate(fatalBlowTemplate, { attacker: winnerName, defender: loserName, weapon: wName });
+    if (by === 'Kill') {
+      const fatalBlowTemplate =
+        NarrativeTemplateEngine.getFromArchive(rng, ['strikes', wType, 'fatal']) ||
+        NarrativeTemplateEngine.getFromArchive(rng, ['strikes', 'generic']);
+      const fatalBlow = NarrativeTemplateEngine.interpolateTemplate(fatalBlowTemplate, {
+        attacker: winnerName,
+        defender: loserName,
+        weapon: wName,
+      });
       return [fatalBlow, conclusionText];
     }
 
@@ -220,24 +280,24 @@ export class CombatNarrator {
   }
 
   private static getStrikeSeverity(
-    damage: number, 
-    maxHp: number, 
-    isFatal: boolean, 
-    isCrit: boolean, 
+    damage: number,
+    maxHp: number,
+    isFatal: boolean,
+    isCrit: boolean,
     isFavorite: boolean,
     fame: number
-  ): "glancing" | "solid" | "mastery" | "critical_human" | "critical_supernatural" | "fatal" {
-    if (isFatal) return "fatal";
-    
+  ): 'glancing' | 'solid' | 'mastery' | 'critical_human' | 'critical_supernatural' | 'fatal' {
+    if (isFatal) return 'fatal';
+
     const ratio = damage / maxHp;
     if (isCrit || ratio >= 0.25) {
-      return fame >= 100 ? "critical_supernatural" : "critical_human";
+      return fame >= 100 ? 'critical_supernatural' : 'critical_human';
     }
 
-    if (isFavorite) return "mastery";
+    if (isFavorite) return 'mastery';
 
-    if (ratio >= 0.10) return "solid";
-    return "glancing";
+    if (ratio >= 0.1) return 'solid';
+    return 'glancing';
   }
 }
 

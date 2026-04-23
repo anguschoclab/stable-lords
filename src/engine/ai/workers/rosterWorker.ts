@@ -1,22 +1,29 @@
-import type { GameState, RivalStableData, SeasonalGrowth } from "@/types/state.types";
-import type { Attributes, Season } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import { checkBudget } from "./budgetWorker";
-import { computeWarriorStats } from "../../skillCalc";
-import { logAgentAction } from "../agentCore";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { generateRecommendations } from "@/engine/equipmentOptimizer";
-import { validateLoadout, checkWeaponRequirements } from "@/data/equipment";
+import type { GameState, RivalStableData, SeasonalGrowth } from '@/types/state.types';
+import type { Attributes, Season } from '@/types/shared.types';
+import type { Warrior } from '@/types/warrior.types';
+import { checkBudget } from './budgetWorker';
+import { computeWarriorStats } from '../../skillCalc';
+import { logAgentAction } from '../agentCore';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { generateRecommendations } from '@/engine/equipmentOptimizer';
+import { validateLoadout, checkWeaponRequirements } from '@/data/equipment';
 import {
   processAttributeTraining,
+  processRecovery,
   processSkillDrillTraining,
   rollForTrainingInjury,
   SKILL_DRILL_CAP,
   TOTAL_CAP,
-} from "@/engine/training/trainingGains";
-import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, FightingStyle, type BaseSkills } from "@/types/shared.types";
-import { getFeatureFlags } from "@/engine/featureFlags";
+} from '@/engine/training/trainingGains';
+import { getHealingTrainerBonus } from '@/engine/training/coachLogic';
+import {
+  ATTRIBUTE_KEYS,
+  ATTRIBUTE_MAX,
+  FightingStyle,
+  type BaseSkills,
+} from '@/types/shared.types';
+import { getFeatureFlags } from '@/engine/featureFlags';
 
 /**
  * RosterWorker: Handles training and equipment.
@@ -29,22 +36,35 @@ export function processRoster(
   seed?: number,
   rng?: IRNGService
 ): RivalStableData {
-  const rngService = rng || new SeededRNGService(seed ?? (currentWeek * 7919 + 101));
+  const rngService = rng || new SeededRNGService(seed ?? currentWeek * 7919 + 101);
   let updatedRival = { ...rival };
   let seasonalGrowth: SeasonalGrowth[] = updatedRival.seasonalGrowth ?? [];
-  const activeRoster = updatedRival.roster.filter(w => w.status === "Active");
-  const intent = updatedRival.strategy?.intent ?? "CONSOLIDATION";
+  const activeRoster = updatedRival.roster.filter((w) => w.status === 'Active');
+  const intent = updatedRival.strategy?.intent ?? 'CONSOLIDATION';
+
+  // 0. Recovery — tick injuries for all active wounded warriors, applying any
+  // healing trainer bonus exactly as the player path does in training.ts.
+  const healingBonus = getHealingTrainerBonus(updatedRival.trainers ?? []);
+  for (const wounded of activeRoster.filter((w) => (w.injuries ?? []).length > 0)) {
+    const { updatedInjuries } = processRecovery(wounded, healingBonus);
+    updatedRival.roster = updatedRival.roster.map((w) =>
+      w.id === wounded.id ? { ...w, injuries: updatedInjuries } : w
+    );
+  }
 
   // 1. Training (Low Risk)
-  // ⚡ TSA: Prioritize Champion or high-fame units for training
+  // ⚡ TSA: Prioritize Champion or high-fame units for training.
+  // Injured warriors are excluded — they are already in the recovery path above
+  // and training them would stack the injury penalty from trainingGains.ts.
   const trainingLimit = updatedRival.treasury > 500 ? 3 : 1;
-  const trainees = activeRoster
+  const trainees = updatedRival.roster
+    .filter((w) => w.status === 'Active' && (w.injuries ?? []).length === 0)
     .sort((a, b) => (a.fame || 0) - (b.fame || 0))
     .slice(0, trainingLimit);
 
   for (const trainee of trainees) {
     const trainingCost = 35;
-    const budgetReport = checkBudget(updatedRival, trainingCost, "ROSTER");
+    const budgetReport = checkBudget(updatedRival, trainingCost, 'ROSTER');
 
     if (budgetReport.isAffordable) {
       updatedRival.treasury -= trainingCost;
@@ -55,8 +75,8 @@ export function processRoster(
       // the rest of the time.
       const doDrill = getFeatureFlags().skillDrilling && rngService.next() < 0.25;
       if (doDrill) {
-        updatedRival.roster = updatedRival.roster.map(w =>
-          w.id === trainee.id ? performAISkillDrill(trainee, updatedRival, rngService) : w,
+        updatedRival.roster = updatedRival.roster.map((w) =>
+          w.id === trainee.id ? performAISkillDrill(trainee, updatedRival, rngService) : w
         );
       } else {
         const { warrior, seasonalGrowth: nextGrowth } = performAITraining(
@@ -65,29 +85,39 @@ export function processRoster(
           season,
           seasonalGrowth,
           rngService,
+          healingBonus
         );
         seasonalGrowth = nextGrowth;
-        updatedRival.roster = updatedRival.roster.map(w => w.id === warrior.id ? warrior : w);
+        updatedRival.roster = updatedRival.roster.map((w) => (w.id === warrior.id ? warrior : w));
       }
     }
   }
   updatedRival.seasonalGrowth = seasonalGrowth;
 
   // 2. Equipment (High Risk)
-  if (intent === "EXPANSION" || (intent === "VENDETTA" && updatedRival.treasury > 1000)) {
+  if (intent === 'EXPANSION' || (intent === 'VENDETTA' && updatedRival.treasury > 1000)) {
     const gearCost = 150;
-    const budgetReport = checkBudget(updatedRival, gearCost, "ROSTER");
-    
+    const budgetReport = checkBudget(updatedRival, gearCost, 'ROSTER');
+
     if (budgetReport.isAffordable && activeRoster.length > 0) {
       // ⚡ TSA: Role-Based Gearing (Prioritize Champion or the 'Muddy' Basher for rain insurance)
-      const gearCandidate = activeRoster.find(w => w.champion) ||
-                          activeRoster.find(w => w.style === "BASHING ATTACK") ||
-                          rngService.pick(activeRoster);
+      const gearCandidate =
+        activeRoster.find((w) => w.champion) ||
+        activeRoster.find((w) => w.style === 'BASHING ATTACK') ||
+        rngService.pick(activeRoster);
 
       if (gearCandidate) {
         updatedRival.treasury -= gearCost;
-        updatedRival.roster = updatedRival.roster.map(w => w.id === gearCandidate.id ? applyGearUpgrade(w, rngService) : w);
-        updatedRival = logAgentAction(updatedRival, "ROSTER", `Invested 150g in gear for ${gearCandidate.name}.`, budgetReport.riskTier, currentWeek);
+        updatedRival.roster = updatedRival.roster.map((w) =>
+          w.id === gearCandidate.id ? applyGearUpgrade(w, rngService) : w
+        );
+        updatedRival = logAgentAction(
+          updatedRival,
+          'ROSTER',
+          `Invested 150g in gear for ${gearCandidate.name}.`,
+          budgetReport.riskTier,
+          currentWeek
+        );
       }
     }
   }
@@ -148,6 +178,7 @@ function performAITraining(
   season: Season | undefined,
   seasonalGrowth: SeasonalGrowth[],
   rng: IRNGService,
+  healingBonus: number = 0
 ): { warrior: Warrior; seasonalGrowth: SeasonalGrowth[] } {
   // 80% pre-gate — preserves the spec's AI-at-80%-effectiveness lever while
   // still routing through the full pipeline on the weeks it attempts.
@@ -160,14 +191,14 @@ function performAITraining(
 
   // Focus selection — preserve the seasonal-priority heuristic the AI already
   // used (Spring→CN, Summer→ST), falling back to the lowest trainable stat.
-  const trainableKeys = ATTRIBUTE_KEYS.filter(k => k !== "SZ") as (keyof Attributes)[];
+  const trainableKeys = ATTRIBUTE_KEYS.filter((k) => k !== 'SZ') as (keyof Attributes)[];
   let chosen: keyof Attributes | undefined;
-  if (season === "Spring") chosen = "CN";
-  else if (season === "Summer") chosen = "ST";
+  if (season === 'Spring') chosen = 'CN';
+  else if (season === 'Summer') chosen = 'ST';
   if (!chosen || w.attributes[chosen] >= ATTRIBUTE_MAX) {
     chosen = trainableKeys.reduce(
-      (min, k) => w.attributes[k] < w.attributes[min] ? k : min,
-      trainableKeys[0]!,
+      (min, k) => (w.attributes[k] < w.attributes[min] ? k : min),
+      trainableKeys[0]!
     );
   }
   if (!chosen) return { warrior: w, seasonalGrowth };
@@ -176,7 +207,7 @@ function performAITraining(
   // `trainers`. Rivals don't have a full GameState, so we feed a minimal shape
   // with just the fields the pipeline reads.
   const stateAdapter = {
-    season: season ?? "Spring",
+    season: season ?? 'Spring',
     trainers: stable.trainers ?? [],
   } as unknown as GameState;
 
@@ -184,9 +215,9 @@ function performAITraining(
   let warrior = attemptResult.updatedWarrior ?? w;
   const nextSeasonalGrowth = attemptResult.updatedSeasonalGrowth ?? seasonalGrowth;
 
-  // Training injury roll — same chance formula the player hits. `healingBonus`
-  // defaults to 0 for rivals (no infirmary / healing trainer modeling yet).
-  const injuryRoll = rollForTrainingInjury(warrior, 0, rng);
+  // Training injury roll — same chance formula the player hits, now using the
+  // rival's actual healing trainer bonus instead of a hardcoded 0.
+  const injuryRoll = rollForTrainingInjury(warrior, healingBonus, rng);
   if (injuryRoll.injury) {
     warrior = { ...warrior, injuries: [...(warrior.injuries ?? []), injuryRoll.injury] };
   }
@@ -210,19 +241,19 @@ function performAITraining(
  * reroute AI drill priorities.
  */
 const STYLE_PRIMARY_DRILL: Record<FightingStyle, keyof BaseSkills> = {
-  [FightingStyle.AimedBlow]: "DEC",
-  [FightingStyle.BashingAttack]: "ATT",
-  [FightingStyle.LungingAttack]: "ATT",
-  [FightingStyle.ParryLunge]: "PAR",
-  [FightingStyle.ParryRiposte]: "RIP",
-  [FightingStyle.ParryStrike]: "PAR",
-  [FightingStyle.SlashingAttack]: "ATT",
-  [FightingStyle.StrikingAttack]: "ATT",
-  [FightingStyle.TotalParry]: "PAR",
-  [FightingStyle.WallOfSteel]: "DEF",
+  [FightingStyle.AimedBlow]: 'DEC',
+  [FightingStyle.BashingAttack]: 'ATT',
+  [FightingStyle.LungingAttack]: 'ATT',
+  [FightingStyle.ParryLunge]: 'PAR',
+  [FightingStyle.ParryRiposte]: 'RIP',
+  [FightingStyle.ParryStrike]: 'PAR',
+  [FightingStyle.SlashingAttack]: 'ATT',
+  [FightingStyle.StrikingAttack]: 'ATT',
+  [FightingStyle.TotalParry]: 'PAR',
+  [FightingStyle.WallOfSteel]: 'DEF',
 };
 
-const DRILLABLE_SKILLS: (keyof BaseSkills)[] = ["ATT", "PAR", "DEF", "INI", "RIP", "DEC"];
+const DRILLABLE_SKILLS: (keyof BaseSkills)[] = ['ATT', 'PAR', 'DEF', 'INI', 'RIP', 'DEC'];
 
 /**
  * Skill drilling for AI warriors — routes through the shared

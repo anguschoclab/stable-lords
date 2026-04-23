@@ -1,10 +1,10 @@
 /**
  * Seeded Pseudo-Random Number Generator (PRNG)
- * 
- * Uses the Mulberry32 algorithm for fast, high-quality, 
+ *
+ * Uses the Mulberry32 algorithm for fast, high-quality,
  * deterministic randomness in the engine.
  */
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 export class SeededRNG {
   private state: number;
@@ -15,10 +15,10 @@ export class SeededRNG {
 
   /** Generates a random float between 0 and 1 */
   next(): number {
-    let t = this.state += 0x6D2B79F5;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    let t = (this.state += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
 
   /** Generates a random integer between min and max (inclusive) */
@@ -34,7 +34,7 @@ export class SeededRNG {
   /** Picks a random element from an array */
   pick<T>(arr: T[]): T {
     if (arr.length === 0) {
-      throw new Error("Cannot pick from empty array");
+      throw new Error('Cannot pick from empty array');
     }
     return arr[Math.floor(this.next() * arr.length)]!;
   }
@@ -51,8 +51,8 @@ export class SeededRNG {
 
   /** Generates a deterministic hex-based ID with an optional prefix */
   uuid(prefix?: string): string {
-    const chars = "abcdef0123456789";
-    let str = "";
+    const chars = 'abcdef0123456789';
+    let str = '';
     for (let i = 0; i < 12; i++) {
       str += chars[Math.floor(this.next() * chars.length)];
     }
@@ -73,7 +73,7 @@ export class SeededRNG {
  */
 export function randomPick<T>(rng: (() => number) | IRNGService, arr: T[]): T {
   if (arr.length === 0) {
-    throw new Error("Cannot pick from empty array");
+    throw new Error('Cannot pick from empty array');
   }
   if (typeof rng === 'function') {
     return arr[Math.floor(rng() * arr.length)]!;
@@ -88,7 +88,7 @@ export function randomPick<T>(rng: (() => number) | IRNGService, arr: T[]): T {
 export function stringToSeed(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = (hash << 5) - hash + str.charCodeAt(i);
     hash |= 0; // Convert to 32bit integer
   }
   return Math.abs(hash);

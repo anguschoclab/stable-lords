@@ -8,381 +8,381 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as World_rootRouteImport } from './routes/world/__root'
-import { Route as Ops_rootRouteImport } from './routes/ops/__root'
-import { Route as Command_rootRouteImport } from './routes/command/__root'
-import { Route as WelcomeRouteImport } from './routes/welcome'
-import { Route as RunRoundRouteImport } from './routes/run-round'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as ArenaHubRouteImport } from './routes/arena-hub'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorldIndexRouteImport } from './routes/world/index'
-import { Route as StableIndexRouteImport } from './routes/stable/index'
-import { Route as OpsIndexRouteImport } from './routes/ops/index'
-import { Route as CommandIndexRouteImport } from './routes/command/index'
-import { Route as WorldTournamentsRouteImport } from './routes/world/tournaments'
-import { Route as WorldIntelligenceRouteImport } from './routes/world/intelligence'
-import { Route as WorldHistoryRouteImport } from './routes/world/history'
-import { Route as WorldChronicleRouteImport } from './routes/world/chronicle'
-import { Route as WarriorIdRouteImport } from './routes/warrior/$id'
-import { Route as ToolsPhysicalsSimulatorRouteImport } from './routes/tools/physicals-simulator'
-import { Route as StableTrainingRouteImport } from './routes/stable/training'
-import { Route as StableTrainersRouteImport } from './routes/stable/trainers'
-import { Route as StableRecruitRouteImport } from './routes/stable/recruit'
-import { Route as StablePlannerRouteImport } from './routes/stable/planner'
-import { Route as StableFinanceRouteImport } from './routes/stable/finance'
-import { Route as StableEquipmentRouteImport } from './routes/stable/equipment'
-import { Route as StableContractsRouteImport } from './routes/stable/contracts'
-import { Route as StableIdRouteImport } from './routes/stable/$id'
-import { Route as OpsPromotersRouteImport } from './routes/ops/promoters'
-import { Route as OpsPersonnelRouteImport } from './routes/ops/personnel'
-import { Route as OpsOffseasonRouteImport } from './routes/ops/offseason'
-import { Route as OpsFinanceRouteImport } from './routes/ops/finance'
-import { Route as OpsEquipmentRouteImport } from './routes/ops/equipment'
-import { Route as OpsContractsRouteImport } from './routes/ops/contracts'
-import { Route as LoreHallOfFightsRouteImport } from './routes/lore/hall-of-fights'
-import { Route as CommandTrainingRouteImport } from './routes/command/training'
-import { Route as CommandTacticsRouteImport } from './routes/command/tactics'
-import { Route as CommandRosterRouteImport } from './routes/command/roster'
-import { Route as CommandCombatRouteImport } from './routes/command/combat'
-import { Route as CommandArenaRouteImport } from './routes/command/arena'
-import { Route as WorldStableIdRouteImport } from './routes/world/stable/$id'
-import { Route as OpsPromoterIdRouteImport } from './routes/ops/promoter.$id'
+import { Route as rootRouteImport } from './routes/__root';
+import { Route as World_rootRouteImport } from './routes/world/__root';
+import { Route as Ops_rootRouteImport } from './routes/ops/__root';
+import { Route as Command_rootRouteImport } from './routes/command/__root';
+import { Route as WelcomeRouteImport } from './routes/welcome';
+import { Route as RunRoundRouteImport } from './routes/run-round';
+import { Route as HelpRouteImport } from './routes/help';
+import { Route as ArenaHubRouteImport } from './routes/arena-hub';
+import { Route as AdminRouteImport } from './routes/admin';
+import { Route as IndexRouteImport } from './routes/index';
+import { Route as WorldIndexRouteImport } from './routes/world/index';
+import { Route as StableIndexRouteImport } from './routes/stable/index';
+import { Route as OpsIndexRouteImport } from './routes/ops/index';
+import { Route as CommandIndexRouteImport } from './routes/command/index';
+import { Route as WorldTournamentsRouteImport } from './routes/world/tournaments';
+import { Route as WorldIntelligenceRouteImport } from './routes/world/intelligence';
+import { Route as WorldHistoryRouteImport } from './routes/world/history';
+import { Route as WorldChronicleRouteImport } from './routes/world/chronicle';
+import { Route as WarriorIdRouteImport } from './routes/warrior/$id';
+import { Route as ToolsPhysicalsSimulatorRouteImport } from './routes/tools/physicals-simulator';
+import { Route as StableTrainingRouteImport } from './routes/stable/training';
+import { Route as StableTrainersRouteImport } from './routes/stable/trainers';
+import { Route as StableRecruitRouteImport } from './routes/stable/recruit';
+import { Route as StablePlannerRouteImport } from './routes/stable/planner';
+import { Route as StableFinanceRouteImport } from './routes/stable/finance';
+import { Route as StableEquipmentRouteImport } from './routes/stable/equipment';
+import { Route as StableContractsRouteImport } from './routes/stable/contracts';
+import { Route as StableIdRouteImport } from './routes/stable/$id';
+import { Route as OpsPromotersRouteImport } from './routes/ops/promoters';
+import { Route as OpsPersonnelRouteImport } from './routes/ops/personnel';
+import { Route as OpsOffseasonRouteImport } from './routes/ops/offseason';
+import { Route as OpsFinanceRouteImport } from './routes/ops/finance';
+import { Route as OpsEquipmentRouteImport } from './routes/ops/equipment';
+import { Route as OpsContractsRouteImport } from './routes/ops/contracts';
+import { Route as LoreHallOfFightsRouteImport } from './routes/lore/hall-of-fights';
+import { Route as CommandTrainingRouteImport } from './routes/command/training';
+import { Route as CommandTacticsRouteImport } from './routes/command/tactics';
+import { Route as CommandRosterRouteImport } from './routes/command/roster';
+import { Route as CommandCombatRouteImport } from './routes/command/combat';
+import { Route as CommandArenaRouteImport } from './routes/command/arena';
+import { Route as WorldStableIdRouteImport } from './routes/world/stable/$id';
+import { Route as OpsPromoterIdRouteImport } from './routes/ops/promoter.$id';
 
 const World_rootRoute = World_rootRouteImport.update({
   id: '/world/__root',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const Ops_rootRoute = Ops_rootRouteImport.update({
   id: '/ops/__root',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const Command_rootRoute = Command_rootRouteImport.update({
   id: '/command/__root',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const RunRoundRoute = RunRoundRouteImport.update({
   id: '/run-round',
   path: '/run-round',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ArenaHubRoute = ArenaHubRouteImport.update({
   id: '/arena-hub',
   path: '/arena-hub',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WorldIndexRoute = WorldIndexRouteImport.update({
   id: '/world/',
   path: '/world/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableIndexRoute = StableIndexRouteImport.update({
   id: '/stable/',
   path: '/stable/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsIndexRoute = OpsIndexRouteImport.update({
   id: '/ops/',
   path: '/ops/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CommandIndexRoute = CommandIndexRouteImport.update({
   id: '/command/',
   path: '/command/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WorldTournamentsRoute = WorldTournamentsRouteImport.update({
   id: '/world/tournaments',
   path: '/world/tournaments',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WorldIntelligenceRoute = WorldIntelligenceRouteImport.update({
   id: '/world/intelligence',
   path: '/world/intelligence',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WorldHistoryRoute = WorldHistoryRouteImport.update({
   id: '/world/history',
   path: '/world/history',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WorldChronicleRoute = WorldChronicleRouteImport.update({
   id: '/world/chronicle',
   path: '/world/chronicle',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WarriorIdRoute = WarriorIdRouteImport.update({
   id: '/warrior/$id',
   path: '/warrior/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ToolsPhysicalsSimulatorRoute = ToolsPhysicalsSimulatorRouteImport.update({
   id: '/tools/physicals-simulator',
   path: '/tools/physicals-simulator',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableTrainingRoute = StableTrainingRouteImport.update({
   id: '/stable/training',
   path: '/stable/training',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableTrainersRoute = StableTrainersRouteImport.update({
   id: '/stable/trainers',
   path: '/stable/trainers',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableRecruitRoute = StableRecruitRouteImport.update({
   id: '/stable/recruit',
   path: '/stable/recruit',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StablePlannerRoute = StablePlannerRouteImport.update({
   id: '/stable/planner',
   path: '/stable/planner',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableFinanceRoute = StableFinanceRouteImport.update({
   id: '/stable/finance',
   path: '/stable/finance',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableEquipmentRoute = StableEquipmentRouteImport.update({
   id: '/stable/equipment',
   path: '/stable/equipment',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableContractsRoute = StableContractsRouteImport.update({
   id: '/stable/contracts',
   path: '/stable/contracts',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const StableIdRoute = StableIdRouteImport.update({
   id: '/stable/$id',
   path: '/stable/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsPromotersRoute = OpsPromotersRouteImport.update({
   id: '/ops/promoters',
   path: '/ops/promoters',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsPersonnelRoute = OpsPersonnelRouteImport.update({
   id: '/ops/personnel',
   path: '/ops/personnel',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsOffseasonRoute = OpsOffseasonRouteImport.update({
   id: '/ops/offseason',
   path: '/ops/offseason',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsFinanceRoute = OpsFinanceRouteImport.update({
   id: '/ops/finance',
   path: '/ops/finance',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsEquipmentRoute = OpsEquipmentRouteImport.update({
   id: '/ops/equipment',
   path: '/ops/equipment',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsContractsRoute = OpsContractsRouteImport.update({
   id: '/ops/contracts',
   path: '/ops/contracts',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LoreHallOfFightsRoute = LoreHallOfFightsRouteImport.update({
   id: '/lore/hall-of-fights',
   path: '/lore/hall-of-fights',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CommandTrainingRoute = CommandTrainingRouteImport.update({
   id: '/command/training',
   path: '/command/training',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CommandTacticsRoute = CommandTacticsRouteImport.update({
   id: '/command/tactics',
   path: '/command/tactics',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CommandRosterRoute = CommandRosterRouteImport.update({
   id: '/command/roster',
   path: '/command/roster',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CommandCombatRoute = CommandCombatRouteImport.update({
   id: '/command/combat',
   path: '/command/combat',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CommandArenaRoute = CommandArenaRouteImport.update({
   id: '/command/arena',
   path: '/command/arena',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const WorldStableIdRoute = WorldStableIdRouteImport.update({
   id: '/world/stable/$id',
   path: '/world/stable/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OpsPromoterIdRoute = OpsPromoterIdRouteImport.update({
   id: '/ops/promoter/$id',
   path: '/ops/promoter/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/arena-hub': typeof ArenaHubRoute
-  '/help': typeof HelpRoute
-  '/run-round': typeof RunRoundRoute
-  '/welcome': typeof WelcomeRoute
-  '/command': typeof Command_rootRoute
-  '/command/arena': typeof CommandArenaRoute
-  '/command/combat': typeof CommandCombatRoute
-  '/command/roster': typeof CommandRosterRoute
-  '/command/tactics': typeof CommandTacticsRoute
-  '/command/training': typeof CommandTrainingRoute
-  '/lore/hall-of-fights': typeof LoreHallOfFightsRoute
-  '/ops': typeof Ops_rootRoute
-  '/ops/contracts': typeof OpsContractsRoute
-  '/ops/equipment': typeof OpsEquipmentRoute
-  '/ops/finance': typeof OpsFinanceRoute
-  '/ops/offseason': typeof OpsOffseasonRoute
-  '/ops/personnel': typeof OpsPersonnelRoute
-  '/ops/promoters': typeof OpsPromotersRoute
-  '/stable/$id': typeof StableIdRoute
-  '/stable/contracts': typeof StableContractsRoute
-  '/stable/equipment': typeof StableEquipmentRoute
-  '/stable/finance': typeof StableFinanceRoute
-  '/stable/planner': typeof StablePlannerRoute
-  '/stable/recruit': typeof StableRecruitRoute
-  '/stable/trainers': typeof StableTrainersRoute
-  '/stable/training': typeof StableTrainingRoute
-  '/tools/physicals-simulator': typeof ToolsPhysicalsSimulatorRoute
-  '/warrior/$id': typeof WarriorIdRoute
-  '/world': typeof World_rootRoute
-  '/world/chronicle': typeof WorldChronicleRoute
-  '/world/history': typeof WorldHistoryRoute
-  '/world/intelligence': typeof WorldIntelligenceRoute
-  '/world/tournaments': typeof WorldTournamentsRoute
-  '/command/': typeof CommandIndexRoute
-  '/ops/': typeof OpsIndexRoute
-  '/stable/': typeof StableIndexRoute
-  '/world/': typeof WorldIndexRoute
-  '/ops/promoter/$id': typeof OpsPromoterIdRoute
-  '/world/stable/$id': typeof WorldStableIdRoute
+  '/': typeof IndexRoute;
+  '/admin': typeof AdminRoute;
+  '/arena-hub': typeof ArenaHubRoute;
+  '/help': typeof HelpRoute;
+  '/run-round': typeof RunRoundRoute;
+  '/welcome': typeof WelcomeRoute;
+  '/command': typeof Command_rootRoute;
+  '/command/arena': typeof CommandArenaRoute;
+  '/command/combat': typeof CommandCombatRoute;
+  '/command/roster': typeof CommandRosterRoute;
+  '/command/tactics': typeof CommandTacticsRoute;
+  '/command/training': typeof CommandTrainingRoute;
+  '/lore/hall-of-fights': typeof LoreHallOfFightsRoute;
+  '/ops': typeof Ops_rootRoute;
+  '/ops/contracts': typeof OpsContractsRoute;
+  '/ops/equipment': typeof OpsEquipmentRoute;
+  '/ops/finance': typeof OpsFinanceRoute;
+  '/ops/offseason': typeof OpsOffseasonRoute;
+  '/ops/personnel': typeof OpsPersonnelRoute;
+  '/ops/promoters': typeof OpsPromotersRoute;
+  '/stable/$id': typeof StableIdRoute;
+  '/stable/contracts': typeof StableContractsRoute;
+  '/stable/equipment': typeof StableEquipmentRoute;
+  '/stable/finance': typeof StableFinanceRoute;
+  '/stable/planner': typeof StablePlannerRoute;
+  '/stable/recruit': typeof StableRecruitRoute;
+  '/stable/trainers': typeof StableTrainersRoute;
+  '/stable/training': typeof StableTrainingRoute;
+  '/tools/physicals-simulator': typeof ToolsPhysicalsSimulatorRoute;
+  '/warrior/$id': typeof WarriorIdRoute;
+  '/world': typeof World_rootRoute;
+  '/world/chronicle': typeof WorldChronicleRoute;
+  '/world/history': typeof WorldHistoryRoute;
+  '/world/intelligence': typeof WorldIntelligenceRoute;
+  '/world/tournaments': typeof WorldTournamentsRoute;
+  '/command/': typeof CommandIndexRoute;
+  '/ops/': typeof OpsIndexRoute;
+  '/stable/': typeof StableIndexRoute;
+  '/world/': typeof WorldIndexRoute;
+  '/ops/promoter/$id': typeof OpsPromoterIdRoute;
+  '/world/stable/$id': typeof WorldStableIdRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/arena-hub': typeof ArenaHubRoute
-  '/help': typeof HelpRoute
-  '/run-round': typeof RunRoundRoute
-  '/welcome': typeof WelcomeRoute
-  '/command': typeof CommandIndexRoute
-  '/command/arena': typeof CommandArenaRoute
-  '/command/combat': typeof CommandCombatRoute
-  '/command/roster': typeof CommandRosterRoute
-  '/command/tactics': typeof CommandTacticsRoute
-  '/command/training': typeof CommandTrainingRoute
-  '/lore/hall-of-fights': typeof LoreHallOfFightsRoute
-  '/ops': typeof OpsIndexRoute
-  '/ops/contracts': typeof OpsContractsRoute
-  '/ops/equipment': typeof OpsEquipmentRoute
-  '/ops/finance': typeof OpsFinanceRoute
-  '/ops/offseason': typeof OpsOffseasonRoute
-  '/ops/personnel': typeof OpsPersonnelRoute
-  '/ops/promoters': typeof OpsPromotersRoute
-  '/stable/$id': typeof StableIdRoute
-  '/stable/contracts': typeof StableContractsRoute
-  '/stable/equipment': typeof StableEquipmentRoute
-  '/stable/finance': typeof StableFinanceRoute
-  '/stable/planner': typeof StablePlannerRoute
-  '/stable/recruit': typeof StableRecruitRoute
-  '/stable/trainers': typeof StableTrainersRoute
-  '/stable/training': typeof StableTrainingRoute
-  '/tools/physicals-simulator': typeof ToolsPhysicalsSimulatorRoute
-  '/warrior/$id': typeof WarriorIdRoute
-  '/world': typeof WorldIndexRoute
-  '/world/chronicle': typeof WorldChronicleRoute
-  '/world/history': typeof WorldHistoryRoute
-  '/world/intelligence': typeof WorldIntelligenceRoute
-  '/world/tournaments': typeof WorldTournamentsRoute
-  '/stable': typeof StableIndexRoute
-  '/ops/promoter/$id': typeof OpsPromoterIdRoute
-  '/world/stable/$id': typeof WorldStableIdRoute
+  '/': typeof IndexRoute;
+  '/admin': typeof AdminRoute;
+  '/arena-hub': typeof ArenaHubRoute;
+  '/help': typeof HelpRoute;
+  '/run-round': typeof RunRoundRoute;
+  '/welcome': typeof WelcomeRoute;
+  '/command': typeof CommandIndexRoute;
+  '/command/arena': typeof CommandArenaRoute;
+  '/command/combat': typeof CommandCombatRoute;
+  '/command/roster': typeof CommandRosterRoute;
+  '/command/tactics': typeof CommandTacticsRoute;
+  '/command/training': typeof CommandTrainingRoute;
+  '/lore/hall-of-fights': typeof LoreHallOfFightsRoute;
+  '/ops': typeof OpsIndexRoute;
+  '/ops/contracts': typeof OpsContractsRoute;
+  '/ops/equipment': typeof OpsEquipmentRoute;
+  '/ops/finance': typeof OpsFinanceRoute;
+  '/ops/offseason': typeof OpsOffseasonRoute;
+  '/ops/personnel': typeof OpsPersonnelRoute;
+  '/ops/promoters': typeof OpsPromotersRoute;
+  '/stable/$id': typeof StableIdRoute;
+  '/stable/contracts': typeof StableContractsRoute;
+  '/stable/equipment': typeof StableEquipmentRoute;
+  '/stable/finance': typeof StableFinanceRoute;
+  '/stable/planner': typeof StablePlannerRoute;
+  '/stable/recruit': typeof StableRecruitRoute;
+  '/stable/trainers': typeof StableTrainersRoute;
+  '/stable/training': typeof StableTrainingRoute;
+  '/tools/physicals-simulator': typeof ToolsPhysicalsSimulatorRoute;
+  '/warrior/$id': typeof WarriorIdRoute;
+  '/world': typeof WorldIndexRoute;
+  '/world/chronicle': typeof WorldChronicleRoute;
+  '/world/history': typeof WorldHistoryRoute;
+  '/world/intelligence': typeof WorldIntelligenceRoute;
+  '/world/tournaments': typeof WorldTournamentsRoute;
+  '/stable': typeof StableIndexRoute;
+  '/ops/promoter/$id': typeof OpsPromoterIdRoute;
+  '/world/stable/$id': typeof WorldStableIdRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/arena-hub': typeof ArenaHubRoute
-  '/help': typeof HelpRoute
-  '/run-round': typeof RunRoundRoute
-  '/welcome': typeof WelcomeRoute
-  '/command/__root': typeof Command_rootRoute
-  '/command/arena': typeof CommandArenaRoute
-  '/command/combat': typeof CommandCombatRoute
-  '/command/roster': typeof CommandRosterRoute
-  '/command/tactics': typeof CommandTacticsRoute
-  '/command/training': typeof CommandTrainingRoute
-  '/lore/hall-of-fights': typeof LoreHallOfFightsRoute
-  '/ops/__root': typeof Ops_rootRoute
-  '/ops/contracts': typeof OpsContractsRoute
-  '/ops/equipment': typeof OpsEquipmentRoute
-  '/ops/finance': typeof OpsFinanceRoute
-  '/ops/offseason': typeof OpsOffseasonRoute
-  '/ops/personnel': typeof OpsPersonnelRoute
-  '/ops/promoters': typeof OpsPromotersRoute
-  '/stable/$id': typeof StableIdRoute
-  '/stable/contracts': typeof StableContractsRoute
-  '/stable/equipment': typeof StableEquipmentRoute
-  '/stable/finance': typeof StableFinanceRoute
-  '/stable/planner': typeof StablePlannerRoute
-  '/stable/recruit': typeof StableRecruitRoute
-  '/stable/trainers': typeof StableTrainersRoute
-  '/stable/training': typeof StableTrainingRoute
-  '/tools/physicals-simulator': typeof ToolsPhysicalsSimulatorRoute
-  '/warrior/$id': typeof WarriorIdRoute
-  '/world/__root': typeof World_rootRoute
-  '/world/chronicle': typeof WorldChronicleRoute
-  '/world/history': typeof WorldHistoryRoute
-  '/world/intelligence': typeof WorldIntelligenceRoute
-  '/world/tournaments': typeof WorldTournamentsRoute
-  '/command/': typeof CommandIndexRoute
-  '/ops/': typeof OpsIndexRoute
-  '/stable/': typeof StableIndexRoute
-  '/world/': typeof WorldIndexRoute
-  '/ops/promoter/$id': typeof OpsPromoterIdRoute
-  '/world/stable/$id': typeof WorldStableIdRoute
+  __root__: typeof rootRouteImport;
+  '/': typeof IndexRoute;
+  '/admin': typeof AdminRoute;
+  '/arena-hub': typeof ArenaHubRoute;
+  '/help': typeof HelpRoute;
+  '/run-round': typeof RunRoundRoute;
+  '/welcome': typeof WelcomeRoute;
+  '/command/__root': typeof Command_rootRoute;
+  '/command/arena': typeof CommandArenaRoute;
+  '/command/combat': typeof CommandCombatRoute;
+  '/command/roster': typeof CommandRosterRoute;
+  '/command/tactics': typeof CommandTacticsRoute;
+  '/command/training': typeof CommandTrainingRoute;
+  '/lore/hall-of-fights': typeof LoreHallOfFightsRoute;
+  '/ops/__root': typeof Ops_rootRoute;
+  '/ops/contracts': typeof OpsContractsRoute;
+  '/ops/equipment': typeof OpsEquipmentRoute;
+  '/ops/finance': typeof OpsFinanceRoute;
+  '/ops/offseason': typeof OpsOffseasonRoute;
+  '/ops/personnel': typeof OpsPersonnelRoute;
+  '/ops/promoters': typeof OpsPromotersRoute;
+  '/stable/$id': typeof StableIdRoute;
+  '/stable/contracts': typeof StableContractsRoute;
+  '/stable/equipment': typeof StableEquipmentRoute;
+  '/stable/finance': typeof StableFinanceRoute;
+  '/stable/planner': typeof StablePlannerRoute;
+  '/stable/recruit': typeof StableRecruitRoute;
+  '/stable/trainers': typeof StableTrainersRoute;
+  '/stable/training': typeof StableTrainingRoute;
+  '/tools/physicals-simulator': typeof ToolsPhysicalsSimulatorRoute;
+  '/warrior/$id': typeof WarriorIdRoute;
+  '/world/__root': typeof World_rootRoute;
+  '/world/chronicle': typeof WorldChronicleRoute;
+  '/world/history': typeof WorldHistoryRoute;
+  '/world/intelligence': typeof WorldIntelligenceRoute;
+  '/world/tournaments': typeof WorldTournamentsRoute;
+  '/command/': typeof CommandIndexRoute;
+  '/ops/': typeof OpsIndexRoute;
+  '/stable/': typeof StableIndexRoute;
+  '/world/': typeof WorldIndexRoute;
+  '/ops/promoter/$id': typeof OpsPromoterIdRoute;
+  '/world/stable/$id': typeof WorldStableIdRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | '/'
     | '/admin'
@@ -424,8 +424,8 @@ export interface FileRouteTypes {
     | '/stable/'
     | '/world/'
     | '/ops/promoter/$id'
-    | '/world/stable/$id'
-  fileRoutesByTo: FileRoutesByTo
+    | '/world/stable/$id';
+  fileRoutesByTo: FileRoutesByTo;
   to:
     | '/'
     | '/admin'
@@ -464,7 +464,7 @@ export interface FileRouteTypes {
     | '/world/tournaments'
     | '/stable'
     | '/ops/promoter/$id'
-    | '/world/stable/$id'
+    | '/world/stable/$id';
   id:
     | '__root__'
     | '/'
@@ -507,342 +507,342 @@ export interface FileRouteTypes {
     | '/stable/'
     | '/world/'
     | '/ops/promoter/$id'
-    | '/world/stable/$id'
-  fileRoutesById: FileRoutesById
+    | '/world/stable/$id';
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
-  ArenaHubRoute: typeof ArenaHubRoute
-  HelpRoute: typeof HelpRoute
-  RunRoundRoute: typeof RunRoundRoute
-  WelcomeRoute: typeof WelcomeRoute
-  Command_rootRoute: typeof Command_rootRoute
-  CommandArenaRoute: typeof CommandArenaRoute
-  CommandCombatRoute: typeof CommandCombatRoute
-  CommandRosterRoute: typeof CommandRosterRoute
-  CommandTacticsRoute: typeof CommandTacticsRoute
-  CommandTrainingRoute: typeof CommandTrainingRoute
-  LoreHallOfFightsRoute: typeof LoreHallOfFightsRoute
-  Ops_rootRoute: typeof Ops_rootRoute
-  OpsContractsRoute: typeof OpsContractsRoute
-  OpsEquipmentRoute: typeof OpsEquipmentRoute
-  OpsFinanceRoute: typeof OpsFinanceRoute
-  OpsOffseasonRoute: typeof OpsOffseasonRoute
-  OpsPersonnelRoute: typeof OpsPersonnelRoute
-  OpsPromotersRoute: typeof OpsPromotersRoute
-  StableIdRoute: typeof StableIdRoute
-  StableContractsRoute: typeof StableContractsRoute
-  StableEquipmentRoute: typeof StableEquipmentRoute
-  StableFinanceRoute: typeof StableFinanceRoute
-  StablePlannerRoute: typeof StablePlannerRoute
-  StableRecruitRoute: typeof StableRecruitRoute
-  StableTrainersRoute: typeof StableTrainersRoute
-  StableTrainingRoute: typeof StableTrainingRoute
-  ToolsPhysicalsSimulatorRoute: typeof ToolsPhysicalsSimulatorRoute
-  WarriorIdRoute: typeof WarriorIdRoute
-  World_rootRoute: typeof World_rootRoute
-  WorldChronicleRoute: typeof WorldChronicleRoute
-  WorldHistoryRoute: typeof WorldHistoryRoute
-  WorldIntelligenceRoute: typeof WorldIntelligenceRoute
-  WorldTournamentsRoute: typeof WorldTournamentsRoute
-  CommandIndexRoute: typeof CommandIndexRoute
-  OpsIndexRoute: typeof OpsIndexRoute
-  StableIndexRoute: typeof StableIndexRoute
-  WorldIndexRoute: typeof WorldIndexRoute
-  OpsPromoterIdRoute: typeof OpsPromoterIdRoute
-  WorldStableIdRoute: typeof WorldStableIdRoute
+  IndexRoute: typeof IndexRoute;
+  AdminRoute: typeof AdminRoute;
+  ArenaHubRoute: typeof ArenaHubRoute;
+  HelpRoute: typeof HelpRoute;
+  RunRoundRoute: typeof RunRoundRoute;
+  WelcomeRoute: typeof WelcomeRoute;
+  Command_rootRoute: typeof Command_rootRoute;
+  CommandArenaRoute: typeof CommandArenaRoute;
+  CommandCombatRoute: typeof CommandCombatRoute;
+  CommandRosterRoute: typeof CommandRosterRoute;
+  CommandTacticsRoute: typeof CommandTacticsRoute;
+  CommandTrainingRoute: typeof CommandTrainingRoute;
+  LoreHallOfFightsRoute: typeof LoreHallOfFightsRoute;
+  Ops_rootRoute: typeof Ops_rootRoute;
+  OpsContractsRoute: typeof OpsContractsRoute;
+  OpsEquipmentRoute: typeof OpsEquipmentRoute;
+  OpsFinanceRoute: typeof OpsFinanceRoute;
+  OpsOffseasonRoute: typeof OpsOffseasonRoute;
+  OpsPersonnelRoute: typeof OpsPersonnelRoute;
+  OpsPromotersRoute: typeof OpsPromotersRoute;
+  StableIdRoute: typeof StableIdRoute;
+  StableContractsRoute: typeof StableContractsRoute;
+  StableEquipmentRoute: typeof StableEquipmentRoute;
+  StableFinanceRoute: typeof StableFinanceRoute;
+  StablePlannerRoute: typeof StablePlannerRoute;
+  StableRecruitRoute: typeof StableRecruitRoute;
+  StableTrainersRoute: typeof StableTrainersRoute;
+  StableTrainingRoute: typeof StableTrainingRoute;
+  ToolsPhysicalsSimulatorRoute: typeof ToolsPhysicalsSimulatorRoute;
+  WarriorIdRoute: typeof WarriorIdRoute;
+  World_rootRoute: typeof World_rootRoute;
+  WorldChronicleRoute: typeof WorldChronicleRoute;
+  WorldHistoryRoute: typeof WorldHistoryRoute;
+  WorldIntelligenceRoute: typeof WorldIntelligenceRoute;
+  WorldTournamentsRoute: typeof WorldTournamentsRoute;
+  CommandIndexRoute: typeof CommandIndexRoute;
+  OpsIndexRoute: typeof OpsIndexRoute;
+  StableIndexRoute: typeof StableIndexRoute;
+  WorldIndexRoute: typeof WorldIndexRoute;
+  OpsPromoterIdRoute: typeof OpsPromoterIdRoute;
+  WorldStableIdRoute: typeof WorldStableIdRoute;
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/world/__root': {
-      id: '/world/__root'
-      path: '/world'
-      fullPath: '/world'
-      preLoaderRoute: typeof World_rootRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/__root';
+      path: '/world';
+      fullPath: '/world';
+      preLoaderRoute: typeof World_rootRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/__root': {
-      id: '/ops/__root'
-      path: '/ops'
-      fullPath: '/ops'
-      preLoaderRoute: typeof Ops_rootRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/__root';
+      path: '/ops';
+      fullPath: '/ops';
+      preLoaderRoute: typeof Ops_rootRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/__root': {
-      id: '/command/__root'
-      path: '/command'
-      fullPath: '/command'
-      preLoaderRoute: typeof Command_rootRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/__root';
+      path: '/command';
+      fullPath: '/command';
+      preLoaderRoute: typeof Command_rootRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/welcome': {
-      id: '/welcome'
-      path: '/welcome'
-      fullPath: '/welcome'
-      preLoaderRoute: typeof WelcomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/welcome';
+      path: '/welcome';
+      fullPath: '/welcome';
+      preLoaderRoute: typeof WelcomeRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/run-round': {
-      id: '/run-round'
-      path: '/run-round'
-      fullPath: '/run-round'
-      preLoaderRoute: typeof RunRoundRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/run-round';
+      path: '/run-round';
+      fullPath: '/run-round';
+      preLoaderRoute: typeof RunRoundRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/help';
+      path: '/help';
+      fullPath: '/help';
+      preLoaderRoute: typeof HelpRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/arena-hub': {
-      id: '/arena-hub'
-      path: '/arena-hub'
-      fullPath: '/arena-hub'
-      preLoaderRoute: typeof ArenaHubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/arena-hub';
+      path: '/arena-hub';
+      fullPath: '/arena-hub';
+      preLoaderRoute: typeof ArenaHubRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/admin';
+      path: '/admin';
+      fullPath: '/admin';
+      preLoaderRoute: typeof AdminRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/world/': {
-      id: '/world/'
-      path: '/world'
-      fullPath: '/world/'
-      preLoaderRoute: typeof WorldIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/';
+      path: '/world';
+      fullPath: '/world/';
+      preLoaderRoute: typeof WorldIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/': {
-      id: '/stable/'
-      path: '/stable'
-      fullPath: '/stable/'
-      preLoaderRoute: typeof StableIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/';
+      path: '/stable';
+      fullPath: '/stable/';
+      preLoaderRoute: typeof StableIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/': {
-      id: '/ops/'
-      path: '/ops'
-      fullPath: '/ops/'
-      preLoaderRoute: typeof OpsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/';
+      path: '/ops';
+      fullPath: '/ops/';
+      preLoaderRoute: typeof OpsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/': {
-      id: '/command/'
-      path: '/command'
-      fullPath: '/command/'
-      preLoaderRoute: typeof CommandIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/';
+      path: '/command';
+      fullPath: '/command/';
+      preLoaderRoute: typeof CommandIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/world/tournaments': {
-      id: '/world/tournaments'
-      path: '/world/tournaments'
-      fullPath: '/world/tournaments'
-      preLoaderRoute: typeof WorldTournamentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/tournaments';
+      path: '/world/tournaments';
+      fullPath: '/world/tournaments';
+      preLoaderRoute: typeof WorldTournamentsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/world/intelligence': {
-      id: '/world/intelligence'
-      path: '/world/intelligence'
-      fullPath: '/world/intelligence'
-      preLoaderRoute: typeof WorldIntelligenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/intelligence';
+      path: '/world/intelligence';
+      fullPath: '/world/intelligence';
+      preLoaderRoute: typeof WorldIntelligenceRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/world/history': {
-      id: '/world/history'
-      path: '/world/history'
-      fullPath: '/world/history'
-      preLoaderRoute: typeof WorldHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/history';
+      path: '/world/history';
+      fullPath: '/world/history';
+      preLoaderRoute: typeof WorldHistoryRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/world/chronicle': {
-      id: '/world/chronicle'
-      path: '/world/chronicle'
-      fullPath: '/world/chronicle'
-      preLoaderRoute: typeof WorldChronicleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/chronicle';
+      path: '/world/chronicle';
+      fullPath: '/world/chronicle';
+      preLoaderRoute: typeof WorldChronicleRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/warrior/$id': {
-      id: '/warrior/$id'
-      path: '/warrior/$id'
-      fullPath: '/warrior/$id'
-      preLoaderRoute: typeof WarriorIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/warrior/$id';
+      path: '/warrior/$id';
+      fullPath: '/warrior/$id';
+      preLoaderRoute: typeof WarriorIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/tools/physicals-simulator': {
-      id: '/tools/physicals-simulator'
-      path: '/tools/physicals-simulator'
-      fullPath: '/tools/physicals-simulator'
-      preLoaderRoute: typeof ToolsPhysicalsSimulatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/tools/physicals-simulator';
+      path: '/tools/physicals-simulator';
+      fullPath: '/tools/physicals-simulator';
+      preLoaderRoute: typeof ToolsPhysicalsSimulatorRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/training': {
-      id: '/stable/training'
-      path: '/stable/training'
-      fullPath: '/stable/training'
-      preLoaderRoute: typeof StableTrainingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/training';
+      path: '/stable/training';
+      fullPath: '/stable/training';
+      preLoaderRoute: typeof StableTrainingRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/trainers': {
-      id: '/stable/trainers'
-      path: '/stable/trainers'
-      fullPath: '/stable/trainers'
-      preLoaderRoute: typeof StableTrainersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/trainers';
+      path: '/stable/trainers';
+      fullPath: '/stable/trainers';
+      preLoaderRoute: typeof StableTrainersRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/recruit': {
-      id: '/stable/recruit'
-      path: '/stable/recruit'
-      fullPath: '/stable/recruit'
-      preLoaderRoute: typeof StableRecruitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/recruit';
+      path: '/stable/recruit';
+      fullPath: '/stable/recruit';
+      preLoaderRoute: typeof StableRecruitRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/planner': {
-      id: '/stable/planner'
-      path: '/stable/planner'
-      fullPath: '/stable/planner'
-      preLoaderRoute: typeof StablePlannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/planner';
+      path: '/stable/planner';
+      fullPath: '/stable/planner';
+      preLoaderRoute: typeof StablePlannerRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/finance': {
-      id: '/stable/finance'
-      path: '/stable/finance'
-      fullPath: '/stable/finance'
-      preLoaderRoute: typeof StableFinanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/finance';
+      path: '/stable/finance';
+      fullPath: '/stable/finance';
+      preLoaderRoute: typeof StableFinanceRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/equipment': {
-      id: '/stable/equipment'
-      path: '/stable/equipment'
-      fullPath: '/stable/equipment'
-      preLoaderRoute: typeof StableEquipmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/equipment';
+      path: '/stable/equipment';
+      fullPath: '/stable/equipment';
+      preLoaderRoute: typeof StableEquipmentRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/contracts': {
-      id: '/stable/contracts'
-      path: '/stable/contracts'
-      fullPath: '/stable/contracts'
-      preLoaderRoute: typeof StableContractsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/contracts';
+      path: '/stable/contracts';
+      fullPath: '/stable/contracts';
+      preLoaderRoute: typeof StableContractsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/stable/$id': {
-      id: '/stable/$id'
-      path: '/stable/$id'
-      fullPath: '/stable/$id'
-      preLoaderRoute: typeof StableIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/stable/$id';
+      path: '/stable/$id';
+      fullPath: '/stable/$id';
+      preLoaderRoute: typeof StableIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/promoters': {
-      id: '/ops/promoters'
-      path: '/ops/promoters'
-      fullPath: '/ops/promoters'
-      preLoaderRoute: typeof OpsPromotersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/promoters';
+      path: '/ops/promoters';
+      fullPath: '/ops/promoters';
+      preLoaderRoute: typeof OpsPromotersRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/personnel': {
-      id: '/ops/personnel'
-      path: '/ops/personnel'
-      fullPath: '/ops/personnel'
-      preLoaderRoute: typeof OpsPersonnelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/personnel';
+      path: '/ops/personnel';
+      fullPath: '/ops/personnel';
+      preLoaderRoute: typeof OpsPersonnelRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/offseason': {
-      id: '/ops/offseason'
-      path: '/ops/offseason'
-      fullPath: '/ops/offseason'
-      preLoaderRoute: typeof OpsOffseasonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/offseason';
+      path: '/ops/offseason';
+      fullPath: '/ops/offseason';
+      preLoaderRoute: typeof OpsOffseasonRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/finance': {
-      id: '/ops/finance'
-      path: '/ops/finance'
-      fullPath: '/ops/finance'
-      preLoaderRoute: typeof OpsFinanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/finance';
+      path: '/ops/finance';
+      fullPath: '/ops/finance';
+      preLoaderRoute: typeof OpsFinanceRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/equipment': {
-      id: '/ops/equipment'
-      path: '/ops/equipment'
-      fullPath: '/ops/equipment'
-      preLoaderRoute: typeof OpsEquipmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/equipment';
+      path: '/ops/equipment';
+      fullPath: '/ops/equipment';
+      preLoaderRoute: typeof OpsEquipmentRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/contracts': {
-      id: '/ops/contracts'
-      path: '/ops/contracts'
-      fullPath: '/ops/contracts'
-      preLoaderRoute: typeof OpsContractsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/contracts';
+      path: '/ops/contracts';
+      fullPath: '/ops/contracts';
+      preLoaderRoute: typeof OpsContractsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/lore/hall-of-fights': {
-      id: '/lore/hall-of-fights'
-      path: '/lore/hall-of-fights'
-      fullPath: '/lore/hall-of-fights'
-      preLoaderRoute: typeof LoreHallOfFightsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/lore/hall-of-fights';
+      path: '/lore/hall-of-fights';
+      fullPath: '/lore/hall-of-fights';
+      preLoaderRoute: typeof LoreHallOfFightsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/training': {
-      id: '/command/training'
-      path: '/command/training'
-      fullPath: '/command/training'
-      preLoaderRoute: typeof CommandTrainingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/training';
+      path: '/command/training';
+      fullPath: '/command/training';
+      preLoaderRoute: typeof CommandTrainingRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/tactics': {
-      id: '/command/tactics'
-      path: '/command/tactics'
-      fullPath: '/command/tactics'
-      preLoaderRoute: typeof CommandTacticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/tactics';
+      path: '/command/tactics';
+      fullPath: '/command/tactics';
+      preLoaderRoute: typeof CommandTacticsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/roster': {
-      id: '/command/roster'
-      path: '/command/roster'
-      fullPath: '/command/roster'
-      preLoaderRoute: typeof CommandRosterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/roster';
+      path: '/command/roster';
+      fullPath: '/command/roster';
+      preLoaderRoute: typeof CommandRosterRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/combat': {
-      id: '/command/combat'
-      path: '/command/combat'
-      fullPath: '/command/combat'
-      preLoaderRoute: typeof CommandCombatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/combat';
+      path: '/command/combat';
+      fullPath: '/command/combat';
+      preLoaderRoute: typeof CommandCombatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/command/arena': {
-      id: '/command/arena'
-      path: '/command/arena'
-      fullPath: '/command/arena'
-      preLoaderRoute: typeof CommandArenaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/command/arena';
+      path: '/command/arena';
+      fullPath: '/command/arena';
+      preLoaderRoute: typeof CommandArenaRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/world/stable/$id': {
-      id: '/world/stable/$id'
-      path: '/world/stable/$id'
-      fullPath: '/world/stable/$id'
-      preLoaderRoute: typeof WorldStableIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/world/stable/$id';
+      path: '/world/stable/$id';
+      fullPath: '/world/stable/$id';
+      preLoaderRoute: typeof WorldStableIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/ops/promoter/$id': {
-      id: '/ops/promoter/$id'
-      path: '/ops/promoter/$id'
-      fullPath: '/ops/promoter/$id'
-      preLoaderRoute: typeof OpsPromoterIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/ops/promoter/$id';
+      path: '/ops/promoter/$id';
+      fullPath: '/ops/promoter/$id';
+      preLoaderRoute: typeof OpsPromoterIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -888,7 +888,7 @@ const rootRouteChildren: RootRouteChildren = {
   WorldIndexRoute: WorldIndexRoute,
   OpsPromoterIdRoute: OpsPromoterIdRoute,
   WorldStableIdRoute: WorldStableIdRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

@@ -1,4 +1,4 @@
-import { GameState } from "@/types/state.types";
+import { GameState } from '@/types/state.types';
 
 /**
  * Updates a promoter's history with a new payout and notable bout.

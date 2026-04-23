@@ -1,5 +1,5 @@
-import type { FightSummary } from "@/types/combat.types";
-import type { GameState } from "@/types/state.types";
+import type { FightSummary } from '@/types/combat.types';
+import type { GameState } from '@/types/state.types';
 
 /**
  * Extracts fights from a specific week using an optimized backward loop.
@@ -42,7 +42,11 @@ export function getRecentFights(arenaHistory: FightSummary[], minWeek: number): 
  * Optimized with a backward loop to break early once the desired count is reached,
  * turning an O(N) full-array scan into an O(K) operation where K is the number of items needed.
  */
-export function getRecentFightsForWarrior(arenaHistory: FightSummary[], warriorId: string, limit: number = 10): FightSummary[] {
+export function getRecentFightsForWarrior(
+  arenaHistory: FightSummary[],
+  warriorId: string,
+  limit: number = 10
+): FightSummary[] {
   const result: FightSummary[] = [];
   for (let i = arenaHistory.length - 1; i >= 0; i--) {
     const f = arenaHistory[i];
@@ -61,7 +65,10 @@ export function getRecentFightsForWarrior(arenaHistory: FightSummary[], warriorI
  * Useful when the full timeline or head-to-head records are needed,
  * but extracts via standard for-loop to avoid O(N) functional allocation overhead.
  */
-export function getAllFightsForWarrior(arenaHistory: FightSummary[], warriorId: string): FightSummary[] {
+export function getAllFightsForWarrior(
+  arenaHistory: FightSummary[],
+  warriorId: string
+): FightSummary[] {
   const result: FightSummary[] = [];
   for (let i = 0; i < arenaHistory.length; i++) {
     const f = arenaHistory[i];
@@ -78,7 +85,10 @@ export function getAllFightsForWarrior(arenaHistory: FightSummary[], warriorId: 
  * stopping if we reach a point where no tournament fights could exist (e.g. before the tournament week, if known).
  * To be safe without knowing the exact tournament week, we just do a standard backward scan.
  */
-export function getFightsForTournament(arenaHistory: FightSummary[], tournamentId: string): FightSummary[] {
+export function getFightsForTournament(
+  arenaHistory: FightSummary[],
+  tournamentId: string
+): FightSummary[] {
   const result: FightSummary[] = [];
   for (let i = arenaHistory.length - 1; i >= 0; i--) {
     const f = arenaHistory[i];

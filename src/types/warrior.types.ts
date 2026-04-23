@@ -1,36 +1,36 @@
-import { 
-  FightingStyle, 
-  STYLE_DISPLAY_NAMES, 
-  STYLE_ABBREV, 
-  type Attributes, 
-  ATTRIBUTE_KEYS, 
-  ATTRIBUTE_LABELS, 
-  ATTRIBUTE_MIN, 
-  ATTRIBUTE_MAX, 
-  ATTRIBUTE_TOTAL, 
-  type BaseSkills, 
+import {
+  FightingStyle,
+  STYLE_DISPLAY_NAMES,
+  STYLE_ABBREV,
+  type Attributes,
+  ATTRIBUTE_KEYS,
+  ATTRIBUTE_LABELS,
+  ATTRIBUTE_MIN,
+  ATTRIBUTE_MAX,
+  ATTRIBUTE_TOTAL,
+  type BaseSkills,
   type DerivedStats,
-  type Gear, 
+  type Gear,
   type FightPlan,
   type DeathEvent,
   type WarriorId,
   type StableId,
-  type InjuryId
-} from "./shared.types";
-import type { AnnualAward } from "./state.types";
+  type InjuryId,
+} from './shared.types';
+import type { AnnualAward } from './state.types';
 
 // ─── UI Prop Types ──────────────────────────────────────────────────────────
 
 export interface TagBadgeProps {
   tag: string;
-  type: "flair" | "title" | "injury";
+  type: 'flair' | 'title' | 'injury';
   className?: string;
 }
 
 export interface StatBadgeProps {
   styleName: FightingStyle;
   career?: CareerRecord;
-  variant?: "outline" | "default" | "secondary" | "destructive";
+  variant?: 'outline' | 'default' | 'secondary' | 'destructive';
   showFullName?: boolean;
   className?: string;
 }
@@ -58,10 +58,10 @@ export interface CareerRecord {
   };
 }
 
-export type WarriorStatus = "Active" | "Dead" | "Retired";
+export type WarriorStatus = 'Active' | 'Dead' | 'Retired';
 
 /** Injury severity tiers (per Design Bible §Injuries) */
-export type InjurySeverity = "Minor" | "Moderate" | "Severe" | "Critical" | "Permanent";
+export type InjurySeverity = 'Minor' | 'Moderate' | 'Severe' | 'Critical' | 'Permanent';
 
 /** Recovery time ranges by severity (in weeks) */
 export const INJURY_SEVERITY_WEEKS: Record<InjurySeverity, { min: number; max: number }> = {
@@ -73,7 +73,15 @@ export const INJURY_SEVERITY_WEEKS: Record<InjurySeverity, { min: number; max: n
 };
 
 /** Body locations that can sustain injuries */
-export type InjuryLocation = "Head" | "Chest" | "Abdomen" | "Right Arm" | "Left Arm" | "Right Leg" | "Left Leg" | "General";
+export type InjuryLocation =
+  | 'Head'
+  | 'Chest'
+  | 'Abdomen'
+  | 'Right Arm'
+  | 'Left Arm'
+  | 'Right Leg'
+  | 'Left Leg'
+  | 'General';
 
 export interface InjuryData {
   id: InjuryId;
@@ -103,7 +111,7 @@ export interface WarriorLineage {
   parentId?: WarriorId;
   stableId?: StableId;
   generation: number;
-  pedigree: "Commoner" | "Second Generation" | "Legacy" | "Noble Blood" | "Exiled Legend";
+  pedigree: 'Commoner' | 'Second Generation' | 'Legacy' | 'Noble Blood' | 'Exiled Legend';
   mentorName?: string;
 }
 
@@ -148,8 +156,8 @@ export interface Warrior {
   isDead?: boolean;
   dateOfDeath?: string;
   causeOfDeath?: string;
-  yearlySnapshots?: Record<number, CareerRecord>; 
-  awards?: import("./state.types").AnnualAward[];
+  yearlySnapshots?: Record<number, CareerRecord>;
+  awards?: import('./state.types').AnnualAward[];
   traits: string[];
   lore?: string;
   origin?: string;
@@ -157,19 +165,19 @@ export interface Warrior {
 }
 
 // Re-exports for convenience
-export { 
-  FightingStyle, 
-  STYLE_DISPLAY_NAMES, 
-  STYLE_ABBREV, 
-  type Attributes, 
-  ATTRIBUTE_KEYS, 
-  ATTRIBUTE_LABELS, 
-  ATTRIBUTE_MIN, 
-  ATTRIBUTE_MAX, 
-  ATTRIBUTE_TOTAL, 
-  type BaseSkills, 
+export {
+  FightingStyle,
+  STYLE_DISPLAY_NAMES,
+  STYLE_ABBREV,
+  type Attributes,
+  ATTRIBUTE_KEYS,
+  ATTRIBUTE_LABELS,
+  ATTRIBUTE_MIN,
+  ATTRIBUTE_MAX,
+  ATTRIBUTE_TOTAL,
+  type BaseSkills,
   type DerivedStats,
   type Gear,
   type FightPlan,
-  type DeathEvent
+  type DeathEvent,
 };

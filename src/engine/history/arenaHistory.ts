@@ -1,14 +1,14 @@
 /**
  * Arena history — persists fight summaries to localStorage.
  */
-import type { FightSummary } from "@/types/combat.types";
+import type { FightSummary } from '@/types/combat.types';
 
-const KEY = "sl.arenaHistory";
+const KEY = 'sl.arenaHistory';
 
 function load(): FightSummary[] {
   if (typeof localStorage === 'undefined') return [];
   try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
+    return JSON.parse(localStorage.getItem(KEY) || '[]');
   } catch {
     return [];
   }
@@ -29,7 +29,10 @@ function save(arr: FightSummary[]) {
             localStorage.setItem(KEY, JSON.stringify(trimmed));
           }
         } catch (retryError) {
-          console.error('Failed to recover from localStorage quota error for arena history', retryError);
+          console.error(
+            'Failed to recover from localStorage quota error for arena history',
+            retryError
+          );
         }
       } else {
         console.error('Failed to save arena history', error);
@@ -63,9 +66,7 @@ export const ArenaHistory = {
     let arr = load();
     if (opts.week != null) arr = arr.filter((f) => f.week === opts.week);
     if (opts.warriorName)
-      arr = arr.filter(
-        (f) => f.a === opts.warriorName || f.d === opts.warriorName
-      );
+      arr = arr.filter((f) => f.a === opts.warriorName || f.d === opts.warriorName);
     return arr;
   },
 };

@@ -4,13 +4,13 @@
  * This module uses a Strategy Pattern to define style-specific behaviors,
  * eliminating massive switch statements and improving extensibility.
  */
-import { FightingStyle } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightPlan } from "@/types/combat.types";
+import { FightingStyle } from '@/types/shared.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { FightPlan } from '@/types/combat.types';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
-export type Phase = "OPENING" | "MID" | "LATE";
+export type Phase = 'OPENING' | 'MID' | 'LATE';
 
 export interface StylePassiveResult {
   attBonus: number;
@@ -42,7 +42,10 @@ export interface StyleStrategy {
   };
   getPassive: (context: StylePassiveContext, mastery: MasteryInfo) => StylePassiveResult;
   getKillMechanic: (context: KillContext) => KillMechanic;
-  getAntiSynergy: (offTactic?: string, defTactic?: string) => { offMult: number; defMult: number; warning?: string };
+  getAntiSynergy: (
+    offTactic?: string,
+    defTactic?: string
+  ) => { offMult: number; defMult: number; warning?: string };
 }
 
 export interface StylePassiveContext {
@@ -70,10 +73,10 @@ export interface KillContext {
 // Non-mechanical flags consumed by the narrator to pick voice/flavour per style,
 // and by crowd-mood + kill-text assembly to bias tone.
 
-export type StyleVoice = "Surgical" | "Brutal" | "Explosive" | "Fortified" | "Flowing" | "Cunning";
-export type AttackFreq = "Sparing" | "Measured" | "Relentless";
-export type KillBias = "Opportunistic" | "Methodical" | "Savage";
-export type FatigueBurn = "Low" | "Moderate" | "High";
+export type StyleVoice = 'Surgical' | 'Brutal' | 'Explosive' | 'Fortified' | 'Flowing' | 'Cunning';
+export type AttackFreq = 'Sparing' | 'Measured' | 'Relentless';
+export type KillBias = 'Opportunistic' | 'Methodical' | 'Savage';
+export type FatigueBurn = 'Low' | 'Moderate' | 'High';
 
 export interface StyleIdentity {
   voice: StyleVoice;
@@ -85,16 +88,76 @@ export interface StyleIdentity {
 }
 
 export const STYLE_IDENTITY: Record<FightingStyle, StyleIdentity> = {
-  [FightingStyle.AimedBlow]:      { voice: "Surgical",  attackFreq: "Sparing",    killBias: "Methodical",    fatigueBurn: "Low",      tagline: "patient surgeon of the arena" },
-  [FightingStyle.BashingAttack]:  { voice: "Brutal",    attackFreq: "Relentless", killBias: "Savage",        fatigueBurn: "Moderate", tagline: "wall-breaker with the weight of a storm" },
-  [FightingStyle.LungingAttack]:  { voice: "Explosive", attackFreq: "Measured",   killBias: "Opportunistic", fatigueBurn: "High",     tagline: "sudden-strike specialist" },
-  [FightingStyle.ParryLunge]:     { voice: "Cunning",   attackFreq: "Measured",   killBias: "Opportunistic", fatigueBurn: "Moderate", tagline: "counter-strike technician" },
-  [FightingStyle.ParryRiposte]:   { voice: "Fortified", attackFreq: "Sparing",    killBias: "Methodical",    fatigueBurn: "Low",      tagline: "iron bulwark, waiting for the error" },
-  [FightingStyle.ParryStrike]:    { voice: "Cunning",   attackFreq: "Measured",   killBias: "Methodical",    fatigueBurn: "Moderate", tagline: "coiled counter-striker" },
-  [FightingStyle.StrikingAttack]: { voice: "Flowing",   attackFreq: "Measured",   killBias: "Methodical",    fatigueBurn: "Moderate", tagline: "rhythmic striker, reading the tempo" },
-  [FightingStyle.SlashingAttack]: { voice: "Flowing",   attackFreq: "Relentless", killBias: "Savage",        fatigueBurn: "Moderate", tagline: "whirl of razored arcs" },
-  [FightingStyle.WallOfSteel]:    { voice: "Fortified", attackFreq: "Sparing",    killBias: "Methodical",    fatigueBurn: "High",     tagline: "unmoving bastion of blade and brace" },
-  [FightingStyle.TotalParry]:     { voice: "Fortified", attackFreq: "Sparing",    killBias: "Opportunistic", fatigueBurn: "Low",      tagline: "immovable defender, drawing mistakes from the foe" },
+  [FightingStyle.AimedBlow]: {
+    voice: 'Surgical',
+    attackFreq: 'Sparing',
+    killBias: 'Methodical',
+    fatigueBurn: 'Low',
+    tagline: 'patient surgeon of the arena',
+  },
+  [FightingStyle.BashingAttack]: {
+    voice: 'Brutal',
+    attackFreq: 'Relentless',
+    killBias: 'Savage',
+    fatigueBurn: 'Moderate',
+    tagline: 'wall-breaker with the weight of a storm',
+  },
+  [FightingStyle.LungingAttack]: {
+    voice: 'Explosive',
+    attackFreq: 'Measured',
+    killBias: 'Opportunistic',
+    fatigueBurn: 'High',
+    tagline: 'sudden-strike specialist',
+  },
+  [FightingStyle.ParryLunge]: {
+    voice: 'Cunning',
+    attackFreq: 'Measured',
+    killBias: 'Opportunistic',
+    fatigueBurn: 'Moderate',
+    tagline: 'counter-strike technician',
+  },
+  [FightingStyle.ParryRiposte]: {
+    voice: 'Fortified',
+    attackFreq: 'Sparing',
+    killBias: 'Methodical',
+    fatigueBurn: 'Low',
+    tagline: 'iron bulwark, waiting for the error',
+  },
+  [FightingStyle.ParryStrike]: {
+    voice: 'Cunning',
+    attackFreq: 'Measured',
+    killBias: 'Methodical',
+    fatigueBurn: 'Moderate',
+    tagline: 'coiled counter-striker',
+  },
+  [FightingStyle.StrikingAttack]: {
+    voice: 'Flowing',
+    attackFreq: 'Measured',
+    killBias: 'Methodical',
+    fatigueBurn: 'Moderate',
+    tagline: 'rhythmic striker, reading the tempo',
+  },
+  [FightingStyle.SlashingAttack]: {
+    voice: 'Flowing',
+    attackFreq: 'Relentless',
+    killBias: 'Savage',
+    fatigueBurn: 'Moderate',
+    tagline: 'whirl of razored arcs',
+  },
+  [FightingStyle.WallOfSteel]: {
+    voice: 'Fortified',
+    attackFreq: 'Sparing',
+    killBias: 'Methodical',
+    fatigueBurn: 'High',
+    tagline: 'unmoving bastion of blade and brace',
+  },
+  [FightingStyle.TotalParry]: {
+    voice: 'Fortified',
+    attackFreq: 'Sparing',
+    killBias: 'Opportunistic',
+    fatigueBurn: 'Low',
+    tagline: 'immovable defender, drawing mistakes from the foe',
+  },
 };
 
 export function getStyleIdentity(style: FightingStyle): StyleIdentity {
@@ -103,7 +166,7 @@ export function getStyleIdentity(style: FightingStyle): StyleIdentity {
 
 // ─── Mastery System ───────────────────────────────────────────────────────
 
-export type MasteryTier = "Novice" | "Practiced" | "Veteran" | "Master" | "Grandmaster";
+export type MasteryTier = 'Novice' | 'Practiced' | 'Veteran' | 'Master' | 'Grandmaster';
 
 export interface MasteryInfo {
   tier: MasteryTier;
@@ -112,26 +175,34 @@ export interface MasteryInfo {
   mult: number;
 }
 
-const MASTERY_THRESHOLDS: { tier: MasteryTier; minFights: number; bonus: number; mult: number }[] = [
-  { tier: "Grandmaster", minFights: 50, bonus: 2, mult: 1.50 },
-  { tier: "Master",      minFights: 30, bonus: 1, mult: 1.30 },
-  { tier: "Veteran",     minFights: 20, bonus: 1, mult: 1.15 },
-  { tier: "Practiced",   minFights: 10, bonus: 0, mult: 1.05 },
-  { tier: "Novice",      minFights: 0,  bonus: 0, mult: 1.00 },
-];
+const MASTERY_THRESHOLDS: { tier: MasteryTier; minFights: number; bonus: number; mult: number }[] =
+  [
+    { tier: 'Grandmaster', minFights: 50, bonus: 2, mult: 1.5 },
+    { tier: 'Master', minFights: 30, bonus: 1, mult: 1.3 },
+    { tier: 'Veteran', minFights: 20, bonus: 1, mult: 1.15 },
+    { tier: 'Practiced', minFights: 10, bonus: 0, mult: 1.05 },
+    { tier: 'Novice', minFights: 0, bonus: 0, mult: 1.0 },
+  ];
 
 export function getMastery(totalFights: number): MasteryInfo {
   for (const t of MASTERY_THRESHOLDS) {
-    if (totalFights >= t.minFights) return { tier: t.tier, fights: totalFights, bonus: t.bonus, mult: t.mult };
+    if (totalFights >= t.minFights)
+      return { tier: t.tier, fights: totalFights, bonus: t.bonus, mult: t.mult };
   }
-  return { tier: "Novice", fights: totalFights, bonus: 0, mult: 1.0 };
+  return { tier: 'Novice', fights: totalFights, bonus: 0, mult: 1.0 };
 }
 
 // ─── Strategy Helpers ─────────────────────────────────────────────────────
 
 const EMPTY_PASSIVE: StylePassiveResult = {
-  attBonus: 0, parBonus: 0, defBonus: 0, ripBonus: 0,
-  dmgBonus: 0, critChance: 0, iniBonus: 0, mastery: "Novice",
+  attBonus: 0,
+  parBonus: 0,
+  defBonus: 0,
+  ripBonus: 0,
+  dmgBonus: 0,
+  critChance: 0,
+  iniBonus: 0,
+  mastery: 'Novice',
 };
 
 function scale(val: number, m: MasteryInfo): number {
@@ -144,7 +215,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
   [FightingStyle.AimedBlow]: {
     tempo: { opening: -1, mid: 0, late: 1, enduranceMult: 0.94 },
     getPassive: (ctx, m) => {
-      const targeted = ctx.targetedLocation && ctx.targetedLocation !== "Any";
+      const targeted = ctx.targetedLocation && ctx.targetedLocation !== 'Any';
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
@@ -154,15 +225,15 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       };
     },
     getKillMechanic: (ctx) => ({
-      killBonus: ctx.hitLocation === "head" ? 0.15 : (ctx.targetedLocation !== "Any" ? 0.05 : 0),
-      decBonus: ctx.targetedLocation !== "Any" ? 3 : 0,
-      extendedKillWindow: ctx.hitLocation === "head",
-      killWindowHpMult: 0.80,
-      killNarrative: "delivers a precise, clinical strike to a vital point!",
+      killBonus: ctx.hitLocation === 'head' ? 0.15 : ctx.targetedLocation !== 'Any' ? 0.05 : 0,
+      decBonus: ctx.targetedLocation !== 'Any' ? 3 : 0,
+      extendedKillWindow: ctx.hitLocation === 'head',
+      killWindowHpMult: 0.8,
+      killNarrative: 'delivers a precise, clinical strike to a vital point!',
     }),
     // Canonical suitability: AB is WS for Bash, Slash, and Lunge; only Decisiveness is U.
     // Anti-synergy is therefore a no-op for AB — suitability handles tactical fit correctly.
-    getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
+    getAntiSynergy: () => ({ offMult: 1, defMult: 1 }),
   },
 
   [FightingStyle.BashingAttack]: {
@@ -175,7 +246,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         mastery: m.tier,
         dmgBonus: scale(momentumDmg, m) + (vsTP ? 1 : 0),
         attBonus: scale(ctx.consecutiveHits >= 2 ? 2 : 1, m) + (vsTP ? 2 : 0),
-        hasPassiveNarrative: (vsTP && ctx.consecutiveHits >= 2) || (ctx.consecutiveHits >= 3),
+        hasPassiveNarrative: (vsTP && ctx.consecutiveHits >= 2) || ctx.consecutiveHits >= 3,
       };
     },
     getKillMechanic: (ctx) => {
@@ -185,19 +256,29 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
         decBonus: momentum,
         extendedKillWindow: ctx.consecutiveHits >= 3,
         killWindowHpMult: ctx.consecutiveHits >= 3 ? 0.4 : 0.3,
-        killNarrative: "unleashes the full weight of their momentum in a crushing final blow!",
+        killNarrative: 'unleashes the full weight of their momentum in a crushing final blow!',
       };
     },
     // Canonical suitability: Lunge/Dodge/Riposte are all U for BA (suitability already penalises them).
     // Decisiveness is WS for BA — no additional penalty.
     // Anti-synergy only reinforces physical incompatibilities beyond the U suitability floor.
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
-      if (off === "Lunge") { offMult = 0.7; warning = "Bashers are too heavy for effective lunging"; }
-      if (def === "Dodge") { defMult = 0.7; warning = (warning ? warning + "; " : "") + "Bashers cannot dodge effectively"; }
-      if (def === "Riposte") { defMult = 0.7; }
+      let offMult = 1,
+        defMult = 1,
+        warning;
+      if (off === 'Lunge') {
+        offMult = 0.7;
+        warning = 'Bashers are too heavy for effective lunging';
+      }
+      if (def === 'Dodge') {
+        defMult = 0.7;
+        warning = (warning ? warning + '; ' : '') + 'Bashers cannot dodge effectively';
+      }
+      if (def === 'Riposte') {
+        defMult = 0.7;
+      }
       return { offMult, defMult, warning };
-    }
+    },
   },
 
   [FightingStyle.LungingAttack]: {
@@ -213,22 +294,30 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       };
     },
     getKillMechanic: (ctx) => ({
-      killBonus: ctx.phase === "OPENING" ? 0.08 : 0,
-      decBonus: ctx.phase === "OPENING" ? 2 : 0,
+      killBonus: ctx.phase === 'OPENING' ? 0.08 : 0,
+      decBonus: ctx.phase === 'OPENING' ? 2 : 0,
       extendedKillWindow: false,
       killWindowHpMult: 0.3,
-      killNarrative: "springs forward with a sudden, lethal thrust!",
+      killNarrative: 'springs forward with a sudden, lethal thrust!',
     }),
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
-      if (off === "Bash") { offMult = 0.5; warning = "Lungers lack the weight for effective bashing"; }
-      if (def === "Parry") { defMult = 0.6; warning = (warning ? warning + "; " : "") + "Lungers are overextended for strong parries"; }
+      let offMult = 1,
+        defMult = 1,
+        warning;
+      if (off === 'Bash') {
+        offMult = 0.5;
+        warning = 'Lungers lack the weight for effective bashing';
+      }
+      if (def === 'Parry') {
+        defMult = 0.6;
+        warning = (warning ? warning + '; ' : '') + 'Lungers are overextended for strong parries';
+      }
       return { offMult, defMult, warning };
-    }
+    },
   },
 
   [FightingStyle.ParryLunge]: {
-    tempo: { opening: 0, mid: 2, late: 0, enduranceMult: 1.00 },
+    tempo: { opening: 0, mid: 2, late: 0, enduranceMult: 1.0 },
     getPassive: (ctx, m) => {
       const counterReady = ctx.hitsTaken > ctx.hitsLanded;
       return {
@@ -240,10 +329,13 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       };
     },
     getKillMechanic: () => ({
-      killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
-      killNarrative: "exploits a gap in the defense to strike home!",
+      killBonus: 0,
+      decBonus: 0,
+      extendedKillWindow: false,
+      killWindowHpMult: 0.3,
+      killNarrative: 'exploits a gap in the defense to strike home!',
     }),
-    getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
+    getAntiSynergy: () => ({ offMult: 1, defMult: 1 }),
   },
 
   [FightingStyle.ParryRiposte]: {
@@ -260,15 +352,21 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 2,
       extendedKillWindow: false,
       killWindowHpMult: 0.25,
-      killNarrative: "pivots around the attack and delivers a stinging riposte!",
+      killNarrative: 'pivots around the attack and delivers a stinging riposte!',
     }),
     getAntiSynergy: (off) => {
-      let offMult = 1, warning;
+      let offMult = 1,
+        warning;
       const defMult = 1;
-      if (off === "Bash") { offMult = 0.5; warning = "Riposte specialists lack bashing power"; }
-      if (off === "Decisiveness") { offMult = 0.7; }
+      if (off === 'Bash') {
+        offMult = 0.5;
+        warning = 'Riposte specialists lack bashing power';
+      }
+      if (off === 'Decisiveness') {
+        offMult = 0.7;
+      }
       return { offMult, defMult, warning };
-    }
+    },
   },
 
   [FightingStyle.ParryStrike]: {
@@ -280,10 +378,13 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       attBonus: ctx.hitsTaken > ctx.hitsLanded ? 1 : 0,
     }),
     getKillMechanic: () => ({
-      killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
-      killNarrative: "blocks and strikes in a single fluid motion!",
+      killBonus: 0,
+      decBonus: 0,
+      extendedKillWindow: false,
+      killWindowHpMult: 0.3,
+      killNarrative: 'blocks and strikes in a single fluid motion!',
     }),
-    getAntiSynergy: (off) => ({ offMult: off === "Bash" ? 0.6 : 1, defMult: 1 })
+    getAntiSynergy: (off) => ({ offMult: off === 'Bash' ? 0.6 : 1, defMult: 1 }),
   },
 
   [FightingStyle.SlashingAttack]: {
@@ -293,7 +394,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(ctx.phase === "LATE" ? 0 : 1, m) + (ctx.phase === "OPENING" ? m.bonus : 0),
+        attBonus: scale(ctx.phase === 'LATE' ? 0 : 1, m) + (ctx.phase === 'OPENING' ? m.bonus : 0),
         dmgBonus: 1 + flurryDmg,
         hasPassiveNarrative: ctx.hitsLanded >= 3,
       };
@@ -303,14 +404,22 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 0,
       extendedKillWindow: ctx.hitsLanded >= 5,
       killWindowHpMult: ctx.hitsLanded >= 5 ? 0.35 : 0.3,
-      killNarrative: "overwhelms their foe with a flurry of precise cuts!",
+      killNarrative: 'overwhelms their foe with a flurry of precise cuts!',
     }),
     getAntiSynergy: (off, def) => {
-      let offMult = 1, defMult = 1, warning;
-      if (off === "Bash") { offMult = 0.5; warning = "Slashers rely on blade edge, not blunt force"; }
-      if (def === "Parry") { defMult = 0.6; warning = (warning ? warning + "; " : "") + "Slashers struggle with disciplined parries"; }
+      let offMult = 1,
+        defMult = 1,
+        warning;
+      if (off === 'Bash') {
+        offMult = 0.5;
+        warning = 'Slashers rely on blade edge, not blunt force';
+      }
+      if (def === 'Parry') {
+        defMult = 0.6;
+        warning = (warning ? warning + '; ' : '') + 'Slashers struggle with disciplined parries';
+      }
       return { offMult, defMult, warning };
-    }
+    },
   },
 
   [FightingStyle.StrikingAttack]: {
@@ -326,36 +435,37 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 2,
       extendedKillWindow: true,
       killWindowHpMult: 0.25,
-      killNarrative: "lands a devastating, direct strike!",
+      killNarrative: 'lands a devastating, direct strike!',
     }),
-    getAntiSynergy: (off, def) => ({ offMult: 1, defMult: def === "Riposte" ? 0.6 : 1 })
+    getAntiSynergy: (off, def) => ({ offMult: 1, defMult: def === 'Riposte' ? 0.6 : 1 }),
   },
 
   [FightingStyle.TotalParry]: {
-    tempo: { opening: -1, mid: 1, late: 1, enduranceMult: 0.90 },
+    tempo: { opening: -1, mid: 1, late: 1, enduranceMult: 0.9 },
     getPassive: (ctx, m) => ({
       ...EMPTY_PASSIVE,
       mastery: m.tier,
       attBonus: -2,
       parBonus: 4 + m.bonus,
       iniBonus: 2,
-      hasPassiveNarrative: ctx.phase === "LATE" && ctx.endRatio > 0.5,
+      hasPassiveNarrative: ctx.phase === 'LATE' && ctx.endRatio > 0.5,
     }),
     getKillMechanic: () => ({
       killBonus: -0.05,
       decBonus: -1,
       extendedKillWindow: false,
       killWindowHpMult: 0.25,
-      killNarrative: "finds a momentary opening in their own defensive shell!",
+      killNarrative: 'finds a momentary opening in their own defensive shell!',
     }),
     getAntiSynergy: (off) => {
-      let offMult = 1, warning;
-      if (["Lunge", "Bash", "Slash"].includes(off || "")) {
-        offMult = off === "Slash" ? 0.5 : 0.4;
+      let offMult = 1,
+        warning;
+      if (['Lunge', 'Bash', 'Slash'].includes(off || '')) {
+        offMult = off === 'Slash' ? 0.5 : 0.4;
         warning = `Total Parry fighters are not built for ${off?.toLowerCase()}`;
       }
       return { offMult, defMult: 1, warning };
-    }
+    },
   },
 
   [FightingStyle.WallOfSteel]: {
@@ -376,9 +486,9 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       decBonus: 0,
       extendedKillWindow: false,
       killWindowHpMult: 0.28,
-      killNarrative: "shifts their weight and drives through the defense!",
+      killNarrative: 'shifts their weight and drives through the defense!',
     }),
-    getAntiSynergy: () => ({ offMult: 1, defMult: 1 })
+    getAntiSynergy: () => ({ offMult: 1, defMult: 1 }),
   },
 };
 
@@ -387,7 +497,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
 export function getTempoBonus(style: FightingStyle, phase: Phase): number {
   const t = STYLES[style]?.tempo;
   if (!t) return 0;
-  return phase === "OPENING" ? t.opening : phase === "MID" ? t.mid : t.late;
+  return phase === 'OPENING' ? t.opening : phase === 'MID' ? t.mid : t.late;
 }
 
 export function getEnduranceMult(style: FightingStyle): number {
@@ -404,22 +514,23 @@ export function getStylePassive(
   return strategy.getPassive(context, m);
 }
 
-export function getKillMechanic(
-  attackerStyle: FightingStyle,
-  context: KillContext
-): KillMechanic {
+export function getKillMechanic(attackerStyle: FightingStyle, context: KillContext): KillMechanic {
   const strategy = STYLES[attackerStyle];
-  if (!strategy) return {
-    killBonus: 0, decBonus: 0, extendedKillWindow: false, killWindowHpMult: 0.3,
-    killNarrative: "strikes home!",
-  };
+  if (!strategy)
+    return {
+      killBonus: 0,
+      decBonus: 0,
+      extendedKillWindow: false,
+      killWindowHpMult: 0.3,
+      killNarrative: 'strikes home!',
+    };
   return strategy.getKillMechanic(context);
 }
 
 export function getStyleAntiSynergy(
   style: FightingStyle,
   offTactic?: string,
-  defTactic?: string,
+  defTactic?: string
 ): { offMult: number; defMult: number; warning?: string } {
   const strategy = STYLES[style];
   if (!strategy) return { offMult: 1.0, defMult: 1.0 };

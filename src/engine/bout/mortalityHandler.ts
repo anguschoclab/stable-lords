@@ -1,84 +1,111 @@
-import type { GameState, RivalStableData, NewsletterItem } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { FightOutcome, FightSummary } from "@/types/combat.types";
-import { generateFightNarrative } from "@/engine/gazetteNarrative";
-import { engineEventBus } from "@/engine/core/EventBus";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { StateImpact } from "@/engine/impacts";
+import type { GameState, RivalStableData, NewsletterItem } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import type { FightOutcome, FightSummary } from '@/types/combat.types';
+import { generateFightNarrative } from '@/engine/gazetteNarrative';
+import { engineEventBus } from '@/engine/core/EventBus';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { StateImpact } from '@/engine/impacts';
 
 export function handleDeath(
-  s: GameState, 
-  wA: Warrior, 
-  wD: Warrior, 
-  outcome: FightOutcome, 
-  week: number, 
-  tags: string[], 
+  s: GameState,
+  wA: Warrior,
+  wD: Warrior,
+  outcome: FightOutcome,
+  week: number,
+  tags: string[],
   rivalStableId?: string,
   rng: IRNGService = new SeededRNGService(week * 9973 + 123)
 ) {
-  if (outcome.by !== "Kill") return { impact: {}, death: false, playerDeath: false, deathNames: [] };
-  
-  const victim = outcome.winner === "A" ? wD : wA;
-  const isPlayerVictim = (outcome.winner === "A" && !!rivalStableId) ? false : (outcome.winner !== "A");
+  if (outcome.by !== 'Kill')
+    return { impact: {}, death: false, playerDeath: false, deathNames: [] };
+
+  const victim = outcome.winner === 'A' ? wD : wA;
+  const isPlayerVictim = outcome.winner === 'A' && !!rivalStableId ? false : outcome.winner !== 'A';
 
   const boutId = rng.uuid();
-  const narrative = generateFightNarrative({ 
-    id: boutId, week, a: wA.name, d: wD.name, 
-    warriorIdA: wA.id, warriorIdD: wD.id,
-    winner: outcome.winner, by: outcome.by, 
-    styleA: wA.style, styleD: wD.style, transcript: [], title: `${wA.name} vs ${wD.name}`, phase: "resolution",
-    createdAt: "2026-01-01T00:00:00Z"
-  } as FightSummary, s.crowdMood);
-  
-  const event = { boutId, killerId: outcome.winner === "A" ? wA.id : wD.id, deathSummary: narrative, memorialTags: tags };
+  const narrative = generateFightNarrative(
+    {
+      id: boutId,
+      week,
+      a: wA.name,
+      d: wD.name,
+      warriorIdA: wA.id,
+      warriorIdD: wD.id,
+      winner: outcome.winner,
+      by: outcome.by,
+      styleA: wA.style,
+      styleD: wD.style,
+      transcript: [],
+      title: `${wA.name} vs ${wD.name}`,
+      phase: 'resolution',
+      createdAt: '2026-01-01T00:00:00Z',
+    } as FightSummary,
+    s.crowdMood
+  );
+
+  const event = {
+    boutId,
+    killerId: outcome.winner === 'A' ? wA.id : wD.id,
+    deathSummary: narrative,
+    memorialTags: tags,
+  };
 
   // Derive the canonical DeathCauseBucket. Precedence:
   //   RIVALRY_FINISH (if the two stables were rivals at the time of the kill)
   //   > whatever the combat resolver stamped (EXECUTION / CRITICAL_CHAIN / ARMOR_FAILURE / FATIGUE_COLLAPSE)
   //   > FATAL_DAMAGE as the catch-all.
   const stableIds = [wA.stableId, wD.stableId].filter((x): x is string => !!x);
-  const isRivalryKill = stableIds.length === 2 && (s.rivalries ?? []).some(r =>
-    (r.stableIdA === stableIds[0] && r.stableIdB === stableIds[1]) ||
-    (r.stableIdA === stableIds[1] && r.stableIdB === stableIds[0])
-  );
+  const isRivalryKill =
+    stableIds.length === 2 &&
+    (s.rivalries ?? []).some(
+      (r) =>
+        (r.stableIdA === stableIds[0] && r.stableIdB === stableIds[1]) ||
+        (r.stableIdA === stableIds[1] && r.stableIdB === stableIds[0])
+    );
   const stampedCause = outcome.post?.causeBucket;
-  const causeBucket: string = isRivalryKill ? "RIVALRY_FINISH" : (stampedCause ?? "FATAL_DAMAGE");
+  const causeBucket: string = isRivalryKill ? 'RIVALRY_FINISH' : (stampedCause ?? 'FATAL_DAMAGE');
 
   // Pure State Transformation for Death
   const graveyardEntry: Warrior = {
     ...victim,
-    status: "Dead",
+    status: 'Dead',
     deathWeek: week,
     isDead: true,
-    killedBy: outcome.winner === "A" ? wA.name : wD.name,
+    killedBy: outcome.winner === 'A' ? wA.name : wD.name,
     causeOfDeath: causeBucket,
     dateOfDeath: `Week ${week}, Season ${s.season}`,
-    deathEvent: { ...event, causeBucket } as typeof event & { causeBucket: string }
+    deathEvent: { ...event, causeBucket } as typeof event & { causeBucket: string },
   };
 
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
   const newsletterItems: NewsletterItem[] = [];
-  
+
   // Remove victim from roster
-  if (s.roster.some(w => w.id === victim.id)) {
-    rosterUpdates.set(victim.id, { status: "Dead" });
-  }
-  
-  if (isPlayerVictim) {
-    newsletterItems.push({ id: rng.uuid(), week, title: "Fame Gained", items: ["Your stable gained 5 fame from this death."] });
+  if (s.roster.some((w) => w.id === victim.id)) {
+    rosterUpdates.set(victim.id, { status: 'Dead' });
   }
 
-  newsletterItems.push({ id: rng.uuid(), week, title: "Arena Obituary", items: [narrative] });
-  
+  if (isPlayerVictim) {
+    newsletterItems.push({
+      id: rng.uuid(),
+      week,
+      title: 'Fame Gained',
+      items: ['Your stable gained 5 fame from this death.'],
+    });
+  }
+
+  newsletterItems.push({ id: rng.uuid(), week, title: 'Arena Obituary', items: [narrative] });
+
   // Decoupled notification
-  engineEventBus.emit({ 
-    type: 'WARRIOR_DEATH', 
-    payload: { warriorId: victim.id, name: victim.name } 
+  engineEventBus.emit({
+    type: 'WARRIOR_DEATH',
+    payload: { warriorId: victim.id, name: victim.name },
   });
 
-  if (rivalStableId && outcome.winner === "A") { // Player killed a rival
+  if (rivalStableId && outcome.winner === 'A') {
+    // Player killed a rival
     const rival = (s.rivals || []).find((r: RivalStableData) => r.owner.id === rivalStableId);
     if (rival) {
       const updatedRoster = rival.roster.filter((w: Warrior) => w.id !== wD.id);
@@ -92,7 +119,7 @@ export function handleDeath(
     rosterUpdates,
     rivalsUpdates,
     newsletterItems,
-    fameDelta: isPlayerVictim ? 5 : 0
+    fameDelta: isPlayerVictim ? 5 : 0,
   };
 
   return { impact, death: true, playerDeath: isPlayerVictim, deathNames: [victim.name] };

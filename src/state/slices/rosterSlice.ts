@@ -1,7 +1,22 @@
-import { StateCreator } from "zustand";
-import { GameState, Warrior, PoolWarrior, DeathEvent, InsightToken, Trainer, TrainingAssignment, SeasonalGrowth, RestState } from "@/types/state.types";
-import type { GameStore } from "@/state/useGameStore";
-import { type WarriorId, type StableId, type InsightId, type ShieldSize } from "@/types/shared.types";
+import { StateCreator } from 'zustand';
+import {
+  GameState,
+  Warrior,
+  PoolWarrior,
+  DeathEvent,
+  InsightToken,
+  Trainer,
+  TrainingAssignment,
+  SeasonalGrowth,
+  RestState,
+} from '@/types/state.types';
+import type { GameStore } from '@/state/useGameStore';
+import {
+  type WarriorId,
+  type StableId,
+  type InsightId,
+  type ShieldSize,
+} from '@/types/shared.types';
 
 export interface RosterSlice {
   roster: Warrior[];
@@ -18,10 +33,18 @@ export interface RosterSlice {
   unacknowledgedDeaths: WarriorId[];
   setRoster: (roster: Warrior[]) => void;
   addWarrior: (warrior: Warrior) => void;
-  killWarrior: (warriorId: WarriorId, killedBy: string, cause: string, deathEvent?: DeathEvent) => void;
+  killWarrior: (
+    warriorId: WarriorId,
+    killedBy: string,
+    cause: string,
+    deathEvent?: DeathEvent
+  ) => void;
   retireWarrior: (warriorId: WarriorId) => void;
   consumeInsightToken: (tokenId: InsightId, warriorId: WarriorId) => void;
-  updateWarriorEquipment: (warriorId: WarriorId, equipment: { weapon: string; armor: string; shield: string; helm: string }) => void;
+  updateWarriorEquipment: (
+    warriorId: WarriorId,
+    equipment: { weapon: string; armor: string; shield: string; helm: string }
+  ) => void;
   renameWarrior: (warriorId: WarriorId, newName: string) => void;
   acknowledgeDeath: (warriorId: WarriorId) => void;
 }
@@ -51,7 +74,7 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
 
       const dead: Warrior = {
         ...victim,
-        status: "Dead",
+        status: 'Dead',
         deathWeek: state.week,
         deathCause: cause,
         killedBy,
@@ -76,7 +99,7 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
 
       const ret: Warrior = {
         ...warrior,
-        status: "Retired",
+        status: 'Retired',
         retiredWeek: state.week,
       };
 
@@ -97,25 +120,29 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
 
         const draft = { ...w };
         if (!draft.favorites) {
-           draft.favorites = {
-             weaponId: "gladius",
-             rhythm: { oe: 0.5, al: 0.5 },
-             discovered: { weapon: false, rhythm: false, weaponHints: 0, rhythmHints: 0 }
-           };
+          draft.favorites = {
+            weaponId: 'gladius',
+            rhythm: { oe: 0.5, al: 0.5 },
+            discovered: { weapon: false, rhythm: false, weaponHints: 0, rhythmHints: 0 },
+          };
         }
 
-        if (token.type === "Weapon") {
+        if (token.type === 'Weapon') {
           draft.favorites.discovered.weapon = true;
-        } else if (token.type === "Rhythm") {
+        } else if (token.type === 'Rhythm') {
           draft.favorites.discovered.rhythm = true;
-        } else if (token.type === "Style") {
-          if (draft.baseSkills) draft.baseSkills = { ...draft.baseSkills, ATT: draft.baseSkills.ATT + 1 };
-        } else if (token.type === "Attribute") {
-          const primaries = ["ST", "WT", "SP", "DF"] as const;
+        } else if (token.type === 'Style') {
+          if (draft.baseSkills)
+            draft.baseSkills = { ...draft.baseSkills, ATT: draft.baseSkills.ATT + 1 };
+        } else if (token.type === 'Attribute') {
+          const primaries = ['ST', 'WT', 'SP', 'DF'] as const;
           const attrKey = primaries[Math.floor(Math.random() * primaries.length)]!;
-          draft.attributes = { ...draft.attributes, [attrKey]: (draft.attributes[attrKey] || 10) + 1 };
-        } else if (token.type === "Tactic") {
-          draft.flair = [...(draft.flair || []), "Tactical Insight"];
+          draft.attributes = {
+            ...draft.attributes,
+            [attrKey]: (draft.attributes[attrKey] || 10) + 1,
+          };
+        } else if (token.type === 'Tactic') {
+          draft.flair = [...(draft.flair || []), 'Tactical Insight'];
         }
 
         return draft;
@@ -140,7 +167,7 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
             armor: equipment.armor,
             shield: equipment.shield as ShieldSize,
             helm: equipment.helm,
-          }
+          },
         };
       });
 
@@ -150,7 +177,8 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
 
   renameWarrior: (warriorId, newName) => {
     set((state: GameStore) => {
-      const updateList = (list: Warrior[]) => list.map(w => w.id === warriorId ? { ...w, name: newName } : w);
+      const updateList = (list: Warrior[]) =>
+        list.map((w) => (w.id === warriorId ? { ...w, name: newName } : w));
 
       return {
         roster: updateList(state.roster),
@@ -162,7 +190,7 @@ export const createRosterSlice: StateCreator<GameStore, [], [], RosterSlice> = (
 
   acknowledgeDeath: (warriorId) => {
     set((state: GameStore) => ({
-      unacknowledgedDeaths: (state.unacknowledgedDeaths || []).filter(id => id !== warriorId)
+      unacknowledgedDeaths: (state.unacknowledgedDeaths || []).filter((id) => id !== warriorId),
     }));
   },
 });

@@ -1,27 +1,32 @@
-import { GameState, Warrior, BoutOffer } from "@/types/state.types";
-import { StateImpact } from "@/engine/impacts";
-import { getMoodModifiers } from "@/engine/crowdMood";
-import { FightOutcome } from "@/types/combat.types";
-import { fameFromTags } from "@/engine/fame";
+import { GameState, Warrior, BoutOffer } from '@/types/state.types';
+import { StateImpact } from '@/engine/impacts';
+import { getMoodModifiers } from '@/engine/crowdMood';
+import { FightOutcome } from '@/types/combat.types';
+import { fameFromTags } from '@/engine/fame';
 
 export function validateBoutCombatants(currentW?: Warrior, currentO?: Warrior): boolean {
-  return !!currentW && currentW.status === "Active" && !!currentO;
+  return !!currentW && currentW.status === 'Active' && !!currentO;
 }
 
 export function getWinnerId(outcome: FightOutcome, wId: string, oId: string): string | null {
-  if (outcome.winner === "A") return wId;
-  if (outcome.winner === "D") return oId;
+  if (outcome.winner === 'A') return wId;
+  if (outcome.winner === 'D') return oId;
   return null;
 }
 
-export function calculateBoutFame(outcome: FightOutcome, tags: string[], moodMods: ReturnType<typeof getMoodModifiers>, isRivalry: boolean) {
-  const rawFameA = fameFromTags(outcome.winner === "A" ? tags : []);
-  const rawFameD = fameFromTags(outcome.winner === "D" ? tags : []);
+export function calculateBoutFame(
+  outcome: FightOutcome,
+  tags: string[],
+  moodMods: ReturnType<typeof getMoodModifiers>,
+  isRivalry: boolean
+) {
+  const rawFameA = fameFromTags(outcome.winner === 'A' ? tags : []);
+  const rawFameD = fameFromTags(outcome.winner === 'D' ? tags : []);
   return {
     fameA: Math.round(rawFameA.fame * moodMods.fameMultiplier * (isRivalry ? 2 : 1)),
     popA: Math.round(rawFameA.pop * moodMods.popMultiplier),
     fameD: Math.round(rawFameD.fame * moodMods.fameMultiplier),
-    popD: Math.round(rawFameD.pop * moodMods.popMultiplier)
+    popD: Math.round(rawFameD.pop * moodMods.popMultiplier),
   };
 }
 
@@ -73,8 +78,11 @@ export function processContractPayouts(
       history: {
         ...updatedPromoters[contract.promoterId].history,
         totalPursePaid: (updatedPromoters[contract.promoterId].history.totalPursePaid || 0) + purse,
-        notableBouts: [...(updatedPromoters[contract.promoterId].history.notableBouts || []), `bout_${state.week}_${currentWId}_vs_${currentOId}`]
-      }
+        notableBouts: [
+          ...(updatedPromoters[contract.promoterId].history.notableBouts || []),
+          `bout_${state.week}_${currentWId}_vs_${currentOId}`,
+        ],
+      },
     };
   }
   impacts.push({ promoters: updatedPromoters });

@@ -7,9 +7,9 @@
  * MatchScoringService) can land behind the `featureFlags.weeklyMatchmaker`
  * flag without touching every call site.
  */
-import type { GameState, Warrior, RivalStableData } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { getFeatureFlags } from "@/engine/featureFlags";
+import type { GameState, Warrior, RivalStableData } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { getFeatureFlags } from '@/engine/featureFlags';
 
 export interface MatchmakingPairing {
   a: Warrior;
@@ -32,8 +32,8 @@ export interface MatchmakingPlan {
  * drop-in substitute once the feature flag flips on.
  */
 function isEligible(w: Warrior): boolean {
-  if (w.isDead || w.status === "Dead") return false;
-  if (w.status === "Injured" || w.status === "Recovering") return false;
+  if (w.isDead || w.status === 'Dead') return false;
+  if (w.status === 'Injured' || w.status === 'Recovering') return false;
   return true;
 }
 
@@ -46,7 +46,7 @@ export function planWeeklyMatches(state: GameState, _rng: IRNGService): Matchmak
   const reasons: string[] = [];
   const flags = getFeatureFlags();
   if (!flags.weeklyMatchmaker) {
-    return { pairings: [], viable: false, reasons: ["feature_flag_off"] };
+    return { pairings: [], viable: false, reasons: ['feature_flag_off'] };
   }
 
   const playerEligible = state.roster.filter(isEligible);
@@ -56,7 +56,7 @@ export function planWeeklyMatches(state: GameState, _rng: IRNGService): Matchmak
   }
 
   if (playerEligible.length === 0 || rivalEligible.length === 0) {
-    reasons.push("min_viable_arena_failed");
+    reasons.push('min_viable_arena_failed');
     return { pairings: [], viable: false, reasons };
   }
 
@@ -64,9 +64,12 @@ export function planWeeklyMatches(state: GameState, _rng: IRNGService): Matchmak
   // for detailed booking flow; this is just the "who fights whom this week" rubric.
   const pairings: MatchmakingPairing[] = [];
   const rivalries = state.rivalries ?? [];
-  const isStableRivalry = (a?: string, b?: string) => !!a && !!b && rivalries.some(
-    r => (r.stableIdA === a && r.stableIdB === b) || (r.stableIdB === a && r.stableIdA === b)
-  );
+  const isStableRivalry = (a?: string, b?: string) =>
+    !!a &&
+    !!b &&
+    rivalries.some(
+      (r) => (r.stableIdA === a && r.stableIdB === b) || (r.stableIdB === a && r.stableIdA === b)
+    );
   for (const pw of playerEligible) {
     let best: { rw: Warrior; stable: RivalStableData; score: number } | null = null;
     for (const { warrior: rw, stable } of rivalEligible) {

@@ -1,13 +1,12 @@
-import React from "react";
+import React from 'react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-} from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Warrior, ATTRIBUTE_LABELS, ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from "@/types/game";
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { Warrior, ATTRIBUTE_LABELS, ATTRIBUTE_KEYS, ATTRIBUTE_MAX } from '@/types/game';
 
 interface WarriorRadarChartProps {
   warrior: Warrior;
@@ -15,16 +14,18 @@ interface WarriorRadarChartProps {
 
 const chartConfig: ChartConfig = {
   current: {
-    label: "Current Stats",
-    color: "hsl(var(--primary))",
+    label: 'Current Stats',
+    color: 'hsl(var(--primary))',
   },
   potential: {
-    label: "Genetic Potential",
-    color: "hsl(var(--muted-foreground))",
+    label: 'Genetic Potential',
+    color: 'hsl(var(--muted-foreground))',
   },
 };
 
-export const WarriorRadarChart = React.memo(function WarriorRadarChart({ warrior }: WarriorRadarChartProps) {
+export const WarriorRadarChart = React.memo(function WarriorRadarChart({
+  warrior,
+}: WarriorRadarChartProps) {
   const data = ATTRIBUTE_KEYS.map((key) => ({
     attribute: ATTRIBUTE_LABELS[key],
     current: warrior.attributes[key],
@@ -39,14 +40,9 @@ export const WarriorRadarChart = React.memo(function WarriorRadarChart({ warrior
           <PolarGrid className="fill-muted/20" />
           <PolarAngleAxis
             dataKey="attribute"
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontWeight: 500 }}
+            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 500 }}
           />
-          <PolarRadiusAxis
-            angle={90}
-            domain={[0, ATTRIBUTE_MAX]}
-            tick={false}
-            axisLine={false}
-          />
+          <PolarRadiusAxis angle={90} domain={[0, ATTRIBUTE_MAX]} tick={false} axisLine={false} />
           <Radar
             name="Potential"
             dataKey="potential"

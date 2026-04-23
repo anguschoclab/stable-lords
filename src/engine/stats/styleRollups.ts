@@ -2,9 +2,9 @@
  * Style rollup tracking — records win/loss/kill rates per style over time.
  * Consolidated: also serves as the style meter (formerly src/metrics/StyleMeter.ts).
  */
-const KEY_WEEK = "sl.styleRollups.week";
-const KEY_ROLLING = "sl.metrics.style.week10";
-const KEY_TOUR = "sl.metrics.style.tournaments";
+const KEY_WEEK = 'sl.styleRollups.week';
+const KEY_ROLLING = 'sl.metrics.style.week10';
+const KEY_TOUR = 'sl.metrics.style.tournaments';
 
 type Bucket = { w: number; l: number; k: number; pct: number; fights: number };
 type RollingBucket = { W: number; L: number; K: number; fights: number };
@@ -107,7 +107,10 @@ function saveWeek(week: number, m: Record<string, Bucket>) {
           // Retry saving
           localStorage.setItem(`${KEY_WEEK}_${week}`, JSON.stringify(m));
         } catch (retryError) {
-          console.error(`Failed to recover from localStorage quota error for week ${week}`, retryError);
+          console.error(
+            `Failed to recover from localStorage quota error for week ${week}`,
+            retryError
+          );
         }
       } else {
         console.error(`Failed to save week ${week} style rollups`, error);
@@ -194,7 +197,7 @@ export const StyleRollups = {
     week: number;
     styleA: string;
     styleD: string;
-    winner: "A" | "D" | null;
+    winner: 'A' | 'D' | null;
     by: string | null;
     isTournament?: string | null;
   }) {
@@ -204,16 +207,16 @@ export const StyleRollups = {
     const ed = ensure(opts.styleD, wkMap);
     ea.fights++;
     ed.fights++;
-    if (opts.winner === "A") {
+    if (opts.winner === 'A') {
       ea.w++;
       ed.l++;
-    } else if (opts.winner === "D") {
+    } else if (opts.winner === 'D') {
       ed.w++;
       ea.l++;
     }
-    if (opts.by === "Kill") {
-      if (opts.winner === "A") ea.k++;
-      else if (opts.winner === "D") ed.k++;
+    if (opts.by === 'Kill') {
+      if (opts.winner === 'A') ea.k++;
+      else if (opts.winner === 'D') ed.k++;
     }
     ea.pct = ea.fights ? ea.w / ea.fights : 0;
     ed.pct = ed.fights ? ed.w / ed.fights : 0;
@@ -221,15 +224,15 @@ export const StyleRollups = {
 
     // Rolling window (last 10)
     const rolling = loadRolling();
-    const kill = opts.by === "Kill";
+    const kill = opts.by === 'Kill';
     const addRolling = (s: string, win: boolean, killed: boolean) => {
       const list = rolling[s] || [];
       rolling[s] = list;
       list.push({ W: win ? 1 : 0, L: win ? 0 : 1, K: killed ? 1 : 0, fights: 1 });
       while (list.length > 10) list.shift();
     };
-    addRolling(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
-    addRolling(opts.styleD, opts.winner === "D", kill && opts.winner === "D");
+    addRolling(opts.styleA, opts.winner === 'A', kill && opts.winner === 'A');
+    addRolling(opts.styleD, opts.winner === 'D', kill && opts.winner === 'D');
     saveRolling(rolling);
 
     // Tournament tracking
@@ -247,8 +250,8 @@ export const StyleRollups = {
         b.K += killed ? 1 : 0;
         b.fights += 1;
       };
-      bump(opts.styleA, opts.winner === "A", kill && opts.winner === "A");
-      bump(opts.styleD, opts.winner === "D", kill && opts.winner === "D");
+      bump(opts.styleA, opts.winner === 'A', kill && opts.winner === 'A');
+      bump(opts.styleD, opts.winner === 'D', kill && opts.winner === 'D');
       saveTour(tour);
     }
   },
@@ -265,7 +268,12 @@ export const StyleRollups = {
       const styleData = rolling[s];
       if (!styleData) return;
       const agg = styleData.reduce(
-        (a: RollingBucket, b: RollingBucket) => ({ W: a.W + b.W, L: a.L + b.L, K: a.K + b.K, fights: a.fights + b.fights }),
+        (a: RollingBucket, b: RollingBucket) => ({
+          W: a.W + b.W,
+          L: a.L + b.L,
+          K: a.K + b.K,
+          fights: a.fights + b.fights,
+        }),
         { W: 0, L: 0, K: 0, fights: 0 }
       );
       rows.push({

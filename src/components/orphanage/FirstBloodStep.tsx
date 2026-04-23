@@ -1,14 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { Swords, ArrowLeft, ArrowRight, Skull } from "lucide-react";
-import type { Warrior, FightSummary } from "@/types/game";
-import { STYLE_DISPLAY_NAMES, FightingStyle } from "@/types/game";
+import { Button } from '@/components/ui/button';
+import { Swords, ArrowLeft, ArrowRight, Skull } from 'lucide-react';
+import type { Warrior, FightSummary } from '@/types/game';
+import { STYLE_DISPLAY_NAMES, FightingStyle } from '@/types/game';
 
 interface FirstBloodStepProps {
   boutResult: {
     a: Warrior;
     d: Warrior;
     outcome: {
-      winner: "A" | "D" | null;
+      winner: 'A' | 'D' | null;
       by: string | null;
       post?: { tags?: string[] };
     };
@@ -18,33 +18,27 @@ interface FirstBloodStepProps {
   onNext: () => void;
 }
 
-export default function FirstBloodStep({
-  boutResult,
-  onBack,
-  onNext,
-}: FirstBloodStepProps) {
+export default function FirstBloodStep({ boutResult, onBack, onNext }: FirstBloodStepProps) {
   return (
     <div className="space-y-4">
       <div
         className="p-7 space-y-6"
         style={{
-          background: "linear-gradient(145deg, #150F08 0%, #110C07 100%)",
-          border: "1px solid rgba(135,34,40,0.4)",
-          borderTopColor: "rgba(200,80,88,0.3)",
+          background: 'linear-gradient(145deg, #150F08 0%, #110C07 100%)',
+          border: '1px solid rgba(135,34,40,0.4)',
+          borderTopColor: 'rgba(200,80,88,0.3)',
         }}
       >
         <div
           className="absolute top-0 left-6 right-6 h-0.5 pointer-events-none"
           style={{
             background:
-              "linear-gradient(90deg, transparent, hsl(var(--primary)/0.7) 30%, hsl(var(--primary)) 50%, hsl(var(--primary)/0.7) 70%, transparent)",
+              'linear-gradient(90deg, transparent, hsl(var(--primary)/0.7) 30%, hsl(var(--primary)) 50%, hsl(var(--primary)/0.7) 70%, transparent)',
           }}
         />
 
         <div>
-          <h2 className="font-display text-xl font-bold text-foreground">
-            First Blood
-          </h2>
+          <h2 className="font-display text-xl font-bold text-foreground">First Blood</h2>
           <p className="text-xs text-muted-foreground/50 mt-0.5">
             The arena witnessed the first trial
           </p>
@@ -81,13 +75,9 @@ export default function FirstBloodStep({
           className="p-4 text-center"
           style={{
             background:
-              boutResult.outcome.by === "Kill"
-                ? "rgba(135,34,40,0.12)"
-                : "rgba(201,151,42,0.06)",
+              boutResult.outcome.by === 'Kill' ? 'rgba(135,34,40,0.12)' : 'rgba(201,151,42,0.06)',
             border: `1px solid ${
-              boutResult.outcome.by === "Kill"
-                ? "rgba(135,34,40,0.4)"
-                : "rgba(201,151,42,0.25)"
+              boutResult.outcome.by === 'Kill' ? 'rgba(135,34,40,0.4)' : 'rgba(201,151,42,0.25)'
             }`,
           }}
         >
@@ -97,23 +87,21 @@ export default function FirstBloodStep({
                 className="font-display font-black text-lg uppercase tracking-wide"
                 style={{
                   color:
-                    boutResult.outcome.by === "Kill"
-                      ? "hsl(var(--arena-blood))"
-                      : "hsl(var(--arena-gold))",
+                    boutResult.outcome.by === 'Kill'
+                      ? 'hsl(var(--arena-blood))'
+                      : 'hsl(var(--arena-gold))',
                   textShadow:
-                    boutResult.outcome.by === "Kill"
-                      ? "0 0 12px hsl(var(--arena-blood)/0.5)"
-                      : "0 0 12px hsl(var(--arena-gold)/0.4)",
+                    boutResult.outcome.by === 'Kill'
+                      ? '0 0 12px hsl(var(--arena-blood)/0.5)'
+                      : '0 0 12px hsl(var(--arena-gold)/0.4)',
                 }}
               >
-                {boutResult.outcome.winner === "A"
-                  ? boutResult.a.name
-                  : boutResult.d.name}{" "}
+                {boutResult.outcome.winner === 'A' ? boutResult.a.name : boutResult.d.name}{' '}
                 victorious
               </div>
               <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mt-1">
-                by {boutResult.outcome.by ?? "decision"}
-                {boutResult.outcome.by === "Kill" && (
+                by {boutResult.outcome.by ?? 'decision'}
+                {boutResult.outcome.by === 'Kill' && (
                   <Skull className="h-3 w-3 inline ml-1.5 text-destructive/70" />
                 )}
               </div>

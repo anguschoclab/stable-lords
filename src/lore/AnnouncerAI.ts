@@ -3,10 +3,10 @@
  * Consolidated and Unified with the Bard Archive (narrativeContent.json).
  */
 
-import { getFromArchive, interpolateTemplate } from "@/engine/narrativePBP";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import { getFromArchive, interpolateTemplate } from '@/engine/narrativePBP';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
-export type AnnounceTone = "neutral" | "hype" | "grim";
+export type AnnounceTone = 'neutral' | 'hype' | 'grim';
 
 /**
  * Generates a summary blurb for a fight.
@@ -19,25 +19,22 @@ export function blurb(opts: {
   rng: IRNGService;
 }): string {
   const { rng } = opts;
-  const tone = opts.tone || "neutral";
-  
-  const template = getFromArchive(rng, ["blurbs", tone]);
-  
+  const tone = opts.tone || 'neutral';
+
+  const template = getFromArchive(rng, ['blurbs', tone]);
+
   return interpolateTemplate(template, {
     attacker: opts.winner,
     defender: opts.loser,
-    hits: opts.by ? ` by ${opts.by.toLowerCase()}` : ""
+    hits: opts.by ? ` by ${opts.by.toLowerCase()}` : '',
   });
 }
 
 /**
  * Generates a short reactionary hype line for specific events.
  */
-export function commentatorFor(
-  tag: "KO" | "Kill" | "Flashy" | "Upset",
-  rng: IRNGService
-): string {
-  return getFromArchive(rng, ["commentary", tag]);
+export function commentatorFor(tag: 'KO' | 'Kill' | 'Flashy' | 'Upset', rng: IRNGService): string {
+  return getFromArchive(rng, ['commentary', tag]);
 }
 
 /**
@@ -49,11 +46,11 @@ export function recapLine(
   minutes: number,
   rng: IRNGService
 ): string {
-  const template = getFromArchive(rng, ["recap"]);
-  
+  const template = getFromArchive(rng, ['recap']);
+
   return interpolateTemplate(template, {
     attacker: winner,
     defender: loser,
-    hits: minutes
+    hits: minutes,
   });
 }

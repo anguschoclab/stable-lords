@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { audioManager } from "@/lib/AudioManager";
-import { MinuteEvent } from "@/types/game";
-import { classifyEvent } from "@/lib/boutUtils";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { audioManager } from '@/lib/AudioManager';
+import { MinuteEvent } from '@/types/game';
+import { classifyEvent } from '@/lib/boutUtils';
 
 export function useBoutPlayback(log: MinuteEvent[]) {
   const [visibleCount, setVisibleCount] = useState(0);
@@ -20,10 +20,10 @@ export function useBoutPlayback(log: MinuteEvent[]) {
         const event = log[c];
         if (event) {
           const type = classifyEvent(event);
-          if (type === "hit") audioManager.play("hit");
-          else if (type === "crit") audioManager.play("crit");
-          else if (type === "death") audioManager.play("death");
-          else if (type === "riposte") audioManager.play("clash");
+          if (type === 'hit') audioManager.play('hit');
+          else if (type === 'crit') audioManager.play('crit');
+          else if (type === 'death') audioManager.play('death');
+          else if (type === 'riposte') audioManager.play('clash');
         }
       }
       return next;

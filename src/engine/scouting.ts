@@ -1,6 +1,6 @@
 /**
  * Scouting System — gather intel on upcoming opponents.
- * 
+ *
  * Scouting reveals partial information about an opponent:
  * - Style (always visible)
  * - Approximate attribute text descriptions (based on scout quality)
@@ -8,12 +8,12 @@
  * - Known injuries
  * - Suspected fight plan tendencies
  */
-import type { InsightToken, InsightTokenType } from "@/types/state.types";
-import type { Warrior } from "@/types/warrior.types";
-import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from "@/types/shared.types";
-import { generateId } from "@/utils/idUtils";
+import type { InsightToken, InsightTokenType } from '@/types/state.types';
+import type { Warrior } from '@/types/warrior.types';
+import { STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from '@/types/shared.types';
+import { generateId } from '@/utils/idUtils';
 
-export type ScoutQuality = "Basic" | "Detailed" | "Expert";
+export type ScoutQuality = 'Basic' | 'Detailed' | 'Expert';
 
 export interface ScoutReport {
   id: string;
@@ -48,13 +48,13 @@ export function getScoutCost(quality: ScoutQuality): number {
 
 /** Converts a numerical stat into a qualitative text description */
 export function getAttributeDescription(value: number): string {
-  if (value <= 5) return "Pathetic";
-  if (value <= 8) return "Weak";
-  if (value <= 11) return "Average";
-  if (value <= 14) return "Good";
-  if (value <= 17) return "Great";
-  if (value <= 20) return "Exceptional";
-  return "Monstrous";
+  if (value <= 5) return 'Pathetic';
+  if (value <= 8) return 'Weak';
+  if (value <= 11) return 'Average';
+  if (value <= 14) return 'Good';
+  if (value <= 17) return 'Great';
+  if (value <= 20) return 'Exceptional';
+  return 'Monstrous';
 }
 
 /** Converts a stat range into a textual description */
@@ -66,7 +66,7 @@ export function getAttributeRangeDescription(low: number, high: number): string 
   return `${lowDesc} to ${highDesc}`;
 }
 
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 /** Generate a scout report for a warrior */
 export function generateScoutReport(
@@ -88,67 +88,71 @@ export function generateScoutReport(
   const record = `${warrior.career.wins}W-${warrior.career.losses}L`;
 
   const knownInjuries: string[] = [];
-  if (quality !== "Basic") {
+  if (quality !== 'Basic') {
     // Show injury names (not details)
     for (const inj of warrior.injuries) {
-      if (typeof inj === "string") knownInjuries.push(inj);
+      if (typeof inj === 'string') knownInjuries.push(inj);
     }
   }
 
   let suspectedOE: string | undefined;
   let suspectedAL: string | undefined;
-  if (quality === "Expert" && warrior.plan) {
-    suspectedOE = warrior.plan.OE >= 7 ? "High" : warrior.plan.OE >= 4 ? "Medium" : "Low";
-    suspectedAL = warrior.plan.AL >= 7 ? "High" : warrior.plan.AL >= 4 ? "Medium" : "Low";
+  if (quality === 'Expert' && warrior.plan) {
+    suspectedOE = warrior.plan.OE >= 7 ? 'High' : warrior.plan.OE >= 4 ? 'Medium' : 'Low';
+    suspectedAL = warrior.plan.AL >= 7 ? 'High' : warrior.plan.AL >= 4 ? 'Medium' : 'Low';
   }
 
   const styleName = STYLE_DISPLAY_NAMES[warrior.style] ?? warrior.style;
-  const notes = quality === "Basic"
-    ? `${warrior.name} fights as a ${styleName}. Limited intel available.`
-    : quality === "Detailed"
-    ? `${warrior.name} is a ${styleName} with ${record}. ${warrior.fame > 3 ? "Well-known in the arena." : "Relatively unknown."}`
-    : `${warrior.name} is an experienced ${styleName} (${record}). ${
-        warrior.career.kills > 0 ? `Known killer (${warrior.career.kills} kills).` : "No kills on record."
-      }`;
-
+  const notes =
+    quality === 'Basic'
+      ? `${warrior.name} fights as a ${styleName}. Limited intel available.`
+      : quality === 'Detailed'
+        ? `${warrior.name} is a ${styleName} with ${record}. ${warrior.fame > 3 ? 'Well-known in the arena.' : 'Relatively unknown.'}`
+        : `${warrior.name} is an experienced ${styleName} (${record}). ${
+            warrior.career.kills > 0
+              ? `Known killer (${warrior.career.kills} kills).`
+              : 'No kills on record.'
+          }`;
 
   const newInsights: InsightToken[] = [];
 
   // Basic scouting reveals Style
   newInsights.push({
     id: rng.uuid(),
-    type: "Style",
+    type: 'Style',
     warriorId: warrior.id,
     warriorName: warrior.name,
     detail: `Identified as ${styleName}`,
-    discoveredWeek: week
+    discoveredWeek: week,
   });
 
   // Detailed scouting reveals 2 random attributes
-  if (quality === "Detailed" || quality === "Expert") {
-    const attrsToReveal = [...ATTRIBUTE_KEYS].sort(() => 0.5 - rng.next()).slice(0, quality === "Expert" ? 4 : 2);
-    attrsToReveal.forEach(attr => {
+  if (quality === 'Detailed' || quality === 'Expert') {
+    const attrsToReveal = [...ATTRIBUTE_KEYS]
+      .sort(() => 0.5 - rng.next())
+      .slice(0, quality === 'Expert' ? 4 : 2);
+    attrsToReveal.forEach((attr) => {
       newInsights.push({
         id: rng.uuid(),
-        type: "Attribute",
+        type: 'Attribute',
         warriorId: warrior.id,
         warriorName: warrior.name,
         targetKey: attr,
         detail: `Discovered exact ${ATTRIBUTE_LABELS[attr] ?? attr}`,
-        discoveredWeek: week
+        discoveredWeek: week,
       });
     });
   }
 
   // Expert scouting reveals Tactics
-  if (quality === "Expert" && warrior.plan) {
+  if (quality === 'Expert' && warrior.plan) {
     newInsights.push({
       id: rng.uuid(),
-      type: "Tactic",
+      type: 'Tactic',
       warriorId: warrior.id,
       warriorName: warrior.name,
       detail: `Suspected OE: ${suspectedOE}, AL: ${suspectedAL}`,
-      discoveredWeek: week
+      discoveredWeek: week,
     });
   }
 
@@ -166,6 +170,6 @@ export function generateScoutReport(
       suspectedAL,
       notes,
     },
-    newInsights
+    newInsights,
   };
 }

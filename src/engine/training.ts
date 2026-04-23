@@ -1,18 +1,18 @@
-import type { GameState, SeasonalGrowth } from "@/types/state.types";
-import type { Warrior, InjuryData } from "@/types/warrior.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { updateEntityInList } from "@/utils/stateUtils";
-import { type StateImpact } from "./impacts";
+import type { GameState, SeasonalGrowth } from '@/types/state.types';
+import type { Warrior, InjuryData } from '@/types/warrior.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { updateEntityInList } from '@/utils/stateUtils';
+import { type StateImpact } from './impacts';
 import {
   computeGainChance,
   processRecovery,
   processAttributeTraining,
   processSkillDrillTraining,
   rollForTrainingInjury,
-  type TrainingResult
-} from "./training/trainingGains";
-import { getHealingTrainerBonus } from "./training/coachLogic";
+  type TrainingResult,
+} from './training/trainingGains';
+import { getHealingTrainerBonus } from './training/coachLogic';
 
 // ─── Exports for backward compatibility ───
 export { computeGainChance };
@@ -29,7 +29,11 @@ export interface TrainingImpact {
  */
 export function computeTrainingImpact(state: GameState, rng: IRNGService): TrainingImpact {
   if (!state.trainingAssignments || state.trainingAssignments.length === 0) {
-    return { updatedRoster: state.roster, updatedSeasonalGrowth: state.seasonalGrowth ? [...state.seasonalGrowth] : [], results: [] };
+    return {
+      updatedRoster: state.roster,
+      updatedSeasonalGrowth: state.seasonalGrowth ? [...state.seasonalGrowth] : [],
+      results: [],
+    };
   }
 
   const results: TrainingResult[] = [];
@@ -38,33 +42,42 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
   const healingBonus = getHealingTrainerBonus(state.trainers ?? []);
 
   for (const assignment of state.trainingAssignments) {
-    const warrior = currentRoster.find(w => w.id === assignment.warriorId);
+    const warrior = currentRoster.find((w) => w.id === assignment.warriorId);
     if (!warrior) continue;
 
     // ── Recovery Mode ──
-    if (assignment.type === "recovery") {
+    if (assignment.type === 'recovery') {
       const { updatedInjuries, message } = processRecovery(warrior, healingBonus);
-      currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({
+      currentRoster = updateEntityInList(currentRoster, warrior.id, (w) => ({
         ...w,
-        injuries: updatedInjuries as InjuryData[]
+        injuries: updatedInjuries as InjuryData[],
       }));
-      results.push({ type: "recovery", warriorId: warrior.id, message });
+      results.push({ type: 'recovery', warriorId: warrior.id, message });
       continue;
     }
 
     // ── Skill Drilling ──
-    if (assignment.type === "skillDrill") {
+    if (assignment.type === 'skillDrill') {
       if (!assignment.skill) continue;
-      const { updatedWarrior, result, hardCapped } = processSkillDrillTraining(warrior, assignment.skill, state, rng);
-      if (result.message !== "") results.push(result);
+      const { updatedWarrior, result, hardCapped } = processSkillDrillTraining(
+        warrior,
+        assignment.skill,
+        state,
+        rng
+      );
+      if (result.message !== '') results.push(result);
       if (updatedWarrior) {
         currentRoster = updateEntityInList(currentRoster, warrior.id, () => updatedWarrior);
       }
       if (hardCapped) continue;
       // Skill drilling still carries injury risk, though slightly lower than attribute training
-      const { injury, result: injuryResult } = rollForTrainingInjury(updatedWarrior || warrior, healingBonus + 1, rng);
+      const { injury, result: injuryResult } = rollForTrainingInjury(
+        updatedWarrior || warrior,
+        healingBonus + 1,
+        rng
+      );
       if (injury && injuryResult) {
-        currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({
+        currentRoster = updateEntityInList(currentRoster, warrior.id, (w) => ({
           ...w,
           injuries: [...w.injuries, injury] as InjuryData[],
         }));
@@ -77,9 +90,15 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
     const attr = assignment.attribute;
     if (!attr) continue;
 
-    const { updatedWarrior, updatedSeasonalGrowth, result, hardCapped } = processAttributeTraining(warrior, attr, state, seasonalGrowth, rng);
+    const { updatedWarrior, updatedSeasonalGrowth, result, hardCapped } = processAttributeTraining(
+      warrior,
+      attr,
+      state,
+      seasonalGrowth,
+      rng
+    );
 
-    if (result.message !== "") {
+    if (result.message !== '') {
       results.push(result);
     }
 
@@ -92,16 +111,20 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
     }
 
     // Skip injury rolls if training was blocked/capped
-    if (hardCapped || (result.type === "blocked" && result.message !== "")) {
+    if (hardCapped || (result.type === 'blocked' && result.message !== '')) {
       continue;
     }
 
     // ── Training Injury Roll ──
-    const { injury, result: injuryResult } = rollForTrainingInjury(updatedWarrior || warrior, healingBonus, rng);
+    const { injury, result: injuryResult } = rollForTrainingInjury(
+      updatedWarrior || warrior,
+      healingBonus,
+      rng
+    );
     if (injury && injuryResult) {
-      currentRoster = updateEntityInList(currentRoster, warrior.id, w => ({ 
-        ...w, 
-        injuries: [...w.injuries, injury] as InjuryData[] 
+      currentRoster = updateEntityInList(currentRoster, warrior.id, (w) => ({
+        ...w,
+        injuries: [...w.injuries, injury] as InjuryData[],
       }));
       results.push(injuryResult);
     }
@@ -120,9 +143,9 @@ export function trainingImpactToStateImpact(
 ): { impact: StateImpact; seasonalGrowth: SeasonalGrowth[]; results: TrainingResult[] } {
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const seasonalGrowth = impact.updatedSeasonalGrowth ? [...impact.updatedSeasonalGrowth] : [];
-  
-  impact.updatedRoster.forEach(w => {
-    const original = state.roster.find(r => r.id === w.id);
+
+  impact.updatedRoster.forEach((w) => {
+    const original = state.roster.find((r) => r.id === w.id);
     if (original && original !== w) {
       // 🛠️ 1.0 Hardening: Return ONLY changed fields to avoid overwriting Aging/Health passes
       const delta: Partial<Warrior> = {
@@ -131,27 +154,30 @@ export function trainingImpactToStateImpact(
         fatigue: w.fatigue ?? 0,
         injuries: w.injuries,
       };
-      
+
       rosterUpdates.set(w.id, delta);
     }
   });
 
-  const newsItems = impact.results
-    .filter(r => r.type !== "blocked")
-    .map(r => r.message);
+  const newsItems = impact.results.filter((r) => r.type !== 'blocked').map((r) => r.message);
 
   return {
     impact: {
       rosterUpdates,
-      newsletterItems: newsItems.length > 0 ? [{
-        id: rng.uuid("newsletter"), // 🆔 Schema compliance: add ID
-        week: state.week,
-        title: "Training Report",
-        items: newsItems
-      }] : [],
-      trainingAssignments: []
+      newsletterItems:
+        newsItems.length > 0
+          ? [
+              {
+                id: rng.uuid('newsletter'), // 🆔 Schema compliance: add ID
+                week: state.week,
+                title: 'Training Report',
+                items: newsItems,
+              },
+            ]
+          : [],
+      trainingAssignments: [],
     },
     seasonalGrowth,
-    results: impact.results
+    results: impact.results,
   };
 }

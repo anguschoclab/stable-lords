@@ -2,47 +2,58 @@
  * Stable Lords — Warrior Detail
  * Deep dive into a single warrior's stats, history, and equipment.
  */
-import { useCallback, useMemo, useState } from "react";
-import { useParams, useNavigate, Link } from "@tanstack/react-router";
-import { obfuscateWarrior } from "@/lib/obfuscation";
-import { useGameStore, type GameStore } from "@/state/useGameStore";
-import { type FightPlan, type GameState } from "@/types/game";
-import type { Warrior } from "@/types/state.types";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Armchair, Target, ScrollText, User } from "lucide-react";
-import { defaultPlanForWarrior } from "@/engine/simulate";
-import { computeStreaks } from "@/engine/gazetteNarrative";
-import { DEFAULT_LOADOUT, type EquipmentLoadout } from "@/data/equipment";
-import { toast } from "sonner";
-import SubNav, { type SubNavTab } from "@/components/SubNav";
+import { useCallback, useMemo, useState } from 'react';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
+import { obfuscateWarrior } from '@/lib/obfuscation';
+import { useGameStore, type GameStore } from '@/state/useGameStore';
+import { type FightPlan, type GameState } from '@/types/game';
+import type { Warrior } from '@/types/state.types';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Armchair, Target, ScrollText, User } from 'lucide-react';
+import { defaultPlanForWarrior } from '@/engine/simulate';
+import { computeStreaks } from '@/engine/gazetteNarrative';
+import { DEFAULT_LOADOUT, type EquipmentLoadout } from '@/data/equipment';
+import { toast } from 'sonner';
+import SubNav, { type SubNavTab } from '@/components/SubNav';
 
 // Modularized Warrior Components
-import { WarriorHeroHeader } from "@/components/warrior/WarriorHeroHeader";
-import { BiometricsTab } from "@/components/warrior/BiometricsTab";
-import { MissionControlTab } from "@/components/warrior/MissionControlTab";
-import { ChronicleTab } from "@/components/warrior/ChronicleTab";
+import { WarriorHeroHeader } from '@/components/warrior/WarriorHeroHeader';
+import { BiometricsTab } from '@/components/warrior/BiometricsTab';
+import { MissionControlTab } from '@/components/warrior/MissionControlTab';
+import { ChronicleTab } from '@/components/warrior/ChronicleTab';
 
 const TABS: SubNavTab[] = [
-  { id: "biometrics", label: "BIOMETRICS", icon: <User className="h-4 w-4" /> },
-  { id: "mission", label: "MISSION CONTROL", icon: <Target className="h-4 w-4" /> },
-  { id: "chronicle", label: "CHRONICLE", icon: <ScrollText className="h-4 w-4" /> },
+  { id: 'biometrics', label: 'BIOMETRICS', icon: <User className="h-4 w-4" /> },
+  { id: 'mission', label: 'MISSION CONTROL', icon: <Target className="h-4 w-4" /> },
+  { id: 'chronicle', label: 'CHRONICLE', icon: <ScrollText className="h-4 w-4" /> },
 ];
 
 export default function WarriorDetail() {
   const { id } = useParams({ strict: false }) as { id: string };
   const navigate = useNavigate();
-  
+
   // Use the unified store hook
   const store = useGameStore();
-  const { roster, graveyard, retired, rivals, arenaHistory, insightTokens, setState, renameWarrior, retireWarrior } = store;
+  const {
+    roster,
+    graveyard,
+    retired,
+    rivals,
+    arenaHistory,
+    insightTokens,
+    setState,
+    renameWarrior,
+    retireWarrior,
+  } = store;
 
-  const [activeTab, setActiveTab] = useState("biometrics");
+  const [activeTab, setActiveTab] = useState('biometrics');
 
   // Find warrior across all possible states
   const warrior = useMemo(() => {
-    let w = roster.find((w) => w.id === id) ||
-            graveyard.find((w) => w.id === id) ||
-            retired.find((w) => w.id === id);
+    let w =
+      roster.find((w) => w.id === id) ||
+      graveyard.find((w) => w.id === id) ||
+      retired.find((w) => w.id === id);
     if (w) return w;
     for (const rs of rivals || []) {
       w = rs.roster.find((w) => w.id === id);
@@ -53,7 +64,11 @@ export default function WarriorDetail() {
 
   const isPlayerOwned = useMemo(() => {
     if (!warrior) return false;
-    return !!(roster.find((w) => w.id === id) || graveyard.find((w) => w.id === id) || retired.find((w) => w.id === id));
+    return !!(
+      roster.find((w) => w.id === id) ||
+      graveyard.find((w) => w.id === id) ||
+      retired.find((w) => w.id === id)
+    );
   }, [warrior, id, roster, graveyard, retired]);
 
   const displayWarrior = useMemo(() => {
@@ -78,7 +93,7 @@ export default function WarriorDetail() {
     if (!warrior) return;
     retireWarrior(warrior.id);
     toast.success(`${warrior.name} has been retired with honor.`);
-    navigate({ to: "/" });
+    navigate({ to: '/' });
   }, [warrior, retireWarrior, navigate]);
 
   const handleEquipmentChange = useCallback(
@@ -113,46 +128,60 @@ export default function WarriorDetail() {
 
   const streakMap = computeStreaks(arenaHistory);
   const streakVal = streakMap.get(displayWarrior.name) ?? 0;
-  const streakLabel = streakVal > 0 ? `🔥 ${streakVal}W streak` : streakVal < 0 ? `${Math.abs(streakVal)}L streak` : null;
+  const streakLabel =
+    streakVal > 0
+      ? `🔥 ${streakVal}W streak`
+      : streakVal < 0
+        ? `${Math.abs(streakVal)}L streak`
+        : null;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Link to="/"><Button variant="ghost" className="gap-2">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Button></Link>
-        {isPlayerOwned && warrior.status === "Active" && (
-          <Button variant="outline" size="sm" onClick={handleRetire} className="gap-1.5 text-muted-foreground hover:text-destructive transition-colors">
+        <Link to="/">
+          <Button variant="ghost" className="gap-2">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Button>
+        </Link>
+        {isPlayerOwned && warrior.status === 'Active' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRetire}
+            className="gap-1.5 text-muted-foreground hover:text-destructive transition-colors"
+          >
             <Armchair className="h-3.5 w-3.5" /> Retire
           </Button>
         )}
       </div>
 
-      <WarriorHeroHeader 
-        warrior={displayWarrior} 
-        record={record} 
-        streakLabel={streakLabel} 
-        streakVal={streakVal} 
+      <WarriorHeroHeader
+        warrior={displayWarrior}
+        record={record}
+        streakLabel={streakLabel}
+        streakVal={streakVal}
         id={id}
         isPlayerOwned={isPlayerOwned}
         insightTokens={insightTokens}
       />
       <SubNav tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === "biometrics" && <BiometricsTab warrior={warrior} displayWarrior={displayWarrior as any} />}
-      
-      {activeTab === "mission" && (
-        <MissionControlTab 
-          warrior={warrior} 
-          displayWarrior={displayWarrior as any} 
-          currentPlan={currentPlan} 
-          currentLoadout={currentLoadout} 
-          onPlanChange={handlePlanChange} 
-          onEquipmentChange={handleEquipmentChange} 
+      {activeTab === 'biometrics' && (
+        <BiometricsTab warrior={warrior} displayWarrior={displayWarrior as any} />
+      )}
+
+      {activeTab === 'mission' && (
+        <MissionControlTab
+          warrior={warrior}
+          displayWarrior={displayWarrior as any}
+          currentPlan={currentPlan}
+          currentLoadout={currentLoadout}
+          onPlanChange={handlePlanChange}
+          onEquipmentChange={handleEquipmentChange}
         />
       )}
 
-      {activeTab === "chronicle" && <ChronicleTab warrior={warrior} arenaHistory={arenaHistory} />}
+      {activeTab === 'chronicle' && <ChronicleTab warrior={warrior} arenaHistory={arenaHistory} />}
     </div>
   );
 }

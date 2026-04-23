@@ -1,14 +1,14 @@
-import type { CommitLevel } from "@/types/shared.types";
-import type { CombatEvent } from "@/types/combat.types";
-import type { FighterState, ResolutionContext } from "./resolution";
-import { contestDistance, transitionZone, resetZone } from "../mechanics/distanceResolution";
+import type { CommitLevel } from '@/types/shared.types';
+import type { CombatEvent } from '@/types/combat.types';
+import type { FighterState, ResolutionContext } from './resolution';
+import { contestDistance, transitionZone, resetZone } from '../mechanics/distanceResolution';
 
 // ─── ExchangeState Accumulator ────────────────────────────────────────────────
 
 export interface ExchangeState {
   rangeModA: number;
   rangeModD: number;
-  distanceWinner: "A" | "D" | null;
+  distanceWinner: 'A' | 'D' | null;
   feintBonus: number;
   feintFailed: boolean;
   commitLevelA: CommitLevel;
@@ -20,10 +20,15 @@ export interface ExchangeState {
 
 export function makeExchangeState(): ExchangeState {
   return {
-    rangeModA: 0, rangeModD: 0, distanceWinner: null,
-    feintBonus: 0, feintFailed: false,
-    commitLevelA: "Standard", commitLevelD: "Standard",
-    recoveryDebtToWriteA: 0, recoveryDebtToWriteD: 0,
+    rangeModA: 0,
+    rangeModD: 0,
+    distanceWinner: null,
+    feintBonus: 0,
+    feintFailed: false,
+    commitLevelA: 'Standard',
+    commitLevelD: 'Standard',
+    recoveryDebtToWriteA: 0,
+    recoveryDebtToWriteD: 0,
     events: [],
   };
 }
@@ -36,7 +41,7 @@ export function runApproach(
   fD: FighterState,
   OE_A: number,
   OE_D: number,
-  ctx: ResolutionContext & { range: import("@/types/shared.types").DistanceRange },
+  ctx: ResolutionContext & { range: import('@/types/shared.types').DistanceRange },
   es: ExchangeState
 ): void {
   const result = contestDistance(rng, fA, fD, OE_A, OE_D, ctx.range);
@@ -66,11 +71,7 @@ export interface FeintResult {
  * threshold = clamp(roll / 20, 0.05, 0.95)
  * Success → +4 ATT bonus. Failure → defender gets +2 DEF this exchange.
  */
-export function runFeint(
-  rng: () => number,
-  att: FighterState,
-  def: FighterState
-): FeintResult {
+export function runFeint(rng: () => number, att: FighterState, def: FighterState): FeintResult {
   const plan = att.activePlan;
   const wt = att.attributes.WT;
   const feintTendency = plan.feintTendency ?? 0;
@@ -86,11 +87,13 @@ export function runFeint(
   const threshold = Math.max(0.05, Math.min(0.95, roll / 20));
   const succeeded = rng() < threshold;
 
-  const events: CombatEvent[] = [{
-    type: succeeded ? "FEINT_SUCCESS" : "FEINT_FAIL",
-    actor: att.label,
-    target: def.label,
-  }];
+  const events: CombatEvent[] = [
+    {
+      type: succeeded ? 'FEINT_SUCCESS' : 'FEINT_FAIL',
+      actor: att.label,
+      target: def.label,
+    },
+  ];
 
   return {
     triggered: true,
@@ -120,13 +123,13 @@ export interface CommitResult {
  */
 export function runCommit(fighter: FighterState, OE: number): CommitResult {
   const hpRatio = fighter.hp / fighter.maxHp;
-  if (hpRatio < 0.30 || OE <= 3) {
-    return { level: "Cautious", attBonus: 0, defPenalty: 1, debtToWrite: 0 };
+  if (hpRatio < 0.3 || OE <= 3) {
+    return { level: 'Cautious', attBonus: 0, defPenalty: 1, debtToWrite: 0 };
   }
   if (OE >= 7 || fighter.momentum >= 2) {
-    return { level: "Full", attBonus: 1, defPenalty: -1, debtToWrite: 1 };
+    return { level: 'Full', attBonus: 1, defPenalty: -1, debtToWrite: 1 };
   }
-  return { level: "Standard", attBonus: 0, defPenalty: 0, debtToWrite: 0 };
+  return { level: 'Standard', attBonus: 0, defPenalty: 0, debtToWrite: 0 };
 }
 
 // ─── Recovery Sub-Phase ───────────────────────────────────────────────────────
@@ -144,9 +147,9 @@ export function runRecovery(
   debtToWriteD: number,
   events: CombatEvent[],
   ctx?: ResolutionContext & {
-    range?: import("@/types/shared.types").DistanceRange;
-    zone?: import("@/types/shared.types").ArenaZone;
-    pushedFighter?: "A" | "D";
+    range?: import('@/types/shared.types').DistanceRange;
+    zone?: import('@/types/shared.types').ArenaZone;
+    pushedFighter?: 'A' | 'D';
   }
 ): void {
   // Write recovery debt
@@ -164,29 +167,29 @@ export function runRecovery(
   if (!ctx || ctx.zone == null) return;
 
   // Zone transitions
-  const hitOnA = events.some(e => e.type === "HIT" && e.target === "A");
-  const hitOnD = events.some(e => e.type === "HIT" && e.target === "D");
+  const hitOnA = events.some((e) => e.type === 'HIT' && e.target === 'A');
+  const hitOnD = events.some((e) => e.type === 'HIT' && e.target === 'D');
 
   if (hitOnA) {
     const newZone = transitionZone(ctx.zone!);
     if (newZone !== ctx.zone) {
-      ctx.pushedFighter = "A";
+      ctx.pushedFighter = 'A';
       ctx.zone = newZone;
-      events.push({ type: "ZONE_SHIFT", actor: "D", target: "A", result: newZone });
+      events.push({ type: 'ZONE_SHIFT', actor: 'D', target: 'A', result: newZone });
     }
   } else if (hitOnD) {
     const newZone = transitionZone(ctx.zone!);
     if (newZone !== ctx.zone) {
-      ctx.pushedFighter = "D";
+      ctx.pushedFighter = 'D';
       ctx.zone = newZone;
-      events.push({ type: "ZONE_SHIFT", actor: "A", target: "D", result: newZone });
+      events.push({ type: 'ZONE_SHIFT', actor: 'A', target: 'D', result: newZone });
     }
   } else {
     // No hit: drift zone back toward Center
     if (ctx.pushedFighter) {
       const prev = ctx.zone;
       ctx.zone = resetZone(ctx.zone!);
-      if (ctx.zone === "Center") {
+      if (ctx.zone === 'Center') {
         ctx.pushedFighter = undefined;
       }
     }

@@ -1,4 +1,4 @@
-import { type SeededRNG } from "./random";
+import { type SeededRNG } from './random';
 
 /**
  * ID Generation utilities with support for deterministic testing.
@@ -26,7 +26,12 @@ export function generateId(rng?: SeededRNG, prefix?: string): string {
     return rng.uuid(prefix);
   }
 
-  const cryptoObj = typeof globalThis !== "undefined" ? globalThis.crypto : (typeof crypto !== "undefined" ? crypto : undefined);
+  const cryptoObj =
+    typeof globalThis !== 'undefined'
+      ? globalThis.crypto
+      : typeof crypto !== 'undefined'
+        ? crypto
+        : undefined;
 
   if (cryptoObj?.randomUUID) {
     return cryptoObj.randomUUID();
@@ -34,11 +39,11 @@ export function generateId(rng?: SeededRNG, prefix?: string): string {
 
   // Fallback for environments where crypto is available but randomUUID is not
   if (cryptoObj?.getRandomValues) {
-    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => {
-        const n = parseInt(c, 10);
-        return (n ^ (cryptoObj.getRandomValues(new Uint8Array(1))[0] & (15 >> (n / 4)))).toString(16);
+    return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) => {
+      const n = parseInt(c, 10);
+      return (n ^ (cryptoObj.getRandomValues(new Uint8Array(1))[0] & (15 >> (n / 4)))).toString(16);
     });
   }
 
-  throw new Error("Secure random number generator not available in this environment.");
+  throw new Error('Secure random number generator not available in this environment.');
 }

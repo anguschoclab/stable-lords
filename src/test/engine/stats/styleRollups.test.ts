@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi, beforeEach, afterEach , Mock} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { StyleRollups } from '@/engine/stats/styleRollups';
 
 describe('StyleRollups', () => {
@@ -39,7 +39,6 @@ describe('StyleRollups', () => {
       expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
     });
 
-
     it('returns {} if localStorage.getItem returns an invalid JSON string (loadWeek error path)', () => {
       (globalThis.localStorage.getItem as Mock).mockReturnValue('{invalid}');
       expect(StyleRollups.getWeekRollup(1)).toMatchObject({});
@@ -59,7 +58,7 @@ describe('StyleRollups', () => {
 
     it('returns valid records if localStorage has valid data', () => {
       const validData = {
-        'Sword': { w: 1, l: 0, k: 0, pct: 1, fights: 1 }
+        Sword: { w: 1, l: 0, k: 0, pct: 1, fights: 1 },
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(validData));
       expect(StyleRollups.getWeekRollup(1)).toEqual(validData);
@@ -67,13 +66,13 @@ describe('StyleRollups', () => {
 
     it('filters out invalid records', () => {
       const mixedData = {
-        'Sword': { w: 1, l: 0, k: 0, pct: 1, fights: 1 },
-        'Axe': { invalid: 'data' }, // Should be ignored by validateWeekRecord
-        'Spear': 'string', // Should be ignored
+        Sword: { w: 1, l: 0, k: 0, pct: 1, fights: 1 },
+        Axe: { invalid: 'data' }, // Should be ignored by validateWeekRecord
+        Spear: 'string', // Should be ignored
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(mixedData));
       expect(StyleRollups.getWeekRollup(1)).toMatchObject({
-        'Sword': { w: 1, l: 0, k: 0, pct: 1, fights: 1 }
+        Sword: { w: 1, l: 0, k: 0, pct: 1, fights: 1 },
       });
     });
   });
@@ -118,10 +117,10 @@ describe('StyleRollups', () => {
 
     it('returns valid records if localStorage has valid data', () => {
       const validData = {
-        'Sword': [
+        Sword: [
           { W: 1, L: 0, K: 0, fights: 1 },
-          { W: 0, L: 1, K: 0, fights: 1 }
-        ]
+          { W: 0, L: 1, K: 0, fights: 1 },
+        ],
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(validData));
       const result = StyleRollups.last10();
@@ -132,18 +131,15 @@ describe('StyleRollups', () => {
         L: 1,
         K: 0,
         fights: 2,
-        P: 50
+        P: 50,
       });
     });
 
     it('filters out invalid records', () => {
       const mixedData = {
-        'Sword': [
-          { W: 1, L: 0, K: 0, fights: 1 },
-          { invalid: 'data' }
-        ],
-        'Axe': { notAnArray: true },
-        'Spear': 'string',
+        Sword: [{ W: 1, L: 0, K: 0, fights: 1 }, { invalid: 'data' }],
+        Axe: { notAnArray: true },
+        Spear: 'string',
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(mixedData));
       const result = StyleRollups.last10();
@@ -193,9 +189,9 @@ describe('StyleRollups', () => {
 
     it('returns valid records if localStorage has valid data', () => {
       const validData = {
-        'tour1': {
-          'Sword': { W: 1, L: 0, K: 0, fights: 1 }
-        }
+        tour1: {
+          Sword: { W: 1, L: 0, K: 0, fights: 1 },
+        },
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(validData));
       const result = StyleRollups.tournament('tour1');
@@ -206,19 +202,19 @@ describe('StyleRollups', () => {
         L: 0,
         K: 0,
         fights: 1,
-        P: 100
+        P: 100,
       });
     });
 
     it('filters out invalid records', () => {
       const mixedData = {
-        'tour1': {
-          'Sword': { W: 1, L: 0, K: 0, fights: 1 },
-          'Axe': { invalid: 'data' },
+        tour1: {
+          Sword: { W: 1, L: 0, K: 0, fights: 1 },
+          Axe: { invalid: 'data' },
         },
-        'tour2': {
-           'Spear': { W: 0, L: 1, K: 0, fights: 1 }
-        }
+        tour2: {
+          Spear: { W: 0, L: 1, K: 0, fights: 1 },
+        },
       };
       (globalThis.localStorage.getItem as Mock).mockReturnValue(JSON.stringify(mixedData));
       const result = StyleRollups.tournament('tour1');

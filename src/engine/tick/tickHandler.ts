@@ -1,6 +1,6 @@
-import type { GameState } from "@/types/state.types";
-import type { IRNGService } from "@/engine/core/rng/IRNGService";
-import { StateImpact } from "@/engine/impacts";
+import type { GameState } from '@/types/state.types';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { StateImpact } from '@/engine/impacts';
 
 /**
  * Stable Lords — Unified Tick Handler Interface

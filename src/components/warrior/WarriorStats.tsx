@@ -1,10 +1,20 @@
-import { type Warrior } from "@/types/game";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { growthNarrative } from "./GrowthHelpers";
-import { generateWarriorStatements } from "@/data/warriorStatements";
-import { StatBattery } from "@/components/ui/StatBattery";
+import { type Warrior } from '@/types/game';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { growthNarrative } from './GrowthHelpers';
+import { generateWarriorStatements } from '@/data/warriorStatements';
+import { StatBattery } from '@/components/ui/StatBattery';
 
-export function AttrBar({ label, value, potential, max = 25 }: { label: string; value: number; potential?: number; max?: number }) {
+export function AttrBar({
+  label,
+  value,
+  potential,
+  max = 25,
+}: {
+  label: string;
+  value: number;
+  potential?: number;
+  max?: number;
+}) {
   const growth = growthNarrative(value, potential);
 
   return (
@@ -28,37 +38,52 @@ export function AttrBar({ label, value, potential, max = 25 }: { label: string; 
           )}
         </div>
       </div>
-      <StatBattery
-        label=""
-        value={value}
-        max={max}
-        className="[&>span:first-child]:hidden"
-      />
+      <StatBattery label="" value={value} max={max} className="[&>span:first-child]:hidden" />
     </div>
   );
 }
 
-export function SkillBar({ label, value, max = 20 }: { label: string; value: number; max?: number }) {
+export function SkillBar({
+  label,
+  value,
+  max = 20,
+}: {
+  label: string;
+  value: number;
+  max?: number;
+}) {
   return <StatBattery label={label} value={value} max={max} />;
 }
 
 export function WarriorStatementsPanel({ warrior }: { warrior: Warrior }) {
   if (!warrior.baseSkills) return null;
   const statements = generateWarriorStatements(
-    warrior.attributes.WT, warrior.attributes.SP, warrior.attributes.DF, warrior.baseSkills
+    warrior.attributes.WT,
+    warrior.attributes.SP,
+    warrior.attributes.DF,
+    warrior.baseSkills
   );
   const lines = [
-    statements.initiative, statements.riposte, statements.attack,
-    statements.parry, statements.defense, statements.endurance,
-    statements.coordination, statements.quickness, statements.activity,
+    statements.initiative,
+    statements.riposte,
+    statements.attack,
+    statements.parry,
+    statements.defense,
+    statements.endurance,
+    statements.coordination,
+    statements.quickness,
+    statements.activity,
   ].filter(Boolean);
 
-  if (lines.length === 0) return <p className="text-xs text-muted-foreground italic">No notable observations.</p>;
+  if (lines.length === 0)
+    return <p className="text-xs text-muted-foreground italic">No notable observations.</p>;
 
   return (
     <ul className="space-y-1.5">
       {lines.map((line, i) => (
-        <li key={i} className="text-xs text-muted-foreground italic leading-relaxed">• {line}</li>
+        <li key={i} className="text-xs text-muted-foreground italic leading-relaxed">
+          • {line}
+        </li>
       ))}
     </ul>
   );

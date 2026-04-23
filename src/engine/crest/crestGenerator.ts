@@ -31,11 +31,11 @@ const PHILOSOPHY_COLOR_PREFERENCES: Record<string, CrestColorKey[]> = {
   'Brute Force': ['crimson', 'blood', 'bronze', 'rust', 'maroon'],
   'Speed Kills': ['amber', 'silver', 'steel', 'ochre'],
   'Iron Defense': ['steel', 'navy', 'forest', 'charcoal', 'sable'],
-  'Cunning': ['royalPurple', 'wine', 'midnight', 'navy'],
-  'Spectacle': ['gold', 'crimson', 'amber', 'royal'],
-  'Endurance': ['forest', 'hunter', 'moss', 'emerald'],
-  'Balanced': ['royal', 'forest', 'gold', 'silver'],
-  'Specialist': ['midnight', 'wine', 'steel', 'bronze'],
+  Cunning: ['royalPurple', 'wine', 'midnight', 'navy'],
+  Spectacle: ['gold', 'crimson', 'amber', 'royal'],
+  Endurance: ['forest', 'hunter', 'moss', 'emerald'],
+  Balanced: ['royal', 'forest', 'gold', 'silver'],
+  Specialist: ['midnight', 'wine', 'steel', 'bronze'],
 };
 
 /**
@@ -90,15 +90,44 @@ function selectFieldType(
   const fieldTypesByTier: Record<string, FieldType[]> = {
     Minor: ['solid', 'fess', 'pale', 'bend'],
     Established: ['solid', 'fess', 'pale', 'bend', 'chevron', 'per-pale', 'per-fess'],
-    Major: ['solid', 'fess', 'pale', 'bend', 'chevron', 'cross', 'per-pale', 'per-fess', 'gyronny', 'saltire', 'pale-environ', 'quarterly'],
-    Legendary: ['solid', 'fess', 'pale', 'bend', 'chevron', 'cross', 'saltire', 'per-pale', 'per-fess', 'gyronny', 'bend-sinister', 'chevron-inverted', 'pale-environ', 'quarterly'],
+    Major: [
+      'solid',
+      'fess',
+      'pale',
+      'bend',
+      'chevron',
+      'cross',
+      'per-pale',
+      'per-fess',
+      'gyronny',
+      'saltire',
+      'pale-environ',
+      'quarterly',
+    ],
+    Legendary: [
+      'solid',
+      'fess',
+      'pale',
+      'bend',
+      'chevron',
+      'cross',
+      'saltire',
+      'per-pale',
+      'per-fess',
+      'gyronny',
+      'bend-sinister',
+      'chevron-inverted',
+      'pale-environ',
+      'quarterly',
+    ],
   };
 
   const availableTypes = fieldTypesByTier[tier] ?? ['solid', 'fess', 'pale'];
 
   // Weighted toward solid for lower tiers, more complex for higher
   const weights = availableTypes.map((type) => {
-    if (type === 'solid') return tier === 'Minor' ? 40 : tier === 'Established' ? 30 : tier === 'Major' ? 20 : 15;
+    if (type === 'solid')
+      return tier === 'Minor' ? 40 : tier === 'Established' ? 30 : tier === 'Major' ? 20 : 15;
     return 10;
   });
 
@@ -125,7 +154,8 @@ function selectColors(
     primaryColor = parentPrimaryColor;
   } else {
     // Pick from philosophy preferences or fallback to random
-    const preferredColors = PHILOSOPHY_COLOR_PREFERENCES[philosophy] || Object.keys(CREST_COLORS) as CrestColorKey[];
+    const preferredColors =
+      PHILOSOPHY_COLOR_PREFERENCES[philosophy] || (Object.keys(CREST_COLORS) as CrestColorKey[]);
     const colorKey = rng.pick(preferredColors);
     primaryColor = CREST_COLORS[colorKey as CrestColorKey];
   }
@@ -174,7 +204,11 @@ function selectCharge(
   if (parentChargeType && rng.chance(config.chargeTypeChance)) {
     chargeType = parentChargeType;
   } else {
-    const preferredTypes = PHILOSOPHY_CHARGE_PREFERENCES[philosophy] || ['beast', 'symbol', 'weapon'];
+    const preferredTypes = PHILOSOPHY_CHARGE_PREFERENCES[philosophy] || [
+      'beast',
+      'symbol',
+      'weapon',
+    ];
 
     // Higher tiers get access to mythical charges
     if (tier === 'Legendary' || tier === 'Major') {
@@ -206,7 +240,13 @@ function selectCharge(
   // Posture for beasts
   let posture: CrestCharge['posture'];
   if (chargeType === 'beast') {
-    const postures: CrestCharge['posture'][] = ['rampant', 'passant', 'sejant', 'statant', 'forcene'];
+    const postures: CrestCharge['posture'][] = [
+      'rampant',
+      'passant',
+      'sejant',
+      'statant',
+      'forcene',
+    ];
     posture = rng.pick(postures);
   }
 
@@ -229,20 +269,10 @@ export function generateCrest(config: StableCrestConfig): CrestData {
   const generation = parentCrest ? parentCrest.generation + 1 : 0;
 
   // Select shield shape
-  const shieldShape = selectShieldShape(
-    rng,
-    tier,
-    parentCrest?.shieldShape,
-    generation
-  );
+  const shieldShape = selectShieldShape(rng, tier, parentCrest?.shieldShape, generation);
 
   // Select field type
-  const fieldType = selectFieldType(
-    rng,
-    tier,
-    parentCrest?.fieldType,
-    generation
-  );
+  const fieldType = selectFieldType(rng, tier, parentCrest?.fieldType, generation);
 
   // Select colors
   const { primaryColor, secondaryColor, metalColor } = selectColors(
@@ -256,13 +286,7 @@ export function generateCrest(config: StableCrestConfig): CrestData {
   );
 
   // Select charge
-  const charge = selectCharge(
-    rng,
-    philosophy,
-    tier,
-    parentCrest?.charge.type,
-    generation
-  );
+  const charge = selectCharge(rng, philosophy, tier, parentCrest?.charge.type, generation);
 
   return {
     shieldShape,

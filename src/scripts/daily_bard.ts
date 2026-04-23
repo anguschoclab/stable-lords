@@ -1,12 +1,12 @@
-import fs from "fs";
-import path from "path";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { z } from "zod";
+import fs from 'fs';
+import path from 'path';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 
-const NARRATIVE_FILE = path.join(process.cwd(), "src/data/narrativeContent.json");
-const REPORT_FILE = path.join(process.cwd(), "Daily_Bard_Report.md");
+const NARRATIVE_FILE = path.join(process.cwd(), 'src/data/narrativeContent.json');
+const REPORT_FILE = path.join(process.cwd(), 'Daily_Bard_Report.md');
 
-const VALID_VARIABLES = ["%A", "%D", "%W", "%BP", "%H"];
+const VALID_VARIABLES = ['%A', '%D', '%W', '%BP', '%H'];
 
 /**
  * Strict Zod Schema for Narrative Templates.
@@ -17,7 +17,7 @@ const templateStringSchema = z.string().refine(
     const foundVars = str.match(/%\w+/g) || [];
     return foundVars.every((v) => VALID_VARIABLES.includes(v));
   },
-  { message: "String contains unauthorized % variables. Only %A, %D, %W, %BP are allowed." }
+  { message: 'String contains unauthorized % variables. Only %A, %D, %W, %BP are allowed.' }
 );
 
 const CategorySchema = z.object({
@@ -56,10 +56,10 @@ export const NarrativeSchema = z.object({
 type ValidatedJSON = z.infer<typeof NarrativeSchema>;
 
 // Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "mock-key");
-const model = genAI.getGenerativeModel({ 
-  model: "gemini-3-flash",
-  generationConfig: { responseMimeType: "application/json" }
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock-key');
+const model = genAI.getGenerativeModel({
+  model: 'gemini-3-flash',
+  generationConfig: { responseMimeType: 'application/json' },
 });
 
 /**
@@ -70,7 +70,8 @@ function fetch_narrative_deficits(data: ValidatedJSON): string[] {
 
   for (const [type, severities] of Object.entries(data.strikes)) {
     for (const [sev, templates] of Object.entries(severities)) {
-      if (templates.length < 15) { // Increased target variety
+      if (templates.length < 15) {
+        // Increased target variety
         deficits.push(`strikes.${type}.${sev}`);
       }
     }
@@ -85,8 +86,16 @@ function fetch_narrative_deficits(data: ValidatedJSON): string[] {
   }
 
   const extraCategories: (keyof ValidatedJSON)[] = [
-    "attacks", "passives", "conclusions", "insights", "media", 
-    "persona", "recruitment", "memorials", "fanfare", "meta"
+    'attacks',
+    'passives',
+    'conclusions',
+    'insights',
+    'media',
+    'persona',
+    'recruitment',
+    'memorials',
+    'fanfare',
+    'meta',
   ];
   for (const cat of extraCategories) {
     if (typeof data[cat] !== 'object' || data[cat] === null) continue;
@@ -96,7 +105,7 @@ function fetch_narrative_deficits(data: ValidatedJSON): string[] {
       } else if (typeof templates === 'object') {
         // Handle nested (e.g., promoters.[personality].pitch)
         for (const [key, tps] of Object.entries(templates)) {
-           if (Array.isArray(tps) && tps.length < 12) deficits.push(`${cat}.${subCat}.${key}`);
+          if (Array.isArray(tps) && tps.length < 12) deficits.push(`${cat}.${subCat}.${key}`);
         }
       }
     }
@@ -108,8 +117,11 @@ function fetch_narrative_deficits(data: ValidatedJSON): string[] {
 /**
  * Calls Gemini 1.5 Flash to generate new templates for a specific deficit path.
  */
-async function request_bardic_inspiration(deficitPath: string, context: string = ""): Promise<string> {
-  const [root, type, leaf] = deficitPath.split(".");
+async function request_bardic_inspiration(
+  deficitPath: string,
+  context: string = ''
+): Promise<string> {
+  const [root, type, leaf] = deficitPath.split('.');
 
   const systemPrompt = `You are the Bard of the Blood Sands, a brutal arena announcer.
 You generate high-fantasy combat and world descriptions for a text-based game.
@@ -131,13 +143,15 @@ TIER DEFINITIONS:
 Format your response as a JSON object with a single key "new_templates" which is an array of 5 unique strings.
 Context: You are writing for ${deficitPath}. ${context}`;
 
-  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "mock-key") {
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'mock-key') {
     try {
-      const result = await model.generateContent(`${systemPrompt}\n\nGenerate 3 new templates for ${deficitPath}.`);
+      const result = await model.generateContent(
+        `${systemPrompt}\n\nGenerate 3 new templates for ${deficitPath}.`
+      );
       return result.response.text();
     } catch (error: any) {
-      console.error("Gemini API Error:", error.message);
-      return "{}";
+      console.error('Gemini API Error:', error.message);
+      return '{}';
     }
   } else {
     // Mock for local testing
@@ -156,13 +170,13 @@ Context: You are writing for ${deficitPath}. ${context}`;
  * The Agentic Loop: Validates LLM output and retries with errors if necessary.
  */
 async function validate_with_retry(deficitPath: string, retries = 3): Promise<string[] | null> {
-  let errorContext = "";
+  let errorContext = '';
   for (let i = 0; i < retries; i++) {
     const rawResponse = await request_bardic_inspiration(deficitPath, errorContext);
     try {
       const parsed = JSON.parse(rawResponse);
       const templates = parsed.new_templates;
-      if (!Array.isArray(templates)) throw new Error("Missing new_templates array");
+      if (!Array.isArray(templates)) throw new Error('Missing new_templates array');
 
       // Validate each template individually to pinpoint errors
       for (const t of templates) {
@@ -171,7 +185,9 @@ async function validate_with_retry(deficitPath: string, retries = 3): Promise<st
 
       return templates;
     } catch (err: any) {
-      console.warn(`Validation failed for ${deficitPath} (Attempt ${i + 1}/${retries}): ${err.message}`);
+      console.warn(
+        `Validation failed for ${deficitPath} (Attempt ${i + 1}/${retries}): ${err.message}`
+      );
       errorContext = `Your previous response failed validation: ${err.message}. Fix the variables and regenerate. Ensure you only use %A, %D, %W, %BP.`;
     }
   }
@@ -182,37 +198,37 @@ async function validate_with_retry(deficitPath: string, retries = 3): Promise<st
  * Atomic merge and write to the archive.
  */
 async function commit_to_archive(newTemplatesMap: Record<string, string[]>) {
-  const rawData = fs.readFileSync(NARRATIVE_FILE, "utf-8");
+  const rawData = fs.readFileSync(NARRATIVE_FILE, 'utf-8');
   const data: ValidatedJSON = JSON.parse(rawData);
 
-  let report = "# Daily Bard Report\n\n";
+  let report = '# Daily Bard Report\n\n';
   let addedCount = 0;
 
   for (const [path, items] of Object.entries(newTemplatesMap)) {
-    const segments = path.split(".");
+    const segments = path.split('.');
     let target: any = data;
     for (let i = 0; i < segments.length - 1; i++) {
       target = target[segments[i]];
     }
     const leaf = segments[segments.length - 1];
-    
+
     // Merge and Deduplicate
     const uniqueTemplates = [...new Set([...target[leaf], ...items])];
     const newItemsCount = uniqueTemplates.length - target[leaf].length;
-    
+
     target[leaf] = uniqueTemplates;
-    
+
     report += `### Added to ${path} (${newItemsCount} new unique templates)\n`;
-    items.forEach(it => report += `- ${it}\n`);
+    items.forEach((it) => (report += `- ${it}\n`));
     addedCount += newItemsCount;
   }
 
   if (addedCount > 0) {
-    fs.writeFileSync(NARRATIVE_FILE, JSON.stringify(data, null, 2), "utf-8");
-    fs.writeFileSync(REPORT_FILE, report, "utf-8");
+    fs.writeFileSync(NARRATIVE_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    fs.writeFileSync(REPORT_FILE, report, 'utf-8');
     console.log(`Successfully added ${addedCount} new templates.`);
   } else {
-    console.log("No new templates were added.");
+    console.log('No new templates were added.');
   }
 }
 
@@ -231,8 +247,17 @@ function deduplicate_full_archive(data: ValidatedJSON) {
     }
   }
   const extraCategories: (keyof ValidatedJSON)[] = [
-    "attacks", "passives", "conclusions", "insights", "media", 
-    "persona", "recruitment", "memorials", "fanfare", "meta", "promoters"
+    'attacks',
+    'passives',
+    'conclusions',
+    'insights',
+    'media',
+    'persona',
+    'recruitment',
+    'memorials',
+    'fanfare',
+    'meta',
+    'promoters',
   ];
   for (const cat of extraCategories) {
     if (!data[cat]) continue;
@@ -252,9 +277,9 @@ function deduplicate_full_archive(data: ValidatedJSON) {
 }
 
 async function main() {
-  console.log("📜 The Bard of the Blood Sands is waking up...");
+  console.log('📜 The Bard of the Blood Sands is waking up...');
 
-  const rawData = fs.readFileSync(NARRATIVE_FILE, "utf-8");
+  const rawData = fs.readFileSync(NARRATIVE_FILE, 'utf-8');
   const data: ValidatedJSON = NarrativeSchema.parse(JSON.parse(rawData));
 
   // 1. Deficit Detection
@@ -275,13 +300,13 @@ async function main() {
 
   // 3. Commit & Deduplicate
   await commit_to_archive(newTemplatesMap);
-  
-  // 4. Final Full-Sweep Cleanup (ensures even static/legacy duplicates are purged)
-  const freshData = JSON.parse(fs.readFileSync(NARRATIVE_FILE, "utf-8"));
-  deduplicate_full_archive(freshData);
-  fs.writeFileSync(NARRATIVE_FILE, JSON.stringify(freshData, null, 2), "utf-8");
 
-  console.log("✅ Bardic duties complete.");
+  // 4. Final Full-Sweep Cleanup (ensures even static/legacy duplicates are purged)
+  const freshData = JSON.parse(fs.readFileSync(NARRATIVE_FILE, 'utf-8'));
+  deduplicate_full_archive(freshData);
+  fs.writeFileSync(NARRATIVE_FILE, JSON.stringify(freshData, null, 2), 'utf-8');
+
+  console.log('✅ Bardic duties complete.');
 }
 
 main().catch(console.error);

@@ -4,16 +4,16 @@
 
 export type ShieldShape = 'heater' | 'french' | 'swiss' | 'spanish' | 'lozenge';
 
-export type FieldType = 
-  | 'solid' 
-  | 'fess' 
-  | 'pale' 
-  | 'bend' 
-  | 'chevron' 
-  | 'cross' 
-  | 'saltire' 
-  | 'per-pale' 
-  | 'per-fess' 
+export type FieldType =
+  | 'solid'
+  | 'fess'
+  | 'pale'
+  | 'bend'
+  | 'chevron'
+  | 'cross'
+  | 'saltire'
+  | 'per-pale'
+  | 'per-fess'
   | 'gyronny'
   | 'bend-sinister'
   | 'pale-environ'
@@ -66,41 +66,41 @@ export const CREST_COLORS = {
   crimson: '#8B2323',
   brick: '#A52A2A',
   maroon: '#800000',
-  
+
   // Azure (blues)
   royal: '#1E3A5F',
   navy: '#2C3E50',
   steel: '#4A5568',
-  
+
   // Vert (greens)
   forest: '#228B22',
   hunter: '#355E3B',
   emerald: '#2E8B57',
-  
+
   // Purpure (purples)
   royalPurple: '#4A0E4E',
   wine: '#722F37',
-  
+
   // Sable (blacks/darks)
   sable: '#1A1A1A',
   charcoal: '#36454F',
-  
+
   // Metals
   gold: '#D4AF37',
   silver: '#C0C0C0',
-  
+
   // Or (yellows/golds)
   ochre: '#CC7722',
   amber: '#FFBF00',
-  
+
   // Argent (whites/silvers)
   pearl: '#E8E8E8',
   platinum: '#E5E4E2',
-  
+
   // Tenné (oranges/browns)
   rust: '#8B4513',
   bronze: '#CD7F32',
-  
+
   // Additional accent colors
   blood: '#8A0303',
   midnight: '#191970',
@@ -110,9 +110,27 @@ export const CREST_COLORS = {
 export type CrestColorKey = keyof typeof CREST_COLORS;
 
 // Charge definitions with display names
-export const CHARGE_DEFINITIONS: Record<ChargeType, { names: string[]; descriptions: Record<string, string> }> = {
+export const CHARGE_DEFINITIONS: Record<
+  ChargeType,
+  { names: string[]; descriptions: Record<string, string> }
+> = {
   beast: {
-    names: ['lion', 'eagle', 'wolf', 'bear', 'boar', 'bull', 'stag', 'horse', 'falcon', 'serpent', 'fox', 'ram', 'griffin', 'dragon'],
+    names: [
+      'lion',
+      'eagle',
+      'wolf',
+      'bear',
+      'boar',
+      'bull',
+      'stag',
+      'horse',
+      'falcon',
+      'serpent',
+      'fox',
+      'ram',
+      'griffin',
+      'dragon',
+    ],
     descriptions: {
       lion: 'Courage and nobility',
       eagle: 'Vision and supremacy',
@@ -131,7 +149,21 @@ export const CHARGE_DEFINITIONS: Record<ChargeType, { names: string[]; descripti
     },
   },
   weapon: {
-    names: ['sword', 'dagger', 'axe', 'spear', 'hammer', 'mace', 'crossed-swords', 'shield', 'arrow', 'trident', 'halberd', 'flail', 'scourge'],
+    names: [
+      'sword',
+      'dagger',
+      'axe',
+      'spear',
+      'hammer',
+      'mace',
+      'crossed-swords',
+      'shield',
+      'arrow',
+      'trident',
+      'halberd',
+      'flail',
+      'scourge',
+    ],
     descriptions: {
       sword: 'Honor and justice',
       dagger: 'Stealth and precision',
@@ -149,7 +181,22 @@ export const CHARGE_DEFINITIONS: Record<ChargeType, { names: string[]; descripti
     },
   },
   symbol: {
-    names: ['crown', 'key', 'hand', 'eye', 'skull', 'heart', 'star', 'sun', 'moon', 'cross', 'anchor', 'chain', 'ring', 'tower'],
+    names: [
+      'crown',
+      'key',
+      'hand',
+      'eye',
+      'skull',
+      'heart',
+      'star',
+      'sun',
+      'moon',
+      'cross',
+      'anchor',
+      'chain',
+      'ring',
+      'tower',
+    ],
     descriptions: {
       crown: 'Authority and victory',
       key: 'Knowledge and access',
@@ -168,7 +215,22 @@ export const CHARGE_DEFINITIONS: Record<ChargeType, { names: string[]; descripti
     },
   },
   nature: {
-    names: ['oak', 'pine', 'rose', 'thistle', 'wheat', 'vine', 'mountain', 'wave', 'flame', 'fleur-de-lis', 'acorn', 'laurel', 'ivy', 'mushroom'],
+    names: [
+      'oak',
+      'pine',
+      'rose',
+      'thistle',
+      'wheat',
+      'vine',
+      'mountain',
+      'wave',
+      'flame',
+      'fleur-de-lis',
+      'acorn',
+      'laurel',
+      'ivy',
+      'mushroom',
+    ],
     descriptions: {
       oak: 'Strength and endurance',
       pine: 'Resilience and longevity',
@@ -187,7 +249,18 @@ export const CHARGE_DEFINITIONS: Record<ChargeType, { names: string[]; descripti
     },
   },
   celestial: {
-    names: ['sun', 'moon', 'star', 'comet', 'lightning', 'cloud', 'rainbow', 'eclipse', 'planet', 'constellation'],
+    names: [
+      'sun',
+      'moon',
+      'star',
+      'comet',
+      'lightning',
+      'cloud',
+      'rainbow',
+      'eclipse',
+      'planet',
+      'constellation',
+    ],
     descriptions: {
       sun: 'Radiance and supreme power',
       moon: 'Mystery and cycles',
@@ -202,7 +275,20 @@ export const CHARGE_DEFINITIONS: Record<ChargeType, { names: string[]; descripti
     },
   },
   mythical: {
-    names: ['phoenix', 'kraken', 'unicorn', 'wyvern', 'hydra', 'chimera', 'basilisk', 'golem', 'titan', 'behemoth', 'leviathan', 'pegasus'],
+    names: [
+      'phoenix',
+      'kraken',
+      'unicorn',
+      'wyvern',
+      'hydra',
+      'chimera',
+      'basilisk',
+      'golem',
+      'titan',
+      'behemoth',
+      'leviathan',
+      'pegasus',
+    ],
     descriptions: {
       phoenix: 'Rebirth and immortality',
       kraken: 'Overwhelming oceanic power',
@@ -225,15 +311,18 @@ export const PHILOSOPHY_CHARGE_PREFERENCES: Record<string, ChargeType[]> = {
   'Brute Force': ['beast', 'weapon', 'mythical'],
   'Speed Kills': ['beast', 'celestial', 'weapon'],
   'Iron Defense': ['symbol', 'nature', 'beast'],
-  'Cunning': ['beast', 'symbol', 'weapon'],
-  'Spectacle': ['mythical', 'beast', 'celestial'],
-  'Endurance': ['nature', 'beast', 'symbol'],
-  'Balanced': ['symbol', 'nature', 'celestial'],
-  'Specialist': ['weapon', 'symbol', 'mythical'],
+  Cunning: ['beast', 'symbol', 'weapon'],
+  Spectacle: ['mythical', 'beast', 'celestial'],
+  Endurance: ['nature', 'beast', 'symbol'],
+  Balanced: ['symbol', 'nature', 'celestial'],
+  Specialist: ['weapon', 'symbol', 'mythical'],
 };
 
 // Shield shape weights by tier (higher = more likely)
-export const SHIELD_SHAPE_WEIGHTS: Record<'Minor' | 'Established' | 'Major' | 'Legendary', Record<ShieldShape, number>> = {
+export const SHIELD_SHAPE_WEIGHTS: Record<
+  'Minor' | 'Established' | 'Major' | 'Legendary',
+  Record<ShieldShape, number>
+> = {
   Minor: { heater: 50, french: 20, swiss: 15, spanish: 10, lozenge: 5 },
   Established: { heater: 40, french: 25, swiss: 15, spanish: 15, lozenge: 5 },
   Major: { heater: 35, french: 20, swiss: 25, spanish: 15, lozenge: 5 },

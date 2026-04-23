@@ -1,21 +1,18 @@
-import { useMemo } from "react";
-import { useNavigate, Link } from "@tanstack/react-router";
-import { useGameStore, useWorldState, type GameStore } from "@/state/useGameStore";
+import { useMemo } from 'react';
+import { useNavigate, Link } from '@tanstack/react-router';
+import { useGameStore, useWorldState, type GameStore } from '@/state/useGameStore';
 import { useShallow } from 'zustand/react/shallow';
-import {
-  ATTRIBUTE_LABELS,
-  type TrainingAssignment, type Attributes,
-} from "@/types/game";
-import type { Warrior } from "@/types/state.types";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dumbbell, Heart, Activity, Target, Zap } from "lucide-react";
-import { toast } from "sonner";
-import { WarriorTrainingCard } from "@/components/training/WarriorTrainingCard";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Surface } from "@/components/ui/Surface";
-import { StyleMeterTable } from "@/components/charts/StyleMeterTable";
+import { ATTRIBUTE_LABELS, type TrainingAssignment, type Attributes } from '@/types/game';
+import type { Warrior } from '@/types/state.types';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dumbbell, Heart, Activity, Target, Zap } from 'lucide-react';
+import { toast } from 'sonner';
+import { WarriorTrainingCard } from '@/components/training/WarriorTrainingCard';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Surface } from '@/components/ui/Surface';
+import { StyleMeterTable } from '@/components/charts/StyleMeterTable';
 
 export default function Training() {
   const navigate = useNavigate();
@@ -24,13 +21,13 @@ export default function Training() {
 
   const assignmentMap = useMemo(() => {
     const map = new Map<string, TrainingAssignment>();
-    for (const a of (state.trainingAssignments ?? [])) map.set(a.warriorId, a);
+    for (const a of state.trainingAssignments ?? []) map.set(a.warriorId, a);
     return map;
   }, [state.trainingAssignments]);
 
   const seasonalGainsMap = useMemo(() => {
     const map = new Map<string, Partial<Record<keyof Attributes, number>>>();
-    for (const sg of (state.seasonalGrowth ?? [])) {
+    for (const sg of state.seasonalGrowth ?? []) {
       if (sg.season === state.season) {
         map.set(sg.warriorId, sg.gains);
       }
@@ -41,12 +38,14 @@ export default function Training() {
   const assignments = state.trainingAssignments ?? [];
 
   const handleAssign = (warriorId: string, attribute: keyof Attributes) => {
-    if (attribute === "SZ") return;
+    if (attribute === 'SZ') return;
     const warrior = state.roster.find((w: Warrior) => w.id === warriorId);
     setState((s: GameStore) => {
       s.trainingAssignments = [
-        ...(s.trainingAssignments ?? []).filter((a: TrainingAssignment) => a.warriorId !== warriorId),
-        { warriorId, type: "attribute", attribute },
+        ...(s.trainingAssignments ?? []).filter(
+          (a: TrainingAssignment) => a.warriorId !== warriorId
+        ),
+        { warriorId, type: 'attribute', attribute },
       ];
     });
     toast.success(`${warrior?.name} assigned to train ${ATTRIBUTE_LABELS[attribute]}`);
@@ -56,8 +55,10 @@ export default function Training() {
     const warrior = state.roster.find((w: Warrior) => w.id === warriorId);
     setState((s: GameStore) => {
       s.trainingAssignments = [
-        ...(s.trainingAssignments ?? []).filter((a: TrainingAssignment) => a.warriorId !== warriorId),
-        { warriorId, type: "recovery" },
+        ...(s.trainingAssignments ?? []).filter(
+          (a: TrainingAssignment) => a.warriorId !== warriorId
+        ),
+        { warriorId, type: 'recovery' },
       ];
     });
     toast.success(`${warrior?.name} assigned to active recovery`);
@@ -65,17 +66,21 @@ export default function Training() {
 
   const handleClear = (warriorId: string) => {
     setState((s: GameStore) => {
-      s.trainingAssignments = (s.trainingAssignments ?? []).filter((a: TrainingAssignment) => a.warriorId !== warriorId);
+      s.trainingAssignments = (s.trainingAssignments ?? []).filter(
+        (a: TrainingAssignment) => a.warriorId !== warriorId
+      );
     });
   };
 
   const handleClearAll = () => {
-    setState((s: GameStore) => { s.trainingAssignments = []; });
-    toast("All training assignments cleared.");
+    setState((s: GameStore) => {
+      s.trainingAssignments = [];
+    });
+    toast('All training assignments cleared.');
   };
 
   const assignedCount = assignments.length;
-  const recoveryCount = assignments.filter((a: TrainingAssignment) => a.type === "recovery").length;
+  const recoveryCount = assignments.filter((a: TrainingAssignment) => a.type === 'recovery').length;
   const trainingCount = assignedCount - recoveryCount;
 
   return (
@@ -116,8 +121,8 @@ export default function Training() {
         <Link
           to="/command/training"
           className={cn(
-            "flex items-center gap-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider border-b-2 -mb-px transition-colors",
-            "text-foreground border-primary"
+            'flex items-center gap-2 px-5 py-2.5 text-[11px] font-black uppercase tracking-wider border-b-2 -mb-px transition-colors',
+            'text-foreground border-primary'
           )}
         >
           <Dumbbell className="h-3.5 w-3.5 text-primary" />
@@ -137,39 +142,49 @@ export default function Training() {
           <StyleMeterTable />
         </div>
         <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
-         <Surface variant="glass" className="p-6 flex flex-col gap-2">
+          <Surface variant="glass" className="p-6 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-primary">
               <Zap className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Active Drills</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Active Drills
+              </span>
             </div>
             <div className="text-3xl font-display font-black tracking-tighter">{trainingCount}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Warriors pursuing growth</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              Warriors pursuing growth
+            </div>
             <div className="text-[10px] text-muted-foreground/60 normal-case tracking-normal leading-snug mt-1">
               Gain attribute points each week. Assign a trainer to improve ST, WT, SP, or DF.
             </div>
-         </Surface>
-         <Surface variant="glass" className="p-6 flex flex-col gap-2 border-l-destructive/20">
+          </Surface>
+          <Surface variant="glass" className="p-6 flex flex-col gap-2 border-l-destructive/20">
             <div className="flex items-center gap-2 text-destructive">
               <Heart className="h-4 w-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">Medical Bay</span>
             </div>
             <div className="text-3xl font-display font-black tracking-tighter">{recoveryCount}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Warriors in active healing</div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              Warriors in active healing
+            </div>
             <div className="text-[10px] text-muted-foreground/60 normal-case tracking-normal leading-snug mt-1">
               Recover fatigue faster between bouts. High fatigue reduces combat performance.
             </div>
-         </Surface>
-         <Surface variant="glass" className="p-6 flex flex-col gap-2 opacity-60">
+          </Surface>
+          <Surface variant="glass" className="p-6 flex flex-col gap-2 opacity-60">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Target className="h-4 w-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">Reserve Pool</span>
             </div>
-            <div className="text-3xl font-display font-black tracking-tighter">{state.roster.length - assignedCount}</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Idle personnel available</div>
+            <div className="text-3xl font-display font-black tracking-tighter">
+              {state.roster.length - assignedCount}
+            </div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              Idle personnel available
+            </div>
             <div className="text-[10px] text-muted-foreground/60 normal-case tracking-normal leading-snug mt-1">
               Unassigned warriors. Use the cards below to assign them to drills or recovery.
             </div>
-         </Surface>
+          </Surface>
         </div>
       </div>
 
@@ -178,24 +193,30 @@ export default function Training() {
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">
             No personnel detected · Please recruit warriors to commence training
           </p>
-          <Button variant="link" className="mt-4 text-xs uppercase tracking-widest font-black" onClick={() => navigate({ to: '/stable/recruit' })}>
+          <Button
+            variant="link"
+            className="mt-4 text-xs uppercase tracking-widest font-black"
+            onClick={() => navigate({ to: '/stable/recruit' })}
+          >
             Go to Recruitments
           </Button>
         </Surface>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {state.roster.filter((w: Warrior) => w.status === "Active").map((warrior: Warrior) => (
-            <WarriorTrainingCard
-              key={warrior.id}
-              warrior={warrior}
-              assignment={assignmentMap.get(warrior.id)}
-              seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
-              trainers={state.trainers ?? []}
-              onAssign={(attr) => handleAssign(warrior.id, attr)}
-              onAssignRecovery={() => handleAssignRecovery(warrior.id)}
-              onClear={() => handleClear(warrior.id)}
-            />
-          ))}
+          {state.roster
+            .filter((w: Warrior) => w.status === 'Active')
+            .map((warrior: Warrior) => (
+              <WarriorTrainingCard
+                key={warrior.id}
+                warrior={warrior}
+                assignment={assignmentMap.get(warrior.id)}
+                seasonalGains={seasonalGainsMap.get(warrior.id) ?? {}}
+                trainers={state.trainers ?? []}
+                onAssign={(attr) => handleAssign(warrior.id, attr)}
+                onAssignRecovery={() => handleAssignRecovery(warrior.id)}
+                onClear={() => handleClear(warrior.id)}
+              />
+            ))}
         </div>
       )}
     </div>

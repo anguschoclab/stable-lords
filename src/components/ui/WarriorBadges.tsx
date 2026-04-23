@@ -1,16 +1,16 @@
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Trophy, Crown, Heart, Skull } from "lucide-react";
-import { getTagDescription } from "@/data/tagDescriptions";
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Trophy, Crown, Heart, Skull } from 'lucide-react';
+import { getTagDescription } from '@/data/tagDescriptions';
 import {
   STYLE_ABBREV,
   STYLE_DISPLAY_NAMES,
   type TagBadgeProps,
   type StatBadgeProps,
-  type WarriorNameTagProps
-} from "@/types/game";
-import { WarriorLink } from "@/components/EntityLink";
+  type WarriorNameTagProps,
+} from '@/types/game';
+import { WarriorLink } from '@/components/EntityLink';
 
 // ─── TagBadge ─────────────────────────────────────────────────────────────
 
@@ -22,19 +22,24 @@ export function TagBadge({ tag, type, className }: TagBadgeProps) {
 
   const badge = (() => {
     switch (type) {
-      case "flair":
+      case 'flair':
         return (
-          <Badge variant="secondary" className={cn("text-arena-gold border-arena-gold/30", className)}>
+          <Badge
+            variant="secondary"
+            className={cn('text-arena-gold border-arena-gold/30', className)}
+          >
             {tag}
           </Badge>
         );
-      case "title":
+      case 'title':
         return (
-          <Badge className={`bg-arena-gold/20 text-arena-gold border-arena-gold/30 ${className ?? ""}`}>
+          <Badge
+            className={`bg-arena-gold/20 text-arena-gold border-arena-gold/30 ${className ?? ''}`}
+          >
             <Trophy className="h-3 w-3 mr-1" /> {tag}
           </Badge>
         );
-      case "injury":
+      case 'injury':
         return (
           <Badge variant="destructive" className={className}>
             {tag}
@@ -57,11 +62,19 @@ export function TagBadge({ tag, type, className }: TagBadgeProps) {
 
 // ─── StatBadge ────────────────────────────────────────────────────────────
 
-export function StatBadge({ styleName, career, variant = "outline", showFullName = false, className }: StatBadgeProps) {
+export function StatBadge({
+  styleName,
+  career,
+  variant = 'outline',
+  showFullName = false,
+  className,
+}: StatBadgeProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn('flex items-center gap-2', className)}>
       <Badge variant={variant} className="text-[10px] font-mono h-4 px-1 shrink-0">
-        {showFullName ? (STYLE_DISPLAY_NAMES[styleName] || styleName) : (STYLE_ABBREV[styleName] || styleName)}
+        {showFullName
+          ? STYLE_DISPLAY_NAMES[styleName] || styleName
+          : STYLE_ABBREV[styleName] || styleName}
       </Badge>
       {career && (
         <span className="text-[10px] text-muted-foreground">
@@ -87,7 +100,9 @@ export function WarriorNameTag({
 
   return (
     <div className="flex items-center gap-1.5">
-      <span className={`font-display font-semibold text-sm truncate ${isDead ? "text-muted-foreground line-through" : ""}`}>
+      <span
+        className={`font-display font-semibold text-sm truncate ${isDead ? 'text-muted-foreground line-through' : ''}`}
+      >
         {id ? (
           <WarriorLink name={name} id={id}>
             {name}

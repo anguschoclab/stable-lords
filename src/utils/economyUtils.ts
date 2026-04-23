@@ -12,7 +12,7 @@
  */
 export const canTransact = (treasury: number, cost: number): boolean => {
   if (cost < 0) {
-    throw new Error("Economy Error: Cannot transact a negative cost.");
+    throw new Error('Economy Error: Cannot transact a negative cost.');
   }
   return treasury >= cost;
 };

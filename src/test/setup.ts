@@ -1,31 +1,31 @@
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom';
 
 // Mock localStorage for Bun/Vitest environment
-const localStorageMock = (function() {
+const localStorageMock = (function () {
   let store: Record<string, string> = {};
   return {
-    getItem: function(key: string) {
+    getItem: function (key: string) {
       return store[key] || null;
     },
-    setItem: function(key: string, value: string) {
+    setItem: function (key: string, value: string) {
       store[key] = value.toString();
     },
-    removeItem: function(key: string) {
+    removeItem: function (key: string) {
       const { [key]: _, ...rest } = store;
       store = rest;
     },
-    clear: function() {
+    clear: function () {
       store = {};
-    }
+    },
   };
 })();
 
 Object.defineProperty(global, 'localStorage', {
-  value: localStorageMock
+  value: localStorageMock,
 });
 
 // Mock ResizeObserver for JSDOM
- 
+
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -38,7 +38,7 @@ const createMockDirHandle = (name: string) => ({
   name,
   getDirectoryHandle: async (dirName: string) => createMockDirHandle(dirName),
   getFileHandle: async () => ({}),
-  values: async function* () {}
+  values: async function* () {},
 });
 
 if (typeof global.navigator === 'undefined') {
@@ -47,13 +47,13 @@ if (typeof global.navigator === 'undefined') {
 
 Object.defineProperty(global.navigator, 'storage', {
   value: {
-    getDirectory: async () => createMockDirHandle('root')
+    getDirectory: async () => createMockDirHandle('root'),
   },
-  configurable: true
+  configurable: true,
 });
 
 // Mock Worker for Vitest
- 
+
 global.Worker = class Worker {
   url: string;
   onmessage: (event: any) => void = () => {};
@@ -66,12 +66,14 @@ global.Worker = class Worker {
   postMessage(_msg: any) {
     // Basic mock: echo back a completion message for common simulation worker patterns
     setTimeout(() => {
-      this.onmessage({ data: { type: "WORKER_READY" } });
+      this.onmessage({ data: { type: 'WORKER_READY' } });
     }, 0);
   }
 
   terminate() {}
   addEventListener() {}
   removeEventListener() {}
-  dispatchEvent() { return true; }
+  dispatchEvent() {
+    return true;
+  }
 } as any;

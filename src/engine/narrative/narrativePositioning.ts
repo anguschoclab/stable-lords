@@ -2,16 +2,16 @@
  * Narrative Positioning - Range and zone narration functions
  * Extracted from narrativePBP.ts to follow SRP
  */
-import { pick } from "./narrativeUtils";
-import { getFromArchive, interpolateTemplate } from "./narrativePBPUtils";
+import { pick } from './narrativeUtils';
+import { getFromArchive, interpolateTemplate } from './narrativePBPUtils';
 
 type RNG = () => number;
 
 export const RANGE_NAMES: Record<string, string> = {
-  Grapple: "grappling range",
-  Tight: "tight quarters",
-  Striking: "striking range",
-  Extended: "extended range",
+  Grapple: 'grappling range',
+  Tight: 'tight quarters',
+  Striking: 'striking range',
+  Extended: 'extended range',
 };
 
 /**
@@ -34,7 +34,7 @@ export function narrateRangeShift(rng: RNG, moverName: string, newRange: string)
  */
 export function narrateFeint(rng: RNG, attackerName: string, succeeded: boolean): string {
   if (succeeded) {
-    const template = getFromArchive(rng, ["pbp", "feints"]);
+    const template = getFromArchive(rng, ['pbp', 'feints']);
     return interpolateTemplate(template, { attacker: attackerName });
   } else {
     const templates = [
@@ -51,14 +51,14 @@ export function narrateFeint(rng: RNG, attackerName: string, succeeded: boolean)
  * Narrates zone shift.
  */
 export function narrateZoneShift(rng: RNG, pushedName: string, zone: string): string {
-  if (zone === "Corner") {
+  if (zone === 'Corner') {
     const templates = [
       `%A is backed into a corner — options shrinking fast.`,
       `%A finds the wall at their back, hemmed in with nowhere to go.`,
       `%A is driven into the corner — pressure becoming desperate.`,
     ];
     return interpolateTemplate(pick(rng, templates), { attacker: pushedName });
-  } else if (zone === "Edge") {
+  } else if (zone === 'Edge') {
     const templates = [
       `%A gives ground, retreating to the edge of the arena.`,
       `%A is pushed to the boundary — the pressure is mounting.`,
@@ -95,7 +95,7 @@ export function tacticStreakLine(name: string, tactic: string, streak: number): 
  * Generates pressing line.
  */
 export function pressingLine(rng: RNG, name: string): string {
-  const template = getFromArchive(rng, ["pbp", "pacing", "pressing"]);
+  const template = getFromArchive(rng, ['pbp', 'pacing', 'pressing']);
   return interpolateTemplate(template, { attacker: name });
 }
 
@@ -103,7 +103,7 @@ export function pressingLine(rng: RNG, name: string): string {
  * Narrates insight hint.
  */
 export function narrateInsightHint(rng: RNG, attribute: string): string | null {
-  const template = getFromArchive(rng, ["pbp", "insights", attribute]);
-  if (!template || template === "A fierce exchange occurs.") return null;
+  const template = getFromArchive(rng, ['pbp', 'insights', attribute]);
+  if (!template || template === 'A fierce exchange occurs.') return null;
   return template;
 }

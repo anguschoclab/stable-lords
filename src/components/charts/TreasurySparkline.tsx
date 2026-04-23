@@ -2,12 +2,12 @@
  * TreasurySparkline — inline SVG sparkline of treasury over weekly snapshots.
  * Reads from state.ledger (weekly entries) or falls back to current value only.
  */
-import { useMemo } from "react";
-import { useGameStore } from "@/state/useGameStore";
-import { useShallow } from "zustand/react/shallow";
-import { cn } from "@/lib/utils";
-import { Surface } from "@/components/ui/Surface";
-import { Coins, TrendingUp, TrendingDown } from "lucide-react";
+import { useMemo } from 'react';
+import { useGameStore } from '@/state/useGameStore';
+import { useShallow } from 'zustand/react/shallow';
+import { cn } from '@/lib/utils';
+import { Surface } from '@/components/ui/Surface';
+import { Coins, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface TreasurySparklineProps {
   className?: string;
@@ -15,7 +15,11 @@ interface TreasurySparklineProps {
   showLabel?: boolean;
 }
 
-export function TreasurySparkline({ className, height = 40, showLabel = true }: TreasurySparklineProps) {
+export function TreasurySparkline({
+  className,
+  height = 40,
+  showLabel = true,
+}: TreasurySparklineProps) {
   const { treasury, ledger, week } = useGameStore(
     useShallow((s) => ({
       treasury: s.treasury,
@@ -63,19 +67,19 @@ export function TreasurySparkline({ className, height = 40, showLabel = true }: 
   const PAD = 4;
 
   const pathD = useMemo(() => {
-    if (points.length < 2) return "";
+    if (points.length < 2) return '';
     return points
       .map((p, i) => {
         const x = PAD + (i / (points.length - 1)) * (W - PAD * 2);
         const y = H - PAD - ((p.value - min) / range) * (H - PAD * 2);
-        return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+        return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
       })
-      .join(" ");
+      .join(' ');
   }, [points, min, range, H, W]);
 
   const areaD = pathD
     ? `${pathD} L ${(PAD + (W - PAD * 2)).toFixed(1)} ${(H - PAD).toFixed(1)} L ${PAD} ${(H - PAD).toFixed(1)} Z`
-    : "";
+    : '';
 
   const last = values[values.length - 1] ?? 0;
   const prev = values[values.length - 2] ?? last;
@@ -83,16 +87,24 @@ export function TreasurySparkline({ className, height = 40, showLabel = true }: 
   const isUp = delta >= 0;
 
   return (
-    <Surface variant="glass" className={cn("p-4 flex flex-col gap-2", className)}>
+    <Surface variant="glass" className={cn('p-4 flex flex-col gap-2', className)}>
       {showLabel && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Coins className="h-3.5 w-3.5 text-arena-gold" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Treasury</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+              Treasury
+            </span>
           </div>
-          <div className={cn("flex items-center gap-1 text-[9px] font-black uppercase tracking-widest", isUp ? "text-primary" : "text-destructive")}>
+          <div
+            className={cn(
+              'flex items-center gap-1 text-[9px] font-black uppercase tracking-widest',
+              isUp ? 'text-primary' : 'text-destructive'
+            )}
+          >
             {isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-            {delta >= 0 ? "+" : ""}{delta.toLocaleString()}g
+            {delta >= 0 ? '+' : ''}
+            {delta.toLocaleString()}g
           </div>
         </div>
       )}
@@ -111,38 +123,41 @@ export function TreasurySparkline({ className, height = 40, showLabel = true }: 
         >
           <defs>
             <linearGradient id="treasury-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isUp ? "rgb(255,0,0)" : "rgb(239,68,68)"} stopOpacity="0.25" />
+              <stop
+                offset="0%"
+                stopColor={isUp ? 'rgb(255,0,0)' : 'rgb(239,68,68)'}
+                stopOpacity="0.25"
+              />
               <stop offset="100%" stopColor="transparent" stopOpacity="0" />
             </linearGradient>
           </defs>
-          {areaD && (
-            <path d={areaD} fill="url(#treasury-grad)" />
-          )}
+          {areaD && <path d={areaD} fill="url(#treasury-grad)" />}
           <path
             d={pathD}
             fill="none"
-            stroke={isUp ? "rgb(255,0,0)" : "rgb(239,68,68)"}
+            stroke={isUp ? 'rgb(255,0,0)' : 'rgb(239,68,68)'}
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           {/* Current value dot */}
-          {points.length > 0 && (() => {
-            const last = points[points.length - 1];
-            if (!last) return null;
-            const i = points.length - 1;
-            const x = PAD + (i / (points.length - 1)) * (W - PAD * 2);
-            const y = H - PAD - ((last.value - min) / range) * (H - PAD * 2);
-            return (
-              <circle
-                cx={x}
-                cy={y}
-                r={3}
-                fill={isUp ? "rgb(255,0,0)" : "rgb(239,68,68)"}
-                className="drop-shadow-[0_0_4px_rgba(255,0,0,0.8)]"
-              />
-            );
-          })()}
+          {points.length > 0 &&
+            (() => {
+              const last = points[points.length - 1];
+              if (!last) return null;
+              const i = points.length - 1;
+              const x = PAD + (i / (points.length - 1)) * (W - PAD * 2);
+              const y = H - PAD - ((last.value - min) / range) * (H - PAD * 2);
+              return (
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={3}
+                  fill={isUp ? 'rgb(255,0,0)' : 'rgb(239,68,68)'}
+                  className="drop-shadow-[0_0_4px_rgba(255,0,0,0.8)]"
+                />
+              );
+            })()}
         </svg>
       )}
 

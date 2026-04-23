@@ -1,38 +1,38 @@
-import type { DistanceRange, ArenaZone, ArenaConfig } from "@/types/shared.types";
-import type { FighterState } from "./resolution";
-import type { CombatEvent } from "@/types/combat.types";
-import { contestCheck } from "./combatMath";
+import type { DistanceRange, ArenaZone, ArenaConfig } from '@/types/shared.types';
+import type { FighterState } from './resolution';
+import type { CombatEvent } from '@/types/combat.types';
+import { contestCheck } from './combatMath';
 
 // ─── Weapon → Preferred Range ─────────────────────────────────────────────────
 
 const WEAPON_PREFERRED_RANGE: Record<string, DistanceRange> = {
   // Grapple
-  open_hand: "Grapple",
+  open_hand: 'Grapple',
   // Tight
-  dagger: "Tight",
-  club: "Tight",
-  short_sword: "Tight",
-  mace: "Tight",
+  dagger: 'Tight',
+  club: 'Tight',
+  short_sword: 'Tight',
+  mace: 'Tight',
   // Striking (default)
-  broad_sword: "Striking",
-  long_sword: "Striking",
-  axe: "Striking",
-  scimitar: "Striking",
-  falchion: "Striking",
-  battle_axe: "Striking",
-  war_hammer: "Striking",
-  morning_star: "Striking",
-  flail: "Striking",
+  broad_sword: 'Striking',
+  long_sword: 'Striking',
+  axe: 'Striking',
+  scimitar: 'Striking',
+  falchion: 'Striking',
+  battle_axe: 'Striking',
+  war_hammer: 'Striking',
+  morning_star: 'Striking',
+  flail: 'Striking',
   // Extended
-  halberd: "Extended",
-  great_sword: "Extended",
-  pike: "Extended",
-  spear: "Extended",
+  halberd: 'Extended',
+  great_sword: 'Extended',
+  pike: 'Extended',
+  spear: 'Extended',
 };
 
 export function getWeaponPreferredRange(weaponId?: string): DistanceRange {
-  if (!weaponId) return "Striking";
-  return WEAPON_PREFERRED_RANGE[weaponId] ?? "Striking";
+  if (!weaponId) return 'Striking';
+  return WEAPON_PREFERRED_RANGE[weaponId] ?? 'Striking';
 }
 
 // ─── Weapon Range Modifiers ───────────────────────────────────────────────────
@@ -46,30 +46,30 @@ export function getWeaponPreferredRange(weaponId?: string): DistanceRange {
 
 const WEAPON_RANGE_MODIFIERS: Record<string, Partial<Record<DistanceRange, number>>> = {
   // ── Grapple-preferred ─────────────────────────────────────────────────────
-  open_hand:    { Grapple: +6, Tight: +3,  Striking:  0, Extended: -6 },
+  open_hand: { Grapple: +6, Tight: +3, Striking: 0, Extended: -6 },
 
   // ── Tight-preferred ───────────────────────────────────────────────────────
-  dagger:       { Grapple: +3, Tight: +4,  Striking:  0, Extended: -5 },
-  club:         { Grapple: +2, Tight: +3,  Striking:  0, Extended: -3 },
-  short_sword:  { Grapple: +2, Tight: +4,  Striking:  0, Extended: -4 },
-  mace:         { Grapple: -1, Tight: +3,  Striking:  0, Extended: -2 },
+  dagger: { Grapple: +3, Tight: +4, Striking: 0, Extended: -5 },
+  club: { Grapple: +2, Tight: +3, Striking: 0, Extended: -3 },
+  short_sword: { Grapple: +2, Tight: +4, Striking: 0, Extended: -4 },
+  mace: { Grapple: -1, Tight: +3, Striking: 0, Extended: -2 },
 
   // ── Striking-preferred (default swords / axes) ────────────────────────────
-  broad_sword:  { Grapple: -3, Tight:  0,  Striking:  0, Extended: -1 },
-  long_sword:   { Grapple: -4, Tight: -1,  Striking:  0, Extended: +2 },
-  axe:          { Grapple: -2, Tight:  0,  Striking:  0, Extended: -2 },
-  scimitar:     { Grapple: -2, Tight: -1,  Striking:  0, Extended: -1 },
-  falchion:     { Grapple: -2, Tight: -1,  Striking:  0, Extended: -1 },
-  battle_axe:   { Grapple: -5, Tight: -2,  Striking:  0, Extended: +1 },
-  war_hammer:   { Grapple: -4, Tight: -1,  Striking:  0, Extended:  0 },
-  morning_star: { Grapple: -3, Tight: -1,  Striking:  0, Extended: +1 },
-  flail:        { Grapple: -2, Tight:  0,  Striking:  0, Extended: +2 },
+  broad_sword: { Grapple: -3, Tight: 0, Striking: 0, Extended: -1 },
+  long_sword: { Grapple: -4, Tight: -1, Striking: 0, Extended: +2 },
+  axe: { Grapple: -2, Tight: 0, Striking: 0, Extended: -2 },
+  scimitar: { Grapple: -2, Tight: -1, Striking: 0, Extended: -1 },
+  falchion: { Grapple: -2, Tight: -1, Striking: 0, Extended: -1 },
+  battle_axe: { Grapple: -5, Tight: -2, Striking: 0, Extended: +1 },
+  war_hammer: { Grapple: -4, Tight: -1, Striking: 0, Extended: 0 },
+  morning_star: { Grapple: -3, Tight: -1, Striking: 0, Extended: +1 },
+  flail: { Grapple: -2, Tight: 0, Striking: 0, Extended: +2 },
 
   // ── Extended-preferred (polearms) ─────────────────────────────────────────
-  spear:        { Grapple: -6, Tight: -3,  Striking:  0, Extended: +4 },
-  halberd:      { Grapple: -7, Tight: -4,  Striking:  0, Extended: +4 },
-  great_sword:  { Grapple: -6, Tight: -3,  Striking:  0, Extended: +3 },
-  pike:         { Grapple: -10, Tight: -6, Striking: -2,  Extended: +6 },
+  spear: { Grapple: -6, Tight: -3, Striking: 0, Extended: +4 },
+  halberd: { Grapple: -7, Tight: -4, Striking: 0, Extended: +4 },
+  great_sword: { Grapple: -6, Tight: -3, Striking: 0, Extended: +3 },
+  pike: { Grapple: -10, Tight: -6, Striking: -2, Extended: +6 },
 };
 
 /**
@@ -101,7 +101,7 @@ export function computeReachScore(
 // ─── Distance Contest ─────────────────────────────────────────────────────────
 
 export interface DistanceContestResult {
-  distanceWinner: "A" | "D" | null;
+  distanceWinner: 'A' | 'D' | null;
   rangeModA: number;
   rangeModD: number;
   newRange: DistanceRange;
@@ -136,14 +136,14 @@ export function contestDistance(
   const reachD = computeReachScore(fD.skills.INI, OE_D, motD, fD.recoveryDebt);
 
   const aWins = contestCheck(rng, reachA, reachD);
-  const winner: "A" | "D" = aWins ? "A" : "D";
+  const winner: 'A' | 'D' = aWins ? 'A' : 'D';
   const winnerPref = aWins ? prefA : prefD;
 
   // Shift range one step toward winner's preferred range
   const newRange = shiftRangeToward(currentRange, winnerPref);
 
   if (newRange !== currentRange) {
-    events.push({ type: "RANGE_SHIFT", actor: winner, result: newRange });
+    events.push({ type: 'RANGE_SHIFT', actor: winner, result: newRange });
   }
 
   return {
@@ -157,7 +157,7 @@ export function contestDistance(
 
 // ─── Range Shift Helper ───────────────────────────────────────────────────────
 
-const RANGE_ORDER: DistanceRange[] = ["Grapple", "Tight", "Striking", "Extended"];
+const RANGE_ORDER: DistanceRange[] = ['Grapple', 'Tight', 'Striking', 'Extended'];
 
 function shiftRangeToward(current: DistanceRange, target: DistanceRange): DistanceRange {
   const ci = RANGE_ORDER.indexOf(current);
@@ -172,8 +172,8 @@ function shiftRangeToward(current: DistanceRange, target: DistanceRange): Distan
  * Returns the DEF modifier for a fighter in the given zone.
  * Negative values = penalty. Center is always 0.
  */
-export function getZonePenalty(zone: ArenaZone, arenaConfig: Pick<ArenaConfig, "zoneDef">): number {
-  if (zone === "Center") return 0;
+export function getZonePenalty(zone: ArenaZone, arenaConfig: Pick<ArenaConfig, 'zoneDef'>): number {
+  if (zone === 'Center') return 0;
   return arenaConfig.zoneDef[zone] ?? 0;
 }
 
@@ -182,18 +182,25 @@ export function getZonePenalty(zone: ArenaZone, arenaConfig: Pick<ArenaConfig, "
 /** Returns the next zone when a fighter is pushed back. */
 export function transitionZone(current: ArenaZone): ArenaZone {
   switch (current) {
-    case "Center":   return "Edge";
-    case "Edge":     return "Corner";
-    case "Corner":   return "Corner";
-    case "Obstacle": return "Obstacle";
+    case 'Center':
+      return 'Edge';
+    case 'Edge':
+      return 'Corner';
+    case 'Corner':
+      return 'Corner';
+    case 'Obstacle':
+      return 'Obstacle';
   }
 }
 
 /** Resets zone toward Center (called when pushed fighter lands a hit). */
 export function resetZone(current: ArenaZone): ArenaZone {
   switch (current) {
-    case "Corner":   return "Edge";
-    case "Edge":     return "Center";
-    default:         return current;
+    case 'Corner':
+      return 'Edge';
+    case 'Edge':
+      return 'Center';
+    default:
+      return current;
   }
 }

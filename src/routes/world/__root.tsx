@@ -1,9 +1,9 @@
 /**
  * World Hub Root Layout
  */
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/world/__root")({
+export const Route = createFileRoute('/world/__root')({
   component: WorldLayout,
 });
 

@@ -1,6 +1,6 @@
-import { Dices } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { BACKSTORY_LIST, type BackstoryId } from "@/data/backstories";
+import { Dices } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BACKSTORY_LIST, type BackstoryId } from '@/data/backstories';
 
 interface BackstoryPickerProps {
   value: BackstoryId | null;
@@ -14,7 +14,9 @@ export default function BackstoryPicker({ value, onChange, onRandomize }: Backst
       <div className="flex items-center justify-between gap-2">
         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70 flex items-center gap-2">
           BACKSTORY
-          <span className="text-[8px] text-muted-foreground/50 normal-case tracking-normal">— Who you were before</span>
+          <span className="text-[8px] text-muted-foreground/50 normal-case tracking-normal">
+            — Who you were before
+          </span>
         </label>
         <Button
           variant="outline"
@@ -40,12 +42,12 @@ export default function BackstoryPicker({ value, onChange, onRandomize }: Backst
               title={b.lore}
               className={`p-3 text-left transition-all duration-150 ${
                 selected
-                  ? "border-accent/70 bg-accent/5"
-                  : "border-[rgba(60,42,22,0.8)] bg-[#0A0705] hover:border-accent/40 hover:bg-accent/5"
+                  ? 'border-accent/70 bg-accent/5'
+                  : 'border-[rgba(60,42,22,0.8)] bg-[#0A0705] hover:border-accent/40 hover:bg-accent/5'
               }`}
               style={{
-                borderWidth: "1px",
-                borderStyle: "solid",
+                borderWidth: '1px',
+                borderStyle: 'solid',
               }}
             >
               <div className="space-y-1.5">
@@ -60,7 +62,7 @@ export default function BackstoryPicker({ value, onChange, onRandomize }: Backst
                     <span
                       key={chip}
                       className="text-[8px] font-bold uppercase tracking-wide text-accent/80 bg-accent/5 px-1.5 py-0.5"
-                      style={{ border: "1px solid rgba(201, 151, 42, 0.25)" }}
+                      style={{ border: '1px solid rgba(201, 151, 42, 0.25)' }}
                     >
                       {chip}
                     </span>

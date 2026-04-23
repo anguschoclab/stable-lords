@@ -3,23 +3,23 @@
  * Single source of truth for combat math utilities used by simulate.ts.
  */
 
-type Phase = "opening" | "mid" | "late";
+type Phase = 'opening' | 'mid' | 'late';
 
 const PHASE_OPENING_THRESHOLD = 0.25;
 const PHASE_MID_THRESHOLD = 0.65;
 
 export function getPhase(exchange: number, maxExchanges: number): Phase {
-  if (maxExchanges <= 0) return "opening";
+  if (maxExchanges <= 0) return 'opening';
   const ratio = exchange / maxExchanges;
-  if (ratio <= PHASE_OPENING_THRESHOLD) return "opening";
-  if (ratio <= PHASE_MID_THRESHOLD) return "mid";
-  return "late";
+  if (ratio <= PHASE_OPENING_THRESHOLD) return 'opening';
+  if (ratio <= PHASE_MID_THRESHOLD) return 'mid';
+  return 'late';
 }
 
 export function pickText(rng: () => number, texts: string[]): string {
-  if (texts.length === 0) return "";
+  if (texts.length === 0) return '';
   const index = Math.floor(rng() * texts.length);
-  return texts[index] ?? "";
+  return texts[index] ?? '';
 }
 
 export function skillCheck(rng: () => number, skill: number, modifier: number = 0): boolean {
@@ -34,7 +34,7 @@ export function contestCheck(
   a: number,
   d: number,
   modA: number = 0,
-  modD: number = 0,
+  modD: number = 0
 ): boolean {
   const rollA = Math.floor(rng() * 20) + 1 + a + modA;
   const rollD = Math.floor(rng() * 20) + 1 + d + modD;
@@ -44,21 +44,21 @@ export function contestCheck(
 export function weatherStaminaModifier(weather?: string): number {
   if (!weather) return 1.0;
   switch (weather) {
-    case "Blazing Sun":
+    case 'Blazing Sun':
       return 1.3; // 30% more stamina drain
-    case "Sweltering":
+    case 'Sweltering':
       return 1.2; // 20% more stamina drain
-    case "Blood Moon":
+    case 'Blood Moon':
       return 1.1; // 10% more stamina drain
-    case "Gale":
+    case 'Gale':
       return 1.15; // 15% more stamina drain
-    case "Breezy":
+    case 'Breezy':
       return 0.9; // 10% less stamina drain
-    case "Eclipse":
+    case 'Eclipse':
       return 0.8; // 20% less stamina drain, slow methodical fights
-    case "Overcast":
-    case "Clear":
-    case "Rainy":
+    case 'Overcast':
+    case 'Clear':
+    case 'Rainy':
     default:
       return 1.0;
   }

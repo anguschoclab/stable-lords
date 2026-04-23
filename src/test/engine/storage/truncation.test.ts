@@ -1,15 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { truncateState } from "@/engine/storage/truncation";
-import { type GameState, type FightSummary } from "@/types/game";
+import { describe, it, expect } from 'vitest';
+import { truncateState } from '@/engine/storage/truncation';
+import { type GameState, type FightSummary } from '@/types/game';
 
-describe("truncateState", () => {
+describe('truncateState', () => {
   const createMockState = (overrides?: Partial<GameState>): GameState => {
     return {
       ...overrides,
     } as GameState;
   };
 
-  it("handles empty state and undefined arrays gracefully", () => {
+  it('handles empty state and undefined arrays gracefully', () => {
     const state = createMockState();
     const truncated = truncateState(state);
 
@@ -20,7 +20,7 @@ describe("truncateState", () => {
     expect(truncated.moodHistory).toEqual([]);
   });
 
-  it("truncates arrays to their respective limits", () => {
+  it('truncates arrays to their respective limits', () => {
     const makeArray = (size: number) => Array.from({ length: size }, (_, i) => ({ id: i }));
 
     const state = createMockState({
@@ -78,13 +78,13 @@ describe("truncateState", () => {
     expect(truncated.rivals.length).toBe(50);
   });
 
-  it("removes transcripts from arenaHistory for flights older than the last 20", () => {
+  it('removes transcripts from arenaHistory for flights older than the last 20', () => {
     // We create 30 fights.
     // Fights index 0-9 are older (will lose transcript).
     // Fights index 10-29 are the most recent 20 (will keep transcript).
     const arenaHistory = Array.from({ length: 30 }, (_, i) => ({
       id: `fight-${i}`,
-      transcript: [`line 1 of fight ${i}`, `line 2 of fight ${i}`]
+      transcript: [`line 1 of fight ${i}`, `line 2 of fight ${i}`],
     })) as unknown as FightSummary[];
 
     const state = createMockState({ arenaHistory });
@@ -106,7 +106,7 @@ describe("truncateState", () => {
     }
   });
 
-  it("slices keeping the most recent items (tail of the array)", () => {
+  it('slices keeping the most recent items (tail of the array)', () => {
     const makeArray = (size: number) => Array.from({ length: size }, (_, i) => ({ id: i }));
     // 105 items, ids 0 to 104
     const state = createMockState({ newsletter: makeArray(105) as unknown });

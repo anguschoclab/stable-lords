@@ -1,4 +1,4 @@
-import type { GameState } from "@/types/state.types";
+import type { GameState } from '@/types/state.types';
 
 export interface SimPulse {
   week: number;
@@ -16,9 +16,10 @@ export interface SimPulse {
  */
 export function collectPulse(state: GameState): SimPulse {
   const activeRivals = state.rivals || [];
-  const avgRivalTreasury = activeRivals.length > 0 
-    ? activeRivals.reduce((sum, r) => sum + r.treasury, 0) / activeRivals.length 
-    : 0;
+  const avgRivalTreasury =
+    activeRivals.length > 0
+      ? activeRivals.reduce((sum, r) => sum + r.treasury, 0) / activeRivals.length
+      : 0;
 
   return {
     week: state.week,
@@ -36,13 +37,14 @@ export function collectPulse(state: GameState): SimPulse {
  * Formats a list of pulses into a console table-friendly format.
  */
 export function formatPulseTable(pulses: SimPulse[]): string {
-  if (pulses.length === 0) return "No data";
-  
-  const header = "Week | Treasury | Roster | Dead | Rivals | Avg Rival Treas";
-  const divider = "---- | -------- | ------ | ---- | ------ | --------------";
-  const rows = pulses.map(p => 
-    `${p.week.toString().padEnd(4)} | ${p.playerTreasury.toString().padEnd(8)} | ${p.rosterSize.toString().padEnd(6)} | ${p.deadCount.toString().padEnd(4)} | ${p.rivalCount.toString().padEnd(6)} | ${p.avgRivalTreasury}`
+  if (pulses.length === 0) return 'No data';
+
+  const header = 'Week | Treasury | Roster | Dead | Rivals | Avg Rival Treas';
+  const divider = '---- | -------- | ------ | ---- | ------ | --------------';
+  const rows = pulses.map(
+    (p) =>
+      `${p.week.toString().padEnd(4)} | ${p.playerTreasury.toString().padEnd(8)} | ${p.rosterSize.toString().padEnd(6)} | ${p.deadCount.toString().padEnd(4)} | ${p.rivalCount.toString().padEnd(6)} | ${p.avgRivalTreasury}`
   );
 
-  return [header, divider, ...rows].join("\n");
+  return [header, divider, ...rows].join('\n');
 }

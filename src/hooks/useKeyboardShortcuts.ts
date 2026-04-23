@@ -7,19 +7,19 @@
  *   E           — Toggle event log sidebar
  *   ?           — Navigate to Help
  */
-import { useEffect, useCallback } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useCallback } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 
 const NAV_ROUTES = [
-  "/",                // 1 — Command Hub
-  "/command/combat",  // 2 — Combat
-  "/ops/personnel",   // 3 — Personnel
-  "/command/training",// 4 — Training
-  "/world/intelligence",// 5 — Intelligence/Scouting
-  "/ops/equipment",   // 6 — Equipment
-  "/world/tournaments",// 7 — Tournaments
-  "/world/chronicle", // 8 — Chronicle
-  "/ops/finance",     // 9 — Finance
+  '/', // 1 — Command Hub
+  '/command/combat', // 2 — Combat
+  '/ops/personnel', // 3 — Personnel
+  '/command/training', // 4 — Training
+  '/world/intelligence', // 5 — Intelligence/Scouting
+  '/ops/equipment', // 6 — Equipment
+  '/world/tournaments', // 7 — Tournaments
+  '/world/chronicle', // 8 — Chronicle
+  '/ops/finance', // 9 — Finance
 ];
 
 interface UseKeyboardShortcutsOpts {
@@ -33,7 +33,7 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
     (e: KeyboardEvent) => {
       // Skip when user is typing in an input
       const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if ((e.target as HTMLElement)?.isContentEditable) return;
 
       // Skip if modifier keys are held (allow browser shortcuts)
@@ -42,23 +42,23 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
       const key = e.key;
 
       // Space → go to Combat
-      if (key === " ") {
+      if (key === ' ') {
         e.preventDefault();
-        navigate({ to: "/command/combat" });
+        navigate({ to: '/command/combat' });
         return;
       }
 
       // E → toggle event log
-      if (key === "e" || key === "E") {
+      if (key === 'e' || key === 'E') {
         e.preventDefault();
         onToggleSidebar();
         return;
       }
 
       // ? → help
-      if (key === "?") {
+      if (key === '?') {
         e.preventDefault();
-        navigate({ to: "/help" });
+        navigate({ to: '/help' });
         return;
       }
 
@@ -74,7 +74,7 @@ export function useKeyboardShortcuts({ onToggleSidebar }: UseKeyboardShortcutsOp
   );
 
   useEffect(() => {
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, [handler]);
 }

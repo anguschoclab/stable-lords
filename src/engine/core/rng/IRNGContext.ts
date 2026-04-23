@@ -1,4 +1,4 @@
-import { IRNGService } from "./IRNGService";
+import { IRNGService } from './IRNGService';
 
 /**
  * RNG Context Interface

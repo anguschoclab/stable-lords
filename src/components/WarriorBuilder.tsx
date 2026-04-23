@@ -2,25 +2,36 @@
  * Stable Lords — Warrior Builder
  * Create a new warrior: allocate 70 points across 7 attributes, pick style, name.
  */
-import React, { useState, useMemo, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
+import React, { useState, useMemo, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-import { UserPlus, Shuffle, Shield, Swords, Heart, Zap, Eye, Brain, Dumbbell, Dices } from "lucide-react";
-import { randomWarriorName } from "@/data/randomNames";
-import { SkillBar } from "@/components/warrior/WarriorStats";
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import {
+  UserPlus,
+  Shuffle,
+  Shield,
+  Swords,
+  Heart,
+  Zap,
+  Eye,
+  Brain,
+  Dumbbell,
+  Dices,
+} from 'lucide-react';
+import { randomWarriorName } from '@/data/randomNames';
+import { SkillBar } from '@/components/warrior/WarriorStats';
 import {
   FightingStyle,
   STYLE_DISPLAY_NAMES,
@@ -30,8 +41,8 @@ import {
   ATTRIBUTE_MAX,
   ATTRIBUTE_TOTAL,
   type Attributes,
-} from "@/types/game";
-import { computeWarriorStats, DAMAGE_LABELS } from "@/engine/skillCalc";
+} from '@/types/game';
+import { computeWarriorStats, DAMAGE_LABELS } from '@/engine/skillCalc';
 
 const ATTR_ICONS: Record<keyof Attributes, React.ReactNode> = {
   ST: <Dumbbell className="h-3.5 w-3.5" />,
@@ -44,11 +55,7 @@ const ATTR_ICONS: Record<keyof Attributes, React.ReactNode> = {
 };
 
 interface WarriorBuilderProps {
-  onCreateWarrior: (data: {
-    name: string;
-    style: FightingStyle;
-    attributes: Attributes;
-  }) => void;
+  onCreateWarrior: (data: { name: string; style: FightingStyle; attributes: Attributes }) => void;
   maxRoster?: number;
   currentRosterSize?: number;
 }
@@ -58,35 +65,32 @@ export default function WarriorBuilder({
   maxRoster = 10,
   currentRosterSize = 0,
 }: WarriorBuilderProps) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [style, setStyle] = useState<FightingStyle>(FightingStyle.StrikingAttack);
   const [attrs, setAttrs] = useState<Attributes>({
-    ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10,
+    ST: 10,
+    CN: 10,
+    SZ: 10,
+    WT: 10,
+    WL: 10,
+    SP: 10,
+    DF: 10,
   });
 
-  const total = useMemo(
-    () => ATTRIBUTE_KEYS.reduce((s, k) => s + attrs[k], 0),
-    [attrs]
-  );
+  const total = useMemo(() => ATTRIBUTE_KEYS.reduce((s, k) => s + attrs[k], 0), [attrs]);
 
   const remaining = ATTRIBUTE_TOTAL - total;
   const isValid = remaining === 0 && name.trim().length >= 2;
   const rosterFull = currentRosterSize >= maxRoster;
 
-  const stats = useMemo(
-    () => computeWarriorStats(attrs, style),
-    [attrs, style]
-  );
+  const stats = useMemo(() => computeWarriorStats(attrs, style), [attrs, style]);
 
-  const updateAttr = useCallback(
-    (key: keyof Attributes, value: number) => {
-      setAttrs((prev) => {
-        const clamped = Math.max(ATTRIBUTE_MIN, Math.min(ATTRIBUTE_MAX, value));
-        return { ...prev, [key]: clamped };
-      });
-    },
-    []
-  );
+  const updateAttr = useCallback((key: keyof Attributes, value: number) => {
+    setAttrs((prev) => {
+      const clamped = Math.max(ATTRIBUTE_MIN, Math.min(ATTRIBUTE_MAX, value));
+      return { ...prev, [key]: clamped };
+    });
+  }, []);
 
   const randomize = useCallback(() => {
     const newAttrs: Attributes = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };
@@ -111,7 +115,7 @@ export default function WarriorBuilder({
   const handleCreate = useCallback(() => {
     if (!isValid || rosterFull) return;
     onCreateWarrior({ name: name.trim().toUpperCase(), style, attributes: attrs });
-    setName("");
+    setName('');
     setAttrs({ ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 });
   }, [isValid, rosterFull, name, style, attrs, onCreateWarrior]);
 
@@ -121,7 +125,8 @@ export default function WarriorBuilder({
         <div>
           <h1 className="text-2xl font-display font-bold">Warrior Builder</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Forge a new warrior for your stable. Allocate {ATTRIBUTE_TOTAL} points across 7 attributes.
+            Forge a new warrior for your stable. Allocate {ATTRIBUTE_TOTAL} points across 7
+            attributes.
           </p>
         </div>
         <Button variant="outline" onClick={randomize} className="gap-2">
@@ -183,10 +188,14 @@ export default function WarriorBuilder({
               <CardTitle className="font-display text-lg flex items-center justify-between">
                 <span>Attributes</span>
                 <Badge
-                  variant={remaining === 0 ? "default" : remaining > 0 ? "secondary" : "destructive"}
+                  variant={
+                    remaining === 0 ? 'default' : remaining > 0 ? 'secondary' : 'destructive'
+                  }
                   className="font-mono"
                 >
-                  {remaining === 0 ? "✓ 70/70" : `${total}/${ATTRIBUTE_TOTAL} (${remaining > 0 ? `+${remaining}` : remaining})`}
+                  {remaining === 0
+                    ? '✓ 70/70'
+                    : `${total}/${ATTRIBUTE_TOTAL} (${remaining > 0 ? `+${remaining}` : remaining})`}
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -212,10 +221,7 @@ export default function WarriorBuilder({
                   />
                 </div>
               ))}
-              <Progress
-                value={(total / ATTRIBUTE_TOTAL) * 100}
-                className="h-2"
-              />
+              <Progress value={(total / ATTRIBUTE_TOTAL) * 100} className="h-2" />
             </CardContent>
           </Card>
         </div>
@@ -249,7 +255,9 @@ export default function WarriorBuilder({
                 </div>
                 <div className="rounded-none bg-secondary p-3 border border-border">
                   <div className="text-xs text-muted-foreground">Damage</div>
-                  <div className="text-xl font-bold">{DAMAGE_LABELS[stats.derivedStats.damage]}</div>
+                  <div className="text-xl font-bold">
+                    {DAMAGE_LABELS[stats.derivedStats.damage]}
+                  </div>
                 </div>
                 <div className="rounded-none bg-secondary p-3 border border-border">
                   <div className="text-xs text-muted-foreground">Carry Cap</div>
@@ -266,7 +274,13 @@ export default function WarriorBuilder({
             className="w-full gap-2"
           >
             <UserPlus className="h-4 w-4" />
-            {rosterFull ? "Roster Full" : !isValid ? (remaining !== 0 ? `${Math.abs(remaining)} points ${remaining > 0 ? "remaining" : "over"}` : "Name required") : "Recruit Warrior"}
+            {rosterFull
+              ? 'Roster Full'
+              : !isValid
+                ? remaining !== 0
+                  ? `${Math.abs(remaining)} points ${remaining > 0 ? 'remaining' : 'over'}`
+                  : 'Name required'
+                : 'Recruit Warrior'}
           </Button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import type { Gear, FightingStyle } from "./game";
+import type { Gear, FightingStyle } from './game';
 
 export interface FighterPose {
   /** Position 0-100 across the arena (left to right) */
@@ -6,17 +6,25 @@ export interface FighterPose {
   /** Vertical offset for lunges/jumps (-10 to 10) */
   y: number;
   /** Facing direction */
-  facing: "left" | "right";
+  facing: 'left' | 'right';
   /** Current combat stance */
-  stance: "neutral" | "advancing" | "retreating" | "lunging" | "defending" | "stunned" | "victorious" | "defeated";
+  stance:
+    | 'neutral'
+    | 'advancing'
+    | 'retreating'
+    | 'lunging'
+    | 'defending'
+    | 'stunned'
+    | 'victorious'
+    | 'defeated';
 }
 
 export interface SpeechBubble {
   id: string;
   text: string;
-  speaker: "A" | "D";
+  speaker: 'A' | 'D';
   duration: number;
-  type: "taunt" | "hit" | "crit" | "death" | "victory";
+  type: 'taunt' | 'hit' | 'crit' | 'death' | 'victory';
 }
 
 export interface ArenaState {

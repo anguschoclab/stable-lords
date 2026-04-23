@@ -33,12 +33,16 @@ const SHIELD_PATHS: Record<ShieldShape, string> = {
   heater: 'M10,10 h80 v40 c0,25 -20,40 -40,40 s-40,-15 -40,-40 z',
   french: 'M10,15 h80 c0,30 -20,50 -40,55 s-40,-25 -40,-55 z',
   swiss: 'M15,10 h70 v50 c0,20 -15,30 -35,30 s-35,-10 -35,-30 z',
-  spanish: 'M10,10 h80 c0,20 -10,35 -20,45 l20,25 l-40,-25 l-40,25 l20,-25 c-10,-10 -20,-25 -20,-45 z',
+  spanish:
+    'M10,10 h80 c0,20 -10,35 -20,45 l20,25 l-40,-25 l-40,25 l20,-25 c-10,-10 -20,-25 -20,-45 z',
   lozenge: 'M50,10 l40,40 l-40,40 l-40,-40 z',
 };
 
 // Field pattern definitions
-function getFieldPattern(fieldType: FieldType, colors: { primary: string; secondary?: string; metal: string }): React.ReactNode {
+function getFieldPattern(
+  fieldType: FieldType,
+  colors: { primary: string; secondary?: string; metal: string }
+): React.ReactNode {
   const { primary, secondary = primary, metal } = colors;
 
   switch (fieldType) {
@@ -67,7 +71,11 @@ function getFieldPattern(fieldType: FieldType, colors: { primary: string; second
       return (
         <svg viewBox="0 0 100 100" preserveAspectRatio="none">
           <polygon points="0,0 30,0 100,70 100,100 70,100 0,30" fill={primary} />
-          <polygon points="30,0 100,70 100,100 70,100 0,30 0,0" fill={secondary} transform="translate(10,-10)" />
+          <polygon
+            points="30,0 100,70 100,100 70,100 0,30 0,0"
+            fill={secondary}
+            transform="translate(10,-10)"
+          />
         </svg>
       );
 
@@ -97,8 +105,14 @@ function getFieldPattern(fieldType: FieldType, colors: { primary: string; second
     case 'saltire':
       return (
         <>
-          <polygon points="0,0 25,0 50,25 75,0 100,0 100,25 75,50 100,75 100,100 75,100 50,75 25,100 0,100 0,75 25,50 0,25" fill={primary} />
-          <polygon points="25,0 50,25 75,0 100,25 75,50 100,75 75,100 50,75 25,100 0,75 25,50 0,25" fill={secondary} />
+          <polygon
+            points="0,0 25,0 50,25 75,0 100,0 100,25 75,50 100,75 100,100 75,100 50,75 25,100 0,100 0,75 25,50 0,25"
+            fill={primary}
+          />
+          <polygon
+            points="25,0 50,25 75,0 100,25 75,50 100,75 75,100 50,75 25,100 0,75 25,50 0,25"
+            fill={secondary}
+          />
         </>
       );
 
@@ -132,7 +146,11 @@ function getFieldPattern(fieldType: FieldType, colors: { primary: string; second
       return (
         <svg viewBox="0 0 100 100" preserveAspectRatio="none">
           <polygon points="100,0 70,0 0,70 0,100 30,100 100,30" fill={primary} />
-          <polygon points="70,0 0,70 0,100 30,100 100,30 100,0" fill={secondary} transform="translate(-10,10)" />
+          <polygon
+            points="70,0 0,70 0,100 30,100 100,30 100,0"
+            fill={secondary}
+            transform="translate(-10,10)"
+          />
         </svg>
       );
 
@@ -198,7 +216,13 @@ function getPostureTransform(posture?: CrestData['charge']['posture']): string {
 // Charge path center is at (50,50) in a 100x100 box.
 // For a translate(tx,ty) scale(s), the path center maps to (tx + 50s, ty + 50s).
 // To place the center at (cX, cY): tx = cX - 50*s, ty = cY - 50*s
-function ChargeComponent({ charge, metal }: { charge: CrestData['charge']; metal: string }): React.ReactNode {
+function ChargeComponent({
+  charge,
+  metal,
+}: {
+  charge: CrestData['charge'];
+  metal: string;
+}): React.ReactNode {
   const paths = getChargePathsByType(charge.type);
   const chargeData: ChargePath | undefined = paths[charge.name];
 
@@ -340,13 +364,15 @@ export function StableCrest({
   const metalColor = crest.metalColor === 'gold' ? '#D4AF37' : '#C0C0C0';
 
   // Glow effect based on metal color
-  const glowColor = crest.metalColor === 'gold' 
-    ? 'rgba(212, 175, 55, 0.3)' 
-    : 'rgba(192, 192, 192, 0.25)';
-  
-  const glowStyle: React.CSSProperties = pixelSize >= 64 ? {
-    filter: `drop-shadow(0 0 ${pixelSize * 0.15}px ${glowColor})`,
-  } : {};
+  const glowColor =
+    crest.metalColor === 'gold' ? 'rgba(212, 175, 55, 0.3)' : 'rgba(192, 192, 192, 0.25)';
+
+  const glowStyle: React.CSSProperties =
+    pixelSize >= 64
+      ? {
+          filter: `drop-shadow(0 0 ${pixelSize * 0.15}px ${glowColor})`,
+        }
+      : {};
 
   // Container style for animation and hover
   const containerStyle: React.CSSProperties = {
@@ -366,7 +392,8 @@ export function StableCrest({
   const heraldicDesc = useMemo(() => {
     const metal = crest.metalColor === 'gold' ? 'Or' : 'Argent';
     const field = crest.fieldType === 'solid' ? '' : ` ${crest.fieldType}`;
-    const charge = crest.charge.count > 1 ? `${crest.charge.count} ${crest.charge.name}s` : crest.charge.name;
+    const charge =
+      crest.charge.count > 1 ? `${crest.charge.count} ${crest.charge.name}s` : crest.charge.name;
     return `${metal}${field} with ${charge}`;
   }, [crest]);
 
@@ -374,7 +401,7 @@ export function StableCrest({
   const hasGeneration = showGenerationBadge && crest.generation && crest.generation > 0;
 
   return (
-    <div 
+    <div
       className={`stable-crest ${className} ${selected ? 'ring-2 ring-accent/50 rounded-sm' : ''} group`}
       style={containerStyle}
       title={showTooltip ? heraldicDesc : undefined}
@@ -388,54 +415,49 @@ export function StableCrest({
           aria-label={`Stable crest: ${crest.charge.name} on ${crest.fieldType} field`}
           className="transition-all duration-200 group-hover:drop-shadow-lg"
         >
-        <defs>
-          {/* Drop shadow filter */}
-          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="1" dy="1" stdDeviation="1" floodOpacity="0.3" />
-          </filter>
-        </defs>
+          <defs>
+            {/* Drop shadow filter */}
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="1" dy="1" stdDeviation="1" floodOpacity="0.3" />
+            </filter>
+          </defs>
 
-        {/* Mantling (behind shield) */}
-        {shouldShowMantling && <Mantling color={crest.primaryColor} />}
+          {/* Mantling (behind shield) */}
+          {shouldShowMantling && <Mantling color={crest.primaryColor} />}
 
-        {/* Helmet (above shield, behind crest) */}
-        {shouldShowHelmet && <Helmet metal={metalColor} />}
+          {/* Helmet (above shield, behind crest) */}
+          {shouldShowHelmet && <Helmet metal={metalColor} />}
 
-        {/* Shield with field pattern */}
-        <g filter="url(#shadow)">
-          {/* Clip path for the shield */}
-          <clipPath id="shieldClip">
-            <path d={shieldPath} />
-          </clipPath>
+          {/* Shield with field pattern */}
+          <g filter="url(#shadow)">
+            {/* Clip path for the shield */}
+            <clipPath id="shieldClip">
+              <path d={shieldPath} />
+            </clipPath>
 
-          {/* Shield background with field pattern */}
-          <g clipPath="url(#shieldClip)">
-            {getFieldPattern(crest.fieldType, {
-              primary: crest.primaryColor,
-              secondary: crest.secondaryColor,
-              metal: metalColor,
-            })}
+            {/* Shield background with field pattern */}
+            <g clipPath="url(#shieldClip)">
+              {getFieldPattern(crest.fieldType, {
+                primary: crest.primaryColor,
+                secondary: crest.secondaryColor,
+                metal: metalColor,
+              })}
+            </g>
+
+            {/* Shield border */}
+            <path d={shieldPath} fill="none" stroke={metalColor} strokeWidth="3" />
+
+            {/* Charge(s) */}
+            <clipPath id="chargeClip">
+              <path d={shieldPath} />
+            </clipPath>
+            <g clipPath="url(#chargeClip)">
+              <ChargeComponent charge={crest.charge} metal={metalColor} />
+            </g>
           </g>
-
-          {/* Shield border */}
-          <path
-            d={shieldPath}
-            fill="none"
-            stroke={metalColor}
-            strokeWidth="3"
-          />
-
-          {/* Charge(s) */}
-          <clipPath id="chargeClip">
-            <path d={shieldPath} />
-          </clipPath>
-          <g clipPath="url(#chargeClip)">
-            <ChargeComponent charge={crest.charge} metal={metalColor} />
-          </g>
-        </g>
-      </svg>
-      </div> {/* Close hover scale wrapper */}
-
+        </svg>
+      </div>{' '}
+      {/* Close hover scale wrapper */}
       {/* Animation styles */}
       {animate && (
         <style>{`
@@ -451,10 +473,9 @@ export function StableCrest({
           }
         `}</style>
       )}
-      
       {/* Generation Badge */}
       {hasGeneration && (
-        <div 
+        <div
           className="absolute -bottom-1 -right-1 text-[8px] font-black px-1 py-0.5 rounded-none bg-black/80 border border-accent/30 text-accent/80"
           style={{ fontSize: Math.max(8, pixelSize * 0.15) }}
         >

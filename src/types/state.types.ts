@@ -24,15 +24,15 @@ import {
   type FightingStyle,
   type FightId,
   type Attributes,
-  type BaseSkills
-} from "./shared.types";
+  type BaseSkills,
+} from './shared.types';
 
-import { type Warrior, type DeathEvent } from "./warrior.types";
-import { type CrestData } from "./crest.types";
+import { type Warrior, type DeathEvent } from './warrior.types';
+import { type CrestData } from './crest.types';
 
-export type { 
-  Warrior, 
-  DeathEvent, 
+export type {
+  Warrior,
+  DeathEvent,
   WeatherType,
   Season,
   CrowdMoodType,
@@ -41,11 +41,11 @@ export type {
   TrainerFocus,
   Trainer,
   ScoutQuality,
-  CrestData
+  CrestData,
 };
-import { type FightSummary, type FightOutcomeBy } from "./combat.types";
+import { type FightSummary, type FightOutcomeBy } from './combat.types';
 export type { FightSummary, FightOutcomeBy };
-import type { PoolWarrior } from "@/engine/recruitment";
+import type { PoolWarrior } from '@/engine/recruitment';
 export type { PoolWarrior };
 
 // ─── Ranking & Contracts ───────────────────────────────────────────────────
@@ -56,8 +56,8 @@ export interface RankingEntry {
   compositeScore: number;
 }
 
-export type BoutOfferStatus = "Proposed" | "Signed" | "Rejected" | "Canceled" | "Expired";
-export type BoutOfferResponse = "Pending" | "Accepted" | "Declined";
+export type BoutOfferStatus = 'Proposed' | 'Signed' | 'Rejected' | 'Canceled' | 'Expired';
+export type BoutOfferResponse = 'Pending' | 'Accepted' | 'Declined';
 
 export interface BoutOffer {
   id: BoutOfferId;
@@ -71,14 +71,14 @@ export interface BoutOffer {
   responses: Record<WarriorId, BoutOfferResponse>;
 }
 
-export type PromoterPersonality = "Greedy" | "Honorable" | "Sadistic" | "Flashy" | "Corporate";
+export type PromoterPersonality = 'Greedy' | 'Honorable' | 'Sadistic' | 'Flashy' | 'Corporate';
 
 export interface Promoter {
   id: PromoterId;
   name: string;
   age: number;
   personality: PromoterPersonality;
-  tier: "Local" | "Regional" | "National" | "Legendary";
+  tier: 'Local' | 'Regional' | 'National' | 'Legendary';
   capacity: number; // Max bouts per week
   biases: FightingStyle[];
   history: {
@@ -91,8 +91,8 @@ export interface Promoter {
 
 // ─── Owner / Stable ─────────────────────────────────────────────────────────
 
-export type OwnerPersonality = "Aggressive" | "Methodical" | "Showman" | "Pragmatic" | "Tactician";
-export type MetaAdaptation = "MetaChaser" | "Traditionalist" | "Opportunist" | "Innovator";
+export type OwnerPersonality = 'Aggressive' | 'Methodical' | 'Showman' | 'Pragmatic' | 'Tactician';
+export type MetaAdaptation = 'MetaChaser' | 'Traditionalist' | 'Opportunist' | 'Innovator';
 
 export interface Owner {
   id: StableId;
@@ -106,7 +106,7 @@ export interface Owner {
   favoredStyles?: FightingStyle[];
   generation?: number; // 🛡️ Crest lineage depth (0 = original founder)
   crest?: CrestData; // 🛡️ Heraldic crest for the stable
-  backstoryId?: import("@/data/backstories").BackstoryId;
+  backstoryId?: import('@/data/backstories').BackstoryId;
   foundedByWarriorId?: WarriorId; // Lineage breadcrumb for legacy founders
 }
 
@@ -116,14 +116,14 @@ export interface TournamentBout {
   round: number;
   matchIndex: number;
   a: string; // snapshots name for display
-  d: string; 
+  d: string;
   warriorIdA: WarriorId;
   warriorIdD: WarriorId;
   stableIdA?: StableId;
   stableIdD?: StableId;
   stableA?: string;
   stableD?: string;
-  winner?: "A" | "D" | null;
+  winner?: 'A' | 'D' | null;
   by?: FightOutcomeBy;
   fightId?: FightId;
 }
@@ -135,14 +135,14 @@ export interface TournamentEntry {
   tierId: string; // 🌩️ Tier Identity (v1.0)
   name: string;
   bracket: TournamentBout[];
-  participants: Warrior[]; 
+  participants: Warrior[];
   champion?: WarriorId;
   completed: boolean;
 }
 
 export interface TrainingAssignment {
   warriorId: WarriorId;
-  type: "attribute" | "recovery" | "skillDrill";
+  type: 'attribute' | 'recovery' | 'skillDrill';
   attribute?: keyof Attributes;
   /** For skillDrill assignments — which combat skill to drill (ATT/PAR/DEF/INI/RIP/DEC). */
   skill?: keyof BaseSkills;
@@ -159,10 +159,18 @@ export interface LedgerEntry {
   week: number;
   label: string;
   amount: number;
-  category: "fight" | "training" | "recruit" | "trainer" | "upkeep" | "prize" | "other";
+  category: 'fight' | 'training' | 'recruit' | 'trainer' | 'upkeep' | 'prize' | 'other';
 }
 
-export type AIIntent = "EXPANSION" | "CONSOLIDATION" | "VENDETTA" | "RECOVERY" | "SURVIVAL" | "WEALTH_ACCUMULATION" | "AGGRESSIVE_EXPANSION" | "ROSTER_DIVERSITY";
+export type AIIntent =
+  | 'EXPANSION'
+  | 'CONSOLIDATION'
+  | 'VENDETTA'
+  | 'RECOVERY'
+  | 'SURVIVAL'
+  | 'WEALTH_ACCUMULATION'
+  | 'AGGRESSIVE_EXPANSION'
+  | 'ROSTER_DIVERSITY';
 
 export interface AIStrategy {
   intent: AIIntent;
@@ -175,23 +183,23 @@ export interface AIStrategy {
 export interface AIEvent {
   id: string; // Events are often transient or don't need branding if not referenced
   week: number;
-  type: "STRATEGY" | "FINANCE" | "ROSTER" | "STAFF";
+  type: 'STRATEGY' | 'FINANCE' | 'ROSTER' | 'STAFF';
   description: string;
-  riskTier: "Low" | "Medium" | "High";
+  riskTier: 'Low' | 'Medium' | 'High';
 }
 
 export interface AIAgentMemory {
   lastTreasury: number;
   burnRate: number;
-  metaAwareness: Record<string, number>; 
-  knownRivals: StableId[]; 
+  metaAwareness: Record<string, number>;
+  knownRivals: StableId[];
   currentIntent?: AIIntent;
 }
 
 export interface RivalStableData {
   id: StableId;
   owner: Owner;
-  fame: number; 
+  fame: number;
   roster: Warrior[];
   trainers?: Trainer[];
   treasury: number;
@@ -201,7 +209,7 @@ export interface RivalStableData {
   motto?: string;
   origin?: string;
   philosophy?: string;
-  tier?: "Minor" | "Established" | "Major" | "Legendary";
+  tier?: 'Minor' | 'Established' | 'Major' | 'Legendary';
   crest?: CrestData;
   seasonalGrowth?: SeasonalGrowth[];
 }
@@ -260,7 +268,7 @@ export interface GazetteStory {
   week: number;
 }
 
-export type InsightTokenType = "Weapon" | "Rhythm" | "Style" | "Attribute" | "Tactic";
+export type InsightTokenType = 'Weapon' | 'Rhythm' | 'Style' | 'Attribute' | 'Tactic';
 
 export interface InsightToken {
   id: InsightId;
@@ -275,7 +283,7 @@ export interface InsightToken {
 export interface HallEntry {
   id: HallEntryId;
   week: number;
-  label: "Fight of the Week" | "Fight of the Tournament";
+  label: 'Fight of the Week' | 'Fight of the Tournament';
   fightId: FightId;
 }
 
@@ -285,13 +293,23 @@ export interface SimulationReport {
   id: SimulationReportId;
   week: number;
   treasuryChange: number;
-  trainingGains: { warriorId: WarriorId; warriorName: string; attr: keyof Attributes; gain: number }[];
+  trainingGains: {
+    warriorId: WarriorId;
+    warriorName: string;
+    attr: keyof Attributes;
+    gain: number;
+  }[];
   agingEvents: string[];
   healthEvents: string[];
-  bouts?: import("@/types/combat.types").FightSummary[];
+  bouts?: import('@/types/combat.types').FightSummary[];
 }
 
-export type AnnualAwardType = "WARRIOR_OF_YEAR" | "KILLER_OF_YEAR" | "STABLE_OF_YEAR" | "CLASS_MVP" | "TOURNAMENT_RANK";
+export type AnnualAwardType =
+  | 'WARRIOR_OF_YEAR'
+  | 'KILLER_OF_YEAR'
+  | 'STABLE_OF_YEAR'
+  | 'CLASS_MVP'
+  | 'TOURNAMENT_RANK';
 
 export interface AnnualAward {
   year: number;
@@ -315,7 +333,7 @@ export interface GameState {
     gazette: NewsletterItem[];
     injuries: string[];
     deaths: string[];
-    bouts: import("@/engine/boutProcessor").BoutResult[];
+    bouts: import('@/engine/boutProcessor').BoutResult[];
     promotions: string[];
   };
   ftueComplete: boolean;
@@ -328,7 +346,7 @@ export interface GameState {
   ledger: LedgerEntry[];
   week: number;
   year: number; // 🌩️ Calendar Authority (v1.0)
-  phase: "planning" | "resolution";
+  phase: 'planning' | 'resolution';
   season: Season;
   weather: WeatherType;
   roster: Warrior[];
@@ -372,10 +390,10 @@ export interface GameState {
   promoters: Record<PromoterId, Promoter>;
   boutOffers: Record<BoutOfferId, BoutOffer>;
   realmRankings: Record<WarriorId, RankingEntry>;
-  awards: AnnualAward[]; 
+  awards: AnnualAward[];
   lastSimulationReport?: SimulationReport;
-  cachedMetaDrift?: import("@/engine/metaDrift").StyleMeta; 
-  warriorMap?: Map<WarriorId, import("@/types/warrior.types").Warrior>; 
+  cachedMetaDrift?: import('@/engine/metaDrift').StyleMeta;
+  warriorMap?: Map<WarriorId, import('@/types/warrior.types').Warrior>;
 }
 
 export interface UIPrefs {

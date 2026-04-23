@@ -1,11 +1,16 @@
 /**
  * Scouting System Tests
  */
-import { describe, it, expect } from "vitest";
-import { generateScoutReport, getScoutCost, type ScoutQuality, getAttributeDescription } from "@/engine/scouting";
-import { FightingStyle, type Warrior } from "@/types/game";
-import { computeWarriorStats } from "@/engine/skillCalc";
-import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
+import { describe, it, expect } from 'vitest';
+import {
+  generateScoutReport,
+  getScoutCost,
+  type ScoutQuality,
+  getAttributeDescription,
+} from '@/engine/scouting';
+import { FightingStyle, type Warrior } from '@/types/game';
+import { computeWarriorStats } from '@/engine/skillCalc';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 const TEST_RNG = new SeededRNGService(42);
 
@@ -13,8 +18,8 @@ function makeWarrior(overrides?: Partial<Warrior>): Warrior {
   const attrs = { ST: 15, CN: 12, SZ: 10, WT: 14, WL: 13, SP: 16, DF: 11 };
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, FightingStyle.SlashingAttack);
   return {
-    id: "w1",
-    name: "Opponent",
+    id: 'w1',
+    name: 'Opponent',
     style: FightingStyle.SlashingAttack,
     attributes: attrs,
     baseSkills,
@@ -26,162 +31,171 @@ function makeWarrior(overrides?: Partial<Warrior>): Warrior {
     flair: [],
     career: { wins: 8, losses: 3, kills: 2 },
     champion: false,
-    status: "Active",
+    status: 'Active',
     age: 24,
     plan: { OE: 7, AL: 5, killDesire: 6 } as unknown,
     ...overrides,
   };
 }
 
-describe("Scouting System", () => {
-  describe("getScoutCost", () => {
-    it("should return correct costs for each quality", () => {
-      expect(getScoutCost("Basic")).toBe(25);
-      expect(getScoutCost("Detailed")).toBe(50);
-      expect(getScoutCost("Expert")).toBe(100);
+describe('Scouting System', () => {
+  describe('getScoutCost', () => {
+    it('should return correct costs for each quality', () => {
+      expect(getScoutCost('Basic')).toBe(25);
+      expect(getScoutCost('Detailed')).toBe(50);
+      expect(getScoutCost('Expert')).toBe(100);
     });
   });
 
-  describe("generateScoutReport", () => {
-    it("should always reveal warrior style", () => {
+  describe('generateScoutReport', () => {
+    it('should always reveal warrior style', () => {
       const warrior = makeWarrior();
-      const { report } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      
+      const { report } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+
       expect(report.style).toBe(FightingStyle.SlashingAttack);
     });
 
-    it("should include win-loss record", () => {
+    it('should include win-loss record', () => {
       const warrior = makeWarrior({ career: { wins: 12, losses: 5, kills: 3 } });
-      const { report } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      
-      expect(report.record).toBe("12W-5L");
+      const { report } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+
+      expect(report.record).toBe('12W-5L');
     });
 
-    it("should generate attribute text based on quality", () => {
+    it('should generate attribute text based on quality', () => {
       const warrior = makeWarrior();
-      const { report: expertReport } = generateScoutReport(warrior, "Expert", 1, TEST_RNG);
-      
+      const { report: expertReport } = generateScoutReport(warrior, 'Expert', 1, TEST_RNG);
+
       // We expect ST (15) to be described with Great/Good range at most
-      expect(typeof expertReport.attributeRanges.ST).toBe("string");
+      expect(typeof expertReport.attributeRanges.ST).toBe('string');
       expect(expertReport.attributeRanges.ST.length).toBeGreaterThan(0);
     });
 
-    it("should not show injuries in Basic report", () => {
+    it('should not show injuries in Basic report', () => {
       const warrior = makeWarrior({
-        injuries: [{ id: "i1", name: "Cut", description: "Ouch", severity: "Minor", weeksRemaining: 2, penalties: {} }],
+        injuries: [
+          {
+            id: 'i1',
+            name: 'Cut',
+            description: 'Ouch',
+            severity: 'Minor',
+            weeksRemaining: 2,
+            penalties: {},
+          },
+        ],
       });
-      const { report } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      
+      const { report } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+
       expect(report.knownInjuries).toEqual([]);
     });
 
-    it("should show injuries in Detailed report", () => {
+    it('should show injuries in Detailed report', () => {
       const warrior = makeWarrior({
-        injuries: ["Broken Arm" as unknown],
+        injuries: ['Broken Arm' as unknown],
       });
-      const { report } = generateScoutReport(warrior, "Detailed", 1, TEST_RNG);
-      
+      const { report } = generateScoutReport(warrior, 'Detailed', 1, TEST_RNG);
+
       expect(report.knownInjuries.length).toBeGreaterThan(0);
     });
 
-    it("should not reveal plan tendencies in Basic or Detailed reports", () => {
+    it('should not reveal plan tendencies in Basic or Detailed reports', () => {
       const warrior = makeWarrior({ plan: { OE: 9, AL: 3, killDesire: 8 } as unknown });
-      
-      const { report: basicReport } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      const { report: detailedReport } = generateScoutReport(warrior, "Detailed", 1, TEST_RNG);
-      
+
+      const { report: basicReport } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+      const { report: detailedReport } = generateScoutReport(warrior, 'Detailed', 1, TEST_RNG);
+
       expect(basicReport.suspectedOE).toBeUndefined();
       expect(basicReport.suspectedAL).toBeUndefined();
       expect(detailedReport.suspectedOE).toBeUndefined();
       expect(detailedReport.suspectedAL).toBeUndefined();
     });
 
-    it("should reveal plan tendencies in Expert report", () => {
+    it('should reveal plan tendencies in Expert report', () => {
       const warrior = makeWarrior({ plan: { OE: 9, AL: 3, killDesire: 8 } as unknown });
-      const { report } = generateScoutReport(warrior, "Expert", 1, TEST_RNG);
-      
-      expect(report.suspectedOE).toBe("High");
-      expect(report.suspectedAL).toBe("Low");
+      const { report } = generateScoutReport(warrior, 'Expert', 1, TEST_RNG);
+
+      expect(report.suspectedOE).toBe('High');
+      expect(report.suspectedAL).toBe('Low');
     });
 
-    it("should categorize OE/AL as Low/Medium/High correctly", () => {
+    it('should categorize OE/AL as Low/Medium/High correctly', () => {
       const low = makeWarrior({ plan: { OE: 2, AL: 3, killDesire: 5 } as unknown });
       const medium = makeWarrior({ plan: { OE: 5, AL: 5, killDesire: 5 } as unknown });
       const high = makeWarrior({ plan: { OE: 8, AL: 9, killDesire: 5 } as unknown });
-      
-      const { report: reportL } = generateScoutReport(low, "Expert", 1, TEST_RNG);
-      const { report: reportM } = generateScoutReport(medium, "Expert", 1, TEST_RNG);
-      const { report: reportH } = generateScoutReport(high, "Expert", 1, TEST_RNG);
-      
-      expect(reportL.suspectedOE).toBe("Low");
-      expect(reportM.suspectedOE).toBe("Medium");
-      expect(reportH.suspectedOE).toBe("High");
-      
-      expect(reportL.suspectedAL).toBe("Low");
-      expect(reportM.suspectedAL).toBe("Medium");
-      expect(reportH.suspectedAL).toBe("High");
+
+      const { report: reportL } = generateScoutReport(low, 'Expert', 1, TEST_RNG);
+      const { report: reportM } = generateScoutReport(medium, 'Expert', 1, TEST_RNG);
+      const { report: reportH } = generateScoutReport(high, 'Expert', 1, TEST_RNG);
+
+      expect(reportL.suspectedOE).toBe('Low');
+      expect(reportM.suspectedOE).toBe('Medium');
+      expect(reportH.suspectedOE).toBe('High');
+
+      expect(reportL.suspectedAL).toBe('Low');
+      expect(reportM.suspectedAL).toBe('Medium');
+      expect(reportH.suspectedAL).toBe('High');
     });
 
-    it("should generate appropriate notes based on quality", () => {
+    it('should generate appropriate notes based on quality', () => {
       const warrior = makeWarrior();
-      
-      const { report: basicReport } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      const { report: detailedReport } = generateScoutReport(warrior, "Detailed", 1, TEST_RNG);
-      const { report: expertReport } = generateScoutReport(warrior, "Expert", 1, TEST_RNG);
-      
-      expect(basicReport.notes).toContain("Limited intel");
+
+      const { report: basicReport } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+      const { report: detailedReport } = generateScoutReport(warrior, 'Detailed', 1, TEST_RNG);
+      const { report: expertReport } = generateScoutReport(warrior, 'Expert', 1, TEST_RNG);
+
+      expect(basicReport.notes).toContain('Limited intel');
       expect(detailedReport.notes.length).toBeGreaterThan(basicReport.notes.length);
       expect(expertReport.notes.length).toBeGreaterThan(detailedReport.notes.length);
     });
 
-    it("should mention kills in Expert report for killers", () => {
+    it('should mention kills in Expert report for killers', () => {
       const killer = makeWarrior({ career: { wins: 10, losses: 2, kills: 5 } });
-      const { report } = generateScoutReport(killer, "Expert", 1, TEST_RNG);
-      
-      expect(report.notes).toContain("kills");
+      const { report } = generateScoutReport(killer, 'Expert', 1, TEST_RNG);
+
+      expect(report.notes).toContain('kills');
     });
 
-    it("should generate valid strings for attribute ranges", () => {
+    it('should generate valid strings for attribute ranges', () => {
       const warrior = makeWarrior();
-      const { report } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      
+      const { report } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+
       for (const key in report.attributeRanges) {
-        expect(typeof report.attributeRanges[key]).toBe("string");
+        expect(typeof report.attributeRanges[key]).toBe('string');
       }
     });
 
-    it("should include all attributes in ranges", () => {
+    it('should include all attributes in ranges', () => {
       const warrior = makeWarrior();
-      const { report } = generateScoutReport(warrior, "Basic", 1, TEST_RNG);
-      
-      expect(report.attributeRanges).toHaveProperty("ST");
-      expect(report.attributeRanges).toHaveProperty("CN");
-      expect(report.attributeRanges).toHaveProperty("SZ");
-      expect(report.attributeRanges).toHaveProperty("WT");
-      expect(report.attributeRanges).toHaveProperty("WL");
-      expect(report.attributeRanges).toHaveProperty("SP");
-      expect(report.attributeRanges).toHaveProperty("DF");
+      const { report } = generateScoutReport(warrior, 'Basic', 1, TEST_RNG);
+
+      expect(report.attributeRanges).toHaveProperty('ST');
+      expect(report.attributeRanges).toHaveProperty('CN');
+      expect(report.attributeRanges).toHaveProperty('SZ');
+      expect(report.attributeRanges).toHaveProperty('WT');
+      expect(report.attributeRanges).toHaveProperty('WL');
+      expect(report.attributeRanges).toHaveProperty('SP');
+      expect(report.attributeRanges).toHaveProperty('DF');
     });
 
-    it("should include quality in report", () => {
+    it('should include quality in report', () => {
       const warrior = makeWarrior();
-      const { report } = generateScoutReport(warrior, "Detailed", 1, TEST_RNG);
-      
-      expect(report.quality).toBe("Detailed");
+      const { report } = generateScoutReport(warrior, 'Detailed', 1, TEST_RNG);
+
+      expect(report.quality).toBe('Detailed');
     });
 
-    it("should include week in report", () => {
+    it('should include week in report', () => {
       const warrior = makeWarrior();
-      const { report } = generateScoutReport(warrior, "Basic", 42, TEST_RNG);
-      
+      const { report } = generateScoutReport(warrior, 'Basic', 42, TEST_RNG);
+
       expect(report.week).toBe(42);
     });
 
-    it("should generate unique report IDs", () => {
+    it('should generate unique report IDs', () => {
       const warrior = makeWarrior();
-      const { report: report1 } = generateScoutReport(warrior, "Basic", 1, new SeededRNGService(1));
-      const { report: report2 } = generateScoutReport(warrior, "Basic", 1, new SeededRNGService(2));
-      
+      const { report: report1 } = generateScoutReport(warrior, 'Basic', 1, new SeededRNGService(1));
+      const { report: report2 } = generateScoutReport(warrior, 'Basic', 1, new SeededRNGService(2));
+
       expect(report1.id).not.toBe(report2.id);
     });
   });

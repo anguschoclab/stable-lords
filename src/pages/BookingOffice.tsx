@@ -1,17 +1,17 @@
-import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { useGameStore, useWorldState, type GameStore } from "@/state/useGameStore";
-import { respondToBoutOffer } from "@/engine/bout/mutations/contractMutations";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Surface } from "@/components/ui/Surface";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { useMemo, useState } from 'react';
+import { Link } from '@tanstack/react-router';
+import { useGameStore, useWorldState, type GameStore } from '@/state/useGameStore';
+import { respondToBoutOffer } from '@/engine/bout/mutations/contractMutations';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Surface } from '@/components/ui/Surface';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import {
   Briefcase,
   User,
@@ -30,65 +30,137 @@ import {
   Award,
   DollarSign,
   Activity,
-  Target
-} from "lucide-react";
-import { FightingStyle, STYLE_DISPLAY_NAMES } from "@/types/shared.types";
-import type { Warrior, PromoterPersonality, BoutOffer } from "@/types/state.types";
-import type { InjuryData } from "@/types/warrior.types";
+  Target,
+} from 'lucide-react';
+import { FightingStyle, STYLE_DISPLAY_NAMES } from '@/types/shared.types';
+import type { Warrior, PromoterPersonality, BoutOffer } from '@/types/state.types';
+import type { InjuryData } from '@/types/warrior.types';
 
 /** Personality badge colors, icons, and tooltip text */
-const PERSONALITY_CONFIG: Record<PromoterPersonality, { color: string; icon: React.ReactNode; desc: string; tooltip: string }> = {
-  Greedy:    { color: "bg-amber-500/20 text-amber-600 border-amber-500/30",  icon: <DollarSign className="h-3 w-3" />,    desc: "+15% purse · −10% hype",          tooltip: "Greedy: +15% purse · −10% hype · prefers mismatches (best for money)" },
-  Honorable: { color: "bg-blue-500/20 text-blue-600 border-blue-500/30",    icon: <Award className="h-3 w-3" />,          desc: "+10% hype · parity fights",        tooltip: "Honorable: +10% hype · baseline purse · prefers tight skill parity <10% gap (best for fame)" },
-  Sadistic:  { color: "bg-red-500/20 text-red-600 border-red-500/30",       icon: <AlertTriangle className="h-3 w-3" />,  desc: "+20% hype & purse · high danger",  tooltip: "Sadistic: +20% hype & +20% purse on risky fights · seeks high-kill/injury matchups (high drama)" },
-  Flashy:    { color: "bg-purple-500/20 text-purple-600 border-purple-500/30", icon: <Zap className="h-3 w-3" />,         desc: "+15% hype · +20% purse (fame>75)",  tooltip: "Flashy: +15% hype · +20% purse for fame>75 · prefers famous warriors & showy styles (spectacle)" },
-  Corporate: { color: "bg-slate-500/20 text-slate-600 border-slate-500/30", icon: <TrendingUp className="h-3 w-3" />,    desc: "+5% purse · tier-matched bouts",   tooltip: "Corporate: +5% purse · tier-boundary matching · balanced steady income (least volatile)" },
+const PERSONALITY_CONFIG: Record<
+  PromoterPersonality,
+  { color: string; icon: React.ReactNode; desc: string; tooltip: string }
+> = {
+  Greedy: {
+    color: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
+    icon: <DollarSign className="h-3 w-3" />,
+    desc: '+15% purse · −10% hype',
+    tooltip: 'Greedy: +15% purse · −10% hype · prefers mismatches (best for money)',
+  },
+  Honorable: {
+    color: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
+    icon: <Award className="h-3 w-3" />,
+    desc: '+10% hype · parity fights',
+    tooltip:
+      'Honorable: +10% hype · baseline purse · prefers tight skill parity <10% gap (best for fame)',
+  },
+  Sadistic: {
+    color: 'bg-red-500/20 text-red-600 border-red-500/30',
+    icon: <AlertTriangle className="h-3 w-3" />,
+    desc: '+20% hype & purse · high danger',
+    tooltip:
+      'Sadistic: +20% hype & +20% purse on risky fights · seeks high-kill/injury matchups (high drama)',
+  },
+  Flashy: {
+    color: 'bg-purple-500/20 text-purple-600 border-purple-500/30',
+    icon: <Zap className="h-3 w-3" />,
+    desc: '+15% hype · +20% purse (fame>75)',
+    tooltip:
+      'Flashy: +15% hype · +20% purse for fame>75 · prefers famous warriors & showy styles (spectacle)',
+  },
+  Corporate: {
+    color: 'bg-slate-500/20 text-slate-600 border-slate-500/30',
+    icon: <TrendingUp className="h-3 w-3" />,
+    desc: '+5% purse · tier-matched bouts',
+    tooltip:
+      'Corporate: +5% purse · tier-boundary matching · balanced steady income (least volatile)',
+  },
 };
 
 /** Get fatigue status for display */
-function getFatigueStatus(fatigue: number): { label: string; color: string; icon: React.ReactNode } {
-  if (fatigue <= 30) return { label: "Fresh", color: "bg-green-500/20 text-green-600 border-green-500/30", icon: <Heart className="h-3 w-3" /> };
-  if (fatigue <= 60) return { label: "Tired", color: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30", icon: <Clock className="h-3 w-3" /> };
-  return { label: "Exhausted", color: "bg-red-500/20 text-red-600 border-red-500/30", icon: <AlertTriangle className="h-3 w-3" /> };
+function getFatigueStatus(fatigue: number): {
+  label: string;
+  color: string;
+  icon: React.ReactNode;
+} {
+  if (fatigue <= 30)
+    return {
+      label: 'Fresh',
+      color: 'bg-green-500/20 text-green-600 border-green-500/30',
+      icon: <Heart className="h-3 w-3" />,
+    };
+  if (fatigue <= 60)
+    return {
+      label: 'Tired',
+      color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
+      icon: <Clock className="h-3 w-3" />,
+    };
+  return {
+    label: 'Exhausted',
+    color: 'bg-red-500/20 text-red-600 border-red-500/30',
+    icon: <AlertTriangle className="h-3 w-3" />,
+  };
 }
 
 /** Get injury severity badge */
-function getInjuryBadge(injuries: InjuryData[]): { label: string; color: string; count: number } | null {
-  const blocking = injuries.filter(i => ["Moderate", "Severe", "Critical", "Permanent"].includes(i.severity));
+function getInjuryBadge(
+  injuries: InjuryData[]
+): { label: string; color: string; count: number } | null {
+  const blocking = injuries.filter((i) =>
+    ['Moderate', 'Severe', 'Critical', 'Permanent'].includes(i.severity)
+  );
   if (blocking.length === 0) return null;
   const severest = blocking.reduce<InjuryData>((max, i) => {
-    const order = ["Minor", "Moderate", "Severe", "Critical", "Permanent"];
+    const order = ['Minor', 'Moderate', 'Severe', 'Critical', 'Permanent'];
     return order.indexOf(i.severity) > order.indexOf(max.severity) ? i : max;
   }, blocking[0]!);
   const colorMap: Record<string, string> = {
-    Moderate: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30",
-    Severe: "bg-orange-500/20 text-orange-600 border-orange-500/30",
-    Critical: "bg-red-500/20 text-red-600 border-red-500/30",
-    Permanent: "bg-purple-500/20 text-purple-600 border-purple-500/30",
+    Moderate: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
+    Severe: 'bg-orange-500/20 text-orange-600 border-orange-500/30',
+    Critical: 'bg-red-500/20 text-red-600 border-red-500/30',
+    Permanent: 'bg-purple-500/20 text-purple-600 border-purple-500/30',
   };
-  const severity = severest.severity ?? "Moderate";
-  return { label: severity, color: colorMap[severity] ?? colorMap.Moderate, count: blocking.length };
+  const severity = severest.severity ?? 'Moderate';
+  return {
+    label: severity,
+    color: colorMap[severity] ?? colorMap.Moderate,
+    count: blocking.length,
+  };
 }
 
 interface OfferCardProps {
   offer: BoutOffer;
-  promoters: ReturnType<typeof useWorldState>["promoters"];
-  roster: ReturnType<typeof useWorldState>["roster"];
-  rivals: ReturnType<typeof useWorldState>["rivals"];
+  promoters: ReturnType<typeof useWorldState>['promoters'];
+  roster: ReturnType<typeof useWorldState>['roster'];
+  rivals: ReturnType<typeof useWorldState>['rivals'];
   signedOfferIds: Set<string>;
-  onResponse: (offerId: string, warriorId: string | undefined, response: "Accepted" | "Declined") => void;
+  onResponse: (
+    offerId: string,
+    warriorId: string | undefined,
+    response: 'Accepted' | 'Declined'
+  ) => void;
 }
 
-function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onResponse }: OfferCardProps) {
+function OfferCard({
+  offer,
+  promoters,
+  roster,
+  rivals,
+  signedOfferIds,
+  onResponse,
+}: OfferCardProps) {
   const promoter = promoters[offer.promoterId];
-  const playerWarriorId = offer.warriorIds.find(id => roster.some(w => w.id === id));
-  const playerWarrior = roster.find(w => w.id === playerWarriorId);
-  const opponentId = offer.warriorIds.find(id => id !== playerWarriorId);
+  const playerWarriorId = offer.warriorIds.find((id) => roster.some((w) => w.id === id));
+  const playerWarrior = roster.find((w) => w.id === playerWarriorId);
+  const opponentId = offer.warriorIds.find((id) => id !== playerWarriorId);
 
-  let opponent: ({ stableName: string } & typeof rivals[0]["roster"][0]) | null = null;
+  let opponent: ({ stableName: string } & (typeof rivals)[0]['roster'][0]) | null = null;
   for (const rival of rivals || []) {
-    const found = rival.roster.find(w => w.id === opponentId);
-    if (found) { opponent = { ...found, stableName: rival.owner.stableName }; break; }
+    const found = rival.roster.find((w) => w.id === opponentId);
+    if (found) {
+      opponent = { ...found, stableName: rival.owner.stableName };
+      break;
+    }
   }
 
   const personality = promoter?.personality as PromoterPersonality;
@@ -98,19 +170,31 @@ function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onRespons
   const injuryBadge = getInjuryBadge(playerWarrior?.injuries || []);
 
   return (
-    <Surface variant="glass" padding="none" className="border-border/10 overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-xl flex flex-col">
+    <Surface
+      variant="glass"
+      padding="none"
+      className="border-border/10 overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-xl flex flex-col"
+    >
       <div className="bg-white/[0.03] border-b border-white/5 p-6 pb-5">
         <div className="flex justify-between items-start">
           <div className="space-y-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-black uppercase tracking-widest text-primary truncate max-w-[150px]">
-                {promoter?.name || "Local Promoter"}
+                {promoter?.name || 'Local Promoter'}
               </span>
-              <Badge variant="outline" className="text-[9px] uppercase font-black border-white/10">{promoter?.tier}</Badge>
+              <Badge variant="outline" className="text-[9px] uppercase font-black border-white/10">
+                {promoter?.tier}
+              </Badge>
               {personalityConfig && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge variant="outline" className={cn("text-[9px] uppercase font-black cursor-help", personalityConfig.color)}>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        'text-[9px] uppercase font-black cursor-help',
+                        personalityConfig.color
+                      )}
+                    >
                       <span className="flex items-center gap-1">
                         {personalityConfig.icon} {personality}
                       </span>
@@ -142,20 +226,34 @@ function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onRespons
               <DollarSign className="h-4 w-4 text-arena-gold" />
               {offer.purse}G
             </div>
-            <div className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">Contract Purse</div>
+            <div className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">
+              Contract Purse
+            </div>
           </div>
         </div>
       </div>
 
       <div className="p-8 flex-1 space-y-8">
         <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-widest border-white/5", fatigueStatus.color)}>
+          <Badge
+            variant="outline"
+            className={cn(
+              'text-[9px] font-black uppercase tracking-widest border-white/5',
+              fatigueStatus.color
+            )}
+          >
             <span className="flex items-center gap-1.5">
               {fatigueStatus.icon} {fatigue}% Ready
             </span>
           </Badge>
           {injuryBadge && (
-            <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-widest border-white/5", injuryBadge.color)}>
+            <Badge
+              variant="outline"
+              className={cn(
+                'text-[9px] font-black uppercase tracking-widest border-white/5',
+                injuryBadge.color
+              )}
+            >
               <span className="flex items-center gap-1.5">
                 <AlertTriangle className="h-3 w-3" /> {injuryBadge.label} Wound
               </span>
@@ -166,9 +264,15 @@ function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onRespons
         <div className="flex items-center justify-between gap-6 px-4 py-6 bg-black/20 border border-white/5 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-primary/40" />
           <div className="text-center space-y-3 flex-1 min-w-0">
-            <div className="text-[8px] font-black text-primary/40 uppercase tracking-[0.3em] mb-2">DEPLOYED</div>
-            <div className="text-xs font-black uppercase tracking-tight text-foreground truncate">{playerWarrior?.name}</div>
-            <div className="text-[9px] font-black text-muted-foreground/60 uppercase">{STYLE_DISPLAY_NAMES[playerWarrior?.style as FightingStyle]}</div>
+            <div className="text-[8px] font-black text-primary/40 uppercase tracking-[0.3em] mb-2">
+              DEPLOYED
+            </div>
+            <div className="text-xs font-black uppercase tracking-tight text-foreground truncate">
+              {playerWarrior?.name}
+            </div>
+            <div className="text-[9px] font-black text-muted-foreground/60 uppercase">
+              {STYLE_DISPLAY_NAMES[playerWarrior?.style as FightingStyle]}
+            </div>
           </div>
           <div className="flex flex-col items-center gap-1 group-hover:scale-110 transition-transform">
             <div className="h-px w-8 bg-white/10" />
@@ -176,12 +280,14 @@ function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onRespons
             <div className="h-px w-8 bg-white/10" />
           </div>
           <div className="text-center space-y-3 flex-1 min-w-0">
-            <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-2">TARGET</div>
+            <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-2">
+              TARGET
+            </div>
             <div className="text-xs font-black uppercase tracking-tight text-muted-foreground/80 truncate">
-              {opponent?.name || "Unknown"}
+              {opponent?.name || 'Unknown'}
             </div>
             <div className="text-[9px] font-black text-muted-foreground/40 uppercase">
-              {opponent ? STYLE_DISPLAY_NAMES[opponent.style as FightingStyle] : "CLASSIFIED"}
+              {opponent ? STYLE_DISPLAY_NAMES[opponent.style as FightingStyle] : 'CLASSIFIED'}
             </div>
           </div>
         </div>
@@ -213,7 +319,7 @@ function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onRespons
         ) : (
           <Button
             className="flex-1 h-12 bg-primary text-black hover:bg-primary/90 gap-2 font-black uppercase text-[10px] tracking-[0.2em] transition-all"
-            onClick={() => onResponse(offer.id, playerWarriorId, "Accepted")}
+            onClick={() => onResponse(offer.id, playerWarriorId, 'Accepted')}
             disabled={!!injuryBadge || fatigue > 60}
           >
             Sign Contract
@@ -222,7 +328,7 @@ function OfferCard({ offer, promoters, roster, rivals, signedOfferIds, onRespons
         <Button
           variant="ghost"
           className="w-12 h-12 p-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors"
-          onClick={() => onResponse(offer.id, playerWarriorId, "Declined")}
+          onClick={() => onResponse(offer.id, playerWarriorId, 'Declined')}
           title="Decline Offer"
         >
           <Ban className="h-5 w-5" />
@@ -236,7 +342,7 @@ export default function BookingOffice() {
   const state = useWorldState();
   const { setState } = useGameStore();
   const { promoters, boutOffers, roster, week, rivals } = state;
-  const [activeTab, setActiveTab] = useState("this-week");
+  const [activeTab, setActiveTab] = useState('this-week');
   const [signedOfferIds, setSignedOfferIds] = useState<Set<string>>(new Set());
   const [selectedWarriorId, setSelectedWarriorId] = useState<string | null>(null);
   const [trackedWeek, setTrackedWeek] = useState(week);
@@ -250,19 +356,22 @@ export default function BookingOffice() {
 
   // Group offers by week
   const { thisWeekOffers, upcomingOffers, idleWarriors, highestPurse } = useMemo(() => {
-    const playerOffers = Object.values(boutOffers).filter((offer: BoutOffer) =>
-      offer.warriorIds.some((wId: string) => roster.some((playerW: Warrior) => playerW.id === wId)) &&
-      (offer.status === "Proposed" || signedOfferIds.has(offer.id))
+    const playerOffers = Object.values(boutOffers).filter(
+      (offer: BoutOffer) =>
+        offer.warriorIds.some((wId: string) =>
+          roster.some((playerW: Warrior) => playerW.id === wId)
+        ) &&
+        (offer.status === 'Proposed' || signedOfferIds.has(offer.id))
     );
 
     const filtered = selectedWarriorId
-      ? playerOffers.filter(o => o.warriorIds.includes(selectedWarriorId as any))
+      ? playerOffers.filter((o) => o.warriorIds.includes(selectedWarriorId as any))
       : playerOffers;
 
     // Keep only the best offer per promoter (highest purse × hype score)
     const bestByPromoter = (offers: BoutOffer[]): BoutOffer[] => {
       const map = new Map<string, BoutOffer>();
-      offers.forEach(o => {
+      offers.forEach((o) => {
         const score = o.purse * o.hype;
         const existing = map.get(o.promoterId);
         if (!existing || score > existing.purse * existing.hype) {
@@ -272,27 +381,33 @@ export default function BookingOffice() {
       return Array.from(map.values());
     };
 
-    const thisWeek = bestByPromoter(filtered.filter(o => o.boutWeek === week + 2));
-    const upcoming = bestByPromoter(filtered.filter(o => o.boutWeek > week + 2));
+    const thisWeek = bestByPromoter(filtered.filter((o) => o.boutWeek === week + 2));
+    const upcoming = bestByPromoter(filtered.filter((o) => o.boutWeek > week + 2));
 
     // Find warriors with no offers
-    const warriorsWithOffers = new Set(playerOffers.flatMap(o => o.warriorIds));
-    const idle = roster.filter(w => w.status === "Active" && !warriorsWithOffers.has(w.id));
+    const warriorsWithOffers = new Set(playerOffers.flatMap((o) => o.warriorIds));
+    const idle = roster.filter((w) => w.status === 'Active' && !warriorsWithOffers.has(w.id));
 
-    const maxPurse = playerOffers.length > 0 ? Math.max(...playerOffers.map(o => o.purse)) : 0;
+    const maxPurse = playerOffers.length > 0 ? Math.max(...playerOffers.map((o) => o.purse)) : 0;
 
     return {
-      thisWeekOffers: thisWeek.sort((a, b) => (promoters[b.promoterId]?.tier ?? "") > (promoters[a.promoterId]?.tier ?? "") ? 1 : -1),
+      thisWeekOffers: thisWeek.sort((a, b) =>
+        (promoters[b.promoterId]?.tier ?? '') > (promoters[a.promoterId]?.tier ?? '') ? 1 : -1
+      ),
       upcomingOffers: upcoming.sort((a, b) => a.boutWeek - b.boutWeek),
       idleWarriors: idle,
-      highestPurse: maxPurse
+      highestPurse: maxPurse,
     };
   }, [boutOffers, roster, week, promoters, signedOfferIds, selectedWarriorId]);
 
-  const handleResponse = (offerId: string, warriorId: string | undefined, response: "Accepted" | "Declined") => {
+  const handleResponse = (
+    offerId: string,
+    warriorId: string | undefined,
+    response: 'Accepted' | 'Declined'
+  ) => {
     if (!warriorId) return;
-    if (response === "Accepted") {
-      setSignedOfferIds(prev => new Set(prev).add(offerId));
+    if (response === 'Accepted') {
+      setSignedOfferIds((prev) => new Set(prev).add(offerId));
     }
     setState((s: GameStore) => {
       const next = respondToBoutOffer(state, offerId, warriorId, response);
@@ -300,18 +415,25 @@ export default function BookingOffice() {
         s.boutOffers = next.boutOffers;
       }
     });
-    toast.success(`Offer ${response === "Accepted" ? "accepted" : "declined"}.`);
+    toast.success(`Offer ${response === 'Accepted' ? 'accepted' : 'declined'}.`);
   };
 
   // Bulk actions
   const acceptAllHonorable = () => {
-    const honorableOffers = thisWeekOffers.filter(o => promoters[o.promoterId]?.personality === "Honorable");
+    const honorableOffers = thisWeekOffers.filter(
+      (o) => promoters[o.promoterId]?.personality === 'Honorable'
+    );
     let accepted = 0;
-    honorableOffers.forEach(offer => {
-      const warriorId = offer.warriorIds.find(id => roster.some(w => w.id === id));
-      const warrior = roster.find(w => w.id === warriorId);
-      if (warriorId && warrior && (warrior.fatigue ?? 0) <= 60 && !getInjuryBadge(warrior.injuries || [])) {
-        handleResponse(offer.id, warriorId, "Accepted");
+    honorableOffers.forEach((offer) => {
+      const warriorId = offer.warriorIds.find((id) => roster.some((w) => w.id === id));
+      const warrior = roster.find((w) => w.id === warriorId);
+      if (
+        warriorId &&
+        warrior &&
+        (warrior.fatigue ?? 0) <= 60 &&
+        !getInjuryBadge(warrior.injuries || [])
+      ) {
+        handleResponse(offer.id, warriorId, 'Accepted');
         accepted++;
       }
     });
@@ -319,12 +441,12 @@ export default function BookingOffice() {
   };
 
   const declineAllFromPromoter = (promoterId: string) => {
-    const promoterOffers = thisWeekOffers.filter(o => o.promoterId === promoterId);
+    const promoterOffers = thisWeekOffers.filter((o) => o.promoterId === promoterId);
     let declined = 0;
-    promoterOffers.forEach(offer => {
-      const warriorId = offer.warriorIds.find(id => roster.some(w => w.id === id));
+    promoterOffers.forEach((offer) => {
+      const warriorId = offer.warriorIds.find((id) => roster.some((w) => w.id === id));
       if (warriorId) {
-        handleResponse(offer.id, warriorId, "Declined");
+        handleResponse(offer.id, warriorId, 'Declined');
         declined++;
       }
     });
@@ -345,138 +467,201 @@ export default function BookingOffice() {
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className="space-y-8 pb-20 max-w-7xl mx-auto">
-      <PageHeader
-        icon={Briefcase}
-        title="Booking Office"
-        subtitle={`OPS · CONTRACTS · WEEK ${week}`}
-      />
+      <div className="space-y-8 pb-20 max-w-7xl mx-auto">
+        <PageHeader
+          icon={Briefcase}
+          title="Booking Office"
+          subtitle={`OPS · CONTRACTS · WEEK ${week}`}
+        />
 
-      {/* Band 2 — Booking Intelligence Strip (Spec §6.4) */}
-      <Surface variant="glass" className="flex items-center gap-12 p-5 border-l-4 border-l-primary/50">
-        <div className="flex items-center gap-3">
-          <Target className="h-4 w-4 text-primary" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Market Overview</span>
-        </div>
+        {/* Band 2 — Booking Intelligence Strip (Spec §6.4) */}
+        <Surface
+          variant="glass"
+          className="flex items-center gap-12 p-5 border-l-4 border-l-primary/50"
+        >
+          <div className="flex items-center gap-3">
+            <Target className="h-4 w-4 text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+              Market Overview
+            </span>
+          </div>
 
-        <div className="flex items-center gap-10">
-           <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">Open Proposals</span>
-              <span className="font-display font-black text-xl text-primary leading-none mt-1">{thisWeekOffers.length + upcomingOffers.length}</span>
-           </div>
-           
-           <div className="h-8 w-px bg-white/5" />
+          <div className="flex items-center gap-10">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">
+                Open Proposals
+              </span>
+              <span className="font-display font-black text-xl text-primary leading-none mt-1">
+                {thisWeekOffers.length + upcomingOffers.length}
+              </span>
+            </div>
 
-           <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">Highest Purse</span>
-              <span className="font-display font-black text-xl text-arena-gold leading-none mt-1">{(highestPurse || 0).toLocaleString()}G</span>
-           </div>
+            <div className="h-8 w-px bg-white/5" />
 
-           <div className="h-8 w-px bg-white/5" />
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">
+                Highest Purse
+              </span>
+              <span className="font-display font-black text-xl text-arena-gold leading-none mt-1">
+                {(highestPurse || 0).toLocaleString()}G
+              </span>
+            </div>
 
-           <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">Idle Warriors</span>
-              <span className={cn("font-display font-black text-xl leading-none mt-1", idleWarriors.length > 0 ? "text-destructive" : "text-muted-foreground")}>
+            <div className="h-8 w-px bg-white/5" />
+
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-widest mb-1">
+                Idle Warriors
+              </span>
+              <span
+                className={cn(
+                  'font-display font-black text-xl leading-none mt-1',
+                  idleWarriors.length > 0 ? 'text-destructive' : 'text-muted-foreground'
+                )}
+              >
                 {idleWarriors.length}
               </span>
-           </div>
-        </div>
-
-        <div className="ml-auto flex gap-3">
-           <Button variant="outline" size="sm" className="h-9 px-4 text-[10px] font-black uppercase tracking-widest" onClick={acceptAllHonorable}>
-             <Award className="h-3.5 w-3.5 mr-2 text-primary" /> Accept All (Safe)
-           </Button>
-        </div>
-      </Surface>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Archetype D: Left Rail Roster (span-4) */}
-        <div className="lg:col-span-4 space-y-4 sticky top-6">
-          <div className="flex items-center gap-3 px-2">
-            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Roster Readiness</h3>
+            </div>
           </div>
-          <Surface variant="glass" className="p-0 border-white/5 max-h-[700px] overflow-y-auto thin-scrollbar">
-            {roster.map(warrior => {
-              const hasAccepted = Object.values(boutOffers).some(o => o.warriorIds.includes(warrior.id) && o.status === "Accepted");
-              const hasProposed = Object.values(boutOffers).some(o => o.warriorIds.includes(warrior.id) && o.status === "Proposed");
-              const fatigueConfig = getFatigueStatus(warrior.fatigue ?? 0);
-              const isSelected = selectedWarriorId === warrior.id;
 
-              return (
-                <button
-                  key={warrior.id}
-                  onClick={() => setSelectedWarriorId(isSelected ? null : warrior.id)}
-                  className={cn(
-                    "w-full p-4 border-b border-white/5 last:border-0 flex items-center gap-3 transition-colors text-left",
-                    isSelected ? "bg-primary/10 border-l-2 border-l-primary" : "hover:bg-white/[0.03] border-l-2 border-l-transparent",
-                    hasAccepted ? "bg-primary/[0.03]" : ""
-                  )}
+          <div className="ml-auto flex gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 px-4 text-[10px] font-black uppercase tracking-widest"
+              onClick={acceptAllHonorable}
+            >
+              <Award className="h-3.5 w-3.5 mr-2 text-primary" /> Accept All (Safe)
+            </Button>
+          </div>
+        </Surface>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Archetype D: Left Rail Roster (span-4) */}
+          <div className="lg:col-span-4 space-y-4 sticky top-6">
+            <div className="flex items-center gap-3 px-2">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                Roster Readiness
+              </h3>
+            </div>
+            <Surface
+              variant="glass"
+              className="p-0 border-white/5 max-h-[700px] overflow-y-auto thin-scrollbar"
+            >
+              {roster.map((warrior) => {
+                const hasAccepted = Object.values(boutOffers).some(
+                  (o) => o.warriorIds.includes(warrior.id) && o.status === 'Accepted'
+                );
+                const hasProposed = Object.values(boutOffers).some(
+                  (o) => o.warriorIds.includes(warrior.id) && o.status === 'Proposed'
+                );
+                const fatigueConfig = getFatigueStatus(warrior.fatigue ?? 0);
+                const isSelected = selectedWarriorId === warrior.id;
+
+                return (
+                  <button
+                    key={warrior.id}
+                    onClick={() => setSelectedWarriorId(isSelected ? null : warrior.id)}
+                    className={cn(
+                      'w-full p-4 border-b border-white/5 last:border-0 flex items-center gap-3 transition-colors text-left',
+                      isSelected
+                        ? 'bg-primary/10 border-l-2 border-l-primary'
+                        : 'hover:bg-white/[0.03] border-l-2 border-l-transparent',
+                      hasAccepted ? 'bg-primary/[0.03]' : ''
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'h-1.5 w-1.5 rounded-full shrink-0',
+                        hasAccepted ? 'bg-primary' : hasProposed ? 'bg-arena-gold' : 'bg-white/10'
+                      )}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-black uppercase truncate">{warrior.name}</p>
+                      <p className="text-[9px] text-muted-foreground uppercase">
+                        {fatigueConfig.label} • {warrior.fatigue ?? 0}% FATIGUE
+                      </p>
+                    </div>
+                    {hasAccepted && (
+                      <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black px-1 h-4">
+                        BOOKED
+                      </Badge>
+                    )}
+                  </button>
+                );
+              })}
+            </Surface>
+          </div>
+
+          {/* Right Rail Viewport (span-8) */}
+          <div className="lg:col-span-8 space-y-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full justify-start h-auto bg-transparent border-b border-white/10 rounded-none p-0 mb-6 flex gap-6">
+                <TabsTrigger
+                  value="this-week"
+                  className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground data-[state=active]:text-primary"
                 >
-                  <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", hasAccepted ? "bg-primary" : hasProposed ? "bg-arena-gold" : "bg-white/10")} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-black uppercase truncate">{warrior.name}</p>
-                    <p className="text-[9px] text-muted-foreground uppercase">{fatigueConfig.label} • {warrior.fatigue ?? 0}% FATIGUE</p>
-                  </div>
-                  {hasAccepted && <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black px-1 h-4">BOOKED</Badge>}
-                </button>
-              );
-            })}
-          </Surface>
-        </div>
+                  Immediate Proposals ({thisWeekOffers.length})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="upcoming"
+                  className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground data-[state=active]:text-primary"
+                >
+                  Future Slates ({upcomingOffers.length})
+                </TabsTrigger>
+              </TabsList>
 
-        {/* Right Rail Viewport (span-8) */}
-        <div className="lg:col-span-8 space-y-6">
-           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full justify-start h-auto bg-transparent border-b border-white/10 rounded-none p-0 mb-6 flex gap-6">
-              <TabsTrigger value="this-week" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground data-[state=active]:text-primary">
-                Immediate Proposals ({thisWeekOffers.length})
-              </TabsTrigger>
-              <TabsTrigger value="upcoming" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground data-[state=active]:text-primary">
-                Future Slates ({upcomingOffers.length})
-              </TabsTrigger>
-            </TabsList>
-
-            {selectedWarriorId && (
-              <div className="flex items-center gap-2 mb-4 px-1">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Showing offers for</span>
-                <span className="text-[9px] font-black uppercase tracking-widest text-primary">{roster.find(w => w.id === selectedWarriorId)?.name}</span>
-                <button onClick={() => setSelectedWarriorId(null)} className="ml-auto text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground transition-colors">Show All ×</button>
-              </div>
-            )}
-
-            <TabsContent value="this-week" className="mt-0 space-y-6">
-              {thisWeekOffers.length === 0 ? (
-                <Surface variant="glass" className="py-24 text-center">
-                  <ShieldAlert className="h-16 w-16 opacity-10 mx-auto mb-4" />
-                  <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">
-                    {selectedWarriorId
-                      ? `No proposals for ${roster.find(w => w.id === selectedWarriorId)?.name ?? "this warrior"} this week`
-                      : `No proposals detected for week ${week + 2}`}
-                  </p>
-                </Surface>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {thisWeekOffers.map(renderOfferCard)}
+              {selectedWarriorId && (
+                <div className="flex items-center gap-2 mb-4 px-1">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">
+                    Showing offers for
+                  </span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-primary">
+                    {roster.find((w) => w.id === selectedWarriorId)?.name}
+                  </span>
+                  <button
+                    onClick={() => setSelectedWarriorId(null)}
+                    className="ml-auto text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-foreground transition-colors"
+                  >
+                    Show All ×
+                  </button>
                 </div>
               )}
-            </TabsContent>
 
-            <TabsContent value="upcoming" className="mt-0 space-y-6">
-              {upcomingOffers.length === 0 && selectedWarriorId ? (
-                <Surface variant="glass" className="py-24 text-center">
-                  <ShieldAlert className="h-16 w-16 opacity-10 mx-auto mb-4" />
-                  <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">
-                    No upcoming proposals for {roster.find(w => w.id === selectedWarriorId)?.name ?? "this warrior"}
-                  </p>
-                </Surface>
-              ) : (
-                upcomingOffers.map(renderOfferCard)
-              )}
-            </TabsContent>
-          </Tabs>
+              <TabsContent value="this-week" className="mt-0 space-y-6">
+                {thisWeekOffers.length === 0 ? (
+                  <Surface variant="glass" className="py-24 text-center">
+                    <ShieldAlert className="h-16 w-16 opacity-10 mx-auto mb-4" />
+                    <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">
+                      {selectedWarriorId
+                        ? `No proposals for ${roster.find((w) => w.id === selectedWarriorId)?.name ?? 'this warrior'} this week`
+                        : `No proposals detected for week ${week + 2}`}
+                    </p>
+                  </Surface>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {thisWeekOffers.map(renderOfferCard)}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="upcoming" className="mt-0 space-y-6">
+                {upcomingOffers.length === 0 && selectedWarriorId ? (
+                  <Surface variant="glass" className="py-24 text-center">
+                    <ShieldAlert className="h-16 w-16 opacity-10 mx-auto mb-4" />
+                    <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">
+                      No upcoming proposals for{' '}
+                      {roster.find((w) => w.id === selectedWarriorId)?.name ?? 'this warrior'}
+                    </p>
+                  </Surface>
+                ) : (
+                  upcomingOffers.map(renderOfferCard)
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
-    </div>
     </TooltipProvider>
   );
 }

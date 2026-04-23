@@ -1,5 +1,5 @@
-import { StateCreator } from "zustand";
-import type { GameStore } from "@/state/useGameStore";
+import { StateCreator } from 'zustand';
+import type { GameStore } from '@/state/useGameStore';
 import {
   Season,
   WeatherType,
@@ -14,27 +14,27 @@ import {
   HallEntry,
   Rivalry,
   MatchRecord,
-  OwnerGrudge
-} from "@/types/state.types";
-import { FightSummary } from "@/types/combat.types";
-import { truncateArray } from "@/utils/stateUtils";
-import { updatePromoterHistory as engineUpdatePromoterHistory } from "@/engine/promoters";
-import { respondToBoutOffer as engineRespondToBoutOffer } from "@/state/mutations/contractMutations";
-import { 
-  type WarriorId, 
-  type StableId, 
-  type PromoterId, 
-  type BoutOfferId, 
-  type FightId, 
-  type TournamentId 
-} from "@/types/shared.types";
+  OwnerGrudge,
+} from '@/types/state.types';
+import { FightSummary } from '@/types/combat.types';
+import { truncateArray } from '@/utils/stateUtils';
+import { updatePromoterHistory as engineUpdatePromoterHistory } from '@/engine/promoters';
+import { respondToBoutOffer as engineRespondToBoutOffer } from '@/state/mutations/contractMutations';
+import {
+  type WarriorId,
+  type StableId,
+  type PromoterId,
+  type BoutOfferId,
+  type FightId,
+  type TournamentId,
+} from '@/types/shared.types';
 
 export interface ArenaPreferences {
-  defaultViewMode: "log" | "arena";
+  defaultViewMode: 'log' | 'arena';
   audioEnabled: boolean;
   audioVolume: number;
   effectsEnabled: boolean;
-  screenShakeIntensity: "off" | "low" | "medium" | "high";
+  screenShakeIntensity: 'off' | 'low' | 'medium' | 'high';
 }
 
 export interface WorldSlice {
@@ -70,17 +70,28 @@ export interface WorldSlice {
   playerChallenges: string[];
   playerAvoids: string[];
   ownerGrudges: OwnerGrudge[];
-  phase: "planning" | "resolution";
+  phase: 'planning' | 'resolution';
   setWeek: (week: number) => void;
   setArenaPreferences: (prefs: Partial<ArenaPreferences>) => void;
   initializeStable: (name: string, stableName: string) => void;
   appendFight: (summary: FightSummary) => void;
-  updateBoutOfferStatus: (offerId: BoutOfferId, status: BoutOffer["status"]) => void;
-  respondToBoutOffer: (offerId: BoutOfferId, warriorId: WarriorId, response: "Accepted" | "Declined") => void;
+  updateBoutOfferStatus: (offerId: BoutOfferId, status: BoutOffer['status']) => void;
+  respondToBoutOffer: (
+    offerId: BoutOfferId,
+    warriorId: WarriorId,
+    response: 'Accepted' | 'Declined'
+  ) => void;
   clearExpiredOffers: () => void;
   updatePromoterHistory: (promoterId: PromoterId, purse: number, boutId: FightId) => void;
   replacePromoter: (oldId: PromoterId, newPromoter: Promoter) => void;
-  updateWarriorStatus: (warriorId: WarriorId, won: boolean, killed: boolean, fameDelta: number, popDelta: number, rivalStableId?: StableId) => void;
+  updateWarriorStatus: (
+    warriorId: WarriorId,
+    won: boolean,
+    killed: boolean,
+    fameDelta: number,
+    popDelta: number,
+    rivalStableId?: StableId
+  ) => void;
   renameStable: (newName: string) => void;
   renamePlayer: (newName: string) => void;
 }
@@ -89,8 +100,8 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
   year: 1,
   week: 1,
   day: 0,
-  season: "Spring" as Season,
-  weather: "Clear" as WeatherType,
+  season: 'Spring' as Season,
+  weather: 'Clear' as WeatherType,
   promoters: {},
   boutOffers: {},
   rivals: [],
@@ -99,7 +110,7 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
   arenaHistory: [],
   newsletter: [],
   hallOfFame: [],
-  crowdMood: "Neutral" as CrowdMoodType,
+  crowdMood: 'Neutral' as CrowdMoodType,
   moodHistory: [],
   settings: {
     featureFlags: {
@@ -108,22 +119,29 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
     },
   },
   arenaPreferences: {
-    defaultViewMode: "arena",
+    defaultViewMode: 'arena',
     audioEnabled: true,
     audioVolume: 0.7,
     effectsEnabled: true,
-    screenShakeIntensity: "medium",
+    screenShakeIntensity: 'medium',
   },
   isFTUE: false,
   ftueComplete: false,
-  player: { id: "p1" as StableId, name: "Rookie", stableName: "Fresh Stable", fame: 0, renown: 0, titles: 0 },
+  player: {
+    id: 'p1' as StableId,
+    name: 'Rookie',
+    stableName: 'Fresh Stable',
+    fame: 0,
+    renown: 0,
+    titles: 0,
+  },
   coachDismissed: [],
   rivalries: [],
   matchHistory: [],
   playerChallenges: [],
   playerAvoids: [],
   ownerGrudges: [],
-  phase: "planning",
+  phase: 'planning',
 
   setWeek: (week) => set({ week }),
 
@@ -146,14 +164,16 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
 
   appendFight: (summary: FightSummary) => {
     set((state: WorldSlice) => {
-      const nextHistory = truncateArray([...state.arenaHistory, summary], 500).map((f: FightSummary, i: number, arr: FightSummary[]) => {
-        // Keep transcripts only for the last 20 fights to save memory
-        if (arr.length - i > 20 && f.transcript) {
-          const { transcript, ...rest } = f;
-          return rest;
+      const nextHistory = truncateArray([...state.arenaHistory, summary], 500).map(
+        (f: FightSummary, i: number, arr: FightSummary[]) => {
+          // Keep transcripts only for the last 20 fights to save memory
+          if (arr.length - i > 20 && f.transcript) {
+            const { transcript, ...rest } = f;
+            return rest;
+          }
+          return f;
         }
-        return f;
-      });
+      );
 
       return {
         arenaHistory: nextHistory,
@@ -182,10 +202,10 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
       const newOffers = { ...state.boutOffers };
       let changed = false;
 
-      (Object.keys(newOffers) as BoutOfferId[]).forEach(id => {
+      (Object.keys(newOffers) as BoutOfferId[]).forEach((id) => {
         const offer = newOffers[id];
-        if (offer.status === "Proposed" && state.week >= offer.expirationWeek) {
-          newOffers[id] = { ...offer, status: "Expired" };
+        if (offer.status === 'Proposed' && state.week >= offer.expirationWeek) {
+          newOffers[id] = { ...offer, status: 'Expired' };
           changed = true;
         }
       });
@@ -213,54 +233,60 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
     set((state) => {
       if (rivalStableId) {
         return {
-          rivals: state.rivals.map((r) => r.owner.id === rivalStableId
-            ? {
-                ...r,
-                roster: r.roster.map((w) => w.id === warriorId
-                  ? {
-                      ...w,
-                      fame: Math.max(0, (w.fame || 0) + fameDelta),
-                      popularity: Math.max(0, (w.popularity || 0) + popDelta),
-                      career: {
-                        ...w.career,
-                        wins: (w.career?.wins || 0) + (won ? 1 : 0),
-                        losses: (w.career?.losses || 0) + (won ? 0 : 1),
-                        kills: (w.career?.kills || 0) + (killed ? 1 : 0),
-                      },
-                    }
-                  : w)
-              }
-            : r)
+          rivals: state.rivals.map((r) =>
+            r.owner.id === rivalStableId
+              ? {
+                  ...r,
+                  roster: r.roster.map((w) =>
+                    w.id === warriorId
+                      ? {
+                          ...w,
+                          fame: Math.max(0, (w.fame || 0) + fameDelta),
+                          popularity: Math.max(0, (w.popularity || 0) + popDelta),
+                          career: {
+                            ...w.career,
+                            wins: (w.career?.wins || 0) + (won ? 1 : 0),
+                            losses: (w.career?.losses || 0) + (won ? 0 : 1),
+                            kills: (w.career?.kills || 0) + (killed ? 1 : 0),
+                          },
+                        }
+                      : w
+                  ),
+                }
+              : r
+          ),
         };
       }
 
       return {
-        roster: state.roster.map((w) => w.id === warriorId
-          ? {
-              ...w,
-              fame: Math.max(0, (w.fame || 0) + fameDelta),
-              popularity: Math.max(0, (w.popularity || 0) + popDelta),
-              career: {
-                ...w.career,
-                wins: (w.career?.wins || 0) + (won ? 1 : 0),
-                losses: (w.career?.losses || 0) + (won ? 0 : 1),
-                kills: (w.career?.kills || 0) + (killed ? 1 : 0),
-              },
-            }
-          : w)
+        roster: state.roster.map((w) =>
+          w.id === warriorId
+            ? {
+                ...w,
+                fame: Math.max(0, (w.fame || 0) + fameDelta),
+                popularity: Math.max(0, (w.popularity || 0) + popDelta),
+                career: {
+                  ...w.career,
+                  wins: (w.career?.wins || 0) + (won ? 1 : 0),
+                  losses: (w.career?.losses || 0) + (won ? 0 : 1),
+                  kills: (w.career?.kills || 0) + (killed ? 1 : 0),
+                },
+              }
+            : w
+        ),
       };
     });
   },
 
   renameStable: (newName: string) => {
     set((state: WorldSlice) => ({
-      player: { ...state.player, stableName: newName }
+      player: { ...state.player, stableName: newName },
     }));
   },
 
   renamePlayer: (newName: string) => {
     set((state: WorldSlice) => ({
-      player: { ...state.player, name: newName }
+      player: { ...state.player, name: newName },
     }));
-  }
+  },
 });

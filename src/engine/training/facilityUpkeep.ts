@@ -1,5 +1,5 @@
-import { type Attributes } from "@/types/shared.types";
-import { type SeasonalGrowth, type Season } from "@/types/state.types";
+import { type Attributes } from '@/types/shared.types';
+import { type SeasonalGrowth, type Season } from '@/types/state.types';
 
 /**
  * Retrieves the partial attribute gains for a specific warrior in a specific season.
@@ -9,7 +9,7 @@ export function getSeasonalGains(
   warriorId: string,
   season: string
 ): Partial<Record<keyof Attributes, number>> {
-  const entry = seasonalGrowth.find(sg => sg.warriorId === warriorId && sg.season === season);
+  const entry = seasonalGrowth.find((sg) => sg.warriorId === warriorId && sg.season === season);
   return entry?.gains ?? {};
 }
 
@@ -22,12 +22,10 @@ export function updateSeasonalGains(
   season: string,
   attr: keyof Attributes
 ): SeasonalGrowth[] {
-  const existing = seasonalGrowth.find(sg => sg.warriorId === warriorId && sg.season === season);
+  const existing = seasonalGrowth.find((sg) => sg.warriorId === warriorId && sg.season === season);
   if (existing) {
-    return seasonalGrowth.map(sg =>
-      sg === existing
-        ? { ...sg, gains: { ...sg.gains, [attr]: (sg.gains[attr] ?? 0) + 1 } }
-        : sg
+    return seasonalGrowth.map((sg) =>
+      sg === existing ? { ...sg, gains: { ...sg.gains, [attr]: (sg.gains[attr] ?? 0) + 1 } } : sg
     );
   }
   return [...seasonalGrowth, { warriorId, season: season as Season, gains: { [attr]: 1 } }];
