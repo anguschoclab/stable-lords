@@ -18,7 +18,19 @@ export function StableWidget() {
   const state = useWorldState();
   const activeWarriors = selectActiveWarriors(state);
   const rosterCap = BASE_ROSTER_CAP + (state.rosterBonus || 0);
-  const topWarriors = [...activeWarriors].sort((a, b) => b.fame - a.fame).slice(0, 4);
+
+  // ⚡ Bolt: Use O(N) bounded insertion sort instead of O(N log N) full array sort
+  const topWarriors = [];
+  for (let i = 0; i < activeWarriors.length; i++) {
+    const w = activeWarriors[i];
+    if (topWarriors.length < 4) {
+      topWarriors.push(w);
+      topWarriors.sort((a, b) => b.fame - a.fame);
+    } else if (w.fame > topWarriors[3].fame) {
+      topWarriors[3] = w;
+      topWarriors.sort((a, b) => b.fame - a.fame);
+    }
+  }
 
   return (
     <Surface variant="glass" padding="none" className="h-full border-border/10 group overflow-hidden relative flex flex-col">

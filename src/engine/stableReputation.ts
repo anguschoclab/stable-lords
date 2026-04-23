@@ -71,7 +71,19 @@ export function computeStableReputation(state: GameState): StableReputation {
   }
 
   // ── Fame ──
-  const topFame = activeWarriors.sort((a, b) => b.fame - a.fame).slice(0, 5);
+  // ⚡ Bolt: Fixed accidental mutation of activeWarriors and optimized O(N log N) sort to O(N) bounded tracking
+  const topFame = [];
+  for (let i = 0; i < activeWarriors.length; i++) {
+    const w = activeWarriors[i];
+    if (topFame.length < 5) {
+      topFame.push(w);
+      topFame.sort((a, b) => b.fame - a.fame);
+    } else if (w.fame > topFame[4].fame) {
+      topFame[4] = w;
+      topFame.sort((a, b) => b.fame - a.fame);
+    }
+  }
+
   let topFameSum = 0;
   for (let i = 0; i < topFame.length; i++) {
     topFameSum += topFame[i].fame;
@@ -125,7 +137,19 @@ export function computeRivalReputation(
     cleanBouts += (w.career?.wins || 0) + (w.career?.losses || 0) - (w.career?.kills || 0);
   }
 
-  const topFame = activeWarriors.sort((a, b) => b.fame - a.fame).slice(0, 5);
+  // ⚡ Bolt: Fixed accidental mutation of activeWarriors and optimized O(N log N) sort to O(N) bounded tracking
+  const topFame = [];
+  for (let i = 0; i < activeWarriors.length; i++) {
+    const w = activeWarriors[i];
+    if (topFame.length < 5) {
+      topFame.push(w);
+      topFame.sort((a, b) => b.fame - a.fame);
+    } else if (w.fame > topFame[4].fame) {
+      topFame[4] = w;
+      topFame.sort((a, b) => b.fame - a.fame);
+    }
+  }
+
   let topFameSum = 0;
   for (let i = 0; i < topFame.length; i++) {
     topFameSum += topFame[i].fame;
