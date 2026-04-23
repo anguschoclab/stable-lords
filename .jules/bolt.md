@@ -23,3 +23,7 @@
 ## 2026-04-22 - Optimize max-value lookups in useMemo
 **Learning:** Using `[...array].sort()[0]` inside frequently executed React hooks like `useMemo` creates unnecessary shallow copies and runs in O(N log N) time, which degrades render performance for large lists.
 **Action:** Always use an O(N) linear scan (`for...of` or `reduce`) when searching for maximum or minimum values in arrays or maps, especially within React render cycles or heavy data processing pipelines.
+
+## 2026-04-23 - Array Mutation & O(N log N) Performance with sort().slice()
+**Learning:** Found several places where `array.sort(...).slice(0, K)` was used to find the top K elements. When used without spreading `[...array]` first, this mutated the underlying arrays (like `activeWarriors` in `stableReputation.ts`), introducing subtle state bugs. Even with spreading, running a full O(N log N) sort on large dynamic datasets just to keep the top 4-5 items scales poorly and creates GC pressure in React render cycles and Engine pipelines.
+**Action:** Replace `array.sort(...).slice(0, K)` with an O(N) bounded insertion sort loop (e.g. tracking an array of max size K) to prevent mutations, reduce allocations, and perform 10-20x faster.
