@@ -42,13 +42,3 @@ export function generateId(rng?: SeededRNG, prefix?: string): string {
 
   throw new Error("Secure random number generator not available in this environment.");
 }
-
-/** Simple FNV-1a hash for deterministic seeds from IDs */
-export function hashStr(s: string): number {
-  let hash = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    hash ^= s.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}

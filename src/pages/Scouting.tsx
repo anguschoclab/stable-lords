@@ -8,7 +8,7 @@ import { generateScoutReport, getScoutCost, type ScoutQuality } from "@/engine/s
 import { type ScoutReportData, type RivalStableData, type Warrior } from "@/types/game";
 import { Search, Eye, ArrowLeftRight, UserRoundSearch } from "lucide-react";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { hashStr } from "@/utils/idUtils";
+import { hashStr } from "@/utils/random";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { PageHeader } from "@/components/ui/PageHeader";

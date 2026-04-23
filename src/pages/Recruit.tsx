@@ -10,7 +10,7 @@ import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, type Attributes } f
 import { BASE_ROSTER_CAP } from "@/data/constants";
 import { makeWarrior } from "@/engine/factories";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { hashStr } from "@/utils/idUtils";
+import { hashStr } from "@/utils/random";
 import {
   generateRecruitPool, fullRefreshPool,
   type PoolWarrior, type RecruitTier,

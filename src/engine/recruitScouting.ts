@@ -14,7 +14,7 @@
  */
 import type { AttributePotential } from "@/types/warrior.types";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { hashStr } from "@/utils/idUtils";
+import { hashStr } from "@/utils/random";
 
 const ATTRIBUTE_KEYS = ["ST", "CN", "SZ", "WT", "WL", "SP", "DF"] as const;
 type AttrKey = typeof ATTRIBUTE_KEYS[number];

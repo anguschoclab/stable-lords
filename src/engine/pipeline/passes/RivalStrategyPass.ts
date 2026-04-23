@@ -9,6 +9,7 @@ import { TournamentSelectionService } from "@/engine/matchmaking/tournamentSelec
 import { processAllRivalsBoutOffers } from "@/engine/ai/workers/competitionWorker";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
 import { StateImpact, mergeImpacts } from "@/engine/impacts";
+import { hashStr } from "@/utils/random";
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
  */
@@ -106,13 +107,4 @@ function handleSeasonalTournaments(state: GameState, week: number, rng: IRNGServ
   });
 
   return mergeImpacts(impacts);
-}
-
-function hashStr(s: string): number {
-  let hash = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    hash ^= s.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
 }
