@@ -5,7 +5,7 @@ import { runSimulation } from "./simulation-harness";
 
 const WEEKS_TO_SIMULATE = 1000;
 const CONSTANTS_FILE = path.join(process.cwd(), "src/engine/combat/mechanics/combatConstants.ts");
-const REPORT_FILE = path.join(process.cwd(), "Autobalance_Report.md");
+const REPORT_FILE = path.join(process.cwd(), "Daily_Balance_Report.md");
 
 interface MetricStats {
   styleWinRates: Record<string, number>;
@@ -171,7 +171,7 @@ async function main() {
     console.log(commitMessage);
 
     try {
-        execSync("git add src/engine/combat/mechanics/combatConstants.ts src/data/economyConstants.ts Autobalance_Report.md");
+        execSync("git add src/engine/combat/mechanics/combatConstants.ts src/data/economyConstants.ts Daily_Balance_Report.md");
         execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
         console.log("Committed to git successfully.");
     } catch (e: any) {
@@ -203,7 +203,7 @@ ${changed ? commitMessage : "None."}
 `;
 
   fs.writeFileSync(REPORT_FILE, report);
-  console.log(`\nWrote Autobalance_Report.md`);
+  console.log(`\nWrote Daily_Balance_Report.md`);
 }
 
 main().catch(console.error);
