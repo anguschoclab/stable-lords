@@ -40,7 +40,7 @@ export {
   getChargeDescription,
   getCrestDescription,
 } from './crest/crestGenerator';
-export { StableCrest, SIZE_MAP } from '@/components/crest/StableCrest';
+
 export type {
   CrestData,
   CrestCharge,

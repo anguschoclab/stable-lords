@@ -24,7 +24,7 @@ export const KILL_THRESHOLD_MIN = 0.05;
 export const KILL_THRESHOLD_BASE = 0.3;
 
 export const TACTIC_OVERUSE_CAP = 3;
-export const CRIT_DAMAGE_MULT = 1.6;
+export const CRIT_DAMAGE_MULT = 1.70;
 
 // ─── Style Matchup Matrix ──────────────────────────────────────────────────
 

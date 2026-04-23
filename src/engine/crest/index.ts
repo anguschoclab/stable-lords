@@ -2,7 +2,7 @@
  * Crest System - Main exports
  */
 
-export { StableCrest, SIZE_MAP } from '@/components/crest/StableCrest';
+
 export {
   generateCrest,
   inheritCrest,

@@ -189,7 +189,7 @@ async function main() {
 
     try {
       execSync(
-        'git add src/engine/combat/mechanics/combatConstants.ts src/data/economyConstants.ts Daily_Balance_Report.md'
+        'git add src/engine/combat/mechanics/combatConstants.ts src/data/economyConstants.ts'
       );
       execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
       console.log('Committed to git successfully.');
