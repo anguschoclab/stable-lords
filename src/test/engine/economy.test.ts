@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { computeWeeklyBreakdown, processEconomy } from "@/engine/economy";
+import { computeWeeklyBreakdown, computeEconomyImpact } from "@/engine/economy";
+import { resolveImpacts } from "@/engine/impacts";
 import type { GameState, Warrior } from "@/types/game";
 import { FightingStyle, type FightSummary } from "@/types/game";
 import { createFreshState } from "@/engine/factories";
@@ -85,13 +86,12 @@ describe("Economy Engine", () => {
     });
   });
 
-  describe("processEconomy", () => {
+  describe("computeEconomyImpact", () => {
     it("should update game state treasury and add ledger entries immutably", () => {
       const state = { ...baseState, week: 3, treasury: 100, fame: 5 };
-      const w1 = makeTestWarrior({ name: "Alice", id: "p1", fame: 0 });
-      const entries = [{ amount: 223, description: "Test entry", week: 1, type: "income" as const }];
+      const impact = computeEconomyImpact(state);
       
-      const newState = processEconomy(state, entries);
+      const newState = resolveImpacts(state, [impact]);
       
       // Treasury calculation may have changed, just verify it increased
       expect(newState.treasury).toBeGreaterThan(100);

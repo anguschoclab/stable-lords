@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { processAging } from "@/engine/aging";
+import { computeAgingImpact } from "@/engine/aging";
+import { resolveImpacts } from "@/engine/impacts";
 import type { GameState, Warrior, Attributes } from "@/types/game";
 import { FightingStyle } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
@@ -81,7 +82,7 @@ function makeGameState(week: number, roster: Warrior[]): GameState {
 
 // ─── Tests ────────────────────────────────────────────────────────────────
 
-describe("processAging — basic aging", () => {
+describe("computeAgingImpact — basic aging", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -89,8 +90,9 @@ describe("processAging — basic aging", () => {
   it("increments age by 1 on multiples of 52 weeks", () => {
     const w = makeWarrior("w1", 20);
     const state = makeGameState(52, [w]);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
 
     expect(newState.roster[0]!.age).toBe(21);
   });
@@ -98,13 +100,15 @@ describe("processAging — basic aging", () => {
   it("does not increment age on non-multiples of 52 weeks", () => {
     const w = makeWarrior("w1", 20);
     const state = makeGameState(51, [w]);
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
 
     expect(newState.roster[0]!.age).toBe(20);
   });
 });
 
-describe("processAging — aging penalties", () => {
+describe("computeAgingImpact — aging penalties", () => {
   beforeEach(() => {
     // Default mock to avoid retirement unless requested
     vi.spyOn(SeededRNGService.prototype, "next").mockReturnValue(0.99);
@@ -117,8 +121,9 @@ describe("processAging — aging penalties", () => {
   it("does not apply penalties to a warrior under the age penalty start limit", () => {
     const w = makeWarrior("w1", 27, { SP: 15, DF: 15 });
     const state = makeGameState(52, [w]);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
 
     expect(newState.roster[0]!.age).toBe(28);
     expect(newState.roster[0]!.attributes.SP).toBe(15);
@@ -128,8 +133,9 @@ describe("processAging — aging penalties", () => {
   it("applies penalty to SP and DF when age exceeds AGING_PENALTY_START", () => {
     const w = makeWarrior("w1", 31, { SP: 15, DF: 15 });
     const state = makeGameState(52, [w]);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
 
     expect(newState.roster[0]!.age).toBe(32);
     expect(newState.roster[0]!.attributes.SP).toBe(14);
@@ -139,15 +145,16 @@ describe("processAging — aging penalties", () => {
   it("adds a newsletter event when aging penalties are applied", () => {
     const w = makeWarrior("w1", 31, { SP: 15, DF: 15 });
     const state = makeGameState(52, [w]);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
 
     expect(newState.newsletter.length).toBe(1);
     expect(newState.newsletter[0]!.title).toBe("Aging Report");
   });
 });
 
-describe("processAging — forced retirement", () => {
+describe("computeAgingImpact — forced retirement", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -155,8 +162,9 @@ describe("processAging — forced retirement", () => {
   it("guarantees retirement for a warrior at FORCED_RETIRE_MAX (40+)", () => {
     const w = makeWarrior("w1", 40);
     const state = makeGameState(10, [w]);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
 
     expect(newState.roster.length).toBe(0);
     expect(newState.retired.length).toBe(1);
@@ -168,8 +176,10 @@ describe("processAging — forced retirement", () => {
 
     // Retire chance at 35 is 0.075. Set mock to 0.01 to trigger.
     vi.spyOn(SeededRNGService.prototype, "next").mockReturnValue(0.01);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
+    
     expect(newState.roster.length).toBe(0);
     expect(newState.retired.length).toBe(1);
   });
@@ -179,8 +189,10 @@ describe("processAging — forced retirement", () => {
     const state = makeGameState(12, [w]);
 
     vi.spyOn(SeededRNGService.prototype, "next").mockReturnValue(0.99);
-
-    const newState = processAging(state);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
+    
     expect(newState.roster.length).toBe(1);
   });
 });

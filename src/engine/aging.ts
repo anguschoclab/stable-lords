@@ -24,6 +24,7 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
   const ageEvents: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const toRetire: string[] = [];
+  const retiredWarriors: Warrior[] = [];
 
   // Age warriors every 52 weeks
   if (state.week % WEEKS_PER_YEAR === 0) {
@@ -52,56 +53,22 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
     const age = (rosterUpdates.get(w.id)?.age ?? w.age) ?? 18;
     if (age >= FORCED_RETIRE_MAX) {
       toRetire.push(w.id);
+      retiredWarriors.push({ ...w, age, status: "Retired" as any, retiredWeek: state.week } as any);
       ageEvents.push(`${w.name} (age ${age}) has been forced to retire — too old to fight.`);
     } else if (age >= FORCED_RETIRE_MIN) {
       const retireChance = (age - FORCED_RETIRE_MIN) / (FORCED_RETIRE_MAX - FORCED_RETIRE_MIN) * 0.15;
       if (rng.next() < retireChance) {
         toRetire.push(w.id);
+        retiredWarriors.push({ ...w, age, status: "Retired" as any, retiredWeek: state.week } as any);
         ageEvents.push(`${w.name} (age ${age}) has decided to hang up the blade.`);
       }
     }
   }
 
-  // Handle retirement in impacts (Simplified for now - can refine graveyard movement later)
-  if (toRetire.length > 0) {
-    toRetire.forEach(id => {
-       const existing = rosterUpdates.get(id) || {};
-       rosterUpdates.set(id, { ...existing, status: "Retired" as WarriorStatus }); 
-    });
-  }
-
   return {
     rosterUpdates,
+    rosterRemovals: toRetire,
+    retired: retiredWarriors,
     newsletterItems: ageEvents.length > 0 ? [{ id: rng.uuid(), week: state.week, title: "Aging Report", items: ageEvents }] : []
-  };
-}
-
-/** @deprecated Use computeAgingImpact and resolveImpacts instead. Process aging for all warriors at week-end. Legacy wrapper. */
-export function processAging(state: GameState): GameState {
-  const rng = new SeededRNGService(state.week * 997 + 3);
-  const impact = computeAgingImpact(state, rng);
-  let roster = [...state.roster];
-  const retired = [...state.retired];
-
-  if (impact.rosterUpdates) {
-    impact.rosterUpdates.forEach((update, id) => {
-       const w = roster.find(r => r.id === id);
-       if (w) {
-         const updated = { ...w, ...update };
-         if (updated.status === "Retired") {
-            roster = roster.filter(r => r.id !== id);
-            retired.push({ ...updated, retiredWeek: state.week });
-         } else {
-            roster = roster.map(r => r.id === id ? updated : r);
-         }
-       }
-    });
-  }
-
-  return { 
-    ...state, 
-    roster, 
-    retired, 
-    newsletter: impact.newsletterItems ? [...state.newsletter, ...impact.newsletterItems] : state.newsletter 
   };
 }

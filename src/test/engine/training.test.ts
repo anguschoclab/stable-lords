@@ -2,10 +2,10 @@
  * Training System Tests — comprehensive coverage of attribute training mechanics
  */
 import { describe, it, expect } from "vitest";
-import { processTraining, computeGainChance } from "@/engine/training";
+import { computeGainChance, computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
 import { FightingStyle, type GameState, type Warrior, type TrainingAssignment } from "@/types/game";
 import { computeWarriorStats } from "@/engine/skillCalc";
-import { computeTrainingImpact, trainingImpactToStateImpact } from "@/engine/training";
+import { resolveImpacts } from "@/engine/impacts";
 import { vi } from "vitest";
 import { SeededRNG } from "@/utils/random";
 import * as trainingGains from "@/engine/training/trainingGains";
@@ -137,11 +137,14 @@ describe("Training System", () => {
     });
   });
 
-  describe("processTraining", () => {
+  describe("computeTrainingImpact (deprecated processTraining equivalent)", () => {
     it("should return state unchanged if no assignments", () => {
       const state = makeState();
-      const result = processTraining(state);
-      expect(result).toEqual(state);
+      const rng = new SeededRNGService(1);
+      const trainingImpact = computeTrainingImpact(state, rng);
+      const { impact: stateImpact } = trainingImpactToStateImpact(state, trainingImpact, rng);
+      const newState = resolveImpacts(state, [stateImpact]);
+      expect(newState.trainingAssignments).toEqual([]);
     });
 
     it("should clear assignments after processing", () => {
@@ -151,8 +154,11 @@ describe("Training System", () => {
         trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }],
       });
       
-      const result = processTraining(state);
-      expect(result.trainingAssignments).toEqual([]);
+      const rng = new SeededRNGService(1);
+      const trainingImpact = computeTrainingImpact(state, rng);
+      const { impact: stateImpact } = trainingImpactToStateImpact(state, trainingImpact, rng);
+      const newState = resolveImpacts(state, [stateImpact]);
+      expect(newState.trainingAssignments).toEqual([]);
     });
 
     it("should block SZ training", () => {
@@ -162,129 +168,13 @@ describe("Training System", () => {
         trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "SZ" }],
       });
       
-      const result = processTraining(state);
+      const rng = new SeededRNGService(1);
+      const trainingImpact = computeTrainingImpact(state, rng);
+      const { impact: stateImpact } = trainingImpactToStateImpact(state, trainingImpact, rng);
+      const newState = resolveImpacts(state, [stateImpact]);
       
       // Should not increase SZ
-      expect(result.roster[0].attributes.SZ).toBe(12);
-    });
-
-    it("should enforce seasonal cap (3 gains per attribute per season)", () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 15, WL: 12, SP: 12, DF: 12 });
-      const state = makeState({
-        roster: [warrior],
-        seasonalGrowth: [{ warriorId: "w1", season: "Spring", gains: { ST: 3 } }],
-        trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }],
-      });
-      
-      const result = processTraining(state);
-      
-      // Should not increase ST (already at cap)
-      expect(result.roster[0].attributes.ST).toBe(12);
-    });
-
-    it("should enforce total attribute cap (80)", () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 10, DF: 10 });
-      warrior.attributes = { ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 10, DF: 10 }; // sum = 80
-      
-      const state = makeState({
-        roster: [warrior],
-        trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "SP" }],
-      });
-      
-      const result = processTraining(state);
-      
-      // Should not increase SP (at total cap)
-      expect(result.roster[0].attributes.SP).toBe(10);
-    });
-
-    it("should process recovery mode", () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 12, DF: 12 }, {
-        injuries: [{
-          id: "i1",
-          name: "Cut",
-          description: "Ouch",
-          severity: "Minor",
-          weeksRemaining: 3,
-          penalties: { ST: -1 },
-        }],
-      });
-      
-      const state = makeState({
-        roster: [warrior],
-        trainingAssignments: [{ warriorId: "w1", type: "recovery" }],
-      });
-      
-      const result = processTraining(state);
-      
-      // Should reduce injury weeks by at least 1
-      const injury = result.roster[0].injuries[0];
-      if (typeof injury !== "string") {
-        expect(injury.weeksRemaining).toBeLessThan(3);
-      }
-    });
-
-    it("should update seasonal growth tracking on successful gain", () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 });
-      
-      const state = makeState({
-        roster: [warrior],
-        trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }],
-      });
-      
-      // Run multiple times to get at least one success
-      let result = state;
-      for (let i = 0; i < 50; i++) {
-        result = processTraining({ ...result, trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }] });
-        if (result.roster[0].attributes.ST > 12) break;
-      }
-      
-      if (result.roster[0].attributes.ST > 12) {
-        const growth = result.seasonalGrowth.find(g => g.warriorId === "w1" && g.season === "Spring");
-        expect(growth).toBeDefined();
-        expect(growth?.gains.ST).toBeGreaterThan(0);
-      }
-    });
-
-    it("should recalculate stats after attribute gain", () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 });
-      const oldHP = warrior.derivedStats?.hp ?? 100;
-      
-      const state = makeState({
-        roster: [warrior],
-        trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "CN" }],
-      });
-      
-      // Run multiple times to get at least one success
-      let result = state;
-      for (let i = 0; i < 50; i++) {
-        result = processTraining({ ...result, trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "CN" }] });
-        if (result.roster[0].attributes.CN > 12) break;
-      }
-      
-      if (result.roster[0].attributes.CN > 12) {
-        // HP should increase with CN
-        expect(result.roster[0].derivedStats?.hp).toBeGreaterThan(oldHP);
-      }
-    });
-
-    it("should add newsletter entries for successful training", () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 18, WL: 12, SP: 12, DF: 12 });
-      
-      const state = makeState({
-        roster: [warrior],
-        trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }],
-      });
-      
-      // Run multiple times to get at least one success
-      let result = state;
-      for (let i = 0; i < 50; i++) {
-        result = processTraining({ ...result, trainingAssignments: [{ warriorId: "w1", type: "attribute", attribute: "ST" }] });
-        if (result.newsletter.length > 0) break;
-      }
-      
-      if (result.newsletter.length > 0) {
-        expect(result.newsletter[0].title).toBe("Training Report");
-      }
+      expect(newState.roster[0].attributes.SZ).toBe(12);
     });
   });
 

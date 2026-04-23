@@ -110,24 +110,6 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
   return { updatedRoster: currentRoster, updatedSeasonalGrowth: seasonalGrowth, results };
 }
 
-/** @deprecated Use computeTrainingImpact and resolveImpacts instead. Process training for all warriors at week-end. */
-export function processTraining(state: GameState): GameState {
-  const rngService = new SeededRNGService(state.week * 555 + 1);
-  const impact = computeTrainingImpact(state, rngService);
-  const { impact: stateImpact, seasonalGrowth } = trainingImpactToStateImpact(state, impact, rngService);
-  
-  const newState = { ...state, seasonalGrowth, trainingAssignments: [] };
-  if (stateImpact.newsletterItems) {
-    newState.newsletter = [...newState.newsletter, ...stateImpact.newsletterItems];
-  }
-  
-  stateImpact.rosterUpdates?.forEach((update: Partial<Warrior>, id: string) => {
-    newState.roster = updateEntityInList(newState.roster, id, w => ({ ...w, ...update }));
-  });
-
-  return newState;
-}
-
 /**
  * Convert a TrainingImpact to a generic StateImpact for the pipeline.
  */
@@ -166,7 +148,8 @@ export function trainingImpactToStateImpact(
         week: state.week,
         title: "Training Report",
         items: newsItems
-      }] : []
+      }] : [],
+      trainingAssignments: []
     },
     seasonalGrowth,
     results: impact.results
