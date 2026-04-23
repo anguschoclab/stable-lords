@@ -67,16 +67,6 @@ export class SeededRNG {
   }
 }
 
-/** Legacy secure RNG (kept for non-deterministic UI needs if any) */
-export function random32(): number {
-  if (typeof globalThis !== "undefined" && "crypto" in globalThis && typeof (globalThis.crypto as Crypto).getRandomValues === "function") {
-    const array = new Uint32Array(1);
-    (globalThis.crypto as Crypto).getRandomValues(array);
-    return array[0]!;
-  }
-  throw new Error("Secure random number generator not available in this environment.");
-}
-
 /**
  * Universal random picker that works with both function-based RNG and IRNGService
  * Eliminates DRY violation of Math.floor(rng() * arr.length) pattern
@@ -116,41 +106,4 @@ export function hashStr(s: string): number {
     hash = Math.imul(hash, 16777619);
   }
   return hash >>> 0;
-}
-
-/**
- * Creates a deterministic RNG seeded from week number
- * Eliminates DRY violation of `new SeededRNGService(week * PRIME + OFFSET)` pattern
- * 
- * @param week - The game week number
- * @param salt - Optional salt (string or number) for variation
- * @param basePrime - Prime number multiplier (default: 9973)
- */
-export function createWeekRng(
-  week: number,
-  salt?: string | number,
-  basePrime: number = 9973
-): SeededRNG {
-  const baseSeed = week * basePrime;
-  if (typeof salt === 'string') {
-    return new SeededRNG(baseSeed + hashStr(salt));
-  }
-  return new SeededRNG(baseSeed + (salt ?? 0));
-}
-
-/**
- * Creates a deterministic RNG using legacy seed pattern
- * Used for backward compatibility with existing seed calculations
- * 
- * @param week - The game week number
- * @param id - String ID or numeric identifier
- * @param multiplier - Prime multiplier (default: 7919)
- */
-export function createWeekRngLegacy(
-  week: number,
-  id: string | number,
-  multiplier: number = 7919
-): SeededRNG {
-  const salt = typeof id === 'string' ? id.length : id;
-  return new SeededRNG(week * multiplier + salt);
 }
