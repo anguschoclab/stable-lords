@@ -41,8 +41,8 @@ export function RivalsListWidget() {
                <Globe className="h-4 w-4 text-destructive" />
             </div>
             <div>
-               <h3 className="font-display text-sm font-black uppercase tracking-tight">Rival_Registry</h3>
-               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Opposing_Stable_Intelligence</p>
+               <h3 className="font-display text-sm font-black uppercase tracking-tight">RIVAL REGISTRY</h3>
+               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">OPPOSING STABLE INTELLIGENCE</p>
             </div>
          </div>
          <Badge variant="outline" className="text-[9px] font-mono font-black border-white/10 bg-white/5 text-muted-foreground/60 h-7 px-3 tracking-widest">
@@ -53,7 +53,7 @@ export function RivalsListWidget() {
       <div className="flex-1 overflow-y-auto relative z-10 custom-scrollbar">
          {rivals.length === 0 ? (
             <div className="p-12 text-center opacity-20 italic">
-               <p className="text-[10px] uppercase tracking-[0.2em]">No_Threat_Signals_Detected</p>
+               <p className="text-[10px] uppercase tracking-[0.2em]">NO THREAT SIGNALS DETECTED</p>
             </div>
          ) : (
             <div className="divide-y divide-white/5">
@@ -116,7 +116,7 @@ export function RivalsListWidget() {
 
       {recentRivalBouts.length > 0 && (
          <div className="p-4 border-t border-white/5 bg-black/20 relative z-10">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mb-3 block">Tactical_Encounter_Log</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mb-3 block">TACTICAL ENCOUNTER LOG</span>
             <div className="space-y-2">
                {recentRivalBouts.map(f => {
                   const rosterNames = new Set((state.roster || []).map(w => w.name));

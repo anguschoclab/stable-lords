@@ -67,7 +67,7 @@ export default function NewGameForm({
           className="flex items-center gap-2 text-muted-foreground/60 hover:text-accent text-[11px] font-black uppercase tracking-widest transition-colors duration-150"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Return to Title
+          RETURN TO TITLE
         </button>
 
         <div
@@ -97,7 +97,7 @@ export default function NewGameForm({
             </div>
             <div>
               <h2 className="text-2xl font-display font-bold text-foreground">
-                Forge Your Stable
+                FORGE YOUR STABLE
               </h2>
               <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-[280px] mx-auto">
                 The orphanage doors creak open. Beyond them lies the roar of the crowd, the clash of steel, and a chance to forge legends.
@@ -115,13 +115,13 @@ export default function NewGameForm({
             className="w-full h-10 gap-2 border-[rgba(60,42,22,0.8)] bg-[#0A0705] hover:border-accent/40 hover:bg-accent/5 text-[11px] font-black uppercase tracking-wider"
           >
             <Dices className="h-4 w-4 text-accent/70" />
-            Randomize All
+            RANDOMIZE ALL
           </Button>
 
           <div className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="owner-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70">
-                Your Name
+                YOUR NAME
               </label>
               <div className="flex gap-2">
                 <Input
@@ -149,7 +149,7 @@ export default function NewGameForm({
 
             <div className="space-y-2">
               <label htmlFor="stable-name" className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70">
-                Stable Name
+                STABLE NAME
               </label>
               <div className="flex gap-2">
                 <Input
@@ -176,7 +176,7 @@ export default function NewGameForm({
 
             <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70 flex items-center gap-2">
-                Heraldic Seal
+                HERALDIC SEAL
                 <span className="text-[8px] text-muted-foreground/50 normal-case tracking-normal">— Your sigil in the arena</span>
               </label>
               
@@ -211,7 +211,7 @@ export default function NewGameForm({
                   className="h-9 px-4 gap-2 border-[rgba(60,42,22,0.8)] bg-[#0A0705] hover:border-accent/40 hover:bg-accent/5 text-[11px] font-black uppercase tracking-wider"
                 >
                   <Dices className="h-4 w-4 text-accent/70" />
-                  Randomize Heraldry
+                  RANDOMIZE HERALDRY
                 </Button>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function NewGameForm({
             className="w-full h-12 gap-2 font-display font-bold text-sm tracking-wider uppercase"
             size="lg"
           >
-            Enter the Orphanage
+            ENTER THE ORPHANAGE
             <ArrowRight className="h-4 w-4" />
           </Button>
         </div>

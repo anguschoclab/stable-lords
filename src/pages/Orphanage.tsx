@@ -17,7 +17,7 @@ import type { Promoter, GameState } from "@/types/state.types";
 import type { Warrior, FightSummary } from "@/types/game";
 import { generatePotential } from "@/engine/potential";
 import { SeededRNGService } from "@/engine/core/rng/SeededRNGService";
-import { generateOrphanPool, TRAIT_PLAN_MODIFIERS } from "@/data/orphanPool";
+import { generateOrphanPool, TRAIT_DATA } from "@/data/orphanPool";
 import StepProgress from "@/components/orphanage/StepProgress";
 import IdentityStep from "@/components/orphanage/IdentityStep";
 import WarriorSelectionStep from "@/components/orphanage/WarriorSelectionStep";
@@ -36,7 +36,7 @@ export default function Orphanage() {
   const [ownerInput, setOwnerInput] = useState(state.player.name || "");
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [poolSeedValue, setPoolSeedValue] = useState(12345);
+  const [poolSeedValue, setPoolSeedValue] = useState(() => Math.floor(Math.random() * 1000000));
 
   const orphanPool = useMemo(
     () => generateOrphanPool(8, poolSeedValue),
@@ -113,14 +113,22 @@ export default function Orphanage() {
       const potential = pw.potential ?? generatePotential(pw.attrs, "Common", () => finishRng.next());
       // Build base plan and merge trait-based modifiers
       const basePlan = defaultPlanForWarrior(makeWarrior(undefined, pw.name, pw.style, pw.attrs));
-      const traitMods = TRAIT_PLAN_MODIFIERS[pw.trait] ?? {};
+      const traitData = TRAIT_DATA[pw.trait];
+      const traitMods = traitData?.modifiers ?? {};
       const plan = { ...basePlan, ...traitMods };
       const w = makeWarrior(
         finishRng.uuid(),
         pw.name,
         pw.style,
         pw.attrs,
-        { potential, age: pw.age, plan },
+        { 
+          potential, 
+          age: pw.age, 
+          plan,
+          traits: [pw.trait],
+          lore: pw.lore,
+          origin: pw.origin
+        },
         finishRng
       );
       if (boutResult) {

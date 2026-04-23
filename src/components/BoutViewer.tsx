@@ -111,7 +111,7 @@ export default function BoutViewer({
                     {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </button>
                </TooltipTrigger>
-               <TooltipContent className="bg-neutral-950 border-white/10 text-[10px] font-black uppercase tracking-widest">{expanded ? 'MINIMIZE_LOG' : 'REVEAL_INTEL'}</TooltipContent>
+               <TooltipContent className="bg-neutral-950 border-white/10 text-[10px] font-black uppercase tracking-widest">{expanded ? 'MINIMIZE LOG' : 'REVEAL INTEL'}</TooltipContent>
             </Tooltip>
           </div>
 
@@ -119,7 +119,7 @@ export default function BoutViewer({
             {/* Asset Alpha */}
             <div className="text-center flex-1 space-y-4">
                <div className="space-y-1">
-                  <h4 className="text-[9px] font-black tracking-[0.4em] text-primary uppercase opacity-40">Asset_Alpha</h4>
+                  <h4 className="text-[9px] font-black tracking-[0.4em] text-primary uppercase opacity-40">ASSET ALPHA</h4>
                   <h3 className={cn(
                     "font-display font-black uppercase text-2xl tracking-tighter transition-all duration-700",
                     winner === "A" ? "text-primary scale-110 drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)]" : winner === "D" ? "text-muted-foreground/30 grayscale" : "text-foreground"
@@ -150,7 +150,7 @@ export default function BoutViewer({
                {isRivalry && (
                  <div className="flex flex-col items-center gap-1">
                     <TagBadge tag="BLOOD FEUD" type="injury" className="animate-pulse shadow-[0_0_10px_rgba(var(--destructive-rgb),0.3)]" />
-                    <span className="text-[7px] font-black text-destructive uppercase tracking-widest opacity-40">High_Hostility_Sync</span>
+                    <span className="text-[7px] font-black text-destructive uppercase tracking-widest opacity-40">HIGH HOSTILITY SYNC</span>
                  </div>
                )}
             </div>
@@ -158,7 +158,7 @@ export default function BoutViewer({
             {/* Asset Beta */}
             <div className="text-center flex-1 space-y-4">
                <div className="space-y-1">
-                  <h4 className="text-[9px] font-black tracking-[0.4em] text-accent uppercase opacity-40">Asset_Beta</h4>
+                  <h4 className="text-[9px] font-black tracking-[0.4em] text-accent uppercase opacity-40">ASSET BETA</h4>
                   <h3 className={cn(
                     "font-display font-black uppercase text-2xl tracking-tighter transition-all duration-700",
                     winner === "D" ? "text-accent scale-110 drop-shadow-[0_0_15px_rgba(var(--accent-rgb),0.4)]" : winner === "A" ? "text-muted-foreground/30 grayscale" : "text-foreground"
@@ -230,7 +230,7 @@ export default function BoutViewer({
                             <RotateCcw className="h-4 w-4" />
                          </button>
                       </TooltipTrigger>
-                      <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">RESET_BUFFER</TooltipContent>
+                      <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">RESET BUFFER</TooltipContent>
                    </Tooltip>
                    
                    <div className="h-4 w-px bg-white/10" />
@@ -254,7 +254,7 @@ export default function BoutViewer({
                             <SkipForward className="h-4 w-4" />
                          </button>
                       </TooltipTrigger>
-                      <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">SKIP_TO_RESOLVE</TooltipContent>
+                      <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">SKIP TO RESOLVE</TooltipContent>
                    </Tooltip>
                 </div>
 
@@ -336,7 +336,7 @@ export default function BoutViewer({
                     </h2>
                     <div className="flex items-center justify-center gap-3">
                        <span className="h-px w-8 bg-white/10" />
-                       <div className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.4em]">BY_WAY_OF_{(by ?? "RESOLUTION").toUpperCase()}</div>
+                       <div className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.4em]">BY WAY OF {(by ?? "RESOLUTION").toUpperCase()}</div>
                        <span className="h-px w-8 bg-white/10" />
                     </div>
                  </div>

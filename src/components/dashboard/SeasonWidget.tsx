@@ -81,10 +81,10 @@ export function SeasonWidget() {
            <div className="p-2 rounded-none bg-primary/10 border border-primary/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.1)]">
               <Clock className="h-4 w-4 text-primary" />
            </div>
-           <div>
-              <h3 className="font-display text-sm font-black uppercase tracking-tight">Chronology Matrix</h3>
+            <div>
+              <h3 className="font-display text-sm font-black uppercase tracking-[0.2em] text-carved">Chronology Matrix</h3>
               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Temporal Registry // WK {week.toString().padStart(2, '0')}</p>
-           </div>
+            </div>
         </div>
 
         <div className="space-y-8 relative z-10">
@@ -110,13 +110,13 @@ export function SeasonWidget() {
           </div>
 
           {isOffseason && latestOffseasonEvent && (
-             <div className="flex items-center gap-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-md animate-in fade-in slide-in-from-top-2 duration-700">
-                <PartyPopper className="h-5 w-5 text-indigo-400" />
+             <div className="flex items-center gap-3 p-3 bg-arena-gold/10 border border-arena-gold/20 rounded-none animate-in fade-in slide-in-from-top-2 duration-700">
+                <PartyPopper className="h-5 w-5 text-arena-gold" />
                 <div className="flex flex-col">
-                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-arena-gold">
                       {latestOffseasonEvent.title}
                    </span>
-                   <span className="text-[9px] font-medium text-indigo-200/70 leading-tight">
+                   <span className="text-[9px] font-medium text-arena-gold/70 leading-tight">
                       {latestOffseasonEvent.items?.[0] ?? ""}
                    </span>
                 </div>

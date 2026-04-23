@@ -113,7 +113,7 @@ export default function AdminTools() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <aside className="lg:col-span-3 space-y-6 sticky top-6">
            <div className="flex items-center gap-3 px-2">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">CONSOLE_LEVEL</span>
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">CONSOLE LEVEL</span>
            </div>
            
            <Surface variant="glass" className="p-2 space-y-1">
@@ -144,7 +144,7 @@ export default function AdminTools() {
                 <Surface variant="glass" className="p-0 border-primary/20 overflow-hidden shadow-2xl">
                   <div className="bg-primary/10 px-5 py-3 border-b border-primary/10 flex items-center gap-2">
                     <Download className="h-4 w-4 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Save_Core</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">SAVE CORE</span>
                   </div>
                   <div className="p-6 space-y-3">
                     <Button onClick={handleExport} className="w-full h-11 gap-2 font-black uppercase text-[10px] tracking-widest" variant="outline">
@@ -167,7 +167,7 @@ export default function AdminTools() {
                      <Trash2 className="h-4 w-4" /> Hard Reset
                    </h3>
                    <p className="text-[10px] text-destructive/70 mb-6 font-mono">WARNING: This bypasses all safety checks and nukes the local IndexedDB pool.</p>
-                   <Button onClick={doReset} variant="destructive" className="w-full h-10 font-black uppercase text-[10px] tracking-widest">EXECUTE_WIPE</Button>
+                   <Button onClick={doReset} variant="destructive" className="w-full h-10 font-black uppercase text-[10px] tracking-widest">EXECUTE WIPE</Button>
                 </Surface>
              </div>
            )}
@@ -177,7 +177,7 @@ export default function AdminTools() {
                <Surface variant="glass" className="p-0 border-accent/20 overflow-hidden">
                   <div className="bg-accent/10 px-5 py-3 border-b border-accent/10 flex items-center gap-2">
                     <FastForward className="h-4 w-4 text-accent" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-accent">Temporal_Drift</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-accent">TEMPORAL DRIFT</span>
                   </div>
                   <div className="p-6 space-y-3">
                     <Button onClick={skipWeek} className="w-full h-11 font-black uppercase text-[10px] tracking-widest" variant="secondary">Advance 1 Week</Button>

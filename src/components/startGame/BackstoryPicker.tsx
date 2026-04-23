@@ -13,7 +13,7 @@ export default function BackstoryPicker({ value, onChange, onRandomize }: Backst
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/70 flex items-center gap-2">
-          Backstory
+          BACKSTORY
           <span className="text-[8px] text-muted-foreground/50 normal-case tracking-normal">— Who you were before</span>
         </label>
         <Button

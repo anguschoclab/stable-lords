@@ -72,8 +72,8 @@ export function RankingsWidget() {
                <Award className="h-5 w-5 text-primary" />
             </div>
             <div>
-               <h3 className="font-display text-base font-black uppercase tracking-tight">Elite_Ranking_Registry</h3>
-               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Internal_Performance_Index</p>
+               <h3 className="font-display text-base font-black uppercase tracking-tight">ELITE RANKING REGISTRY</h3>
+               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">INTERNAL PERFORMANCE INDEX</p>
             </div>
          </div>
          <Badge variant="outline" className="text-[9px] font-mono font-black border-white/10 bg-white/5 text-muted-foreground/60 h-7 px-3 tracking-widest">
@@ -85,7 +85,7 @@ export function RankingsWidget() {
       <div className="px-6 py-3 bg-primary/5 border-b border-primary/10 relative z-10 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <Shield className="h-3.5 w-3.5 text-primary/60 shrink-0" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Your_Standing</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">YOUR STANDING</span>
         </div>
         <div className="flex items-center gap-4">
           {playerStanding.bestWarriorName && playerStanding.bestRank !== null ? (
@@ -101,7 +101,7 @@ export function RankingsWidget() {
               </Badge>
             </>
           ) : (
-            <span className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-widest">No_Rank_Data</span>
+            <span className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-widest">NO RANK DATA</span>
           )}
         </div>
       </div>
@@ -109,7 +109,7 @@ export function RankingsWidget() {
       <div className="flex-1 overflow-y-auto relative z-10 custom-scrollbar">
         {ranked.length === 0 ? (
           <div className="px-8 py-12 text-center opacity-20 italic">
-            <p className="text-[10px] uppercase tracking-[0.3em]">No_Combat_Data_Recorded</p>
+            <p className="text-[10px] uppercase tracking-[0.3em]">NO COMBAT DATA RECORDED</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
@@ -167,7 +167,7 @@ export function RankingsWidget() {
                        <span className="text-lg font-mono font-black tracking-tighter">{w.fame}</span>
                        <Star className="h-3.5 w-3.5 opacity-60 group-hover/row:opacity-100 transition-opacity" />
                     </div>
-                    <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Fame_Score</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">FAME SCORE</span>
                   </div>
                   <ChevronRight className="h-4 w-4 text-white/5 group-hover/row:text-primary transition-all group-hover/row:translate-x-1" />
                 </div>

@@ -26,14 +26,14 @@ export function FinancesWidget() {
             <Coins className="h-4 w-4 text-arena-gold" />
          </div>
          <div>
-            <h3 className="font-display text-sm font-black uppercase tracking-tight">Fiscal_Core</h3>
-            <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Operating_Liquidity_Monitor</p>
+            <h3 className="font-display text-sm font-black uppercase tracking-tight">FISCAL CORE</h3>
+            <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">OPERATING LIQUIDITY MONITOR</p>
          </div>
       </div>
 
       <div className="space-y-6 relative z-10">
         <div className="flex flex-col items-center justify-center py-4 bg-black/20 rounded-none border border-white/5 shadow-inner">
-           <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 mb-1">TOTAL_RESERVE</span>
+           <span className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 mb-1">TOTAL RESERVE</span>
            <div className="flex items-center gap-2">
                <span className="text-3xl font-display font-black text-white selection:bg-arena-gold/30 drop-shadow-[0_0_15px_rgba(255,215,0,0.1)]">
                  {Math.round(treasury).toLocaleString()}
@@ -81,7 +81,7 @@ export function FinancesWidget() {
         <div className="pt-4 border-t border-white/5 flex items-center justify-between">
            <div className="flex items-center gap-2">
               <TrendingUp className="h-3 w-3 text-muted-foreground opacity-40" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Weekly_Flux</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">WEEKLY FLUX</span>
            </div>
            <div className={cn(
               "text-xs font-mono font-black drop-shadow-sm",

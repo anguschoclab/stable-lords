@@ -452,7 +452,7 @@ export default function Recruit() {
             {/* Archetype B: Left Filter Sidebar (span-3) */}
             <aside className="lg:col-span-3 space-y-6 sticky top-6">
                <div className="flex items-center gap-3 px-1">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">FILTER_ENGINE</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">FILTER ENGINE</span>
                </div>
                
                <Surface variant="glass" className="space-y-6">
@@ -559,7 +559,7 @@ export default function Recruit() {
                ) : (
                  <Surface variant="glass" className="py-48 text-center border-dashed opacity-50">
                     <Search className="h-12 w-12 mx-auto mb-4 opacity-10" />
-                    <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">No_Matches_Detected</p>
+                    <p className="font-display font-black uppercase tracking-widest text-sm text-muted-foreground/30">NO MATCHES DETECTED</p>
                  </Surface>
                )}
             </main>

@@ -142,6 +142,9 @@ export interface Warrior {
   causeOfDeath?: string;
   yearlySnapshots?: Record<number, CareerRecord>; // 📸 Snapshot at Year Start
   awards?: import("./state.types").AnnualAward[];
+  traits: string[];
+  lore?: string;
+  origin?: string;
 }
 
 // Re-exports for convenience

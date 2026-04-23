@@ -31,12 +31,12 @@ export default function Graveyard() {
         actions={
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end">
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">WORLD_FALLEN</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">WORLD FALLEN</span>
               <span className="text-2xl font-mono font-black text-destructive">{worldFallen.length}</span>
             </div>
             <Separator orientation="vertical" className="h-10 bg-border/20" />
             <div className="flex flex-col items-end">
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">STABLE_MEMORIAL</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">STABLE MEMORIAL</span>
               <span className="text-2xl font-mono font-black text-primary">{myFallen.length}</span>
             </div>
           </div>
@@ -134,20 +134,20 @@ function FallenGrid({ warriors, season, emptyTitle, emptyDesc }: { warriors: War
 
               <div className="grid grid-cols-2 gap-4 mt-auto">
                 <div className="bg-white/[0.02] p-4 border border-white/5 text-center">
-                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">SERVICE_RECORD</span>
+                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">SERVICE RECORD</span>
                    <span className="text-sm font-mono font-black">{(w.career?.wins || 0)}W-{(w.career?.losses || 0)}L-{(w.career?.kills || 0)}K</span>
                 </div>
                 <div className="bg-white/[0.02] p-4 border border-white/5 text-center">
-                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">FINAL_FAME</span>
+                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">FINAL FAME</span>
                    <span className="text-sm font-mono font-black text-arena-gold">{w.fame}G</span>
                 </div>
               </div>
 
               {w.career?.medals && (w.career.medals.gold > 0 || w.career.medals.silver > 0 || w.career.medals.bronze > 0) && (
                 <div className="flex flex-wrap gap-2 pt-6 mt-6 border-t border-white/5">
-                  {w.career.medals.gold > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2.5 py-1.5 border border-arena-gold/20">🥇 GOLD_VALOR</span>}
-                  {w.career.medals.silver > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/5 px-2.5 py-1.5 border border-white/10">🥈 SILVER_TOKEN</span>}
-                  {w.career.medals.bronze > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-orange-500 bg-orange-500/10 px-2.5 py-1.5 border border-orange-500/20">🥉 BRONZE_ELITE</span>}
+                  {w.career.medals.gold > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2.5 py-1.5 border border-arena-gold/20">🥇 GOLD VALOR</span>}
+                  {w.career.medals.silver > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/5 px-2.5 py-1.5 border border-white/10">🥈 SILVER TOKEN</span>}
+                  {w.career.medals.bronze > 0 && <span className="text-[9px] uppercase font-black tracking-widest text-orange-500 bg-orange-500/10 px-2.5 py-1.5 border border-orange-500/20">🥉 BRONZE ELITE</span>}
                 </div>
               )}
             </div>

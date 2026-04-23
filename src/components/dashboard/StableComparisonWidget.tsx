@@ -146,8 +146,8 @@ export function StableComparisonWidget() {
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden border border-white/5">
-                    <div className={cn("h-full rounded-full transition-all duration-1000", s.isPlayer ? "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]" : "bg-arena-pop")} style={{ width: `${(s.wins / maxWins) * 100}%` }} />
+                  <div className="flex-1 h-1.5 bg-black/40 rounded-none overflow-hidden border border-white/5">
+                    <div className={cn("h-full rounded-none transition-all duration-1000", s.isPlayer ? "bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]" : "bg-arena-pop")} style={{ width: `${(s.wins / maxWins) * 100}%` }} />
                   </div>
                   <span className="text-[10px] font-mono font-black w-6 text-right">{s.wins}</span>
                 </div>
@@ -157,8 +157,8 @@ export function StableComparisonWidget() {
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden border border-white/5">
-                    <div className={cn("h-full rounded-full transition-all duration-1000", s.isPlayer ? "bg-arena-gold shadow-[0_0_10px_rgba(255,215,0,0.4)]" : "bg-arena-fame")} style={{ width: `${(s.avgFame / maxFame) * 100}%` }} />
+                  <div className="flex-1 h-1.5 bg-black/40 rounded-none overflow-hidden border border-white/5">
+                    <div className={cn("h-full rounded-none transition-all duration-1000", s.isPlayer ? "bg-arena-gold shadow-[0_0_10px_rgba(255,215,0,0.4)]" : "bg-arena-fame")} style={{ width: `${(s.avgFame / maxFame) * 100}%` }} />
                   </div>
                   <span className="text-[10px] font-mono font-black w-8 text-right">{s.avgFame}</span>
                 </div>
@@ -171,7 +171,7 @@ export function StableComparisonWidget() {
           <div className="border-t border-white/5 pt-8 space-y-6">
             <div className="flex items-center gap-3 px-2">
               <Swords className="h-4 w-4 text-primary opacity-60" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Head-to-Head</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">HEAD TO HEAD</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {rivalStats.map(r => {
@@ -185,11 +185,11 @@ export function StableComparisonWidget() {
                     <div className="flex justify-between items-center mb-3">
                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{resolveStableName(state, r.id, r.name)}</span>
                        <div className="flex items-center gap-2">
-                          <span className={cn("text-xs font-mono font-black", winPct >= 50 ? "text-arena-pop" : "text-destructive")}>{winPct}% Efficiency</span>
+                          <span className={cn("text-xs font-mono font-black", winPct >= 50 ? "text-arena-pop" : "text-destructive")}>{winPct}% EFFICIENCY</span>
                        </div>
                     </div>
                     
-                    <div className="flex gap-1 h-2 rounded-full overflow-hidden mb-3 border border-white/5">
+                    <div className="flex gap-1 h-2 rounded-none overflow-hidden mb-3 border border-white/5">
                        <div className="h-full bg-arena-pop shadow-[inset_0_0_5px_rgba(0,0,0,0.2)]" style={{ width: `${winPct}%` }} />
                        <div className="h-full bg-destructive/40" style={{ width: `${100 - winPct}%` }} />
                     </div>
@@ -197,11 +197,11 @@ export function StableComparisonWidget() {
                     <div className="flex justify-between items-center">
                        <div className="flex gap-4">
                           <div className="flex flex-col">
-                             <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">Wins</span>
+                             <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">WINS</span>
                              <span className="text-xs font-mono font-black text-arena-pop">{rec.wins}</span>
                           </div>
                           <div className="flex flex-col">
-                             <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">Losses</span>
+                             <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">LOSSES</span>
                              <span className="text-xs font-mono font-black text-destructive">{rec.losses}</span>
                           </div>
                        </div>
@@ -209,13 +209,13 @@ export function StableComparisonWidget() {
                        <div className="flex gap-4 text-right">
                           {rec.kills > 0 && (
                              <div className="flex flex-col">
-                                <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest text-right">Terminated</span>
+                                <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest text-right">TERMINATED</span>
                                 <span className="text-xs font-mono font-black text-arena-gold">☠ {rec.kills}</span>
                              </div>
                           )}
                           {rec.deaths > 0 && (
                              <div className="flex flex-col">
-                                <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest text-right">Fatalities</span>
+                                <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest text-right">FATALITIES</span>
                                 <span className="text-xs font-mono font-black text-destructive">💀 {rec.deaths}</span>
                              </div>
                           )}
@@ -231,7 +231,7 @@ export function StableComparisonWidget() {
 
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10 mt-auto">
          <button aria-label="Global Registry Analysis" className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group">
-            Global Registry Analysis <BarChart3 className="h-3 w-3 group-hover:scale-110 transition-transform" />
+            GLOBAL REGISTRY ANALYSIS <BarChart3 className="h-3 w-3 group-hover:scale-110 transition-transform" />
          </button>
       </div>
     </Surface>

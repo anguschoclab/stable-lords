@@ -40,7 +40,7 @@ export default function BubbleWatchWidget() {
               
               <div className="space-y-3">
                 {playerWarriorsInZone.length === 0 ? (
-                  <p className="px-1 text-[9px] uppercase font-black tracking-widest text-muted-foreground/20 italic">No_Contenders_In_Zone</p>
+                  <p className="px-1 text-[9px] uppercase font-black tracking-widest text-muted-foreground/20 italic">NO CONTENDERS IN ZONE</p>
                 ) : (
                   playerWarriorsInZone.map(({ w, rank }) => {
                     const isSafe = rank <= cutOff;

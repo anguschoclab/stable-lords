@@ -6,6 +6,7 @@
 import { FightingStyle, type Attributes, ATTRIBUTE_KEYS } from "@/types/game";
 import type { AttributePotential } from "@/types/warrior.types";
 import { generatePotential } from "@/engine/potential";
+import type { FightPlan } from "@/types/shared.types";
 
 export interface OrphanWarrior {
   id: string;
@@ -19,63 +20,45 @@ export interface OrphanWarrior {
   potential: AttributePotential;
 }
 
-/**
- * Maps orphan trait strings to partial FightPlan overrides.
- * Applied at adoption time to give traits mechanical weight.
- */
-export const TRAIT_PLAN_MODIFIERS: Record<string, {
-  OE?: number; AL?: number; killDesire?: number;
-  feintTendency?: number; rangePreference?: "Grapple" | "Tight" | "Striking" | "Extended";
-}> = {
-  "Fearless":         { killDesire: 8, OE: 7 },
-  "Calculating":      { feintTendency: 6, AL: 7 },
-  "Savage":           { killDesire: 9, OE: 9, AL: 3 },
-  "Patient":          { AL: 7, OE: 3 },
-  "Reckless":         { OE: 9, AL: 3, killDesire: 7 },
-  "Stoic":            { AL: 6, OE: 5 },
-  "Hot-blooded":      { OE: 8, killDesire: 7 },
-  "Methodical":       { feintTendency: 4, AL: 8 },
-  "Cunning":          { feintTendency: 7, OE: 5 },
-  "Relentless":       { OE: 8, AL: 4, killDesire: 6 },
-  "Cold-eyed":        { feintTendency: 5, killDesire: 8 },
-  "Scrappy":          { OE: 7, rangePreference: "Grapple" },
-  "Iron-willed":      { AL: 6, killDesire: 6 },
-  "Quiet fury":       { feintTendency: 3, killDesire: 7 },
-  "Born survivor":    { AL: 8, OE: 4 },
-  "Ruthless":         { killDesire: 9, OE: 8 },
-  "Deceptively calm": { feintTendency: 8, AL: 7 },
-  "Feral instinct":   { OE: 8, rangePreference: "Grapple", killDesire: 7 },
-  "Natural leader":   { feintTendency: 4, AL: 6, OE: 6 },
-  "Lone wolf":        { OE: 7, AL: 5, killDesire: 6 },
-};
-
 // ── Name pools by archetype ─────────────────────────────────────────────
 
 const NAMES_BRUTAL = [
   "KRAGOS", "GORLAK", "BRUTAG", "THUNDRAK", "GARVOK", "IRONJAW",
   "BOLVERK", "SKARN", "GROTHAK", "WULFGAR", "DRAXUS", "MORGUL",
   "KORGAN", "BREKKA", "GRIMMAW", "STONEFIST", "BLOODAXE", "IRONCLAW",
+  "KRAKEN", "OX", "HAMMER", "ANVIL", "BULL", "BOAR", "MAMMOTH", "TITAN",
+  "COLOSSUS", "JUGGERNAUT", "RAZOR", "GOLIATH", "BEHEMOTH", "IRONBULL",
+  "WARHAMMER", "CRUSHER", "BREAKER", "STOMPER", "GRIM", "BASTION"
 ];
 
 const NAMES_AGILE = [
   "SILVANE", "VEXIA", "THORNE", "VYREN", "KAELIS", "NYX",
   "TALYN", "ZEPHYRA", "LYSARA", "MIRAEL", "SYRAH", "ASHARA",
   "DUSKBANE", "SHADOWSTEP", "QUICKBLADE", "SWIFTWIND", "NIGHTWHISPER", "RAZORLEAF",
+  "WISP", "GHOST", "MIST", "DART", "BOLT", "STRIKE", "FLASH", "COBRA",
+  "KESTREL", "HAWK", "FALCON", "VIPER", "SCORPION", "SILVER", "QUICKSILVER",
+  "SHADE", "WHISPER", "ZEPHYR", "ECHO", "GOSSAMER"
 ];
 
 const NAMES_CUNNING = [
   "FERRIK", "MORKA", "OBERON", "MALAKAI", "SEREN", "VHAEL",
   "RAZIEL", "CASSIAN", "EREBUS", "ORPHEUS", "REVENANT", "NOCTIS",
   "GHAEL", "VELKOR", "AURELIAN", "PRIMUS", "DECIMUS", "SEVERAK",
+  "FOX", "JACKAL", "RAVEN", "CROW", "OWL", "SNAKE", "SPIDER", "WEB",
+  "TRICKSTER", "JESTER", "PHANTOM", "ENIGMA", "MYSTIC", "SAGE", "ORACLE",
+  "PROPHET", "SCRIBE", "SCHOLAR", "CIPHER", "VEIL"
 ];
 
 const NAMES_MIXED = [
   "VICTUS", "MAXIMAR", "GLADIUS", "SPARTOK", "CENTURAX", "VALORIAN",
   "FANGMAW", "STORMFANG", "SCORPIUS", "RAVENMOOR", "HAWKSTEEL", "DIREWOLF",
   "ASHCLAW", "VIPERTOOTH", "LYNXBLADE", "BEARJAW", "TYRANNUS", "WRAITH",
+  "WOLF", "HOUND", "BEAR", "LION", "TIGER", "LEOPARD", "PANTHER", "CHIMERA",
+  "HYDRA", "DRAKE", "DRAGON", "PHOENIX", "GRIFFIN", "MANTICORE", "SPHINX",
+  "BASILISK", "WYVERN", "LEGION", "VANGUARD"
 ];
 
-// ── Backstory components ────────────────────────────────────────────────
+// ── Lore & Backstory ─────────────────────────────────────────────────────
 
 const ORIGINS = [
   "Found as an infant in the collapsed mines beneath Ironveil",
@@ -94,48 +77,120 @@ const ORIGINS = [
   "Escaped a collapsed quarry at age seven, dragging two others to safety",
   "The child of a disgraced gladiator, born in the shadow of the arena",
   "Found clutching a broken sword in the ruins of Fort Ashenmere",
+  "A former temple acolyte who traded prayers for a practice sword",
+  "Left at a roadside inn during a summer festival, raised by the kitchen staff",
+  "Found in the ruins of a library, clutching a scroll on anatomy",
+  "Escaped from a salt mine after a cave-in killed the guards",
+  "The child of a fallen knight, found wandering the high mountain passes",
+  "A stowaway from the distant Southern Isles, discovered in a spice crate",
+  "Born during a solar eclipse, considered an omen of blood and iron",
+  "Survived the burning of the Great Forest by hiding in a hollow log",
+  "A street urchin who won a bet with an arena recruiter",
+  "Found under the floorboards of a tailor shop after a city riot",
+  "The only survivor of a mountain pass avalanche",
+  "Raised by a retired trainer in a remote fishing village",
+  "Found adrift on a raft in the middle of the Great Sea",
+  "Discovered in the heart of a hedge maze, silent and watchful"
 ];
 
-const TRAITS = [
-  "Fearless", "Calculating", "Savage", "Patient", "Reckless",
-  "Stoic", "Hot-blooded", "Methodical", "Cunning", "Relentless",
-  "Cold-eyed", "Scrappy", "Iron-willed", "Quiet fury", "Born survivor",
-  "Ruthless", "Deceptively calm", "Feral instinct", "Natural leader", "Lone wolf",
+const CHILDHOOD_TRAITS = [
+  "was known for stealing bread from the temple kitchen",
+  "spent nights watching the stars from the orphanage roof",
+  "often got into fights with the older boys and won",
+  "preferred the company of stray dogs to other children",
+  "secretly practiced with a heavy wooden branch in the woods",
+  "would spend hours drawing technical diagrams in the dirt",
+  "earned a reputation as a peacemaker among the street urchins",
+  "could hold their breath for three minutes in the harbor pits",
+  "was obsessed with the stories of the old arena champions",
+  "learned to move without making a single sound in the shadows",
+  "developed a freakish grip strength from climbing the quarry walls",
+  "spent their few coins on medical scrolls instead of food",
+  "would sit in silence for hours, observing the birds of prey",
+  "was the only one brave enough to explore the haunted ruins",
+  "taught themselves to fight by imitating the arena trainees",
+  "became a local legend for never backing down from a challenge"
 ];
 
-const LORE_TEMPLATES_BRUTAL: string[] = [
-  "A hulking youth who settles every argument with fists. The other orphans give {name} a wide berth.",
-  "Massive for {pronoun} age. {name} once broke a training dummy clean in half — on accident.",
-  "{name} fights like a cornered beast. No technique, just terrifying raw power.",
-  "The strongest orphan anyone can remember. {name} was arm-wrestling adults by age twelve.",
-  "Built like a siege engine. {name} doesn't dodge — {pronoun_sub} walks through punishment and keeps swinging.",
+const DEFINING_MOMENTS = [
+  "until a recruiter saw them handle a practice sword with natural grace",
+  "but everything changed when they saved the Headmistress from a fire",
+  "growing into a restless youth with a hunger for the arena's glory",
+  "waiting for the day they could finally leave the slums behind",
+  "now seeking a master who can turn that raw potential into lethality",
+  "possessing a gaze that suggests they have seen more than their share of blood",
+  "driven by a quiet, burning desire to prove their worth to the world",
+  "carrying the weight of their past with a grim, unyielding determination",
+  "ready to trade their freedom for the chance to strike back at fate",
+  "looking for the one fight that will finally set them free",
+  "with a spirit that refuses to be broken by the grinding poverty of the pits",
+  "now standing at the threshold of a legacy they are eager to claim"
 ];
 
-const LORE_TEMPLATES_AGILE: string[] = [
-  "Quick as a shadow and twice as hard to catch. {name} was born to move.",
-  "Lightning reflexes. {name} can snatch a thrown knife from the air — and has, more than once.",
-  "{name} dances where others merely fight. Every movement is precise, deliberate, lethal.",
-  "The fastest hands in the orphanage. {name} strikes before opponents even see it coming.",
-  "Lean and whip-fast. {name} treats combat like a deadly performance art.",
-];
+// ── Mechanical Traits ────────────────────────────────────────────────────
 
-const LORE_TEMPLATES_CUNNING: string[] = [
-  "{name} watches. Waits. Then strikes exactly where it hurts most.",
-  "Uncannily perceptive. {name} reads opponents like an open book and exploits every weakness.",
-  "Not the biggest, not the fastest — but {name} wins more than anyone. Brains over brawn.",
-  "Quiet and observant. {name} has already planned three moves ahead before the fight begins.",
-  "{name} fights with eerie precision. Every blow is calculated to inflict maximum damage with minimum effort.",
-];
+export interface TraitData {
+  modifiers: Partial<FightPlan>;
+  attrBonus?: Partial<Attributes>;
+  description: string;
+}
 
-const LORE_TEMPLATES_TANK: string[] = [
-  "An iron wall. {name} absorbs punishment that would fell lesser fighters, then grinds opponents down.",
-  "{name} doesn't go down. Ever. The other orphans stopped trying to knock {pronoun_obj} out years ago.",
-  "Unyielding. {name} treats pain as a suggestion and exhaustion as a myth.",
-  "Built to endure. {name} has never been knocked unconscious — not once, not ever.",
-  "{name} outlasts everyone. When the dust settles, {pronoun_sub} is always the one still standing.",
-];
+export const TRAIT_DATA: Record<string, TraitData> = {
+  "Aggressive": {
+    modifiers: { OE: 4, AL: -2, killDesire: 5 },
+    attrBonus: { ST: 1, WL: 1 },
+    description: "Fights with reckless abandon, favoring strength over defense."
+  },
+  "Disciplined": {
+    modifiers: { AL: 3, OE: -1, feintTendency: 5 },
+    attrBonus: { DF: 1, WL: 1 },
+    description: "Calm and focused, waiting for the perfect moment to strike."
+  },
+  "Cunning": {
+    modifiers: { feintTendency: 10, AL: 2, killDesire: -2 },
+    attrBonus: { SP: 1, DF: 1 },
+    description: "Favors trickery and misdirection to find the killing blow."
+  },
+  "Sturdy": {
+    modifiers: { AL: -3, OE: -2, killDesire: -5 },
+    attrBonus: { CN: 1, SZ: 1 },
+    description: "An unbreakable wall that outlasts any opponent."
+  },
+  "Feral": {
+    modifiers: { OE: 6, AL: -4, killDesire: 10 },
+    attrBonus: { ST: 1, SP: 1 },
+    description: "Fights with a savage, unpredictable intensity."
+  },
+  "Merciless": {
+    modifiers: { killDesire: 15, OE: 2 },
+    attrBonus: { ST: 1, WL: 1 },
+    description: "Relentlessly pursues the kill, ignoring all distractions."
+  },
+  "Calculated": {
+    modifiers: { feintTendency: 8, AL: 4, OE: -3 },
+    attrBonus: { SP: 1, DF: 1 },
+    description: "Every move is a deliberate setup for a final strike."
+  },
+  "Resilient": {
+    modifiers: { AL: -2, killDesire: -8 },
+    attrBonus: { CN: 2 },
+    description: "Absorbs punishment that would fell a lesser warrior."
+  },
+  "Evasive": {
+    modifiers: { AL: 10, OE: -5, feintTendency: 5 },
+    attrBonus: { SP: 2 },
+    description: "A ghost on the sand, near-impossible to pin down."
+  },
+  "Brutal": {
+    modifiers: { OE: 8, killDesire: 5, AL: -5 },
+    attrBonus: { ST: 2 },
+    description: "Values raw power and crushing impact above all else."
+  }
+};
 
-// ── Style archetype mapping ─────────────────────────────────────────────
+const TRAITS = Object.keys(TRAIT_DATA);
+
+// ── Archetypes ───────────────────────────────────────────────────────────
 
 type Archetype = "brutal" | "agile" | "cunning" | "tank";
 
@@ -159,16 +214,6 @@ const ARCHETYPE_NAMES: Record<Archetype, string[]> = {
   tank:    NAMES_MIXED,
 };
 
-const ARCHETYPE_LORE: Record<Archetype, string[]> = {
-  brutal:  LORE_TEMPLATES_BRUTAL,
-  agile:   LORE_TEMPLATES_AGILE,
-  cunning: LORE_TEMPLATES_CUNNING,
-  tank:    LORE_TEMPLATES_TANK,
-};
-
-// ── Stat spread templates per archetype ─────────────────────────────────
-
-// Each archetype has weighted stat distributions (high, medium, low keys)
 const ARCHETYPE_STAT_WEIGHTS: Record<Archetype, { high: (keyof Attributes)[]; mid: (keyof Attributes)[]; low: (keyof Attributes)[] }> = {
   brutal:  { high: ["ST", "CN", "SZ"], mid: ["WL"], low: ["WT", "SP", "DF"] },
   agile:   { high: ["SP", "DF", "WT"], mid: ["ST"], low: ["CN", "SZ", "WL"] },
@@ -176,7 +221,7 @@ const ARCHETYPE_STAT_WEIGHTS: Record<Archetype, { high: (keyof Attributes)[]; mi
   tank:    { high: ["CN", "WL", "SZ"], mid: ["ST"], low: ["WT", "SP", "DF"] },
 };
 
-// ── RNG Helper ──────────────────────────────────────────────────────────
+// ── RNG & Helpers ────────────────────────────────────────────────────────
 
 function seededRng(seed: number) {
   let s = seed;
@@ -199,39 +244,37 @@ function shuffled<T>(arr: T[], rng: () => number): T[] {
   return a;
 }
 
-// ── Attribute Generation ────────────────────────────────────────────────
+// ── Generation Logic ─────────────────────────────────────────────────────
 
 function generateAttrs(archetype: Archetype, rng: () => number): Attributes {
   const weights = ARCHETYPE_STAT_WEIGHTS[archetype];
   const attrs: Attributes = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };
-  let pool = 70 - 21; // 49 to distribute
+  
+  const totalPoints = 70 + (Math.floor(rng() * 7) - 2); 
+  let pool = totalPoints - 21;
 
-  // Distribute to high stats first (11-17 range)
   for (const key of weights.high) {
-    const add = Math.floor(rng() * 7) + 8; // 8-14 more (total 11-17)
-    const clamped = Math.min(add, pool, 22); // max 25 total
-    attrs[key] += clamped;
-    pool -= clamped;
-  }
-
-  // Mid stats (7-12 range)
-  for (const key of weights.mid) {
-    const add = Math.floor(rng() * 6) + 4; // 4-9 more (total 7-12)
+    const add = Math.floor(rng() * 7) + 8;
     const clamped = Math.min(add, pool, 22);
     attrs[key] += clamped;
     pool -= clamped;
   }
 
-  // Distribute remaining to low stats
+  for (const key of weights.mid) {
+    const add = Math.floor(rng() * 6) + 4;
+    const clamped = Math.min(add, pool, 22);
+    attrs[key] += clamped;
+    pool -= clamped;
+  }
+
   const lowKeys = shuffled(weights.low, rng);
   for (const key of lowKeys) {
     if (pool <= 0) break;
-    const add = Math.min(Math.floor(rng() * 5) + 2, pool, 22); // 2-6 more (total 5-9)
+    const add = Math.min(Math.floor(rng() * 5) + 2, pool, 22);
     attrs[key] += add;
     pool -= add;
   }
 
-  // Distribute any leftover evenly
   while (pool > 0) {
     const key = pick(ATTRIBUTE_KEYS as unknown as (keyof Attributes)[], rng);
     if (attrs[key] < 25) {
@@ -243,19 +286,11 @@ function generateAttrs(archetype: Archetype, rng: () => number): Attributes {
   return attrs;
 }
 
-// ── Lore Generation ─────────────────────────────────────────────────────
-
-function generateLore(name: string, archetype: Archetype, rng: () => number): string {
-  const template = pick(ARCHETYPE_LORE[archetype], rng);
-  const isFemName = ["VEXIA", "SILVANE", "ASHARA", "ZEPHYRA", "LYSARA", "MIRAEL", "SYRAH", "NYX", "NIGHTWHISPER", "RAZORLEAF", "SWIFTWIND"].includes(name);
-  return template
-    .replace(/\{name\}/g, name)
-    .replace(/\{pronoun\}/g, isFemName ? "her" : "his")
-    .replace(/\{pronoun_sub\}/g, isFemName ? "she" : "he")
-    .replace(/\{pronoun_obj\}/g, isFemName ? "her" : "him");
+function generateLore(name: string, rng: () => number): string {
+  const childhood = pick(CHILDHOOD_TRAITS, rng);
+  const defining = pick(DEFINING_MOMENTS, rng);
+  return `${name} ${childhood}, ${defining}.`;
 }
-
-// ── Main Generator ──────────────────────────────────────────────────────
 
 export function generateOrphanPool(count: number = 8, seed?: number): OrphanWarrior[] {
   const rng = seededRng(seed ?? Date.now());
@@ -263,7 +298,6 @@ export function generateOrphanPool(count: number = 8, seed?: number): OrphanWarr
   const usedNames = new Set<string>();
   const pool: OrphanWarrior[] = [];
 
-  // Ensure style variety: pick at least one from each archetype
   const guaranteedStyles = shuffled([
     pick([FightingStyle.BashingAttack, FightingStyle.StrikingAttack], rng),
     pick([FightingStyle.LungingAttack, FightingStyle.SlashingAttack], rng),
@@ -275,18 +309,30 @@ export function generateOrphanPool(count: number = 8, seed?: number): OrphanWarr
     const style = i < guaranteedStyles.length ? guaranteedStyles[i] : pick(styles, rng);
     const archetype = STYLE_ARCHETYPE[style];
 
-    // Pick unique name from archetype pool + mixed
     const namePool = [...ARCHETYPE_NAMES[archetype], ...NAMES_MIXED].filter(n => !usedNames.has(n));
     const name = namePool.length > 0 ? pick(namePool, rng) : `ORPHAN_${i}`;
     usedNames.add(name);
 
-    const age = Math.floor(rng() * 5) + 15; // 15-19
+    const age = Math.floor(rng() * 5) + 15;
     const attrs = generateAttrs(archetype, rng);
     const origin = pick(ORIGINS, rng);
     const trait = pick(TRAITS, rng);
-    const lore = generateLore(name, archetype, rng);
-    // Orphans all start at Common tier potential — street kids with raw ability
-    const potential = generatePotential(attrs, "Common", rng);
+    const lore = generateLore(name, rng);
+    
+    const rarityRoll = rng();
+    let tier: "Common" | "Promising" | "Exceptional" | "Prodigy" = "Common";
+    if (rarityRoll > 0.99) tier = "Prodigy";
+    else if (rarityRoll > 0.95) tier = "Exceptional";
+    else if (rarityRoll > 0.82) tier = "Promising";
+    
+    const traitData = TRAIT_DATA[trait];
+    if (traitData.attrBonus) {
+      for (const [key, bonus] of Object.entries(traitData.attrBonus)) {
+        attrs[key as keyof Attributes] += bonus;
+      }
+    }
+    
+    const potential = generatePotential(attrs, tier, rng);
 
     pool.push({
       id: `orp_${i}_${Math.floor(rng() * 1e6)}`,

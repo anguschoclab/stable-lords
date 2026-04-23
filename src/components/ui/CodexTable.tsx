@@ -29,13 +29,13 @@ const headerVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary/10 border-primary/20 text-primary",
+        default: "bg-white/[0.03] border-primary/20 text-primary",
         glass: "bg-[#120D09]/80 border-[#2A1E13] text-primary",
         minimal: "bg-transparent border-border/20 text-muted-foreground",
       },
       density: {
         compact: "px-2 py-1.5 text-[10px]",
-        default: "px-4 py-2.5 text-[11px]",
+        default: "px-4 py-2.5 text-[9px]",
         spacious: "px-6 py-3 text-xs",
       },
     },

@@ -178,7 +178,7 @@ export default function Trainers() {
             ) : (
               <div className="space-y-4">
                  <div className="flex items-center gap-3 px-1 mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">STAFF_PERSONNEL</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">STAFF PERSONNEL</span>
                     <div className="h-px flex-1 bg-gradient-to-r from-primary/20 via-border/20 to-transparent" />
                  </div>
                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -198,7 +198,7 @@ export default function Trainers() {
           {currentTrainers.length > 0 && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 px-1">
-                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">AGGREGATED_SYSTEM_BONUSES</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">AGGREGATED SYSTEM BONUSES</span>
                  <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
               </div>
               <Surface variant="glass" padding="none" className="border-border/40 shadow-2xl relative overflow-hidden">
@@ -331,7 +331,7 @@ export default function Trainers() {
                                 <Coins className="h-3.5 w-3.5" /> {TIER_COST[t.tier as TrainerTier] ?? 50}G
                              </div>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ACQUISITION_CREDITS</TooltipContent>
+                          <TooltipContent className="bg-neutral-950 border-white/10 text-[9px] font-black uppercase tracking-widest">ACQUISITION CREDITS</TooltipContent>
                        </Tooltip>
                        
                         <button

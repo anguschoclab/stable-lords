@@ -38,8 +38,8 @@ export function TrainingWidget() {
                <Zap className="h-4 w-4 text-primary" />
             </div>
             <div>
-               <h3 className="font-display text-sm font-black uppercase tracking-tight">Neuro_Conditioning</h3>
-               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Attribute_Optimization_Feed</p>
+               <h3 className="font-display text-sm font-black uppercase tracking-tight">NEURO CONDITIONING</h3>
+               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">ATTRIBUTE OPTIMIZATION FEED</p>
             </div>
          </div>
          <Badge variant="outline" className="text-[9px] font-mono font-black border-white/10 bg-white/5 text-muted-foreground/60 h-7 px-3 tracking-widest">
@@ -50,10 +50,10 @@ export function TrainingWidget() {
       <div className="flex-1 overflow-y-auto relative z-10 space-y-4 p-6 custom-scrollbar">
         {trainingWarriors.length === 0 ? (
           <div className="py-8 text-center opacity-20 italic">
-            <p className="text-[10px] uppercase tracking-[0.2em]">Training_Grounds_Idle</p>
+            <p className="text-[10px] uppercase tracking-[0.2em]">TRAINING GROUNDS IDLE</p>
             <Link to="/command/training">
                <Button variant="ghost" size="sm" className="mt-4 text-[9px] uppercase tracking-widest font-black border border-white/5 hover:bg-primary/10 hover:text-primary transition-all">
-                  Assign_Modules
+                  ASSIGN MODULES
                </Button>
             </Link>
           </div>
@@ -102,10 +102,10 @@ export function TrainingWidget() {
                             {current}<span className="text-[9px] text-white/10 ml-0.5">/</span>{potential || "???"}
                          </div>
                          {atCeiling && (
-                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 block leading-none mt-0.5">At_Cap</span>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 block leading-none mt-0.5">AT CAP</span>
                          )}
                          {!atCeiling && nearCeiling && (
-                            <span className="text-[8px] font-black uppercase tracking-widest text-arena-gold block leading-none mt-0.5 animate-pulse">Near_Cap</span>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-arena-gold block leading-none mt-0.5 animate-pulse">NEAR CAP</span>
                          )}
                       </div>
                    </div>

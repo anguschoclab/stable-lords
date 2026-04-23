@@ -32,8 +32,8 @@ export function StableWidget() {
                <Users className="h-4 w-4 text-primary" />
             </div>
             <div>
-               <h3 className="font-display text-sm font-black uppercase tracking-tight">Personnel_Manifest</h3>
-               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">Active_Roster_Monitor</p>
+               <h3 className="font-display text-sm font-black uppercase tracking-tight">PERSONNEL MANIFEST</h3>
+               <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">ACTIVE ROSTER MONITOR</p>
             </div>
          </div>
          <Badge variant="outline" className="text-[9px] font-mono font-black border-white/10 bg-white/5 text-muted-foreground/60 h-7 px-3 tracking-widest">
@@ -44,7 +44,7 @@ export function StableWidget() {
       <div className="flex-1 overflow-y-auto relative z-10 custom-scrollbar">
          {topWarriors.length === 0 ? (
             <div className="p-12 text-center opacity-20 italic">
-               <p className="text-[10px] uppercase tracking-[0.2em]">Roster_Empty</p>
+               <p className="text-[10px] uppercase tracking-[0.2em]">ROSTER EMPTY</p>
             </div>
          ) : (
             <div className="divide-y divide-white/5">

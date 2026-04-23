@@ -30,7 +30,7 @@ export default function ActionButtons({
           size="lg"
         >
           <Play className="h-5 w-5 fill-current" />
-          Continue — {mostRecent.name}
+          Continue — {mostRecent.name.toUpperCase()}
         </Button>
       )}
 
@@ -46,7 +46,7 @@ export default function ActionButtons({
         disabled={slots.length >= maxSaveSlots}
       >
         <Plus className="h-4 w-4" />
-        New Game
+        NEW GAME
         {slots.length >= maxSaveSlots && (
           <span className="text-xs text-muted-foreground ml-2">
             (Max {maxSaveSlots} saves)
@@ -60,7 +60,7 @@ export default function ActionButtons({
         className="w-full flex items-center justify-center gap-2 h-9 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors duration-150"
       >
         <Upload className="h-3.5 w-3.5" />
-        Import Save File
+        IMPORT SAVE FILE
       </button>
       <input
         ref={importRef}

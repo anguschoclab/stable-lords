@@ -61,24 +61,24 @@ const MemoNextBoutWidget = React.memo(NextBoutWidget);
 const MemoWeatherWidget = React.memo(WeatherWidget);
 
 const WIDGET_REGISTRY: WidgetDef[] = [
-  { id: "season",   label: "Season & Schedule", component: MemoSeasonWidget },
-  { id: "stable",   label: "Stable Overview",   component: MemoStableWidget },
-  { id: "crowd",    label: "Crowd Mood",         component: MemoCrowdMoodWidget },
-  { id: "finances", label: "Finances",           component: MemoFinancesWidget },
-  { id: "training", label: "Training Status",    component: MemoTrainingWidget },
-  { id: "rivals",    label: "Rival Stables",      component: MemoRivalsWidget },
-  { id: "stableCompare", label: "Stable Comparison", component: MemoStableComparisonWidget, wide: true },
-  { id: "strategy", label: "Stable Strategy",    component: MemoStableStrategyWidget },
-  { id: "bubbleWatch", label: "Tournament Bubble Watch", component: MemoBubbleWatchWidget },
-  { id: "rivalries", label: "Rivalries",          component: MemoRivalryWidget, wide: true },
-  { id: "rankings", label: "Warrior Rankings",   component: MemoRankingsWidget, wide: true },
-  { id: "intel",    label: "Intelligence Hub",   component: MemoIntelligenceHubWidget, wide: true },
-  { id: "medical",   label: "Medical Audit",     component: MemoMedicalAuditWidget },
-  { id: "meta",     label: "Meta Pulse",         component: MemoMetaPulseWidget },
-  { id: "bouts",    label: "Recent Bouts",       component: MemoRecentBoutsWidget, wide: true },
-  { id: "eventLog", label: "Event Log",          component: MemoEventLog, wide: true },
-  { id: "nextBout", label: "Next Bout",          component: MemoNextBoutWidget },
-  { id: "weather",  label: "Weather",            component: MemoWeatherWidget },
+  { id: "season",   label: "SEASON & SCHEDULE", component: MemoSeasonWidget },
+  { id: "stable",   label: "STABLE OVERVIEW",   component: MemoStableWidget },
+  { id: "crowd",    label: "CROWD MOOD",         component: MemoCrowdMoodWidget },
+  { id: "finances", label: "FINANCES",           component: MemoFinancesWidget },
+  { id: "training", label: "TRAINING STATUS",    component: MemoTrainingWidget },
+  { id: "rivals",    label: "RIVAL STABLES",      component: MemoRivalsWidget },
+  { id: "stableCompare", label: "STABLE COMPARISON", component: MemoStableComparisonWidget, wide: true },
+  { id: "strategy", label: "STABLE STRATEGY",    component: MemoStableStrategyWidget },
+  { id: "bubbleWatch", label: "TOURNAMENT BUBBLE WATCH", component: MemoBubbleWatchWidget },
+  { id: "rivalries", label: "RIVALRIES",          component: MemoRivalryWidget, wide: true },
+  { id: "rankings", label: "WARRIOR RANKINGS",   component: MemoRankingsWidget, wide: true },
+  { id: "intel",    label: "INTELLIGENCE HUB",   component: MemoIntelligenceHubWidget, wide: true },
+  { id: "medical",   label: "MEDICAL AUDIT",     component: MemoMedicalAuditWidget },
+  { id: "meta",     label: "META PULSE",         component: MemoMetaPulseWidget },
+  { id: "bouts",    label: "RECENT BOUTS",       component: MemoRecentBoutsWidget, wide: true },
+  { id: "eventLog", label: "EVENT LOG",          component: MemoEventLog, wide: true },
+  { id: "nextBout", label: "NEXT BOUT",          component: MemoNextBoutWidget },
+  { id: "weather",  label: "WEATHER",            component: MemoWeatherWidget },
 ];
 
 const DEFAULT_ORDER = [
@@ -178,12 +178,12 @@ export default function Dashboard() {
   return (
     <div className="space-y-12 max-w-7xl mx-auto">
       <PageHeader 
-        title={<EditableText value={player.stableName} onSave={renameStable} className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl font-display uppercase tracking-tighter" />}
+        title={<EditableText value={player.stableName} onSave={renameStable} className="text-4xl font-black tracking-tighter text-foreground sm:text-6xl font-display uppercase" />}
         subtitle={
           <div className="flex items-center gap-2 text-muted-foreground font-black uppercase text-[10px] tracking-[0.2em] opacity-60">
             <span>By</span>
             <EditableText value={player.name} onSave={renamePlayer} className="text-primary/80" />
-            <span>• Command Center</span>
+            <span>• COMMAND CENTER</span>
           </div>
         }
         icon={LayoutDashboard}
@@ -191,11 +191,11 @@ export default function Dashboard() {
           <div className="flex flex-col md:flex-row items-center gap-4">
             <div className="flex items-center gap-4 text-sm bg-neutral-900/40 backdrop-blur-md px-4 py-2 rounded-none border border-white/5 shrink-0 shadow-inner">
                <div className="flex items-center gap-2 border-r border-white/5 pr-4">
-                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Gold</span>
+                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">GOLD</span>
                   <span className="font-mono text-arena-gold font-black">{Math.round(treasury).toLocaleString()}G</span>
                </div>
                <div className="flex items-center gap-2 border-r border-white/5 pr-4">
-                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">Fame</span>
+                  <span className="text-muted-foreground text-[9px] uppercase tracking-widest font-black opacity-60">FAME</span>
                   <span className="font-mono text-arena-fame font-black">{Math.round(fame).toLocaleString()}</span>
                </div>
             </div>
@@ -206,7 +206,7 @@ export default function Dashboard() {
                   className="text-[10px] font-black uppercase tracking-widest gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all h-9 px-3 text-xs"
                   onClick={resetLayout}
                 >
-                  <RotateCcw className="h-3 w-3" /> Reset
+                  <RotateCcw className="h-3 w-3" /> RESET
                 </Button>
               )}
               <Button
@@ -217,7 +217,7 @@ export default function Dashboard() {
                 onClick={() => setIsEditing(v => !v)}
               >
                 <GripVertical className="h-3 w-3" />
-                {isEditing ? "Registry Closed" : "Modify Layout"}
+                {isEditing ? "REGISTRY CLOSED" : "MODIFY LAYOUT"}
               </Button>
             </div>
           </div>

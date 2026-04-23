@@ -108,7 +108,7 @@ export function AgentReasoningWidget({ rival }: AgentReasoningWidgetProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-1 w-1 rounded-full bg-green-500 animate-ping" />
-              <span className="text-[8px] font-black uppercase text-green-500/60">Active_Intent</span>
+              <span className="text-[8px] font-black uppercase text-green-500/60">ACTIVE INTENT</span>
             </div>
           </div>
           <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-medium">
@@ -120,7 +120,7 @@ export function AgentReasoningWidget({ rival }: AgentReasoningWidgetProps) {
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-muted-foreground/40 px-1">
             <History className="w-3.5 h-3.5" />
-            <span className="text-[9px] font-black uppercase tracking-widest">Action_Timeline</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">ACTION TIMELINE</span>
           </div>
           
           <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/5">

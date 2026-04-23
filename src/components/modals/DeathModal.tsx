@@ -39,12 +39,12 @@ export function DeathModal() {
               initial={{ rotate: -10, scale: 0.8 }}
               animate={{ rotate: 0, scale: 1 }}
               transition={{ delay: 0.2, type: "spring" }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-arena-blood/10 border border-arena-blood/20 text-arena-blood mb-2"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-none bg-arena-blood/10 border border-arena-blood/20 text-arena-blood mb-2"
             >
               <Skull className="w-8 h-8" />
             </motion.div>
-            <h1 className="text-3xl md:text-5xl font-display font-black tracking-tighter text-arena-blood uppercase italic">
-              The Sands Claim Another
+            <h1 className="text-3xl md:text-5xl font-display font-black tracking-tighter text-arena-blood uppercase">
+              THE SANDS CLAIM ANOTHER
             </h1>
             <p className="text-[10px] tracking-[0.4em] font-black uppercase text-muted-foreground/60">
               Chronicle. Archive. Remembrance.
@@ -55,7 +55,7 @@ export function DeathModal() {
             <div className="space-y-6">
               <div className="space-y-1">
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Deceased</span>
-                <h2 className="text-2xl font-display font-bold text-foreground leading-none">{warrior.name}</h2>
+                <h2 className="text-2xl font-display font-bold text-foreground leading-none">{warrior.name.toUpperCase()}</h2>
                 <p className="text-xs font-mono text-muted-foreground/80 uppercase">
                   {warrior.style} · Year {warrior.age}
                 </p>
@@ -89,7 +89,7 @@ export function DeathModal() {
             </div>
 
             <div className="flex justify-center bg-black/40 rounded-none p-4 border border-white/5 relative group">
-                <div className="absolute inset-0 bg-arena-blood/5 opacity-0 group-hover:opacity-100 transition-opacity blur-xl rounded-full" />
+                <div className="absolute inset-0 bg-arena-blood/5 opacity-0 group-hover:opacity-100 transition-opacity blur-xl rounded-none" />
                 <div className="relative w-full max-w-52 aspect-[1/2] opacity-60 grayscale filter contrast-125">
                    <PaperDoll healthMap={{}} />
                 </div>
@@ -101,7 +101,7 @@ export function DeathModal() {
                 onClick={() => acknowledgeDeath(warrior.id)}
                 className="w-full md:w-auto px-12 py-6 h-auto bg-arena-blood hover:bg-arena-blood/80 text-white rounded-none font-display font-black text-lg tracking-widest uppercase transition-all shadow-xl shadow-arena-blood/20 active:scale-95"
             >
-                Memorialize & Continue
+                MEMORIALIZE & CONTINUE
             </Button>
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">
                "Even the strongest steel returns to the earth"

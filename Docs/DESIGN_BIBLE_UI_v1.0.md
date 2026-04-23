@@ -121,7 +121,7 @@ The background uses two radial gradients creating a torchlit room:
 1. **ALL display text uses Cinzel** — it reads as Roman inscriptions
 2. **Heading shadow**: `text-shadow: 0 2px 8px rgba(0,0,0,0.7), 0 1px 0 rgba(0,0,0,0.9)` — creates the engraved look
 3. **Stat/data text** should feel like carved ledger entries — monospace or Inter 700
-4. **"Codex notation"** for system labels: `UPPERCASE_WITH_UNDERSCORES` in tracking-widest — this is internal record language, like official Roman bureaucratic notation
+4. **"Codex notation"** for system labels: `UPPERCASE WITH SPACES` in tracking-widest — this is internal record language, like official Roman bureaucratic notation
 5. **Body text** is slightly warm (`--foreground: warm papyrus`) — NEVER pure white, which feels cold and digital
 
 ### DON'Ts
@@ -210,7 +210,7 @@ Every page has a `<PageHeader>` with:
 
 Section dividers use the pattern:
 ```jsx
-<span className="codex-label">SECTION_NAME</span>
+<span className="codex-label">SECTION NAME</span>
 <div className="h-px flex-1 bg-gradient-to-r from-accent/20 via-border/20 to-transparent" />
 ```
 
@@ -283,7 +283,7 @@ hover: subtle white/5 increase
 
 **Key Elements**:
 - Progress bar looks like a scroll being unrolled (fills left to right with warmth)
-- Step labels in codex notation: "ESTABLISH_IDENTITY / CHOOSE_WARRIORS / FIRST_BLOOD / YOUR_STORY_BEGINS"
+- Step labels in codex notation: "ESTABLISH IDENTITY / CHOOSE WARRIORS / FIRST BLOOD / YOUR STORY BEGINS"
 - Warrior selection cards: Each has a "gladiatorial registration" feel — name prominent, style badge like a wax seal, stats as engraved numbers
 - The "First Blood" result card: Dramatic — blood-border variant, winner announced in large crimson
 - Final step: Warm arrival — "Your Story Begins" with golden accents, entering the main game
@@ -308,7 +308,7 @@ hover: subtle white/5 increase
 - PageHeader with Swords icon in imperial-ring
 - Leaderboard: Stone-carved table with rank numbers in `font-mono font-black`
 - Crowd Mood widget: Large mood icon (like an omen/auspice) + bronze modifier stats
-- The "ARENA_ANALYTICS" panel feels like a carved wall of statistics
+- The "ARENA ANALYTICS" panel feels like a carved wall of statistics
 
 ### Run Round (`/run-round`)
 
@@ -339,7 +339,7 @@ hover: subtle white/5 increase
 - Three stat surfaces at top: "Active Drills / Medical Bay / Reserve Pool" — clean data panels
 - Training cards: Assignment feels like writing a training mandate on a wax tablet
 - Recovery state: Subtle warm red tint — medical/healing connotation
-- "RESET_ALL" button: Secondary style — clears the training manifest
+- "RESET ALL" button: Secondary style — clears the training manifest
 
 ### Recruitment (`/recruit`)
 
@@ -369,7 +369,7 @@ hover: subtle white/5 increase
 
 **Key Elements**:
 - Hero header: Fighter name in massive Cinzel + style badge as a seal
-- Tabs: "BIOMETRICS / MISSION_CONTROL / CHRONICLE" — official records categories
+- Tabs: "BIOMETRICS / MISSION CONTROL / CHRONICLE" — official records categories
 - Stats: Engraved table format — attribute scores feel carved into stone
 - Career timeline: Chronicle feels like a historical record being written in real-time
 - Equipment: Visual "loadout" display — equipment items as official armory entries
@@ -479,15 +479,15 @@ This creates a bronze-framed appearance — like official imperial seals.
 
 The game uses a dual-voice system:
 
-1. **Codex Notation** (system/UI labels): `UPPERCASE_WITH_UNDERSCORES` — official, bureaucratic, terse. Like Roman legal documents. Used for: section labels, status indicators, system messages, table headers.
-   - Examples: `STABLE_COMPOSITION`, `ARENA_ANALYTICS`, `WEEK_12_CYCLE`
+1. **Codex Notation** (system/UI labels): `UPPERCASE WITH SPACES` — official, bureaucratic, terse. Like Roman legal documents. Used for: section labels, status indicators, system messages, table headers.
+   - Examples: `STABLE COMPOSITION`, `ARENA ANALYTICS`, `WEEK 12 CYCLE`
 
 2. **Narrative Voice** (game content): Dramatic, period-appropriate prose. Used in: Gazette articles, flavor text, lore descriptions, warrior bios.
    - Examples: *"The orphanage doors creak open. Beyond them lies the roar of the crowd..."*
 
 ### UI Text Rules
 
-- Section labels: ALWAYS `UPPERCASE_WITH_UNDERSCORES` in the `codex-label` class
+- Section labels: ALWAYS `UPPERCASE WITH SPACES` in the `codex-label` class
 - Button text: Title Case for primary actions, UPPERCASE for secondary/system buttons
 - Stat labels: Short, ALL CAPS, 2-4 characters preferred (`ATK`, `END`, `HP`)
 - Numbers: Never spell out numbers for stats — always numerals
@@ -552,7 +552,7 @@ When building new screens or updating existing ones, watch for:
 
 5. **Purple gradient backgrounds**: Never add purple or blue-purple gradients — this is the signature look of generic AI interfaces.
 
-6. **Missing codex-label treatment**: New sections should always have the `<span className="codex-label">SECTION_NAME</span>` + gradient divider pattern.
+6. **Missing codex-label treatment**: New sections should always have the `<span className="codex-label">SECTION NAME</span>` + gradient divider pattern.
 
 ---
 

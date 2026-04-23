@@ -47,6 +47,9 @@ export function makeWarrior(
     status: "Active",
     age: 18 + Math.floor((rng ? rng.next() : 0.5) * 8),
     favorites,
+    traits: overrides?.traits ?? [],
+    lore: overrides?.lore ?? "",
+    origin: overrides?.origin ?? "",
     ...overrides,
   };
 }

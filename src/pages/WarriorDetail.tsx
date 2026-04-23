@@ -23,9 +23,9 @@ import { MissionControlTab } from "@/components/warrior/MissionControlTab";
 import { ChronicleTab } from "@/components/warrior/ChronicleTab";
 
 const TABS: SubNavTab[] = [
-  { id: "biometrics", label: "Biometrics", icon: <User className="h-4 w-4" /> },
-  { id: "mission", label: "Mission Control", icon: <Target className="h-4 w-4" /> },
-  { id: "chronicle", label: "Chronicle", icon: <ScrollText className="h-4 w-4" /> },
+  { id: "biometrics", label: "BIOMETRICS", icon: <User className="h-4 w-4" /> },
+  { id: "mission", label: "MISSION CONTROL", icon: <Target className="h-4 w-4" /> },
+  { id: "chronicle", label: "CHRONICLE", icon: <ScrollText className="h-4 w-4" /> },
 ];
 
 export default function WarriorDetail() {

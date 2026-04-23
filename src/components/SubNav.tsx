@@ -52,7 +52,7 @@ export default function SubNav({ tabs, activeTab, onTabChange }: SubNavProps) {
                 {tab.label}
                 
                 {activeTab === tab.id && (
-                  <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-t-full shadow-[0_-4px_10px_rgba(34,197,94,0.4)]" />
+                  <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-none shadow-[0_-4px_10px_rgba(var(--arena-blood-rgb),0.5)]" />
                 )}
               </button>
             </TooltipTrigger>

@@ -124,7 +124,7 @@ export default function PhysicalsSimulator() {
         {/* Archetype D: Left Rail Roster Pickers (span-3) */}
         <aside className="lg:col-span-3 space-y-6 sticky top-6">
           <div className="px-1 flex items-center justify-between">
-            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">DEPLOY_PILOTS</span>
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em]">DEPLOY PILOTS</span>
           </div>
 
           <Surface variant="glass" className="p-0 border-white/5 max-h-[600px] overflow-y-auto thin-scrollbar">
@@ -169,7 +169,7 @@ export default function PhysicalsSimulator() {
           <Surface variant="glass" className="border-accent/40 bg-accent/5 p-0 overflow-hidden">
             <div className="bg-accent/10 px-6 py-4 border-b border-accent/20 flex items-center gap-2">
               <Zap className="h-4 w-4 text-accent" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-accent">Simulation_Results (10 MINUTES_ENGAGEMENT)</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-accent">SIMULATION RESULTS (10 MINUTES ENGAGEMENT)</span>
             </div>
             
             <div className="p-8">
@@ -200,7 +200,7 @@ export default function PhysicalsSimulator() {
                   <Swords className="h-10 w-10 text-muted-foreground/20" />
                   <div className="text-center">
                     <span className="text-2xl font-display font-black text-foreground">{simulation.minutesPassed}M</span>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mt-1">Elapsed_Time</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mt-1">ELAPSED TIME</p>
                   </div>
                   {simulation.minutesPassed < 10 && (
                     <Badge className="bg-destructive/20 text-destructive border-destructive/30 text-[9px] font-black uppercase h-6 px-3">
