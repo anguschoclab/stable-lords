@@ -1,17 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Shield, UserPlus, Users, Activity, Heart, Swords, Star, AlertCircle } from "lucide-react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { Shield, UserPlus, Users, AlertCircle } from "lucide-react";
+import { useWorldState } from "@/state/useGameStore";
 import { selectActiveWarriors } from "@/state/selectors";
 import { Surface } from "@/components/ui/Surface";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { BASE_ROSTER_CAP } from "@/data/constants";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export function StableWidget() {
   const state = useWorldState();
@@ -47,7 +42,7 @@ export function StableWidget() {
             </div>
          ) : (
             <div className="divide-y divide-white/5">
-               {topWarriors.map((w, idx) => {
+               {topWarriors.map((w) => {
                   const hasInjuries = w.injuries && w.injuries.length > 0;
                   return (
                      <div key={w.id} className="p-4 flex items-center gap-4 hover:bg-white/2 transition-colors group/item">

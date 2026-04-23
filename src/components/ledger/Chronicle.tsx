@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
-import { ScrollText, BookOpen, Clock, ChevronRight, History, Activity, Zap, ShieldCheck, Terminal } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ScrollText, ChevronRight, History, Activity, ShieldCheck, Terminal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,

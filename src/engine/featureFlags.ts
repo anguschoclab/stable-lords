@@ -49,7 +49,3 @@ export function getFeatureFlags(): FeatureFlags {
 export function setFeatureFlags(patch: Partial<FeatureFlags>): void {
   activeFlags = { ...activeFlags, ...patch };
 }
-
-export function setFeatureFlags(patch: Partial<FeatureFlags>): void {
-  activeFlags = { ...activeFlags, ...patch };
-}

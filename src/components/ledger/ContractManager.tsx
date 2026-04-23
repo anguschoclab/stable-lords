@@ -1,4 +1,4 @@
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { Link } from "@tanstack/react-router";
 import { TRAINER_WEEKLY_SALARY } from "@/engine/trainers";
 import { Surface } from "@/components/ui/Surface";
@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatBattery } from "@/components/ui/StatBattery";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { GraduationCap, AlertTriangle, Coins, Target, Calendar, UserCheck, Clock, TrendingDown, ShieldCheck } from "lucide-react";
+import { GraduationCap, AlertTriangle, Coins, UserCheck, TrendingDown, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,

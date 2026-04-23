@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { Shield } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { Warrior } from "@/types/game";
 
 interface LethalityBadgeProps {

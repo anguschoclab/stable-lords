@@ -1,17 +1,17 @@
 import { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { computeWeeklyBreakdown } from "@/engine/economy";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Coins, FileText, TrendingUp, Skull, Swords, Activity, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, History } from "lucide-react";
+import { TrendingUp, Skull, Swords, Wallet, BarChart3, ArrowUpRight, ArrowDownRight, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { type Warrior, type LedgerEntry } from "@/types/game";
+import { type Warrior } from "@/types/game";
 import { TreasurySparkline } from "@/components/charts/TreasurySparkline";
 
 export function TreasuryOverview() {
@@ -26,8 +26,11 @@ export function TreasuryOverview() {
   let totalKills = 0;
   const roster = state.roster ?? [];
   for (let i = 0; i < roster.length; i++) {
-    totalWins += roster[i].career.wins ?? 0;
-    totalKills += roster[i].career.kills ?? 0;
+    const w = roster[i];
+    if (w) {
+      totalWins += w.career.wins ?? 0;
+      totalKills += w.career.kills ?? 0;
+    }
   }
 
   const recentLedger = (state.ledger ?? []).slice(-15).reverse();

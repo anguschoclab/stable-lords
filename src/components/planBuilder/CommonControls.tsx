@@ -19,7 +19,7 @@ export default function CommonControls({ plan, onPlanChange }: CommonControlsPro
           </div>
           <Slider 
             value={[plan.OE]} 
-            onValueChange={([v]) => onPlanChange({ ...plan, OE: v })} 
+            onValueChange={([v]) => onPlanChange({ ...plan, OE: v ?? 5 })} 
             min={1} max={10} step={1} 
           />
         </div>
@@ -30,7 +30,7 @@ export default function CommonControls({ plan, onPlanChange }: CommonControlsPro
           </div>
           <Slider
             value={[plan.AL ?? 5]}
-            onValueChange={([v]) => onPlanChange({ ...plan, AL: v })}
+            onValueChange={([v]) => onPlanChange({ ...plan, AL: v ?? 5 })}
             min={1} max={10} step={1}
           />
         </div>

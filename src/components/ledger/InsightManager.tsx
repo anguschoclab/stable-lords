@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useGameStore, useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Zap,
@@ -18,7 +17,6 @@ import {
 } from "lucide-react";
 import type { InsightTokenType } from "@/types/state.types";
 import { motion, AnimatePresence } from "framer-motion";
-import { FightingStyle } from "@/types/shared.types";
 
 const TOKEN_CFG: Record<InsightTokenType, { Icon: React.ElementType; color: string; label: string }> = {
   Weapon:    { Icon: Swords,      color: "bg-orange-500/20 text-orange-500", label: "Weapon"    },

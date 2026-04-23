@@ -1,14 +1,8 @@
 import React from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, Zap, Target, Database, Binary, Info, Search, Box, Lock, Unlock } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Shield, Zap, Target, Database, Binary, Search, Box, Lock, Unlock } from "lucide-react";
 
 export function InsightVault() {
   const state = useWorldState();

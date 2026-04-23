@@ -26,7 +26,7 @@ export function RecentBoutsWidget() {
     // to find the first 5 bouts without scanning or allocating the entire history.
     for (let i = 0; i < history.length; i++) {
       const bout = history[i];
-      if (bout.stableIdA === playerStableId || bout.stableIdD === playerStableId) {
+      if (bout && (bout.stableIdA === playerStableId || bout.stableIdD === playerStableId)) {
         results.push(bout);
         if (results.length >= 5) break;
       }

@@ -64,7 +64,7 @@ export default function PhaseOverrides({ plan, onPlanChange }: PhaseOverridesPro
                         value={[plan.phases?.[p]?.OE ?? plan.OE]}
                         onValueChange={([v]) => {
                           const next = { ...(plan.phases || {}) };
-                          next[p] = { ...(next[p] || { OE: plan.OE, AL: plan.AL ?? 5, killDesire: plan.killDesire ?? 5 }), OE: v };
+                          next[p] = { ...(next[p] || { OE: plan.OE, AL: plan.AL ?? 5, killDesire: plan.killDesire ?? 5 }), OE: v ?? plan.OE };
                           onPlanChange({ ...plan, phases: next });
                         }}
                         min={1} max={10} step={1}

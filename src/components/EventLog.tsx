@@ -4,7 +4,7 @@
  * Entity names are rendered as clickable links via WarriorLink.
  */
 import React, { useMemo } from "react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {

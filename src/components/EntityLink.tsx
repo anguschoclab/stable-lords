@@ -4,7 +4,7 @@
  */
 import React from "react";
 import { Link } from "@tanstack/react-router";
-import { useGameStore as useGame, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { cn } from "@/lib/utils";
 import {
   Sheet,

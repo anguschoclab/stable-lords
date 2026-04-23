@@ -2,11 +2,6 @@ import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Newspaper, Quote, Sparkles, Zap, Trophy, History, MessageSquare, ArrowRight, ExternalLink } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { MarkdownReader } from "@/components/MarkdownReader";
 
 interface GazetteIssue {

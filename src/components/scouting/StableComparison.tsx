@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
-import { Shield, ArrowLeftRight, TrendingUp, Swords, Trophy, Hexagon, Crosshair, BarChart3 } from "lucide-react";
+import { Shield, ArrowLeftRight, Swords, Trophy, Hexagon, Crosshair, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
 import { Surface } from "@/components/ui/Surface";
 import type { RivalStableData } from "@/types/game";
 import { ATTRIBUTE_KEYS, STYLE_DISPLAY_NAMES } from "@/types/game";
@@ -303,7 +302,7 @@ export function StableComparison({ rivals }: StableComparisonProps) {
              </div>
           </Surface>
 
-          <HeadToHead nameA={rivalA.owner.stableName} nameB={rivalB.owner.stableName} rosterA={rivalA.roster} rosterB={rivalB.roster} />
+          <HeadToHead rosterA={rivalA.roster} rosterB={rivalB.roster} />
         </div>
       )}
 

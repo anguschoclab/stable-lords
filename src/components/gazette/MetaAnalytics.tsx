@@ -26,12 +26,16 @@ export function TacticalStyleAnalysis({ allFights }: MetaAnalyticsProps) {
 
     for (let i = 0; i < allFights.length; i++) {
       const f = allFights[i];
-      if (f.winnerStyle && agg[f.winnerStyle]) {
-        agg[f.winnerStyle].wins++;
-        agg[f.winnerStyle].total++;
+      if (!f) continue;
+      const wStyle = f.winner === "A" ? f.styleA : f.winner === "D" ? f.styleD : null;
+      const lStyle = f.winner === "A" ? f.styleD : f.winner === "D" ? f.styleA : null;
+      
+      if (wStyle && agg[wStyle]) {
+        agg[wStyle].wins++;
+        agg[wStyle].total++;
       }
-      if (f.loserStyle && agg[f.loserStyle]) {
-        agg[f.loserStyle].total++;
+      if (lStyle && agg[lStyle]) {
+        agg[lStyle].total++;
       }
     }
 
@@ -115,17 +119,18 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
   const matchupStats = useMemo(() => {
     const agg: Record<string, Record<string, { wins: number; total: number }>> = {};
     for (const f of allFights || []) {
-      const { winnerStyle: w, loserStyle: l } = f;
-      if (!w || !l) continue;
+      const wStyle = f.winner === "A" ? f.styleA : f.winner === "D" ? f.styleD : null;
+      const lStyle = f.winner === "A" ? f.styleD : f.winner === "D" ? f.styleA : null;
+      if (!wStyle || !lStyle) continue;
 
-      if (!agg[w]) agg[w] = {};
-      if (!agg[w][l]) agg[w][l] = { wins: 0, total: 0 };
-      agg[w][l].wins++;
-      agg[w][l].total++;
+      if (!agg[wStyle]) agg[wStyle] = {};
+      if (!agg[wStyle][lStyle]) agg[wStyle][lStyle] = { wins: 0, total: 0 };
+      agg[wStyle][lStyle].wins++;
+      agg[wStyle][lStyle].total++;
 
-      if (!agg[l]) agg[l] = {};
-      if (!agg[l][w]) agg[l][w] = { wins: 0, total: 0 };
-      agg[l][w].total++;
+      if (!agg[lStyle]) agg[lStyle] = {};
+      if (!agg[lStyle][wStyle]) agg[lStyle][wStyle] = { wins: 0, total: 0 };
+      agg[lStyle][wStyle].total++;
     }
     return agg;
   }, [allFights]);

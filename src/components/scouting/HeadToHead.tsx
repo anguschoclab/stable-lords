@@ -15,7 +15,7 @@ interface HeadToHeadProps {
   rosterB: Warrior[];
 }
 
-export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) {
+export function HeadToHead({ rosterA, rosterB }: Omit<HeadToHeadProps, 'nameA' | 'nameB'>) {
   const state = useGameStore();
   const allFights = useMemo(() => ArenaHistory.all() || [], []);
   const idsA = useMemo(() => new Set(rosterA.map(w => w.id)), [rosterA]);
@@ -31,6 +31,7 @@ export function HeadToHead({ nameA, nameB, rosterA, rosterB }: HeadToHeadProps) 
 
     for (let i = allFights.length - 1; i >= 0; i--) {
       const f = allFights[i];
+      if (!f) continue;
       const idA = f.warriorIdA;
       const idD = f.warriorIdD;
       const aIsA = idsA.has(idA);

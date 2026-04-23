@@ -1,10 +1,8 @@
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { WarriorNameTag, StatBadge } from "@/components/ui/WarriorBadges";
-import { Trophy, Skull, Star, Swords, Target, Activity, Quote, Landmark, History, Cross, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { StatBadge } from "@/components/ui/WarriorBadges";
+import { Trophy, Landmark, Sparkles } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,

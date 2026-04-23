@@ -1,17 +1,12 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { Dumbbell, ChevronRight, Activity, Zap, Target, TrendingUp, AlertCircle, Sparkles } from "lucide-react";
-import { useGameStore, useWorldState } from "@/state/useGameStore";
+import { Dumbbell, ChevronRight, Zap } from "lucide-react";
+import { useWorldState } from "@/state/useGameStore";
 import { Surface } from "@/components/ui/Surface";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ATTRIBUTE_LABELS } from "@/types/game";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export function TrainingWidget() {
   const state = useWorldState();

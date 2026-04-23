@@ -1,4 +1,4 @@
-import { Trophy, Skull, Activity, Swords, ChevronDown, ChevronUp, Zap } from "lucide-react";
+import { Skull, Activity, ChevronDown, ChevronUp, Zap } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import BoutViewer from "@/components/BoutViewer";
 import { Badge } from "@/components/ui/badge";

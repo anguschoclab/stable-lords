@@ -2,8 +2,7 @@ import { useMemo } from "react";
 import { Surface } from "@/components/ui/Surface";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trophy, Star, Swords, Target, Activity, Zap, TrendingUp, User, LayoutGrid, Award, ShieldCheck } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Trophy, Star, Swords, Target, Zap, TrendingUp, User, Award, ShieldCheck } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +19,7 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
 
     for (let i = 0; i < allFights.length; i++) {
       const f = allFights[i];
+      if (!f) continue;
       
       let aData = registry.get(f.a);
       if (!aData) {
@@ -57,8 +57,13 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
       const entry = { name, w: data.w, l: data.l, k: data.k, fame: data.fame, style: data.style, rate };
 
       let i = result.length - 1;
-      while (i >= 0 && (entry.w > result[i].w || (entry.w === result[i].w && entry.rate > result[i].rate))) {
-        i--;
+      while (i >= 0) {
+        const current = result[i];
+        if (current && (entry.w > current.w || (entry.w === current.w && entry.rate > current.rate))) {
+          i--;
+        } else {
+          break;
+        }
       }
       result.splice(i + 1, 0, entry);
       if (result.length > 5) result.pop();
@@ -154,6 +159,7 @@ export function BestByStyle({ allFights }: LeaderboardProps) {
       const warriors: Record<string, number> = {};
       for (let i = 0; i < allFights.length; i++) {
         const f = allFights[i];
+        if (!f) continue;
         let wStyle: string | null = null;
         let wName: string | null = null;
         
@@ -219,12 +225,13 @@ export function BestByStyle({ allFights }: LeaderboardProps) {
   );
 }
 
-export function RisingStars({ allFights, currentWeek }: LeaderboardProps & { currentWeek: number }) {
+export function RisingStars({ allFights }: LeaderboardProps) {
   const stars = useMemo(() => {
     const history = new Map<string, { wins: number; matches: number; firstWeek: number }>();
 
     for (let i = 0; i < allFights.length; i++) {
       const f = allFights[i];
+      if (!f) continue;
 
       let aData = history.get(f.a);
       if (!aData) {
@@ -251,8 +258,13 @@ export function RisingStars({ allFights, currentWeek }: LeaderboardProps & { cur
       if (data.matches <= 5 && data.wins >= 3) {
         const entry = { name, wins: data.wins, matches: data.matches, firstWeek: data.firstWeek };
         let i = result.length - 1;
-        while (i >= 0 && entry.wins > result[i].wins) {
-          i--;
+        while (i >= 0) {
+          const current = result[i];
+          if (current && entry.wins > current.wins) {
+            i--;
+          } else {
+            break;
+          }
         }
         result.splice(i + 1, 0, entry);
         if (result.length > 3) result.pop();

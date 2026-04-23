@@ -3,7 +3,8 @@
  * 20-minute bout for the current plan. Deterministic preview, not a full sim.
  */
 import { useMemo } from "react";
-import type { FightPlan, Warrior } from "@/types/shared.types";
+import type { FightPlan } from "@/types/shared.types";
+import type { Warrior } from "@/types/warrior.types";
 import { estimateStaminaCurve } from "@/engine/strategyValidator";
 
 interface Props {

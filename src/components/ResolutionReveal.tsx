@@ -7,24 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import BoutViewer from "./BoutViewer";
-import { Newspaper, Skull, Activity, Swords, ChevronRight, BarChart3, BrainCircuit } from "lucide-react";
+import { Newspaper, Skull, Activity, Swords, ChevronRight } from "lucide-react";
 import { audioManager } from "@/lib/AudioManager";
 import type { NewsletterItem } from "@/types/shared.types";
-import type { Warrior } from "@/types/warrior.types";
-import type { GazetteStory } from "@/types/state.types";
 import type { BoutResult } from "@/engine/boutProcessor";
 import type { FightSummary } from "@/types/combat.types";
 import narrativeContent from "@/data/narrativeContent.json";
 
 type RevealStep = "gazette" | "injuries" | "bouts" | "math" | "memorial";
 
-function t(template: string, data: Record<string, any>): string {
-  let result = template;
-  for (const [key, value] of Object.entries(data)) {
-    result = result.replace(new RegExp(`{{${key}}}`, "g"), String(value));
-  }
-  return result;
-}
 
 export default function ResolutionReveal() {
   const store = useGameStore();
