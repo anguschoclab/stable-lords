@@ -13,3 +13,6 @@
 ## 2024-05-20 - [A11y attributes on functional divs]
 **Learning:** React toggles built with `div` instead of `button` require explicitly `role="button"`, `tabIndex`, keyboard handler (`onKeyDown`) and proper `aria` attributes to be accessible. Icon-only buttons must have `aria-label` to be usable by screen readers.
 **Action:** When inspecting components, identify actionable non-button elements and convert them to semantic buttons or add correct ARIA attributes and keyboard event handlers.
+## 2024-04-23 - Adding ARIA labels to buttons within loops/mapping generic structures
+**Learning:** Generic buttons constructed dynamically within `.map()` loops (like for `TACTIC_BANK`, distance ranges, and dynamically generated conditions) often omit specific `aria-label`s since they inherit generic UI markup. It is vital to pass the mapped element properties (like `t.label`, `r`, or specific indices and functions) into an `aria-label` template literal to make them functional for screen readers.
+**Action:** When implementing generic array `.map()` structures that return interactive elements (`button`, `a`), dynamically inject `aria-label` properties based on the mapped array value to provide screen readers precise context about what exactly the generic button represents.

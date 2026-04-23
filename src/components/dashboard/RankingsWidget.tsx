@@ -11,12 +11,22 @@ export function RankingsWidget() {
   const state = useWorldState();
   const navigate = useNavigate();
 
-  const ranked = useMemo(
-    () => [...selectActiveWarriors(state)]
-      .sort((a, b) => b.fame - a.fame)
-      .slice(0, 5),
-    [state]
-  );
+  const ranked = useMemo(() => {
+    // ⚡ Bolt: Use O(N) bounded insertion sort instead of O(N log N) full array sort
+    const activeWarriors = selectActiveWarriors(state);
+    const top = [];
+    for (let i = 0; i < activeWarriors.length; i++) {
+      const w = activeWarriors[i];
+      if (top.length < 5) {
+        top.push(w);
+        top.sort((a, b) => b.fame - a.fame);
+      } else if (w.fame > top[4].fame) {
+        top[4] = w;
+        top.sort((a, b) => b.fame - a.fame);
+      }
+    }
+    return top;
+  }, [state.roster]);
 
   // ── Player standings summary ──────────────────────────────────────────────
   const playerStanding = useMemo(() => {
