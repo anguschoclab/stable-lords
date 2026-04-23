@@ -83,6 +83,7 @@ export default function SpatialControls({ plan, warrior, onPlanChange }: Spatial
                     ? "bg-blue-500/20 border-blue-500/60 text-blue-300"
                     : "bg-black/40 border-white/10 text-muted-foreground hover:border-white/30"
                 )}
+                aria-label={"Set preferred distance to " + r}
               >
                 {r}
                 {isNatural && <span className="block text-[7px] text-blue-400/60 normal-case font-normal">natural</span>}

@@ -217,11 +217,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       OE {cond.override.OE !== undefined ? cond.override.OE : "—"}
                     </Label>
                     {cond.override.OE !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button onClick={() => updateOverrideSlider(idx, "OE", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Clear OE override">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold">
+                      <button onClick={() => updateOverrideSlider(idx, "OE", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-gold" aria-label="Set OE override">
                         set
                       </button>
                     )}
@@ -245,11 +245,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       AL {cond.override.AL !== undefined ? cond.override.AL : "—"}
                     </Label>
                     {cond.override.AL !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button onClick={() => updateOverrideSlider(idx, "AL", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Clear AL override">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame">
+                      <button onClick={() => updateOverrideSlider(idx, "AL", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-arena-fame" aria-label="Set AL override">
                         set
                       </button>
                     )}
@@ -273,11 +273,11 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
                       KD {cond.override.killDesire !== undefined ? cond.override.killDesire : "—"}
                     </Label>
                     {cond.override.killDesire !== undefined ? (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button onClick={() => updateOverrideSlider(idx, "killDesire", undefined)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Clear Kill Desire override">
                         clear
                       </button>
                     ) : (
-                      <button onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive">
+                      <button onClick={() => updateOverrideSlider(idx, "killDesire", 5)} className="text-[8px] font-black uppercase text-muted-foreground/40 hover:text-destructive" aria-label="Set Kill Desire override">
                         set
                       </button>
                     )}
@@ -340,6 +340,7 @@ export default function ConditionEditor({ conditions, onChange }: ConditionEdito
       <button
         onClick={addCondition}
         className="w-full flex items-center justify-center gap-2 border border-dashed border-white/10 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:border-arena-gold/40 hover:text-arena-gold transition-all"
+        aria-label="Add Condition"
       >
         <Plus className="w-3.5 h-3.5" />
         Add Condition
