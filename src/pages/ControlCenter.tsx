@@ -17,6 +17,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { SeasonWidget } from '@/components/dashboard/SeasonWidget';
 import { RecentBoutsWidget } from '@/components/dashboard/RecentBoutsWidget';
+import { WeeklyDigestWidget } from '@/components/dashboard/WeeklyDigestWidget';
 import { RivalryWidget } from '@/components/dashboard/RivalryWidget';
 import { MetaDriftWidget } from '@/components/widgets/MetaDriftWidget';
 import { FormSparkline } from '@/components/charts/FormSparkline';
@@ -456,6 +457,14 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
 
 export default function ControlCenter() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const { week, season, arenaHistory, boutOffers } = useGameStore(
+    useShallow((s) => ({
+      week: s.week,
+      season: s.season,
+      arenaHistory: s.arenaHistory,
+      boutOffers: s.boutOffers,
+    }))
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-20">
@@ -499,6 +508,13 @@ export default function ControlCenter() {
             <div className="flex flex-col gap-6">
               <SeasonWidget />
               <RecentBoutsWidget />
+              <WeeklyDigestWidget
+                week={week}
+                season={season}
+                arenaHistory={arenaHistory}
+                boutOffers={boutOffers ?? {}}
+                currentWeek={week}
+              />
             </div>
             <div className="flex flex-col gap-6">
               <RivalryWidget />

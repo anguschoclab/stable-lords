@@ -27,6 +27,8 @@ import { Surface } from '@/components/ui/Surface';
 import { WarriorLink } from '@/components/EntityLink';
 import { STYLE_DISPLAY_NAMES, FightingStyle } from '@/types/game';
 import { motion } from 'framer-motion';
+import FightsList from '@/components/awards/FightsList';
+import UpsetsList, { type UpsetEntry } from '@/components/awards/UpsetsList';
 
 export default function HallOfFame() {
   const { roster, graveyard, retired, rivals, awards, year, player, season } = useGameStore();
@@ -61,6 +63,35 @@ export default function HallOfFame() {
   }, [allWarriors]);
 
   const myFallen = graveyard.filter((w) => w.stableId === player.id);
+
+  const fameByWarriorId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const w of allWarriors) map.set(w.id, w.fame ?? 0);
+    return map;
+  }, [allWarriors]);
+
+  const getFightsForYear = (yr: number) => {
+    const weekStart = (yr - 1) * 52 + 1;
+    const weekEnd = yr * 52;
+    return allFights.filter((f) => f.week >= weekStart && f.week <= weekEnd);
+  };
+
+  const getUpsetsForYear = (yr: number): UpsetEntry[] => {
+    return getFightsForYear(yr)
+      .map((f) => {
+        const fameA = fameByWarriorId.get(f.warriorIdA ?? '') ?? 0;
+        const fameD = fameByWarriorId.get(f.warriorIdD ?? '') ?? 0;
+        const winnerName = f.winner === 'A' ? f.a : f.d;
+        const loserName = f.winner === 'A' ? f.d : f.a;
+        const winnerFame = f.winner === 'A' ? fameA : fameD;
+        const loserFame = f.winner === 'A' ? fameD : fameA;
+        const fameDiff = loserFame - winnerFame;
+        return { winner: winnerName, loser: loserName, by: f.by, fameDiff, week: f.week };
+      })
+      .filter((u) => u.fameDiff >= 10)
+      .sort((a, b) => b.fameDiff - a.fameDiff)
+      .slice(0, 5);
+  };
 
   const awardIcon = (type: string) => {
     switch (type) {
@@ -185,6 +216,19 @@ export default function HallOfFame() {
                     );
                   })}
                 </div>
+
+                {/* ── Year fight highlights ── */}
+                {(() => {
+                  const yearFights = getFightsForYear(year);
+                  const yearUpsets = getUpsetsForYear(year);
+                  if (yearFights.length === 0) return null;
+                  return (
+                    <div className="border-t border-border/20 pt-4 space-y-3">
+                      <FightsList fights={yearFights} />
+                      <UpsetsList upsets={yearUpsets} />
+                    </div>
+                  );
+                })()}
               </article>
             ))
           ) : (

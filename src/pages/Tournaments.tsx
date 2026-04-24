@@ -44,6 +44,7 @@ import { toast } from 'sonner';
 import { TournamentBracket } from '@/components/tournaments/TournamentBracket';
 import { TournamentHistory } from '@/components/tournaments/TournamentHistory';
 import { TournamentPrepDialog } from '@/components/tournaments/TournamentPrepDialog';
+import { TournamentSchedule } from '@/components/tournaments/TournamentSchedule';
 
 const SEASON_NAMES: Record<string, string> = {
   Spring: 'Spring Classic',
@@ -258,6 +259,10 @@ export default function Tournaments() {
             </div>
           </div>
           <div className="p-0">
+            <div className="p-6 border-b border-white/5">
+              <TournamentSchedule tournament={currentTournament} currentWeek={week} />
+            </div>
+
             <TournamentBracket
               bouts={currentTournament.bracket}
               arenaHistory={arenaHistory}

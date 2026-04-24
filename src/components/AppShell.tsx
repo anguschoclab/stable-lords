@@ -334,7 +334,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 flex flex-col relative bg-[#0C0806] overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
 
-          <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10">
+          <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10 pb-20 md:pb-20">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
@@ -354,6 +354,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <CoachOverlay />
+          <TacticalBar />
 
           <AnimatePresence>
             {!isInitialized && (

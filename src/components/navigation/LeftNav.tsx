@@ -72,7 +72,8 @@ const HUBS = [
       { to: '/world/tournaments', label: 'Tournaments', icon: CalendarClock },
       { to: '/world/intelligence', label: 'Scouting', icon: Radar },
       { to: '/world/chronicle', label: 'Chronicle', icon: Newspaper },
-      { to: '/world/history', label: 'Graveyard', icon: Skull },
+      { to: '/world/history', label: 'Hall of Fame', icon: Trophy },
+      { to: '/world/graveyard', label: 'Graveyard', icon: Skull },
     ],
   },
 ] as const;

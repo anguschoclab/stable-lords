@@ -26,6 +26,7 @@ import { Route as WorldTournamentsRouteImport } from './routes/world/tournaments
 import { Route as WorldIntelligenceRouteImport } from './routes/world/intelligence';
 import { Route as WorldHistoryRouteImport } from './routes/world/history';
 import { Route as WorldChronicleRouteImport } from './routes/world/chronicle';
+import { Route as WorldGraveyardRouteImport } from './routes/world/graveyard';
 import { Route as WarriorIdRouteImport } from './routes/warrior/$id';
 import { Route as ToolsPhysicalsSimulatorRouteImport } from './routes/tools/physicals-simulator';
 import { Route as StableTrainingRouteImport } from './routes/stable/training';
@@ -131,6 +132,11 @@ const WorldHistoryRoute = WorldHistoryRouteImport.update({
 const WorldChronicleRoute = WorldChronicleRouteImport.update({
   id: '/world/chronicle',
   path: '/world/chronicle',
+  getParentRoute: () => rootRouteImport,
+} as any);
+const WorldGraveyardRoute = WorldGraveyardRouteImport.update({
+  id: '/world/graveyard',
+  path: '/world/graveyard',
   getParentRoute: () => rootRouteImport,
 } as any);
 const WarriorIdRoute = WarriorIdRouteImport.update({
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/warrior/$id': typeof WarriorIdRoute;
   '/world': typeof World_rootRoute;
   '/world/chronicle': typeof WorldChronicleRoute;
+  '/world/graveyard': typeof WorldGraveyardRoute;
   '/world/history': typeof WorldHistoryRoute;
   '/world/intelligence': typeof WorldIntelligenceRoute;
   '/world/tournaments': typeof WorldTournamentsRoute;
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/warrior/$id': typeof WarriorIdRoute;
   '/world': typeof WorldIndexRoute;
   '/world/chronicle': typeof WorldChronicleRoute;
+  '/world/graveyard': typeof WorldGraveyardRoute;
   '/world/history': typeof WorldHistoryRoute;
   '/world/intelligence': typeof WorldIntelligenceRoute;
   '/world/tournaments': typeof WorldTournamentsRoute;
@@ -371,6 +379,7 @@ export interface FileRoutesById {
   '/warrior/$id': typeof WarriorIdRoute;
   '/world/__root': typeof World_rootRoute;
   '/world/chronicle': typeof WorldChronicleRoute;
+  '/world/graveyard': typeof WorldGraveyardRoute;
   '/world/history': typeof WorldHistoryRoute;
   '/world/intelligence': typeof WorldIntelligenceRoute;
   '/world/tournaments': typeof WorldTournamentsRoute;
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/warrior/$id'
     | '/world'
     | '/world/chronicle'
+    | '/world/graveyard'
     | '/world/history'
     | '/world/intelligence'
     | '/world/tournaments'
@@ -459,6 +469,7 @@ export interface FileRouteTypes {
     | '/warrior/$id'
     | '/world'
     | '/world/chronicle'
+    | '/world/graveyard'
     | '/world/history'
     | '/world/intelligence'
     | '/world/tournaments'
@@ -499,6 +510,7 @@ export interface FileRouteTypes {
     | '/warrior/$id'
     | '/world/__root'
     | '/world/chronicle'
+    | '/world/graveyard'
     | '/world/history'
     | '/world/intelligence'
     | '/world/tournaments'
@@ -543,6 +555,7 @@ export interface RootRouteChildren {
   WarriorIdRoute: typeof WarriorIdRoute;
   World_rootRoute: typeof World_rootRoute;
   WorldChronicleRoute: typeof WorldChronicleRoute;
+  WorldGraveyardRoute: typeof WorldGraveyardRoute;
   WorldHistoryRoute: typeof WorldHistoryRoute;
   WorldIntelligenceRoute: typeof WorldIntelligenceRoute;
   WorldTournamentsRoute: typeof WorldTournamentsRoute;
@@ -673,6 +686,13 @@ declare module '@tanstack/react-router' {
       path: '/world/chronicle';
       fullPath: '/world/chronicle';
       preLoaderRoute: typeof WorldChronicleRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/world/graveyard': {
+      id: '/world/graveyard';
+      path: '/world/graveyard';
+      fullPath: '/world/graveyard';
+      preLoaderRoute: typeof WorldGraveyardRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     '/warrior/$id': {
@@ -879,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   WarriorIdRoute: WarriorIdRoute,
   World_rootRoute: World_rootRoute,
   WorldChronicleRoute: WorldChronicleRoute,
+  WorldGraveyardRoute: WorldGraveyardRoute,
   WorldHistoryRoute: WorldHistoryRoute,
   WorldIntelligenceRoute: WorldIntelligenceRoute,
   WorldTournamentsRoute: WorldTournamentsRoute,

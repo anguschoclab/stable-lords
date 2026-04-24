@@ -7,7 +7,17 @@ import { useGameStore } from '@/state/useGameStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Download, Upload, Trash2, FastForward, Activity, Zap } from 'lucide-react';
+import {
+  Settings,
+  Download,
+  Upload,
+  Trash2,
+  FastForward,
+  Activity,
+  Zap,
+  SlidersHorizontal,
+} from 'lucide-react';
+import ArenaSettings from '@/components/settings/ArenaSettings';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Surface } from '@/components/ui/Surface';
 import { cn } from '@/lib/utils';
@@ -34,7 +44,7 @@ export default function AdminTools() {
   } = useGameStore();
 
   const [activeCategory, setActiveCategory] = React.useState<
-    'SYSTEM' | 'ECONOMY' | 'WORLD' | 'TELEMETRY'
+    'SYSTEM' | 'ECONOMY' | 'WORLD' | 'TELEMETRY' | 'PREFERENCES'
   >('SYSTEM');
 
   const handleExport = useCallback(() => {
@@ -151,6 +161,7 @@ export default function AdminTools() {
               { id: 'ECONOMY', icon: Zap, label: 'Market_Ops' },
               { id: 'WORLD', icon: FastForward, label: 'Temporal_Flux' },
               { id: 'TELEMETRY', icon: Activity, label: 'Data_Stream' },
+              { id: 'PREFERENCES', icon: SlidersHorizontal, label: 'Arena_Prefs' },
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -323,6 +334,12 @@ export default function AdminTools() {
                 </pre>
               </div>
             </Surface>
+          )}
+
+          {activeCategory === 'PREFERENCES' && (
+            <div className="max-w-xl">
+              <ArenaSettings />
+            </div>
           )}
         </main>
       </div>
