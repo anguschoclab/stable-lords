@@ -5,7 +5,8 @@ import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { generateId } from '@/utils/idUtils';
 import narrativeContent from '@/data/narrativeContent.json';
 import { StateImpact } from '@/engine/impacts';
-import { type WarriorId, type LedgerEntryId } from '@/types/shared.types';
+import { type WarriorId, type LedgerEntryId, type InsightId } from '@/types/shared.types';
+import type { InsightToken } from '@/types/state.types';
 
 /**
  * Stable Lords — Seasonal Pipeline Pass (Offseason)
@@ -21,7 +22,7 @@ function t(template: string, data: Record<string, string | number>): string {
 
 interface OffseasonEventNarrative {
   title: string;
-  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing';
+  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany';
   newsletter: string[];
 }
 
@@ -40,6 +41,7 @@ export function runSeasonalPass(
   const newsletterItems: NewsletterItem[] = [];
   let treasuryDelta = 0;
   const ledgerEntries: LedgerEntry[] = [];
+  const insightTokens: InsightToken[] = [];
 
   // Safe cast for our dynamic offseason data
   const events = (narrativeContent as any).offseason_events as
@@ -106,6 +108,32 @@ export function runSeasonalPass(
       title: e.title,
       items: [t(seasonRng.pick(e.newsletter) || '', { gold })],
     });
+  } else if (e.effectType === 'epiphany' && state.roster.length > 0) {
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    if (activeWarriors.length > 0) {
+      const chosen = activeWarriors[Math.floor(seasonRng.next() * activeWarriors.length)];
+
+      rosterUpdates.set(chosen.id, {
+        fame: (chosen.fame || 0) + 10,
+        xp: (chosen.xp || 0) + 15,
+      });
+
+      insightTokens.push({
+        id: generateId(seasonRng, 'insight') as InsightId,
+        type: 'Attribute',
+        warriorId: chosen.id,
+        warriorName: chosen.name,
+        detail: 'Discovered a hidden reserve of strength during offseason meditation.',
+        discoveredWeek: nextWeek,
+      });
+
+      newsletterItems.push({
+        id: generateId(seasonRng, 'newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name })],
+      });
+    }
   }
 
   // Record this event in the State so the UI can pick it up
@@ -114,6 +142,7 @@ export function runSeasonalPass(
     newsletterItems,
     ...(ledgerEntries.length > 0 ? { ledgerEntries } : {}),
     ...(treasuryDelta !== 0 ? { treasuryDelta } : {}),
+    ...(insightTokens.length > 0 ? { insightTokens } : {}),
   };
 
   return impact;
