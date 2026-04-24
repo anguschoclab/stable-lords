@@ -42,15 +42,18 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
     );
 
     playerOffers.forEach((offer) => {
-      const playerWarriorId = offer.warriorIds.find((id) => state.roster.some((w) => w.id === id));
-      if (!playerWarriorId) return;
+      const playerWarriorIds = offer.warriorIds.filter((id) => state.roster.some((w) => w.id === id));
+
       if (offer.hype > 100 || offer.purse > 200) {
-        state.boutOffers[offer.id].responses[playerWarriorId] = 'Accepted';
+        playerWarriorIds.forEach((id) => {
+          offer.responses[id] = 'Accepted';
+        });
+
         const allResponded = offer.warriorIds.every(
-          (wid) => state.boutOffers[offer.id].responses[wid] !== 'Pending'
+          (wid) => offer.responses[wid] !== 'Pending'
         );
         if (allResponded) {
-          state.boutOffers[offer.id].status = 'Signed';
+          offer.status = 'Signed';
         }
       }
     });
