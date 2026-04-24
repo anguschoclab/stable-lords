@@ -218,20 +218,45 @@ export function getRecommendedChallenges(
   limit = 3
 ): MatchupScore[] {
   const eligibleRivals = getEligibleRivals(state);
-  const scores: MatchupScore[] = eligibleRivals.map((r) => {
-    const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[r.warrior.style] ?? 0;
-    const fameDiff = playerWarrior.fame - r.warrior.fame;
-    return {
-      playerWarriorId: playerWarrior.id,
-      rivalWarrior: r.warrior,
-      rivalStableName: r.stable.owner.stableName,
-      score: scoreMatchup(playerWarrior, r.warrior, state),
-      styleAdvantage,
-      fameDiff,
-      notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff),
-    };
-  });
-  return scores.sort((a, b) => b.score - a.score).slice(0, limit);
+  const topScores: MatchupScore[] = [];
+
+  // Bolt Optimization: Bounded Insertion Sort (O(N) instead of O(N log N))
+  // Prevents allocating and sorting a massive array when we only need the top K items
+  // Additionally saves execution time by lazy-evaluating getMatchupNotes
+  for (let i = 0; i < eligibleRivals.length; i++) {
+    const r = eligibleRivals[i];
+    const score = scoreMatchup(playerWarrior, r.warrior, state);
+
+    if (topScores.length < limit) {
+      const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[r.warrior.style] ?? 0;
+      const fameDiff = playerWarrior.fame - r.warrior.fame;
+      topScores.push({
+        playerWarriorId: playerWarrior.id,
+        rivalWarrior: r.warrior,
+        rivalStableName: r.stable.owner.stableName,
+        score,
+        styleAdvantage,
+        fameDiff,
+        notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff),
+      });
+      topScores.sort((a, b) => b.score - a.score);
+    } else if (score > topScores[limit - 1].score) {
+      const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[r.warrior.style] ?? 0;
+      const fameDiff = playerWarrior.fame - r.warrior.fame;
+      topScores[limit - 1] = {
+        playerWarriorId: playerWarrior.id,
+        rivalWarrior: r.warrior,
+        rivalStableName: r.stable.owner.stableName,
+        score,
+        styleAdvantage,
+        fameDiff,
+        notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff),
+      };
+      topScores.sort((a, b) => b.score - a.score);
+    }
+  }
+
+  return topScores;
 }
 
 export function getMatchupsToAvoid(
@@ -240,18 +265,43 @@ export function getMatchupsToAvoid(
   limit = 3
 ): MatchupScore[] {
   const eligibleRivals = getEligibleRivals(state);
-  const scores: MatchupScore[] = eligibleRivals.map((r) => {
-    const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[r.warrior.style] ?? 0;
-    const fameDiff = playerWarrior.fame - r.warrior.fame;
-    return {
-      playerWarriorId: playerWarrior.id,
-      rivalWarrior: r.warrior,
-      rivalStableName: r.stable.owner.stableName,
-      score: scoreMatchup(playerWarrior, r.warrior, state),
-      styleAdvantage,
-      fameDiff,
-      notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff),
-    };
-  });
-  return scores.sort((a, b) => a.score - b.score).slice(0, limit);
+  const bottomScores: MatchupScore[] = [];
+
+  // Bolt Optimization: Bounded Insertion Sort (O(N) instead of O(N log N))
+  // Prevents allocating and sorting a massive array when we only need the top K items
+  // Additionally saves execution time by lazy-evaluating getMatchupNotes
+  for (let i = 0; i < eligibleRivals.length; i++) {
+    const r = eligibleRivals[i];
+    const score = scoreMatchup(playerWarrior, r.warrior, state);
+
+    if (bottomScores.length < limit) {
+      const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[r.warrior.style] ?? 0;
+      const fameDiff = playerWarrior.fame - r.warrior.fame;
+      bottomScores.push({
+        playerWarriorId: playerWarrior.id,
+        rivalWarrior: r.warrior,
+        rivalStableName: r.stable.owner.stableName,
+        score,
+        styleAdvantage,
+        fameDiff,
+        notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff),
+      });
+      bottomScores.sort((a, b) => a.score - b.score);
+    } else if (score < bottomScores[limit - 1].score) {
+      const styleAdvantage = MATCHUP_MATRIX[playerWarrior.style]?.[r.warrior.style] ?? 0;
+      const fameDiff = playerWarrior.fame - r.warrior.fame;
+      bottomScores[limit - 1] = {
+        playerWarriorId: playerWarrior.id,
+        rivalWarrior: r.warrior,
+        rivalStableName: r.stable.owner.stableName,
+        score,
+        styleAdvantage,
+        fameDiff,
+        notes: getMatchupNotes(playerWarrior, r.warrior, styleAdvantage, fameDiff),
+      };
+      bottomScores.sort((a, b) => a.score - b.score);
+    }
+  }
+
+  return bottomScores;
 }
