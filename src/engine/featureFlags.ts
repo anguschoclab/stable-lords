@@ -22,6 +22,8 @@ export interface FeatureFlags {
   potentialGradeUI: boolean;
   /** Allow players to assign skill-drilling training types. */
   skillDrilling: boolean;
+  /** Skip combat narration and log generation (headless performance). */
+  skipCombatNarration: boolean;
 }
 
 const DEFAULTS: FeatureFlags = {
@@ -38,6 +40,7 @@ const DEFAULTS: FeatureFlags = {
   weeklyMatchmaker: false,
   // Skill drilling is data-complete.
   skillDrilling: true,
+  skipCombatNarration: false,
 };
 
 let activeFlags: FeatureFlags = { ...DEFAULTS };

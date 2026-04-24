@@ -12,7 +12,10 @@ export function runRecruitmentPass(state: GameState, rootRng?: IRNGService): Sta
   const rng = rootRng || new SeededRNGService(state.week * 701 + 13);
 
   // 1. Refresh recruitment pool
-  const usedNames = new Set<string>(state.roster.map((w) => w.name));
+  const usedNames = new Set<string>([
+    ...state.roster.map((w) => w.name),
+    ...(state.rivals || []).flatMap((r) => r.roster.map((w) => w.name)),
+  ]);
 
   // Collect legacy candidates (fame > 1000)
   const legacyCandidates = [...(state.graveyard || []), ...(state.retired || [])].filter(

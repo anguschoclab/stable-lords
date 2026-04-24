@@ -9,7 +9,7 @@ import type { Season } from '@/types/shared.types';
 import { processStaff } from './workers/staffWorker';
 import { processRoster } from './workers/rosterWorker';
 import { consolidateAgentMemory, createAgentContext } from './agentCore';
-import { StateImpact } from '@/engine/impacts';
+import { StateImpact, mergeImpacts } from '@/engine/impacts';
 
 import {
   FIGHT_PURSE,
@@ -103,14 +103,15 @@ export function processAIStable(
   // 5. Update Treasury & Check Bankruptcy (Risk Control)
   const treasuryDelta = weeklyIncome - weeklyExpenses;
   const newTreasury = updatedRival.treasury + treasuryDelta;
-  const isBankrupt = newTreasury <= 0;
-
-  updatedRival.treasury = newTreasury;
-
-  if (isBankrupt) {
-    gazetteItems.push(
-      `📉 BANKRUPTCY: ${updatedRival.owner.stableName} has collapsed under its debts.`
-    );
+  // 🏛️ 1.0 Hardening: League Subsidy (Prevent economic death spiral)
+  const SUBSIDY_FLOOR = 500;
+  let isBankrupt = false;
+  if (newTreasury < SUBSIDY_FLOOR) {
+      const subsidy = SUBSIDY_FLOOR - (newTreasury < 0 ? 0 : newTreasury);
+      updatedRival.treasury = SUBSIDY_FLOOR;
+      gazetteItems.push(`🏛️ SUBSIDY: ${updatedRival.owner.stableName} received ${subsidy}g from the League of Lords to maintain operations.`);
+  } else {
+      updatedRival.treasury = newTreasury;
   }
 
   // Milestone detection — narrow parity with the player's own-stable gazette.
@@ -140,11 +141,13 @@ export function processAIStable(
   rivalsUpdates.set(rival.owner.id, updatedRival);
   impacts.push({ rivalsUpdates });
 
+  // console.log(`[AIStable] ${updatedRival.owner.stableName} | Pop: ${updatedRival.roster.length} | T: ${updatedRival.treasury}`);
+
   return {
     updatedRival,
     isBankrupt,
     gazetteItems,
     updatedHiringPool: currentHiringPool,
-    impact: impacts.length > 0 ? impacts[0] : {},
+    impact: mergeImpacts(impacts),
   };
 }

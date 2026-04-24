@@ -14,7 +14,7 @@ import { generateId } from '@/utils/idUtils';
 import { computeTrainerBonus } from './coachLogic';
 import { getSeasonalGains, updateSeasonalGains } from './facilityUpkeep';
 
-export const TOTAL_CAP = 80;
+export const TOTAL_CAP = 120;
 export const BASE_GAIN_CHANCE = 0.55;
 export const SEASONAL_CAP_PER_ATTR = 3;
 export const BASE_TRAINING_INJURY_CHANCE = 0.03;
@@ -169,7 +169,8 @@ export function processAttributeTraining(
   const gainChance = computeGainChance(warrior, attr, state.trainers ?? []);
 
   // Roll for gain
-  if (rng.next() < gainChance) {
+  const roll = rng.next();
+  if (roll < gainChance) {
     const newAttrs = { ...warrior.attributes, [attr]: currentVal + 1 };
     const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, warrior.style);
 

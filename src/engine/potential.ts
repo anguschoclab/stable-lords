@@ -21,10 +21,10 @@ import type { RecruitTier } from './recruitment';
 // E.g., a Common warrior with ST=10 gets potential ST of 10 + rand(2..5) = 12-15.
 
 const TIER_HEADROOM: Record<RecruitTier, [number, number]> = {
-  Common: [2, 5],
-  Promising: [3, 7],
-  Exceptional: [5, 9],
-  Prodigy: [7, 12],
+  Common: [1, 4],
+  Promising: [3, 6],
+  Exceptional: [5, 10],
+  Prodigy: [10, 15],
 };
 
 // Absolute floor/ceiling for potential values

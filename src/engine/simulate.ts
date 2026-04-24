@@ -214,6 +214,8 @@ export function simulateFight(
 
   const log: MinuteEvent[] = [];
   const exchangeLog: ExchangeLogEntry[] = [];
+  const skipNarration = getFeatureFlags().skipCombatNarration;
+
   const tags = new Set<string>();
   let prevHpRatioA = 1.0;
   let prevHpRatioD = 1.0;
@@ -227,50 +229,52 @@ export function simulateFight(
   let fatalExchangeIndex: number | undefined;
 
   // ── 1. Introductions ──
-  const introA = generateWarriorIntro(
-    rng,
-    {
-      name: nameA,
-      style: planA.style,
-      weaponId: weaponA,
-      armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor,
-      helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm,
-      attributes: warriorA?.attributes,
-      backupWeaponId: (warriorA?.equipment as { backup?: string } | undefined)?.backup,
-    },
-    warriorA?.attributes?.SZ
-  );
-  const introD = generateWarriorIntro(
-    rng,
-    {
-      name: nameD,
-      style: planD.style,
-      weaponId: weaponD,
-      armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor,
-      helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
-      attributes: warriorD?.attributes,
-      backupWeaponId: (warriorD?.equipment as { backup?: string } | undefined)?.backup,
-    },
-    warriorD?.attributes?.SZ
-  );
+  if (!skipNarration) {
+    const introA = generateWarriorIntro(
+      rng,
+      {
+        name: nameA,
+        style: planA.style,
+        weaponId: weaponA,
+        armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor,
+        helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
+        attributes: warriorA?.attributes,
+        backupWeaponId: (warriorA?.equipment as { backup?: string } | undefined)?.backup,
+      },
+      warriorA?.attributes?.SZ
+    );
+    const introD = generateWarriorIntro(
+      rng,
+      {
+        name: nameD,
+        style: planD.style,
+        weaponId: weaponD,
+        armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor,
+        helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
+        attributes: warriorD?.attributes,
+        backupWeaponId: (warriorD?.equipment as { backup?: string } | undefined)?.backup,
+      },
+      warriorD?.attributes?.SZ
+    );
 
-  introA.forEach((line) => log.push({ minute: 0, text: line }));
-  log.push({ minute: 0, text: '' });
-  introD.forEach((line) => log.push({ minute: 0, text: line }));
-  log.push({ minute: 0, text: '' });
+    introA.forEach((line) => log.push({ minute: 0, text: line }));
+    log.push({ minute: 0, text: '' });
+    introD.forEach((line) => log.push({ minute: 0, text: line }));
+    log.push({ minute: 0, text: '' });
 
-  // Emit weather opening line with explicit type name (skipped for Clear/Overcast)
-  const weatherLine = weatherOpeningLine(weather);
-  if (weatherLine) log.push({ minute: 0, text: `☁ ${weather.toUpperCase()} — ${weatherLine}` });
+    // Emit weather opening line with explicit type name (skipped for Clear/Overcast)
+    const weatherLine = weatherOpeningLine(weather);
+    if (weatherLine) log.push({ minute: 0, text: `☁ ${weather.toUpperCase()} — ${weatherLine}` });
 
-  // Emit arena intro line for non-default arenas
-  if (arenaId !== 'standard_arena') {
-    log.push({ minute: 0, text: arenaIntroLine(resCtx.arenaConfig) });
+    // Emit arena intro line for non-default arenas
+    if (arenaId !== 'standard_arena') {
+      log.push({ minute: 0, text: arenaIntroLine(resCtx.arenaConfig) });
+    }
+
+    log.push({ minute: 1, text: battleOpener(rng) });
+    if (planA.OE <= 3) log.push({ minute: 1, text: conservingLine(nameA) });
+    if (planD.OE <= 3) log.push({ minute: 1, text: conservingLine(nameD) });
   }
-
-  log.push({ minute: 1, text: battleOpener(rng) });
-  if (planA.OE <= 3) log.push({ minute: 1, text: conservingLine(nameA) });
-  if (planD.OE <= 3) log.push({ minute: 1, text: conservingLine(nameD) });
 
   // ── 2. Main Simulation Loop ──
   for (let ex = 0; ex < MAX_EXCHANGES; ex++) {
@@ -285,18 +289,20 @@ export function simulateFight(
       const phaseKey = phase.toLowerCase() as 'opening' | 'mid' | 'late';
       const tacticsA = resolveEffectiveTactics(fA.plan, phaseKey);
       const tacticsD = resolveEffectiveTactics(fD.plan, phaseKey);
-      log.push({
-        minute: min,
-        text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,
-        phase,
-        offTacticA: tacticsA.offTactic !== 'none' ? tacticsA.offTactic : undefined,
-        defTacticA: tacticsA.defTactic !== 'none' ? tacticsA.defTactic : undefined,
-        offTacticD: tacticsD.offTactic !== 'none' ? tacticsD.offTactic : undefined,
-        defTacticD: tacticsD.defTactic !== 'none' ? tacticsD.defTactic : undefined,
-      });
+      if (!skipNarration) {
+        log.push({
+          minute: min,
+          text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,
+          phase,
+          offTacticA: tacticsA.offTactic !== 'none' ? tacticsA.offTactic : undefined,
+          defTacticA: tacticsA.defTactic !== 'none' ? tacticsA.defTactic : undefined,
+          offTacticD: tacticsD.offTactic !== 'none' ? tacticsD.offTactic : undefined,
+          defTacticD: tacticsD.defTactic !== 'none' ? tacticsD.defTactic : undefined,
+        });
+      }
     }
 
-    if (min > lastMinuteMarker && min > 1) {
+    if (!skipNarration && min > lastMinuteMarker && min > 1) {
       lastMinuteMarker = min;
       log.push({ minute: min, text: `MINUTE ${min}.` });
       log.push({
@@ -310,36 +316,38 @@ export function simulateFight(
     exchangeLog.push(buildExchangeLogEntry(ex, min, phase, events));
 
     // B. Resolve Narration (Drama)
-    const narCtx: NarrationContext = {
-      rng,
-      nameA,
-      nameD,
-      weaponA,
-      weaponD,
-      styleA: fA.style,
-      styleD: fD.style,
-      maxHpA: fA.maxHp,
-      maxHpD: fD.maxHp,
-      prevHpRatioA,
-      prevHpRatioD,
-      fameA: warriorA?.fame ?? 0,
-      fameD: warriorD?.fame ?? 0,
-      isFavoriteA: !!warriorA?.favorites?.discovered?.weapon,
-      isFavoriteD: !!warriorD?.favorites?.discovered?.weapon,
-    };
-    const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
-    log.push(...newLines);
-    prevHpRatioA = lastHpRatioA;
-    prevHpRatioD = lastHpRatioD;
+    if (!skipNarration) {
+      const narCtx: NarrationContext = {
+        rng,
+        nameA,
+        nameD,
+        weaponA,
+        weaponD,
+        styleA: fA.style,
+        styleD: fD.style,
+        maxHpA: fA.maxHp,
+        maxHpD: fD.maxHp,
+        prevHpRatioA,
+        prevHpRatioD,
+        fameA: warriorA?.fame ?? 0,
+        fameD: warriorD?.fame ?? 0,
+        isFavoriteA: !!warriorA?.favorites?.discovered?.weapon,
+        isFavoriteD: !!warriorD?.favorites?.discovered?.weapon,
+      };
+      const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
+      log.push(...newLines);
+      prevHpRatioA = lastHpRatioA;
+      prevHpRatioD = lastHpRatioD;
 
-    // Tactic streak commentary — emit only at the 3 and 5 thresholds
-    if ((resCtx.tacticStreakA === 3 || resCtx.tacticStreakA === 5) && resCtx.lastOffTacticA) {
-      const streakLine = tacticStreakLine(nameA, resCtx.lastOffTacticA, resCtx.tacticStreakA);
-      if (streakLine) log.push({ minute: min, text: streakLine });
-    }
-    if ((resCtx.tacticStreakD === 3 || resCtx.tacticStreakD === 5) && resCtx.lastOffTacticD) {
-      const streakLine = tacticStreakLine(nameD, resCtx.lastOffTacticD, resCtx.tacticStreakD);
-      if (streakLine) log.push({ minute: min, text: streakLine });
+      // Tactic streak commentary — emit only at the 3 and 5 thresholds
+      if ((resCtx.tacticStreakA === 3 || resCtx.tacticStreakA === 5) && resCtx.lastOffTacticA) {
+        const streakLine = tacticStreakLine(nameA, resCtx.lastOffTacticA, resCtx.tacticStreakA);
+        if (streakLine) log.push({ minute: min, text: streakLine });
+      }
+      if ((resCtx.tacticStreakD === 3 || resCtx.tacticStreakD === 5) && resCtx.lastOffTacticD) {
+        const streakLine = tacticStreakLine(nameD, resCtx.lastOffTacticD, resCtx.tacticStreakD);
+        if (streakLine) log.push({ minute: min, text: streakLine });
+      }
     }
 
     // C. Check for End Events
@@ -380,12 +388,14 @@ export function simulateFight(
       // Pass kill-cause, winner's style, and crowd mood so narrativePostBout can
       // pick from tiered archive paths (cause × style × mood → cause × style → cause → generic).
       const winnerStyle = boutEnd.actor === 'A' ? planA.style : planD.style;
-      const boutEndLines = narrateBoutEnd(rng, by as string, narWinner, narLoser, undefined, {
-        cause: causeBucket,
-        style: winnerStyle,
-        mood: crowdMood,
-      });
-      boutEndLines.forEach((line) => log.push({ minute: min, text: line }));
+      if (!skipNarration) {
+        const boutEndLines = narrateBoutEnd(rng, by as string, narWinner, narLoser, undefined, {
+          cause: causeBucket,
+          style: winnerStyle,
+          mood: crowdMood,
+        });
+        boutEndLines.forEach((line) => log.push({ minute: min, text: line }));
+      }
       break;
     }
   }
@@ -395,10 +405,12 @@ export function simulateFight(
     const finalOutcome = resolveDecision(fA, fD, nameA, nameD, rng);
     winner = finalOutcome.winner;
     by = finalOutcome.by;
-    log.push({
-      minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE),
-      text: finalOutcome.narrative,
-    });
+    if (!skipNarration) {
+      log.push({
+        minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE),
+        text: finalOutcome.narrative,
+      });
+    }
   }
 
   // Outcome Tags & Postprocessing

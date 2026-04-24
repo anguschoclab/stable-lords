@@ -73,6 +73,8 @@ export interface StateImpact {
   unacknowledgedDeaths?: string[];
   crowdMood?: CrowdMoodType;
   awards?: AnnualAward[];
+  /** 🛠️ 1.0 Hardening: Atomic replacement for the entire rivals array */
+  rivalStableReplacement?: RivalStableData[];
 }
 
 type ImpactHandler<K extends keyof StateImpact> = (
@@ -104,6 +106,11 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
   },
   rivalsUpdates: (state, value) => {
     if (value.size === 0) return;
+    const allUpdate = value.get('all' as any);
+    if (allUpdate && (allUpdate as any).rivals) {
+      state.rivals = (allUpdate as any).rivals;
+      return;
+    }
     state.rivals = state.rivals.map((r) => {
       const update = value.get(r.owner.id);
       return update ? { ...r, ...update } : r;
@@ -228,6 +235,9 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
   newPoolRecruits: (state, value) => {
     state.recruitPool = value;
   },
+  rivalStableReplacement: (state, value) => {
+    state.rivals = value;
+  },
 };
 
 export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameState {
@@ -297,6 +307,7 @@ const MERGE_CONFIG: MergeConfig = {
   season: { strategy: 'replace', defaultValue: undefined },
   weather: { strategy: 'replace', defaultValue: undefined },
   crowdMood: { strategy: 'replace', defaultValue: undefined },
+  rivalStableReplacement: { strategy: 'replace', defaultValue: undefined },
 };
 
 // 🌩️ Pure helpers for merging strategies (Strategy Pattern)

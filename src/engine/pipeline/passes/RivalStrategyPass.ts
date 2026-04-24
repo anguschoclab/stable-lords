@@ -10,6 +10,8 @@ import { processAllRivalsBoutOffers } from '@/engine/ai/workers/competitionWorke
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { StateImpact, mergeImpacts } from '@/engine/impacts';
 import { hashStr } from '@/utils/random';
+import { planWorldBouts } from '@/engine/matchmaking/worldMatchmaking';
+
 /**
  * Stable Lords — Rival Strategy Pipeline Pass
  */
@@ -24,14 +26,22 @@ export function runRivalStrategyPass(
   const rng = rootRng || new SeededRNGService(nextWeek * 7919 + 13);
   const impacts: StateImpact[] = [];
   const globalGazetteItems: string[] = [];
-  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
 
   // 1. Process Individual Rival Stables (Economy/Strategy)
-  const processedRivals = (state.rivals || []).map((rival, index) => {
-    const strategySeed = nextWeek * 31 + index * 997 + rival.owner.id.length;
+  let currentRivals = (state.rivals || []).map((rival, index) => {
+    const strategySeed = nextWeek * 31 + index * 997 + (rival.owner.id || '').length;
     const strategy = updateAIStrategy(rival, state, strategySeed);
-    const rivalWithStrategy = { ...rival, strategy };
-    const { updatedRival, isBankrupt, gazetteItems } = processAIStable(rivalWithStrategy, state);
+    
+    // 🎂 1.0 Hardening: Handle Aging & Succession
+    const { updatedRival: rivalWithLifecycle, gazetteItems: lifecycleGazette } = handleOwnerLifecycle(
+      { ...rival, strategy },
+      state,
+      nextWeek,
+      new SeededRNGService(strategySeed + 123)
+    );
+    globalGazetteItems.push(...lifecycleGazette);
+
+    const { updatedRival, isBankrupt, gazetteItems } = processAIStable(rivalWithLifecycle, state);
     globalGazetteItems.push(...gazetteItems);
 
     if (isBankrupt) {
@@ -45,16 +55,27 @@ export function runRivalStrategyPass(
     return updatedRival;
   });
 
-  rivalsUpdates.set('all', { rivals: processedRivals });
-  impacts.push({ rivalsUpdates });
+  // 1.5. World Matchmaking: NPCs propose bouts to each other
+  const worldBouts = planWorldBouts(state, rng);
+  const boutOffersWithWorld = { ...(state.boutOffers || {}) };
+  
+  // 🧹 1.6 Hardening: Purge Expired Offers (Prevent state bloat)
+  Object.keys(boutOffersWithWorld).forEach(id => {
+      if (boutOffersWithWorld[id].expirationWeek < nextWeek) {
+          delete boutOffersWithWorld[id];
+      }
+  });
+
+  if (worldBouts.length > 0) {
+    worldBouts.forEach(o => { boutOffersWithWorld[o.id] = o; });
+  }
+  impacts.push({ boutOffers: boutOffersWithWorld });
 
   // 2. Draft from Recruitment Pool
-  const draft = aiDraftFromPool(state.recruitPool, processedRivals, nextWeek, state);
+  const draft = aiDraftFromPool(state.recruitPool, currentRivals, nextWeek, state);
   globalGazetteItems.push(...draft.gazetteItems);
-  impacts.push({
-    rivalsUpdates: new Map([['all', { rivals: draft.updatedRivals }]]),
-    recruitPool: draft.updatedPool,
-  });
+  currentRivals = draft.updatedRivals;
+  impacts.push({ recruitPool: draft.updatedPool });
 
   // 3. AI Roster Management (Recruitment/Retirement)
   const rosterSeed = nextWeek * 13 + 7;
@@ -63,14 +84,25 @@ export function runRivalStrategyPass(
     {
       ...state,
       week: nextWeek,
+      rivals: currentRivals,
+      recruitPool: draft.updatedPool,
+      boutOffers: boutOffersWithWorld,
     },
     rosterRng
   );
   globalGazetteItems.push(...rosterGazette);
-  impacts.push({ rivalsUpdates: new Map([['all', { rivals: finalizedRivals }]]) });
+  currentRivals = finalizedRivals;
 
-  // 4. Contract Decision Phase: AI Stables accept/decline pending boutique offers
-  const boutOffersImpact = processAllRivalsBoutOffers(state, finalizedRivals);
+  // 4. Final Aggregation of Rival Updates
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  finalizedRivals.forEach(r => {
+    rivalsUpdates.set(r.owner.id, r);
+  });
+  impacts.push({ rivalsUpdates });
+
+  // 4.5. Contract Decision Phase: AI Stables accept/decline pending boutique offers
+  const stateWithWorldBouts = { ...state, boutOffers: boutOffersWithWorld };
+  const boutOffersImpact = processAllRivalsBoutOffers(stateWithWorldBouts, finalizedRivals);
   impacts.push(boutOffersImpact);
 
   // 5. Tournament Handling (Every 13 weeks)
@@ -93,6 +125,57 @@ export function runRivalStrategyPass(
   }
 
   return mergeImpacts(impacts);
+}
+
+/**
+ * 🎂 Owner Lifecycle: Handles annual aging and generational succession.
+ */
+function handleOwnerLifecycle(
+  rival: RivalStableData,
+  state: GameState,
+  nextWeek: number,
+  rng: SeededRNGService
+): { updatedRival: RivalStableData; gazetteItems: string[] } {
+  const updatedRival = { ...rival, owner: { ...rival.owner } };
+  const gazetteItems: string[] = [];
+
+  // 1. Annual Aging (Occurs on Week 1)
+  if (nextWeek === 1) {
+    updatedRival.owner.age = (updatedRival.owner.age || 40) + 1;
+  }
+
+  // 2. Succession Logic (Starts at age 65, becomes likely by 75)
+  const age = updatedRival.owner.age || 40;
+  const retirementChance = age < 65 ? 0 : age < 75 ? 0.05 : 0.2;
+
+  if (rng.next() < retirementChance) {
+    const generation = (updatedRival.owner.generation || 0) + 1;
+    const oldName = updatedRival.owner.name;
+
+    // 🏆 Successor Hunt: Look for a famous retired warrior from THIS stable
+    const successorCandidate = (state.retired || []).find(
+      (w) => w.stableId === updatedRival.id && (w.fame || 0) > 200
+    );
+
+    const newName = successorCandidate 
+      ? successorCandidate.name 
+      : `Lord ${updatedRival.owner.stableName.split(' ')[0]} ${'I'.repeat(generation + 1)}`;
+
+    updatedRival.owner = {
+      ...updatedRival.owner,
+      name: newName,
+      age: 25 + Math.floor(rng.next() * 15),
+      generation,
+      fame: Math.floor(updatedRival.owner.fame * 0.4), // Fame reset on new leadership
+      backstoryId: undefined, // Fresh start
+    };
+
+    gazetteItems.push(
+      `👑 SUCCESSION: ${oldName} has retired from ${updatedRival.owner.stableName}. ${newName} takes the mantle (Generation ${generation})!`
+    );
+  }
+
+  return { updatedRival, gazetteItems };
 }
 
 function handleSeasonalTournaments(state: GameState, week: number, rng: IRNGService): StateImpact {

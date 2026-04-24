@@ -31,9 +31,15 @@ export function runBoutSimulationPass(state: GameState, _rng: IRNGService): Stat
 
   // Although processWeekBouts uses its own deterministic seeds via hashStr,
   // we wrap it here to maintain pipeline consistency for the 1.0 release.
-  const { impact: boutImpact, summary } = processWeekBouts(state);
+  const { impact: boutImpact, results, summary } = processWeekBouts(state);
+  
+  /*
+  if (summary.bouts > 0) {
+      console.log(`[BoutPass] Week ${state.week} | Bouts: ${summary.bouts}`);
+  }
+  */
 
-  // Attach the summary to the state for use in later narrative or event passes if needed
+  // Attach the results to the state for telemetry
   boutImpact.lastSimulationReport = {
     id: _rng.uuid(),
     week: state.week,
@@ -42,7 +48,14 @@ export function runBoutSimulationPass(state: GameState, _rng: IRNGService): Stat
     agingEvents: [],
     healthEvents: [],
     ...state.lastSimulationReport,
-    bouts: summary,
+    bouts: results.map(r => ({
+        ...r.outcome,
+        id: r.contractId || generateId(),
+        warriorIdA: r.a.id,
+        warriorIdD: r.d.id,
+        week: state.week,
+        year: state.year
+    })),
   } as any;
 
   return boutImpact;

@@ -108,6 +108,8 @@ export interface Owner {
   crest?: CrestData; // 🛡️ Heraldic crest for the stable
   backstoryId?: import('@/data/backstories').BackstoryId;
   foundedByWarriorId?: WarriorId; // Lineage breadcrumb for legacy founders
+  age?: number; // 🎂 1.0 Hardening: Owner age for retirement
+  ageRetired?: number; // Week the previous owner retired
 }
 
 // ─── Game State ─────────────────────────────────────────────────────────────

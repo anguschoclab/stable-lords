@@ -56,7 +56,7 @@ export function generateRivalStables(
 
   for (let i = 0; i < picked.length; i++) {
     const { tmpl, iteration } = picked[i]!;
-    const stableId = `rival_${i}`;
+    const stableId = rng.uuid() as StableId;
 
     // Procedural name variance for duplicates
     const nameSuffix =
@@ -107,7 +107,7 @@ export function generateRivalStables(
       const catchupStats = Math.min(40, week);
       const attrs = biasedAttrs(() => rng.next(), tmpl.attrBias, catchupStats);
 
-      const wId = `rival_w_${i}_${j}`;
+      const wId = rng.uuid('warrior');
       const warrior = createRivalWarrior(wId, wName, style, attrs, stableId, tmpl.fameRange, rng);
 
       warriors.push(warrior);

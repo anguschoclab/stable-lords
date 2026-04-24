@@ -29,6 +29,9 @@ export function generatePairings(state: GameState): BoutPairing[] {
   const currentOffers = Object.values(state.boutOffers || {}).filter(
     (o) => o.status === 'Signed' && o.boutWeek === currentWeek
   );
+  if (currentOffers.length > 0) {
+      // console.log(`[Pairings] Week ${currentWeek} | Signed Offers: ${currentOffers.length}`);
+  }
 
   currentOffers.forEach((offer) => {
     const wA = warriorMap.get(offer.warriorIds[0]);

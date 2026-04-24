@@ -67,8 +67,14 @@ export interface BoutContext {
 function getValidatedCombatants(ctx: BoutContext): { cW: Warrior; cO: Warrior } | null {
   const cW = ctx.warriorMap.get(ctx.warrior.id);
   const cO = ctx.warriorMap.get(ctx.opponent.id);
-  if (!validateBoutCombatants(cW, cO)) return null;
-  if (!cW || !cO) return null;
+  if (!cW || !cO) {
+      // console.log(`[BoutValidation] FAILED: Missing warriors (${ctx.warrior.id} vs ${ctx.opponent.id})`);
+      return null;
+  }
+  if (!validateBoutCombatants(cW, cO)) {
+      // console.log(`[BoutValidation] FAILED: validateBoutCombatants check`);
+      return null;
+  }
   return { cW, cO };
 }
 

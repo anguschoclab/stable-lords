@@ -46,23 +46,46 @@ export function processContractPayouts(
   const purse = contract.purse;
   const showFee = Math.floor(purse * 0.2);
 
+  // Find rivals
+  const rivalA = state.rivals?.find(r => r.roster.some(w => w.id === currentWId));
+  const rivalD = state.rivals?.find(r => r.roster.some(w => w.id === currentOId));
+
   if (winnerId === currentWId) {
-    impacts.push({ treasuryDelta: purse });
-    if (rivalStableId) {
-      const existing = rivalsUpdates.get(rivalStableId) || { treasury: 0 };
-      rivalsUpdates.set(rivalStableId, { treasury: existing.treasury + showFee });
+    if (rivalA) {
+        const existing = rivalsUpdates.get(rivalA.owner.id) || { treasury: rivalA.treasury };
+        rivalsUpdates.set(rivalA.owner.id, { treasury: (existing.treasury || 0) + purse });
+    } else {
+        impacts.push({ treasuryDelta: purse });
+    }
+    
+    if (rivalD) {
+      const existing = rivalsUpdates.get(rivalD.owner.id) || { treasury: rivalD.treasury };
+      rivalsUpdates.set(rivalD.owner.id, { treasury: (existing.treasury || 0) + showFee });
     }
   } else if (winnerId === currentOId) {
-    if (rivalStableId) {
-      const existing = rivalsUpdates.get(rivalStableId) || { treasury: 0 };
-      rivalsUpdates.set(rivalStableId, { treasury: existing.treasury + purse });
+    if (rivalD) {
+      const existing = rivalsUpdates.get(rivalD.owner.id) || { treasury: rivalD.treasury };
+      rivalsUpdates.set(rivalD.owner.id, { treasury: (existing.treasury || 0) + purse });
     }
-    impacts.push({ treasuryDelta: showFee });
+    
+    if (rivalA) {
+        const existing = rivalsUpdates.get(rivalA.owner.id) || { treasury: rivalA.treasury };
+        rivalsUpdates.set(rivalA.owner.id, { treasury: (existing.treasury || 0) + showFee });
+    } else {
+        impacts.push({ treasuryDelta: showFee });
+    }
   } else {
-    impacts.push({ treasuryDelta: showFee });
-    if (rivalStableId) {
-      const existing = rivalsUpdates.get(rivalStableId) || { treasury: 0 };
-      rivalsUpdates.set(rivalStableId, { treasury: existing.treasury + showFee });
+    // Draw
+    if (rivalA) {
+        const existing = rivalsUpdates.get(rivalA.owner.id) || { treasury: rivalA.treasury };
+        rivalsUpdates.set(rivalA.owner.id, { treasury: (existing.treasury || 0) + showFee });
+    } else {
+        impacts.push({ treasuryDelta: showFee });
+    }
+    
+    if (rivalD) {
+      const existing = rivalsUpdates.get(rivalD.owner.id) || { treasury: rivalD.treasury };
+      rivalsUpdates.set(rivalD.owner.id, { treasury: (existing.treasury || 0) + showFee });
     }
   }
 

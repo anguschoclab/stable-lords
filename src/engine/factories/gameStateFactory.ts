@@ -130,6 +130,8 @@ export function createFreshState(
         fame: 100,
         renown: 10,
         titles: 0,
+        age: 35 + Math.floor(rng.next() * 25), // Initial age 35-60
+        generation: 0,
       },
       roster: [],
       ledger: [],

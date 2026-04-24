@@ -96,12 +96,11 @@ export function processAIRosterManagement(
           ? 'Master'
           : 'Novice';
 
-    const recruitChance =
-      personality === 'Aggressive' ? 0.4 : personality === 'Pragmatic' ? 0.25 : 0.15;
+    const recruitChance = currentActive < 4 ? 1.0 : (personality === 'Aggressive' ? 0.4 : personality === 'Pragmatic' ? 0.25 : 0.15);
 
     // Treasury Awareness: Recruitment costs 100g (signing fee)
     const RECRUIT_COST = 100;
-    const canAfford = r.treasury >= RECRUIT_COST + 200; // Keep a buffer
+    const canAfford = r.treasury >= RECRUIT_COST + (currentActive < 4 ? 0 : 200); // Only enforce buffer if roster is healthy
     const intent = r.strategy?.intent ?? 'CONSOLIDATION';
 
     if (

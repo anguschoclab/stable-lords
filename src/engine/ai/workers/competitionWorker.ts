@@ -222,6 +222,11 @@ export function evaluateBoutOffer(
   rival: RivalStableData,
   warrior: Warrior
 ): 'Accepted' | 'Declined' {
+  // 0. Desperation Gate: if treasury is critically low, accept ANYTHING for the purse
+  if (rival.treasury < 500) {
+      return 'Accepted';
+  }
+
   // 1. Health Guard: Protective owners decline if HP < 80%
   const currentHP = warrior.derivedStats?.hp ?? 100;
   if (currentHP < 80 && rival.owner.personality !== 'Aggressive') {
@@ -264,8 +269,8 @@ export function processAllRivalsBoutOffers(
   state: GameState,
   rivals: RivalStableData[]
 ): StateImpact {
-  const impacts: StateImpact[] = [];
-  const pendingOffers = Object.values(state.boutOffers).filter((o) => o.status === 'Proposed');
+  const currentOffers = { ...state.boutOffers };
+  const pendingOffers = Object.values(currentOffers).filter((o) => o.status === 'Proposed');
 
   // Group offers by stableId (each rival gets their weekly slate)
   const offersByRival = new Map<string, typeof pendingOffers>();
@@ -289,10 +294,9 @@ export function processAllRivalsBoutOffers(
     const owningRival = rivals.find((r) => r.id === rivalId);
     if (!owningRival) return;
 
-    // Track warriors already committed this week (prevents double-booking)
+    // Track warriors already committed this week
     const pickedWarriors = new Set<string>();
 
-    // Sort offers by quality (hype * purse) for better selection
     const sortedOffers = [...rivalOffers].sort((a, b) => {
       const scoreA = a.hype * a.purse;
       const scoreB = b.hype * b.purse;
@@ -307,24 +311,26 @@ export function processAllRivalsBoutOffers(
         // Skip if warrior already committed this week
         if (pickedWarriors.has(wId)) return;
 
-        // Skip if already responded
-        if (offer.responses[wId] !== 'Pending') return;
+        // Skip if already responded in our local tracking
+        const trackedOffer = currentOffers[offer.id];
+        if (!trackedOffer || trackedOffer.responses[wId] !== 'Pending') return;
 
         const rivalWarrior = owningRival.roster.find((w) => w.id === wId);
         if (!rivalWarrior) return;
 
-        const response = evaluateBoutOffer(offer, owningRival, rivalWarrior);
+        const response = evaluateBoutOffer(trackedOffer, owningRival, rivalWarrior);
 
         if (response === 'Accepted') {
-          // Mark warrior as committed for this week
           pickedWarriors.add(wId);
         }
 
-        const impact = respondToBoutOffer(state, offer.id, rivalWarrior.id, response);
-        impacts.push(impact);
+        const impact = respondToBoutOffer({ ...state, boutOffers: currentOffers }, offer.id, rivalWarrior.id, response);
+        if (impact.boutOffers) {
+           Object.assign(currentOffers, impact.boutOffers);
+        }
       });
     });
   });
 
-  return mergeImpacts(impacts);
+  return { boutOffers: currentOffers };
 }

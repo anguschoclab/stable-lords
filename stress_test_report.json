@@ -1,0 +1,1204 @@
+{
+  "annual": [
+    {
+      "year": 1,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 2,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 3,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 4,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 5,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 6,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 7,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 8,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 9,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 10,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 11,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 12,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 13,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 14,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 15,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 16,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 17,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 18,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 19,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 20,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 21,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 22,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 23,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 24,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    },
+    {
+      "year": 25,
+      "demographics": {
+        "active": 21,
+        "dead": 0,
+        "retired": 0
+      },
+      "economy": {
+        "avgTreasury": 109.6,
+        "wealthGap": 197,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 70.33333333333333
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 1,
+          "BASHING ATTACK": 1,
+          "LUNGING ATTACK": 1,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 6,
+          "SLASHING ATTACK": 5,
+          "STRIKING ATTACK": 6,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 1
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 0,
+          "LUNGING ATTACK": 0,
+          "PARRY-LUNGE": 0,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": 0,
+          "STRIKING ATTACK": 0,
+          "TOTAL PARRY": 0,
+          "WALL OF STEEL": 0
+        }
+      },
+      "prospects": {
+        "Common": 0,
+        "Promising": 0,
+        "Exceptional": 0,
+        "Prodigy": 0
+      }
+    }
+  ]
+}

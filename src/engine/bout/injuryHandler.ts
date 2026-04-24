@@ -19,7 +19,7 @@ export function handleInjuries(
   const names: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
-  const restStates: RestState[] = [...(s.restStates || [])];
+  const restStates: RestState[] = [];
 
   if (outcome.by === 'KO') {
     const victimId = outcome.winner === 'A' ? wD.id : wA.id;

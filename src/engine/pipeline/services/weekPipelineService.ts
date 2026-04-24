@@ -95,6 +95,18 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext):
   state.day = 0;
   state.trainingAssignments = [];
 
+  // 🧹 1.0 Hardening: Purge expired bout offers to prevent memory/perf degradation
+  if (state.boutOffers) {
+    const cleanedOffers: Record<string, any> = {};
+    Object.values(state.boutOffers).forEach((offer) => {
+      // Keep only offers for current/future weeks or those that are Signed and active
+      if (offer.boutWeek >= ctx.nextWeek || offer.status === 'Signed') {
+        cleanedOffers[offer.id] = offer;
+      }
+    });
+    state.boutOffers = cleanedOffers;
+  }
+
   if (state.season !== oldState.season) {
     state.seasonalGrowth = (state.seasonalGrowth ?? []).filter((sg) => sg.season === state.season);
   }
@@ -107,6 +119,7 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext):
  * Orchestrates the simulation tick using a high-performance batched architecture.
  */
 export function advanceWeek(state: GameState): GameState {
+  console.log(`>>> advanceWeek Start | Week: ${state.week}`);
   const ctx = prepareWeekContext(state);
   const settledState = runBoutPhase(state, ctx);
   const coreImpacts = collectCoreImpacts(settledState, ctx);
