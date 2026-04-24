@@ -19,7 +19,7 @@ export function SortHeader({ label, active, dir, onClick }: SortHeaderProps) {
     >
       <span>{label}</span>
       <span className="sr-only">
-        {active ? (dir === 'desc' ? ' (sorted descending)' : ' (sorted ascending)') : ' (click to sort)'}
+        {active ? (dir ? (dir === 'desc' ? ' (sorted descending)' : ' (sorted ascending)') : ' (sorted)') : ' (click to sort)'}
       </span>
       <ArrowUpDown className={`h-3 w-3 ${active ? 'text-primary' : 'text-muted-foreground/40'}`} aria-hidden="true" />
     </button>
