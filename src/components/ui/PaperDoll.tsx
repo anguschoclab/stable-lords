@@ -17,7 +17,7 @@ export function PaperDoll({ healthMap, className }: PaperDollProps) {
   };
 
   return (
-    <div className={cn('relative w-full max-w-xs aspect-[1/2]', className)}>
+    <div className={cn('relative w-full max-w-48 aspect-[1/2]', className)}>
       <svg
         viewBox="0 0 100 200"
         fill="none"
