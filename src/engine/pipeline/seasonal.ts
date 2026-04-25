@@ -140,7 +140,7 @@ export function runSeasonalPass(
     const activeWarriors = state.roster.filter((w) => w.status === 'Active');
     if (activeWarriors.length > 0) {
       const chosen = seasonRng.pick(activeWarriors)!;
-      const fameGained = 10 + Math.floor(seasonRng.next() * 10);
+      const fameGained = 10 + Math.floor(seasonRng.next() * 11);
 
       const newInjury: InjuryData = {
         id: generateId(seasonRng, 'injury') as InjuryId,
