@@ -7,6 +7,7 @@ import { Link } from '@tanstack/react-router';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Surface } from '@/components/ui/Surface';
 import { YearEndRecap } from '@/components/ledger/YearEndRecap';
+import { SeasonSynthesis } from '@/components/ledger/SeasonSynthesis';
 import { CalendarDays, UserPlus, GraduationCap, BookOpen } from 'lucide-react';
 
 export default function Offseason() {
@@ -19,6 +20,8 @@ export default function Offseason() {
       />
 
       <YearEndRecap />
+
+      <SeasonSynthesis />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t border-white/5">
         <Link to="/stable/recruit">
