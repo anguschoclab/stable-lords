@@ -19,3 +19,6 @@
 ## 2026-04-24 - Dynamic Accessibility in Sortable Headers
 **Learning:** When making sortable headers accessible, hardcoding `aria-label="Sort"` is an anti-pattern as it overwrites the column name for screen readers. The reviewer flagged the lack of `dir` prop at call sites, but they actually don't pass `dir` because they handle direction via their own sort state variables locally. To prevent overriding context and announce correctly, use visually hidden elements (like `<span className="sr-only">`) alongside the visible text, and ensure component props map correctly without requiring mass refactors of all parent components.
 **Action:** Use `.sr-only` appended text rather than static `aria-label` for screen reader state additions that should supplement visible text.
+## 2024-05-18 - Nested Tooltips from Button Components
+**Learning:** The internal UI `<Button>` component automatically wraps itself in a `<Tooltip>` if the `title` prop is provided. Using `<Button title="...">` inside a manual `<TooltipTrigger>` causes nested/double tooltips to render.
+**Action:** When manually wrapping a `<Button>` in a `<Tooltip>`, rely on `aria-label` for screen reader accessibility instead of `title` to prevent the `<Button>` component from spawning its own tooltip.
