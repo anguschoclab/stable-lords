@@ -121,6 +121,7 @@ export function runSeasonalPass(
       insightTokens.push({
         id: generateId(seasonRng, 'insight') as InsightId,
         type: 'Attribute',
+        targetKey: 'ST',
         warriorId: chosen.id,
         warriorName: chosen.name,
         detail: 'Discovered a hidden reserve of strength during offseason meditation.',
