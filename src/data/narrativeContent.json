@@ -1772,6 +1772,13 @@
       "newsletter": [
         "During the quiet months, {{name}} experienced a profound breakthrough in training! (+15 XP, +10 Fame, New Insight Discovered)"
       ]
+    },
+    "tavern_brawl": {
+      "title": "Tavern Brawl",
+      "effectType": "tavern_brawl",
+      "newsletter": [
+        "{{name}} got involved in a chaotic tavern brawl over the break! They broke a few noses (and maybe a chair), gaining notoriety, but took some bruises in the process. (+{{fame}} Fame, Minor Injury)"
+      ]
     }
   },
   "crowd_reactions": {
