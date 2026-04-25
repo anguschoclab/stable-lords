@@ -1,11 +1,11 @@
 import type { GameState, NewsletterItem, LedgerEntry } from '@/types/state.types';
-import type { Warrior } from '@/types/warrior.types';
+import type { Warrior, InjuryData } from '@/types/warrior.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { generateId } from '@/utils/idUtils';
 import narrativeContent from '@/data/narrativeContent.json';
 import { StateImpact } from '@/engine/impacts';
-import { type WarriorId, type LedgerEntryId, type InsightId } from '@/types/shared.types';
+import { type WarriorId, type LedgerEntryId, type InsightId, type InjuryId } from '@/types/shared.types';
 import type { InsightToken } from '@/types/state.types';
 
 /**
@@ -22,7 +22,7 @@ function t(template: string, data: Record<string, string | number>): string {
 
 interface OffseasonEventNarrative {
   title: string;
-  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany';
+  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany' | 'tavern_brawl';
   newsletter: string[];
 }
 
@@ -133,6 +133,36 @@ export function runSeasonalPass(
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name })],
+      });
+    }
+
+  } else if (e.effectType === 'tavern_brawl') {
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors)!;
+      const fameGained = 10 + Math.floor(seasonRng.next() * 11);
+
+      const newInjury: InjuryData = {
+        id: generateId(seasonRng, 'injury') as InjuryId,
+        name: 'Bruised Ribs',
+        description: 'Painful but manageable.',
+        severity: 'Minor',
+        weeksRemaining: 1 + Math.floor(seasonRng.next() * 2), // 1-2 weeks
+        penalties: { CN: -1 },
+      };
+
+      const currentInjuries = chosen.injuries || [];
+
+      rosterUpdates.set(chosen.id, {
+        fame: (chosen.fame || 0) + fameGained,
+        injuries: [...currentInjuries, newInjury],
+      });
+
+      newsletterItems.push({
+        id: generateId(seasonRng, 'newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],
       });
     }
   }
