@@ -59,9 +59,12 @@ export function getSpecialtyMods(
 
     switch (trainer.specialty) {
       case 'KillerInstinct':
-        // Kill-window bonus when enemy HP < 40%
+        // Kill-window bonus when enemy HP < 40%.
+        // Halved 2026-04 to stay proportional to the new 0.025 cap on
+        // calculateKillWindow — at the prior 0.02*tier (up to +0.06 at Master)
+        // a single trainer would saturate the cap on its own.
         if (opponent.hp / opponent.maxHp < 0.4) {
-          mods.killWindowBonus += 0.02 * tier;
+          mods.killWindowBonus += 0.01 * tier;
         }
         break;
 
@@ -105,14 +108,15 @@ export function getSpecialtyMods(
     }
   }
 
-  // Chemistry combo: KillerInstinct + Finisher together → extra kill window bonus
+  // Chemistry combo: KillerInstinct + Finisher together → extra kill window bonus.
+  // Halved 2026-04 to match the new kill-window cap of 0.025.
   if (
     hasKillerInstinct &&
     hasFinisher &&
     opponent.hp / opponent.maxHp < 0.4 &&
     self.momentum >= 2
   ) {
-    mods.killWindowBonus += 0.01;
+    mods.killWindowBonus += 0.005;
   }
 
   mods.damageReceivedMult = Math.max(0.5, mods.damageReceivedMult); // floor at 50% reduction

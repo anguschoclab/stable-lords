@@ -110,7 +110,7 @@ export function processRecruitment(
         champion: false,
         status: 'Active',
         age: recruit.age,
-        stableId: updatedRival.owner.id,
+        stableId: updatedRival.id,
         lineage: recruit.lineage,
       };
 

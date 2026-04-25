@@ -140,6 +140,14 @@ export function advanceWeek(state: GameState): GameState {
     return finalizeState(resolveImpacts(settledState, coreImpacts), state, ctx);
   }
 
-  const allImpacts = [...coreImpacts, ...collectRemainingImpacts(settledState, ctx)];
-  return finalizeState(resolveImpacts(settledState, allImpacts), state, ctx);
+  // Stage the pipeline: apply core impacts (training, aging, health) BEFORE
+  // running the remaining passes so RivalStrategyPass et al. see aged rosters.
+  // Previously every pass ran against the same pre-impact state and emitted
+  // rivalsUpdates with the FULL rival object, so a later pass's stale roster
+  // would clobber an earlier pass's roster mutation under mapMerge — aging
+  // ticks were silently overwritten by RivalStrategyPass's snapshot, so ages
+  // never advanced and no warrior ever reached retirement.
+  const stateAfterCore = resolveImpacts(settledState, coreImpacts);
+  const remainingImpacts = collectRemainingImpacts(stateAfterCore, ctx);
+  return finalizeState(resolveImpacts(stateAfterCore, remainingImpacts), state, ctx);
 }

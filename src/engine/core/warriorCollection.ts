@@ -119,7 +119,7 @@ export function findWarriorGlobally(
     if (warrior) {
       return {
         warrior,
-        stableId: rival.owner?.id,
+        stableId: rival.id,
         isPlayer: false,
       };
     }

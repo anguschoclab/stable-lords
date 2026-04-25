@@ -33,7 +33,10 @@ for (let w = 1; w <= years * 52; w++) {
     const avgPwr = allWarriors.length > 0
       ? allWarriors.reduce((s, w) => s + Object.values(w.attributes).reduce((a, b) => a + b, 0), 0) / allWarriors.length
       : 0;
-    origLog(`Y${yr} | rivals=${state.rivals.length} active=${allWarriors.length} dead=${state.graveyard.length} ret=${state.retired.length} avgPwr=${avgPwr.toFixed(1)} pool=${state.recruitPool.length} treasury=[${state.rivals.map(r=>r.treasury).sort((a,b)=>a-b).map(t=>t).join(',')}]`);
+    const ages = allWarriors.map(w => w.age || 0).sort((a,b)=>a-b);
+    const oldest = ages[ages.length-1];
+    const median = ages[Math.floor(ages.length/2)];
+    origLog(`Y${yr} | rivals=${state.rivals.length} active=${allWarriors.length} dead=${state.graveyard.length} ret=${state.retired.length} avgPwr=${avgPwr.toFixed(1)} pool=${state.recruitPool.length} ages(med/max)=${median}/${oldest}`);
     origLog(`     style: ${Object.entries(styleCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>k.slice(0,6)+':'+v).join(' ')}`);
   }
 }

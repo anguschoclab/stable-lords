@@ -123,7 +123,24 @@ describe('computeAgingImpact — aging penalties', () => {
     vi.restoreAllMocks();
   });
 
+  // Age constants tuned 2026-04: AGING_PENALTY_START=25, FORCED_RETIRE_MIN=26,
+  // FORCED_RETIRE_MAX=32. Test ages updated to match the new windows.
   it('does not apply penalties to a warrior under the age penalty start limit', () => {
+    const w = makeWarrior('w1', 23, { SP: 15, DF: 15 });
+    const state = makeGameState(52, [w]);
+    const rng = new SeededRNGService(state.week * 997 + 3);
+    const impact = computeAgingImpact(state, rng);
+    const newState = resolveImpacts(state, [impact]);
+
+    expect(newState.roster[0]!.age).toBe(24);
+    expect(newState.roster[0]!.attributes.SP).toBe(15);
+    expect(newState.roster[0]!.attributes.DF).toBe(15);
+  });
+
+  it('applies penalty to SP and DF when age exceeds AGING_PENALTY_START', () => {
+    // Age 27 → 28 ticks: > AGING_PENALTY_START (25), penalty=floor((28-25)/3)=1.
+    // Stays under FORCED_RETIRE_MAX (32) so no retirement; retire chance gated
+    // out by mock returning 0.99 in the parent describe's beforeEach.
     const w = makeWarrior('w1', 27, { SP: 15, DF: 15 });
     const state = makeGameState(52, [w]);
     const rng = new SeededRNGService(state.week * 997 + 3);
@@ -131,24 +148,12 @@ describe('computeAgingImpact — aging penalties', () => {
     const newState = resolveImpacts(state, [impact]);
 
     expect(newState.roster[0]!.age).toBe(28);
-    expect(newState.roster[0]!.attributes.SP).toBe(15);
-    expect(newState.roster[0]!.attributes.DF).toBe(15);
-  });
-
-  it('applies penalty to SP and DF when age exceeds AGING_PENALTY_START', () => {
-    const w = makeWarrior('w1', 31, { SP: 15, DF: 15 });
-    const state = makeGameState(52, [w]);
-    const rng = new SeededRNGService(state.week * 997 + 3);
-    const impact = computeAgingImpact(state, rng);
-    const newState = resolveImpacts(state, [impact]);
-
-    expect(newState.roster[0]!.age).toBe(32);
     expect(newState.roster[0]!.attributes.SP).toBe(14);
     expect(newState.roster[0]!.attributes.DF).toBe(14);
   });
 
   it('adds a newsletter event when aging penalties are applied', () => {
-    const w = makeWarrior('w1', 31, { SP: 15, DF: 15 });
+    const w = makeWarrior('w1', 27, { SP: 15, DF: 15 });
     const state = makeGameState(52, [w]);
     const rng = new SeededRNGService(state.week * 997 + 3);
     const impact = computeAgingImpact(state, rng);
@@ -164,8 +169,9 @@ describe('computeAgingImpact — forced retirement', () => {
     vi.restoreAllMocks();
   });
 
-  it('guarantees retirement for a warrior at FORCED_RETIRE_MAX (40+)', () => {
-    const w = makeWarrior('w1', 40);
+  // Retirement window 2026-04: FORCED_RETIRE_MIN=26, FORCED_RETIRE_MAX=32.
+  it('guarantees retirement for a warrior at FORCED_RETIRE_MAX (32+)', () => {
+    const w = makeWarrior('w1', 32);
     const state = makeGameState(10, [w]);
     const rng = new SeededRNGService(state.week * 997 + 3);
     const impact = computeAgingImpact(state, rng);
@@ -176,10 +182,10 @@ describe('computeAgingImpact — forced retirement', () => {
   });
 
   it('can force retirement with a low random roll', () => {
-    const w = makeWarrior('w1', 35);
+    const w = makeWarrior('w1', 29);
     const state = makeGameState(12, [w]);
 
-    // Retire chance at 35 is 0.075. Set mock to 0.01 to trigger.
+    // Retire chance at age 29 = ((29-26)/(32-26)) * 0.15 = 0.075. Mock 0.01 triggers.
     vi.spyOn(SeededRNGService.prototype, 'next').mockReturnValue(0.01);
     const rng = new SeededRNGService(state.week * 997 + 3);
     const impact = computeAgingImpact(state, rng);
@@ -190,7 +196,7 @@ describe('computeAgingImpact — forced retirement', () => {
   });
 
   it('does not force retirement with a high random roll', () => {
-    const w = makeWarrior('w1', 35);
+    const w = makeWarrior('w1', 29);
     const state = makeGameState(12, [w]);
 
     vi.spyOn(SeededRNGService.prototype, 'next').mockReturnValue(0.99);

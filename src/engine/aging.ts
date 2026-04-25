@@ -11,9 +11,14 @@ import type { Warrior, WarriorStatus } from '@/types/warrior.types';
 import { computeWarriorStats } from './skillCalc';
 
 const WEEKS_PER_YEAR = 52;
-const AGING_PENALTY_START = 28;
-const FORCED_RETIRE_MIN = 30;
-const FORCED_RETIRE_MAX = 40;
+const AGING_PENALTY_START = 25;
+// Retirement window tuned 2026-04 against measured ~17 bouts/warrior/year and
+// ~6% per-bout kill rate (lifespan ~0.7y in calendar terms even after lethality
+// halving). Pulling MIN to 26 / MAX to 32 lets a 5-7 calendar-year career
+// reach the retirement curve, restoring the generational turnover that the
+// 25-year stress test was missing entirely.
+const FORCED_RETIRE_MIN = 26;
+const FORCED_RETIRE_MAX = 32;
 
 import { type StateImpact } from './impacts';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';

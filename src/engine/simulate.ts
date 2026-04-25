@@ -43,15 +43,17 @@ import { getFeatureFlags } from '@/engine/featureFlags';
 import type { CrowdMood } from '@/engine/crowdMood';
 
 /**
- * Per-mood kill-window deltas. Magnitudes are intentionally tiny so the 8%
- * cap in `calculateKillWindow` keeps overall mortality near the 10% baseline
- * even when a Bloodthirsty crowd stacks with other risk factors.
+ * Per-mood kill-window deltas. Magnitudes intentionally tiny — the 0.025 cap
+ * in `calculateKillWindow` (lowered from 0.08 in 2026-04 to enable retirements)
+ * keeps per-bout mortality near the ~5% baseline even when a Bloodthirsty
+ * crowd stacks with other risk factors. Halved 2026-04 in proportion to the
+ * cap reduction so crowd mood remains a modulation, not a near-binary switch.
  */
 const CROWD_KILL_BONUS: Record<CrowdMood, number> = {
   Calm: 0,
-  Bloodthirsty: 0.008,
+  Bloodthirsty: 0.004,
   Theatrical: 0,
-  Solemn: -0.004,
+  Solemn: -0.002,
   Festive: 0,
 };
 

@@ -90,7 +90,7 @@ describe('trainerSpecialties', () => {
       createMockFighter({ hp: 39, maxHp: 100 }),
       createMockContext()
     );
-    expect(mods.killWindowBonus).toBe(0.02 * 1); // Novice tier = 1
+    expect(mods.killWindowBonus).toBe(0.01 * 1); // Novice tier = 1 (halved 2026-04 to match 0.025 cap)
   });
 
   it('should NOT apply KillerInstinct bonus when opponent HP is >= 40%', () => {
@@ -334,7 +334,7 @@ describe('trainerSpecialties', () => {
         cost: 10,
         contractWeeksLeft: 1,
         isPlayer: false,
-      }, // 0.02 * 1
+      }, // 0.01 * 1 (halved 2026-04)
       {
         id: '2',
         name: 'T2',
@@ -352,8 +352,8 @@ describe('trainerSpecialties', () => {
       createMockContext()
     );
 
-    // killWindowBonus: 0.02 (KillerInstinct) + 0.01 (Combo) = 0.03
-    expect(mods.killWindowBonus).toBeCloseTo(0.03);
+    // killWindowBonus: 0.01 (KillerInstinct) + 0.005 (Combo) = 0.015 (both halved 2026-04)
+    expect(mods.killWindowBonus).toBeCloseTo(0.015);
     // Finisher is also applied
     expect(mods.attMod).toBeCloseTo(0.1);
   });

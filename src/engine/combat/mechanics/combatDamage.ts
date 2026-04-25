@@ -208,55 +208,62 @@ export function calculateKillWindow(
   decSkill: number = 10, // Canonical: DEC skill drives kill/decisiveness ability (1-20)
   momentum: number = 0, // Attacker momentum (-3 to +3). < 1 blocks kill attempts.
   specialtyBonus: number = 0, // Extra kill window from trainer specialties (e.g. KillerInstinct)
-  crowdKillBonus: number = 0 // Crowd-mood modulation; kept small to preserve ~10% baseline (Bloodthirsty +, Solemn -)
+  crowdKillBonus: number = 0 // Crowd-mood modulation; kept small to preserve ~5% per-bout mortality baseline (Bloodthirsty +, Solemn -)
 ): number {
   // Momentum gate: must have neutral or positive momentum to attempt a kill
   // Softened from < 1 to < 0 to allow kills at neutral momentum (not just after consecutive hits)
   if (momentum < 0) return 0;
 
-  // Base threshold (lethal hits are rare but possible)
-  // Target: ~10% overall mortality across the league (Unified 1.0 Gold Baseline)
-  let threshold = 0.01;
+  // Base threshold (lethal hits are rare but possible).
+  // Tuned 2026-04: prior 0.01 base + 0.08 cap produced ~14% per-bout kill rate
+  // and ~0.4yr warrior lifespan, blocking retirements entirely (warriors died
+  // before reaching age 30). Halving the per-hit kill chance brings per-bout
+  // mortality toward the documented ~5% target and lets warriors live long
+  // enough to age out, retire, and create generational turnover.
+  let threshold = 0.005;
 
   // HP factor: higher chance if HP is low (below 30%)
-  if (hpRatio < 0.3) threshold += 0.004;
-  else if (hpRatio < 0.5) threshold += 0.001;
+  if (hpRatio < 0.3) threshold += 0.002;
+  else if (hpRatio < 0.5) threshold += 0.0005;
 
   // Endurance (Fatigue) factor: exhaustion opens kill windows
-  if (enduranceRatio < 0.2) threshold += 0.008;
-  else if (enduranceRatio < 0.4) threshold += 0.004;
-  else if (enduranceRatio < 0.6) threshold += 0.001;
+  if (enduranceRatio < 0.2) threshold += 0.004;
+  else if (enduranceRatio < 0.4) threshold += 0.002;
+  else if (enduranceRatio < 0.6) threshold += 0.0005;
 
   // Location factor: Vital spots are deadlier
   const locMult = LOCATION_KILL_MULT[location] ?? 1.0;
   threshold *= locMult;
 
   // Strategic Risk (AL/OE): Aggression fuels lethality
-  threshold += (attOE + attAL - 10) * 0.0005;
+  threshold += (attOE + attAL - 10) * 0.00025;
 
   // Matchup Bias: Dominant styles find more fatal openings
-  threshold += matchupBonus * 0.002;
+  threshold += matchupBonus * 0.001;
 
   // Kill Desire: primary lever for intentional execution — scales aggressively
-  threshold += (killDesire - 5) * 0.004;
+  threshold += (killDesire - 5) * 0.002;
 
   // DEC skill bonus
-  threshold += (decSkill - 10) * 0.0006;
+  threshold += (decSkill - 10) * 0.0003;
 
   // Phase escalation: fights get more dangerous as time passes
-  threshold += phaseLevel * 0.003;
+  threshold += phaseLevel * 0.0015;
 
-  // Momentum bonus: momentum 2 = +0.008, momentum 3 = +0.015
-  if (momentum >= 3) threshold += 0.015;
-  else if (momentum >= 2) threshold += 0.008;
+  // Momentum bonus: momentum 2 = +0.004, momentum 3 = +0.0075
+  if (momentum >= 3) threshold += 0.0075;
+  else if (momentum >= 2) threshold += 0.004;
 
   // Trainer specialty bonus (e.g. KillerInstinct)
   threshold += specialtyBonus;
 
-  // Crowd-mood modulation: small additive so the 8% cap preserves the ~10% mortality target.
+  // Crowd-mood modulation: small additive so the 4% cap preserves the ~5% mortality target.
   // Magnitudes intentionally tiny — the cap absorbs Bloodthirsty surges rather than blowing past baseline.
   threshold += crowdKillBonus;
 
-  // Cap at 8% for the perfect storm (Unified 1.0 Gold Baseline)
-  return Math.max(0, Math.min(0.08, threshold));
+  // Cap at 2.5% for the perfect storm. Was 8% → 4% → 2.5% (2026-04 tuning).
+  // At 4% per-bout mortality was still ~7-8%, giving ~1.5y warrior lifespans —
+  // not enough to reach age 30 retirement from 18-25 starts. 2.5% targets
+  // ~4% per-bout kill rate and ~5-7y lifespans, opening real generational play.
+  return Math.max(0, Math.min(0.025, threshold));
 }

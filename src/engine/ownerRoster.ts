@@ -210,7 +210,7 @@ function generateAIRecruit(
     champion: false,
     status: 'Active',
     age: 17 + Math.floor(rng.next() * 5),
-    stableId: rival.owner.id,
+    stableId: rival.id,
   };
 }
 
