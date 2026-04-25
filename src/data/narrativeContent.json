@@ -1271,10 +1271,10 @@
         "Week {{week}}: A TRAIL OF BODIES! {{name}}'s win streak hits {{streak}}!",
         "Week {{week}}: THE JUGGERNAUT! {{name}} secures their {{streak}}th consecutive victory!",
         "Week {{week}}: FLAWLESS! {{name}} celebrates {{streak}} straight wins!",
-        "UNSTOPPABLE! {{name}} CONTINUES THEIR BLOODY REIGN",
-        "THE STREAK LIVES ON: {{name}} REMAINS UNDEFEATED IN RECENT CLASHES",
-        "NO END IN SIGHT FOR {{name}}'S REIGN OF TERROR",
-        "A TRAIL OF BODIES: {{name}} EXTENDS WINNING STREAK"
+        "Week {{week}}: UNSTOPPABLE! {{name}} CONTINUES THEIR BLOODY REIGN ({{streak}} WINS)",
+        "Week {{week}}: THE STREAK LIVES ON: {{name}} REMAINS UNDEFEATED IN {{streak}} CLASHES",
+        "Week {{week}}: NO END IN SIGHT FOR {{name}}'S REIGN OF TERROR ({{streak}} STRAIGHT)",
+        "Week {{week}}: A TRAIL OF BODIES: {{name}} EXTENDS WINNING STREAK TO {{streak}}"
       ]
     },
     "featured": {
