@@ -189,32 +189,70 @@ function handleSeasonalTournaments(state: GameState, week: number, rng: IRNGServ
     week * 881
   );
   const tournamentNews: string[] = [];
-  const impacts: StateImpact[] = [];
 
+  // resolveCompleteTournament returns a fully-mutated GameState (not a delta), so we
+  // run it against a working copy and then extract a clean delta as the impact.
+  // Prior code pushed the whole returned GameState as an impact, which caused the
+  // append-strategy fields (graveyard, arenaHistory, retired) to duplicate their
+  // entire contents every tournament — graveyard exploded into the millions and
+  // OOM'd long-running sims.
+  const preGraveyardLen = (state.graveyard || []).length;
+  const preRetiredLen = (state.retired || []).length;
+  const preArenaLen = (state.arenaHistory || []).length;
+  const preRosterIds = new Set((state.roster || []).map((w) => w.id));
+  const preRivalRosters = new Map(
+    (state.rivals || []).map((r) => [r.id, new Set(r.roster.map((w) => w.id))])
+  );
+
+  let workingState = { ...state, tournaments: [...(state.tournaments || []), ...tournaments] };
   tournaments.forEach((tour) => {
-    impacts.push({ tournaments: [tour] });
-    const tournamentImpact = TournamentSelectionService.resolveCompleteTournament(
-      state,
+    workingState = TournamentSelectionService.resolveCompleteTournament(
+      workingState,
       tour.id,
       week * 500 + hashStr(tour.id)
     );
-    impacts.push(tournamentImpact);
     tournamentNews.push(`🏆 ${tour.name} finalized: Champion crowned.`);
   });
 
-  impacts.push({
-    isTournamentWeek: true,
-    activeTournamentId: tournaments[0]?.id,
-    day: 0,
-    newsletterItems: [
-      {
-        id: rng.uuid(),
-        week: week,
-        title: '🎖️ TOURNAMENT ARCHIVE',
-        items: tournamentNews,
-      },
-    ],
+  const newGraveyard = (workingState.graveyard || []).slice(preGraveyardLen);
+  const newRetired = (workingState.retired || []).slice(preRetiredLen);
+  const newArena = (workingState.arenaHistory || []).slice(preArenaLen);
+
+  const postRosterIds = new Set((workingState.roster || []).map((w) => w.id));
+  const rosterRemovals = [...preRosterIds].filter((id) => !postRosterIds.has(id));
+
+  // Build rivalsUpdates so the rival rosters reflect tournament casualties + status updates.
+  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  (workingState.rivals || []).forEach((r) => {
+    const preIds = preRivalRosters.get(r.id);
+    if (!preIds) return;
+    const postIds = new Set(r.roster.map((w) => w.id));
+    const removed = [...preIds].filter((id) => !postIds.has(id));
+    const sizesDiffer = preIds.size !== postIds.size;
+    if (removed.length > 0 || sizesDiffer) {
+      rivalsUpdates.set(r.id, { roster: r.roster });
+    }
   });
 
-  return mergeImpacts(impacts);
+  return mergeImpacts([
+    { tournaments: workingState.tournaments },
+    {
+      graveyard: newGraveyard,
+      retired: newRetired,
+      arenaHistory: newArena,
+      rosterRemovals,
+      rivalsUpdates,
+      isTournamentWeek: true,
+      activeTournamentId: tournaments[0]?.id,
+      day: 0,
+      newsletterItems: [
+        {
+          id: rng.uuid(),
+          week: week,
+          title: '🎖️ TOURNAMENT ARCHIVE',
+          items: tournamentNews,
+        },
+      ],
+    },
+  ]);
 }

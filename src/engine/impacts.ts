@@ -180,7 +180,7 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
     state.awards = [...(state.awards || []), ...value];
   },
   boutOffers: (state, value) => {
-    state.boutOffers = value;
+    state.boutOffers = { ...(state.boutOffers || {}), ...value };
   },
   promoters: (state, value) => {
     state.promoters = value;
@@ -257,7 +257,7 @@ export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameSt
 }
 
 // Merge strategy configuration
-type MergeStrategy = 'accumulate' | 'append' | 'mapMerge' | 'replace';
+type MergeStrategy = 'accumulate' | 'append' | 'mapMerge' | 'dictMerge' | 'replace';
 
 type MergeConfig = {
   [K in keyof StateImpact]: { strategy: MergeStrategy; defaultValue: StateImpact[K] };
@@ -291,7 +291,7 @@ const MERGE_CONFIG: MergeConfig = {
   recruitPool: { strategy: 'replace', defaultValue: undefined },
   newPoolRecruits: { strategy: 'replace', defaultValue: undefined },
   realmRankings: { strategy: 'replace', defaultValue: undefined },
-  boutOffers: { strategy: 'replace', defaultValue: undefined },
+  boutOffers: { strategy: 'dictMerge', defaultValue: undefined },
   promoters: { strategy: 'replace', defaultValue: undefined },
   trainers: { strategy: 'replace', defaultValue: undefined },
   hiringPool: { strategy: 'replace', defaultValue: undefined },
@@ -329,6 +329,11 @@ const mergeStrategies: Record<MergeStrategy, (merged: any, key: string, value: a
         const existing = targetMap.get(mapKey) || {};
         targetMap.set(mapKey, { ...existing, ...val });
       });
+    }
+  },
+  dictMerge: (merged, key, value) => {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      merged[key] = { ...(merged[key] ?? {}), ...value };
     }
   },
   replace: (merged, key, value) => {

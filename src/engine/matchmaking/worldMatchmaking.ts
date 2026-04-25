@@ -71,6 +71,7 @@ export function planWorldBouts(state: GameState, rng: IRNGService): BoutOffer[] 
         proposerStableId: entryA.stable.id,
         warriorIds: [entryA.warrior.id, bestOpponent.warrior.id],
         boutWeek: state.week + 1,
+        expirationWeek: state.week + 1,
         purse: 300 + Math.floor(rng.next() * 200), // Variable purses
         hype: 100 + Math.floor(rng.next() * 100),
         status: 'Proposed',

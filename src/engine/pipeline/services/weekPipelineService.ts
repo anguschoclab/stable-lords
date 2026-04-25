@@ -95,15 +95,26 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext):
   state.day = 0;
   state.trainingAssignments = [];
 
-  // 🧹 1.0 Hardening: Purge expired bout offers
+  // 🧹 Bout offer cleanup — single source of truth for offer pruning.
+  // The just-finished week's bouts have already fired in runBoutPhase, so
+  // any offer with boutWeek <= just-finished week is done (fired, expired,
+  // or rejected). Past Signed offers must be dropped or they accumulate
+  // forever and break the matchmaker.
   if (state.boutOffers) {
     const cleanedOffers: Record<string, any> = {};
-    const currentWeek = ctx.nextWeek - 1; // The week that just finished
+    const justFinishedWeek = ctx.nextWeek - 1;
     Object.values(state.boutOffers).forEach((offer) => {
-      // Keep if it's for current/future week, or if it's already Signed
-      if (offer.boutWeek >= currentWeek || offer.status === 'Signed') {
-        cleanedOffers[offer.id] = offer;
+      // Past offers (already fired or whose date has passed) — discard regardless of status
+      if (offer.boutWeek <= justFinishedWeek) return;
+      // Stale proposals that didn't get signed before their deadline — discard
+      if (
+        offer.status !== 'Signed' &&
+        offer.expirationWeek != null &&
+        offer.expirationWeek <= justFinishedWeek
+      ) {
+        return;
       }
+      cleanedOffers[offer.id] = offer;
     });
     state.boutOffers = cleanedOffers;
   }
