@@ -213,14 +213,23 @@ function scale(val: number, m: MasteryInfo): number {
 
 const STYLES: Record<FightingStyle, StyleStrategy> = {
   [FightingStyle.AimedBlow]: {
-    tempo: { opening: -1, mid: 0, late: 1, enduranceMult: 0.94 },
+    tempo: { opening: 0, mid: 0, late: 1, enduranceMult: 0.94 },
+    // Tuned 2026-04 (passive pass 2): pass 1's modest floor only lifted AB
+    // 17.6% → 18.2%. AB's structural weakness was deeper: opening tempo -1
+    // meant LU and other openers struck before AB could land anything, and
+    // there was no defensive identity at all. Pass 2:
+    //  - Tempo opening -1 → 0 (no longer fights uphill from exchange 0)
+    //  - attBonus floor 1 → 2 (untargeted), 2 → 3 (targeted)
+    //  - parBonus +1 baseline (precision implies controlled distance)
+    //  - critChance floor doubled
     getPassive: (ctx, m) => {
       const targeted = ctx.targetedLocation && ctx.targetedLocation !== 'Any';
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(targeted ? 1 : 0, m),
-        critChance: targeted ? 0.05 + (ctx.exchange > 8 ? 0.03 : 0) : 0,
+        attBonus: scale(targeted ? 3 : 2, m),
+        parBonus: 1,
+        critChance: targeted ? 0.08 + (ctx.exchange > 8 ? 0.04 : 0) : 0.04,
         hasPassiveNarrative: !!(targeted && ctx.exchange > 5),
       };
     },
@@ -283,14 +292,20 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
 
   [FightingStyle.LungingAttack]: {
     tempo: { opening: 1, mid: 0, late: -1, enduranceMult: 1.02 },
+    // Tuned 2026-04 (passive pass 3): rich-mode LU still at 71% W%. The
+    // exchange-0 first-strike kept dominating once the warrior had decent
+    // attributes + mastery + favorites. Drop the +1 attBonus on first strike
+    // (initiative is enough; doubling with damage was the runaway combo) and
+    // extend the late-phase malus to MID as well, so LU has to win in the
+    // first ~5 exchanges or fade.
     getPassive: (ctx, m) => {
-      const earlyBonus = ctx.exchange === 0 ? 2 : 0;
+      const isFirst = ctx.exchange === 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        iniBonus: scale(earlyBonus, m) + (ctx.exchange === 0 ? m.bonus : 0),
-        attBonus: ctx.exchange === 0 ? 1 : 0,
-        hasPassiveNarrative: ctx.exchange === 0,
+        iniBonus: isFirst ? 1 + m.bonus : 0,
+        attBonus: isFirst ? 0 : ctx.phase === 'LATE' ? -1 : ctx.phase === 'MID' ? -1 : 0,
+        hasPassiveNarrative: isFirst,
       };
     },
     getKillMechanic: (ctx) => ({
@@ -340,11 +355,17 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
 
   [FightingStyle.ParryRiposte]: {
     tempo: { opening: 0, mid: 1, late: 0, enduranceMult: 1.04 },
+    // Tuned 2026-04 (passive pass): PR at 31.3% aggregate. The flat -1 attBonus
+    // every exchange + only-when-2+-ripostes bonus meant PR was a permanent
+    // offensive minus that rarely got compensated. Drop the flat -1 to phase-
+    // gated (only OPENING) and give a baseline +1 ripBonus at all times so PR's
+    // riposte identity rewards the style continuously, not just after stacking.
     getPassive: (ctx, m) => ({
       ...EMPTY_PASSIVE,
       mastery: m.tier,
-      attBonus: -1,
-      ripBonus: ctx.ripostes >= 2 ? 1 : 0,
+      attBonus: ctx.phase === 'OPENING' ? -1 : 0,
+      parBonus: 1,
+      ripBonus: 1 + (ctx.ripostes >= 2 ? 1 : 0),
       hasPassiveNarrative: ctx.ripostes >= 3,
     }),
     getKillMechanic: () => ({
@@ -371,11 +392,15 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
 
   [FightingStyle.ParryStrike]: {
     tempo: { opening: 0, mid: 0, late: 0, enduranceMult: 0.96 },
+    // Tuned 2026-04 (passive pass): PS at 32.4% aggregate. attBonus only
+    // activated when on the back foot — meaning if PS was winning, no offense
+    // bonus, but it also wasn't accruing kills to close out. Make the +1
+    // attBonus baseline so PS scales reasonably regardless of pace.
     getPassive: (ctx, m) => ({
       ...EMPTY_PASSIVE,
       mastery: m.tier,
       parBonus: 2,
-      attBonus: ctx.hitsTaken > ctx.hitsLanded ? 1 : 0,
+      attBonus: 1 + (ctx.hitsTaken > ctx.hitsLanded ? 1 : 0),
     }),
     getKillMechanic: () => ({
       killBonus: 0,
@@ -388,15 +413,20 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
   },
 
   [FightingStyle.SlashingAttack]: {
-    tempo: { opening: 1, mid: 1, late: 0, enduranceMult: 0.96 },
+    tempo: { opening: 1, mid: 0, late: 0, enduranceMult: 0.96 },
+    // Tuned 2026-04 (passive pass 3): SL still 73% W% after passes 1-2.
+    // The cumulative phase-tempo (+1/+1/0) + attBonus(+1) + dmg flurry was a
+    // permanent triple-stack. Pass 3 drops mid tempo +1 → 0, gates attBonus to
+    // OPENING only, and stretches the flurry threshold so you need 4+ landed
+    // hits before the +1 dmg kicks in.
     getPassive: (ctx, m) => {
-      const flurryDmg = Math.min(3, Math.floor(ctx.hitsLanded / 2));
+      const flurryDmg = ctx.hitsLanded >= 4 ? 1 : 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(ctx.phase === 'LATE' ? 0 : 1, m) + (ctx.phase === 'OPENING' ? m.bonus : 0),
-        dmgBonus: 1 + flurryDmg,
-        hasPassiveNarrative: ctx.hitsLanded >= 3,
+        attBonus: ctx.phase === 'OPENING' ? 1 + m.bonus : 0,
+        dmgBonus: flurryDmg,
+        hasPassiveNarrative: ctx.hitsLanded >= 4,
       };
     },
     getKillMechanic: (ctx) => ({
@@ -442,11 +472,15 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
 
   [FightingStyle.TotalParry]: {
     tempo: { opening: -1, mid: 1, late: 1, enduranceMult: 0.9 },
+    // Tuned 2026-04 (passive pass): TP at 36% aggregate. attBonus -2 was so
+    // punishing it couldn't finish fights. Soften to -1 (still defensive
+    // identity) and trim parBonus +4 → +3 so it doesn't hard-counter aggressive
+    // styles into 0% win rates.
     getPassive: (ctx, m) => ({
       ...EMPTY_PASSIVE,
       mastery: m.tier,
-      attBonus: -2,
-      parBonus: 4 + m.bonus,
+      attBonus: -1,
+      parBonus: 3 + m.bonus,
       iniBonus: 2,
       hasPassiveNarrative: ctx.phase === 'LATE' && ctx.endRatio > 0.5,
     }),
@@ -469,15 +503,20 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
   },
 
   [FightingStyle.WallOfSteel]: {
-    tempo: { opening: 1, mid: 1, late: 1, enduranceMult: 0.92 },
+    // Tuned 2026-04 (passive pass 3): WS still ~72% W% after passes 1-2.
+    // The defBonus floor + par + tempo bundle was still strictly dominant.
+    // Pass 3: tempo opening +1 → 0 (was strong-everywhere), drop parBonus
+    // floor 1 → 0 — defense ramps with `wallBonus` only. WS is now a true
+    // late-game style, not a flat-strong all-phases bulldozer.
+    tempo: { opening: 0, mid: 0, late: 1, enduranceMult: 0.92 },
     getPassive: (ctx, m) => {
       const wallBonus = Math.min(1 + m.bonus, Math.floor(ctx.exchange / 5));
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        defBonus: scale(wallBonus, m) + 2,
-        parBonus: 1,
-        iniBonus: scale(wallBonus + 1, m) + 1,
+        defBonus: scale(wallBonus, m),
+        parBonus: wallBonus > 0 ? 1 : 0,
+        iniBonus: scale(wallBonus, m),
         hasPassiveNarrative: wallBonus >= 1,
       };
     },

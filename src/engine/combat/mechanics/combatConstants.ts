@@ -71,16 +71,16 @@ export const STYLE_ORDER = [
  */
 export const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [0, +1, 0, 0, +1, +1, +1, +1, +1, +1], // AB  (row +7; was +4)
-  [0, 0, 0, +1, 0, 0, 0, 0, 0, 0], // BA  (row +1; was +4 — major nerf)
-  [0, 0, 0, +1, +1, -1, 0, 0, +1, -1], // LU  (unchanged, row +1)
-  [0, -1, -1, 0, 0, 0, 0, -1, 0, 0], // PL  (unchanged, row -3)
-  [0, -1, 0, 0, 0, 0, 0, -1, 0, 0], // PR  (unchanged, row -1)
-  [0, 0, +1, 0, 0, 0, 0, -1, 0, 0], // PS  (lifted vs WS from -1 to 0; PS-v-WS was 26.7%)
-  [0, -1, 0, 0, 0, 0, 0, -1, +1, 0], // SL  (added -1 vs ST to dampen SL aggregate dominance)
-  [0, 0, +1, +1, +1, 0, +1, 0, +1, +1], // ST  (dropped +1 vs PS — ST-eats-PS was 78%; added +1 vs SL — counter SL passive)
-  [0, 0, -1, 0, 0, 0, -1, -1, 0, 0], // TP  (removed -1 vs AB — row -3)
-  [0, 0, +1, 0, 0, 0, 0, 0, 0, 0], // WS  (unchanged, row +1)
+  [0, +1, +2, +1, +1, +1, +2, +2, +1, +2], // AB  (heavy buff; rich-mode AB still 28.8%)
+  [0, 0, 0, +1, +1, +1, 0, 0, +1, 0], // BA  (restored some advantages after rich-mode AB attr pool sapped BA to 37%)
+  [-2, 0, 0, +1, +1, -1, 0, 0, +1, -1], // LU  (penalized vs AB; LU at 71% rich-mode, kept hostile)
+  [0, -1, -1, 0, 0, 0, 0, -1, 0, 0], // PL
+  [0, -1, 0, 0, 0, 0, 0, -1, +1, 0], // PR
+  [0, 0, +1, 0, 0, 0, 0, -1, 0, 0], // PS
+  [-1, -1, 0, 0, +1, 0, 0, -1, +1, 0], // SL  (penalized vs AB/BA; SL still 67.8% rich-mode)
+  [-1, 0, +1, +1, +1, 0, +1, 0, +1, +1], // ST
+  [0, 0, -1, 0, 0, 0, -1, -1, 0, 0], // TP
+  [-1, 0, +1, 0, 0, 0, 0, 0, 0, 0], // WS
 ];
 
 export function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {
