@@ -266,7 +266,12 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                     <Badge variant="outline" className="text-[10px]">
                       {completedCount}/{bouts.length} matches
                     </Badge>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      aria-label={isExpanded ? `Collapse ${getRoundName(round, totalRounds)}` : `Expand ${getRoundName(round, totalRounds)}`}
+                    >
                       {isExpanded ? (
                         <ChevronUp className="h-4 w-4" />
                       ) : (
