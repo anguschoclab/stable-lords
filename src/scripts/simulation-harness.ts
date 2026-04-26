@@ -80,7 +80,7 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
     }
 
     // Stop Conditions (Optional)
-    if (state.roster.length === 0 && state.treasury < 100) {
+    if (state.treasury < -5000 || (state.roster.length === 0 && state.treasury < 100)) {
       console.warn(`[Sim] Failure at week ${w}: Stable Bankrupt/Empty.`);
       break;
     }
