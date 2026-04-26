@@ -46,7 +46,7 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
         state.roster.some((w) => w.id === id)
       );
 
-      if (offer.hype > 100 || offer.purse > 200) {
+      if (offer.hype >= 20 || offer.purse >= 50) {
         playerWarriorIds.forEach((id) => {
           offer.responses[id] = 'Accepted';
         });
@@ -69,6 +69,14 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
         `[Harness] Week ${state.week} | Roster: ${state.roster.length} | Treasury: ${state.treasury}`
       );
       pulses.push(collectPulse(state));
+    }
+
+    // Auto-recruit if empty roster (to keep the simulation running)
+    if (state.roster.length === 0) {
+      if (state.recruitPool.length > 0) {
+        state.roster.push({ ...state.recruitPool[0] });
+        state.recruitPool.shift();
+      }
     }
 
     // Stop Conditions (Optional)
