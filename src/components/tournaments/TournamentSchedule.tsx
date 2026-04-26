@@ -270,7 +270,8 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                       variant="ghost"
                       size="sm"
                       className="h-7 w-7 p-0"
-                      aria-label={isExpanded ? `Collapse ${getRoundName(round, totalRounds)}` : `Expand ${getRoundName(round, totalRounds)}`}
+                      aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${getRoundName(round, totalRounds)}`}
+                      aria-expanded={isExpanded}
                     >
                       {isExpanded ? (
                         <ChevronUp className="h-4 w-4" />
