@@ -77,6 +77,13 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
     damageMult: 1.3,
     description: 'Eerie darkness heightens all combat instincts.',
   },
+  'Thick Fog': {
+    staminaMult: 0.95,
+    initiativeMod: -4,
+    riposteMod: -2,
+    damageMult: 1.15,
+    description: 'Dense fog obscures vision, slowing combat but making sudden strikes deadlier.',
+  },
 };
 
 export function getWeatherEffect(weather: WeatherType): WeatherEffect {
@@ -107,6 +114,8 @@ export function weatherOpeningLine(weather: WeatherType): string | null {
       return 'A crimson moon hangs overhead. The crowd is already baying for blood.';
     case 'Eclipse':
       return 'Darkness falls mid-day. An eerie calm descends before the violence.';
+    case 'Thick Fog':
+      return 'A dense fog rolls in, cloaking the arena in a chilling mist.';
     default:
       return null;
   }

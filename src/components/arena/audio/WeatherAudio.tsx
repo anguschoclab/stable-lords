@@ -18,6 +18,7 @@ const WEATHER_AMBIENCE: Record<WeatherType, string | null> = {
   Gale: 'ambience-wind-gale',
   'Blood Moon': 'ambience-blood-moon',
   Eclipse: 'ambience-eclipse',
+  'Thick Fog': 'ambience-wind-breezy', // Reusing an existing low wind/eerie sound
 };
 
 export default function WeatherAudio({ weather, volume, enabled }: WeatherAudioProps) {

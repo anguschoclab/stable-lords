@@ -22,7 +22,7 @@ function t(template: string, data: Record<string, string | number>): string {
 
 interface OffseasonEventNarrative {
   title: string;
-  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany' | 'tavern_brawl';
+  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany' | 'tavern_brawl' | 'mascot_bond';
   newsletter: string[];
 }
 
@@ -163,6 +163,21 @@ export function runSeasonalPass(
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],
+      });
+    }
+  } else if (e.effectType === 'mascot_bond') {
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    if (activeWarriors.length > 0) {
+      activeWarriors.forEach((w) => {
+        rosterUpdates.set(w.id, {
+          fame: (w.fame || 0) + 5,
+        });
+      });
+      newsletterItems.push({
+        id: generateId(seasonRng, 'newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', {})],
       });
     }
   }

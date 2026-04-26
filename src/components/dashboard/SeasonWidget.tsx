@@ -39,7 +39,7 @@ export function SeasonWidget() {
     ?.filter(
       (item) =>
         item.week === state.week &&
-        ['Festival of Blades', 'A Bitter Winter', "Wandering Merchant's Favor"].includes(item.title)
+        ['Festival of Blades', 'A Bitter Winter', "Wandering Merchant's Favor", 'Offseason Epiphany', 'Tavern Brawl', 'Stable Mascot'].includes(item.title)
     )
     .pop();
 
@@ -80,6 +80,10 @@ export function SeasonWidget() {
     WeatherIcon = Moon;
     weatherColor = 'text-purple-500';
     weatherBg = 'bg-purple-500/10 border-purple-500/20';
+  } else if (weather === 'Thick Fog') {
+    WeatherIcon = Cloud;
+    weatherColor = 'text-slate-400';
+    weatherBg = 'bg-slate-400/10 border-slate-400/20';
   }
 
   return (
@@ -214,9 +218,11 @@ export function SeasonWidget() {
                             ? '10% less stamina drain in combat.'
                             : weather === 'Eclipse'
                               ? '20% less stamina drain in combat. Fights are slow and methodical.'
-                              : weather === 'Rainy'
-                                ? 'Poor visibility and slick ground penalize initiative and attack.'
-                                : 'Standard atmospheric conditions.'}
+                              : weather === 'Thick Fog'
+                                ? 'Dense fog obscures vision. Initiative is heavily penalized, but strikes are deadlier.'
+                                : weather === 'Rainy'
+                                  ? 'Poor visibility and slick ground penalize initiative and attack.'
+                                  : 'Standard atmospheric conditions.'}
                 </TooltipContent>
               </Tooltip>
             </div>

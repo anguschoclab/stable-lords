@@ -288,7 +288,7 @@ export type WeatherType =
   | 'Blazing Sun'
   | 'Gale'
   | 'Blood Moon'
-  | 'Eclipse';
+  | 'Eclipse' | 'Thick Fog';
 
 export interface DeathEvent {
   boutId: string;

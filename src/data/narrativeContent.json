@@ -1810,6 +1810,13 @@
       "newsletter": [
         "{{name}} got involved in a chaotic tavern brawl over the break! They broke a few noses (and maybe a chair), gaining notoriety, but took some bruises in the process. (+{{fame}} Fame, Minor Injury)"
       ]
+    },
+    "stray_dog": {
+      "title": "Stable Mascot",
+      "effectType": "mascot_bond",
+      "newsletter": [
+        "A stray dog wandered into the stable during the break. The warriors bonded with it, raising morale and boosting everyone's fame a little! (+5 Fame)"
+      ]
     }
   },
   "crowd_reactions": {

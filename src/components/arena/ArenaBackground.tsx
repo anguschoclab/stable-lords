@@ -285,5 +285,20 @@ function WeatherOverlay({ weather }: { weather: string }) {
     );
   }
 
+  // Thick Fog effect
+  if (weatherLower.includes('thick fog')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute inset-0 bg-slate-300/30 backdrop-blur-[2px] animate-pulse"
+          style={{ animationDuration: '8s' }}
+        />
+        <div
+          className="absolute -inset-1/2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC4wMSIgbnVtT2N0YXZlcz0iMyIgLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC4xNSIvPjwvc3ZnPg==')] opacity-40 animate-pan-slow"
+        />
+      </div>
+    );
+  }
+
   return null;
 }

@@ -20,8 +20,9 @@ export function rollWeather(rng: IRNGService): WeatherType {
   if (roll < 0.85) return 'Rainy';
   if (roll < 0.9) return 'Sweltering';
   if (roll < 0.95) return 'Blazing Sun';
-  if (roll < 0.98) return 'Breezy';
-  if (roll < 0.985) return 'Gale';
+  if (roll < 0.96) return 'Gale';
+  if (roll < 0.97) return 'Thick Fog';
+  if (roll < 0.985) return 'Breezy';
   if (roll < 0.995) return 'Blood Moon';
   return 'Eclipse';
 }
