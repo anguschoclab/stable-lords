@@ -2,10 +2,101 @@ import { GameState, Warrior } from '@/types/state.types';
 
 interface NameResolutionState {
   player: { id: string; stableName: string; name: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rivals: { id: string; owner: { stableName: string }; roster?: { id: string; name: string }[] }[];
   roster: { id: string; name: string }[];
   graveyard: { id: string; name: string }[];
   retired: { id: string; name: string }[];
+}
+
+// Caching structure: WeakMap allows GC to clean up when GameState changes
+const cache = new WeakMap<
+  NameResolutionState | GameState,
+  {
+    warriorNames: Map<string, string>;
+    stableNames: Map<string, string>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    warriorsById: Map<string, any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    warriorsByName: Map<string, any>;
+  }
+>();
+
+function buildCache(state: NameResolutionState | GameState) {
+  const warriorNames = new Map<string, string>();
+  const stableNames = new Map<string, string>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const warriorsById = new Map<string, any>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const warriorsByName = new Map<string, any>();
+
+  // Process player and player's roster
+  stableNames.set(state.player.id, state.player.stableName);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processWarrior = (w: any) => {
+    if (w.id && w.name) {
+      if (!warriorNames.has(w.id)) warriorNames.set(w.id, w.name);
+      if (!warriorsById.has(w.id)) warriorsById.set(w.id, w);
+      if (!warriorsByName.has(w.name)) warriorsByName.set(w.name, w);
+    }
+  };
+
+  // Highest precedence items should overwrite lower precedence ones,
+  // so we process in reverse order of precedence.
+
+  // 1. Rivals (lowest precedence, rival 0 is highest among rivals)
+  if (state.rivals) {
+    for (let i = state.rivals.length - 1; i >= 0; i--) {
+      const rival = state.rivals[i];
+      if (rival.id && rival.owner?.stableName) {
+        stableNames.set(rival.id, rival.owner.stableName);
+      }
+      if (rival.roster) {
+        for (let j = rival.roster.length - 1; j >= 0; j--) {
+          processWarrior(rival.roster[j]);
+        }
+      }
+    }
+  }
+
+  // 2. Retired
+  if (state.retired) {
+    for (let i = state.retired.length - 1; i >= 0; i--) {
+      processWarrior(state.retired[i]);
+    }
+  }
+
+  // 3. Graveyard
+  if (state.graveyard) {
+    for (let i = state.graveyard.length - 1; i >= 0; i--) {
+      processWarrior(state.graveyard[i]);
+    }
+  }
+
+  // 4. Active Roster (highest precedence)
+  if (state.roster) {
+    for (let i = state.roster.length - 1; i >= 0; i--) {
+      processWarrior(state.roster[i]);
+    }
+  }
+
+  // Player stable (highest precedence)
+  if (state.player && state.player.id && state.player.stableName) {
+    stableNames.set(state.player.id, state.player.stableName);
+  }
+
+  const cacheEntry = { warriorNames, stableNames, warriorsById, warriorsByName };
+  cache.set(state, cacheEntry);
+  return cacheEntry;
+}
+
+function getCache(state: NameResolutionState | GameState) {
+  let cacheEntry = cache.get(state);
+  if (!cacheEntry) {
+    cacheEntry = buildCache(state);
+  }
+  return cacheEntry;
 }
 
 /**
@@ -18,26 +109,8 @@ export function resolveWarriorName(
   legacyName: string
 ): string {
   if (!warriorId) return legacyName;
-
-  // Search active roster
-  const w = state.roster.find((w) => w.id === warriorId);
-  if (w) return w.name;
-
-  // Search graveyard
-  const dead = state.graveyard.find((w) => w.id === warriorId);
-  if (dead) return dead.name;
-
-  // Search retired
-  const retired = state.retired.find((w) => w.id === warriorId);
-  if (retired) return retired.name;
-
-  // Search rival rosters
-  for (const rival of state.rivals) {
-    const rw = rival.roster?.find((w) => w.id === warriorId);
-    if (rw) return rw.name;
-  }
-
-  return legacyName;
+  const { warriorNames } = getCache(state);
+  return warriorNames.get(warriorId) ?? legacyName;
 }
 
 /**
@@ -50,46 +123,17 @@ export function resolveStableName(
   legacyName: string
 ): string {
   if (!stableId) return legacyName;
-
-  // Check player stable
-  if (state.player.id === stableId) return state.player.stableName;
-
-  // Check rival stables
-  const rival = state.rivals.find((r) => r.id === stableId);
-  if (rival) return rival.owner.stableName;
-
-  return legacyName;
+  const { stableNames } = getCache(state);
+  return stableNames.get(stableId) ?? legacyName;
 }
 
 /**
  * Resolves a warrior object by ID or Name.
  */
 export function findWarrior(state: GameState, id?: string, name?: string): Warrior | undefined {
-  if (id) {
-    const w =
-      state.roster.find((w) => w.id === id) ||
-      state.graveyard.find((w) => w.id === id) ||
-      state.retired.find((w) => w.id === id);
-    if (w) return w;
-
-    for (const rival of state.rivals) {
-      const rw = rival.roster.find((w) => w.id === id);
-      if (rw) return rw;
-    }
-  }
-
-  if (name) {
-    const w =
-      state.roster.find((w) => w.name === name) ||
-      state.graveyard.find((w) => w.name === name) ||
-      state.retired.find((w) => w.name === name);
-    if (w) return w;
-
-    for (const rival of state.rivals) {
-      const rw = rival.roster.find((w) => w.name === name);
-      if (rw) return rw;
-    }
-  }
-
+  if (!id && !name) return undefined;
+  const { warriorsById, warriorsByName } = getCache(state);
+  if (id && warriorsById.has(id)) return warriorsById.get(id);
+  if (name && warriorsByName.has(name)) return warriorsByName.get(name);
   return undefined;
 }

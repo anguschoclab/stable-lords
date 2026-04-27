@@ -1,0 +1,3 @@
+## YYYY-MM-DD - [Optimizing array search to constant-time Map lookup]
+**Learning:** In state resolution systems with many linear scans over arrays during tight rendering loops (like historyResolver traversing `roster`, `graveyard`, `retired`, and `rivals`), using `WeakMap` to store precomputed index Maps by reference can avoid massive GC pressure and provide huge speedups without changing function contracts.
+**Action:** Use `WeakMap` keyed against state objects to build and return `Map` caches for fast, reactive queries in React loops. Make sure to adhere perfectly to existing precedence behaviors (e.g. iterate in reverse order so higher-precedence entities overwrite correctly).
