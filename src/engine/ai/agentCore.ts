@@ -5,7 +5,7 @@ import type {
   AIAgentMemory,
   AIIntent,
 } from '@/types/state.types';
-import { generateId } from '../../utils/idUtils';
+import { hashStr } from '../../utils/random';
 import { computeMetaDrift } from '../metaDrift';
 import type { BudgetReport } from './workers/budgetWorker';
 import { checkBudget } from './workers/budgetWorker';
@@ -58,8 +58,10 @@ export function logAgentAction(
   riskTier: AIEvent['riskTier'],
   week: number
 ): RivalStableData {
+  const eventIndex = (rival.actionHistory || []).length;
+  const eventId = `event-${hashStr(`${rival.owner.id}|${week}|${type}|${description}|${eventIndex}`).toString(16)}`;
   const newEvent: AIEvent = {
-    id: generateId(undefined, 'event'),
+    id: eventId,
     week,
     type,
     description,

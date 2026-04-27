@@ -33,8 +33,11 @@ export function processAIRosterManagement(
     };
 
     const personality = r.owner.personality ?? 'Pragmatic';
+    const activeBeforeCulling = r.roster.filter((w) => w.status === 'Active').length;
 
     // 1) Retirement / Culling Logic
+    let culledThisTick = 0;
+
     // Methodical/Tactician owners cull underperformers
     if (personality === 'Methodical' || personality === 'Tactician') {
       const candidates = r.roster.filter(
@@ -47,6 +50,7 @@ export function processAIRosterManagement(
       for (const c of candidates.slice(0, 1)) {
         c.status = 'Retired';
         c.retiredWeek = state.week;
+        culledThisTick++;
         gazetteItems.push(
           `📋 ${r.owner.name} (${r.owner.stableName}) retires ${c.name} — "Not meeting expectations."`
         );
@@ -65,6 +69,7 @@ export function processAIRosterManagement(
       for (const c of killless.slice(0, 1)) {
         c.status = 'Retired';
         c.retiredWeek = state.week;
+        culledThisTick++;
         gazetteItems.push(
           `🗡️ ${r.owner.name} (${r.owner.stableName}) cuts ${c.name} — "No killer instinct."`
         );
@@ -107,11 +112,12 @@ export function processAIRosterManagement(
 
     // Treasury Awareness: Recruitment costs 100g (signing fee)
     const RECRUIT_COST = 100;
-    const canAfford = r.treasury >= RECRUIT_COST + (currentActive < 4 ? 0 : 200); // Only enforce buffer if roster is healthy
+    const canAfford = r.treasury >= RECRUIT_COST + (activeBeforeCulling < 4 ? 0 : 200); // Only enforce buffer if roster was healthy before culling
     const intent = r.strategy?.intent ?? 'CONSOLIDATION';
 
     if (
       currentActive < minRoster &&
+      culledThisTick === 0 &&
       rngSnapshot.next() < recruitChance &&
       canAfford &&
       intent !== 'RECOVERY'

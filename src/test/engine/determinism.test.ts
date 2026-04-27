@@ -28,12 +28,7 @@ describe('Simulation Determinism', () => {
     vi.restoreAllMocks();
   });
 
-  it.skip('should produce identical results from a fresh state over 5 weeks', () => {
-    // SKIPPED: This test requires proper deep cloning of Map objects (warriorMap)
-    // which JSON.stringify/JSON.parse doesn't handle. Fix requires implementing
-    // a proper deep clone function or restructuring the state to avoid Maps.
-    // TODO: Implement proper deep clone for Maps/Sets or restructure state
-
+  it('should produce identical results from a fresh state over 5 weeks', () => {
     // 1. Setup two identical states
     // Pass a fixed timestamp to ensure meta.createdAt remains stable
     const stateA = createFreshState('test-seed-1', '2026-04-11T09:00:00Z');

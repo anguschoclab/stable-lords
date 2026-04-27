@@ -80,7 +80,7 @@ export function planWorldBouts(state: GameState, rng: IRNGService): BoutOffer[] 
           [bestOpponent.warrior.id]: 'Pending',
         },
         conditions: [],
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(Date.UTC(2026, 0, 1) + (state.week - 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
       };
       offers.push(offer);
     }

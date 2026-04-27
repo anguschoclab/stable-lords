@@ -54,7 +54,7 @@ export function handleReporting(
     popularityDeltaD: pD,
     transcript: outcome.log.map((e) => e.text),
     isRivalry,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(Date.UTC(2026, 0, 1) + (week - 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
   // Side effects
