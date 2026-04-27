@@ -1235,8 +1235,8 @@
         "Week {{week}}: THE SANDS SHIFT! Nobody expected {{winner}} to massacre {{loser}}!",
         "Week {{week}}: A MIRACLE IN BLOOD! {{winner}} Defies the Gods, Slaying {{loser}}!",
         "Week {{week}}: THE KING IS DEAD! {{winner}} Causes the Greatest Upset of the Season!",
-        "Week {{week}}: SHOCKER IN THE SANDS! The Unknown {{a}} Dismantles the Mighty {{b}}!",
-        "Week {{week}}: DOWN GOES THE TITAN! {{a}} Pulls Off the Upset of the Century Over {{b}}!"
+        "Week {{week}}: SHOCKER IN THE SANDS! The Unknown {{winner}} Dismantles the Mighty {{loser}}!",
+        "Week {{week}}: DOWN GOES THE TITAN! {{winner}} Pulls Off the Upset of the Century Over {{loser}}!"
       ],
       "MultipleKills": [
         "Week {{week}}: THE REAPER'S HARVEST! {{count}} warriors fallen!",
