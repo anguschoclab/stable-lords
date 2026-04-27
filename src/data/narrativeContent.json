@@ -1213,7 +1213,7 @@
         "Week {{week}}: ETERNAL FOES! {{a}} and {{b}} Clash in Chapter {{count}} of Their Saga!",
         "Week {{week}}: THE GRUDGE MATCH OF THE CENTURY! {{a}} vs {{b}} (Chapter {{count}})",
         "Week {{week}}: BAD BLOOD BOILS OVER! {{a}} Meets {{b}} in Chapter {{count}} of Their Vicious Feud!",
-        "Week {{week}}: THE ARENA DIVIDED! Fans Riot as {{a}} Faces {{b}} for the {{count}}th Time!"
+        "Week {{week}}: THE ARENA DIVIDED! Fans Riot as {{a}} Faces {{b}} for the {{count}}{{suffix}} Time!"
       ],
       "Rivalry": [
         "Week {{week}}: BLOOD FEUD! {{a}} and {{b}} meet again in the pit!",
