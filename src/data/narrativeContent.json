@@ -457,7 +457,7 @@
         "A sickening 'CRACK' echoes as {{attacker}} shatters {{defender}}'s {{bodyPart}} with a monstrous swing.",
         "{{attacker}} pulverizes {{defender}}'s {{bodyPart}} with a bone-jarring blow from their {{weapon}}.",
         "The sheer concussive force of {{attacker}}'s {{weapon}} demolishes {{defender}}'s {{bodyPart}}.",
-        "{{defender}} collapse as {{attacker}} delivers a crushing strike that caves in their {{bodyPart}}.",
+        "{{defender}} collapses as {{attacker}} delivers a crushing strike that caves in their {{bodyPart}}.",
         "{{attacker}} brings the {{weapon}} down like a thunderbolt, obliterating {{defender}}'s {{bodyPart}}."
       ]
     },
