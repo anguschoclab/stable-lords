@@ -2,23 +2,25 @@
 
 ## Simulation Results
 - **Weeks Simulated:** 1000
-- **Total Bouts:** 566
-- **Total Deaths:** 18
-- **Mortality Rate:** 3.18%
-- **Average Stable Gold:** -33761
+- **Total Bouts:** 562
+- **Total Deaths:** 7
+- **Mortality Rate:** 1.25%
+- **Average Stable Gold:** -38655
 
 ## Style Win Rates
-- **PARRY-STRIKE:** 68.24%
+- **PARRY-STRIKE:** 70.00%
+- **TOTAL PARRY:** 66.67%
 - **BASHING ATTACK:** 64.96%
-- **LUNGING ATTACK:** 53.90%
-- **PARRY-LUNGE:** 53.70%
-- **PARRY-RIPOSTE:** 49.11%
-- **STRIKING ATTACK:** 47.57%
-- **TOTAL PARRY:** 46.58%
-- **SLASHING ATTACK:** 41.96%
-- **WALL OF STEEL:** 41.00%
-- **AIMED BLOW:** 35.00%
+- **PARRY-RIPOSTE:** 58.72%
+- **PARRY-LUNGE:** 50.88%
+- **WALL OF STEEL:** 47.83%
+- **STRIKING ATTACK:** 43.62%
+- **AIMED BLOW:** 40.48%
+- **SLASHING ATTACK:** 39.45%
+- **LUNGING ATTACK:** 36.36%
 
 ## Suggested Variable Tweaks (For Product Owner Approval)
-- **Lethality Low**: Mortality rate is 3.18% (Target: 8% - 15%). Suggest increasing CRIT_DAMAGE_MULT.
-- **Meta Anomaly**: PARRY-STRIKE win rate is too high (68.24%). Suggest reducing base bonus.
+- **Lethality Low**: Mortality rate is 1.25% (Target: 8% - 15%). Suggest increasing CRIT_DAMAGE_MULT.
+- **Meta Anomaly**: PARRY-STRIKE win rate is too high (70.00%). Suggest reducing base bonus.
+- **Meta Anomaly**: TOTAL PARRY win rate is too high (66.67%). Suggest reducing base bonus.
+- **Economy Warning**: Average stable economy is deeply negative (-38655 gold). Suggest increasing FIGHT_PURSE or reducing costs.

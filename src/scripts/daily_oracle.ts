@@ -19,7 +19,8 @@ async function main() {
   const result = runSimulation({
     weeks: WEEKS_TO_SIMULATE,
     seed: 12345, // Deterministic
-    logFrequency: 52,
+    logFrequency: 1,
+    ignoreBankruptcy: true,
   });
 
   const { finalState, pulses } = result;
@@ -100,7 +101,7 @@ async function main() {
   }
 
   // Check economy
-  if (avgEconomy < -50000) {
+  if (avgEconomy < -20000) {
     recommendations += `- **Economy Warning**: Average stable economy is deeply negative (${avgEconomy.toFixed(0)} gold). Suggest increasing FIGHT_PURSE or reducing costs.\n`;
     hasAnomalies = true;
   } else if (avgEconomy > 50000) {
