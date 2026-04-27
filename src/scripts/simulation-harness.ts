@@ -10,6 +10,7 @@ export interface SimulationConfig {
   weeks: number;
   seed: number;
   logFrequency?: number; // Log every N weeks
+  ignoreBankruptcy?: boolean;
 }
 
 export interface SimulationResult {
@@ -80,9 +81,11 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
     }
 
     // Stop Conditions (Optional)
-    if (state.treasury < -5000 || (state.roster.length === 0 && state.treasury < 100)) {
-      console.warn(`[Sim] Failure at week ${w}: Stable Bankrupt/Empty.`);
-      break;
+    if (!config.ignoreBankruptcy) {
+      if (state.treasury < -5000 || (state.roster.length === 0 && state.treasury < 100)) {
+        console.warn(`[Sim] Failure at week ${w}: Stable Bankrupt/Empty.`);
+        break;
+      }
     }
   }
 

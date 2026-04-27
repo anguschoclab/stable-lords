@@ -77,7 +77,7 @@ export default function TacticalLogView({ log, visibleCount, className }: Tactic
   const visibleEvents = log.slice(0, visibleCount);
 
   return (
-    <ScrollArea className={cn('h-[400px] w-full', className)}>
+    <ScrollArea className={cn('h-full min-h-96 w-full', className)}>
       <div ref={scrollRef} className="p-4 space-y-1">
         {visibleEvents.length === 0 ? (
           <div className="text-center text-muted-foreground text-sm py-8 italic">

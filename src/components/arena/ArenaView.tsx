@@ -150,7 +150,7 @@ export default function ArenaView({
         arenaPrefs.screenShakeIntensity === 'off' ? 'low' : arenaPrefs.screenShakeIntensity
       }
       disabled={!arenaPrefs.effectsEnabled || arenaPrefs.screenShakeIntensity === 'off'}
-      className={cn('relative w-full h-[400px] overflow-hidden rounded-none', className)}
+      className={cn('relative w-full h-full min-h-96 overflow-hidden rounded-none', className)}
     >
       {/* Arena Background */}
       <ArenaBackground tier={arenaTier} weather={weather} className="absolute inset-0" />

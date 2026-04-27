@@ -227,7 +227,9 @@ export function RankingsWidget() {
       {/* Footer / CTA */}
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10">
         <button
+          type="button"
           onClick={() => navigate({ to: '/world' })}
+          aria-label="Sync Global Rankings"
           className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
         >
           Sync_Global_Rankings{' '}
