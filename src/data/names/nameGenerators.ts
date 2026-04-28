@@ -6,14 +6,7 @@
 import { WARRIOR_NAMES } from './warriorNames';
 import { OWNER_FIRST, OWNER_LAST } from './ownerNames';
 import { STABLE_PREFIXES, STABLE_SUFFIXES, STABLE_ALT } from './stableNames';
-
-/**
- * Picks a random element from an array using the provided RNG or Math.random.
- */
-function pick<T>(arr: T[], rng?: () => number): T {
-  const safeRng = rng || Math.random;
-  return arr[Math.floor(safeRng() * arr.length)];
-}
+import { randomPick } from '@/utils/random';
 
 /**
  * Generates a random warrior name from the WARRIOR_NAMES array.
@@ -22,7 +15,7 @@ function pick<T>(arr: T[], rng?: () => number): T {
  * @returns A random warrior name
  */
 export function randomWarriorName(rng?: () => number): string {
-  return pick(WARRIOR_NAMES, rng);
+  return randomPick(rng || Math.random, WARRIOR_NAMES);
 }
 
 /**
@@ -32,41 +25,41 @@ export function randomWarriorName(rng?: () => number): string {
  * @returns A random owner name in "First Last" format
  */
 export function randomOwnerName(rng?: () => number): string {
-  return `${pick(OWNER_FIRST, rng)} ${pick(OWNER_LAST, rng)}`;
+  const firstName = randomPick(rng || Math.random, OWNER_FIRST);
+  const lastName = randomPick(rng || Math.random, OWNER_LAST);
+  return `${firstName} ${lastName}`;
 }
 
 /**
- * Generates a random stable name.
- * 40% chance of using an alternative style name, 60% chance of prefix+suffix combination.
+ * Generates a random stable name using either prefixed format or alternative names.
  * 
  * @param rng - Optional random number generator function
  * @returns A random stable name
  */
 export function randomStableName(rng?: () => number): string {
-  const safeRng = rng || Math.random;
-  // 40% chance of alt-style name, 60% prefix+suffix
-  if (safeRng() < 0.4) {
-    return pick(STABLE_ALT, rng);
-  }
-  return `${pick(STABLE_PREFIXES, rng)} ${pick(STABLE_SUFFIXES, rng)}`;
+  // 50% chance for prefixed name, 50% chance for alternative name
+  const usePrefixed = (rng || Math.random)() < 0.5;
+  return usePrefixed ? randomPrefixedStableName(rng) : randomAltStableName(rng);
 }
 
 /**
- * Generates a random stable name using only prefix+suffix format.
+ * Generates a random prefixed stable name (e.g., "Red Dragon", "Iron Wolf").
  * 
  * @param rng - Optional random number generator function
- * @returns A random stable name in "Prefix Suffix" format
+ * @returns A random prefixed stable name
  */
 export function randomPrefixedStableName(rng?: () => number): string {
-  return `${pick(STABLE_PREFIXES, rng)} ${pick(STABLE_SUFFIXES, rng)}`;
+  const prefix = randomPick(rng || Math.random, STABLE_PREFIXES);
+  const suffix = randomPick(rng || Math.random, STABLE_SUFFIXES);
+  return `${prefix} ${suffix}`;
 }
 
 /**
- * Generates a random stable name using only alternative format.
+ * Generates a random alternative stable name from the STABLE_ALT array.
  * 
  * @param rng - Optional random number generator function
- * @returns A random alternative-style stable name
+ * @returns A random alternative stable name
  */
 export function randomAltStableName(rng?: () => number): string {
-  return pick(STABLE_ALT, rng);
+  return randomPick(rng || Math.random, STABLE_ALT);
 }

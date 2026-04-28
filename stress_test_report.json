@@ -1103,6 +1103,54 @@
         "Exceptional": 11,
         "Prodigy": 1
       }
+    },
+    {
+      "year": 24,
+      "demographics": {
+        "active": 41,
+        "dead": 845,
+        "retired": 322
+      },
+      "economy": {
+        "avgTreasury": 3455,
+        "wealthGap": 5205,
+        "bankruptRivals": 0
+      },
+      "power": {
+        "avgAttributeSum": 81.85365853658537
+      },
+      "meta": {
+        "classPopularity": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 11,
+          "LUNGING ATTACK": 3,
+          "PARRY-LUNGE": 2,
+          "PARRY-RIPOSTE": 3,
+          "PARRY-STRIKE": 1,
+          "SLASHING ATTACK": 2,
+          "STRIKING ATTACK": 7,
+          "TOTAL PARRY": 6,
+          "WALL OF STEEL": 6
+        },
+        "drift": {
+          "AIMED BLOW": 0,
+          "BASHING ATTACK": 3,
+          "LUNGING ATTACK": -10,
+          "PARRY-LUNGE": -10,
+          "PARRY-RIPOSTE": 0,
+          "PARRY-STRIKE": 0,
+          "SLASHING ATTACK": -3,
+          "STRIKING ATTACK": -2,
+          "TOTAL PARRY": 7,
+          "WALL OF STEEL": 3
+        }
+      },
+      "prospects": {
+        "Common": 17,
+        "Promising": 11,
+        "Exceptional": 10,
+        "Prodigy": 1
+      }
     }
   ]
 }

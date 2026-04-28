@@ -4,6 +4,7 @@ import type {
 } from '@/types/state.types';
 import { getRecentFights } from '@/engine/core/historyUtils';
 import { PERSONALITY_CLASH } from '@/data/ownerData';
+import { clamp } from '@/utils/math';
 
 /**
  * Detect and escalate owner-to-owner grudges based on personality clashes
@@ -118,5 +119,5 @@ export function calculateRivalryScore(
   score += Math.floor(boutsFought / 3);
   score += deathsCount * 5;
   score += upsetsCount * 3;
-  return Math.max(1, Math.min(5, score));
+  return clamp(score, 1, 5);
 }

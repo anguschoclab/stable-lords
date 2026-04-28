@@ -10,10 +10,7 @@
  */
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes } from '@/types/shared.types';
 import type { AttributePotential } from '@/types/warrior.types';
-import type { GameState } from '@/types/state.types';
-import type { Warrior } from '@/types/warrior.types';
-import type { FightSummary } from '@/types/combat.types';
-import { FightingStyle } from '@/types/shared.types';
+import { clamp } from '@/utils/math';
 import type { RecruitTier } from './recruitment';
 
 // ─── Potential Range by Tier ──────────────────────────────────────────────
@@ -46,7 +43,7 @@ export function generatePotential(
   for (const key of ATTRIBUTE_KEYS) {
     const headroom = hMin + Math.floor(rng() * (hMax - hMin + 1));
     const raw = attrs[key] + headroom;
-    potential[key] = Math.max(POTENTIAL_MIN, Math.min(POTENTIAL_ABSOLUTE_MAX, raw));
+    potential[key] = clamp(raw, POTENTIAL_MIN, POTENTIAL_ABSOLUTE_MAX);
   }
 
   return potential;

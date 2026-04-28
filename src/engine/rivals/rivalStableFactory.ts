@@ -13,8 +13,9 @@
  */
 import type { RivalStableData, Owner } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
-import type { StableTemplate } from '@/data/stableTemplates';
-import { STABLE_TEMPLATES } from '@/data/stableTemplates';
+import type { StableTemplate } from '@/data/templates';
+import type { StableId } from '@/types/shared.types';
+import { ALL_TEMPLATES } from '@/data/templates';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { FightingStyle } from '@/types/shared.types';
 import { generateCrest } from '../crest/crestGenerator';
@@ -25,7 +26,7 @@ import { generateStableTrainers } from './rivalTrainerFactory';
  * Gets stable templates.
  */
 export function getStableTemplates(): StableTemplate[] {
-  return [...STABLE_TEMPLATES];
+  return [...ALL_TEMPLATES];
 }
 
 /**
@@ -42,11 +43,11 @@ export function generateRivalStables(
   const rivals: RivalStableData[] = [];
 
   // Support for count > templates.length via over-sampling with procedural variance
-  const iterations = Math.ceil(count / STABLE_TEMPLATES.length);
+  const iterations = Math.ceil(count / ALL_TEMPLATES.length);
   const picked: { tmpl: StableTemplate; iteration: number }[] = [];
 
   for (let iter = 0; iter < iterations; iter++) {
-    const shuffled = [...STABLE_TEMPLATES].sort(() => rng.next() - 0.5);
+    const shuffled = [...ALL_TEMPLATES].sort(() => rng.next() - 0.5);
     shuffled.forEach((tmpl) => {
       if (picked.length < count) {
         picked.push({ tmpl, iteration: iter });

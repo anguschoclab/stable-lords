@@ -4,6 +4,7 @@
  */
 import type { RivalStableData, Warrior } from '@/types/state.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { clamp } from '@/utils/math';
 
 /**
  * Randomly picks an eligible opponent from a pool of rival stables.
@@ -60,5 +61,5 @@ export function calculateRivalryScore(
   score += Math.floor(boutsFought / 3);
   score += deathsCount * 5;
   score += upsetsCount * 3;
-  return Math.max(1, Math.min(5, score));
+  return clamp(score, 1, 5);
 }

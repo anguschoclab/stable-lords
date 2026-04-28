@@ -2,6 +2,7 @@ import type { FightPlan } from '@/types/combat.types';
 import type { Warrior } from '@/types/warrior.types';
 import { getTempoBonus } from '@/engine/stylePassives';
 import { getOffensiveSuitability, getDefensiveSuitability } from '@/engine/tacticSuitability';
+import { clamp } from '@/utils/math';
 
 /**
  * Strategy Analysis Engine
@@ -48,7 +49,7 @@ export function computeStrategyScore(plan: FightPlan, warrior?: Warrior): number
   if (plan.OE >= 7 && tempo > 0) score += 10;
   if (plan.OE <= 4 && tempo < 0) score += 10;
 
-  return Math.max(0, Math.min(100, score));
+  return clamp(score, 0, 100);
 }
 
 export function getScoreColor(score: number): string {
