@@ -89,8 +89,9 @@ export function detectRivalryMatchup(
     if (!f) continue;
     if (names.has(f.a) && names.has(f.d)) {
       const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
-      if (pairCounts.has(key)) {
-        pairCounts.set(key, pairCounts.get(key)! + 1);
+      const currentCount = pairCounts.get(key);
+      if (currentCount !== undefined) {
+        pairCounts.set(key, currentCount + 1);
       }
     }
   }
