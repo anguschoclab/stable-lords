@@ -15,10 +15,8 @@ const cache = new WeakMap<
   {
     warriorNames: Map<string, string>;
     stableNames: Map<string, string>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    warriorsById: Map<string, any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    warriorsByName: Map<string, any>;
+    warriorsById: Map<string, Warrior>;
+    warriorsByName: Map<string, Warrior>;
   }
 >();
 
