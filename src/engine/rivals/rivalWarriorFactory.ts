@@ -26,10 +26,18 @@ export function biasedAttrs(
     for (let i = 0; i < w; i++) weighted.push(k);
   }
   while (pool > 0) {
-    const key = weighted[Math.floor(rng() * weighted.length)]!;
-    const add = Math.min(pool, 25 - attrs[key]!, Math.floor(rng() * 4) + 1);
+    const idx = Math.floor(rng() * weighted.length);
+    const key = weighted[idx];
+    if (key === undefined) {
+      throw new Error('Attribute key selection out of bounds');
+    }
+    const currentVal = attrs[key];
+    if (currentVal === undefined) {
+      throw new Error('Attribute value not found');
+    }
+    const add = Math.min(pool, 25 - currentVal, Math.floor(rng() * 4) + 1);
     if (add <= 0) continue;
-    attrs[key]! += add;
+    attrs[key] = currentVal + add;
     pool -= add;
   }
   return attrs;
@@ -52,7 +60,12 @@ export function createRivalWarrior(
     next: () => rng.next(),
     pick: <T>(arr: T[]): T => {
       if (arr.length === 0) throw new Error('Cannot pick from empty array');
-      return arr[Math.floor(rng.next() * arr.length)]!;
+      const idx = Math.floor(rng.next() * arr.length);
+      const item = arr[idx];
+      if (item === undefined) {
+        throw new Error('RNG pick returned undefined');
+      }
+      return item;
     },
     roll: (min: number, max: number) => Math.floor(rng.next() * (max - min + 1)) + min,
     uuid: () => crypto.randomUUID(),
@@ -61,9 +74,13 @@ export function createRivalWarrior(
       const shuffled = [...arr];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(rng.next() * (i + 1));
-        const temp = shuffled[i]!;
-        shuffled[i] = shuffled[j]!;
-        shuffled[j] = temp!;
+        const tempI = shuffled[i];
+        const tempJ = shuffled[j];
+        if (tempI === undefined || tempJ === undefined) {
+          throw new Error('Shuffle index out of bounds');
+        }
+        shuffled[i] = tempJ;
+        shuffled[j] = tempI;
       }
       return shuffled;
     },
@@ -72,10 +89,24 @@ export function createRivalWarrior(
       const random = rng.next() * totalWeight;
       let cumulative = 0;
       for (let i = 0; i < items.length; i++) {
-        cumulative += weights[i]!;
-        if (random < cumulative) return items[i]!;
+        const weight = weights[i];
+        if (weight === undefined) {
+          throw new Error('Weight index out of bounds');
+        }
+        cumulative += weight;
+        if (random < cumulative) {
+          const item = items[i];
+          if (item === undefined) {
+            throw new Error('Item index out of bounds');
+          }
+          return item;
+        }
       }
-      return items[items.length - 1]!;
+      const fallback = items[items.length - 1];
+      if (fallback === undefined) {
+        throw new Error('No items available for weighted pick');
+      }
+      return fallback;
     },
   };
 

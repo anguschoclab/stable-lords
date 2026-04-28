@@ -55,8 +55,9 @@ export function generateRivalStables(
     });
   }
 
-  for (let i = 0; i < picked.length; i++) {
-    const { tmpl, iteration } = picked[i]!;
+  for (const item of picked) {
+    const tmpl = item.tmpl;
+    const iteration = item.iteration;
     const stableId = rng.uuid() as StableId;
 
     // Procedural name variance for duplicates
@@ -97,12 +98,21 @@ export function generateRivalStables(
       if (!wName) wName = `${tmpl.stableName.split(' ').pop()?.toUpperCase()}_${j}`;
       usedWarriorNames.add(wName);
 
-      const style =
-        rng.next() < 0.7 && tmpl.preferredStyles.length > 0
-          ? tmpl.preferredStyles[Math.floor(rng.next() * tmpl.preferredStyles.length)]!
-          : Object.values(FightingStyle)[
-              Math.floor(rng.next() * Object.values(FightingStyle).length)
-            ]!;
+      let style: FightingStyle;
+      if (rng.next() < 0.7 && tmpl.preferredStyles.length > 0) {
+        const preferred = tmpl.preferredStyles[Math.floor(rng.next() * tmpl.preferredStyles.length)];
+        if (!preferred) {
+          throw new Error('Style selection from preferredStyles failed');
+        }
+        style = preferred;
+      } else {
+        const allStyles = Object.values(FightingStyle);
+        const randomStyle = allStyles[Math.floor(rng.next() * allStyles.length)];
+        if (!randomStyle) {
+          throw new Error('Style selection from all styles failed');
+        }
+        style = randomStyle;
+      }
 
       // Catch-up Attribute Scaling: +1 point per week (cap +40)
       const catchupStats = Math.min(40, week);

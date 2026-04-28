@@ -77,7 +77,7 @@ function calculatePersonalityMatchScore(
       score += 15;
       break;
 
-    case 'Sadistic':
+    case 'Sadistic': {
       // Prefer Brute + high-kill warriors; injury-prone matchups
       const aIsBrute =
         warriorA.style === FightingStyle.BashingAttack ||
@@ -89,6 +89,7 @@ function calculatePersonalityMatchScore(
       if (isHighKillWarrior(warriorA) || isHighKillWarrior(warriorB)) score += 15;
       if (hasInjuryRisk(warriorA) || hasInjuryRisk(warriorB)) score += 10;
       break;
+    }
 
     case 'Flashy':
       // Prefer famous + showy styles

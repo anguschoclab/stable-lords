@@ -105,12 +105,13 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
           return hasCompleted;
         case 'upcoming':
           return hasPending;
-        case 'current-round':
+        case 'current-round': {
           // Find first round with pending matches
           const firstPendingRound = Array.from(roundsMap.entries()).find(([_, bs]) =>
             bs.some((b) => b.winner === undefined)
           );
           return round === firstPendingRound?.[0];
+        }
         default:
           return true;
       }

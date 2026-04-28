@@ -45,7 +45,11 @@ export function generateRivalryNarrative(
     `⚔️ VENDETTA IN THE PITS: ${stableA} vs ${stableB} — ${warriorA} and ${warriorB} settled scores in the arena!`,
     `🏟️ BAD BLOOD: ${stableA} and ${stableB} clashed again as ${warriorA} took on ${warriorB}!`,
   ];
-  return rng.pick(templates)!;
+  const result = rng.pick(templates);
+  if (!result) {
+    throw new Error('Rival narrative template pick failed');
+  }
+  return result;
 }
 
 /**

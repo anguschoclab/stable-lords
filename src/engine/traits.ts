@@ -164,13 +164,16 @@ export function generateTraits(rng: IRNGService): string[] {
   if (numTraits === 0) return [];
 
   const picked: string[] = [];
-  const totalWeight = TRAIT_IDS.reduce((s, id) => s + TRAITS[id]!.weight, 0);
+  const totalWeight = TRAIT_IDS.reduce((s, id) => {
+    const trait = TRAITS[id];
+    return trait ? s + trait.weight : s;
+  }, 0);
 
   for (let i = 0; i < numTraits; i++) {
     let target = rng.next() * totalWeight;
     for (const id of TRAIT_IDS) {
-      const t = TRAITS[id]!;
-      if (picked.includes(id)) continue;
+      const t = TRAITS[id];
+      if (!t || picked.includes(id)) continue;
       target -= t.weight;
       if (target <= 0) {
         picked.push(id);
