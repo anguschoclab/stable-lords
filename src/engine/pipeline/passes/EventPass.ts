@@ -2,10 +2,10 @@ import type { GameState, NewsletterItem, LedgerEntry } from '@/types/state.types
 import type { Warrior } from '@/types/warrior.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
-import { generateId } from '@/utils/idUtils';
 import narrativeContent from '@/data/narrativeContent.json';
 import { StateImpact } from '@/engine/impacts';
 import { type WarriorId, type InjuryId, type LedgerEntryId } from '@/types/shared.types';
+import type { EventNarrative } from '@/types/narrative.types';
 
 /**
  * Stable Lords — Random Event Pipeline Pass
@@ -16,13 +16,6 @@ function t(template: string, data: Record<string, string | number>): string {
     result = result.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
   }
   return result;
-}
-
-interface EventNarrative {
-  title: string;
-  injury_name: string;
-  injury_desc: string;
-  newsletter: string[];
 }
 
 export function runEventPass(
@@ -44,8 +37,8 @@ export function runEventPass(
     );
     if (activeWarriors.length > 0) {
       const brawlerIndex = Math.floor(brawlRng.next() * activeWarriors.length);
-      const brawler = activeWarriors[brawlerIndex];
-      const e = events.tavern_brawl;
+      const brawler = activeWarriors[brawlerIndex]!;
+      const e = events.tavern_brawl!;
 
       rosterUpdates.set(brawler.id, {
         fame: (brawler.fame || 0) + 5,
@@ -53,8 +46,8 @@ export function runEventPass(
           ...(brawler.injuries || []),
           {
             id: brawlRng.uuid() as InjuryId,
-            name: e.injury_name,
-            description: e.injury_desc,
+            name: e.injury_name ?? 'Black Eye',
+            description: e.injury_desc ?? 'Caught a nasty right hook in the tavern.',
             severity: 'Minor',
             weeksRemaining: 1,
             penalties: { ATT: -1 },
@@ -63,7 +56,7 @@ export function runEventPass(
       });
 
       newsletterItems.push({
-        id: generateId(brawlRng, 'newsletter'),
+        id: brawlRng.uuid('newsletter'),
         week: nextWeek,
         title: e.title,
         items: [t(brawlRng.pick(e.newsletter), { name: brawler.name, fame: 5 })],
@@ -76,8 +69,8 @@ export function runEventPass(
     const youngWarriors = state.roster.filter((w) => w.status === 'Active' && (w.age || 0) <= 25);
     if (youngWarriors.length > 0) {
       const chosenIndex = Math.floor(brawlRng.next() * youngWarriors.length);
-      const chosen = youngWarriors[chosenIndex];
-      const e = events.celestial_blessing;
+      const chosen = youngWarriors[chosenIndex]!;
+      const e = events.celestial_blessing!;
 
       const existingUpdate = rosterUpdates.get(chosen.id) || {};
       rosterUpdates.set(chosen.id, {
@@ -87,7 +80,7 @@ export function runEventPass(
       });
 
       newsletterItems.push({
-        id: generateId(brawlRng, 'newsletter'),
+        id: brawlRng.uuid('newsletter'),
         week: nextWeek,
         title: e.title,
         items: [t(brawlRng.pick(e.newsletter), { name: chosen.name, fame: 15, xp: 2 })],
@@ -100,8 +93,8 @@ export function runEventPass(
     const activeWarriors = state.roster.filter((w) => w.status === 'Active');
     if (activeWarriors.length > 0) {
       const chosenIndex = Math.floor(brawlRng.next() * activeWarriors.length);
-      const chosen = activeWarriors[chosenIndex];
-      const e = events.lost_relic;
+      const chosen = activeWarriors[chosenIndex]!;
+      const e = events.lost_relic!;
 
       const existingUpdate = rosterUpdates.get(chosen.id) || {};
       rosterUpdates.set(chosen.id, {
@@ -111,7 +104,7 @@ export function runEventPass(
       });
 
       newsletterItems.push({
-        id: generateId(brawlRng, 'newsletter'),
+        id: brawlRng.uuid('newsletter'),
         week: nextWeek,
         title: e.title,
         items: [t(brawlRng.pick(e.newsletter), { name: chosen.name, fame: 10, xp: 5 })],
@@ -121,11 +114,11 @@ export function runEventPass(
 
   // 💰 Mysterious Patron Event
   if (brawlRng.next() < 0.05) {
-    const e = events.mysterious_patron;
+    const e = events.mysterious_patron!;
     const gold = 100 + Math.floor(brawlRng.next() * 401); // 100-500 gold
     treasuryDelta += gold;
     ledgerEntries.push({
-      id: generateId(brawlRng, 'ledger') as LedgerEntryId,
+      id: brawlRng.uuid('ledger') as LedgerEntryId,
       week: nextWeek,
       label: 'Mysterious Patron Donation',
       amount: gold,
@@ -133,7 +126,7 @@ export function runEventPass(
     });
 
     newsletterItems.push({
-      id: generateId(brawlRng, 'newsletter'),
+      id: brawlRng.uuid('newsletter'),
       week: nextWeek,
       title: e.title,
       items: [t(brawlRng.pick(e.newsletter), { gold })],

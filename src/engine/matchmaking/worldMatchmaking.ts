@@ -39,20 +39,32 @@ export function planWorldBouts(state: GameState, rng: IRNGService): BoutOffer[] 
   });
 
   for (let i = 0; i < pool.length; i++) {
-    const entryA = pool[i];
+    const entryA = pool[i]!;
     if (pairedIds.has(entryA.warrior.id)) continue;
 
     // Find a suitable opponent (proximity in fame + different stable)
+    // If the stable is on a VENDETTA intent with a target, bias toward that stable's warriors.
+    const vendettaTargetId = entryA.stable.strategy?.intent === 'VENDETTA'
+      ? entryA.stable.strategy.targetStableId
+      : undefined;
+
     let bestOpponent: typeof entryA | null = null;
     let minFameGap = Infinity;
 
     for (let j = 0; j < pool.length; j++) {
       if (i === j) continue;
-      const entryD = pool[j];
+      const entryD = pool[j]!;
       if (pairedIds.has(entryD.warrior.id)) continue;
       if (entryA.stable.id === entryD.stable.id) continue;
 
       const fameGap = Math.abs((entryA.warrior.fame || 0) - (entryD.warrior.fame || 0));
+
+      // Prefer vendetta target if fame is within ±200
+      if (vendettaTargetId && entryD.stable.id === vendettaTargetId && fameGap <= 200) {
+        bestOpponent = entryD;
+        break;
+      }
+
       if (fameGap < minFameGap) {
         minFameGap = fameGap;
         bestOpponent = entryD;

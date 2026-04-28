@@ -198,6 +198,12 @@ export interface AIAgentMemory {
   metaAwareness: Record<string, number>;
   knownRivals: StableId[];
   currentIntent?: AIIntent;
+  seasonRecord?: {
+    wins: number;
+    losses: number;
+    kills: number;
+    rosterSizeAtSeasonStart: number;
+  };
 }
 
 export interface RivalStableData {

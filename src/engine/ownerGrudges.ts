@@ -1,7 +1,5 @@
 import type {
   GameState,
-  RivalStableData,
-  OwnerPersonality,
   OwnerGrudge,
 } from '@/types/state.types';
 import { getRecentFights } from '@/engine/core/historyUtils';
@@ -24,8 +22,8 @@ export function processOwnerGrudges(
 
   for (let i = 0; i < rivals.length; i++) {
     for (let j = i + 1; j < rivals.length; j++) {
-      const rA = rivals[i];
-      const rB = rivals[j];
+      const rA = rivals[i]!;
+      const rB = rivals[j]!;
       const persA = rA.owner.personality;
       const persB = rB.owner.personality;
       if (!persA || !persB) continue;
@@ -43,7 +41,7 @@ export function processOwnerGrudges(
       let hasKill = false;
 
       for (let k = 0; k < recentFights.length; k++) {
-        const f = recentFights[k];
+        const f = recentFights[k]!;
         const isCrossFight =
           (aNamesSet.has(f.a) && bNamesSet.has(f.d)) || (bNamesSet.has(f.a) && aNamesSet.has(f.d));
 
@@ -66,16 +64,22 @@ export function processOwnerGrudges(
 
       if (existing) {
         if (hasKill && existing.lastEscalation < state.week - 4) {
+          const prevIntensity = existing.intensity;
           existing.intensity = Math.min(5, existing.intensity + 1);
           existing.lastEscalation = state.week;
           existing.reason = `Blood spilled between ${rA.owner.stableName} and ${rB.owner.stableName}`;
           gazetteItems.push(
             `🔥 GRUDGE DEEPENS: ${rA.owner.name} (${persA}) and ${rB.owner.name} (${persB}) — their feud intensifies after another kill!`
           );
+          if (prevIntensity < 4 && existing.intensity >= 4) {
+            gazetteItems.push(
+              `⚡ SEASON FEUD: The rivalry between ${rA.owner.stableName} and ${rB.owner.stableName} has become an all-consuming feud!`
+            );
+          }
         }
       } else if (hasKill) {
         grudges.push({
-          id: `grudge_${rA.owner.id}_${rB.owner.id}`,
+          id: `grudge_${rA.owner.id}_${rB.owner.id}` as import('@/types/shared.types').GrudgeId,
           ownerIdA: rA.owner.id,
           ownerIdB: rB.owner.id,
           intensity: 2,
@@ -90,9 +94,10 @@ export function processOwnerGrudges(
     }
   }
 
-  // Decay old grudges
+  // Decay old grudges — after 4 consecutive weeks with no cross-stable fight the
+  // intensity drops by 1. This replaces the old 26-week cliff.
   for (const g of grudges) {
-    if (state.week - g.lastEscalation > 26 && g.intensity > 1) {
+    if (state.week - g.lastEscalation > 4 && g.intensity > 1) {
       g.intensity = Math.max(1, g.intensity - 1);
     }
   }

@@ -2,7 +2,6 @@ import type { GameState, NewsletterItem, LedgerEntry } from '@/types/state.types
 import type { Warrior, InjuryData } from '@/types/warrior.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
-import { generateId } from '@/utils/idUtils';
 import narrativeContent from '@/data/narrativeContent.json';
 import { StateImpact } from '@/engine/impacts';
 import { type WarriorId, type LedgerEntryId, type InsightId, type InjuryId } from '@/types/shared.types';
@@ -55,7 +54,7 @@ export function runSeasonalPass(
   const eventKeys = Object.keys(events);
   if (eventKeys.length === 0) return {};
 
-  const chosenEventKey = eventKeys[Math.floor(seasonRng.next() * eventKeys.length)];
+  const chosenEventKey = eventKeys[Math.floor(seasonRng.next() * eventKeys.length)]!;
   const e = events[chosenEventKey];
 
   if (!e) return {};
@@ -63,12 +62,12 @@ export function runSeasonalPass(
   if (e.effectType === 'fame_boost' && state.roster.length > 0) {
     const activeWarriors = state.roster.filter((w) => w.status === 'Active');
     if (activeWarriors.length > 0) {
-      const chosen = activeWarriors[Math.floor(seasonRng.next() * activeWarriors.length)];
+      const chosen = activeWarriors[Math.floor(seasonRng.next() * activeWarriors.length)]!;
       rosterUpdates.set(chosen.id, {
         fame: (chosen.fame || 0) + 25,
       });
       newsletterItems.push({
-        id: generateId(seasonRng, 'newsletter'),
+        id: seasonRng.uuid('newsletter'),
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: 25 })],
@@ -79,14 +78,14 @@ export function runSeasonalPass(
     const cost = 150 + Math.floor(seasonRng.next() * 100);
     treasuryDelta -= cost;
     ledgerEntries.push({
-      id: generateId(seasonRng, 'ledger') as LedgerEntryId,
+      id: seasonRng.uuid('ledger') as LedgerEntryId,
       week: nextWeek,
       label: 'Winter Heating & Supplies',
       amount: -cost,
       category: 'other',
     });
     newsletterItems.push({
-      id: generateId(seasonRng, 'newsletter'),
+      id: seasonRng.uuid('newsletter'),
       week: nextWeek,
       title: e.title,
       items: [t(seasonRng.pick(e.newsletter) || '', { gold: cost })],
@@ -96,14 +95,14 @@ export function runSeasonalPass(
     const gold = 200 + Math.floor(seasonRng.next() * 200);
     treasuryDelta += gold;
     ledgerEntries.push({
-      id: generateId(seasonRng, 'ledger') as LedgerEntryId,
+      id: seasonRng.uuid('ledger') as LedgerEntryId,
       week: nextWeek,
       label: 'Offseason Sponsorship',
       amount: gold,
       category: 'other',
     });
     newsletterItems.push({
-      id: generateId(seasonRng, 'newsletter'),
+      id: seasonRng.uuid('newsletter'),
       week: nextWeek,
       title: e.title,
       items: [t(seasonRng.pick(e.newsletter) || '', { gold })],
@@ -119,7 +118,7 @@ export function runSeasonalPass(
       });
 
       insightTokens.push({
-        id: generateId(seasonRng, 'insight') as InsightId,
+        id: seasonRng.uuid('insight') as InsightId,
         type: 'Attribute',
         targetKey: 'ST',
         warriorId: chosen.id,
@@ -129,7 +128,7 @@ export function runSeasonalPass(
       });
 
       newsletterItems.push({
-        id: generateId(seasonRng, 'newsletter'),
+        id: seasonRng.uuid('newsletter'),
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name })],
@@ -137,13 +136,15 @@ export function runSeasonalPass(
     }
 
   } else if (e.effectType === 'tavern_brawl') {
-    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    const activeWarriors = state.roster.filter(
+      (w) => w.status === 'Active' && (!w.injuries || w.injuries.length === 0)
+    );
     if (activeWarriors.length > 0) {
       const chosen = seasonRng.pick(activeWarriors)!;
       const fameGained = 10 + Math.floor(seasonRng.next() * 11);
 
       const newInjury: InjuryData = {
-        id: generateId(seasonRng, 'injury') as InjuryId,
+        id: seasonRng.uuid('injury') as InjuryId,
         name: 'Bruised Ribs',
         description: 'Painful but manageable.',
         severity: 'Minor',
@@ -159,7 +160,7 @@ export function runSeasonalPass(
       });
 
       newsletterItems.push({
-        id: generateId(seasonRng, 'newsletter'),
+        id: seasonRng.uuid('newsletter'),
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],

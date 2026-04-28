@@ -13,6 +13,7 @@ import {
 import { getTrainingBonus } from '@/engine/trainers';
 import { getFavoriteWeaponBonus } from '@/engine/favorites';
 import { getStaticTraitMods } from '@/engine/traits';
+import { getInjuryPenalties } from '@/engine/injuries';
 import { type FighterState } from '../combat/resolution';
 
 function getTrainerMods(trainers: Trainer[], style: FightingStyle) {
@@ -79,6 +80,8 @@ export function createFighterState(
   // (Berserker, Patient, etc.) are applied per-exchange in resolution.ts.
   const traitMods = getStaticTraitMods(warrior);
 
+  const injuryPenalties = getInjuryPenalties(warrior?.injuries ?? []);
+
   const effSkills: BaseSkills = {
     ATT:
       skills.ATT +
@@ -88,27 +91,31 @@ export function createFighterState(
       weaponReq.attPenalty +
       totalShieldAtt +
       (drills.ATT ?? 0) +
-      traitMods.attMod,
+      traitMods.attMod +
+      (injuryPenalties['ATT'] ?? 0),
     PAR:
       skills.PAR +
       (trainerMods?.parMod ?? 0) +
       totalShieldDef +
       (drills.PAR ?? 0) +
-      traitMods.parMod,
+      traitMods.parMod +
+      (injuryPenalties['PAR'] ?? 0),
     DEF:
       skills.DEF +
       (trainerMods?.defMod ?? 0) +
       totalShieldDef +
       (drills.DEF ?? 0) +
-      traitMods.defMod,
+      traitMods.defMod +
+      (injuryPenalties['DEF'] ?? 0),
     INI:
       skills.INI +
       (trainerMods?.iniMod ?? 0) +
       encumbranceIniPenalty +
       (drills.INI ?? 0) +
-      traitMods.iniMod,
-    RIP: skills.RIP + (drills.RIP ?? 0) + traitMods.ripMod,
-    DEC: skills.DEC + (trainerMods?.decMod ?? 0) + (drills.DEC ?? 0) + traitMods.decMod,
+      traitMods.iniMod +
+      (injuryPenalties['INI'] ?? 0),
+    RIP: skills.RIP + (drills.RIP ?? 0) + traitMods.ripMod + (injuryPenalties['RIP'] ?? 0),
+    DEC: skills.DEC + (trainerMods?.decMod ?? 0) + (drills.DEC ?? 0) + traitMods.decMod + (injuryPenalties['DEC'] ?? 0),
   };
 
   return {

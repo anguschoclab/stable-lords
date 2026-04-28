@@ -1,11 +1,13 @@
 import { FightingStyle } from '@/types/shared.types';
+import type { OffensiveTactic, DefensiveTactic, PlanCondition } from '@/types/shared.types';
 import type { Warrior } from '@/types/warrior.types';
-import type { FightPlan } from '@/types/combat.types';
+import type { FightPlan, PhaseStrategy } from '@/types/combat.types';
 import type { OwnerPersonality, AIIntent } from '@/types/state.types';
 import { defaultPlanForWarrior } from './simulate';
 import { PERSONALITY_PLAN_MODS, PHILOSOPHY_PLAN_MODS } from '@/data/ownerData';
 import { computeStrategyScore } from './strategyAnalysis';
 import { clamp } from '@/utils/math';
+import { getOffensiveSuitability, getDefensiveSuitability } from './tacticSuitability';
 
 /**
  * Generate a personality-, philosophy-, meta-, and matchup-aware fight plan for an AI warrior.
@@ -107,13 +109,121 @@ export function aiPlanForWarrior(
   // so player overrides take precedence (evaluateConditions is first-match-wins).
   // Each personality gets at most one adaptation condition to keep behaviour
   // legible in transcripts and bounded (±1/2 nudges, never beyond plan caps).
+  // Style-appropriate tactic assignment — pick best-rated offensive + defensive tactic
+  const bestOffTactic = getBestOffensiveTactic(w.style);
+  const bestDefTactic = getBestDefensiveTactic(w.style);
+  if (bestOffTactic !== 'none') plan.offensiveTactic = bestOffTactic;
+  if (bestDefTactic !== 'none') plan.defensiveTactic = bestDefTactic;
+
+  // Phase-stratified effort curves — opening is conservative, late is personality-modified
+  plan.phases = buildPhasePlan(plan, personality, w.style);
+
+  // Desperate plan — wired into resolution.ts at HP<30% or END<20%
+  plan.desperatePlan = buildDesperatePlan(plan, personality);
+
+  // Universal ENDURANCE_BELOW condition prepended before personality ones
+  // (first-match-wins: this fires before personality-specific conditions)
+  const universalConditions = buildUniversalConditions(plan);
+
   plan.ownerPersonality = personality;
-  const adaptations = getPersonalityAdaptations(personality, plan);
-  if (adaptations.length > 0) {
-    plan.conditions = [...(plan.conditions ?? []), ...adaptations];
-  }
+  const adaptations = getPersonalityAdaptations(personality, plan, intent);
+  plan.conditions = [...universalConditions, ...(plan.conditions ?? []), ...adaptations];
 
   return plan;
+}
+
+/**
+ * Pick the best-rated offensive tactic for a style, returning 'none' for TotalParry.
+ */
+function getBestOffensiveTactic(style: FightingStyle): OffensiveTactic {
+  const tactics: OffensiveTactic[] = ['Lunge', 'Slash', 'Bash', 'Decisiveness'];
+  let best: OffensiveTactic = 'none';
+  let bestScore = -1;
+  for (const t of tactics) {
+    const r = getOffensiveSuitability(style, t);
+    const score = r === 'WS' ? 2 : r === 'S' ? 1 : 0;
+    if (score > bestScore) { bestScore = score; best = t; }
+  }
+  return bestScore > 0 ? best : 'none';
+}
+
+/**
+ * Pick the best-rated defensive tactic for a style.
+ */
+function getBestDefensiveTactic(style: FightingStyle): DefensiveTactic {
+  const tactics: DefensiveTactic[] = ['Dodge', 'Parry', 'Riposte', 'Responsiveness'];
+  let best: DefensiveTactic = 'none';
+  let bestScore = -1;
+  for (const t of tactics) {
+    const r = getDefensiveSuitability(style, t);
+    const score = r === 'WS' ? 2 : r === 'S' ? 1 : 0;
+    if (score > bestScore) { bestScore = score; best = t; }
+  }
+  return bestScore > 0 ? best : 'none';
+}
+
+/**
+ * Build per-phase OE/AL curves: conservative opening, base mid, personality-tweaked late.
+ */
+function buildPhasePlan(
+  plan: FightPlan,
+  personality: OwnerPersonality,
+  style: FightingStyle
+): FightPlan['phases'] {
+  const isDefensive = (
+    style === FightingStyle.TotalParry ||
+    style === FightingStyle.WallOfSteel ||
+    style === FightingStyle.ParryRiposte
+  );
+  const openingOE = clamp(plan.OE - (isDefensive ? 2 : 1), 1, 10);
+  const opening: PhaseStrategy = { OE: openingOE, AL: plan.AL, killDesire: Math.max(1, (plan.killDesire ?? 5) - 1) };
+  const mid: PhaseStrategy = { OE: plan.OE, AL: plan.AL, killDesire: plan.killDesire ?? 5 };
+  const lateOE =
+    personality === 'Aggressive' || personality === 'Showman'
+      ? clamp(plan.OE + 1, 1, 10)
+      : personality === 'Methodical' || personality === 'Tactician'
+      ? clamp(plan.OE - 1, 1, 10)
+      : plan.OE;
+  const lateAL =
+    personality === 'Methodical' || personality === 'Tactician'
+      ? clamp(plan.AL + 1, 1, 10)
+      : plan.AL;
+  const late: PhaseStrategy = { OE: lateOE, AL: lateAL, killDesire: plan.killDesire ?? 5 };
+  return { opening, mid, late };
+}
+
+/**
+ * Build a personality-keyed desperate plan (HP<30% or END<20% fallback).
+ */
+function buildDesperatePlan(
+  plan: FightPlan,
+  personality: OwnerPersonality
+): FightPlan['desperatePlan'] {
+  const baseOE = plan.OE;
+  const baseAL = plan.AL;
+  const baseKD = plan.killDesire ?? 5;
+  if (personality === 'Aggressive') {
+    return { OE: clamp(baseOE - 1, 1, 10), AL: clamp(baseAL + 1, 1, 10), killDesire: clamp(baseKD + 1, 1, 10) };
+  }
+  if (personality === 'Methodical') {
+    return { OE: 1, AL: clamp(baseAL + 3, 1, 10), killDesire: clamp(baseKD - 2, 1, 10) };
+  }
+  return { OE: clamp(baseOE - 2, 1, 10), AL: clamp(baseAL + 2, 1, 10), killDesire: clamp(baseKD - 2, 1, 10) };
+}
+
+/**
+ * Universal conditions prepended before personality ones (first-match-wins).
+ * Ensures every AI warrior has a critical-endurance survival fallback.
+ */
+function buildUniversalConditions(plan: FightPlan): PlanCondition[] {
+  const bounded = (v: number, delta: number) => clamp(v + delta, 1, 10);
+  return [
+    {
+      trigger: { type: 'ENDURANCE_BELOW', value: 15 },
+      override: { OE: bounded(plan.OE, -2), AL: bounded(plan.AL, +2) },
+      label: 'Universal: critical endurance survival',
+    },
+  ];
 }
 
 /**
@@ -122,19 +232,29 @@ export function aiPlanForWarrior(
  */
 function getPersonalityAdaptations(
   personality: OwnerPersonality,
-  plan: FightPlan
-): import('@/types/shared.types').PlanCondition[] {
+  plan: FightPlan,
+  intent?: AIIntent
+): PlanCondition[] {
   const bounded = (v: number, delta: number) => clamp(v + delta, 1, 10);
+  const isKillIntent = intent === 'VENDETTA' || intent === 'AGGRESSIVE_EXPANSION';
   switch (personality) {
-    case 'Aggressive':
-      // When ahead on momentum, press harder.
-      return [
+    case 'Aggressive': {
+      const conditions: PlanCondition[] = [
         {
           trigger: { type: 'MOMENTUM_LEAD', value: 2 },
           override: { OE: bounded(plan.OE, +1), killDesire: bounded(plan.killDesire ?? 5, +1) },
           label: 'Aggressive: press the advantage',
         },
       ];
+      if (isKillIntent) {
+        conditions.push({
+          trigger: { type: 'MOMENTUM_LEAD', value: 2 },
+          override: { OE: bounded(plan.OE, +1), killDesire: bounded(plan.killDesire ?? 5, +2) },
+          label: 'Aggressive+Vendetta: kill commitment',
+        });
+      }
+      return conditions;
+    }
     case 'Methodical':
       // Losing ground on momentum → tighten defence.
       return [

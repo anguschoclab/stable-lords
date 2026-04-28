@@ -1,9 +1,7 @@
 import type {
   GameState,
   RivalStableData,
-  OwnerPersonality,
   MetaAdaptation,
-  TrainerTier,
 } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
@@ -38,6 +36,19 @@ export function processAIRosterManagement(
     // 1) Retirement / Culling Logic
     let culledThisTick = 0;
 
+    // Trajectory guard: warriors on a hot streak (3+ wins in last 5 fights) are
+    // protected from any personality-based culling regardless of career win-rate.
+    const isOnWinStreak = (w: { career: { wins: number; losses: number } }) => {
+      const total = w.career.wins + w.career.losses;
+      if (total < 5) return false;
+      const wId = (w as any).id as string;
+      const recentFights = getRecentFightsForWarrior(state.arenaHistory, wId, 5);
+      const recentWins = recentFights.filter(
+        (f) => (f.warriorIdA === wId && f.winner === 'A') || (f.warriorIdD === wId && f.winner === 'D')
+      ).length;
+      return recentWins >= 3;
+    };
+
     // Methodical/Tactician owners cull underperformers
     if (personality === 'Methodical' || personality === 'Tactician') {
       const candidates = r.roster.filter(
@@ -45,7 +56,8 @@ export function processAIRosterManagement(
           w.status === 'Active' &&
           w.career.wins + w.career.losses >= 5 &&
           w.career.wins / Math.max(1, w.career.wins + w.career.losses) < 0.3 &&
-          (w.age ?? 18) >= 25
+          (w.age ?? 18) >= 25 &&
+          !isOnWinStreak(w)
       );
       for (const c of candidates.slice(0, 1)) {
         c.status = 'Retired';
@@ -64,7 +76,8 @@ export function processAIRosterManagement(
           w.status === 'Active' &&
           w.career.kills === 0 &&
           w.career.wins + w.career.losses >= 8 &&
-          (w.age ?? 18) >= 24
+          (w.age ?? 18) >= 24 &&
+          !isOnWinStreak(w)
       );
       for (const c of killless.slice(0, 1)) {
         c.status = 'Retired';
@@ -91,16 +104,6 @@ export function processAIRosterManagement(
     // 2) Recruitment Logic
     const currentActive = r.roster.filter((w) => w.status === 'Active').length;
     const minRoster = personality === 'Aggressive' ? 8 : personality === 'Showman' ? 7 : 6;
-    const tier = r.tier ?? 'Minor';
-    const trainerTier: TrainerTier =
-      tier === 'Legendary'
-        ? rngSnapshot.next() < 0.3
-          ? 'Master'
-          : 'Seasoned'
-        : rngSnapshot.next() < 0.1
-          ? 'Master'
-          : 'Novice';
-
     const recruitChance =
       currentActive < 4
         ? 1.0
@@ -201,7 +204,7 @@ function generateAIRecruit(
   const name = `${rng.pick(prefixes)}${rng.pick(suffixes)}`;
 
   return {
-    id: rng.uuid('warrior'),
+    id: rng.uuid('warrior') as import('@/types/shared.types').WarriorId,
     name,
     style,
     attributes: attrs,
@@ -217,6 +220,7 @@ function generateAIRecruit(
     status: 'Active',
     age: 17 + Math.floor(rng.next() * 5),
     stableId: rival.id,
+    traits: [],
   };
 }
 

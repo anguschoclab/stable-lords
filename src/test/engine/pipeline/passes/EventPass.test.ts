@@ -4,6 +4,8 @@ import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { resolveImpacts } from '@/engine/impacts';
 import type { GameState } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
+import type { WarriorId } from '@/types/shared.types';
+
 
 describe('EventPass', () => {
   afterEach(() => {
@@ -28,7 +30,7 @@ describe('EventPass', () => {
     };
     (rng as any).next = mockNext;
 
-    const w: Partial<Warrior> = { id: 'w-1', name: 'Gladiator', status: 'Active', fame: 0, xp: 0 };
+    const w: Partial<Warrior> = { id: 'w-1' as WarriorId, name: 'Gladiator', status: 'Active', fame: 0, xp: 0 };
     const state: Partial<GameState> = {
       roster: [w as Warrior],
       newsletter: [],
@@ -43,6 +45,43 @@ describe('EventPass', () => {
     const newsletter = nextState.newsletter?.[0];
     expect(newsletter?.title).toBe('Lost Relic Discovery');
     expect(newsletter?.items[0]).toContain('discovered an ancient artifact');
+  });
+
+  it('should trigger the Tavern Brawl event, award +5 fame and add a Black Eye injury', () => {
+    const rng = new SeededRNGService(42);
+    const originalNext = rng.next.bind(rng);
+    let callCount = 0;
+    const mockNext = () => {
+      callCount++;
+      if (callCount === 1) return 0.01; // succeed Tavern Brawl (< 0.05)
+      return originalNext();
+    };
+    (rng as any).next = mockNext;
+
+    const w: Partial<Warrior> = {
+      id: 'w-brawl' as WarriorId,
+      name: 'Bruto',
+      status: 'Active',
+      fame: 10,
+      injuries: [],
+    };
+    const state: Partial<GameState> = {
+      roster: [w as Warrior],
+      newsletter: [],
+    };
+
+    const impact = runEventPass(state as GameState, 3, rng);
+    const nextState = resolveImpacts(state as GameState, [impact]);
+    const warrior = nextState.roster.find((r: Warrior) => r.id === 'w-brawl');
+
+    expect(warrior?.fame).toBe(15);
+    expect(warrior?.injuries).toHaveLength(1);
+    expect(warrior?.injuries?.[0]?.name).toBe('Black Eye');
+    expect(warrior?.injuries?.[0]?.severity).toBe('Minor');
+    expect(warrior?.injuries?.[0]?.weeksRemaining).toBe(1);
+
+    const newsletter = nextState.newsletter?.[0];
+    expect(newsletter?.title).toBe('Tavern Brawl!');
   });
 
   it('should trigger the Mysterious Patron event and correctly update treasuryDelta', () => {

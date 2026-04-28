@@ -15,11 +15,14 @@ import { checkBudget } from './workers/budgetWorker';
  * Encapsulates the turn logic for a single rival stable.
  * Implements "Skeptical Memory" and "Hierarchical Delegation".
  */
+export type PlayerThreatLevel = 'Dominant' | 'Moderate' | 'Neutral';
+
 export interface AgentContext {
   rival: RivalStableData;
   state: GameState;
   meta: Record<string, number>;
   budgetReport?: BudgetReport; // ⚡ Bolt: Cache budget report for the week
+  playerThreatLevel: PlayerThreatLevel;
 }
 
 export function createAgentContext(rival: RivalStableData, state: GameState): AgentContext {
@@ -31,7 +34,7 @@ export function createAgentContext(rival: RivalStableData, state: GameState): Ag
     knownRivals: state.rivals
       ? state.rivals.map((r) => r.owner.id).filter((id) => id !== rival.owner.id)
       : [],
-    currentIntent: 'SURVIVAL',
+    currentIntent: 'CONSOLIDATION',
   };
 
   // ⚡ Continuous Alignment: Compute meta awareness from current arena history (use cached if available)
@@ -40,11 +43,15 @@ export function createAgentContext(rival: RivalStableData, state: GameState): Ag
   // ⚡ Bolt: Pre-compute budget report for the week
   const budgetReport = checkBudget(rival, 0, 'OTHER'); // Zero cost for baseline report
 
+  // Player threat level from realm rankings — rivals use this to decide VENDETTA targets
+  const playerThreatLevel = computePlayerThreatLevel(state);
+
   return {
     rival: { ...rival, agentMemory },
     state,
     meta,
     budgetReport,
+    playerThreatLevel,
   };
 }
 
@@ -70,7 +77,7 @@ export function logAgentAction(
   const actionHistory = [newEvent, ...(rival.actionHistory || [])].slice(0, 20);
 
   // ⚡ Intent Recognition: Infer intent from action type
-  let currentIntent: AIIntent = rival.agentMemory?.currentIntent || 'SURVIVAL';
+  let currentIntent: AIIntent = rival.agentMemory?.currentIntent || 'CONSOLIDATION';
   if (type === 'FINANCE' && (description.includes('hoard') || description.includes('saving')))
     currentIntent = 'WEALTH_ACCUMULATION';
   if (
@@ -87,6 +94,7 @@ export function logAgentAction(
 
 /**
  * Background Consolidation: Updates burn rate and long-term memory.
+ * Resets seasonRecord on week 1 (season boundary).
  */
 export function consolidateAgentMemory(
   rival: RivalStableData,
@@ -98,12 +106,50 @@ export function consolidateAgentMemory(
   const currentTreasury = rival.treasury;
   const burnRate = lastTreasury - currentTreasury;
 
+  const isSeasonBoundary = currentWeek === 1;
+  const seasonRecord = isSeasonBoundary
+    ? {
+        wins: 0,
+        losses: 0,
+        kills: 0,
+        rosterSizeAtSeasonStart: rival.roster.filter((w) => w.status === 'Active').length,
+      }
+    : rival.agentMemory.seasonRecord;
+
   return {
     ...rival,
     agentMemory: {
       ...rival.agentMemory,
       lastTreasury: currentTreasury,
       burnRate,
+      ...(seasonRecord !== undefined ? { seasonRecord } : {}),
     },
   };
+}
+
+/**
+ * Computes how threatening the player is relative to the world,
+ * based on their best warrior's realm ranking vs the world median.
+ */
+export function computePlayerThreatLevel(state: GameState): PlayerThreatLevel {
+  const rankings = state.realmRankings;
+  if (!rankings || Object.keys(rankings).length === 0) return 'Neutral';
+
+  const playerWarriorIds = new Set((state.roster || []).map((w) => w.id));
+  let playerBestRank: number | null = null;
+  for (const [id, entry] of Object.entries(rankings)) {
+    if (!playerWarriorIds.has(id as import('@/types/shared.types').WarriorId)) continue;
+    if (playerBestRank === null || entry.overallRank < playerBestRank) {
+      playerBestRank = entry.overallRank;
+    }
+  }
+
+  if (playerBestRank === null) return 'Neutral';
+
+  const totalRanked = Object.keys(rankings).length;
+  const percentile = playerBestRank / Math.max(1, totalRanked);
+
+  if (percentile <= 0.15) return 'Dominant';
+  if (percentile <= 0.4) return 'Moderate';
+  return 'Neutral';
 }

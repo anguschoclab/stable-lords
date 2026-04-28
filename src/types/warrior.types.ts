@@ -163,6 +163,7 @@ export interface Warrior {
   lore?: string;
   origin?: string;
   lineage?: WarriorLineage;
+  isStarInvestment?: boolean;
 }
 
 // Re-exports for convenience

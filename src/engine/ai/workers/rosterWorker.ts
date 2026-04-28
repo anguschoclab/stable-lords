@@ -57,10 +57,14 @@ export function processRoster(
   // Injured warriors are excluded — they are already in the recovery path above
   // and training them would stack the injury penalty from trainingGains.ts.
   const trainingLimit = updatedRival.treasury > 500 ? 3 : 1;
-  const trainees = updatedRival.roster
-    .filter((w) => w.status === 'Active' && (w.injuries ?? []).length === 0)
-    .sort((a, b) => (a.fame || 0) - (b.fame || 0))
-    .slice(0, trainingLimit);
+  const trainableWarriors = updatedRival.roster.filter(
+    (w) => w.status === 'Active' && (w.injuries ?? []).length === 0
+  );
+  const champions = trainableWarriors.filter((w) => w.champion || (w as any).isStarInvestment);
+  const nonChampions = trainableWarriors
+    .filter((w) => !w.champion && !(w as any).isStarInvestment)
+    .sort((a, b) => (b.fame || 0) - (a.fame || 0));
+  const trainees = [...champions, ...nonChampions].slice(0, trainingLimit);
 
   for (const trainee of trainees) {
     const trainingCost = 35;
@@ -95,6 +99,27 @@ export function processRoster(
   updatedRival.seasonalGrowth = seasonalGrowth;
 
   // 2. Equipment (High Risk)
+  // Champions always get gear consideration regardless of intent (treasury gate only).
+  const activeForGear = updatedRival.roster.filter((w) => w.status === 'Active');
+  const hasChampion = activeForGear.some((w) => w.champion);
+  if (hasChampion && updatedRival.treasury > 800) {
+    const gearCost = 150;
+    const budgetReport = checkBudget(updatedRival, gearCost, 'ROSTER');
+    const champWarrior = activeForGear.find((w) => w.champion);
+    if (budgetReport.isAffordable && champWarrior) {
+      updatedRival.treasury -= gearCost;
+      updatedRival.roster = updatedRival.roster.map((w) =>
+        w.id === champWarrior.id ? applyGearUpgrade(w, rngService) : w
+      );
+      updatedRival = logAgentAction(
+        updatedRival,
+        'ROSTER',
+        `Invested 150g in gear for champion ${champWarrior.name}.`,
+        budgetReport.riskTier,
+        currentWeek
+      );
+    }
+  }
   if (intent === 'EXPANSION' || (intent === 'VENDETTA' && updatedRival.treasury > 1000)) {
     const gearCost = 150;
     const budgetReport = checkBudget(updatedRival, gearCost, 'ROSTER');
