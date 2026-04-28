@@ -49,3 +49,27 @@ export type {
   MetalColor,
   ChargeType,
 } from '@/types/crest.types';
+
+// ⏱️ Time Advance System (Phase 1 & 2)
+export { TickOrchestrator } from './tick/TickOrchestrator';
+export {
+  TimeAdvanceService,
+  type AdvanceOptions,
+  type WeekSummary,
+  type QuarterSummary,
+  type QuarterAdvanceResult,
+  type YearAdvanceResult,
+  type SoftStopCondition,
+  DEFAULT_AUTOSIM_STOPS,
+  evaluateStopConditions,
+} from './tick/TimeAdvanceService';
+export { type WeekAdvanceOptions } from './pipeline/services/weekPipelineService';
+
+// 🎲 Autosim System (Phase 3)
+export {
+  runAutosim,
+  type AutosimOptions,
+  type AutosimWeekSummary,
+  type AutosimResult,
+  DEFAULT_AUTOSIM_STOP_CONDITIONS,
+} from './autosim';

@@ -202,49 +202,55 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
     for (const warriorA of shuffledWarriors) {
       if (generated >= capacity) break;
 
-      const rankA = rankings[warriorA.warrior.id]?.overallRank || 999;
+      const rankDataA = rankings[warriorA.warrior.id];
+      const rankA = rankDataA?.overallRank ?? 999;
       if (rankA > RANK_REQUIREMENTS[promoter.tier]) continue;
 
       // Find an opponent B with personality-based matching
-      const scoreA = rankings[warriorA.warrior.id]?.compositeScore || 0;
+      const scoreA = rankDataA?.compositeScore ?? 0;
+      const maxScoreA = Math.max(1, scoreA);
 
-      // Score and rank candidates by personality fit + skill proximity
-      const candidates = shuffledWarriors
-        .filter((candidate) => {
-          if (candidate.warrior.id === warriorA.warrior.id) return false;
+      // Optimized candidate selection: single pass with inline scoring
+      // Avoids multiple array allocations (filter + map + sort)
+      let bestCandidate: typeof shuffledWarriors[0] | null = null;
+      let bestScore = -Infinity;
+      let bestGap = 0;
 
-          const rankB = rankings[candidate.warrior.id]?.overallRank || 999;
-          const scoreB = rankings[candidate.warrior.id]?.compositeScore || 0;
+      for (const candidate of shuffledWarriors) {
+        if (candidate.warrior.id === warriorA.warrior.id) continue;
 
-          // Qualification & Score Proximity (personality-based gap threshold)
-          const gap = Math.abs(scoreA - scoreB) / Math.max(1, scoreA);
-          return rankB <= RANK_REQUIREMENTS[promoter.tier] && gap <= gapThreshold;
-        })
-        .map((candidate) => ({
-          ...candidate,
-          scoreB: rankings[candidate.warrior.id]?.compositeScore || 0,
-          personalityScore: calculatePersonalityMatchScore(
-            warriorA.warrior,
-            candidate.warrior,
-            promoter
-          ),
-          gap:
-            Math.abs(scoreA - (rankings[candidate.warrior.id]?.compositeScore || 0)) /
-            Math.max(1, scoreA),
-        }))
-        .sort((a, b) => {
-          // Greedy prefers bigger gaps, others prefer smaller gaps
-          if (promoter.personality === 'Greedy') {
-            return b.gap - a.gap; // Bigger gap = better for Greedy
-          }
+        const rankDataB = rankings[candidate.warrior.id];
+        const rankB = rankDataB?.overallRank ?? 999;
+        if (rankB > RANK_REQUIREMENTS[promoter.tier]) continue;
+
+        const scoreB = rankDataB?.compositeScore ?? 0;
+        const gap = Math.abs(scoreA - scoreB) / maxScoreA;
+        if (gap > gapThreshold) continue;
+
+        const personalityScore = calculatePersonalityMatchScore(
+          warriorA.warrior,
+          candidate.warrior,
+          promoter
+        );
+
+        // Calculate composite score for comparison
+        let candidateScore: number;
+        if (promoter.personality === 'Greedy') {
+          // Greedy prefers bigger gaps
+          candidateScore = gap * 100 + personalityScore;
+        } else {
           // Others: personality score first, then tighter gap
-          if (b.personalityScore !== a.personalityScore) {
-            return b.personalityScore - a.personalityScore;
-          }
-          return a.gap - b.gap; // Tighter gap = better
-        });
+          candidateScore = personalityScore * 100 - gap;
+        }
 
-      const opponentB = candidates[0];
+        if (candidateScore > bestScore) {
+          bestScore = candidateScore;
+          bestCandidate = candidate;
+          bestGap = gap;
+        }
+      }
+
+      const opponentB = bestCandidate;
 
       if (opponentB) {
         const offerId = rngService.uuid();

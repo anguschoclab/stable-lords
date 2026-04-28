@@ -80,5 +80,10 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    /* BY-DESIGN: Logger utility intentionally uses console */
+    files: ["src/utils/logger.ts"],
+    rules: { "no-console": "off" },
   }
 );

@@ -5,6 +5,17 @@ import { archiveWeekLogs } from '../adapters/opfsArchiver';
 import { computeMetaDrift } from '@/engine/metaDrift';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { resolveImpacts, StateImpact } from '@/engine/impacts';
+import { getFeatureFlags } from '@/engine/featureFlags';
+
+/**
+ * Options for week advancement
+ */
+export interface WeekAdvanceOptions {
+  /** Skip UI-facing content generation (newsletters, gazettes) for headless mode */
+  headless?: boolean;
+  /** Defer OPFS archiving - accumulate logs in state instead of writing immediately */
+  deferArchives?: boolean;
+}
 
 // 🌩️ Modular Pipeline Passes
 import { runBoutSimulationPass } from '../passes/BoutSimulationPass';
@@ -79,8 +90,8 @@ function checkBankruptcy(state: GameState, coreImpacts: StateImpact[]): boolean 
   return estimatedTreasury < -500;
 }
 
-function collectRemainingImpacts(state: GameState, ctx: WeekContext): StateImpact[] {
-  return [
+function collectRemainingImpacts(state: GameState, ctx: WeekContext, opts?: WeekAdvanceOptions): StateImpact[] {
+  const impacts: StateImpact[] = [
     runWorldPass(state, ctx.nextWeek, ctx.rootRng),
     runSystemPass(state, ctx.rootRng),
     runRankingsPass(state),
@@ -88,30 +99,30 @@ function collectRemainingImpacts(state: GameState, ctx: WeekContext): StateImpac
     runPromoterLifecyclePass(state, ctx.rootRng),
     runTrainerPass(state, ctx.rootRng),
     runRivalStrategyPass(state, ctx.nextWeek, ctx.rootRng),
-    runEventPass(state, ctx.nextWeek, ctx.rootRng),
-    runNarrativePass(state, ctx.currentWeek, ctx.nextWeek, ctx.rootRng),
-    runSeasonalPass(state, ctx.nextWeek, ctx.rootRng),
   ];
+
+  // In headless mode, skip expensive content generation passes
+  if (!opts?.headless) {
+    impacts.push(runEventPass(state, ctx.nextWeek, ctx.rootRng));
+    impacts.push(runNarrativePass(state, ctx.currentWeek, ctx.nextWeek, ctx.rootRng));
+  }
+
+  impacts.push(runSeasonalPass(state, ctx.nextWeek, ctx.rootRng));
+  return impacts;
 }
 
-function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext): GameState {
+function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext, opts?: WeekAdvanceOptions): GameState {
   state.week = ctx.nextWeek;
   state.year = ctx.nextYear;
   state.day = 0;
   state.trainingAssignments = [];
 
   // 🧹 Bout offer cleanup — single source of truth for offer pruning.
-  // The just-finished week's bouts have already fired in runBoutPhase, so
-  // any offer with boutWeek <= just-finished week is done (fired, expired,
-  // or rejected). Past Signed offers must be dropped or they accumulate
-  // forever and break the matchmaker.
   if (state.boutOffers) {
     const cleanedOffers: Record<string, any> = {};
     const justFinishedWeek = ctx.nextWeek - 1;
     Object.values(state.boutOffers).forEach((offer) => {
-      // Past offers (already fired or whose date has passed) — discard regardless of status
       if (offer.boutWeek <= justFinishedWeek) return;
-      // Stale proposals that didn't get signed before their deadline — discard
       if (
         offer.status !== 'Signed' &&
         offer.expirationWeek != null &&
@@ -128,6 +139,31 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext):
     state.seasonalGrowth = (state.seasonalGrowth ?? []).filter((sg) => sg.season === state.season);
   }
 
+  // Handle OPFS archiving
+  if (opts?.deferArchives) {
+    // In batch mode, defer archives to state for later flushing
+    // Accumulate bout logs in state.deferredBoutLogs
+    const pendingArchives: Array<{year: number; season: number; boutId: string; transcript: string[]}> = [];
+    for (const summary of state.arenaHistory || []) {
+      if (summary.transcript && summary.transcript.length > 0 && summary.week === ctx.currentWeek) {
+        const seasonIdx = ['Spring', 'Summer', 'Fall', 'Winter'].indexOf(state.season);
+        pendingArchives.push({
+          year: state.year,
+          season: seasonIdx >= 0 ? seasonIdx : 0,
+          boutId: summary.id,
+          transcript: summary.transcript,
+        });
+        // Clear transcript to save memory
+        summary.transcript = undefined;
+      }
+    }
+
+    // Store in state for batch flushing
+    (state as any).deferredBoutLogs = [...((state as any).deferredBoutLogs || []), ...pendingArchives];
+    return state;
+  }
+
+  // Normal mode: archive immediately
   return archiveWeekLogs(state);
 }
 
@@ -135,23 +171,21 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext):
  * Stable Lords — Consolidated Weekly Pipeline (1.0 Hardened)
  * Orchestrates the simulation tick using a high-performance batched architecture.
  */
-export function advanceWeek(state: GameState): GameState {
+export function advanceWeek(state: GameState, opts?: WeekAdvanceOptions): GameState {
+  // Check feature flag for headless mode
+  const flags = getFeatureFlags();
+  const headless = flags.headlessWeekAdvance && opts?.headless;
+
   const ctx = prepareWeekContext(state);
   const settledState = runBoutPhase(state, ctx);
   const coreImpacts = collectCoreImpacts(settledState, ctx);
 
   if (checkBankruptcy(settledState, coreImpacts)) {
-    return finalizeState(resolveImpacts(settledState, coreImpacts), state, ctx);
+    return finalizeState(resolveImpacts(settledState, coreImpacts), state, ctx, { deferArchives: opts?.deferArchives });
   }
 
-  // Stage the pipeline: apply core impacts (training, aging, health) BEFORE
-  // running the remaining passes so RivalStrategyPass et al. see aged rosters.
-  // Previously every pass ran against the same pre-impact state and emitted
-  // rivalsUpdates with the FULL rival object, so a later pass's stale roster
-  // would clobber an earlier pass's roster mutation under mapMerge — aging
-  // ticks were silently overwritten by RivalStrategyPass's snapshot, so ages
-  // never advanced and no warrior ever reached retirement.
+  // Stage the pipeline: apply core impacts BEFORE running remaining passes
   const stateAfterCore = resolveImpacts(settledState, coreImpacts);
-  const remainingImpacts = collectRemainingImpacts(stateAfterCore, ctx);
-  return finalizeState(resolveImpacts(stateAfterCore, remainingImpacts), state, ctx);
+  const remainingImpacts = collectRemainingImpacts(stateAfterCore, ctx, { headless });
+  return finalizeState(resolveImpacts(stateAfterCore, remainingImpacts), state, ctx, { deferArchives: opts?.deferArchives });
 }

@@ -1,5 +1,6 @@
 import type { GameState } from '@/types/state.types';
-import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
+import { advanceWeek, type WeekAdvanceOptions } from '@/engine/pipeline/services/weekPipelineService';
+import { flushDeferredArchives } from '@/engine/pipeline/adapters/opfsArchiver';
 import { getFeatureFlags } from '@/engine/featureFlags';
 
 /**
@@ -144,32 +145,6 @@ function extractWeekSummary(state: GameState): WeekSummary {
 }
 
 /**
- * Flush deferred archives to OPFS
- */
-async function flushDeferredArchives(state: GameState): Promise<void> {
-  const deferred = (state as any).deferredBoutLogs;
-  if (!deferred || deferred.length === 0) return;
-
-  // Import dynamically to avoid circular dependencies
-  const { OPFSArchiveService } = await import('@/engine/storage/opfsArchive');
-  const service = new OPFSArchiveService();
-
-  if (!service.isSupported()) return;
-
-  // Batch archive all deferred logs
-  for (const log of deferred) {
-    try {
-      await service.archiveBoutLog(log.year, log.season, log.boutId, log.transcript, true);
-    } catch (err) {
-      console.error(`Failed to archive bout ${log.boutId}:`, err);
-    }
-  }
-
-  // Clear deferred logs
-  (state as any).deferredBoutLogs = [];
-}
-
-/**
  * Unified Time Advance Service
  * Central point for all time-based progression with batch support
  */
@@ -180,21 +155,22 @@ export const TimeAdvanceService = {
   advanceWeek(state: GameState, opts?: AdvanceOptions): GameState {
     const flags = getFeatureFlags();
 
-    // If headless mode is not enabled via feature flag, ignore the option
-    // TODO: Implement headless mode in weekPipelineService (Phase 2)
+    // Only use headless mode if feature flag is enabled
     const headless = flags.headlessWeekAdvance && opts?.headless;
-    void headless; // Marked for future use
 
-    // Call the existing week pipeline with options
-    // Note: weekPipelineService needs to be updated to accept options
-    return advanceWeek(state);
+    // Call the week pipeline with options
+    const weekOpts: WeekAdvanceOptions = {
+      headless,
+      deferArchives: opts?.deferArchives,
+    };
+    return advanceWeek(state, weekOpts);
   },
 
   /**
    * Advance a quarter (13 weeks)
    * Guarantees determinism: 13 sequential advanceWeek calls produce identical state
    */
-  advanceQuarter(state: GameState, opts?: AdvanceOptions): QuarterAdvanceResult {
+  async advanceQuarter(state: GameState, opts?: AdvanceOptions): Promise<QuarterAdvanceResult> {
     const flags = getFeatureFlags();
 
     if (!flags.quarterPipeline) {
@@ -211,8 +187,12 @@ export const TimeAdvanceService = {
     const checkpointInterval = opts?.checkpointInterval ?? 4;
 
     for (let i = 0; i < 13; i++) {
-      // Advance one week using the core pipeline
-      currentState = advanceWeek(currentState);
+      // Advance one week using the core pipeline with options
+      const weekOpts: WeekAdvanceOptions = {
+        headless: flags.headlessWeekAdvance && opts?.headless,
+        deferArchives: opts?.deferArchives,
+      };
+      currentState = advanceWeek(currentState, weekOpts);
 
       // Extract summary
       weekSummaries.push(extractWeekSummary(currentState));
@@ -223,7 +203,7 @@ export const TimeAdvanceService = {
         if (stopResult.shouldStop) {
           // Flush any deferred archives before returning
           if (opts.deferArchives) {
-            flushDeferredArchives(currentState);
+            await flushDeferredArchives(currentState);
           }
 
           return {
@@ -251,7 +231,7 @@ export const TimeAdvanceService = {
 
     // Flush deferred archives at quarter end
     if (opts?.deferArchives) {
-      flushDeferredArchives(currentState);
+      await flushDeferredArchives(currentState);
     }
 
     return {
@@ -273,7 +253,7 @@ export const TimeAdvanceService = {
   /**
    * Advance a year (52 weeks = 4 quarters)
    */
-  advanceYear(state: GameState, opts?: AdvanceOptions): YearAdvanceResult {
+  async advanceYear(state: GameState, opts?: AdvanceOptions): Promise<YearAdvanceResult> {
     const flags = getFeatureFlags();
 
     if (!flags.yearPipeline) {
@@ -286,7 +266,7 @@ export const TimeAdvanceService = {
     const startTreasury = state.treasury;
 
     for (let q = 0; q < 4; q++) {
-      const result = this.advanceQuarter(currentState, opts);
+      const result = await this.advanceQuarter(currentState, opts);
       quarterResults.push(result);
       currentState = result.state;
 
@@ -324,7 +304,7 @@ export const TimeAdvanceService = {
   /**
    * Skip to quarter end (headless mode for UI)
    */
-  skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): QuarterAdvanceResult {
+  async skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<QuarterAdvanceResult> {
     return this.advanceQuarter(state, {
       ...opts,
       headless: true,
@@ -335,7 +315,7 @@ export const TimeAdvanceService = {
   /**
    * Skip to year end (headless mode for UI)
    */
-  skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): YearAdvanceResult {
+  async skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<YearAdvanceResult> {
     return this.advanceYear(state, {
       ...opts,
       headless: true,

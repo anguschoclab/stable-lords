@@ -8,6 +8,14 @@ import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { engineProxy } from '@/engine/workerProxy';
 import { opfsArchive } from '@/engine/storage/opfsArchive';
 
+// Helper to strip non-serializable fields before worker transfer
+function stripNonSerializable<T extends { warriorMap?: unknown; cachedMetaDrift?: unknown }>(
+  state: T
+): Omit<T, 'warriorMap' | 'cachedMetaDrift'> {
+  const { warriorMap, cachedMetaDrift, ...rest } = state;
+  return rest;
+}
+
 // ─── Slices ────────────────────────────────────────────────────────────────
 import { createEconomySlice, EconomySlice } from './slices/economySlice';
 import { createRosterSlice, RosterSlice } from './slices/rosterSlice';
@@ -303,8 +311,7 @@ export const useGameStore = create<GameStore>()(
         // In PROD (worker), structured clone handles this automatically
         const state = import.meta.env.DEV ? JSON.parse(JSON.stringify(raw)) : raw;
         // Strip non-serializable fields before structured-clone transfer to worker
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { warriorMap: _wm, cachedMetaDrift: _cmd, ...cleanState } = state as any;
+        const cleanState = stripNonSerializable(state) as GameState;
         const currentWeek = cleanState.week;
 
         set((draft) => {
@@ -362,8 +369,7 @@ export const useGameStore = create<GameStore>()(
         const store = get();
         const raw = processedState || reconstructGameState(store);
         const state = import.meta.env.DEV ? JSON.parse(JSON.stringify(raw)) : raw;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { warriorMap: _wm, cachedMetaDrift: _cmd, ...cleanState } = state as any;
+        const cleanState = stripNonSerializable(state) as GameState;
         const currentWeek = cleanState.week;
 
         set((draft) => {

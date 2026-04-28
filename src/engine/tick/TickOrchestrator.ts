@@ -106,7 +106,7 @@ export const TickOrchestrator = {
    * Advance a quarter (13 weeks) with progress tracking.
    * Delegates to TimeAdvanceService for batch processing.
    */
-  advanceQuarter(state: GameState, opts?: AdvanceOptions): QuarterAdvanceResult {
+  async advanceQuarter(state: GameState, opts?: AdvanceOptions): Promise<QuarterAdvanceResult> {
     return TimeAdvanceService.advanceQuarter(state, opts);
   },
 
@@ -114,7 +114,7 @@ export const TickOrchestrator = {
    * Skip to quarter end (headless mode for UI).
    * Batches 13 weeks with deferred I/O.
    */
-  skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): QuarterAdvanceResult {
+  async skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<QuarterAdvanceResult> {
     return TimeAdvanceService.skipToQuarterEnd(state, opts);
   },
 
@@ -122,7 +122,7 @@ export const TickOrchestrator = {
    * Advance a full year (52 weeks = 4 quarters).
    * Includes year-end Hall of Fame and tier progression.
    */
-  advanceYear(state: GameState, opts?: AdvanceOptions): YearAdvanceResult {
+  async advanceYear(state: GameState, opts?: AdvanceOptions): Promise<YearAdvanceResult> {
     return TimeAdvanceService.advanceYear(state, opts);
   },
 
@@ -130,7 +130,7 @@ export const TickOrchestrator = {
    * Skip to year end (headless mode for UI).
    * Batches 52 weeks with deferred I/O.
    */
-  skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): YearAdvanceResult {
+  async skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<YearAdvanceResult> {
     return TimeAdvanceService.skipToYearEnd(state, opts);
   },
 };

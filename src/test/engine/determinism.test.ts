@@ -106,7 +106,7 @@ describe('Quarter/Year Advancement Determinism', () => {
     });
   });
 
-  it('advanceQuarter should produce functionally equivalent state to 13 sequential advanceWeek calls', () => {
+  it('advanceQuarter should produce functionally equivalent state to 13 sequential advanceWeek calls', async () => {
     const FIXED_ISO = '2026-04-11T09:00:00.000Z';
     vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(FIXED_ISO);
 
@@ -115,7 +115,7 @@ describe('Quarter/Year Advancement Determinism', () => {
     const stateSequential = createFreshState('determinism-test', '2026-04-11T09:00:00Z');
 
     // Advance using batch method
-    const batchResult = TimeAdvanceService.advanceQuarter(stateBatch);
+    const batchResult = await TimeAdvanceService.advanceQuarter(stateBatch);
 
     // Advance using sequential method
     let sequentialState = stateSequential;
@@ -144,7 +144,7 @@ describe('Quarter/Year Advancement Determinism', () => {
     }
   });
 
-  it('advanceYear should produce functionally equivalent state to 52 sequential advanceWeek calls', () => {
+  it('advanceYear should produce functionally equivalent state to 52 sequential advanceWeek calls', async () => {
     const FIXED_ISO = '2026-04-11T09:00:00.000Z';
     vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(FIXED_ISO);
 
@@ -153,7 +153,7 @@ describe('Quarter/Year Advancement Determinism', () => {
     const stateSequential = createFreshState('year-determinism-test', '2026-04-11T09:00:00Z');
 
     // Advance using batch method
-    const batchResult = TimeAdvanceService.advanceYear(stateBatch);
+    const batchResult = await TimeAdvanceService.advanceYear(stateBatch);
 
     // Advance using sequential method
     let sequentialState = stateSequential;
@@ -173,13 +173,13 @@ describe('Quarter/Year Advancement Determinism', () => {
     expect(batchResult.annualSummary.endYear).toBe(batchResult.state.year);
   });
 
-  it('quarter advancement should handle year boundaries correctly', () => {
+  it('quarter advancement should handle year boundaries correctly', async () => {
     // Start at week 50 (near year end)
     const state = createFreshState('year-boundary-test', '2026-04-11T09:00:00Z');
     state.week = 50;
     state.year = 1;
 
-    const result = TimeAdvanceService.advanceQuarter(state);
+    const result = await TimeAdvanceService.advanceQuarter(state);
 
     // Should have advanced 13 weeks: 50→52 (year 1), then 1→11 (year 2)
     expect(result.state.year).toBe(2);
@@ -190,13 +190,13 @@ describe('Quarter/Year Advancement Determinism', () => {
     expect(result.quarterSummary.endYear).toBe(2);
   });
 
-  it('should stop early when stop condition is met', () => {
+  it('should stop early when stop condition is met', async () => {
     const state = createFreshState('stop-condition-test', '2026-04-11T09:00:00Z');
 
     // Empty roster should trigger stop
     state.roster = [];
 
-    const result = TimeAdvanceService.advanceQuarter(state, {
+    const result = await TimeAdvanceService.advanceQuarter(state, {
       stopConditions: [{ type: 'rosterEmpty' }],
       checkpointInterval: 1,
     });
@@ -205,10 +205,10 @@ describe('Quarter/Year Advancement Determinism', () => {
     expect(result.weeksCompleted).toBe(1); // Stopped after first checkpoint
   });
 
-  it('should provide week summaries for each week advanced', () => {
+  it('should provide week summaries for each week advanced', async () => {
     const state = createFreshState('summaries-test', '2026-04-11T09:00:00Z');
 
-    const result = TimeAdvanceService.advanceQuarter(state);
+    const result = await TimeAdvanceService.advanceQuarter(state);
 
     expect(result.summaries).toHaveLength(13);
     expect(result.quarterSummary.weekSummaries).toHaveLength(13);

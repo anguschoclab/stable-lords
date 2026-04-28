@@ -1,18 +1,13 @@
 import { test, expect } from 'vitest';
-import { resolveWarriorName, resolveStableName, findWarrior } from '@/utils/historyResolver';
+import {
+  resolveWarriorName,
+  resolveStableName,
+  findWarrior,
+  type NameResolutionState,
+} from '@/utils/historyResolver';
 import { GameState } from '@/types/state.types';
 
-// Create a basic structure without needing full complex typed objects
-interface TestNameResolutionState {
-  player: { id: string; stableName: string; name: string };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rivals: { id: string; owner: { stableName: string }; roster?: { id: string; name: string }[] }[];
-  roster: { id: string; name: string }[];
-  graveyard: { id: string; name: string }[];
-  retired: { id: string; name: string }[];
-}
-
-const generateState = (numRivals = 100, rosterSize = 20): TestNameResolutionState => {
+const generateState = (numRivals = 100, rosterSize = 20) => {
   return {
     player: { id: 'p1', stableName: 'Player Stable', name: 'Player' },
     roster: Array.from({ length: rosterSize }, (_, i) => ({
@@ -35,11 +30,11 @@ const generateState = (numRivals = 100, rosterSize = 20): TestNameResolutionStat
         name: `Rival ${i} Warrior ${j}`,
       })),
     })),
-  };
+  } as unknown as NameResolutionState;
 };
 
 test('historyResolver caching logic exactly matches precedence', () => {
-  const state: TestNameResolutionState = {
+  const state = {
     player: { id: 'p1', stableName: 'Player Stable', name: 'Player' },
     roster: [{ id: 'w1', name: 'Roster Warrior 1' }], // Highest precedence
     graveyard: [
@@ -70,15 +65,15 @@ test('historyResolver caching logic exactly matches precedence', () => {
     ],
   };
 
-  expect(resolveWarriorName(state, 'w1', '')).toBe('Roster Warrior 1');
-  expect(resolveWarriorName(state, 'w2', '')).toBe('Graveyard Warrior 2');
-  expect(resolveWarriorName(state, 'w3', '')).toBe('Retired Warrior 3');
-  expect(resolveWarriorName(state, 'w4', '')).toBe('Rival1 Warrior 4');
-  expect(resolveWarriorName(state, 'w5', '')).toBe('Rival2 Warrior 5');
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w1', '')).toBe('Roster Warrior 1');
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w2', '')).toBe('Graveyard Warrior 2');
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w3', '')).toBe('Retired Warrior 3');
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w4', '')).toBe('Rival1 Warrior 4');
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w5', '')).toBe('Rival2 Warrior 5');
 });
 
 test('historyResolver stable name logic exactly matches precedence', () => {
-  const state: TestNameResolutionState = {
+  const state = {
     player: { id: 'p1', stableName: 'Player Stable', name: 'Player' },
     roster: [],
     graveyard: [],
@@ -88,7 +83,7 @@ test('historyResolver stable name logic exactly matches precedence', () => {
       { id: 'r2', owner: { stableName: 'Rival 2' }, roster: [] },
       { id: 'r2', owner: { stableName: 'Rival 3' }, roster: [] },
     ],
-  };
+  } as unknown as NameResolutionState;
 
   expect(resolveStableName(state, 'p1', '')).toBe('Player Stable'); // Player stable > rival stable
   expect(resolveStableName(state, 'r2', '')).toBe('Rival 2'); // Rival 0 > Rival 1
@@ -114,7 +109,7 @@ test('findWarrior uses the correct precedence and caching', () => {
 test('historyResolver works correctly with missing arrays', () => {
   const state = {
     player: { id: 'p1', stableName: 'Player Stable', name: 'Player' },
-  } as unknown as TestNameResolutionState;
+  } as unknown as NameResolutionState;
 
   expect(resolveWarriorName(state, 'w1', 'Fallback')).toBe('Fallback');
   expect(resolveStableName(state, 'p1', 'Fallback')).toBe('Player Stable');

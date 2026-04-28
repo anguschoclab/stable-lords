@@ -1,12 +1,20 @@
 import { GameState, Warrior } from '@/types/state.types';
 
-interface NameResolutionState {
+// Minimal types for history resolution — avoids importing full RivalStableData
+export type WarriorMinimal = Pick<Warrior, 'id' | 'name'>;
+
+export type RivalShallow = {
+  id: string;
+  owner: { stableName: string };
+  roster?: WarriorMinimal[];
+};
+
+export interface NameResolutionState {
   player: { id: string; stableName: string; name: string };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rivals: { id: string; owner: { stableName: string }; roster?: { id: string; name: string }[] }[];
-  roster: { id: string; name: string }[];
-  graveyard: { id: string; name: string }[];
-  retired: { id: string; name: string }[];
+  rivals: RivalShallow[];
+  roster: WarriorMinimal[];
+  graveyard: WarriorMinimal[];
+  retired: WarriorMinimal[];
 }
 
 // Caching structure: WeakMap allows GC to clean up when GameState changes
@@ -23,20 +31,17 @@ const cache = new WeakMap<
 function buildCache(state: NameResolutionState | GameState) {
   const warriorNames = new Map<string, string>();
   const stableNames = new Map<string, string>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const warriorsById = new Map<string, any>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const warriorsByName = new Map<string, any>();
+  const warriorsById = new Map<string, Warrior>();
+  const warriorsByName = new Map<string, Warrior>();
 
   // Process player and player's roster
   stableNames.set(state.player.id, state.player.stableName);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const processWarrior = (w: any) => {
+  const processWarrior = (w: WarriorMinimal) => {
     if (w.id && w.name) {
       warriorNames.set(w.id, w.name);
-      warriorsById.set(w.id, w);
-      warriorsByName.set(w.name, w);
+      warriorsById.set(w.id, w as Warrior);
+      warriorsByName.set(w.name, w as Warrior);
     }
   };
 
@@ -47,12 +52,14 @@ function buildCache(state: NameResolutionState | GameState) {
   if (state.rivals) {
     for (let i = state.rivals.length - 1; i >= 0; i--) {
       const rival = state.rivals[i];
+      if (!rival) continue;
       if (rival.id && rival.owner?.stableName) {
         stableNames.set(rival.id, rival.owner.stableName);
       }
       if (rival.roster) {
         for (let j = rival.roster.length - 1; j >= 0; j--) {
-          processWarrior(rival.roster[j]);
+          const w = rival.roster[j];
+          if (w) processWarrior(w);
         }
       }
     }
@@ -61,21 +68,24 @@ function buildCache(state: NameResolutionState | GameState) {
   // 2. Retired
   if (state.retired) {
     for (let i = state.retired.length - 1; i >= 0; i--) {
-      processWarrior(state.retired[i]);
+      const w = state.retired[i];
+      if (w) processWarrior(w);
     }
   }
 
   // 3. Graveyard
   if (state.graveyard) {
     for (let i = state.graveyard.length - 1; i >= 0; i--) {
-      processWarrior(state.graveyard[i]);
+      const w = state.graveyard[i];
+      if (w) processWarrior(w);
     }
   }
 
   // 4. Active Roster (highest precedence)
   if (state.roster) {
     for (let i = state.roster.length - 1; i >= 0; i--) {
-      processWarrior(state.roster[i]);
+      const w = state.roster[i];
+      if (w) processWarrior(w);
     }
   }
 
