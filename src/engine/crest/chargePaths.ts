@@ -437,6 +437,17 @@ export function getChargePathsByType(type: ChargeType): Record<string, ChargePat
 export function getRandomCharge(type: ChargeType, seed: number): ChargePath & { name: string } {
   const paths = getChargePathsByType(type);
   const keys = Object.keys(paths);
-  const key = keys[Math.floor(seed * keys.length)] || keys[0]!;
-  return { ...paths[key]!, name: key };
+  if (keys.length === 0) {
+    throw new Error(`No charge paths found for type: ${type}`);
+  }
+  const idx = Math.floor(seed * keys.length);
+  const key = keys[idx] ?? keys[0];
+  if (!key) {
+    throw new Error('Charge path key selection failed');
+  }
+  const path = paths[key];
+  if (!path) {
+    throw new Error(`Charge path not found for key: ${key}`);
+  }
+  return { ...path, name: key };
 }

@@ -109,7 +109,11 @@ export function createFreshState(
 
   state.rivals = pool.slice(0, 4).map((name): RivalStableData => {
     const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
-    const backstoryId = BACKSTORY_IDS[Math.floor(rng.next() * BACKSTORY_IDS.length)]!;
+    const backstoryIdx = Math.floor(rng.next() * BACKSTORY_IDS.length);
+    const backstoryId = BACKSTORY_IDS[backstoryIdx];
+    if (!backstoryId) {
+      throw new Error('Backstory ID selection failed');
+    }
     const ownerId = rng.uuid() as StableId;
     return {
       id: rng.uuid() as StableId,

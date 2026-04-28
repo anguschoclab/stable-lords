@@ -28,7 +28,9 @@ export function runRankingsPass(state: GameState): StateImpact {
   // Pre-size the array for better memory allocation
   const scores: WarriorScore[] = new Array(allWarriors.length);
   for (let i = 0; i < allWarriors.length; i++) {
-    const warrior = allWarriors[i]!.warrior;
+    const warriorEntry = allWarriors[i];
+    if (!warriorEntry) continue;
+    const warrior = warriorEntry.warrior;
     const wins = warrior.career?.wins ?? 0;
     const losses = warrior.career?.losses ?? 0;
     const total = wins + losses;
@@ -61,7 +63,8 @@ export function runRankingsPass(state: GameState): StateImpact {
   const realmRankings: Record<string, RankingEntry> = {};
 
   for (let i = 0; i < scores.length; i++) {
-    const entry = scores[i]!;
+    const entry = scores[i];
+    if (!entry) continue;
     entry.overallRank = i + 1;
 
     // Increment class rank counter for this style
