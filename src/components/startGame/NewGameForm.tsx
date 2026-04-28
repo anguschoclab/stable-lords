@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dices, ArrowRight } from 'lucide-react';
-import { randomOwnerName, randomStableName } from '@/data/randomNames';
+import { randomOwnerName, randomStableName } from '@/data/names';
 import { generateCrest } from '@/engine/crest/crestGenerator';
 import { StableCrest } from '@/components/crest/StableCrest';
 import type { CrestData } from '@/types/crest.types';

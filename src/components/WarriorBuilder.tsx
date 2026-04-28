@@ -30,7 +30,7 @@ import {
   Dumbbell,
   Dices,
 } from 'lucide-react';
-import { randomWarriorName } from '@/data/randomNames';
+import { randomWarriorName } from '@/data/names';
 import { SkillBar } from '@/components/warrior/WarriorStats';
 import {
   FightingStyle,
