@@ -10,14 +10,13 @@ import type { FightingStyle } from '@/types/shared.types';
  * ExpansionService - Handles stable expansion.
  * Manages generation of new rival stables.
  */
-export class ExpansionService {
-  private constructor() {}
+export const ExpansionService = {
   /**
    * Processes expansion by generating new rival stables.
    * Adds new stables to maintain world population.
    * Supports crest inheritance for legacy stables (retired warriors founding new stables).
    */
-  static processExpansion(
+  processExpansion(
     state: GameState,
     rng: IRNGService,
     targetCount: number = 8,
@@ -114,4 +113,4 @@ export class ExpansionService {
 
     return { updatedState, newStables };
   }
-}
+} as const;

@@ -1,5 +1,4 @@
 import { CombatNarrator } from './combatNarrator';
-import { StatusNarrator } from './statusNarrator';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import type { Warrior } from '@/types/game';
 
@@ -7,26 +6,25 @@ import type { Warrior } from '@/types/game';
  * BoutNarrator - Intro, opener, and conclusion narration.
  * Handles bout-level narrative generation.
  */
-export class BoutNarrator {
-  private constructor() {}
+export const BoutNarrator = {
   /**
    * Delegates to CombatNarrator for warrior intro.
    */
-  static generateWarriorIntro(rng: IRNGService, data: Warrior, sz?: number): string[] {
+  generateWarriorIntro(rng: IRNGService, data: Warrior, sz?: number): string[] {
     return CombatNarrator.generateWarriorIntro(rng, data, sz);
-  }
+  },
 
   /**
    * Delegates to CombatNarrator for battle opener.
    */
-  static battleOpener(rng: IRNGService): string {
+  battleOpener(rng: IRNGService): string {
     return CombatNarrator.battleOpener(rng);
-  }
+  },
 
   /**
    * Delegates to CombatNarrator for bout end.
    */
-  static narrateBoutEnd(
+  narrateBoutEnd(
     rng: IRNGService,
     by: string,
     winnerName: string,
@@ -35,4 +33,4 @@ export class BoutNarrator {
   ): string[] {
     return CombatNarrator.narrateBoutEnd(rng, by, winnerName, loserName, weaponId);
   }
-}
+} as const;

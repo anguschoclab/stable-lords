@@ -14,13 +14,12 @@ interface LegacyCandidate {
   fightingStyle?: import('@/types/shared.types').FightingStyle;
 }
 
-export class SeasonalRetirementService {
-  private constructor() {}
+export const SeasonalRetirementService = {
   /**
    * Processes seasonal retirement for all rival stables.
    * Handles legacy founders (retired warriors becoming owners).
    */
-  static processSeasonalRetirement(
+  processSeasonalRetirement(
     state: GameState,
     rng: IRNGService
   ): { updatedState: GameState; legacyCandidates: LegacyCandidate[] } {
@@ -70,4 +69,4 @@ export class SeasonalRetirementService {
 
     return { updatedState, legacyCandidates };
   }
-}
+} as const;

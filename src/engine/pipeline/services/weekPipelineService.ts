@@ -5,7 +5,6 @@ import { archiveWeekLogs } from '../adapters/opfsArchiver';
 import { computeMetaDrift } from '@/engine/metaDrift';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { resolveImpacts, StateImpact } from '@/engine/impacts';
-import { getFeatureFlags } from '@/engine/featureFlags';
 
 /**
  * Options for week advancement
@@ -172,9 +171,7 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext, 
  * Orchestrates the simulation tick using a high-performance batched architecture.
  */
 export function advanceWeek(state: GameState, opts?: WeekAdvanceOptions): GameState {
-  // Check feature flag for headless mode
-  const flags = getFeatureFlags();
-  const headless = flags.headlessWeekAdvance && opts?.headless;
+  const headless = opts?.headless;
 
   const ctx = prepareWeekContext(state);
   const settledState = runBoutPhase(state, ctx);

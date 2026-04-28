@@ -80,7 +80,6 @@ function makeState(overrides?: Partial<GameState>): GameState {
     gazettes: [],
     isFTUE: false,
     unacknowledgedDeaths: [],
-    settings: { featureFlags: { tournaments: true, scouting: true } },
     ...overrides,
   };
 }

@@ -1,9 +1,6 @@
 import { createFreshState } from "../src/engine/factories";
 import { advanceWeek } from "../src/engine/pipeline/services/weekPipelineService";
-import { setFeatureFlags } from "../src/engine/featureFlags";
 import { FightingStyle } from "../src/types/shared.types";
-
-setFeatureFlags({ skipCombatNarration: true });
 
 const origLog = console.log;
 console.log = () => {}; // suppress engine logging

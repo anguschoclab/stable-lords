@@ -6,7 +6,6 @@ import {
   TimeAdvanceService,
   type SoftStopCondition,
 } from './tick/TimeAdvanceService';
-import { getFeatureFlags } from './featureFlags';
 
 export interface AutosimWeekSummary {
   week: number;
@@ -53,7 +52,7 @@ function mapStopReason(reason: string | null | undefined): AutosimResult['stopRe
 export interface AutosimOptions {
   weeksToSim: number;
   onProgress?: (current: number, total: number) => void;
-  /** Use batch (quarter/year) advancement for better performance. Requires feature flags. */
+  /** Use batch (quarter/year) advancement for better performance. */
   useBatchMode?: boolean;
   /** Defer OPFS archiving during simulation */
   deferArchives?: boolean;
@@ -178,12 +177,6 @@ async function runBatchAutosim(
   onProgress?: (current: number, total: number) => void,
   deferArchives?: boolean
 ): Promise<AutosimResult> {
-  const flags = getFeatureFlags();
-
-  if (!flags.quarterPipeline) {
-    throw new Error('Batch autosim requires quarterPipeline feature flag');
-  }
-
   let state = initialState;
   let weeksSimmed = 0;
   const weekSummaries: AutosimWeekSummary[] = [];
@@ -301,10 +294,8 @@ export async function runAutosim(
     deferArchives = options.deferArchives ?? false;
   }
 
-  const flags = getFeatureFlags();
-
-  // Use batch mode if requested and enabled
-  if (useBatchMode && flags.quarterPipeline) {
+  // Use batch mode if requested
+  if (useBatchMode) {
     return runBatchAutosim(initialState, weeksToSim, onProgress, deferArchives);
   }
 

@@ -74,7 +74,6 @@ function makeGameState(week: number, roster: Warrior[]): GameState {
     ownerGrudges: [],
     insightTokens: [],
     moodHistory: [],
-    settings: { featureFlags: { tournaments: false, scouting: false } },
     phase: 'Planning',
     gazettes: [],
     playerChallenges: [],

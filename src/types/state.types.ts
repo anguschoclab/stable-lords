@@ -384,12 +384,6 @@ export interface GameState {
   ownerGrudges: OwnerGrudge[];
   insightTokens: InsightToken[];
   moodHistory: { week: number; mood: CrowdMoodType }[];
-  settings: {
-    featureFlags: {
-      tournaments: boolean;
-      scouting: boolean;
-    };
-  };
   isFTUE: boolean;
   unacknowledgedDeaths: string[];
   // ─── Daily Progression ───

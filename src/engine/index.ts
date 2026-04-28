@@ -73,3 +73,13 @@ export {
   type AutosimResult,
   DEFAULT_AUTOSIM_STOP_CONDITIONS,
 } from './autosim';
+
+// 📊 Telemetry (Phase 6)
+export {
+  setTelemetryProvider,
+  getTelemetryProvider,
+  telemetry,
+  TelemetryEvents,
+  TelemetryTags,
+  type TelemetryProvider,
+} from './telemetry';

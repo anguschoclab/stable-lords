@@ -23,7 +23,6 @@ import {
   FightingStyle,
   type BaseSkills,
 } from '@/types/shared.types';
-import { getFeatureFlags } from '@/engine/featureFlags';
 
 /**
  * RosterWorker: Handles training and equipment.
@@ -77,7 +76,7 @@ export function processRoster(
       // option surface the player has in the TrainingAssignment UI. Below the
       // cap a drill is comparatively cheap and the attribute pipeline handles
       // the rest of the time.
-      const doDrill = getFeatureFlags().skillDrilling && rngService.next() < 0.25;
+      const doDrill = rngService.next() < 0.25;
       if (doDrill) {
         updatedRival.roster = updatedRival.roster.map((w) =>
           w.id === trainee.id ? performAISkillDrill(trainee, updatedRival, rngService) : w

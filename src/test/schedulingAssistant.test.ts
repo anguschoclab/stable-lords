@@ -93,7 +93,6 @@ describe('Scheduling Assistant Engine', () => {
       playerAvoids: [],
       isFTUE: false,
       unacknowledgedDeaths: [],
-      settings: { featureFlags: { tournaments: true, scouting: true } },
     };
   };
 

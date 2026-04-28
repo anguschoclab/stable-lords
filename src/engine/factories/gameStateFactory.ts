@@ -74,12 +74,6 @@ export function createFreshState(
     ownerGrudges: [],
     insightTokens: [],
     moodHistory: [],
-    settings: {
-      featureFlags: {
-        tournaments: true,
-        scouting: true,
-      },
-    },
     isFTUE: true,
     unacknowledgedDeaths: [],
     day: 0,

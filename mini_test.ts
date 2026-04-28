@@ -1,11 +1,9 @@
 import { createFreshState } from './src/engine/factories';
 import { advanceWeek } from './src/engine/pipeline/services/weekPipelineService';
 import { type GameState, type RivalStableData } from './src/types/state.types';
-import { setFeatureFlags } from './src/engine/featureFlags';
 
 async function runMiniTest() {
   console.log("Starting Mini Test (1 Year)...");
-  setFeatureFlags({ skipCombatNarration: true });
   let state = createFreshState("mini-test-seed");
 
   // Move player to rivals

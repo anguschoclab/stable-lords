@@ -39,7 +39,6 @@ import type { WeatherType, DistanceRange, ArenaZone } from '@/types/shared.types
 import { getTrainerMods } from './combat/mechanics/simulateHelpers';
 import { getWeatherEffect, weatherOpeningLine } from './combat/mechanics/weatherEffects';
 import { getArenaById } from '@/data/arenas';
-import { getFeatureFlags } from '@/engine/featureFlags';
 import type { CrowdMood } from '@/engine/crowdMood';
 
 /**
@@ -210,14 +209,11 @@ export function simulateFight(
     arenaConfig: getArenaById(arenaId),
     surfaceMod: getArenaById(arenaId).surfaceMod,
     pushedFighter: undefined,
-    crowdKillBonus:
-      getFeatureFlags().crowdMoodLethality && crowdMood ? CROWD_KILL_BONUS[crowdMood] : 0,
+    crowdKillBonus: crowdMood ? CROWD_KILL_BONUS[crowdMood] : 0,
   };
 
   const log: MinuteEvent[] = [];
   const exchangeLog: ExchangeLogEntry[] = [];
-  const skipNarration = getFeatureFlags().skipCombatNarration;
-
   const tags = new Set<string>();
   let prevHpRatioA = 1.0;
   let prevHpRatioD = 1.0;
@@ -231,7 +227,7 @@ export function simulateFight(
   let fatalExchangeIndex: number | undefined;
 
   // ── 1. Introductions ──
-  if (!skipNarration) {
+  {
     const introA = generateWarriorIntro(
       rng,
       {
@@ -291,20 +287,18 @@ export function simulateFight(
       const phaseKey = phase.toLowerCase() as 'opening' | 'mid' | 'late';
       const tacticsA = resolveEffectiveTactics(fA.plan, phaseKey);
       const tacticsD = resolveEffectiveTactics(fD.plan, phaseKey);
-      if (!skipNarration) {
-        log.push({
-          minute: min,
-          text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,
-          phase,
-          offTacticA: tacticsA.offTactic !== 'none' ? tacticsA.offTactic : undefined,
-          defTacticA: tacticsA.defTactic !== 'none' ? tacticsA.defTactic : undefined,
-          offTacticD: tacticsD.offTactic !== 'none' ? tacticsD.offTactic : undefined,
-          defTacticD: tacticsD.defTactic !== 'none' ? tacticsD.defTactic : undefined,
-        });
-      }
+      log.push({
+        minute: min,
+        text: `— ${phase.charAt(0) + phase.slice(1).toLowerCase()} Phase —`,
+        phase,
+        offTacticA: tacticsA.offTactic !== 'none' ? tacticsA.offTactic : undefined,
+        defTacticA: tacticsA.defTactic !== 'none' ? tacticsA.defTactic : undefined,
+        offTacticD: tacticsD.offTactic !== 'none' ? tacticsD.offTactic : undefined,
+        defTacticD: tacticsD.defTactic !== 'none' ? tacticsD.defTactic : undefined,
+      });
     }
 
-    if (!skipNarration && min > lastMinuteMarker && min > 1) {
+    if (min > lastMinuteMarker && min > 1) {
       lastMinuteMarker = min;
       log.push({ minute: min, text: `MINUTE ${min}.` });
       log.push({
@@ -318,7 +312,7 @@ export function simulateFight(
     exchangeLog.push(buildExchangeLogEntry(ex, min, phase, events));
 
     // B. Resolve Narration (Drama)
-    if (!skipNarration) {
+    {
       const narCtx: NarrationContext = {
         rng,
         nameA,
@@ -390,14 +384,12 @@ export function simulateFight(
       // Pass kill-cause, winner's style, and crowd mood so narrativePostBout can
       // pick from tiered archive paths (cause × style × mood → cause × style → cause → generic).
       const winnerStyle = boutEnd.actor === 'A' ? planA.style : planD.style;
-      if (!skipNarration) {
-        const boutEndLines = narrateBoutEnd(rng, by as string, narWinner, narLoser, undefined, {
-          cause: causeBucket,
-          style: winnerStyle,
-          mood: crowdMood,
-        });
-        boutEndLines.forEach((line) => log.push({ minute: min, text: line }));
-      }
+      const boutEndLines = narrateBoutEnd(rng, by as string, narWinner, narLoser, undefined, {
+        cause: causeBucket,
+        style: winnerStyle,
+        mood: crowdMood,
+      });
+      boutEndLines.forEach((line) => log.push({ minute: min, text: line }));
       break;
     }
   }
@@ -407,12 +399,10 @@ export function simulateFight(
     const finalOutcome = resolveDecision(fA, fD, nameA, nameD, rng);
     winner = finalOutcome.winner;
     by = finalOutcome.by;
-    if (!skipNarration) {
-      log.push({
-        minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE),
-        text: finalOutcome.narrative,
-      });
-    }
+    log.push({
+      minute: Math.floor(MAX_EXCHANGES / EXCHANGES_PER_MINUTE),
+      text: finalOutcome.narrative,
+    });
   }
 
   // Outcome Tags & Postprocessing

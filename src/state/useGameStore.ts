@@ -103,7 +103,6 @@ type GameStateValues = {
   moodHistory: GameState['moodHistory'];
   newsletter: GameState['newsletter'];
   hallOfFame: GameState['hallOfFame'];
-  settings: GameState['settings'];
   isFTUE: boolean;
   ftueStep: GameState['ftueStep'];
   ftueComplete: boolean;
@@ -156,7 +155,6 @@ export function reconstructGameState(store: GameStore): GameState {
     moodHistory: store.moodHistory,
     newsletter: store.newsletter,
     hallOfFame: store.hallOfFame,
-    settings: store.settings,
     isFTUE: store.isFTUE,
     ftueStep: store.ftueStep,
     ftueComplete: store.ftueComplete,
@@ -271,9 +269,6 @@ export const useGameStore = create<GameStore>()(
           draft.moodHistory = state.moodHistory || [];
           draft.newsletter = state.newsletter || [];
           draft.hallOfFame = state.hallOfFame || [];
-          draft.settings = state.settings || {
-            featureFlags: { tournaments: true, scouting: true },
-          };
           draft.isFTUE = state.isFTUE || false;
           draft.ftueStep = state.ftueStep || 0;
           draft.ftueComplete = state.ftueComplete || false;

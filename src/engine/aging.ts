@@ -41,7 +41,7 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
 
   for (const { w, isPlayer, rivalId } of allWarriors) {
     let currentAge = w.age ?? 18;
-    let update: Partial<Warrior> = {};
+    const update: Partial<Warrior> = {};
 
     // 1. Age tick
     if (isAgeTick) {

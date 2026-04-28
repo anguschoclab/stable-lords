@@ -54,12 +54,6 @@ export interface WorldSlice {
   hallOfFame: HallEntry[];
   crowdMood: CrowdMoodType;
   moodHistory: { week: number; mood: CrowdMoodType }[];
-  settings: {
-    featureFlags: {
-      tournaments: boolean;
-      scouting: boolean;
-    };
-  };
   arenaPreferences: ArenaPreferences;
   isFTUE: boolean;
   ftueStep?: number;
@@ -114,12 +108,6 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
   hallOfFame: [],
   crowdMood: 'Neutral' as CrowdMoodType,
   moodHistory: [],
-  settings: {
-    featureFlags: {
-      tournaments: true,
-      scouting: true,
-    },
-  },
   arenaPreferences: {
     defaultViewMode: 'arena',
     audioEnabled: true,

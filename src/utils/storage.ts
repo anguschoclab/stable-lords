@@ -8,7 +8,7 @@
  * Handles localStorage quota exceeded errors with retry logic
  * Eliminates DRY violation of localStorage error handling patterns
  */
-export function handleLocalStorageQuotaError(operation: string, data: any): void {
+export function handleLocalStorageQuotaError(operation: string, data: unknown): void {
   try {
     localStorage.setItem(operation, JSON.stringify(data));
   } catch (error) {
@@ -27,7 +27,9 @@ export function handleLocalStorageQuotaError(operation: string, data: any): void
       localStorage.setItem(operation, JSON.stringify(data));
     } catch (retryError) {
       console.error(`Failed to recover from localStorage quota error for ${operation}`, retryError);
-      throw new Error(`Unable to save ${operation} to localStorage due to quota limits`);
+      const error = new Error(`Unable to save ${operation} to localStorage due to quota limits`);
+      (error as Error & { cause: unknown }).cause = retryError;
+      throw error;
     }
   }
 }

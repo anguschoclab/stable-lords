@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
 import { createFreshState } from '@/engine/factories';
 import { TimeAdvanceService } from '@/engine/tick/TimeAdvanceService';
-import { setFeatureFlags } from '@/engine/featureFlags';
 
 // Mock the archiver adapter (used by weekPipelineService) to avoid disk I/O during tests
 vi.mock('@/engine/pipeline/adapters/opfsArchiver', () => ({
@@ -90,21 +89,6 @@ describe('Simulation Determinism', () => {
 });
 
 describe('Quarter/Year Advancement Determinism', () => {
-  beforeEach(() => {
-    // Enable batch advancement features for tests
-    setFeatureFlags({
-      quarterPipeline: true,
-      yearPipeline: true,
-    });
-  });
-
-  afterEach(() => {
-    // Reset flags
-    setFeatureFlags({
-      quarterPipeline: false,
-      yearPipeline: false,
-    });
-  });
 
   it('advanceQuarter should produce functionally equivalent state to 13 sequential advanceWeek calls', async () => {
     const FIXED_ISO = '2026-04-11T09:00:00.000Z';

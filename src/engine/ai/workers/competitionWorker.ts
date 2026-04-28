@@ -85,7 +85,6 @@ export function generateBoutBids(
     playerChallenges: [],
     playerAvoids: [],
     unacknowledgedDeaths: [],
-    settings: { featureFlags: { tournaments: true, scouting: true } },
     isFTUE: false,
     day: 1,
     isTournamentWeek: false,

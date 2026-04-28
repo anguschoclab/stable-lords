@@ -160,7 +160,7 @@ export interface ResolutionContext {
   pushedFighter?: 'A' | 'D';
   /** Surface modifiers from arenaConfig, unpacked for convenience */
   surfaceMod: SurfaceMod;
-  /** Optional crowd-mood lethality delta (gated by featureFlags.crowdMoodLethality upstream). */
+  /** Crowd-mood lethality delta injected by simulate.ts. */
   crowdKillBonus?: number;
 }
 

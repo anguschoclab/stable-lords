@@ -1,9 +1,6 @@
 import { createFreshState } from "../src/engine/factories";
 import { advanceWeek } from "../src/engine/pipeline/services/weekPipelineService";
-import { setFeatureFlags } from "../src/engine/featureFlags";
 import { FightingStyle } from "../src/types/shared.types";
-
-setFeatureFlags({ skipCombatNarration: true });
 console.log = () => {};
 
 let state = createFreshState("combat-audit-seed");
@@ -18,7 +15,7 @@ function bump(style: string, k: keyof (typeof styleStats)[string]) {
 const fightLengths: number[] = [];
 let totalBouts = 0;
 let totalKills = 0;
-let totalRepeats = 0; // injuries that don't kill
+const totalRepeats = 0; // injuries that don't kill
 
 const years = 8;
 let processedFightIds = new Set<string>();

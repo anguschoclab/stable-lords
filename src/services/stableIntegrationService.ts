@@ -26,6 +26,7 @@ import { clamp } from '@/utils/math';
 /**
  * Integration service that combines template, equipment, and name systems
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StableIntegrationService {
   
   /**
@@ -172,7 +173,7 @@ export class StableIntegrationService {
 
     let bestWeapon = availableWeapons[0];
     let bestScore = -Infinity;
-    let issues: string[] = [];
+    const issues: string[] = [];
 
     // Score weapons based on multiple factors
     for (const weapon of availableWeapons) {

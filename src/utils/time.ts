@@ -13,7 +13,11 @@ const SEASONS: Season[] = ['Spring', 'Summer', 'Fall', 'Winter'];
  * Eliminates DRY violation of season calculation patterns
  */
 export function getSeasonFromWeek(week: number): Season {
-  return SEASONS[Math.floor((week - 1) / 13) % 4]!;
+  const season = SEASONS[Math.floor((week - 1) / 13) % 4];
+  if (season === undefined) {
+    throw new Error('Invalid season calculation');
+  }
+  return season;
 }
 
 /**

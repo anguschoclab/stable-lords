@@ -6,13 +6,12 @@ import type { StateImpact } from '@/engine/impacts';
  * BankruptcyService - Handles bankruptcy detection and processing.
  * Manages rival stable bankruptcy and removal, and player bankruptcy consequences.
  */
-export class BankruptcyService {
-  private constructor() {}
+export const BankruptcyService = {
   /**
    * Processes bankruptcy for all rival stables.
    * Removes stables that have gone bankrupt.
    */
-  static processBankruptcy(
+  processBankruptcy(
     state: GameState,
     _rng: IRNGService
   ): { updatedState: GameState; bankruptStables: string[] } {
@@ -29,14 +28,14 @@ export class BankruptcyService {
     });
 
     return { updatedState, bankruptStables };
-  }
+  },
 
   /**
    * Processes player bankruptcy consequences.
    * If treasury < -500, force sell highest-fame warrior, reduce reputation, generate newsletter.
    * Returns StateImpact for integration with the pipeline.
    */
-  static processPlayerBankruptcy(
+  processPlayerBankruptcy(
     state: GameState,
     rng: IRNGService
   ): { bankrupt: boolean; impact: StateImpact; soldWarrior?: Warrior } {
@@ -102,4 +101,4 @@ export class BankruptcyService {
 
     return { bankrupt: true, impact };
   }
-}
+} as const;

@@ -2,7 +2,6 @@ import { createFreshState } from './src/engine/factories';
 import { advanceWeek } from './src/engine/pipeline/services/weekPipelineService';
 import { type GameState, type RivalStableData } from './src/types/state.types';
 import { FightingStyle } from './src/types/shared.types';
-import { setFeatureFlags } from './src/engine/featureFlags';
 import * as fs from 'fs';
 
 /**
@@ -21,9 +20,6 @@ async function runStressTest(years: number) {
   console.log(`\n🏰 STABLE LORDS: ${years}-YEAR LONGITUDINAL STRESS TEST`);
   console.log(`====================================================`);
 
-  // Optimization: Disable expensive combat narration for headless sim
-  setFeatureFlags({ skipCombatNarration: true });
-  
   // Initialize state with a fixed seed for determinism
   let state = createFreshState("stress-test-seed-2026-v2");
   

@@ -16,13 +16,10 @@
  */
 import { simulateFight, defaultPlanForWarrior } from '../src/engine/simulate';
 import { makeWarrior } from '../src/engine/factories/warriorFactory';
-import { setFeatureFlags } from '../src/engine/featureFlags';
 import { FightingStyle, type WarriorId } from '../src/types/shared.types';
 import { SeededRNGService } from '../src/engine/core/rng/SeededRNGService';
 import { STYLE_CLASSIC_WEAPONS, DEFAULT_LOADOUT } from '../src/data/equipment';
 import type { Warrior } from '../src/types/warrior.types';
-
-setFeatureFlags({ skipCombatNarration: true });
 
 const STYLES = [
   FightingStyle.AimedBlow,

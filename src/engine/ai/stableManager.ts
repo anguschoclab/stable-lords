@@ -120,7 +120,7 @@ export function processAIStable(
   const newTreasury = updatedRival.treasury + treasuryDelta;
   // 🏛️ 1.0 Hardening: League Subsidy (Prevent economic death spiral)
   const SUBSIDY_FLOOR = 500;
-  let isBankrupt = false;
+  const isBankrupt = false;
   if (newTreasury < SUBSIDY_FLOOR) {
     const subsidy = SUBSIDY_FLOOR - (newTreasury < 0 ? 0 : newTreasury);
     updatedRival.treasury = SUBSIDY_FLOOR;

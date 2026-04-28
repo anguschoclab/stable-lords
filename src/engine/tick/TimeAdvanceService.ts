@@ -1,7 +1,7 @@
 import type { GameState } from '@/types/state.types';
 import { advanceWeek, type WeekAdvanceOptions } from '@/engine/pipeline/services/weekPipelineService';
 import { flushDeferredArchives } from '@/engine/pipeline/adapters/opfsArchiver';
-import { getFeatureFlags } from '@/engine/featureFlags';
+import { telemetry, TelemetryEvents, TelemetryTags } from '@/engine/telemetry';
 
 /**
  * Stop condition types for batch operations
@@ -153,14 +153,8 @@ export const TimeAdvanceService = {
    * Advance a single week
    */
   advanceWeek(state: GameState, opts?: AdvanceOptions): GameState {
-    const flags = getFeatureFlags();
-
-    // Only use headless mode if feature flag is enabled
-    const headless = flags.headlessWeekAdvance && opts?.headless;
-
-    // Call the week pipeline with options
     const weekOpts: WeekAdvanceOptions = {
-      headless,
+      headless: opts?.headless,
       deferArchives: opts?.deferArchives,
     };
     return advanceWeek(state, weekOpts);
@@ -171,12 +165,7 @@ export const TimeAdvanceService = {
    * Guarantees determinism: 13 sequential advanceWeek calls produce identical state
    */
   async advanceQuarter(state: GameState, opts?: AdvanceOptions): Promise<QuarterAdvanceResult> {
-    const flags = getFeatureFlags();
-
-    if (!flags.quarterPipeline) {
-      // Fallback: return error or use default behavior
-      throw new Error('Quarter pipeline not enabled. Set feature flag quarterPipeline=true');
-    }
+    const startTime = performance.now();
 
     let currentState = state;
     const weekSummaries: WeekSummary[] = [];
@@ -189,7 +178,7 @@ export const TimeAdvanceService = {
     for (let i = 0; i < 13; i++) {
       // Advance one week using the core pipeline with options
       const weekOpts: WeekAdvanceOptions = {
-        headless: flags.headlessWeekAdvance && opts?.headless,
+        headless: opts?.headless,
         deferArchives: opts?.deferArchives,
       };
       currentState = advanceWeek(currentState, weekOpts);
@@ -203,8 +192,20 @@ export const TimeAdvanceService = {
         if (stopResult.shouldStop) {
           // Flush any deferred archives before returning
           if (opts.deferArchives) {
+            const flushStart = performance.now();
             await flushDeferredArchives(currentState);
+            telemetry.timing(TelemetryEvents.FLUSH_DEFERRED_ARCHIVES, performance.now() - flushStart);
           }
+
+          const duration = performance.now() - startTime;
+          telemetry.timing(TelemetryEvents.ADVANCE_QUARTER, duration, {
+            [TelemetryTags.HEADLESS]: String(!!opts?.headless),
+            [TelemetryTags.STOP_REASON]: stopResult.reason ?? 'unknown',
+            [TelemetryTags.WEEKS_COMPLETED]: String(i + 1),
+          });
+          telemetry.increment(TelemetryEvents.STOP_CONDITION_TRIGGERED, {
+            reason: stopResult.reason ?? 'unknown',
+          });
 
           return {
             state: currentState,
@@ -231,8 +232,19 @@ export const TimeAdvanceService = {
 
     // Flush deferred archives at quarter end
     if (opts?.deferArchives) {
+      const flushStart = performance.now();
       await flushDeferredArchives(currentState);
+      telemetry.timing(TelemetryEvents.FLUSH_DEFERRED_ARCHIVES, performance.now() - flushStart);
     }
+
+    const duration = performance.now() - startTime;
+    telemetry.timing(TelemetryEvents.ADVANCE_QUARTER, duration, {
+      [TelemetryTags.HEADLESS]: String(!!opts?.headless),
+      [TelemetryTags.WEEKS_COMPLETED]: '13',
+    });
+    telemetry.increment(TelemetryEvents.ADVANCE_QUARTER_SUCCESS, {
+      [TelemetryTags.HEADLESS]: String(!!opts?.headless),
+    });
 
     return {
       state: currentState,
@@ -254,12 +266,6 @@ export const TimeAdvanceService = {
    * Advance a year (52 weeks = 4 quarters)
    */
   async advanceYear(state: GameState, opts?: AdvanceOptions): Promise<YearAdvanceResult> {
-    const flags = getFeatureFlags();
-
-    if (!flags.yearPipeline) {
-      throw new Error('Year pipeline not enabled. Set feature flag yearPipeline=true');
-    }
-
     let currentState = state;
     const quarterResults: QuarterAdvanceResult[] = [];
     const startYear = state.year;

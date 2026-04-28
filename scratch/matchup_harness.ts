@@ -8,11 +8,8 @@
  */
 import { simulateFight, defaultPlanForWarrior } from '../src/engine/simulate';
 import { makeWarrior } from '../src/engine/factories/warriorFactory';
-import { setFeatureFlags } from '../src/engine/featureFlags';
 import { FightingStyle, type WarriorId } from '../src/types/shared.types';
 import { SeededRNGService } from '../src/engine/core/rng/SeededRNGService';
-
-setFeatureFlags({ skipCombatNarration: true });
 
 const STYLES = [
   FightingStyle.AimedBlow,       // AB

@@ -44,37 +44,45 @@ function initializeCaches(): void {
   // Philosophy caches
   for (const template of ALL_TEMPLATES) {
     const philosophy = template.philosophy;
-    if (!PHILOSOPHY_CACHE.has(philosophy)) {
-      PHILOSOPHY_CACHE.set(philosophy, []);
+    let cache = PHILOSOPHY_CACHE.get(philosophy);
+    if (!cache) {
+      cache = [];
+      PHILOSOPHY_CACHE.set(philosophy, cache);
     }
-    PHILOSOPHY_CACHE.get(philosophy)!.push(template);
+    cache.push(template);
   }
 
   // Personality caches
   for (const template of ALL_TEMPLATES) {
     const personality = template.personality;
-    if (!PERSONALITY_CACHE.has(personality)) {
-      PERSONALITY_CACHE.set(personality, []);
+    let cache = PERSONALITY_CACHE.get(personality);
+    if (!cache) {
+      cache = [];
+      PERSONALITY_CACHE.set(personality, cache);
     }
-    PERSONALITY_CACHE.get(personality)!.push(template);
+    cache.push(template);
   }
 
   // Meta adaptation caches
   for (const template of ALL_TEMPLATES) {
     const metaAdaptation = template.metaAdaptation;
-    if (!META_ADAPTATION_CACHE.has(metaAdaptation)) {
-      META_ADAPTATION_CACHE.set(metaAdaptation, []);
+    let cache = META_ADAPTATION_CACHE.get(metaAdaptation);
+    if (!cache) {
+      cache = [];
+      META_ADAPTATION_CACHE.set(metaAdaptation, cache);
     }
-    META_ADAPTATION_CACHE.get(metaAdaptation)!.push(template);
+    cache.push(template);
   }
 
   // Backstory caches
   for (const template of ALL_TEMPLATES) {
     const backstoryId = template.backstoryId;
-    if (!BACKSTORY_CACHE.has(backstoryId)) {
-      BACKSTORY_CACHE.set(backstoryId, []);
+    let cache = BACKSTORY_CACHE.get(backstoryId);
+    if (!cache) {
+      cache = [];
+      BACKSTORY_CACHE.set(backstoryId, cache);
     }
-    BACKSTORY_CACHE.get(backstoryId)!.push(template);
+    cache.push(template);
   }
 }
 
@@ -127,8 +135,9 @@ export function getTemplatesByBackstory(backstoryId: StableTemplate['backstoryId
  */
 export function getTemplatesByStyle(style: string): StableTemplate[] {
   const cacheKey = `style:${style}`;
-  if (templateCache.has(cacheKey)) {
-    return templateCache.get(cacheKey)!;
+  const cached = templateCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   const result = ALL_TEMPLATES.filter(template => 
@@ -145,8 +154,9 @@ export function getTemplatesByStyle(style: string): StableTemplate[] {
  */
 export function getTemplatesByFameRange(minFame: number, maxFame: number): StableTemplate[] {
   const cacheKey = `fame:${minFame}-${maxFame}`;
-  if (templateCache.has(cacheKey)) {
-    return templateCache.get(cacheKey)!;
+  const cached = templateCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   const result = ALL_TEMPLATES.filter(template => 
@@ -163,8 +173,9 @@ export function getTemplatesByFameRange(minFame: number, maxFame: number): Stabl
  */
 export function getTemplatesByRosterRange(minRoster: number, maxRoster: number): StableTemplate[] {
   const cacheKey = `roster:${minRoster}-${maxRoster}`;
-  if (templateCache.has(cacheKey)) {
-    return templateCache.get(cacheKey)!;
+  const cached = templateCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   const result = ALL_TEMPLATES.filter(template => 
@@ -193,8 +204,9 @@ export function searchTemplates(criteria: {
 }): StableTemplate[] {
   // Create cache key from criteria
   const cacheKey = JSON.stringify(criteria);
-  if (templateCache.has(cacheKey)) {
-    return templateCache.get(cacheKey)!;
+  const cached = templateCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   // Start with the most selective filter first
