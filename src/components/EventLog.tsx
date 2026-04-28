@@ -56,7 +56,7 @@ const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }>
   recruit: { icon: UserPlus, color: 'text-arena-pop' },
   tournament: { icon: Trophy, color: 'text-arena-gold' },
   news: { icon: Newspaper, color: 'text-muted-foreground' },
-  injury: { icon: AlertTriangle, color: 'text-amber-400' },
+  injury: { icon: AlertTriangle, color: 'text-arena-gold' },
   retirement: { icon: Star, color: 'text-arena-fame' },
   training: { icon: Dumbbell, color: 'text-primary' },
   recovery: { icon: Heart, color: 'text-arena-pop' },

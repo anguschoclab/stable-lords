@@ -2,6 +2,7 @@ import type { GameState } from '@/types/state.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { advanceWeek as runWeeklyPipeline } from '@/engine/pipeline/services/weekPipelineService';
 import { TournamentSelectionService } from '@/engine/matchmaking/tournamentSelection';
+import { TimeAdvanceService, type QuarterAdvanceResult, type YearAdvanceResult, type AdvanceOptions } from './TimeAdvanceService';
 
 /**
  * Stable Lords — Unified Tick Orchestrator
@@ -99,5 +100,37 @@ export const TickOrchestrator = {
       isTournamentWeek: false,
       activeTournamentId: undefined,
     };
+  },
+
+  /**
+   * Advance a quarter (13 weeks) with progress tracking.
+   * Delegates to TimeAdvanceService for batch processing.
+   */
+  advanceQuarter(state: GameState, opts?: AdvanceOptions): QuarterAdvanceResult {
+    return TimeAdvanceService.advanceQuarter(state, opts);
+  },
+
+  /**
+   * Skip to quarter end (headless mode for UI).
+   * Batches 13 weeks with deferred I/O.
+   */
+  skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): QuarterAdvanceResult {
+    return TimeAdvanceService.skipToQuarterEnd(state, opts);
+  },
+
+  /**
+   * Advance a full year (52 weeks = 4 quarters).
+   * Includes year-end Hall of Fame and tier progression.
+   */
+  advanceYear(state: GameState, opts?: AdvanceOptions): YearAdvanceResult {
+    return TimeAdvanceService.advanceYear(state, opts);
+  },
+
+  /**
+   * Skip to year end (headless mode for UI).
+   * Batches 52 weeks with deferred I/O.
+   */
+  skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): YearAdvanceResult {
+    return TimeAdvanceService.skipToYearEnd(state, opts);
   },
 };

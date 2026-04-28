@@ -85,7 +85,7 @@ export function HallOfWarriors() {
                     >
                       <TableCell className="pl-8 py-5">
                         <div className="flex flex-col">
-                          <span className="font-display font-black text-sm uppercase tracking-tight text-white group-hover:text-arena-gold transition-colors">
+                          <span >
                             {w.name}
                           </span>
                           <div className="flex items-center gap-2 mt-1">
@@ -104,18 +104,18 @@ export function HallOfWarriors() {
                           {w.career?.medals && (
                             <>
                               {w.career.medals.gold ? (
-                                <span className="p-1 rounded bg-arena-gold/20 text-arena-gold text-[10px] font-black">
-                                  🥇{w.career.medals.gold}
+                                <span className="p-1 rounded-none bg-arena-gold/20 text-arena-gold text-[10px] font-black">
+                                  G·{w.career.medals.gold}
                                 </span>
                               ) : null}
                               {w.career.medals.silver ? (
-                                <span className="p-1 rounded bg-slate-400/20 text-slate-400 text-[10px] font-black">
-                                  🥈{w.career.medals.silver}
+                                <span className="p-1 rounded-none bg-foreground/10 text-muted-foreground text-[10px] font-black">
+                                  S·{w.career.medals.silver}
                                 </span>
                               ) : null}
                               {w.career.medals.bronze ? (
-                                <span className="p-1 rounded bg-orange-600/20 text-orange-600 text-[10px] font-black">
-                                  🥉{w.career.medals.bronze}
+                                <span className="p-1 rounded-none bg-arena-gold/10 text-arena-gold text-[10px] font-black">
+                                  B·{w.career.medals.bronze}
                                 </span>
                               ) : null}
                             </>
@@ -129,9 +129,9 @@ export function HallOfWarriors() {
                               <span className="text-arena-pop border-b border-arena-pop/20">
                                 {w.career.wins}W
                               </span>
-                              <span className="text-white/20">/</span>
+                              <span className="text-foreground/20">/</span>
                               <span className="text-destructive/60">{w.career.losses}L</span>
-                              <span className="text-white/20">/</span>
+                              <span className="text-foreground/20">/</span>
                               <span className="text-arena-gold drop-shadow-[0_0_5px_rgba(255,215,0,0.3)]">
                                 {w.career.kills}K
                               </span>
@@ -155,10 +155,10 @@ export function HallOfWarriors() {
                       </TableCell>
                       <TableCell className="text-right pr-8 py-5">
                         <div className="flex flex-col items-end">
-                          <span className="font-mono font-black text-[10px] text-white/40 uppercase tracking-widest group-hover:text-white/60 transition-colors">
+                          <span className="font-mono font-black text-[10px] text-foreground/40 uppercase tracking-widest group-hover:text-foreground/60 transition-colors">
                             WK_{w.retiredWeek?.toString().padStart(2, '0') ?? '??'}
                           </span>
-                          <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
+                          <span className="text-[8px] font-black text-foreground/20 uppercase tracking-widest">
                             Cessation_Week
                           </span>
                         </div>

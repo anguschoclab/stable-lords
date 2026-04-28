@@ -65,7 +65,7 @@ export default function CommonControls({ plan, onPlanChange }: CommonControlsPro
         <div className="min-h-[60px] border-2 border-dashed flex items-center justify-center p-4 bg-black/20 border-white/10">
           <div className="flex gap-2">
             {plan.offensiveTactic && plan.offensiveTactic !== 'none' && (
-              <Badge className="bg-arena-blood text-white rounded-none uppercase font-black tracking-widest px-3 py-1">
+              <Badge >
                 {plan.offensiveTactic}
               </Badge>
             )}

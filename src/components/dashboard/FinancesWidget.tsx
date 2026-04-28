@@ -35,7 +35,7 @@ export function FinancesWidget() {
             TOTAL RESERVE
           </span>
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-display font-black text-white selection:bg-arena-gold/30 drop-shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+            <span className="text-3xl font-display font-black text-foreground selection:bg-arena-gold/30 drop-shadow-[0_0_15px_rgba(255,215,0,0.1)]">
               {Math.round(treasury).toLocaleString()}
             </span>
             <span className="text-xs font-black text-arena-gold opacity-60">G</span>

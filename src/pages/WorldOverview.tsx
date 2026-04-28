@@ -239,19 +239,19 @@ export default function WorldOverview() {
         <TabsList className="bg-neutral-900/60 border border-white/5 p-1 mb-6">
           <TabsTrigger
             value="stables"
-            className="data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest text-[10px] font-black py-2 px-6"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase tracking-widest text-[10px] font-black py-2 px-6"
           >
             <Trophy className="h-3 w-3 mr-2" /> Stables
           </TabsTrigger>
           <TabsTrigger
             value="warriors"
-            className="data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest text-[10px] font-black py-2 px-6"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase tracking-widest text-[10px] font-black py-2 px-6"
           >
             <Swords className="h-3 w-3 mr-2" /> Warriors
           </TabsTrigger>
           <TabsTrigger
             value="intel"
-            className="data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest text-[10px] font-black py-2 px-6"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase tracking-widest text-[10px] font-black py-2 px-6"
           >
             <Brain className="h-3 w-3 mr-2" /> Intelligence
           </TabsTrigger>

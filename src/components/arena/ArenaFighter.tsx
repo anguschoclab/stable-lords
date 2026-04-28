@@ -118,7 +118,7 @@ export default function ArenaFighter({
           <div
             className={cn(
               'h-full transition-all duration-300',
-              hpPercent > 50 ? 'bg-green-600' : hpPercent > 25 ? 'bg-yellow-500' : 'bg-red-600'
+              hpPercent > 50 ? 'bg-primary' : hpPercent > 25 ? 'bg-arena-gold' : 'bg-destructive'
             )}
             style={{ width: `${hpPercent}%` }}
           />
@@ -131,7 +131,7 @@ export default function ArenaFighter({
           />
         </div>
         {/* Winner glow */}
-        {isWinner && <div className="absolute -inset-1 bg-yellow-500/30 blur-sm animate-pulse" />}
+        {isWinner && <div className="absolute -inset-1 bg-arena-gold/30 blur-sm animate-pulse" />}
       </div>
 
       {/* Name Plate */}
@@ -139,7 +139,7 @@ export default function ArenaFighter({
         <span
           className={cn(
             'text-xs font-bold px-2 py-0.5 rounded-none',
-            isWinner ? 'bg-yellow-600/80 text-white' : 'bg-black/60 text-white/90'
+            isWinner ? 'bg-arena-gold/80 text-black' : 'bg-black/60 text-foreground/90'
           )}
         >
           {name}

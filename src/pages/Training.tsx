@@ -168,8 +168,8 @@ export default function Training() {
                   key={i}
                   className={cn(
                     'flex items-start gap-2 px-3 py-2 rounded text-[11px]',
-                    kind === 'gain' && 'bg-emerald-500/10 text-emerald-300',
-                    kind === 'injury' && 'bg-amber-500/10 text-amber-300',
+                    kind === 'gain' && 'bg-primary/10 text-primary',
+                    kind === 'injury' && 'bg-arena-gold/10 text-arena-gold',
                     kind === 'recovery' && 'bg-sky-500/10 text-sky-300'
                   )}
                 >

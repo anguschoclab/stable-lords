@@ -52,13 +52,13 @@ export default function Graveyard() {
         <TabsList className="bg-secondary/20 p-1 rounded-none h-12">
           <TabsTrigger
             value="memorial"
-            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
+            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             <Zap className="h-3.5 w-3.5" /> Private Memorial
           </TabsTrigger>
           <TabsTrigger
             value="world"
-            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-white transition-all"
+            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-primary-foreground transition-all"
           >
             <Skull className="h-3.5 w-3.5" /> World Cemetery
           </TabsTrigger>
@@ -211,17 +211,17 @@ function FallenGrid({
                   <div className="flex flex-wrap gap-2 pt-6 mt-6 border-t border-white/5">
                     {w.career.medals.gold > 0 && (
                       <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2.5 py-1.5 border border-arena-gold/20">
-                        🥇 GOLD VALOR
+                        GOLD · VALOR
                       </span>
                     )}
                     {w.career.medals.silver > 0 && (
-                      <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/5 px-2.5 py-1.5 border border-white/10">
-                        🥈 SILVER TOKEN
+                      <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-foreground/5 px-2.5 py-1.5 border border-border/20">
+                        SILVER · TOKEN
                       </span>
                     )}
                     {w.career.medals.bronze > 0 && (
-                      <span className="text-[9px] uppercase font-black tracking-widest text-orange-500 bg-orange-500/10 px-2.5 py-1.5 border border-orange-500/20">
-                        🥉 BRONZE ELITE
+                      <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2.5 py-1.5 border border-arena-gold/20">
+                        BRONZE · ELITE
                       </span>
                     )}
                   </div>

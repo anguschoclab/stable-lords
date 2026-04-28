@@ -44,7 +44,7 @@ export function LethalityBadge({ wA, wB, crowdMood }: LethalityBadgeProps) {
     return (
       <Badge
         variant="outline"
-        className="border-amber-500/50 text-amber-500 bg-amber-500/5 gap-1.5 font-black uppercase text-[9px] tracking-widest px-2.5"
+        className="border-arena-gold/50 text-arena-gold bg-arena-gold/5 gap-1.5 font-black uppercase text-[9px] tracking-widest px-2.5"
       >
         <Shield className="h-3 w-3" /> Moderate Danger
       </Badge>

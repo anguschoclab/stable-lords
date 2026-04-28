@@ -27,7 +27,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren, Stat
         <div className="text-primary text-[10px] uppercase tracking-[0.5em] animate-pulse">
           System Failure
         </div>
-        <h1 className="text-white text-xl uppercase tracking-widest font-bold">
+        <h1 >
           Critical System Failure
         </h1>
         <p className="text-muted-foreground text-xs uppercase tracking-[0.3em] max-w-sm">

@@ -31,10 +31,10 @@ import { PageHeader } from '@/components/ui/PageHeader';
 
 
 const TIER_COLORS: Record<Promoter['tier'], string> = {
-  Local: 'bg-stone-500/20 text-stone-600 border-stone-500/30',
-  Regional: 'bg-cyan-500/20 text-cyan-600 border-cyan-500/30',
-  National: 'bg-violet-500/20 text-violet-600 border-violet-500/30',
-  Legendary: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
+  Local: 'bg-muted/40 text-muted-foreground border-border/40',
+  Regional: 'bg-accent/20 text-accent border-accent/30',
+  National: 'bg-arena-fame/20 text-arena-fame border-arena-fame/30',
+  Legendary: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
 };
 
 /** Calculate active offers for a promoter */
@@ -128,19 +128,19 @@ function PromoterCard({ promoter, offers, currentWeek }: PromoterCardProps) {
               <Calendar className="h-3 w-3" /> Weekly Capacity
             </span>
             <span
-              className={`font-mono font-bold ${capacityPercent >= 80 ? 'text-red-500' : capacityPercent >= 50 ? 'text-amber-500' : 'text-emerald-500'}`}
+              className={`font-mono font-bold ${capacityPercent >= 80 ? 'text-destructive' : capacityPercent >= 50 ? 'text-arena-gold' : 'text-primary'}`}
             >
               {capacityUsed}/{promoter.capacity}
             </span>
           </div>
-          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <div className="h-1.5 bg-muted rounded-none overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
+              className={`h-full rounded-none transition-all duration-500 ${
                 capacityPercent >= 80
-                  ? 'bg-red-500'
+                  ? 'bg-destructive'
                   : capacityPercent >= 50
-                    ? 'bg-amber-500'
-                    : 'bg-emerald-500'
+                    ? 'bg-arena-gold'
+                    : 'bg-primary'
               }`}
               style={{ width: `${Math.min(capacityPercent, 100)}%` }}
             />

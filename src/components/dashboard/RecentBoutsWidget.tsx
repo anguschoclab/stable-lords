@@ -106,7 +106,7 @@ export function RecentBoutsWidget() {
                     className="border-white/5 group/row hover:bg-white/2 transition-colors"
                   >
                     <TableCell className="pl-6 py-4">
-                      <span className="text-[10px] font-mono font-black text-white/20 group-hover/row:text-primary transition-colors">
+                      <span className="text-[10px] font-mono font-black text-foreground/20 group-hover/row:text-primary transition-colors">
                         WK {bout.week.toString().padStart(2, '0')}
                       </span>
                     </TableCell>

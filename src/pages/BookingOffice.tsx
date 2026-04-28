@@ -38,18 +38,18 @@ function getFatigueStatus(fatigue: number): {
   if (fatigue <= 30)
     return {
       label: 'Fresh',
-      color: 'bg-green-500/20 text-green-600 border-green-500/30',
+      color: 'bg-primary/20 text-primary border-primary/30',
       icon: <Heart className="h-3 w-3" />,
     };
   if (fatigue <= 60)
     return {
       label: 'Tired',
-      color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
+      color: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
       icon: <Clock className="h-3 w-3" />,
     };
   return {
     label: 'Exhausted',
-    color: 'bg-red-500/20 text-red-600 border-red-500/30',
+    color: 'bg-destructive/20 text-destructive border-destructive/30',
     icon: <AlertTriangle className="h-3 w-3" />,
   };
 }
@@ -67,10 +67,10 @@ function getInjuryBadge(
     return order.indexOf(i.severity) > order.indexOf(max.severity) ? i : max;
   }, blocking[0]!);
   const colorMap: Record<string, string> = {
-    Moderate: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
-    Severe: 'bg-orange-500/20 text-orange-600 border-orange-500/30',
-    Critical: 'bg-red-500/20 text-red-600 border-red-500/30',
-    Permanent: 'bg-purple-500/20 text-purple-600 border-purple-500/30',
+    Moderate: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
+    Severe: 'bg-arena-blood/20 text-arena-blood border-arena-blood/30',
+    Critical: 'bg-destructive/20 text-destructive border-destructive/30',
+    Permanent: 'bg-arena-fame/20 text-arena-fame border-arena-fame/30',
   };
   const severity = severest.severity ?? 'Moderate';
   return {
@@ -433,7 +433,7 @@ export default function BookingOffice() {
         >
           <div className="flex items-center gap-3">
             <Target className="h-4 w-4 text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
               Market Overview
             </span>
           </div>

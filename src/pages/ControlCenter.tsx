@@ -96,7 +96,7 @@ function KpiBar() {
       color: 'text-destructive',
       glow: '',
     },
-    { label: 'Kill Rate', value: `${killRate}%`, icon: Flame, color: 'text-orange-400', glow: '' },
+    { label: 'Kill Rate', value: `${killRate}%`, icon: Flame, color: 'text-arena-blood', glow: '' },
   ];
 
   return (

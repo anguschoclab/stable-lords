@@ -138,7 +138,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               whileHover={{ rotate: 15 }}
               className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
-              <Swords className="h-5 w-5 text-white" />
+              <Swords  />
             </motion.div>
             <div className="flex flex-col">
               <span className="font-display font-black text-sm tracking-tighter uppercase leading-none group-hover:text-primary transition-colors">
@@ -211,7 +211,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               'flex items-center gap-2 h-9 px-4 font-black text-[11px] uppercase tracking-widest transition-all duration-150',
               isSimulating
                 ? 'bg-white/5 text-muted-foreground/40 pointer-events-none'
-                : 'bg-primary text-white shadow-[0_0_16px_rgba(255,0,0,0.35)] hover:bg-primary/90 hover:shadow-[0_0_24px_rgba(255,0,0,0.5)] active:scale-95'
+                : 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(255,0,0,0.35)] hover:bg-primary/90 hover:shadow-[0_0_24px_rgba(255,0,0,0.5)] active:scale-95'
             )}
           >
             {isSimulating ? (

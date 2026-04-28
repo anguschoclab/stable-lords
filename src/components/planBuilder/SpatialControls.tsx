@@ -49,7 +49,7 @@ export default function SpatialControls({ plan, warrior, onPlanChange }: Spatial
                     Derived from the warrior's WT. Higher Wit means more natural deception in
                     combat. Traits like Cunning or Calculating amplify this further.
                   </p>
-                  <p className="text-[9px] leading-relaxed text-yellow-400">
+                  <p className="text-[9px] leading-relaxed text-arena-gold">
                     Only triggers when WT ≥ 15 and OE ≥ 4.
                   </p>
                 </TooltipContent>
@@ -65,7 +65,7 @@ export default function SpatialControls({ plan, warrior, onPlanChange }: Spatial
             </span>
           </div>
           {warrior.attributes.WT < 15 && (
-            <p className="text-[9px] text-yellow-400/70 font-black uppercase tracking-wider">
+            <p className="text-[9px] text-arena-gold/70 font-black uppercase tracking-wider">
               ⚠ WT {warrior.attributes.WT} — needs WT ≥ 15 to trigger
             </p>
           )}
@@ -142,9 +142,9 @@ export default function SpatialControls({ plan, warrior, onPlanChange }: Spatial
                     className={cn(
                       'text-xs font-mono font-black',
                       mod > 0
-                        ? 'text-green-400'
+                        ? 'text-primary'
                         : mod < 0
-                          ? 'text-red-400'
+                          ? 'text-destructive'
                           : 'text-muted-foreground/40'
                     )}
                   >

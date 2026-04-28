@@ -273,7 +273,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                       <Link
                         to="/warrior/$id"
                         params={{ id: row.id }}
-                        className="font-display font-black uppercase text-xs tracking-tight text-primary hover:text-white transition-all flex items-center gap-2"
+                        
                       >
                         {row.name}
                         {row.officialRank === 1 && <Crown className="h-3 w-3 text-arena-gold" />}

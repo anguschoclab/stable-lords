@@ -162,25 +162,25 @@ export default function Trainers() {
         <TabsList className="bg-neutral-900/60 border border-white/5 p-1 h-12 rounded-none">
           <TabsTrigger
             value="current"
-            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
           >
             <GraduationCap className="h-3.5 w-3.5" /> Stability Staff
           </TabsTrigger>
           <TabsTrigger
             value="hire"
-            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
           >
             <UserPlus className="h-3.5 w-3.5" /> Tactical Hire
           </TabsTrigger>
           <TabsTrigger
             value="mentors"
-            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
           >
             <Award className="h-3.5 w-3.5" /> Top Mentors
           </TabsTrigger>
           <TabsTrigger
             value="legends"
-            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-white transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
+            className="gap-2 px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all rounded-none font-black uppercase text-[10px] tracking-widest"
           >
             <Skull className="h-3.5 w-3.5" /> Departed Legends
           </TabsTrigger>
@@ -255,7 +255,7 @@ export default function Trainers() {
                           </div>
                           <div className="text-center relative">
                             <div className="flex items-center justify-center gap-1.5 mb-1">
-                              <span className="text-3xl font-display font-black text-white leading-none">
+                              <span className="text-3xl font-display font-black text-foreground leading-none">
                                 +{total}
                               </span>
                               <Zap
@@ -286,7 +286,7 @@ export default function Trainers() {
                 <DialogTrigger asChild>
                   <button className="w-full h-16 rounded-none bg-primary/10 border border-primary/30 flex items-center justify-center gap-4 group hover:bg-primary/20 hover:border-primary transition-all">
                     <div className="p-2 rounded-none bg-primary/20 group-hover:bg-primary transition-colors">
-                      <Armchair className="h-5 w-5 text-white" />
+                      <Armchair className="h-5 w-5 text-foreground" />
                     </div>
                     <div className="text-left">
                       <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary block leading-none mb-1">
@@ -301,7 +301,7 @@ export default function Trainers() {
                 <DialogContent className="bg-neutral-950/95 backdrop-blur-2xl border-white/10 sm:max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
                   <DialogHeader className="p-6 border-b border-white/5 flex flex-col gap-4">
                     <DialogTitle className="font-display text-2xl font-black uppercase tracking-tight flex items-center gap-4">
-                      <div className="p-2 rounded-none bg-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
+                      <div className="p-2 rounded-none bg-primary text-foreground shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
                         <GraduationCap className="h-6 w-6" />
                       </div>
                       Retired_to_Staff_Sync
@@ -344,7 +344,7 @@ export default function Trainers() {
                           </div>
                           <button
                             onClick={() => convertWarrior(w.id)}
-                            className="bg-primary text-white px-6 py-2.5 rounded-none font-black uppercase text-[10px] tracking-widest shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all"
+                            className="bg-primary text-foreground px-6 py-2.5 rounded-none font-black uppercase text-[10px] tracking-widest shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all"
                           >
                             ESTABLISH_Staff
                           </button>
@@ -419,7 +419,7 @@ export default function Trainers() {
                           'flex items-center gap-2 px-5 py-1.5 rounded-none font-black uppercase text-[10px] tracking-widest transition-all',
                           !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
                             ? 'bg-neutral-900 border border-white/5 text-muted-foreground/40 cursor-not-allowed'
-                            : 'bg-primary text-white border border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95'
+                            : 'bg-primary text-foreground border border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95'
                         )}
                       >
                         <UserPlus className="h-4 w-4" />

@@ -77,7 +77,7 @@ function CrowdMoodWidget() {
         <div>
           <div className="flex items-center gap-2">
             <Eye className="h-3 w-3 text-accent" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
               Crowd Temperament
             </span>
           </div>
@@ -206,7 +206,7 @@ function ArenaLeaderboard() {
       <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Trophy className="h-4 w-4 text-arena-gold" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
             Global Power Rankings
           </span>
         </div>
@@ -405,7 +405,7 @@ export default function ArenaHub() {
         className="flex flex-row items-center gap-6 p-5 border-l-4 border-l-primary/50"
       >
         <div className="flex-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
             {isTournamentWeek ? 'Tournament Day' : `Week ${week}`}
           </p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -419,7 +419,7 @@ export default function ArenaHub() {
             setAutosimResult(null);
           }}
           disabled={showCombat}
-          className="bg-primary text-black font-black uppercase tracking-widest shrink-0"
+          className="bg-primary text-primary-foreground font-black uppercase tracking-widest shrink-0"
         >
           <Zap className="h-4 w-4 mr-2" />
           {isTournamentWeek ? 'EXECUTE TOURNAMENT DAY →' : `EXECUTE WEEK ${week} →`}
@@ -449,7 +449,7 @@ export default function ArenaHub() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
                   Arena Analytics
                 </span>
               </div>
@@ -458,7 +458,7 @@ export default function ArenaHub() {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center group">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-foreground/80 transition-colors">
                   Stable Renown
                 </span>
                 <span className="font-display font-black text-xl text-arena-fame tracking-tighter">
@@ -466,7 +466,7 @@ export default function ArenaHub() {
                 </span>
               </div>
               <div className="flex justify-between items-center group">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-foreground/80 transition-colors">
                   Lifetime Kills
                 </span>
                 <span className="font-display font-black text-xl text-destructive tracking-tighter">
@@ -474,7 +474,7 @@ export default function ArenaHub() {
                 </span>
               </div>
               <div className="flex justify-between items-center group">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-white/80 transition-colors">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-foreground/80 transition-colors">
                   Combat Yield
                 </span>
                 <span className="font-display font-black text-xl text-primary tracking-tighter">
@@ -517,7 +517,7 @@ export default function ArenaHub() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Zap className="h-4 w-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
                 Engagement Console
               </span>
             </div>
@@ -544,7 +544,7 @@ export default function ArenaHub() {
           >
             <div className="flex items-center gap-3">
               <Activity className="h-4 w-4 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
                 Stable Readiness
               </span>
             </div>
@@ -572,7 +572,7 @@ export default function ArenaHub() {
                 <Button
                   onClick={handleExecuteCycle}
                   disabled={running || (matchCard.length === 0 && fightReady.length < 2)}
-                  className="h-10 px-8 gap-3 font-black uppercase text-[12px] tracking-[0.2em] bg-primary text-black hover:bg-primary/90"
+                  className="h-10 px-8 gap-3 font-black uppercase text-[12px] tracking-[0.2em] bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   <Zap className="h-4 w-4 fill-current" />
                   {isTournamentWeek
@@ -596,7 +596,7 @@ export default function ArenaHub() {
                 <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Activity className="h-4 w-4 text-accent" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
                       Active Combat Manifest
                     </span>
                   </div>

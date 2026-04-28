@@ -69,9 +69,9 @@ const TIER_PRIZES: Record<string, { first: number; second: number; third: number
 
 function getFatigueLabel(fatigue: number | undefined): { label: string; color: string } {
   const f = fatigue ?? 0;
-  if (f < 30) return { label: 'Fresh', color: 'text-emerald-400' };
-  if (f < 60) return { label: 'Tired', color: 'text-yellow-400' };
-  return { label: 'Exhausted', color: 'text-red-400' };
+  if (f < 30) return { label: 'Fresh', color: 'text-primary' };
+  if (f < 60) return { label: 'Tired', color: 'text-arena-gold' };
+  return { label: 'Exhausted', color: 'text-destructive' };
 }
 
 export default function Tournaments() {
@@ -225,7 +225,7 @@ export default function Tournaments() {
                     {fatigueLabel}
                   </span>
                   {hasInjuries && (
-                    <div className="flex items-center gap-1 text-red-400">
+                    <div className="flex items-center gap-1 text-destructive">
                       <AlertTriangle className="h-3 w-3" />
                       <span className="text-[9px] font-black uppercase tracking-widest">
                         {w.injuries.length === 1

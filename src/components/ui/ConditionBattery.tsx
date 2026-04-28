@@ -8,7 +8,7 @@ interface ConditionBatteryProps {
 
 export function ConditionBattery({ value, className, showText = false }: ConditionBatteryProps) {
   // Determine color segment
-  const color = value > 70 ? 'bg-primary' : value > 30 ? 'bg-amber-500' : 'bg-destructive';
+  const color = value > 70 ? 'bg-primary' : value > 30 ? 'bg-arena-gold' : 'bg-destructive';
   const opacity = value > 70 ? 'opacity-100' : value > 30 ? 'opacity-80' : 'opacity-90';
 
   return (

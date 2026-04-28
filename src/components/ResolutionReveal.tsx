@@ -108,7 +108,7 @@ export default function ResolutionReveal() {
                     <div className="space-y-6">
                       {data.gazette.map((item: NewsletterItem, i: number) => (
                         <div key={i} className="space-y-2 border-l-2 border-primary/50 pl-4">
-                          <h4 className="text-lg font-bold font-serif leading-tight">
+                          <h4 className="text-lg font-bold font-display leading-tight">
                             {item.title}
                           </h4>
                           <ul className="list-disc list-inside space-y-1">
@@ -139,7 +139,7 @@ export default function ResolutionReveal() {
                 className="h-full p-6 flex flex-col gap-6"
               >
                 <div className="flex items-center gap-2">
-                  <Activity className="h-6 w-6 text-amber-500" />
+                  <Activity className="h-6 w-6 text-arena-gold" />
                   <h3 className="text-xl font-semibold">
                     {narrativeContent.fanfare.report_medical}
                   </h3>
@@ -160,12 +160,12 @@ export default function ResolutionReveal() {
                 )}
 
                 {data.injuries.length > 0 && (
-                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-none p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-amber-500 font-bold">
+                  <div className="bg-arena-gold/10 border border-arena-gold/20 rounded-none p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-arena-gold font-bold">
                       <Activity className="h-5 w-5" />
                       <h4>Injured Roster</h4>
                     </div>
-                    <ul className="list-disc list-inside text-sm text-amber-600 dark:text-amber-400">
+                    <ul className="list-disc list-inside text-sm text-arena-gold">
                       {data.injuries.map((name: string, i: number) => (
                         <li key={i}>{name}</li>
                       ))}
@@ -232,7 +232,7 @@ export default function ResolutionReveal() {
                 className="h-full p-6 space-y-6"
               >
                 <div className="flex items-center gap-2">
-                  <Activity className="h-6 w-6 text-stone-400" />
+                  <Activity className="h-6 w-6 text-muted-foreground" />
                   <h3 className="text-xl font-semibold">{narrativeContent.fanfare.report_math}</h3>
                 </div>
 
@@ -243,7 +243,7 @@ export default function ResolutionReveal() {
                     </CardHeader>
                     <CardContent className="py-2 px-4">
                       <div
-                        className={`text-2xl font-mono font-bold ${state.lastSimulationReport?.treasuryChange && state.lastSimulationReport.treasuryChange >= 0 ? 'text-green-500' : 'text-amber-500'}`}
+                        className={`text-2xl font-mono font-bold ${state.lastSimulationReport?.treasuryChange && state.lastSimulationReport.treasuryChange >= 0 ? 'text-primary' : 'text-arena-gold'}`}
                       >
                         {state.lastSimulationReport?.treasuryChange &&
                         state.lastSimulationReport.treasuryChange > 0
@@ -277,7 +277,7 @@ export default function ResolutionReveal() {
                           <div key={i} className="flex items-center justify-between text-sm">
                             <span className="font-medium">{g.warriorName}</span>
                             <div className="flex gap-2 font-mono">
-                              <Badge variant="outline" className="text-green-500">
+                              <Badge variant="outline" className="text-primary">
                                 +{g.gain} {g.attr}
                               </Badge>
                             </div>
@@ -285,7 +285,7 @@ export default function ResolutionReveal() {
                         )
                       )}
                       {state.lastSimulationReport?.agingEvents.map((e: string, i: number) => (
-                        <div key={`age-${i}`} className="text-sm text-amber-500">
+                        <div key={`age-${i}`} className="text-sm text-arena-gold">
                           <span className="font-bold mr-2">!</span> {e}
                         </div>
                       ))}
@@ -301,12 +301,12 @@ export default function ResolutionReveal() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
-                className="h-full p-6 flex flex-col items-center justify-center bg-zinc-950 text-zinc-50 relative overflow-hidden"
+                className="h-full p-6 flex flex-col items-center justify-center bg-background text-foreground relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(200,0,0,0.05)_0,transparent_100%)] mix-blend-screen" />
                 <div className="z-10 flex flex-col items-center max-w-full">
-                  <Skull className="h-16 w-16 mb-4 text-zinc-600 animate-pulse drop-shadow-[0_0_15px_rgba(200,0,0,0.3)]" />
-                  <h2 className="text-3xl font-serif text-center mb-8 uppercase tracking-widest text-zinc-300">
+                  <Skull className="h-16 w-16 mb-4 text-muted-foreground animate-pulse drop-shadow-[0_0_15px_rgba(200,0,0,0.3)]" />
+                  <h2 className="text-3xl font-display text-center mb-8 uppercase tracking-widest text-foreground">
                     {narrativeContent.fanfare.memorial_title}
                   </h2>
                   <div className="flex gap-6 overflow-x-auto pb-4 max-w-[100%]">
@@ -315,37 +315,37 @@ export default function ResolutionReveal() {
                       return (
                         <div
                           key={w.id}
-                          className="bg-zinc-900 border border-zinc-800 p-6 rounded-none text-center min-w-72 shadow-2xl relative"
+                          className="bg-muted/40 border border-border/60 p-6 rounded-none text-center min-w-72 shadow-2xl relative"
                         >
-                          <h3 className="text-2xl font-display font-bold text-red-500 mb-1 drop-shadow-md">
+                          <h3 className="text-2xl font-display font-bold text-destructive mb-1 drop-shadow-md">
                             {w.name}
                           </h3>
-                          <p className="text-sm text-zinc-400 mb-4 italic leading-relaxed">
+                          <p className="text-sm text-muted-foreground mb-4 italic leading-relaxed">
                             {w.deathCause || narrativeContent.fanfare.memorial_default}
                           </p>
-                          <Separator className="bg-zinc-800 mb-4" />
-                          <div className="grid grid-cols-2 gap-3 text-xs text-zinc-500 text-left">
-                            <div className="bg-zinc-950 p-2 rounded">
+                          <Separator className="bg-border mb-4" />
+                          <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground text-left">
+                            <div className="bg-background/60 p-2 rounded-none">
                               Age:{' '}
-                              <span className="text-zinc-300 font-mono inline-block ml-1">
+                              <span className="text-foreground font-mono inline-block ml-1">
                                 {w.age}
                               </span>
                             </div>
-                            <div className="bg-zinc-950 p-2 rounded">
+                            <div className="bg-background/60 p-2 rounded-none">
                               Fame:{' '}
-                              <span className="text-zinc-300 font-mono inline-block ml-1">
+                              <span className="text-foreground font-mono inline-block ml-1">
                                 {w.fame}
                               </span>
                             </div>
-                            <div className="bg-zinc-950 p-2 rounded">
+                            <div className="bg-background/60 p-2 rounded-none">
                               Wins:{' '}
-                              <span className="text-zinc-300 font-mono inline-block ml-1">
+                              <span className="text-foreground font-mono inline-block ml-1">
                                 {w.career?.wins || 0}
                               </span>
                             </div>
-                            <div className="bg-zinc-950 p-2 rounded">
+                            <div className="bg-background/60 p-2 rounded-none">
                               Kills:{' '}
-                              <span className="text-red-400 font-mono inline-block ml-1">
+                              <span className="text-destructive font-mono inline-block ml-1">
                                 {w.career?.kills || 0}
                               </span>
                             </div>

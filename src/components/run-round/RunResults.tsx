@@ -32,7 +32,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
             </span>
           )}
           {KOs > 0 && (
-            <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
+            <span className="text-[10px] font-black text-arena-gold uppercase tracking-widest flex items-center gap-1.5">
               <Activity className="h-3 w-3" /> {KOs} KOs
             </span>
           )}
@@ -121,7 +121,7 @@ export function RunResults({ results, expandedId, onToggleExpand }: RunResultsPr
                         {res.outcome.by === 'Kill' && (
                           <Skull className="h-4 w-4 text-destructive animate-pulse" />
                         )}
-                        {res.outcome.by === 'KO' && <Zap className="h-4 w-4 text-amber-500" />}
+                        {res.outcome.by === 'KO' && <Zap className="h-4 w-4 text-arena-gold" />}
                       </div>
                       <div
                         className={cn(

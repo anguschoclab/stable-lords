@@ -24,6 +24,12 @@ export interface FeatureFlags {
   skillDrilling: boolean;
   /** Skip combat narration and log generation (headless performance). */
   skipCombatNarration: boolean;
+  /** Enable quarter (13-week) batch advancement. */
+  quarterPipeline: boolean;
+  /** Enable year (52-week) batch advancement. */
+  yearPipeline: boolean;
+  /** Enable headless mode for week advancement (skips UI-facing content). */
+  headlessWeekAdvance: boolean;
 }
 
 const DEFAULTS: FeatureFlags = {
@@ -41,6 +47,10 @@ const DEFAULTS: FeatureFlags = {
   // Skill drilling is data-complete.
   skillDrilling: true,
   skipCombatNarration: false,
+  // Batch advancement features — disabled until fully tested.
+  quarterPipeline: false,
+  yearPipeline: false,
+  headlessWeekAdvance: false,
 };
 
 let activeFlags: FeatureFlags = { ...DEFAULTS };

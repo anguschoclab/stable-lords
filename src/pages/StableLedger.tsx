@@ -74,11 +74,11 @@ export default function StableLedger() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/60">
                 Fiscal Runway Projection
               </span>
               {isEmergency && (
-                <Badge className="bg-destructive text-white text-[8px] font-black h-4 px-1.5 animate-bounce">
+                <Badge className="bg-destructive text-foreground text-[8px] font-black h-4 px-1.5 animate-bounce">
                   CRITICAL
                 </Badge>
               )}
@@ -132,7 +132,7 @@ export default function StableLedger() {
           </TabsTrigger>
           <TabsTrigger
             value="contracts"
-            className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-primary/80 data-[state=active]:text-white"
+            className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground"
           >
             <GraduationCap className="h-3.5 w-3.5" />{' '}
             <span className="hidden sm:inline">Staffing</span>
@@ -146,7 +146,7 @@ export default function StableLedger() {
           </TabsTrigger>
           <TabsTrigger
             value="hall"
-            className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-destructive data-[state=active]:text-white"
+            className="text-[10px] font-black uppercase tracking-widest py-3 gap-2 data-[state=active]:bg-destructive data-[state=active]:text-primary-foreground"
           >
             <Skull className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Legends Hall</span>
           </TabsTrigger>

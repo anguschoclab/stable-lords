@@ -84,7 +84,7 @@ function StableSelector({
                         className={cn(
                           'h-8 w-8 flex items-center justify-center rounded-none border transition-all',
                           idA === r.owner.id
-                            ? 'bg-primary text-white border-primary'
+                            ? 'bg-primary text-primary-foreground border-primary'
                             : 'bg-neutral-800 text-muted-foreground border-white/5'
                         )}
                       >
@@ -148,7 +148,7 @@ function StableSelector({
                         className={cn(
                           'h-8 w-8 flex items-center justify-center rounded-none border transition-all',
                           idB === r.owner.id
-                            ? 'bg-accent text-white border-accent'
+                            ? 'bg-accent text-primary-foreground border-accent'
                             : 'bg-neutral-800 text-muted-foreground border-white/5'
                         )}
                       >
@@ -408,17 +408,17 @@ export function StableComparison({ rivals }: StableComparisonProps) {
               <Surface
                 variant="glass"
                 padding="none"
-                className="border-amber-500/10 overflow-hidden"
+                className="border-arena-gold/10 overflow-hidden"
               >
-                <div className="p-4 border-b border-white/5 bg-amber-500/5 flex items-center gap-3">
-                  <div className="p-1.5 rounded bg-amber-500/10 border border-amber-500/20">
-                    <BrainCircuit className="h-3.5 w-3.5 text-amber-400" />
+                <div className="p-4 border-b border-white/5 bg-arena-gold/5 flex items-center gap-3">
+                  <div className="p-1.5 rounded bg-arena-gold/10 border border-arena-gold/20">
+                    <BrainCircuit className="h-3.5 w-3.5 text-arena-gold" />
                   </div>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-arena-gold">
                     Doctrine Intelligence
                   </h3>
                   {clashes && (
-                    <div className="ml-auto flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-amber-300">
+                    <div className="ml-auto flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-arena-gold/70">
                       <AlertTriangle className="h-3 w-3" />
                       Personality Clash Detected
                     </div>

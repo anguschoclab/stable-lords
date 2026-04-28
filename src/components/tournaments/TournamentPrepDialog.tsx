@@ -71,7 +71,7 @@ export function TournamentPrepDialog({
                             <TooltipTrigger>
                               <AlertCircle className="h-3.5 w-3.5 text-destructive animate-pulse" />
                             </TooltipTrigger>
-                            <TooltipContent className="bg-destructive text-white font-black uppercase text-[9px] border-none">
+                            <TooltipContent >
                               Nearing Sig Freeze
                             </TooltipContent>
                           </Tooltip>

@@ -30,7 +30,7 @@ export function LineageTree({ lineage, warriorName }: LineageTreeProps) {
 
   const pedigreeLevels = {
     Commoner: 'text-muted-foreground',
-    'Second Generation': 'text-emerald-400',
+    'Second Generation': 'text-primary',
     Legacy: 'text-primary',
     'Noble Blood': 'text-arena-gold',
     'Exiled Legend': 'text-destructive',
@@ -80,7 +80,7 @@ export function LineageTree({ lineage, warriorName }: LineageTreeProps) {
                 <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">
                   Source Ancestor
                 </p>
-                <p className="text-xs font-display font-black uppercase tracking-tight text-white/80">
+                <p className="text-xs font-display font-black uppercase tracking-tight text-foreground/80">
                   {lineage.mentorName || 'REDACTED'}
                 </p>
                 <div className="mt-2 h-0.5 w-12 mx-auto bg-primary/20 group-hover:bg-primary/60 transition-all" />
@@ -98,7 +98,7 @@ export function LineageTree({ lineage, warriorName }: LineageTreeProps) {
                 <p className="text-[9px] font-black text-arena-gold uppercase tracking-[0.3em] mb-1">
                   Current Subject
                 </p>
-                <p className="text-sm font-display font-black uppercase tracking-tighter text-white">
+                <p >
                   {warriorName}
                 </p>
                 <div className="mt-3 flex justify-center gap-1">

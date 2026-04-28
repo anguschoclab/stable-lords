@@ -34,18 +34,18 @@ const SLOT_ICONS: Record<string, React.ReactNode> = {
 };
 
 const SLOT_COLORS: Record<string, string> = {
-  weapon: 'bg-red-100 text-red-800 border-red-200',
-  armor: 'bg-blue-100 text-blue-800 border-blue-200',
-  shield: 'bg-green-100 text-green-800 border-green-200',
-  helm: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  weapon: 'bg-destructive/10 text-destructive border-destructive/20',
+  armor: 'bg-primary/10 text-primary border-primary/20',
+  shield: 'bg-arena-pop/10 text-arena-pop border-arena-pop/20',
+  helm: 'bg-arena-gold/10 text-arena-gold border-arena-gold/20',
 };
 
 const RARITY_COLORS: Record<number, string> = {
-  0: 'border-gray-200', // Common
-  1: 'border-green-300', // Uncommon
-  2: 'border-blue-300', // Rare
-  3: 'border-purple-300', // Epic
-  4: 'border-orange-300', // Legendary
+  0: 'border-border/40', // Common
+  1: 'border-arena-pop/40', // Uncommon
+  2: 'border-primary/40', // Rare
+  3: 'border-arena-fame/40', // Epic
+  4: 'border-arena-gold/60', // Legendary
 };
 
 function getEquipmentRarity(item: EquipmentItem): number {
@@ -105,8 +105,8 @@ export function EquipmentCard({
           </div>
           {item.twoHanded && (
             <div className="flex items-center gap-2">
-              <Sword className="h-4 w-4 text-orange-600" />
-              <span className="text-orange-600">Two-Handed</span>
+              <Sword className="h-4 w-4 text-arena-gold" />
+              <span className="text-arena-gold">Two-Handed</span>
             </div>
           )}
         </div>
@@ -119,19 +119,19 @@ export function EquipmentCard({
               <h4 className="font-semibold text-sm mb-2">Style Compatibility</h4>
               <div className="space-y-2">
                 {isPreferred && (
-                  <div className="flex items-center gap-2 text-green-600">
+                  <div className="flex items-center gap-2 text-primary">
                     <Star className="h-4 w-4" />
                     <span className="text-sm">Preferred for {warriorStyle}</span>
                   </div>
                 )}
                 {isRestricted && (
-                  <div className="flex items-center gap-2 text-red-600">
+                  <div className="flex items-center gap-2 text-destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="text-sm">Restricted for {warriorStyle}</span>
                   </div>
                 )}
                 {!isPreferred && !isRestricted && (
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Shield className="h-4 w-4" />
                     <span className="text-sm">Compatible with {warriorStyle}</span>
                   </div>
@@ -151,7 +151,7 @@ export function EquipmentCard({
                 {item.reqST && (
                   <div className="flex justify-between text-sm">
                     <span>Strength:</span>
-                    <span className={warriorAttrs && warriorAttrs.ST < item.reqST ? 'text-red-600' : 'text-green-600'}>
+                    <span className={warriorAttrs && warriorAttrs.ST < item.reqST ? 'text-destructive' : 'text-primary'}>
                       {warriorAttrs?.ST || 0} / {item.reqST}
                     </span>
                   </div>
@@ -159,7 +159,7 @@ export function EquipmentCard({
                 {item.reqSZ && (
                   <div className="flex justify-between text-sm">
                     <span>Size:</span>
-                    <span className={warriorAttrs && warriorAttrs.SZ < item.reqSZ ? 'text-red-600' : 'text-green-600'}>
+                    <span className={warriorAttrs && warriorAttrs.SZ < item.reqSZ ? 'text-destructive' : 'text-primary'}>
                       {warriorAttrs?.SZ || 0} / {item.reqSZ}
                     </span>
                   </div>
@@ -167,7 +167,7 @@ export function EquipmentCard({
                 {item.reqWT && (
                   <div className="flex justify-between text-sm">
                     <span>Wit:</span>
-                    <span className={warriorAttrs && warriorAttrs.WT < item.reqWT ? 'text-red-600' : 'text-green-600'}>
+                    <span className={warriorAttrs && warriorAttrs.WT < item.reqWT ? 'text-destructive' : 'text-primary'}>
                       {warriorAttrs?.WT || 0} / {item.reqWT}
                     </span>
                   </div>
@@ -175,7 +175,7 @@ export function EquipmentCard({
                 {item.reqDF && (
                   <div className="flex justify-between text-sm">
                     <span>Deftness:</span>
-                    <span className={warriorAttrs && warriorAttrs.DF < item.reqDF ? 'text-red-600' : 'text-green-600'}>
+                    <span className={warriorAttrs && warriorAttrs.DF < item.reqDF ? 'text-destructive' : 'text-primary'}>
                       {warriorAttrs?.DF || 0} / {item.reqDF}
                     </span>
                   </div>
@@ -183,8 +183,8 @@ export function EquipmentCard({
               </div>
               
               {!weaponReqResult.met && (
-                <div className="mt-3 p-2 bg-red-50 rounded-md">
-                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                <div className="mt-3 p-2 bg-destructive/10 rounded-none">
+                  <div className="flex items-center gap-2 text-destructive text-sm">
                     <AlertTriangle className="h-4 w-4" />
                     <span>Penalties: ATT {weaponReqResult.attPenalty}, Endurance +{(weaponReqResult.endurancePenalty - 1) * 100}%</span>
                   </div>

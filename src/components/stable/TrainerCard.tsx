@@ -131,7 +131,7 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
                   </TooltipTrigger>
                   <TooltipContent
                     side="left"
-                    className="bg-destructive text-white border-none font-black text-[10px] tracking-widest"
+                    
                   >
                     TERMINATE CONTRACT
                   </TooltipContent>

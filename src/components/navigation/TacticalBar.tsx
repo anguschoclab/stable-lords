@@ -136,8 +136,8 @@ export function TacticalBar() {
           {hasAlerts ? (
             <>
               <div className="flex items-center gap-1.5">
-                <AlertCircle className="h-4 w-4 text-amber-500" />
-                <span className="text-xs font-black uppercase tracking-wider text-amber-500">
+                <AlertCircle className="h-4 w-4 text-arena-gold" />
+                <span className="text-xs font-black uppercase tracking-wider text-arena-gold">
                   {alerts.length} Alert{alerts.length > 1 ? 's' : ''}
                 </span>
               </div>
@@ -191,20 +191,20 @@ export function TacticalBar() {
                       key={alert.id}
                       className={cn(
                         'flex items-center justify-between p-3 rounded-none border',
-                        alert.type === 'warning' && 'bg-amber-500/10 border-amber-500/20',
-                        alert.type === 'info' && 'bg-stone-500/10 border-stone-500/20',
-                        alert.type === 'urgent' && 'bg-red-500/10 border-red-500/20',
-                        alert.type === 'success' && 'bg-emerald-500/10 border-emerald-500/20'
+                        alert.type === 'warning' && 'bg-arena-gold/10 border-arena-gold/20',
+                        alert.type === 'info' && 'bg-muted/30 border-border/30',
+                        alert.type === 'urgent' && 'bg-destructive/10 border-destructive/20',
+                        alert.type === 'success' && 'bg-primary/10 border-primary/20'
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <Icon
                           className={cn(
                             'h-4 w-4',
-                            alert.type === 'warning' && 'text-amber-500',
-                            alert.type === 'info' && 'text-stone-400',
-                            alert.type === 'urgent' && 'text-red-500',
-                            alert.type === 'success' && 'text-emerald-500'
+                            alert.type === 'warning' && 'text-arena-gold',
+                            alert.type === 'info' && 'text-muted-foreground',
+                            alert.type === 'urgent' && 'text-destructive',
+                            alert.type === 'success' && 'text-primary'
                           )}
                         />
                         <span className="text-xs font-medium">{alert.message}</span>
@@ -218,11 +218,11 @@ export function TacticalBar() {
                             className={cn(
                               'h-7 text-[10px] font-black uppercase tracking-wider',
                               alert.type === 'warning' &&
-                                'border-amber-500/30 hover:bg-amber-500/20',
-                              alert.type === 'info' && 'border-stone-500/30 hover:bg-stone-500/20',
-                              alert.type === 'urgent' && 'border-red-500/30 hover:bg-red-500/20',
+                                'border-arena-gold/30 hover:bg-arena-gold/20',
+                              alert.type === 'info' && 'border-border/30 hover:bg-muted/20',
+                              alert.type === 'urgent' && 'border-destructive/30 hover:bg-destructive/20',
                               alert.type === 'success' &&
-                                'border-emerald-500/30 hover:bg-emerald-500/20'
+                                'border-primary/30 hover:bg-primary/20'
                             )}
                           >
                             {alert.action.label}

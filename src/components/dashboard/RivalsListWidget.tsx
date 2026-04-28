@@ -149,7 +149,7 @@ export function RivalsListWidget() {
                       )}
                     />
                     <span className="text-foreground/60 group-hover/bout:text-foreground transition-colors font-medium">
-                      {playerIsA ? f.a : f.d} <span className="text-white/10 mx-1">VS</span>{' '}
+                      {playerIsA ? f.a : f.d} <span className="text-foreground/10 mx-1">VS</span>{' '}
                       {playerIsA ? f.d : f.a}
                     </span>
                   </div>

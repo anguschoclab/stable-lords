@@ -54,7 +54,7 @@ export function RosterWall() {
           <Button
             variant="outline"
             size="sm"
-            className="bg-neutral-900 border-white/10 text-[10px] font-black uppercase tracking-[0.2em] gap-2 h-10 px-6 hover:bg-primary hover:text-white hover:border-primary transition-all"
+            
           >
             Initialize Recruitment <ChevronRight className="h-4 w-4" />
           </Button>
@@ -81,7 +81,7 @@ export function RosterWall() {
               </p>
             </div>
             <Link to="/ops/recruit" className="mt-4">
-              <Button className="bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 h-12 shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all">
+              <Button >
                 Initialize Sync
               </Button>
             </Link>
@@ -187,7 +187,7 @@ export function RosterWall() {
                                           : grade === 'A'
                                             ? 'text-primary border-primary/40'
                                             : grade === 'B'
-                                              ? 'text-emerald-400 border-emerald-400/40'
+                                              ? 'text-primary border-emerald-400/40'
                                               : grade === 'C'
                                                 ? 'text-muted-foreground border-white/10'
                                                 : 'text-muted-foreground/60 border-white/5';

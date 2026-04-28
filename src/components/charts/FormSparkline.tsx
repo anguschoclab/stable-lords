@@ -37,7 +37,7 @@ export const FormSparkline = React.memo(function FormSparkline({
             let label = 'Draw';
 
             if (isDraw) {
-              colorClass = 'bg-amber-500/50';
+              colorClass = 'bg-arena-gold/50';
               label = 'Draw';
             } else if (won) {
               colorClass = byKill

@@ -68,7 +68,7 @@ export function TacticalStyleAnalysis({ allFights }: MetaAnalyticsProps) {
           <div key={s.style} className="space-y-2.5 group">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-3">
-                <span className="text-[10px] font-mono font-black text-white/20">0{idx + 1}</span>
+                <span className="text-[10px] font-mono font-black text-foreground/20">0{idx + 1}</span>
                 <span className="text-xs font-black uppercase tracking-widest text-foreground/80 group-hover:text-primary transition-colors">
                   {s.style}
                 </span>
@@ -221,7 +221,7 @@ export function StyleMatchupHeatmap({ allFights }: MetaAnalyticsProps) {
                           >
                             {!isNeutral && (
                               <div className="h-full w-full flex items-center justify-center">
-                                <span className="text-[10px] font-mono font-black text-white/60">
+                                <span className="text-[10px] font-mono font-black text-foreground/60">
                                   {rate.toFixed(0)}
                                 </span>
                               </div>

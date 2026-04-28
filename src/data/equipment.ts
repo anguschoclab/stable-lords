@@ -27,7 +27,7 @@ export { HELMS } from './equipment/helms';
 export { SHIELDS } from './equipment/shields';
 
 // Re-export utility functions that tests might be importing
-export { 
+export {
   getAvailableItems,
   getItemById,
   getItemByCode,
@@ -38,7 +38,8 @@ export {
   getLoadoutWeight,
   isOverEncumbered,
   ALL_EQUIPMENT,
-  DEFAULT_LOADOUT
+  DEFAULT_LOADOUT,
+  getClassicWeaponBonus,
 } from './equipment/equipment.utils';
 
 // Re-export shield constants from weapons module

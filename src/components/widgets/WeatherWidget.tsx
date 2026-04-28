@@ -8,9 +8,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const WEATHER_METADATA = {
   Clear: {
     icon: Sun,
-    color: 'text-yellow-400',
-    bg: 'bg-yellow-400/10',
-    border: 'border-yellow-400/20',
+    color: 'text-arena-gold',
+    bg: 'bg-arena-gold/10',
+    border: 'border-arena-gold/20',
     description: 'Optimal conditions. No environmental modifiers applied to combat resolution.',
     stats: 'NORMAL VISIBILITY // ZERO DRAIN',
   },
@@ -33,17 +33,17 @@ const WEATHER_METADATA = {
   },
   Gale: {
     icon: Wind,
-    color: 'text-emerald-500',
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-500/20',
+    color: 'text-primary',
+    bg: 'bg-primary/10',
+    border: 'border-primary/20',
     description: 'Fierce winds. Substantial penalty to stamina.',
     stats: 'STAMINA DRAIN 115%',
   },
   Sweltering: {
     icon: ThermometerSun,
-    color: 'text-orange-500',
-    bg: 'bg-orange-500/10',
-    border: 'border-orange-500/20',
+    color: 'text-arena-blood',
+    bg: 'bg-arena-blood/10',
+    border: 'border-arena-blood/20',
     description:
       'Oppressive heat. Endurance consumption is doubled. High-constitution warriors favored.',
     stats: 'ENDURANCE DRAIN 200% // FATIGUE ACCEL',
@@ -81,7 +81,7 @@ export function WeatherWidget() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Cloud className="h-4 w-4 text-primary" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
             Arena Environment
           </span>
         </div>

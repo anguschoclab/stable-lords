@@ -194,7 +194,7 @@ export function LeftNav({ className }: LeftNavProps) {
                     e.stopPropagation();
                     navigate({ to: alertLink });
                   }}
-                  className="flex items-center justify-center h-4 min-w-4 px-1 rounded-none bg-arena-blood text-white text-[8px] font-black hover:bg-destructive transition-colors"
+                  
                 >
                   {alertCount}
                 </button>

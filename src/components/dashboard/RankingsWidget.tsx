@@ -192,7 +192,7 @@ export function RankingsWidget() {
                     <div className="flex items-center gap-1.5">
                       <Target className="h-2.5 w-2.5 text-arena-pop opacity-40 group-hover/row:opacity-100 transition-opacity" />
                       <span className="text-[10px] font-mono font-black text-arena-pop/80">
-                        {w.career.wins}W <span className="text-white/10 font-normal">/</span>{' '}
+                        {w.career.wins}W <span className="text-foreground/10 font-normal">/</span>{' '}
                         {w.career.kills}K
                       </span>
                     </div>
@@ -211,7 +211,7 @@ export function RankingsWidget() {
                       FAME SCORE
                     </span>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-white/5 group-hover/row:text-primary transition-all group-hover/row:translate-x-1" />
+                  <ChevronRight  />
                 </div>
 
                 {/* Progress Sparkline Mask */}

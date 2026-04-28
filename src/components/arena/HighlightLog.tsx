@@ -50,7 +50,7 @@ const KIND_META: Record<Kind, { label: string; color: string; icon: React.ReactN
   },
   momentum: {
     label: 'SWING',
-    color: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10',
+    color: 'text-primary border-primary/30 bg-primary/10',
     icon: <Swords className="h-3 w-3" />,
   },
 };

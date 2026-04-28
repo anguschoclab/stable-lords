@@ -101,7 +101,7 @@ export default function Scouting() {
             <TooltipTrigger asChild>
               <TabsTrigger
                 value="scout"
-                className="data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest text-[10px] font-black py-2 px-6 rounded-none transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase tracking-widest text-[10px] font-black py-2 px-6 rounded-none transition-all"
               >
                 <Eye className="h-3.5 w-3.5 mr-2" /> SCOUT INTEL
               </TabsTrigger>
@@ -117,7 +117,7 @@ export default function Scouting() {
             <TooltipTrigger asChild>
               <TabsTrigger
                 value="compare"
-                className="data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest text-[10px] font-black py-2 px-6 rounded-none transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase tracking-widest text-[10px] font-black py-2 px-6 rounded-none transition-all"
               >
                 <ArrowLeftRight className="h-3.5 w-3.5 mr-2" /> STABLE DYNAMICS
               </TabsTrigger>
@@ -133,7 +133,7 @@ export default function Scouting() {
             <TooltipTrigger asChild>
               <TabsTrigger
                 value="warriors"
-                className="data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest text-[10px] font-black py-2 px-6 rounded-none transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground uppercase tracking-widest text-[10px] font-black py-2 px-6 rounded-none transition-all"
               >
                 <UserRoundSearch className="h-3.5 w-3.5 mr-2" /> WARRIOR FACE-OFF
               </TabsTrigger>

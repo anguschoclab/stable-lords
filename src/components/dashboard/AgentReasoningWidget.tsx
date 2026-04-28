@@ -25,7 +25,7 @@ const INTENT_METRICS: Record<
   SURVIVAL: {
     label: 'Survival Protocol',
     icon: ShieldAlert,
-    color: 'text-amber-500',
+    color: 'text-arena-gold',
     description: 'Prioritizing stable preservation and low-risk engagements.',
   },
   WEALTH_ACCUMULATION: {
@@ -108,8 +108,8 @@ export function AgentReasoningWidget({ rival }: AgentReasoningWidgetProps) {
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="h-1 w-1 rounded-full bg-green-500 animate-ping" />
-              <span className="text-[8px] font-black uppercase text-green-500/60">
+              <div className="h-1 w-1 rounded-full bg-primary animate-ping" />
+              <span className="text-[8px] font-black uppercase text-primary/60">
                 ACTIVE INTENT
               </span>
             </div>
@@ -145,8 +145,8 @@ export function AgentReasoningWidget({ rival }: AgentReasoningWidgetProps) {
                           event.riskTier === 'High'
                             ? 'bg-destructive/20 text-destructive'
                             : event.riskTier === 'Medium'
-                              ? 'bg-amber-500/20 text-amber-500'
-                              : 'bg-green-500/20 text-green-500'
+                              ? 'bg-arena-gold/20 text-arena-gold'
+                              : 'bg-primary/20 text-primary'
                         )}
                       >
                         {event.riskTier}_RISK

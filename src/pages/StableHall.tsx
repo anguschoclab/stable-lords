@@ -69,7 +69,7 @@ export default function StableHall() {
               <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">
                 Patron Tokens
               </span>
-              <div className="flex items-center gap-2 font-display font-black text-2xl text-yellow-400 tracking-tighter leading-none">
+              <div className="flex items-center gap-2 font-display font-black text-2xl text-arena-gold tracking-tighter leading-none">
                 {pendingTokens} <Sparkles className="h-4 w-4 animate-pulse" />
               </div>
             </div>
@@ -108,11 +108,11 @@ export default function StableHall() {
       {/* Band 4 — Patronage Awards */}
       <div className="space-y-4">
         <div className="flex items-center gap-3 px-1">
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">
             PATRONAGE AWARDS
           </span>
           {pendingTokens > 0 ? (
-            <Badge className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-[9px] font-black">
+            <Badge className="bg-arena-gold/20 text-arena-gold border border-arena-gold/30 text-[9px] font-black rounded-none">
               {pendingTokens} TOKEN{pendingTokens !== 1 ? 'S' : ''} PENDING
             </Badge>
           ) : (
@@ -120,7 +120,7 @@ export default function StableHall() {
               Place in tournaments to earn tokens
             </Badge>
           )}
-          <div className="h-px flex-1 bg-gradient-to-r from-yellow-400/20 via-border/20 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
         </div>
         <InsightManager />
       </div>

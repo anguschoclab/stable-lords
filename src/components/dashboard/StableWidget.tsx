@@ -74,10 +74,10 @@ export function StableWidget() {
                 >
                   <div className="relative">
                     <div className="w-10 h-10 rounded-none bg-secondary/20 border border-white/10 flex items-center justify-center overflow-hidden transition-transform group-hover/item:scale-105">
-                      <span className="text-xs font-black text-white/40">{w.name.charAt(0)}</span>
+                      <span className="text-xs font-black text-foreground/40">{w.name.charAt(0)}</span>
                       {hasInjuries && (
                         <div className="absolute -top-1 -right-1 bg-destructive p-0.5 rounded-full ring-2 ring-[#050506]">
-                          <AlertCircle className="h-2 w-2 text-white" />
+                          <AlertCircle className="h-2 w-2 text-foreground" />
                         </div>
                       )}
                     </div>
@@ -94,7 +94,7 @@ export function StableWidget() {
                       </Link>
                       <div className="flex items-center gap-2 text-xs font-mono font-black shrink-0">
                         <span className="text-arena-pop">{w.career.wins}W</span>
-                        <span className="text-white/10">/</span>
+                        <span className="text-foreground/10">/</span>
                         <span className="text-destructive/60">{w.career.kills}K</span>
                       </div>
                     </div>
@@ -107,13 +107,13 @@ export function StableWidget() {
                         <div
                           className={cn(
                             'h-1.5 w-1.5 rounded-full animate-pulse',
-                            hasInjuries ? 'bg-destructive' : 'bg-emerald-500'
+                            hasInjuries ? 'bg-destructive' : 'bg-primary'
                           )}
                         />
                         <span
                           className={cn(
                             'text-[8px] font-black uppercase tracking-[0.2em]',
-                            hasInjuries ? 'text-destructive' : 'text-emerald-500'
+                            hasInjuries ? 'text-destructive' : 'text-primary'
                           )}
                         >
                           {hasInjuries ? 'Compromised' : 'Nominal'}

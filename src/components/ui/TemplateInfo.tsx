@@ -27,9 +27,9 @@ interface TemplateInfoProps {
 
 const TIER_COLORS = {
   Legendary: 'bg-arena-gold text-black',
-  Major: 'bg-purple-600 text-white',
-  Established: 'bg-blue-600 text-white',
-  Minor: 'bg-gray-600 text-white',
+  Major: 'bg-arena-fame/80 text-foreground',
+  Established: 'bg-primary/80 text-primary-foreground',
+  Minor: 'bg-secondary text-muted-foreground',
 };
 
 const PHILOSOPHY_ICONS = {
@@ -130,7 +130,7 @@ export function TemplateInfo({ template, showWarriorNames = false }: TemplateInf
             <Separator />
             <div>
               <h4 className="font-semibold text-sm mb-2">Warrior Names</h4>
-              <ScrollArea className="h-20 w-full rounded-md border p-2">
+              <ScrollArea className="h-20 w-full rounded-none border p-2">
                 <div className="flex flex-wrap gap-1">
                   {template.warriorNames.map((name) => (
                     <Badge key={name} variant="outline" className="text-xs">

@@ -402,7 +402,7 @@ export function StableCrest({
 
   return (
     <div
-      className={`stable-crest ${className} ${selected ? 'ring-2 ring-accent/50 rounded-sm' : ''} group`}
+      className={`stable-crest ${className} ${selected ? 'ring-2 ring-accent/50 rounded-none' : ''} group`}
       style={containerStyle}
       title={showTooltip ? heraldicDesc : undefined}
     >

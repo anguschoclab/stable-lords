@@ -111,7 +111,7 @@ export function MedicalAuditWidget() {
                     value={condition}
                     max={100}
                     labelValue={`${condition}%`}
-                    colorClass={condition < 40 ? 'bg-destructive' : 'bg-amber-500'}
+                    colorClass={condition < 40 ? 'bg-destructive' : 'bg-arena-gold'}
                     className="mt-1 w-full"
                   />
 

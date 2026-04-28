@@ -152,7 +152,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
             <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold">
               <Trophy className="h-3.5 w-3.5" /> Completed
             </div>
-            <div className="text-xl font-black font-mono mt-1 text-emerald-600">
+            <div className="text-xl font-black font-mono mt-1 text-primary">
               {stats.completed}
             </div>
           </CardContent>
@@ -162,7 +162,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
             <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold">
               <Clock className="h-3.5 w-3.5" /> Pending
             </div>
-            <div className="text-xl font-black font-mono mt-1 text-amber-600">{stats.upcoming}</div>
+            <div className="text-xl font-black font-mono mt-1 text-arena-gold">{stats.upcoming}</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-stone-500/5 to-transparent">
@@ -223,14 +223,14 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
               key={round}
               className={cn(
                 'overflow-hidden transition-all duration-300',
-                isComplete && 'border-emerald-500/30',
+                isComplete && 'border-primary/30',
                 isCurrent && 'border-primary/50 shadow-[0_0_15px_-5px_hsl(var(--primary)/0.2)]'
               )}
             >
               <CardHeader
                 className={cn(
                   'p-3 cursor-pointer hover:bg-secondary/20 transition-colors',
-                  isComplete && 'bg-emerald-500/5',
+                  isComplete && 'bg-primary/5',
                   isCurrent && 'bg-primary/5'
                 )}
                 onClick={() => toggleRound(round)}
@@ -241,7 +241,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                       className={cn(
                         'w-8 h-8 rounded-full flex items-center justify-center text-xs font-black',
                         isComplete
-                          ? 'bg-emerald-500/20 text-emerald-600'
+                          ? 'bg-primary/20 text-primary'
                           : isCurrent
                             ? 'bg-primary/20 text-primary animate-pulse'
                             : 'bg-muted text-muted-foreground'
@@ -256,7 +256,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
                         <span>Week {estimatedWeek}</span>
-                        {isPast && <span className="text-emerald-600">(Completed)</span>}
+                        {isPast && <span className="text-primary">(Completed)</span>}
                         {isCurrent && <span className="text-primary font-bold">(Current)</span>}
                         {isFuture && <span>(Upcoming)</span>}
                       </div>
@@ -297,7 +297,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                           className={cn(
                             'p-3 flex items-center justify-between',
                             isResolved && 'bg-secondary/10',
-                            bronze && 'bg-amber-500/5'
+                            bronze && 'bg-arena-gold/5'
                           )}
                         >
                           <div className="flex items-center gap-3">
@@ -360,7 +360,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                             {bronze && (
                               <Badge
                                 variant="outline"
-                                className="text-[9px] border-amber-500/30 text-amber-600"
+                                className="text-[9px] border-arena-gold/30 text-arena-gold"
                               >
                                 Bronze
                               </Badge>
@@ -370,7 +370,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
                                 Auto-win
                               </Badge>
                             ) : isResolved ? (
-                              <Badge className="text-[9px] bg-emerald-500/20 text-emerald-600 border-none">
+                              <Badge className="text-[9px] bg-primary/20 text-primary border-none">
                                 {bout.by || 'Win'}
                               </Badge>
                             ) : (

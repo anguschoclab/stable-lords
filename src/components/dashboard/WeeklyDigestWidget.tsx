@@ -221,10 +221,10 @@ interface StatBoxProps {
 
 function StatBox({ icon, label, value, color }: StatBoxProps) {
   const colorClasses = {
-    emerald: 'text-emerald-600 bg-emerald-500/10',
-    red: 'text-red-600 bg-red-500/10',
-    orange: 'text-orange-600 bg-orange-500/10',
-    blue: 'text-blue-600 bg-blue-500/10',
+    emerald: 'text-primary bg-primary/10',
+    red: 'text-destructive bg-destructive/10',
+    orange: 'text-arena-gold bg-arena-gold/10',
+    blue: 'text-accent bg-accent/10',
   };
 
   return (
@@ -246,15 +246,15 @@ function AlertBox({ type, message }: AlertBoxProps) {
   const configs = {
     death: {
       icon: <AlertTriangle className="h-4 w-4" />,
-      className: 'bg-red-500/10 border-red-500/30 text-red-700',
+      className: 'bg-destructive/10 border-destructive/30 text-destructive',
     },
     offer: {
       icon: <Target className="h-4 w-4" />,
-      className: 'bg-amber-500/10 border-amber-500/30 text-amber-700',
+      className: 'bg-arena-gold/10 border-arena-gold/30 text-arena-gold',
     },
     tournament: {
       icon: <Trophy className="h-4 w-4" />,
-      className: 'bg-purple-500/10 border-purple-500/30 text-purple-700',
+      className: 'bg-accent/10 border-accent/30 text-accent',
     },
   };
 

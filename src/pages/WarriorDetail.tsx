@@ -130,7 +130,7 @@ export default function WarriorDetail() {
   const streakVal = streakMap.get(displayWarrior.name) ?? 0;
   const streakLabel =
     streakVal > 0
-      ? `🔥 ${streakVal}W streak`
+      ? `${streakVal}W streak`
       : streakVal < 0
         ? `${Math.abs(streakVal)}L streak`
         : null;
