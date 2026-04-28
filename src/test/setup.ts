@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom';
+import { enableMapSet } from 'immer';
+
+enableMapSet();
 
 // Mock localStorage for Bun/Vitest environment
 const localStorageMock = (function () {

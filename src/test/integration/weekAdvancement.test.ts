@@ -202,13 +202,22 @@ describe('Week Advancement Integration', () => {
     it('should age warriors after 52 weeks', () => {
       const state = {
         ...initialState,
-        rivals: [], // no rivals → no fights → warrior survives
+        rivals: [],
         roster: [makeWarrior('w1', 'Young Warrior', { age: 20 })],
+        boutOffers: {} as GameState['boutOffers'],
+        tournaments: [],
+        isTournamentWeek: false,
+        recruitPool: [],
+        promoters: {},
+        realmRankings: {},
+        treasury: 999999, // prevent bankruptcy from selling the warrior
       };
 
       let current: GameState = state;
       for (let i = 0; i < 52; i++) {
         current = advanceWeek(current);
+        // Keep realmRankings empty so w1 is never seeded into tournaments
+        current = { ...current, realmRankings: {}, tournaments: [] };
       }
 
       // Warrior should be 21 after 52 weeks (find by ID in case roster order changed)
