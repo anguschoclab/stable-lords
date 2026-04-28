@@ -36,9 +36,9 @@ function buildCache(state: NameResolutionState | GameState) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processWarrior = (w: any) => {
     if (w.id && w.name) {
-      if (!warriorNames.has(w.id)) warriorNames.set(w.id, w.name);
-      if (!warriorsById.has(w.id)) warriorsById.set(w.id, w);
-      if (!warriorsByName.has(w.name)) warriorsByName.set(w.name, w);
+      warriorNames.set(w.id, w.name);
+      warriorsById.set(w.id, w);
+      warriorsByName.set(w.name, w);
     }
   };
 
