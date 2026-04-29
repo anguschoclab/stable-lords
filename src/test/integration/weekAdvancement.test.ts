@@ -158,15 +158,13 @@ describe('Week Advancement Integration', () => {
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
-      // TODO: Season transition not working correctly after first transition
-      // This requires deeper investigation of the pipeline impact resolution
-      // expect(state.season).toBe("Fall");
+      expect(state.season).toBe("Fall");
 
       // Advance to Winter (week 40)
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
-      // expect(state.season).toBe("Winter");
+      expect(state.season).toBe("Winter");
 
       // Advance to next year Spring (week 1)
       for (let i = 0; i < 13; i++) {
@@ -174,9 +172,23 @@ describe('Week Advancement Integration', () => {
       }
       expect(state.year).toBe(2);
       expect(state.week).toBe(1);
-      // TODO: Season reset at year boundary not working correctly
-      // This requires deeper investigation of the season calculation logic
-      // expect(state.season).toBe("Spring");
+      expect(state.season).toBe("Spring");
+
+      // Advance to next year Summer (week 14)
+      for (let i = 0; i < 13; i++) {
+        state = advanceWeek(state);
+      }
+      expect(state.year).toBe(2);
+      expect(state.week).toBe(14);
+      expect(state.season).toBe('Summer');
+
+      // Advance to year 3 Spring (week 1)
+      for (let i = 0; i < 39; i++) {
+        state = advanceWeek(state);
+      }
+      expect(state.year).toBe(3);
+      expect(state.week).toBe(1);
+      expect(state.season).toBe('Spring');
     });
 
     it('should not crash on seasonal growth check', () => {
