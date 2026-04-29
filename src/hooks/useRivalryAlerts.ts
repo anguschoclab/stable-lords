@@ -109,7 +109,7 @@ export function useRivalryAlerts() {
   );
 
   const rivalWarriorStable = useMemo(() => {
-    const m: Record<string, string> = {};
+    const m: Record<string, string> = Object.create(null);
     for (const r of state.rivals ?? []) {
       for (const w of r.roster) m[w.name] = r.owner.stableName;
     }
