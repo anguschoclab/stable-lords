@@ -78,7 +78,7 @@ describe('Autosim Integration', () => {
       });
 
       expect(result.finalState.week).toBeGreaterThan(initialState.week);
-      expect(result.weeksSimmed).toBeLessThanOrEqual(weeksToAdvance);
+      expect(result.weeksSimmed).toBe(weeksToAdvance);
       expect(progressCalls).toBeGreaterThan(0);
     });
 
