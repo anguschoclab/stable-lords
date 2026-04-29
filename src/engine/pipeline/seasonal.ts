@@ -33,7 +33,9 @@ interface OffseasonEventNarrative {
     | 'epiphany'
     | 'tavern_brawl'
     | 'bards_song'
-    | 'plague_outbreak';
+    | 'plague_outbreak'
+    | 'black_market_raid'
+    | 'grand_feast';
   newsletter: string[];
 }
 
@@ -55,7 +57,9 @@ export function runSeasonalPass(
   const insightTokens: InsightToken[] = [];
 
   // Safe cast for our dynamic offseason data
-  const events = (narrativeContent as unknown as { offseason_events: Record<string, OffseasonEventNarrative> }).offseason_events;
+  const events = (
+    narrativeContent as unknown as { offseason_events: Record<string, OffseasonEventNarrative> }
+  ).offseason_events;
 
   if (!events) {
     return {};
@@ -227,6 +231,60 @@ export function runSeasonalPass(
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameLost })],
       });
     }
+  } else if (e.effectType === 'black_market_raid') {
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    const goldLost = 50 + Math.floor(seasonRng.next() * 101); // 50-150 gold
+    treasuryDelta -= goldLost;
+    ledgerEntries.push({
+      id: seasonRng.uuid('ledger') as LedgerEntryId,
+      week: nextWeek,
+      label: 'Black Market Fines',
+      amount: -goldLost,
+      category: 'other',
+    });
+
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors);
+      if (chosen) {
+        newsletterItems.push({
+          id: seasonRng.uuid('newsletter'),
+          week: nextWeek,
+          title: e.title,
+          items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, gold: goldLost })],
+        });
+      }
+    } else {
+      newsletterItems.push({
+        id: seasonRng.uuid('newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: 'Someone', gold: goldLost })],
+      });
+    }
+  } else if (e.effectType === 'grand_feast') {
+    const goldCost = 200 + Math.floor(seasonRng.next() * 201); // 200-400 gold
+    treasuryDelta -= goldCost;
+    ledgerEntries.push({
+      id: seasonRng.uuid('ledger') as LedgerEntryId,
+      week: nextWeek,
+      label: 'Grand Feast Expenses',
+      amount: -goldCost,
+      category: 'other',
+    });
+
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    for (const w of activeWarriors) {
+      rosterUpdates.set(w.id, {
+        xp: (w.xp || 0) + 10,
+      });
+    }
+
+    newsletterItems.push({
+      id: seasonRng.uuid('newsletter'),
+      week: nextWeek,
+      title: e.title,
+      items: [t(seasonRng.pick(e.newsletter) || '', { gold: goldCost })],
+    });
   }
   // Record this event in the State so the UI can pick it up
   const impact: StateImpact = {
