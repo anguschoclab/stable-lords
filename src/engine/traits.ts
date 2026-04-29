@@ -328,3 +328,22 @@ export function getDynamicTraitMods(
   }
   return acc;
 }
+
+/** Combines personality/combat AI trait modifiers for a warrior's FightPlan */
+export function getTraitFightPlanMods(warrior?: Warrior): Partial<import('@/types/shared.types').FightPlan> {
+  const mods: Partial<import('@/types/shared.types').FightPlan> = {};
+  if (!warrior?.traits) return mods;
+
+  for (const id of warrior.traits) {
+    const t = TRAITS[id];
+    if (!t?.effect.fightPlanMod) continue;
+    
+    for (const [key, val] of Object.entries(t.effect.fightPlanMod)) {
+      const k = key as keyof import('@/types/shared.types').FightPlan;
+      if (typeof val === 'number') {
+        mods[k] = ((mods[k] as number) || 0) + val;
+      }
+    }
+  }
+  return mods;
+}
