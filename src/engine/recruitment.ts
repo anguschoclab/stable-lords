@@ -17,6 +17,10 @@ import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import narrativeContent from '@/data/narrativeContent.json';
 import type { NarrativeContent } from '@/types/narrative.types';
+import { PERSONALITY_TRAITS, PERSONALITY_TRAIT_DATA } from '@/data/personalityTraits';
+import { ARCHETYPE_NAMES } from '@/data/names/archetypeNames';
+import { STYLE_ARCHETYPE, generateArchetypeAttrs } from '@/engine/factories/statGeneration';
+import { generateLore, generateOrigin } from '@/engine/narrative/loreGenerator';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -34,6 +38,8 @@ export interface PoolWarrior {
   cost: number;
   age: number;
   lore: string;
+  origin?: string;
+  traits: string[];
   addedWeek: number;
   favorites: WarriorFavorites;
   lineage?: WarriorLineage;
@@ -79,30 +85,6 @@ function rollTier(rng: IRNGService): RecruitTier {
   return 'Common';
 }
 
-function distributeAttributes(rng: IRNGService, total: number): Attributes {
-  const attrs: Attributes = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };
-  let pool = total - 21; // 21 is base (7 × 3)
-  const keys: (keyof Attributes)[] = ['ST', 'CN', 'SZ', 'WT', 'WL', 'SP', 'DF'];
-
-  while (pool > 0) {
-    const key = rng.pick(keys);
-    const max = Math.min(pool, 21 - attrs[key]); // recruit cap is 21
-    if (max <= 0) continue;
-    const add = Math.min(max, Math.floor(rng.next() * 3) + 1);
-    attrs[key] += add;
-    pool -= add;
-  }
-  return attrs;
-}
-
-function generateLore(rng: IRNGService, style: FightingStyle): string {
-  const recruitment = (narrativeContent as NarrativeContent).recruitment;
-  const origin = rng.pick(recruitment.origin);
-  const blurbs = recruitment.style_blurbs?.[style] || ['A fighter with something to prove.'];
-  const blurb = rng.pick(blurbs);
-  return `${origin} ${blurb}`;
-}
-
 export function generateRecruit(
   rng: IRNGService,
   usedNames: Set<string>,
@@ -112,12 +94,6 @@ export function generateRecruit(
   legacyCandidates: import('@/types/warrior.types').Warrior[] = []
 ): PoolWarrior {
   const tier = forceTier ?? rollTier(rng);
-  const tierData = getTierData(tier);
-  const [minPts, maxPts] = tierData.points;
-  // ⚡ Fix: use rng instead of Math.random()
-  const total = Math.floor(rng.next() * (maxPts - minPts + 1)) + minPts;
-  const attributes = distributeAttributes(rng, total);
-
   const styles = Object.values(FightingStyle);
   let style: FightingStyle;
   let lineage: import('@/types/warrior.types').WarriorLineage | undefined;
@@ -146,11 +122,24 @@ export function generateRecruit(
     style = rng.pick(styles);
   }
 
-  // Pick unique name
+  const archetype = STYLE_ARCHETYPE[style];
+  const attributes = generateArchetypeAttrs(style, () => rng.next());
+
+  // Personality Trait
+  const trait = rng.pick(PERSONALITY_TRAITS);
+  const traitData = PERSONALITY_TRAIT_DATA[trait];
+  if (traitData?.attrBonus) {
+    for (const [key, bonus] of Object.entries(traitData.attrBonus)) {
+      attributes[key as keyof Attributes] += bonus as number;
+    }
+  }
+
+  // Pick unique name based on Archetype
   let name: string;
   let attempts = 0;
+  const namePool = [...ARCHETYPE_NAMES[archetype], ...ARCHETYPE_NAMES.tank];
   do {
-    name = rng.pick(NAME_POOL);
+    name = namePool.length > 0 ? rng.pick(namePool) : rng.pick(NAME_POOL);
     attempts++;
   } while (usedNames.has(name) && attempts < 200);
   usedNames.add(name);
@@ -158,6 +147,8 @@ export function generateRecruit(
   const { baseSkills, derivedStats } = computeWarriorStats(attributes, style);
   const potential = generatePotential(attributes, tier, () => rng.next());
   const favorites = generateFavorites(style, () => rng.next());
+  const originStr = generateOrigin(() => rng.next());
+  const loreStr = generateLore(name, () => rng.next());
 
   return {
     id: rng.uuid(),
@@ -170,9 +161,12 @@ export function generateRecruit(
     tier,
     cost: TIER_COST[tier],
     age: 16 + Math.floor(rng.next() * 6),
-    lore: generateLore(rng, style),
+    lore: loreStr,
+    origin: originStr,
+    traits: [trait],
     addedWeek: week,
     favorites,
+    lineage,
   };
 }
 
