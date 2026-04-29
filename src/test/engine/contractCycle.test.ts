@@ -15,20 +15,22 @@ describe('Contract System Cycle', () => {
     state = createFreshState('test-seed');
     state = populateTestState(state);
     // Pre-initialize rankings cache
-    state = runRankingsPass(state);
+    const rankImpact = runRankingsPass(state);
+    state = resolveImpacts(state, [rankImpact]);
   });
 
   it('should generate bout offers in PromoterPass', () => {
-    const updatedState = runPromoterPass(state);
+    const impact = runPromoterPass(state);
+    const updatedState = resolveImpacts(state, [impact]);
     const offers = Object.values(updatedState.boutOffers || {}) as BoutOffer[];
-    // TODO: Fix test setup - no offers being generated
-    if (offers.length > 0 && offers[0]) {
-      expect(offers[0].status).toBe('Proposed');
-    }
+
+    expect(offers.length).toBeGreaterThan(0);
+    expect(offers[0].status).toBe('Proposed');
   });
 
   it("should transition offer to 'Signed' when accepted by player", () => {
-    const stateWithOffers = runPromoterPass(state);
+    const impact = runPromoterPass(state);
+    const stateWithOffers = resolveImpacts(state, [impact]);
     const offers = Object.values(stateWithOffers.boutOffers || {}) as BoutOffer[];
 
     // Find an offer for a player warrior
@@ -47,7 +49,8 @@ describe('Contract System Cycle', () => {
   });
 
   it('should payout the purse upon bout resolution via processWeekBouts', () => {
-    let s = runPromoterPass(state);
+    const pImpact = runPromoterPass(state);
+    let s = resolveImpacts(state, [pImpact]);
     const offers = Object.values(s.boutOffers || {}) as BoutOffer[];
     const offer = offers.find((o) =>
       o.warriorIds.some((wId) => s.roster.some((pW) => pW.id === wId))
