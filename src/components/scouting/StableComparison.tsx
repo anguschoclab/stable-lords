@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useStableComparison } from '@/hooks/scouting/useStableComparison';
 import {
   Shield,
   ArrowLeftRight,
@@ -19,22 +19,9 @@ import { ATTRIBUTE_KEYS, STYLE_DISPLAY_NAMES } from '@/types/game';
 import { ComparisonBar } from './ComparisonBar';
 import { ComparisonHeader } from './ComparisonHeader';
 import { HeadToHead } from './HeadToHead';
-import { calculateStableStats } from '@/engine/stats/stableStats';
-import { useGameStore } from '@/state/useGameStore';
-import { useShallow } from 'zustand/react/shallow';
-import { PERSONALITY_CLASH, PHILOSOPHY_PLAN_MODS } from '@/data/ownerData';
 
 interface StableComparisonProps {
   rivals: RivalStableData[];
-}
-
-function stableStats(rival: RivalStableData) {
-  const stats = calculateStableStats(rival.roster);
-  return {
-    ...stats,
-    rosterSize: stats.activeCount,
-    avgAttrs: stats.avgAttributes,
-  };
 }
 
 function StableSelector({
@@ -184,40 +171,25 @@ function StableSelector({
 }
 
 export function StableComparison({ rivals }: StableComparisonProps) {
-  const [idA, setIdA] = useState<string | null>(null);
-  const [idB, setIdB] = useState<string | null>(null);
-  const ownerGrudges = useGameStore(useShallow((s) => s.ownerGrudges ?? []));
-
-  const rivalA = useMemo(() => rivals.find((r) => r.owner.id === idA), [rivals, idA]);
-  const rivalB = useMemo(() => rivals.find((r) => r.owner.id === idB), [rivals, idB]);
-
-  const statsA = useMemo(() => (rivalA ? stableStats(rivalA) : null), [rivalA]);
-  const statsB = useMemo(() => (rivalB ? stableStats(rivalB) : null), [rivalB]);
-
-  if (rivals.length < 2) {
-    return (
-      <Surface
-        variant="glass"
-        className="py-24 text-center border-dashed border-border/40 flex flex-col items-center gap-4"
-      >
-        <ArrowLeftRight className="h-12 w-12 text-muted-foreground opacity-20" />
-        <div className="space-y-1">
-          <p className="text-sm font-display font-black uppercase tracking-tight text-muted-foreground">
-            Comparative Dataset Insufficient
-          </p>
-          <p className="text-xs text-muted-foreground/60 italic">
-            Scan more rivals via progress to enable benchmark protocols.
-          </p>
-        </div>
-      </Surface>
-    );
-  }
-
-  const maxWins = Math.max(statsA?.totalWins ?? 0, statsB?.totalWins ?? 0, 1);
-  const maxKills = Math.max(statsA?.totalKills ?? 0, statsB?.totalKills ?? 0, 1);
-  const maxFame = Math.max(statsA?.totalFame ?? 0, statsB?.totalFame ?? 0, 1);
-  const maxRoster = Math.max(statsA?.rosterSize ?? 0, statsB?.rosterSize ?? 0, 1);
-  const maxAttr = 25;
+  const {
+    idA,
+    setIdA,
+    idB,
+    setIdB,
+    rivalA,
+    rivalB,
+    statsA,
+    statsB,
+    grudge,
+    clashes,
+    modsA,
+    modsB,
+    maxWins,
+    maxKills,
+    maxFame,
+    maxRoster,
+    maxAttr,
+  } = useStableComparison(rivals);
 
   return (
     <div className="space-y-6">
@@ -384,21 +356,6 @@ export function StableComparison({ rivals }: StableComparisonProps) {
           </div>
 
           {(() => {
-            const grudge = ownerGrudges.find(
-              (g) =>
-                (g.ownerIdA === rivalA.owner.id && g.ownerIdB === rivalB.owner.id) ||
-                (g.ownerIdA === rivalB.owner.id && g.ownerIdB === rivalA.owner.id)
-            );
-            const clashes =
-              (
-                PERSONALITY_CLASH[rivalA.owner.personality as keyof typeof PERSONALITY_CLASH] ?? []
-              ).includes(rivalB.owner.personality as never) ||
-              (
-                PERSONALITY_CLASH[rivalB.owner.personality as keyof typeof PERSONALITY_CLASH] ?? []
-              ).includes(rivalA.owner.personality as never);
-            const modsA = rivalA.philosophy ? (PHILOSOPHY_PLAN_MODS[rivalA.philosophy] ?? {}) : {};
-            const modsB = rivalB.philosophy ? (PHILOSOPHY_PLAN_MODS[rivalB.philosophy] ?? {}) : {};
-
             function modLabel(val: number | undefined) {
               if (!val) return '0';
               return val > 0 ? `+${val}` : `${val}`;
