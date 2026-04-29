@@ -112,7 +112,7 @@ describe('Trainers Component', () => {
     if (!trainerCard) throw new Error('Trainer card not found in hire tab');
 
     // Find and click the Secure Contract button.
-    const hireBtn = within(trainerCard as HTMLElement).getByText(/Secure_Contract/i);
+    const hireBtn = within(trainerCard as HTMLElement).getByText(/Secure Contract/i);
     fireEvent.click(hireBtn);
 
     // Test that the card is moved (it should be removed from the hire tab)

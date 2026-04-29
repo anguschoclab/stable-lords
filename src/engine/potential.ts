@@ -10,10 +10,7 @@
  */
 import { ATTRIBUTE_KEYS, ATTRIBUTE_MAX, type Attributes } from '@/types/shared.types';
 import type { AttributePotential } from '@/types/warrior.types';
-import type { GameState } from '@/types/state.types';
-import type { Warrior } from '@/types/warrior.types';
-import type { FightSummary } from '@/types/combat.types';
-import { FightingStyle } from '@/types/shared.types';
+import { clamp } from '@/utils/math';
 import type { RecruitTier } from './recruitment';
 
 // ─── Potential Range by Tier ──────────────────────────────────────────────
@@ -21,10 +18,10 @@ import type { RecruitTier } from './recruitment';
 // E.g., a Common warrior with ST=10 gets potential ST of 10 + rand(2..5) = 12-15.
 
 const TIER_HEADROOM: Record<RecruitTier, [number, number]> = {
-  Common: [2, 5],
-  Promising: [3, 7],
-  Exceptional: [5, 9],
-  Prodigy: [7, 12],
+  Common: [1, 4],
+  Promising: [3, 6],
+  Exceptional: [5, 10],
+  Prodigy: [10, 15],
 };
 
 // Absolute floor/ceiling for potential values
@@ -46,7 +43,7 @@ export function generatePotential(
   for (const key of ATTRIBUTE_KEYS) {
     const headroom = hMin + Math.floor(rng() * (hMax - hMin + 1));
     const raw = attrs[key] + headroom;
-    potential[key] = Math.max(POTENTIAL_MIN, Math.min(POTENTIAL_ABSOLUTE_MAX, raw));
+    potential[key] = clamp(raw, POTENTIAL_MIN, POTENTIAL_ABSOLUTE_MAX);
   }
 
   return potential;

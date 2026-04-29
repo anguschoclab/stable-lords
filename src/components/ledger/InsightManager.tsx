@@ -22,10 +22,10 @@ const TOKEN_CFG: Record<
   InsightTokenType,
   { Icon: React.ElementType; color: string; label: string }
 > = {
-  Weapon: { Icon: Swords, color: 'bg-orange-500/20 text-orange-500', label: 'Weapon' },
+  Weapon: { Icon: Swords, color: 'bg-arena-blood/20 text-arena-blood', label: 'Weapon' },
   Rhythm: { Icon: RotateCw, color: 'bg-cyan-500/20 text-cyan-500', label: 'Rhythm' },
-  Style: { Icon: Zap, color: 'bg-yellow-500/20 text-yellow-500', label: 'Style' },
-  Attribute: { Icon: TrendingUp, color: 'bg-green-500/20 text-green-500', label: 'Attribute' },
+  Style: { Icon: Zap, color: 'bg-arena-gold/20 text-arena-gold', label: 'Style' },
+  Attribute: { Icon: TrendingUp, color: 'bg-primary/20 text-primary', label: 'Attribute' },
   Tactic: { Icon: Brain, color: 'bg-purple-500/20 text-purple-500', label: 'Tactic' },
 };
 
@@ -90,7 +90,7 @@ export function InsightManager() {
           <Search className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-display text-lg font-black uppercase tracking-tight text-white">
+          <h3 >
             Insight Intelligence Hub
           </h3>
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">
@@ -140,7 +140,7 @@ export function InsightManager() {
                         );
                       })()}
                       <div>
-                        <span className="block text-[10px] font-black uppercase tracking-wider text-white">
+                        <span >
                           {token.type}_Token
                         </span>
                         <span className="block text-[9px] text-muted-foreground uppercase tracking-widest font-mono opacity-60">
@@ -232,7 +232,7 @@ export function InsightManager() {
                       )}
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase text-white tracking-widest">
+                      <p >
                         {selectedWarrior?.name || 'Target Required'}
                       </p>
                       <p className="text-[9px] text-muted-foreground uppercase tracking-widest opacity-60">
@@ -281,13 +281,13 @@ export function InsightManager() {
           >
             <div className="bg-neutral-950 border-2 border-primary/40 rounded-none p-10 max-w-md w-full text-center relative shadow-[0_0_50px_rgba(255,0,0,0.2)]">
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-none bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.5)]">
-                <Sparkles className="text-white h-6 w-6 animate-pulse" />
+                <Sparkles  />
               </div>
 
               <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">
                 Discovery Successful
               </h4>
-              <h2 className="text-4xl font-display font-black uppercase tracking-tighter text-white mb-6 leading-none">
+              <h2 >
                 {revealData.name}
               </h2>
 
@@ -302,7 +302,7 @@ export function InsightManager() {
 
               <Button
                 onClick={() => setRevealData(null)}
-                className="w-full h-12 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[10px] tracking-widest border border-white/10"
+                
               >
                 Close Sequence
               </Button>

@@ -93,7 +93,6 @@ describe('Bout Simulation Integration - getFromArchive function issue', () => {
         renown: 0,
         titles: 0,
       } as any,
-      settings: { featureFlags: { tournaments: true, scouting: true } },
     };
 
     // 2. Advance the week (which should trigger the simulation)

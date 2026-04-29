@@ -29,7 +29,11 @@ export function generateStableTrainers(
 
   for (let i = 0; i < count; i++) {
     const firstName = TRAINER_FIRST_NAMES[Math.floor(rng() * TRAINER_FIRST_NAMES.length)];
-    const focus = focusPool[Math.floor(rng() * focusPool.length)]!;
+    const focusIdx = Math.floor(rng() * focusPool.length);
+    const focus = focusPool[focusIdx];
+    if (!focus) {
+      throw new Error('Focus selection from focusPool failed');
+    }
     const trainerTier: TrainerTier =
       tier === 'Legendary'
         ? rng() < 0.3

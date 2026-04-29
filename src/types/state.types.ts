@@ -3,7 +3,6 @@ import {
   type WarriorId,
   type StableId,
   type PromoterId,
-  type TrainerId,
   type TournamentId,
   type BoutOfferId,
   type LedgerEntryId,
@@ -69,6 +68,9 @@ export interface BoutOffer {
   hype: number;
   status: BoutOfferStatus;
   responses: Record<WarriorId, BoutOfferResponse>;
+  proposerStableId?: StableId;
+  conditions?: string[];
+  createdAt?: string;
 }
 
 export type PromoterPersonality = 'Greedy' | 'Honorable' | 'Sadistic' | 'Flashy' | 'Corporate';
@@ -108,6 +110,8 @@ export interface Owner {
   crest?: CrestData; // 🛡️ Heraldic crest for the stable
   backstoryId?: import('@/data/backstories').BackstoryId;
   foundedByWarriorId?: WarriorId; // Lineage breadcrumb for legacy founders
+  age?: number; // 🎂 1.0 Hardening: Owner age for retirement
+  ageRetired?: number; // Week the previous owner retired
 }
 
 // ─── Game State ─────────────────────────────────────────────────────────────
@@ -194,6 +198,12 @@ export interface AIAgentMemory {
   metaAwareness: Record<string, number>;
   knownRivals: StableId[];
   currentIntent?: AIIntent;
+  seasonRecord?: {
+    wins: number;
+    losses: number;
+    kills: number;
+    rosterSizeAtSeasonStart: number;
+  };
 }
 
 export interface RivalStableData {
@@ -374,12 +384,6 @@ export interface GameState {
   ownerGrudges: OwnerGrudge[];
   insightTokens: InsightToken[];
   moodHistory: { week: number; mood: CrowdMoodType }[];
-  settings: {
-    featureFlags: {
-      tournaments: boolean;
-      scouting: boolean;
-    };
-  };
   isFTUE: boolean;
   unacknowledgedDeaths: string[];
   // ─── Daily Progression ───

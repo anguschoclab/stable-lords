@@ -105,8 +105,10 @@ export function handleDeath(
   });
 
   if (rivalStableId && outcome.winner === 'A') {
-    // Player killed a rival
-    const rival = (s.rivals || []).find((r: RivalStableData) => r.owner.id === rivalStableId);
+    // Player killed a rival. rivalStableId is rival.id (StableId), not owner.id —
+    // looking up by owner.id silently failed, so the dead warrior stayed in
+    // the rival's roster while ALSO being added to the graveyard.
+    const rival = (s.rivals || []).find((r: RivalStableData) => r.id === rivalStableId);
     if (rival) {
       const updatedRoster = rival.roster.filter((w: Warrior) => w.id !== wD.id);
       rivalsUpdates.set(rivalStableId, { roster: updatedRoster });

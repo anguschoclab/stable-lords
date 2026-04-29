@@ -7,7 +7,9 @@ import {
   ArrowDownLeft,
   Target,
   Globe,
+  ChevronRight,
 } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 import { useGameStore, useWorldState } from '@/state/useGameStore';
 import { computeMetaDrift, getMetaLabel, getMetaColor } from '@/engine/metaDrift';
 import { STYLE_DISPLAY_NAMES } from '@/types/game';
@@ -106,13 +108,13 @@ export function MetaPulseWidget() {
       </div>
 
       <div className="px-6 py-4 border-t border-white/5 bg-black/40 flex justify-center mt-auto">
-        <button
-          aria-label="Access Full Intelligence"
+        <Link
+          to="/world/chronicle"
           className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
         >
-          Access Full Intelligence{' '}
-          <Activity className="h-3 w-3 group-hover:scale-110 transition-transform" />
-        </button>
+          View Full Meta Report
+          <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </Surface>
   );

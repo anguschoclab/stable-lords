@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", "src/routeTree.gen.ts"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.strict],
     files: ["**/*.{ts,tsx}"],
@@ -80,5 +80,20 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    /* BY-DESIGN: Logger utility intentionally uses console */
+    files: ["src/utils/logger.ts"],
+    rules: { "no-console": "off" },
+  },
+  {
+    /* TEST FILES: Allow non-null assertions for convenience in tests */
+    files: ["src/test/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
+    rules: { "@typescript-eslint/no-non-null-assertion": "off" },
+  },
+  {
+    /* SCRATCH/SCRIPTS: Utility/debug files - allow non-null assertions */
+    files: ["scratch/**/*.{ts,tsx}", "scripts/**/*.{ts,tsx}", "*.ts"],
+    rules: { "@typescript-eslint/no-non-null-assertion": "off" },
   }
 );

@@ -43,7 +43,7 @@ export default function TacticBank({ plan, onPlanChange }: TacticBankProps = {})
               plan &&
                 ((t.type === 'offensive' && plan.offensiveTactic === t.id) ||
                   (t.type === 'defensive' && plan.defensiveTactic === t.id))
-                ? 'bg-arena-blood/20 border-arena-blood/60 text-white'
+                ? 'bg-arena-blood/20 border-arena-blood/60 text-foreground'
                 : 'bg-white/5 border-white/10 text-muted-foreground hover:border-arena-gold/40 hover:text-foreground'
             )}
             aria-label={'Select tactic ' + t.label}

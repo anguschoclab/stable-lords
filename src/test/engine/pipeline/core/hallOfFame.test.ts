@@ -21,7 +21,7 @@ describe('processHallOfFame', () => {
       fame,
       career: { wins, kills, losses: 0 },
       yearlySnapshots: {
-        1: { wins, kills, losses: 0, fame }, // Snapshots for Year 1 with actual stats
+        1: { wins: 0, kills: 0, losses: 0, fame: 0 }, // Snapshots for Year 1 representing start of year
       },
       status: 'Active',
       attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
@@ -71,9 +71,9 @@ describe('processHallOfFame', () => {
 
     const res = resolveImpacts(state, [impact]);
 
-    // TODO: Fix test setup - yearly snapshots should represent start of year (zeros)
-    // Currently snapshots have same values as career stats, resulting in 0 yearly progress
-    // expect(res.awards.length).toBeGreaterThan(0);
-    expect(true).toBe(true);
+    expect(res.awards?.length).toBeGreaterThan(0);
+    const awardTypes = res.awards?.map(a => a.type);
+    expect(awardTypes).toContain('WARRIOR_OF_YEAR');
+    expect(awardTypes).toContain('KILLER_OF_YEAR');
   });
 });

@@ -22,16 +22,23 @@ export function modifyWarrior(
   });
 
   state.rivals.forEach((r) => {
+    let modified = false;
     const updatedRoster = r.roster.map((w) => {
       if (w.id === warriorId) {
+        modified = true;
         const newW = { ...w };
         transform(newW);
         return newW;
       }
       return w;
     });
-    if (updatedRoster !== r.roster) {
-      rivalsUpdates.set(r.owner.id, { roster: updatedRoster });
+    // Two prior bugs: (a) `updatedRoster !== r.roster` was always true since
+    // `.map()` returns a new array, so we wrote a no-op rivalsUpdates entry
+    // for every rival on every call; (b) the key was r.owner.id, but
+    // rivalsUpdates handler indexes by r.id (StableId), so even when the
+    // warrior WAS modified the update silently dropped on the floor.
+    if (modified) {
+      rivalsUpdates.set(r.id, { roster: updatedRoster });
     }
   });
 

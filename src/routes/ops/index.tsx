@@ -5,5 +5,5 @@
 import { createFileRoute, Navigate } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/ops/')({
-  component: () => <Navigate to="/ops/personnel" />,
+  component: () => <Navigate to="/ops/overview" />,
 });

@@ -98,11 +98,11 @@ export function WarriorTrainingCard({
             className={cn(
               'w-full h-10 gap-2 border-white/5 transition-all text-[10px] font-black uppercase tracking-[0.2em]',
               isRecovery
-                ? 'bg-destructive/20 text-white border-destructive/40 shadow-[0_0_15px_-5px_rgba(239,68,68,0.4)]'
+                ? 'bg-destructive/20 text-destructive border-destructive/40 shadow-[0_0_15px_-5px_rgba(239,68,68,0.4)]'
                 : 'bg-white/5 hover:bg-white/10'
             )}
           >
-            <Heart className={cn('h-3.5 w-3.5', isRecovery ? 'text-white' : 'text-destructive')} />
+            <Heart className={cn('h-3.5 w-3.5', isRecovery ? 'text-destructive' : 'text-destructive')} />
             {isRecovery ? 'CANCEL RECOVERY' : 'ACTIVE RECOVERY'}
           </Button>
         )}

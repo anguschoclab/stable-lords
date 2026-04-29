@@ -389,4 +389,20 @@ describe('processAttributeTraining - successful gain', () => {
       expect(res.result.message).toMatch(/made no measurable progress/);
     });
   });
+
+  describe('processAttributeTraining - caps and limits', () => {
+    it('should hard cap training if TOTAL_CAP is reached', () => {
+      const warrior = makeWarrior({ ST: 10, CN: 20, SZ: 20, WT: 20, WL: 20, SP: 20, DF: 10 }); // Total: 120, TOTAL_CAP is 120
+      const rng = new SeededRNGService(1);
+      const res = processAttributeTraining(warrior, 'ST', {} as GameState, [], rng);
+      expect(res.hardCapped).toBe(true);
+    });
+
+    it('should hard cap training if potential is reached', () => {
+      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 12, DF: 12 }, { potential: { ST: 12 } });
+      const rng = new SeededRNGService(1);
+      const res = processAttributeTraining(warrior, 'ST', {} as GameState, [], rng);
+      expect(res.hardCapped).toBe(true);
+    });
+  });
 });

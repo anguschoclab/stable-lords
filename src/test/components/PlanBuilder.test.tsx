@@ -43,7 +43,7 @@ describe('PlanBuilder Matchup Rendering', () => {
       <PlanBuilder plan={mockPlan} onPlanChange={vi.fn()} rivalStyle={FightingStyle.ParryLunge} />
     );
 
-    expect(screen.getByText('MATCHUP_ADV')).toBeInTheDocument();
+    expect(screen.getByText('MATCHUP ADV')).toBeInTheDocument();
     expect(screen.getByText('+1')).toBeInTheDocument();
   });
 
@@ -58,7 +58,7 @@ describe('PlanBuilder Matchup Rendering', () => {
       />
     );
 
-    expect(screen.getByText('MATCHUP_PENALTY')).toBeInTheDocument();
+    expect(screen.getByText('MATCHUP PENALTY')).toBeInTheDocument();
     expect(screen.getByText('-1')).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('PlanBuilder Matchup Rendering', () => {
       />
     );
 
-    expect(screen.queryByText('MATCHUP_ADV')).not.toBeInTheDocument();
-    expect(screen.queryByText('MATCHUP_PENALTY')).not.toBeInTheDocument();
+    expect(screen.queryByText('MATCHUP ADV')).not.toBeInTheDocument();
+    expect(screen.queryByText('MATCHUP PENALTY')).not.toBeInTheDocument();
   });
 });

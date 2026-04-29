@@ -56,7 +56,13 @@
       "Bash(node \"node_modules/prettier/bin/prettier.cjs\" --write \"src/main.tsx\")",
       "Bash(node \"node_modules/typescript/bin/tsc\" --noEmit)",
       "Bash(/c/Users/amauricia/.bun/bin/bunx prettier *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(/c/Users/amauricia/.bun/bin/bunx vite *)",
+      "Bash(/c/Users/amauricia/.bun/bin/bunx --bun vite build)",
+      "Bash(node node_modules/.bin/vite build)",
+      "Bash(bun -e ' *)",
+      "Bash(bunx --bun tsc --noEmit)",
+      "Bash(git stash *)"
     ]
   },
   "hooks": {

@@ -21,8 +21,8 @@ export function defaultPlanForWarrior(warrior: Warrior): FightPlan {
     kd = 5;
 
   if (isAggressive) {
-    oe = style === FightingStyle.BashingAttack ? 9 : 8;
-    al = style === FightingStyle.BashingAttack ? 3 : style === FightingStyle.LungingAttack ? 8 : 5;
+    oe = style === FightingStyle.BashingAttack ? 7 : 7;
+    al = style === FightingStyle.BashingAttack ? 3 : style === FightingStyle.LungingAttack ? 6 : 5;
     kd = 7;
   } else if (style === FightingStyle.TotalParry) {
     oe = 2;

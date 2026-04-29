@@ -6,6 +6,8 @@ import type { Warrior } from '@/types/state.types';
 import { FightingStyle, type WarriorId } from '@/types/shared.types';
 import { computeWarriorStats } from '@/engine/skillCalc';
 import { generateFavorites } from '@/engine/favorites';
+import { generateTraits } from '@/engine/traits';
+import { getStyleDefaultLoadout } from '@/data/equipment';
 import { generateId } from '@/utils/idUtils';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
@@ -29,6 +31,14 @@ export function makeWarrior(
 ): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
   const favorites = generateFavorites(style, rng ? () => rng.next() : () => 0.5);
+  // Traits are now consumed in combat (see src/engine/traits.ts) — generate
+  // them at creation so warriors carry inherent quirks. Tests/explicit
+  // overrides win via the spread below.
+  const traits = overrides?.traits ?? (rng ? generateTraits(rng) : []);
+  // Seed equipment with the style's classic weapon so we no longer hand every
+  // default-built warrior a broadsword (which silently buffed Striking Attack
+  // and penalized everyone else via weapon-stat reqs / classic-weapon misses).
+  const equipment = overrides?.equipment ?? getStyleDefaultLoadout(style);
 
   return {
     id: id ?? (rng ? (rng.uuid() as WarriorId) : (generateId(undefined, 'warrior') as WarriorId)),
@@ -47,7 +57,8 @@ export function makeWarrior(
     status: 'Active',
     age: 18 + Math.floor((rng ? rng.next() : 0.5) * 8),
     favorites,
-    traits: overrides?.traits ?? [],
+    traits,
+    equipment,
     lore: overrides?.lore ?? '',
     origin: overrides?.origin ?? '',
     ...overrides,

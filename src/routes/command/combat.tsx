@@ -1,10 +1,8 @@
-/**
- * Command Hub - Combat Page
- * Bout execution and match management
- */
-import { createFileRoute } from '@tanstack/react-router';
-import RunRound from '@/pages/RunRound';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/command/combat')({
-  component: RunRound,
+  beforeLoad: () => {
+    throw redirect({ to: '/command/arena' });
+  },
+  component: () => null,
 });

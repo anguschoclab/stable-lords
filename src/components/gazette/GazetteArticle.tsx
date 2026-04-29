@@ -50,7 +50,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
                 SEASON_{season} // VOLUME_IV
               </span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-display font-black uppercase tracking-tighter text-white leading-[0.95] max-w-4xl group-hover:text-primary transition-colors duration-500">
+            <h2 >
               {issue.mainHeadline.replace('_', ' ')}
             </h2>
           </div>
@@ -61,7 +61,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
             </span>
             <div className="flex items-center gap-2">
               <Sparkles className="h-3 w-3 text-arena-gold" />
-              <span className="text-[8px] font-mono font-black text-white/50">
+              <span >
                 HASH: {Math.random().toString(16).slice(2, 10).toUpperCase()}
               </span>
             </div>
@@ -132,7 +132,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
                   <div className="absolute -left-0.5 top-0 w-1 h-3 bg-arena-gold opacity-0 group-hover/short:opacity-100 transition-opacity shadow-[0_0_10px_rgba(255,215,0,0.5)]" />
                   <div className="flex items-center gap-2">
                     <Zap className="h-3 w-3 text-arena-gold opacity-40 group-hover/short:opacity-100 transition-opacity" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover/short:text-arena-gold transition-colors">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/40 group-hover/short:text-arena-gold transition-colors">
                       INTEL_FRAGMENT
                     </span>
                   </div>
@@ -157,7 +157,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
                     Bout_Replays_Active
                   </span>
                 </div>
-                <ExternalLink className="h-3 w-3 text-white/20 group-hover:text-primary transition-colors" />
+                <ExternalLink className="h-3 w-3 text-foreground/20 group-hover:text-primary transition-colors" />
               </div>
             </Surface>
             <div className="flex items-center justify-center gap-2 opacity-20">

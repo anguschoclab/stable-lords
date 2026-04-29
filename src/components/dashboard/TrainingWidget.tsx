@@ -87,7 +87,7 @@ export function TrainingWidget() {
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <div className="h-8 w-8 rounded-none bg-secondary/20 flex items-center justify-center border border-white/5">
-                        <span className="text-[10px] font-black text-white/40">
+                        <span className="text-[10px] font-black text-foreground/40">
                           {w.name.charAt(0)}
                         </span>
                       </div>
@@ -126,7 +126,7 @@ export function TrainingWidget() {
                     <div className="text-right">
                       <div className="text-xs font-mono font-black text-foreground drop-shadow-sm">
                         {current}
-                        <span className="text-[9px] text-white/10 ml-0.5">/</span>
+                        <span className="text-[9px] text-foreground/10 ml-0.5">/</span>
                         {potential || '???'}
                       </div>
                       {atCeiling && (

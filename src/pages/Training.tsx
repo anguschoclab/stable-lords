@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { useGameStore, useWorldState, type GameStore } from '@/state/useGameStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -7,7 +7,17 @@ import type { Warrior } from '@/types/state.types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, Heart, Activity, Target, Zap } from 'lucide-react';
+import {
+  Dumbbell,
+  Heart,
+  Activity,
+  Target,
+  Zap,
+  TrendingUp,
+  AlertTriangle,
+  X,
+  CheckCircle2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { WarriorTrainingCard } from '@/components/training/WarriorTrainingCard';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -83,6 +93,24 @@ export default function Training() {
   const recoveryCount = assignments.filter((a: TrainingAssignment) => a.type === 'recovery').length;
   const trainingCount = assignedCount - recoveryCount;
 
+  // Training results from the last week pipeline run
+  const trainingReportItems = useMemo(() => {
+    return (state.newsletter ?? [])
+      .filter((n) => n.title === 'Training Report' && n.week === state.week)
+      .flatMap((n) => n.items);
+  }, [state.newsletter, state.week]);
+
+  const [dismissedWeek, setDismissedWeek] = useState<number | null>(null);
+  const showReport = trainingReportItems.length > 0 && dismissedWeek !== state.week;
+
+  function classifyItem(msg: string): 'gain' | 'injury' | 'recovery' {
+    const lower = msg.toLowerCase();
+    if (lower.includes('injur') || lower.includes('hurt') || lower.includes('strain'))
+      return 'injury';
+    if (lower.includes('recover') || lower.includes('rest')) return 'recovery';
+    return 'gain';
+  }
+
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-20">
       <PageHeader
@@ -115,6 +143,50 @@ export default function Training() {
           </div>
         }
       />
+
+      {/* Weekly Training Results Banner */}
+      {showReport && (
+        <Surface variant="glass" className="border-primary/20 overflow-hidden -mt-6">
+          <div className="flex items-center justify-between px-5 py-3 bg-primary/10 border-b border-primary/10">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+              <TrendingUp className="h-3.5 w-3.5" />
+              Last Week — Training Report
+            </div>
+            <button
+              onClick={() => setDismissedWeek(state.week)}
+              className="text-muted-foreground hover:text-foreground transition-colors p-1"
+              aria-label="Dismiss"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {trainingReportItems.map((msg, i) => {
+              const kind = classifyItem(msg);
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    'flex items-start gap-2 px-3 py-2 rounded text-[11px]',
+                    kind === 'gain' && 'bg-primary/10 text-primary',
+                    kind === 'injury' && 'bg-arena-gold/10 text-arena-gold',
+                    kind === 'recovery' && 'bg-sky-500/10 text-sky-300'
+                  )}
+                >
+                  {kind === 'gain' ? (
+                    <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                  ) : kind === 'injury' ? (
+                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                  ) : (
+                    <Heart className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                  )}
+                  <span className="leading-snug">{msg}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Surface>
+      )}
 
       {/* Training Tab Bar */}
       <div className="flex items-center border-b border-white/5 -mt-8">

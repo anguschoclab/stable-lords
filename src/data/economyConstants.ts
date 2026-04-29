@@ -2,8 +2,11 @@
  * Centralized Economy Constants for Stable Lords.
  * Ensures parity between Player and AI economic calculations.
  */
-export const FIGHT_PURSE = 280; // Quadrupled for low-frequency bouts
-export const WIN_BONUS = 100; // Quadrupled for low-frequency bouts
+// 2026-04: lethality halving + matchmaker fix made bouts much more frequent
+// than the "low-frequency" assumption these constants were quadrupled for.
+// Restored to a base purse so rival treasuries don't balloon into millions.
+export const FIGHT_PURSE = 90;
+export const WIN_BONUS = 35;
 export const FAME_DIVIDEND = 0.5; // Stable 0.5x fame dividend
 
 export const WARRIOR_UPKEEP_BASE = 60; // 1.0 Gold Unified Baseline

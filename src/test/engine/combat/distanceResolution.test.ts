@@ -27,11 +27,18 @@ describe('computeReachScore', () => {
 });
 
 describe('getWeaponPreferredRange', () => {
-  it('returns Grapple for open_hand', () => {
-    expect(getWeaponPreferredRange('open_hand')).toBe('Grapple');
+  // Updated 2026-04: weapon ids must match those in src/data/equipment.ts.
+  // Prior tests used `open_hand` and `pike` which were never real weapon ids,
+  // exposing the underlying weapon-id-mismatch bug that silently disabled the
+  // entire range/weapon system.
+  it('returns Tight for short_sword', () => {
+    expect(getWeaponPreferredRange('short_sword')).toBe('Tight');
   });
-  it('returns Extended for pike', () => {
-    expect(getWeaponPreferredRange('pike')).toBe('Extended');
+  it('returns Extended for long_spear', () => {
+    expect(getWeaponPreferredRange('long_spear')).toBe('Extended');
+  });
+  it('returns Extended for halberd', () => {
+    expect(getWeaponPreferredRange('halberd')).toBe('Extended');
   });
   it('returns Striking as default for unknown weapon', () => {
     expect(getWeaponPreferredRange('unknown_weapon')).toBe('Striking');
@@ -48,13 +55,13 @@ describe('contestDistance', () => {
       skills: { INI: 15 },
       activePlan: { OE: 5 },
       recoveryDebt: 0,
-      weaponId: 'broad_sword',
+      weaponId: 'broadsword',
     } as any;
     const fD = {
       skills: { INI: 5 },
       activePlan: { OE: 5 },
       recoveryDebt: 0,
-      weaponId: 'broad_sword',
+      weaponId: 'broadsword',
     } as any;
     const result = contestDistance(rng, fA, fD, 5, 5, 'Striking');
     expect(result.rangeModA).toBe(1);
@@ -74,7 +81,7 @@ describe('contestDistance', () => {
       skills: { INI: 5 },
       activePlan: { OE: 5 },
       recoveryDebt: 0,
-      weaponId: 'broad_sword',
+      weaponId: 'broadsword',
     } as any;
     const result = contestDistance(rng, fA, fD, 5, 5, 'Striking');
     // Striking → Extended (one step toward Extended)
@@ -89,13 +96,13 @@ describe('contestDistance', () => {
       skills: { INI: 10 },
       activePlan: { OE: 5, rangePreference: 'Striking' },
       recoveryDebt: 0,
-      weaponId: 'broad_sword',
+      weaponId: 'broadsword',
     } as any;
     const fD = {
       skills: { INI: 10 },
       activePlan: { OE: 5, rangePreference: 'Striking' },
       recoveryDebt: 0,
-      weaponId: 'broad_sword',
+      weaponId: 'broadsword',
     } as any;
     const result = contestDistance(rng, fA, fD, 5, 5, 'Striking');
     // Both prefer Striking, so newRange stays Striking regardless of who wins

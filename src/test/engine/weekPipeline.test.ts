@@ -10,7 +10,9 @@ describe('processTierProgression', () => {
     meta: { createdAt: 'mock-date' },
     rivals: [
       {
-        owner: { id: 'rival-1', stableName: 'Rival 1' },
+        // rivalsUpdates is keyed by rival.id (StableId) — owner.id is the OwnerId.
+        id: 'rival-1',
+        owner: { id: 'owner-1', stableName: 'Rival 1' },
         tier: 'Minor',
         roster: Array(5).fill({
           status: 'Active',

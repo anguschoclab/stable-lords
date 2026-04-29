@@ -7,6 +7,9 @@ import {
   Hexagon,
   Crosshair,
   BarChart3,
+  AlertTriangle,
+  Flame,
+  BrainCircuit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,6 +20,9 @@ import { ComparisonBar } from './ComparisonBar';
 import { ComparisonHeader } from './ComparisonHeader';
 import { HeadToHead } from './HeadToHead';
 import { calculateStableStats } from '@/engine/stats/stableStats';
+import { useGameStore } from '@/state/useGameStore';
+import { useShallow } from 'zustand/react/shallow';
+import { PERSONALITY_CLASH, PHILOSOPHY_PLAN_MODS } from '@/data/ownerData';
 
 interface StableComparisonProps {
   rivals: RivalStableData[];
@@ -78,7 +84,7 @@ function StableSelector({
                         className={cn(
                           'h-8 w-8 flex items-center justify-center rounded-none border transition-all',
                           idA === r.owner.id
-                            ? 'bg-primary text-white border-primary'
+                            ? 'bg-primary text-primary-foreground border-primary'
                             : 'bg-neutral-800 text-muted-foreground border-white/5'
                         )}
                       >
@@ -142,7 +148,7 @@ function StableSelector({
                         className={cn(
                           'h-8 w-8 flex items-center justify-center rounded-none border transition-all',
                           idB === r.owner.id
-                            ? 'bg-accent text-white border-accent'
+                            ? 'bg-accent text-primary-foreground border-accent'
                             : 'bg-neutral-800 text-muted-foreground border-white/5'
                         )}
                       >
@@ -180,6 +186,7 @@ function StableSelector({
 export function StableComparison({ rivals }: StableComparisonProps) {
   const [idA, setIdA] = useState<string | null>(null);
   const [idB, setIdB] = useState<string | null>(null);
+  const ownerGrudges = useGameStore(useShallow((s) => s.ownerGrudges ?? []));
 
   const rivalA = useMemo(() => rivals.find((r) => r.owner.id === idA), [rivals, idA]);
   const rivalB = useMemo(() => rivals.find((r) => r.owner.id === idB), [rivals, idB]);
@@ -375,6 +382,164 @@ export function StableComparison({ rivals }: StableComparisonProps) {
               </div>
             </Surface>
           </div>
+
+          {(() => {
+            const grudge = ownerGrudges.find(
+              (g) =>
+                (g.ownerIdA === rivalA.owner.id && g.ownerIdB === rivalB.owner.id) ||
+                (g.ownerIdA === rivalB.owner.id && g.ownerIdB === rivalA.owner.id)
+            );
+            const clashes =
+              (
+                PERSONALITY_CLASH[rivalA.owner.personality as keyof typeof PERSONALITY_CLASH] ?? []
+              ).includes(rivalB.owner.personality as never) ||
+              (
+                PERSONALITY_CLASH[rivalB.owner.personality as keyof typeof PERSONALITY_CLASH] ?? []
+              ).includes(rivalA.owner.personality as never);
+            const modsA = rivalA.philosophy ? (PHILOSOPHY_PLAN_MODS[rivalA.philosophy] ?? {}) : {};
+            const modsB = rivalB.philosophy ? (PHILOSOPHY_PLAN_MODS[rivalB.philosophy] ?? {}) : {};
+
+            function modLabel(val: number | undefined) {
+              if (!val) return '0';
+              return val > 0 ? `+${val}` : `${val}`;
+            }
+
+            return (
+              <Surface
+                variant="glass"
+                padding="none"
+                className="border-arena-gold/10 overflow-hidden"
+              >
+                <div className="p-4 border-b border-white/5 bg-arena-gold/5 flex items-center gap-3">
+                  <div className="p-1.5 rounded bg-arena-gold/10 border border-arena-gold/20">
+                    <BrainCircuit className="h-3.5 w-3.5 text-arena-gold" />
+                  </div>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-arena-gold">
+                    Doctrine Intelligence
+                  </h3>
+                  {clashes && (
+                    <div className="ml-auto flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-arena-gold/70">
+                      <AlertTriangle className="h-3 w-3" />
+                      Personality Clash Detected
+                    </div>
+                  )}
+                  {grudge && (
+                    <div className="ml-auto flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-arena-blood">
+                      {Array.from({ length: grudge.intensity }).map((_, i) => (
+                        <Flame key={i} className="h-3 w-3" style={{ opacity: 0.4 + i * 0.12 }} />
+                      ))}
+                      Active Grudge · {grudge.reason}
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 grid grid-cols-2 gap-8">
+                  {[
+                    {
+                      rival: rivalA,
+                      mods: modsA,
+                      color: 'text-primary',
+                      borderColor: 'border-primary/20',
+                      bgColor: 'bg-primary/5',
+                    },
+                    {
+                      rival: rivalB,
+                      mods: modsB,
+                      color: 'text-accent',
+                      borderColor: 'border-accent/20',
+                      bgColor: 'bg-accent/5',
+                    },
+                  ].map(({ rival, mods, color, borderColor, bgColor }) => (
+                    <div
+                      key={rival.owner.id}
+                      className={cn('p-4 border rounded-none', borderColor, bgColor)}
+                    >
+                      <div
+                        className={cn(
+                          'text-[9px] font-black uppercase tracking-widest mb-3 opacity-60',
+                          color
+                        )}
+                      >
+                        {rival.owner.stableName}
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-muted-foreground/60 font-black uppercase tracking-widest">
+                            Personality
+                          </span>
+                          <span className={cn('font-black', color)}>{rival.owner.personality}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-muted-foreground/60 font-black uppercase tracking-widest">
+                            Philosophy
+                          </span>
+                          <span className="font-black text-foreground/80">
+                            {rival.philosophy ?? '—'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-muted-foreground/60 font-black uppercase tracking-widest">
+                            Adaptation
+                          </span>
+                          <span className="font-black text-foreground/60">
+                            {rival.owner.metaAdaptation ?? '—'}
+                          </span>
+                        </div>
+                        {Object.keys(mods).length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-white/5 space-y-1">
+                            <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 mb-2">
+                              Combat Modifiers
+                            </div>
+                            {(mods as Record<string, number | undefined>).OE !== undefined && (
+                              <div className="flex justify-between text-[9px]">
+                                <span className="text-muted-foreground/50">Offensive Effort</span>
+                                <span
+                                  className={cn(
+                                    'font-mono font-black',
+                                    (mods as any).OE > 0 ? 'text-arena-blood' : 'text-sky-400'
+                                  )}
+                                >
+                                  {modLabel((mods as any).OE)}
+                                </span>
+                              </div>
+                            )}
+                            {(mods as Record<string, number | undefined>).AL !== undefined && (
+                              <div className="flex justify-between text-[9px]">
+                                <span className="text-muted-foreground/50">Activity Level</span>
+                                <span
+                                  className={cn(
+                                    'font-mono font-black',
+                                    (mods as any).AL > 0 ? 'text-arena-blood' : 'text-sky-400'
+                                  )}
+                                >
+                                  {modLabel((mods as any).AL)}
+                                </span>
+                              </div>
+                            )}
+                            {(mods as Record<string, number | undefined>).killDesire !==
+                              undefined && (
+                              <div className="flex justify-between text-[9px]">
+                                <span className="text-muted-foreground/50">Kill Desire</span>
+                                <span
+                                  className={cn(
+                                    'font-mono font-black',
+                                    (mods as any).killDesire > 0
+                                      ? 'text-arena-blood'
+                                      : 'text-sky-400'
+                                  )}
+                                >
+                                  {modLabel((mods as any).killDesire)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Surface>
+            );
+          })()}
 
           <Surface variant="glass" padding="none" className="border-border/40 overflow-hidden">
             <div className="p-4 border-b border-white/5 bg-neutral-900/60 flex items-center gap-3">

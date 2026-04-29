@@ -62,7 +62,7 @@ export function CoachOverlay() {
         label: 'Tactical Mismatch',
         description: `${mismatchedSprints[0].name} loadout exceeds endurance. High fatigue penalties will apply.`,
         icon: Zap,
-        color: 'text-amber-500 border-amber-500/20 bg-amber-500/10',
+        color: 'text-arena-gold border-arena-gold/20 bg-arena-gold/10',
       });
     }
 
@@ -120,7 +120,7 @@ export function CoachOverlay() {
 
 function Badge({ children, className, variant }: any) {
   return (
-    <span className={cn('px-2 py-0.5 rounded text-white text-[10px] font-black', className)}>
+    <span className={cn('px-2 py-0.5 rounded-none text-foreground text-[10px] font-black', className)}>
       {children}
     </span>
   );

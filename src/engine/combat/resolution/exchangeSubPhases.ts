@@ -166,19 +166,22 @@ export function runRecovery(
 
   if (!ctx || ctx.zone == null) return;
 
+  // Store zone in a local variable after null check
+  const currentZone = ctx.zone;
+
   // Zone transitions
   const hitOnA = events.some((e) => e.type === 'HIT' && e.target === 'A');
   const hitOnD = events.some((e) => e.type === 'HIT' && e.target === 'D');
 
   if (hitOnA) {
-    const newZone = transitionZone(ctx.zone!);
+    const newZone = transitionZone(currentZone);
     if (newZone !== ctx.zone) {
       ctx.pushedFighter = 'A';
       ctx.zone = newZone;
       events.push({ type: 'ZONE_SHIFT', actor: 'D', target: 'A', result: newZone });
     }
   } else if (hitOnD) {
-    const newZone = transitionZone(ctx.zone!);
+    const newZone = transitionZone(currentZone);
     if (newZone !== ctx.zone) {
       ctx.pushedFighter = 'D';
       ctx.zone = newZone;
@@ -188,7 +191,7 @@ export function runRecovery(
     // No hit: drift zone back toward Center
     if (ctx.pushedFighter) {
       const prev = ctx.zone;
-      ctx.zone = resetZone(ctx.zone!);
+      ctx.zone = resetZone(currentZone);
       if (ctx.zone === 'Center') {
         ctx.pushedFighter = undefined;
       }

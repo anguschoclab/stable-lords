@@ -72,7 +72,7 @@ export default function RunRound() {
     // Persist to store based on cycle type
     if (state.isTournamentWeek) {
       doAdvanceDay(
-        processed.state,
+        undefined,
         processed.results,
         processed.summary.deathNames,
         processed.summary.injuryNames
@@ -80,7 +80,7 @@ export default function RunRound() {
       toast.success(`Empire Day ${state.day + 1} concluded.`);
     } else {
       doAdvanceWeek(
-        processed.state,
+        undefined,
         processed.results,
         processed.summary.deathNames,
         processed.summary.injuryNames
@@ -135,7 +135,7 @@ export default function RunRound() {
       >
         <div className="flex items-center gap-3">
           <Activity className="h-4 w-4 text-primary" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
             Stable Readiness
           </span>
         </div>
@@ -202,7 +202,7 @@ export default function RunRound() {
             <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-accent" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
                   Active Combat Manifest
                 </span>
               </div>

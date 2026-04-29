@@ -8,7 +8,7 @@ import {
 import { type CrowdMood } from '../../crowdMood';
 import { FightingStyle } from '@/types/shared.types';
 import { respondToBoutOffer } from '@/engine/bout/mutations/contractMutations';
-import { StateImpact, mergeImpacts } from '@/engine/impacts';
+import { StateImpact } from '@/engine/impacts';
 import { scoreMatchup } from '@/engine/schedulingAssistant';
 
 /**
@@ -85,7 +85,6 @@ export function generateBoutBids(
     playerChallenges: [],
     playerAvoids: [],
     unacknowledgedDeaths: [],
-    settings: { featureFlags: { tournaments: true, scouting: true } },
     isFTUE: false,
     day: 1,
     isTournamentWeek: false,
@@ -209,8 +208,18 @@ export function verifyBoutAcceptance(
 
   return { accepted: true };
 }
-/** Injury severity types that block bout acceptance */
-const BLOCKING_INJURY_SEVERITIES = ['Moderate', 'Severe', 'Critical', 'Permanent'] as const;
+/** Injury severity types that block bout acceptance.
+ *  Any of these blocks acceptance regardless of desperation. The previous
+ *  behavior allowed desperation (long inactivity / tournament hunger) to
+ *  override even Critical injuries, which meant rivals routinely sent
+ *  half-dead warriors to die. Tightened 2026-04 to never override.
+ */
+const BLOCKING_INJURY_SEVERITIES = [
+  'Moderate',
+  'Severe',
+  'Critical',
+  'Permanent',
+] as const;
 type BlockingSeverity = (typeof BLOCKING_INJURY_SEVERITIES)[number];
 
 /**
@@ -220,37 +229,63 @@ type BlockingSeverity = (typeof BLOCKING_INJURY_SEVERITIES)[number];
 export function evaluateBoutOffer(
   offer: BoutOffer,
   rival: RivalStableData,
-  warrior: Warrior
+  warrior: Warrior,
+  currentWeek: number
 ): 'Accepted' | 'Declined' {
-  // 1. Health Guard: Protective owners decline if HP < 80%
+  // 0. Desperation Gate: if treasury is critically low, accept ANYTHING for the purse
+  if (rival.treasury < 500) {
+    return 'Accepted';
+  }
+
+  // 🏆 1. Tournament Hunger: If we are close to a tournament week (13, 26, 39, 52), we MUST fight for rankings
+  const weeksUntilTournament = 13 - (currentWeek % 13);
+  const isTournamentHungry = weeksUntilTournament <= 4;
+
+  // 1. Inactivity Pressure: if haven't fought in 4+ weeks, reduce caution
+  const lastBoutWeek = warrior.lastBoutWeek;
+  const weeksSinceBout = lastBoutWeek != null ? currentWeek - lastBoutWeek : 10;
+  const isDesperateForBout = weeksSinceBout > 4 || isTournamentHungry;
+
+  // 2. Health Guard: Protective owners decline if HP < 70% (Relaxed from 80%)
+  const hpThreshold = isDesperateForBout ? 50 : 70;
   const currentHP = warrior.derivedStats?.hp ?? 100;
-  if (currentHP < 80 && rival.owner.personality !== 'Aggressive') {
+  if (currentHP < hpThreshold && rival.owner.personality !== 'Aggressive') {
     return 'Declined';
   }
 
-  // 🔋 Fatigue Gate: if fatigue > 60, decline unless personality is Aggressive
+  // 🔋 Fatigue Gate: if fatigue > 70, decline (Relaxed from 60)
+  const fatigueThreshold = isDesperateForBout ? 90 : 70;
   const fatigue = warrior.fatigue ?? 0;
-  if (fatigue > 60 && rival.owner.personality !== 'Aggressive') {
+  if (fatigue > fatigueThreshold && rival.owner.personality !== 'Aggressive') {
     return 'Declined';
   }
 
-  // 🩹 Injury Gate: if any injury severity is Moderate+, decline
+  // 🩹 Injury Gate: any Moderate+ injury blocks. Tightened 2026-04 — the
+  // prior `isDesperateForBout` override let injured warriors fight if they
+  // hadn't been booked recently OR were near a tournament; in long sims this
+  // funneled hurt warriors into the arena and inflated death rates.
   const hasBlockingInjury = (warrior.injuries || []).some((injury) =>
-    BLOCKING_INJURY_SEVERITIES.includes(injury.severity as BlockingSeverity)
+    (BLOCKING_INJURY_SEVERITIES as readonly string[]).includes(injury.severity as BlockingSeverity)
   );
   if (hasBlockingInjury) {
     return 'Declined';
   }
 
-  // 2. Personality Logic
+  // 3. Personality Logic
   const personality = rival.owner.personality;
   const hype = offer.hype;
   const purse = offer.purse;
 
-  if (personality === 'Aggressive' && (hype > 120 || purse > 500)) return 'Accepted';
-  if (personality === 'Methodical' && currentHP < 95) return 'Declined';
-  if (personality === 'Showman' && hype > 130) return 'Accepted';
-  if (personality === 'Pragmatic' && purse > 400) return 'Accepted';
+  if (isTournamentHungry) {
+    return 'Accepted';
+  }
+
+  if (personality === 'Aggressive' && (hype > 110 || purse > 300)) return 'Accepted';
+  if (personality === 'Methodical' && currentHP < 85) {
+    return 'Declined';
+  }
+  if (personality === 'Showman' && hype > 120) return 'Accepted';
+  if (personality === 'Pragmatic' && purse > 250) return 'Accepted';
 
   // Default: Accept if reasonable
   return 'Accepted';
@@ -264,8 +299,8 @@ export function processAllRivalsBoutOffers(
   state: GameState,
   rivals: RivalStableData[]
 ): StateImpact {
-  const impacts: StateImpact[] = [];
-  const pendingOffers = Object.values(state.boutOffers).filter((o) => o.status === 'Proposed');
+  const currentOffers = { ...state.boutOffers };
+  const pendingOffers = Object.values(currentOffers).filter((o) => o.status === 'Proposed');
 
   // Group offers by stableId (each rival gets their weekly slate)
   const offersByRival = new Map<string, typeof pendingOffers>();
@@ -277,10 +312,12 @@ export function processAllRivalsBoutOffers(
       if (!owningRival) return;
 
       // Group by rival stable ID
-      if (!offersByRival.has(owningRival.id)) {
-        offersByRival.set(owningRival.id, []);
+      let offersForRival = offersByRival.get(owningRival.id);
+      if (!offersForRival) {
+        offersForRival = [];
+        offersByRival.set(owningRival.id, offersForRival);
       }
-      offersByRival.get(owningRival.id)!.push(offer);
+      offersForRival.push(offer);
     });
   });
 
@@ -289,10 +326,9 @@ export function processAllRivalsBoutOffers(
     const owningRival = rivals.find((r) => r.id === rivalId);
     if (!owningRival) return;
 
-    // Track warriors already committed this week (prevents double-booking)
+    // Track warriors already committed this week
     const pickedWarriors = new Set<string>();
 
-    // Sort offers by quality (hype * purse) for better selection
     const sortedOffers = [...rivalOffers].sort((a, b) => {
       const scoreA = a.hype * a.purse;
       const scoreB = b.hype * b.purse;
@@ -307,24 +343,31 @@ export function processAllRivalsBoutOffers(
         // Skip if warrior already committed this week
         if (pickedWarriors.has(wId)) return;
 
-        // Skip if already responded
-        if (offer.responses[wId] !== 'Pending') return;
+        // Skip if already responded in our local tracking
+        const trackedOffer = currentOffers[offer.id];
+        if (!trackedOffer || trackedOffer.responses[wId] !== 'Pending') return;
 
         const rivalWarrior = owningRival.roster.find((w) => w.id === wId);
         if (!rivalWarrior) return;
 
-        const response = evaluateBoutOffer(offer, owningRival, rivalWarrior);
+        const response = evaluateBoutOffer(trackedOffer, owningRival, rivalWarrior, state.week);
 
         if (response === 'Accepted') {
-          // Mark warrior as committed for this week
           pickedWarriors.add(wId);
         }
 
-        const impact = respondToBoutOffer(state, offer.id, rivalWarrior.id, response);
-        impacts.push(impact);
+        const impact = respondToBoutOffer(
+          { ...state, boutOffers: currentOffers },
+          offer.id,
+          rivalWarrior.id,
+          response
+        );
+        if (impact.boutOffers) {
+          Object.assign(currentOffers, impact.boutOffers);
+        }
       });
     });
   });
 
-  return mergeImpacts(impacts);
+  return { boutOffers: currentOffers };
 }

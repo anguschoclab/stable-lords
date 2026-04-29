@@ -104,7 +104,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     const activeWarriors = roster.filter((w: Warrior) => w.status === 'Active');
     if (activeWarriors.length < 3) {
-      console.warn('Personnel deficit detected. Redirecting to recruitment protocol.');
       navigate({ to: '/welcome' });
     }
   }, [roster, activePath, navigate]);
@@ -125,7 +124,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // const activePath = location.pathname;
 
   return (
     <div className="min-h-screen bg-[#0C0806] flex flex-col overflow-hidden text-foreground selection:bg-primary/30">
@@ -140,7 +138,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               whileHover={{ rotate: 15 }}
               className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
-              <Swords className="h-5 w-5 text-white" />
+              <Swords  />
             </motion.div>
             <div className="flex flex-col">
               <span className="font-display font-black text-sm tracking-tighter uppercase leading-none group-hover:text-primary transition-colors">
@@ -213,7 +211,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               'flex items-center gap-2 h-9 px-4 font-black text-[11px] uppercase tracking-widest transition-all duration-150',
               isSimulating
                 ? 'bg-white/5 text-muted-foreground/40 pointer-events-none'
-                : 'bg-primary text-white shadow-[0_0_16px_rgba(255,0,0,0.35)] hover:bg-primary/90 hover:shadow-[0_0_24px_rgba(255,0,0,0.5)] active:scale-95'
+                : 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(255,0,0,0.35)] hover:bg-primary/90 hover:shadow-[0_0_24px_rgba(255,0,0,0.5)] active:scale-95'
             )}
           >
             {isSimulating ? (
@@ -237,7 +235,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 size="icon"
                 className="h-9 w-9 rounded-none hover:bg-white/5 transition-colors"
                 onClick={toggleMute}
-                title={isMuted ? 'Unmute audio' : 'Mute audio'}
                 aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
                 aria-pressed={!isMuted}
               >
@@ -265,7 +262,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   'h-9 w-9 rounded-none transition-all',
                   saveFlash ? 'bg-primary/20 text-primary scale-110' : 'hover:bg-white/5'
                 )}
-                title="Save status"
                 aria-label="Save status"
               >
                 <Save className="h-4 w-4" />
@@ -286,7 +282,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 size="icon"
                 className="h-9 w-9 rounded-none hover:bg-destructive/10 hover:text-destructive transition-colors"
                 onClick={() => setResetOpen(true)}
-                title="Reset game"
                 aria-label="Reset game"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -310,7 +305,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 className="h-9 w-9 rounded-none hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30"
                 onClick={returnToTitle}
                 disabled={isSimulating}
-                title="Exit to title"
                 aria-label="Exit to title"
               >
                 <LogOut className="h-4 w-4" />
@@ -334,7 +328,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 flex flex-col relative bg-[#0C0806] overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
 
-          <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10">
+          <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-6 md:p-10 pb-20 md:pb-20">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
@@ -354,6 +348,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <CoachOverlay />
+          <TacticalBar />
 
           <AnimatePresence>
             {!isInitialized && (

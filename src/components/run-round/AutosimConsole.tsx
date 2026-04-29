@@ -76,7 +76,7 @@ export function AutosimConsole({ isSimulating, progress, result, onStart }: Auto
                   <span className="text-[10px] font-mono text-destructive">
                     ☠️ {progress.lastSummary.deaths}
                   </span>
-                  <span className="text-[10px] font-mono text-amber-500">
+                  <span className="text-[10px] font-mono text-arena-gold">
                     🩹 {progress.lastSummary.injuries}
                   </span>
                 </div>

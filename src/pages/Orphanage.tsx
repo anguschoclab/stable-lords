@@ -4,6 +4,7 @@
  * Dynamic warrior selection → Tutorial bout → Summary
  */
 import { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useGameStore, type GameStore } from '@/state/useGameStore';
 import { makeWarrior } from '@/engine/factories';
 import { simulateFight, defaultPlanForWarrior } from '@/engine';
@@ -18,6 +19,7 @@ import type { Warrior, FightSummary } from '@/types/game';
 import { generatePotential } from '@/engine/potential';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { generateOrphanPool, TRAIT_DATA } from '@/data/orphanPool';
+import { createBoutSummary } from '@/engine/core/fightSummaryFactory';
 import StepProgress from '@/components/orphanage/StepProgress';
 import IdentityStep from '@/components/orphanage/IdentityStep';
 import WarriorSelectionStep from '@/components/orphanage/WarriorSelectionStep';
@@ -27,6 +29,7 @@ import StoryBeginsStep from '@/components/orphanage/StoryBeginsStep';
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export default function Orphanage() {
+  const navigate = useNavigate();
   const state = useGameStore();
   const { initializeStable, setState, returnToTitle, saveCurrentState } = state;
 
@@ -79,25 +82,10 @@ export default function Orphanage() {
     const outcome = simulateFight(planA, planB, wA, wB);
     const tags = outcome.post?.tags ?? [];
 
-    const summary: FightSummary = {
-      id: `ftue_${Date.now()}`,
-      week: 1,
-      phase: 'resolution',
-      title: `${wA.name} vs ${wB.name}`,
-      a: wA.name,
-      d: wB.name,
-      warriorIdA: wA.id,
-      warriorIdD: wB.id,
-      winner: outcome.winner,
-      by: outcome.by,
-      styleA: wA.style,
-      styleD: wB.style,
-      flashyTags: tags,
-      fameDeltaA: outcome.winner === 'A' ? 1 : 0,
-      fameDeltaD: outcome.winner === 'D' ? 1 : 0,
-      transcript: outcome.log.map((e) => e.text),
-      createdAt: new Date().toISOString(),
-    };
+    const summary = createBoutSummary(wA, wB, outcome, 1, { uuid: () => `ftue_${Date.now()}` });
+    summary.flashyTags = tags;
+    summary.fameDeltaA = outcome.winner === 'A' ? 1 : 0;
+    summary.fameDeltaD = outcome.winner === 'D' ? 1 : 0;
 
     setBoutResult({ a: wA, d: wB, outcome, summary });
   }, [selectedWarriors]);
@@ -223,7 +211,10 @@ export default function Orphanage() {
       draft.realmRankings = seeded.realmRankings;
     });
     saveCurrentState();
-  }, [state, setState, selectedWarriors, boutResult, poolSeedValue, saveCurrentState]);
+
+    // Navigate to command center after FTUE
+    navigate({ to: '/command' });
+  }, [state, setState, selectedWarriors, boutResult, poolSeedValue, saveCurrentState, navigate]);
 
   // ─── Shell ──────────────────────────────────────────────────────────────────
 

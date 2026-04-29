@@ -40,8 +40,8 @@ const PERSONALITY_CONFIG: Record<
   }
 > = {
   Greedy: {
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-500/10',
+    color: 'text-arena-gold',
+    bgColor: 'bg-arena-gold/10',
     icon: <DollarSign className="h-5 w-5" />,
     label: 'Greedy',
     description:
@@ -49,8 +49,8 @@ const PERSONALITY_CONFIG: Record<
     traits: ['+15% Purse Bonus', '-10% Hype Penalty', 'Wide skill gap tolerance (0.35)'],
   },
   Honorable: {
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-500/10',
+    color: 'text-accent',
+    bgColor: 'bg-accent/10',
     icon: <Award className="h-5 w-5" />,
     label: 'Honorable',
     description:
@@ -58,8 +58,8 @@ const PERSONALITY_CONFIG: Record<
     traits: ['+10% Hype Bonus', 'Tight skill matching', 'Warrior safety priority'],
   },
   Sadistic: {
-    color: 'text-red-600',
-    bgColor: 'bg-red-500/10',
+    color: 'text-destructive',
+    bgColor: 'bg-destructive/10',
     icon: <AlertTriangle className="h-5 w-5" />,
     label: 'Sadistic',
     description:
@@ -67,8 +67,8 @@ const PERSONALITY_CONFIG: Record<
     traits: ['+25% Hype with injuries', 'High-kill matchups', 'Moderate skill gap (0.25)'],
   },
   Flashy: {
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-500/10',
+    color: 'text-arena-fame',
+    bgColor: 'bg-arena-fame/10',
     icon: <Sparkles className="h-5 w-5" />,
     label: 'Flashy',
     description:
@@ -76,8 +76,8 @@ const PERSONALITY_CONFIG: Record<
     traits: ['+15% Hype (showy styles)', '+20% Purse', 'Moderate skill gap (0.25)'],
   },
   Corporate: {
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-500/10',
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
     icon: <Building2 className="h-5 w-5" />,
     label: 'Corporate',
     description:
@@ -88,20 +88,20 @@ const PERSONALITY_CONFIG: Record<
 
 const TIER_COLORS: Record<Promoter['tier'], { badge: string; bg: string }> = {
   Local: {
-    badge: 'bg-stone-500/20 text-stone-600 border-stone-500/30',
-    bg: 'bg-stone-500/5',
+    badge: 'bg-muted/40 text-muted-foreground border-border/40',
+    bg: 'bg-muted/10',
   },
   Regional: {
-    badge: 'bg-cyan-500/20 text-cyan-600 border-cyan-500/30',
-    bg: 'bg-cyan-500/5',
+    badge: 'bg-accent/20 text-accent border-accent/30',
+    bg: 'bg-accent/5',
   },
   National: {
-    badge: 'bg-violet-500/20 text-violet-600 border-violet-500/30',
-    bg: 'bg-violet-500/5',
+    badge: 'bg-arena-fame/20 text-arena-fame border-arena-fame/30',
+    bg: 'bg-arena-fame/5',
   },
   Legendary: {
-    badge: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
-    bg: 'bg-amber-500/10',
+    badge: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
+    bg: 'bg-arena-gold/10',
   },
 };
 
@@ -193,7 +193,7 @@ export default function PromoterDetail() {
       </div>
 
       {/* Hero Section */}
-      <div className={`p-6 rounded-xl border ${tierStyle.bg} ${tierStyle.badge} border-current`}>
+      <div className={`p-6 rounded-none border ${tierStyle.bg} ${tierStyle.badge} border-current`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-3 flex-wrap">
@@ -204,7 +204,7 @@ export default function PromoterDetail() {
             </div>
             <p className="text-sm opacity-80">{personality.description}</p>
           </div>
-          <div className={`p-4 rounded-lg ${personality.bgColor} flex items-center gap-3`}>
+          <div className={`p-4 rounded-none ${personality.bgColor} flex items-center gap-3`}>
             <div className={personality.color}>{personality.icon}</div>
             <div>
               <div className={`font-bold ${personality.color}`}>{personality.label}</div>
@@ -263,19 +263,19 @@ export default function PromoterDetail() {
               <div className="flex justify-between text-sm">
                 <span className="font-bold uppercase tracking-wider">Weekly Capacity Usage</span>
                 <span
-                  className={`font-mono font-bold ${stats.capacityPercent >= 80 ? 'text-red-500' : stats.capacityPercent >= 50 ? 'text-amber-500' : 'text-emerald-500'}`}
+                  className={`font-mono font-bold ${stats.capacityPercent >= 80 ? 'text-destructive' : stats.capacityPercent >= 50 ? 'text-arena-gold' : 'text-primary'}`}
                 >
                   {Math.round(stats.capacityPercent)}%
                 </span>
               </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-none overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${
+                  className={`h-full rounded-none transition-all duration-500 ${
                     stats.capacityPercent >= 80
-                      ? 'bg-red-500'
+                      ? 'bg-destructive'
                       : stats.capacityPercent >= 50
-                        ? 'bg-amber-500'
-                        : 'bg-emerald-500'
+                        ? 'bg-arena-gold'
+                        : 'bg-primary'
                   }`}
                   style={{ width: `${Math.min(stats.capacityPercent, 100)}%` }}
                 />

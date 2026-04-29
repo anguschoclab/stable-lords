@@ -17,6 +17,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { SeasonWidget } from '@/components/dashboard/SeasonWidget';
 import { RecentBoutsWidget } from '@/components/dashboard/RecentBoutsWidget';
+import { WeeklyDigestWidget } from '@/components/dashboard/WeeklyDigestWidget';
 import { RivalryWidget } from '@/components/dashboard/RivalryWidget';
 import { MetaDriftWidget } from '@/components/widgets/MetaDriftWidget';
 import { FormSparkline } from '@/components/charts/FormSparkline';
@@ -95,7 +96,7 @@ function KpiBar() {
       color: 'text-destructive',
       glow: '',
     },
-    { label: 'Kill Rate', value: `${killRate}%`, icon: Flame, color: 'text-orange-400', glow: '' },
+    { label: 'Kill Rate', value: `${killRate}%`, icon: Flame, color: 'text-arena-blood', glow: '' },
   ];
 
   return (
@@ -293,7 +294,7 @@ function RosterSnapshot() {
       )}
       {active.map((w) => {
         return (
-          <Link key={w.id} to="/command/roster" className="block group">
+          <Link key={w.id} to="/ops/overview" className="block group">
             <Surface variant="glass" className="p-4 hover:border-primary/20 transition-colors">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
@@ -456,6 +457,14 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
 
 export default function ControlCenter() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const { week, season, arenaHistory, boutOffers } = useGameStore(
+    useShallow((s) => ({
+      week: s.week,
+      season: s.season,
+      arenaHistory: s.arenaHistory,
+      boutOffers: s.boutOffers,
+    }))
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-20">
@@ -499,6 +508,13 @@ export default function ControlCenter() {
             <div className="flex flex-col gap-6">
               <SeasonWidget />
               <RecentBoutsWidget />
+              <WeeklyDigestWidget
+                week={week}
+                season={season}
+                arenaHistory={arenaHistory}
+                boutOffers={boutOffers ?? {}}
+                currentWeek={week}
+              />
             </div>
             <div className="flex flex-col gap-6">
               <RivalryWidget />

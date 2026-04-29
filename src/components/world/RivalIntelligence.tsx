@@ -68,12 +68,12 @@ export function RivalIntelligence({ rivals }: RivalIntelligenceProps) {
                     className={cn(
                       'text-[9px] font-black border-none uppercase tracking-widest px-2 py-0.5 shrink-0',
                       rival.strategy?.intent === 'VENDETTA'
-                        ? 'bg-red-500/20 text-red-400'
+                        ? 'bg-destructive/20 text-destructive'
                         : rival.strategy?.intent === 'EXPANSION'
                           ? 'bg-stone-500/20 text-stone-400'
                           : rival.strategy?.intent === 'RECOVERY'
-                            ? 'bg-orange-500/20 text-orange-400'
-                            : 'bg-emerald-500/20 text-emerald-400'
+                            ? 'bg-arena-blood/20 text-arena-blood'
+                            : 'bg-primary/20 text-primary'
                     )}
                   >
                     {rival.strategy?.intent || 'STABLE'}
@@ -104,8 +104,8 @@ export function RivalIntelligence({ rivals }: RivalIntelligenceProps) {
                           rival.treasury < 150
                             ? 'bg-destructive'
                             : rival.treasury < 500
-                              ? 'bg-orange-500'
-                              : 'bg-emerald-500'
+                              ? 'bg-arena-blood'
+                              : 'bg-primary'
                         )}
                       />
                       <span className="text-[10px] font-black uppercase tracking-tight text-foreground/70">

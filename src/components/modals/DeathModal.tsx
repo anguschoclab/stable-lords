@@ -107,7 +107,7 @@ export function DeathModal() {
           <footer className="pt-4 flex flex-col items-center gap-4 border-t border-white/5">
             <Button
               onClick={() => acknowledgeDeath(warrior.id)}
-              className="w-full md:w-auto px-12 py-6 h-auto bg-arena-blood hover:bg-arena-blood/80 text-white rounded-none font-display font-black text-lg tracking-widest uppercase transition-all shadow-xl shadow-arena-blood/20 active:scale-95"
+              
             >
               MEMORIALIZE & CONTINUE
             </Button>

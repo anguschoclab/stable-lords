@@ -16,18 +16,28 @@ import { WEAPONS, getAvailableItems, STYLE_CLASSIC_WEAPONS } from '@/data/equipm
 
 // ─── Generation ─────────────────────────────────────────────────────────
 
-/** Preferred OE/AL ranges per style (favorites are drawn from these) */
+/**
+ * Preferred OE/AL ranges per style (favorites are drawn from these).
+ *
+ * Tuned 2026-04: AB and WS had default-plan OE values that fell *outside*
+ * their favorite-rhythm ranges, making the rhythm-match +INI bonus
+ * structurally impossible to earn via the default plan. PR's range was
+ * narrow enough to make the perfect match a 1-in-9 chance.
+ *
+ * Widened so each style's defaultPlan OE/AL falls inside the favorite range,
+ * and slightly broadened to give more variance across warriors.
+ */
 const STYLE_RHYTHM_RANGES: Record<FightingStyle, { oe: [number, number]; al: [number, number] }> = {
-  [FightingStyle.AimedBlow]: { oe: [3, 5], al: [4, 6] },
-  [FightingStyle.BashingAttack]: { oe: [7, 9], al: [3, 5] },
-  [FightingStyle.LungingAttack]: { oe: [6, 8], al: [6, 8] },
-  [FightingStyle.ParryLunge]: { oe: [4, 6], al: [4, 6] },
-  [FightingStyle.ParryRiposte]: { oe: [2, 4], al: [3, 5] },
-  [FightingStyle.ParryStrike]: { oe: [4, 6], al: [4, 6] },
-  [FightingStyle.SlashingAttack]: { oe: [6, 8], al: [5, 7] },
-  [FightingStyle.StrikingAttack]: { oe: [6, 8], al: [4, 6] },
-  [FightingStyle.TotalParry]: { oe: [2, 4], al: [2, 4] },
-  [FightingStyle.WallOfSteel]: { oe: [3, 5], al: [4, 6] },
+  [FightingStyle.AimedBlow]: { oe: [4, 7], al: [4, 6] }, // widened OE to include default 6
+  [FightingStyle.BashingAttack]: { oe: [7, 9], al: [2, 5] }, // widened AL to include default 3
+  [FightingStyle.LungingAttack]: { oe: [6, 9], al: [6, 9] },
+  [FightingStyle.ParryLunge]: { oe: [4, 7], al: [4, 7] },
+  [FightingStyle.ParryRiposte]: { oe: [3, 6], al: [4, 7] }, // widened to give PR more variance
+  [FightingStyle.ParryStrike]: { oe: [4, 7], al: [4, 7] },
+  [FightingStyle.SlashingAttack]: { oe: [6, 9], al: [4, 7] },
+  [FightingStyle.StrikingAttack]: { oe: [6, 9], al: [4, 7] },
+  [FightingStyle.TotalParry]: { oe: [1, 4], al: [1, 4] },
+  [FightingStyle.WallOfSteel]: { oe: [5, 8], al: [4, 7] }, // widened OE to include default 7
 };
 
 /** Generate hidden favorites for a warrior at creation */
@@ -145,7 +155,19 @@ export function getFavoriteWeaponBonus(warrior: Warrior): number {
   return equippedWeapon === fav.weaponId ? 1 : 0;
 }
 
-/** Get INI bonus from matching favorite rhythm (only if discovered, perfect match) */
+/**
+ * Get INI bonus from matching favorite rhythm.
+ *
+ * - Perfect match (exact OE and AL) → +2 INI
+ * - Close match (within ±1 of both axes) → +1 INI
+ * - Otherwise → 0
+ *
+ * Widened from "exact only" 2026-04: the perfect-match-only rule meant the
+ * bonus was a 1-in-9 lottery for warriors whose default plan was inside the
+ * favorite range, and structurally impossible for AB/WS whose defaults were
+ * outside. The ±1 "close match" tier gives a more reliable bonus while still
+ * rewarding plans that exactly hit the warrior's natural rhythm.
+ */
 export function getFavoriteRhythmBonus(
   warrior: Warrior,
   currentOE: number,
@@ -153,10 +175,10 @@ export function getFavoriteRhythmBonus(
 ): number {
   const fav = warrior.favorites;
   if (!fav?.discovered.rhythm) return 0;
-  const oeMatches = currentOE === fav.rhythm.oe;
-  const alMatches = currentAL === fav.rhythm.al;
-  // Perfect match = +2 INI
-  if (oeMatches && alMatches) return 2;
+  const oeDelta = Math.abs(currentOE - fav.rhythm.oe);
+  const alDelta = Math.abs(currentAL - fav.rhythm.al);
+  if (oeDelta === 0 && alDelta === 0) return 2; // perfect match
+  if (oeDelta <= 1 && alDelta <= 1) return 1; // close match
   return 0;
 }
 

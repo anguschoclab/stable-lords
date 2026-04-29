@@ -6,9 +6,13 @@
 import { getWeatherEffect } from './weatherEffects';
 import type { WeatherType } from '@/types/shared.types';
 
-// Endurance scaling — tuned so OE=8 fighters (END≈25) last ~20-25 exchanges before exhaustion
-const ENDURANCE_OE_SCALING = 0.1;
-const ENDURANCE_AL_SCALING = 0.05;
+// Endurance scaling — tuned so OE=5/AL=5 fighters with END≈25 reach the
+// FATIGUE_MODERATE threshold around exchange ~10-12 (mid game). Prior values
+// (0.1 / 0.05) produced base costs <1.0, which Math.floor inside this fn then
+// truncated to 0 for any OE≤9, meaning defensive fighters never tired and
+// the entire fatigue system was effectively dead for sub-aggressive plans.
+const ENDURANCE_OE_SCALING = 0.18;
+const ENDURANCE_AL_SCALING = 0.09;
 
 // Fatigue thresholds (fighters need to be genuinely exhausted before penalties kick in)
 const FATIGUE_MODERATE_THRESHOLD = 0.45;
@@ -21,7 +25,10 @@ const FATIGUE_HEAVY_PENALTY = -8;
 export function enduranceCost(oe: number, al: number, weather?: WeatherType | string): number {
   const baseCost = oe * ENDURANCE_OE_SCALING + al * ENDURANCE_AL_SCALING;
   const weatherMod = getWeatherEffect((weather as WeatherType) ?? 'Clear').staminaMult;
-  return Math.floor(baseCost * weatherMod);
+  // Return raw fractional cost — the consumer (applyEnduranceCosts) rounds
+  // once after all multipliers are applied, so we don't accumulate
+  // double-rounding error here.
+  return baseCost * weatherMod;
 }
 
 /**

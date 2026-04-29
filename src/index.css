@@ -337,6 +337,22 @@
     animation: livePulse 2s ease-in-out infinite;
   }
 
+  /* ── Thin scrollbar for overflow panels ─────────────────── */
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(42, 30, 19, 0.8);
+    border-radius: 0;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent) / 0.4);
+  }
+
   /* ── Imperial Seal border (circular ornament) ────────────── */
   .imperial-ring {
     @apply p-2.5 rounded-none relative;

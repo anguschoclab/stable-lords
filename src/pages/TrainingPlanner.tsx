@@ -112,7 +112,7 @@ function BurnWarnings({ burns }: { burns: BurnWarning[] }) {
         <div
           key={i}
           className={`flex items-center gap-2 text-[10px] ${
-            b.severity === 'high' ? 'text-destructive' : 'text-amber-500'
+            b.severity === 'high' ? 'text-destructive' : 'text-arena-gold'
           }`}
         >
           <AlertTriangle className="h-3 w-3 shrink-0" />
@@ -166,7 +166,7 @@ function AttributeRow({
               attr.capped
                 ? 'bg-muted-foreground/30'
                 : attr.drFactor < 0.5
-                  ? 'bg-amber-500/70'
+                  ? 'bg-arena-gold/70'
                   : 'bg-primary'
             }`}
             style={{ width: `${(attr.val / 25) * 100}%` }}
@@ -322,7 +322,7 @@ function WarriorPlannerCard({
           <span>Age {warrior.age ?? '?'}</span>
           <span>Total: {total}/80</span>
           {highBurns > 0 && <span className="text-destructive">⚠ {highBurns} at ceiling</span>}
-          {medBurns > 0 && <span className="text-amber-500">⚡ {medBurns} warnings</span>}
+          {medBurns > 0 && <span className="text-arena-gold">{medBurns} warnings</span>}
         </div>
       </CardHeader>
       <CardContent className="space-y-1.5 pt-2">

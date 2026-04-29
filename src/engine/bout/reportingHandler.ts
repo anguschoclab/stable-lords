@@ -1,4 +1,5 @@
 import type { Warrior } from '@/types/state.types';
+import type { StableId, FightId } from '@/types/shared.types';
 import type { FightOutcome, FightSummary } from '@/types/combat.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { generateId } from '@/utils/idUtils';
@@ -19,13 +20,13 @@ export function handleReporting(
   fD: number,
   pD: number,
   week: number,
-  rivalStableId?: string,
+  _rivalStableId?: string,
   isRivalry?: boolean,
-  day: number = 0,
+  _day: number = 0,
   rng?: IRNGService
 ) {
   const safeRng = rng;
-  const boutId = safeRng ? safeRng.uuid() : generateId(undefined, 'bout');
+  const boutId = (safeRng ? safeRng.uuid() : generateId(undefined, 'bout')) as FightId;
   const summary: FightSummary = {
     id: boutId,
     week,
@@ -34,6 +35,13 @@ export function handleReporting(
     d: wD.name,
     warriorIdA: wA.id,
     warriorIdD: wD.id,
+    // Stable identity fields — needed by stableManager.weeklyIncome (which keys
+    // by stableIdA/B) and by ownerNarrative/schedulingAssistant rivalry lookups.
+    // Prior code omitted these on regular bouts (only tournament summaries via
+    // createFightSummary set them), so rival income from arenaHistory was always
+    // 0 and rival treasuries never reflected bout earnings.
+    stableIdA: wA.stableId as unknown as StableId,
+    stableIdD: wD.stableId as unknown as StableId,
     winner: outcome.winner,
     by: outcome.by,
     styleA: wA.style,
@@ -47,7 +55,7 @@ export function handleReporting(
     popularityDeltaD: pD,
     transcript: outcome.log.map((e) => e.text),
     isRivalry,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(Date.UTC(2026, 0, 1) + (week - 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
   // Side effects

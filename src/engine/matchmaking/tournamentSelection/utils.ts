@@ -24,7 +24,8 @@ export function getAIPlan(
   opponentStyle?: FightingStyle,
   opponentOwnerId?: string
 ) {
-  const rival = state.rivals.find((r) => r.owner.id === w.stableId);
+  // warrior.stableId is rival.id (StableId), not owner.id
+  const rival = state.rivals.find((r) => r.id === w.stableId);
   if (!rival) return { ...defaultPlanForWarrior(w), killDesire: 7 };
 
   let grudgeIntensity = 0;

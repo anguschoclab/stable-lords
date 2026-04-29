@@ -4,6 +4,7 @@
  */
 import type { RivalStableData, Warrior } from '@/types/state.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { clamp } from '@/utils/math';
 
 /**
  * Randomly picks an eligible opponent from a pool of rival stables.
@@ -44,7 +45,11 @@ export function generateRivalryNarrative(
     `⚔️ VENDETTA IN THE PITS: ${stableA} vs ${stableB} — ${warriorA} and ${warriorB} settled scores in the arena!`,
     `🏟️ BAD BLOOD: ${stableA} and ${stableB} clashed again as ${warriorA} took on ${warriorB}!`,
   ];
-  return rng.pick(templates)!;
+  const result = rng.pick(templates);
+  if (!result) {
+    throw new Error('Rival narrative template pick failed');
+  }
+  return result;
 }
 
 /**
@@ -60,5 +65,5 @@ export function calculateRivalryScore(
   score += Math.floor(boutsFought / 3);
   score += deathsCount * 5;
   score += upsetsCount * 3;
-  return Math.max(1, Math.min(5, score));
+  return clamp(score, 1, 5);
 }

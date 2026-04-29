@@ -71,7 +71,7 @@ export function EditableText({
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10"
+            className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
             onClick={handleSave}
             aria-label="Save"
           >

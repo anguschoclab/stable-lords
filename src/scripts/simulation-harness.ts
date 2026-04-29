@@ -10,6 +10,7 @@ export interface SimulationConfig {
   weeks: number;
   seed: number;
   logFrequency?: number; // Log every N weeks
+  ignoreBankruptcy?: boolean;
 }
 
 export interface SimulationResult {
@@ -42,16 +43,16 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
     );
 
     playerOffers.forEach((offer) => {
-      const playerWarriorIds = offer.warriorIds.filter((id) => state.roster.some((w) => w.id === id));
+      const playerWarriorIds = offer.warriorIds.filter((id) =>
+        state.roster.some((w) => w.id === id)
+      );
 
-      if (offer.hype > 100 || offer.purse > 200) {
+      if (offer.hype >= 20 || offer.purse >= 50) {
         playerWarriorIds.forEach((id) => {
           offer.responses[id] = 'Accepted';
         });
 
-        const allResponded = offer.warriorIds.every(
-          (wid) => offer.responses[wid] !== 'Pending'
-        );
+        const allResponded = offer.warriorIds.every((wid) => offer.responses[wid] !== 'Pending');
         if (allResponded) {
           offer.status = 'Signed';
         }
@@ -71,10 +72,20 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
       pulses.push(collectPulse(state));
     }
 
+    // Auto-recruit if empty roster (to keep the simulation running)
+    if (state.roster.length === 0) {
+      if (state.recruitPool.length > 0) {
+        state.roster.push({ ...state.recruitPool[0] });
+        state.recruitPool.shift();
+      }
+    }
+
     // Stop Conditions (Optional)
-    if (state.roster.length === 0 && state.treasury < 100) {
-      console.warn(`[Sim] Failure at week ${w}: Stable Bankrupt/Empty.`);
-      break;
+    if (!config.ignoreBankruptcy) {
+      if (state.treasury < -5000 || (state.roster.length === 0 && state.treasury < 100)) {
+        console.warn(`[Sim] Failure at week ${w}: Stable Bankrupt/Empty.`);
+        break;
+      }
     }
   }
 

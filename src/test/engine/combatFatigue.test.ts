@@ -30,15 +30,17 @@ describe('combatFatigue engine', () => {
   });
 
   describe('enduranceCost', () => {
-    it('calculates cost based on OE (0.10) and AL (0.05) and floors the result', () => {
-      // 10 * 0.10 + 10 * 0.05 = 1.0 + 0.5 = 1.5 -> floor = 1
-      expect(enduranceCost(10, 10)).toBe(1);
-
-      // 5 * 0.10 + 5 * 0.05 = 0.5 + 0.25 = 0.75 -> floor = 0
-      expect(enduranceCost(5, 5)).toBe(0);
-
-      // 8 * 0.10 + 8 * 0.05 = 0.8 + 0.4 = 1.2 -> floor = 1
-      expect(enduranceCost(8, 8)).toBe(1);
+    // Tuned 2026-04: scaling raised from 0.10/0.05 to 0.18/0.09, and the
+    // internal Math.floor was removed so callers (applyEnduranceCosts) can
+    // round once after all multipliers. Prior values + floor truncated most
+    // OE/AL combos to 0 endurance/exchange — fatigue was effectively dead.
+    it('calculates cost based on OE (0.18) + AL (0.09) without internal floor', () => {
+      // 10 * 0.18 + 10 * 0.09 = 1.8 + 0.9 = 2.7
+      expect(enduranceCost(10, 10)).toBeCloseTo(2.7);
+      // 5 * 0.18 + 5 * 0.09 = 0.9 + 0.45 = 1.35 (was 0 under prior floor)
+      expect(enduranceCost(5, 5)).toBeCloseTo(1.35);
+      // 8 * 0.18 + 8 * 0.09 = 1.44 + 0.72 = 2.16
+      expect(enduranceCost(8, 8)).toBeCloseTo(2.16);
     });
 
     it('returns 0 if inputs are 0', () => {

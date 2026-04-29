@@ -52,7 +52,12 @@ export function revealRecruitPotential(
   // Deterministic Fisher-Yates shuffle via the seeded rng.
   for (let i = keys.length - 1; i > 0; i--) {
     const j = Math.floor(rng.next() * (i + 1));
-    [keys[i], keys[j]] = [keys[j]!, keys[i]!];
+    const keyJ = keys[j];
+    const keyI = keys[i];
+    if (keyJ === undefined || keyI === undefined) {
+      throw new Error('Shuffle index out of bounds');
+    }
+    [keys[i], keys[j]] = [keyJ, keyI];
   }
 
   const revealed: Partial<Record<AttrKey, number>> = {};

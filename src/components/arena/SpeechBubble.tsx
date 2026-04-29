@@ -36,27 +36,24 @@ export default function SpeechBubble({ bubble, onDismiss, position = 'left' }: S
   return (
     <div
       className={cn(
-        'absolute z-20 animate-in fade-in slide-in-from-bottom-2 duration-300',
+        'absolute z-20 animate-in fade-in slide-in-from-bottom-2 duration-300 -top-[60px]',
         position === 'left' ? 'left-1/2 -translate-x-1/4' : 'right-1/2 translate-x-1/4'
       )}
-      style={{ top: '-60px' }}
     >
       <div
         className={cn(
-          'relative px-4 py-2 rounded-sm border-2 font-display text-xs font-black uppercase tracking-wide whitespace-nowrap',
+          'relative px-4 py-2 rounded-none border-2 font-display text-xs font-black uppercase tracking-wide whitespace-nowrap',
           'shadow-lg backdrop-blur-sm',
           getBubbleStyles(bubble.type)
         )}
       >
         {/* Pointer triangle */}
         <div
-          className={cn('absolute -bottom-2 w-0 h-0', position === 'left' ? 'left-4' : 'right-4')}
-          style={{
-            borderLeft: '8px solid transparent',
-            borderRight: '8px solid transparent',
-            borderTop: '8px solid currentColor',
-            opacity: 0.8,
-          }}
+          className={cn(
+            'absolute -bottom-2 w-0 h-0 opacity-80',
+            'border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-current',
+            position === 'left' ? 'left-4' : 'right-4'
+          )}
         />
 
         {/* Quote marks */}

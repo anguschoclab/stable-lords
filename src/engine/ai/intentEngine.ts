@@ -1,9 +1,9 @@
 import type { GameState, RivalStableData, AIIntent, AIStrategy } from '@/types/state.types';
-import { PERSONALITY_CLASH } from '@/data/ownerData';
-
 import { computeMetaDrift } from '../metaDrift';
+import { FightingStyle } from '@/types/shared.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
+import { computePlayerThreatLevel } from './agentCore';
 
 /**
  * Determines the weekly strategic intent for an AI owner.
@@ -22,7 +22,6 @@ export function pickWeeklyIntent(
 
   // ⚡ Environmental Awareness
   const isRainy = state.weather === 'Rainy';
-  const isSummer = state.season === 'Summer';
 
   // ⚡ Continuous Alignment: Meta-Drift Awareness (use cached if available)
   const meta = state.cachedMetaDrift || computeMetaDrift(state.arenaHistory || []);
@@ -36,32 +35,91 @@ export function pickWeeklyIntent(
     return 'RECOVERY';
   }
 
-  // 1. RECOVERY: High priority if stable is in crisis
+  // 1. RECOVERY: High priority if stable is in crisis or season is going badly
+  const seasonRecord = rival.agentMemory?.seasonRecord;
+  const seasonFightsPlayed = (seasonRecord?.wins ?? 0) + (seasonRecord?.losses ?? 0);
+  const seasonWinRate =
+    seasonFightsPlayed >= 6
+      ? (seasonRecord?.wins ?? 0) / seasonFightsPlayed
+      : null;
+
   if (
     rival.treasury < 200 ||
     (activeRoster.length > 0 && injuryCount / activeRoster.length >= 0.4) ||
-    (metaIsHostile && personality === 'Methodical')
+    (metaIsHostile && personality === 'Methodical') ||
+    (seasonWinRate !== null && seasonWinRate < 0.3)
   ) {
     return 'RECOVERY';
   }
 
-  // 2. VENDETTA: If there is a high-intensity grudge, consider targeting them
+  // 2. VENDETTA: If there is a high-intensity grudge, or the player is dominant
   const hasGrudge = state.ownerGrudges?.some(
     (g) => (g.ownerIdA === rival.owner.id || g.ownerIdB === rival.owner.id) && g.intensity >= 3
   );
 
-  const vendettaChance = personality === 'Aggressive' ? 0.4 : personality === 'Showman' ? 0.2 : 0.1;
+  const playerThreat = computePlayerThreatLevel(state);
+  const playerThreatVendettaChance =
+    playerThreat === 'Dominant' &&
+    (personality === 'Aggressive' || personality === 'Showman' || personality === 'Tactician')
+      ? 0.25
+      : 0;
+
+  const vendettaChance =
+    personality === 'Aggressive' ? 0.4 : personality === 'Showman' ? 0.2 : 0.1;
   if (hasGrudge && rngService.next() < vendettaChance) {
     return 'VENDETTA';
   }
+  if (playerThreatVendettaChance > 0 && rngService.next() < playerThreatVendettaChance) {
+    return 'VENDETTA';
+  }
 
-  // 3. EXPANSION: If roster is thin
+  // 3. WEALTH_ACCUMULATION: Thriving stables with full rosters hoard cash
+  if (
+    rival.treasury > 1500 &&
+    seasonWinRate !== null &&
+    seasonWinRate >= 0.6 &&
+    (personality === 'Methodical' || personality === 'Pragmatic')
+  ) {
+    return 'WEALTH_ACCUMULATION';
+  }
+
+  // 4. AGGRESSIVE_EXPANSION: Dominant Aggressive stables push for prestige bouts
+  const maxRosterSize = personality === 'Aggressive' ? 10 : 8;
+  if (
+    activeRoster.length >= maxRosterSize &&
+    rival.treasury > 1200 &&
+    personality === 'Aggressive'
+  ) {
+    return 'AGGRESSIVE_EXPANSION';
+  }
+
+  // 5. ROSTER_DIVERSITY: Stables heavily concentrated in a meta-losing style diversify
+  const allStyles = activeRoster.map((w) => w.style);
+  if (allStyles.length >= 4) {
+    const styleCounts: Record<string, number> = {};
+    for (const s of allStyles) styleCounts[s] = (styleCounts[s] ?? 0) + 1;
+    const maxConcentration = Math.max(...Object.values(styleCounts)) / allStyles.length;
+    const dominantStyle = Object.entries(styleCounts).reduce((a, b) => (b[1] > a[1] ? b : a))[0] as FightingStyle;
+    if (maxConcentration >= 0.5 && (meta[dominantStyle] ?? 0) <= -3) {
+      return 'ROSTER_DIVERSITY';
+    }
+  }
+
+  // 6. EXPANSION: If roster is thin — boosted if a known rival has grown recently
   const minSize = personality === 'Aggressive' ? 8 : personality === 'Methodical' ? 5 : 6;
-  if (activeRoster.length < minSize && rival.treasury > 300) {
+  const knownRivals = rival.agentMemory?.knownRivals ?? [];
+  const rivalExpanding = knownRivals.some((rivalId) => {
+    const r = state.rivals?.find((rv) => rv.owner.id === rivalId);
+    if (!r || !r.agentMemory?.seasonRecord) return false;
+    return r.roster.filter((w) => w.status === 'Active').length >
+      r.agentMemory.seasonRecord.rosterSizeAtSeasonStart + 1;
+  });
+  const expansionThreshold = rivalExpanding ? Math.floor(minSize * 0.8) : minSize;
+  if (activeRoster.length < expansionThreshold && rival.treasury > 300) {
     return 'EXPANSION';
   }
 
-  // 4. CONSOLIDATION: Default (focus on training and base maintenance)
+  // 7. CONSOLIDATION: Default (focus on training and base maintenance)
   return 'CONSOLIDATION';
 }
 
@@ -135,6 +193,10 @@ export function updateAIStrategy(
         (g) => (g.ownerIdA === rival.owner.id || g.ownerIdB === rival.owner.id) && g.intensity >= 3
       );
       targetStableId = g?.ownerIdA === rival.owner.id ? g?.ownerIdB : g?.ownerIdA;
+      // If no grudge target but player triggered the vendetta, target the player stable
+      if (!targetStableId) {
+        targetStableId = state.player?.id;
+      }
     }
 
     return {

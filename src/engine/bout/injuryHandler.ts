@@ -19,7 +19,7 @@ export function handleInjuries(
   const names: string[] = [];
   const rosterUpdates = new Map<string, Partial<Warrior>>();
   const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
-  const restStates: RestState[] = [...(s.restStates || [])];
+  const restStates: RestState[] = [];
 
   if (outcome.by === 'KO') {
     const victimId = outcome.winner === 'A' ? wD.id : wA.id;
@@ -36,7 +36,10 @@ export function handleInjuries(
       const existing = rosterUpdates.get(wA.id) || wA;
       rosterUpdates.set(wA.id, { ...existing, injuries: [...(existing.injuries || []), injA] });
     } else if (rivalStableId) {
-      const rival = (s.rivals || []).find((r) => r.owner.id === rivalStableId);
+      // rivalStableId is set from `rival.id` (StableId) by pairings/world bouts,
+      // not owner.id. Looking up by owner.id silently dropped every rival
+      // injury — they remained completely unmaimed across the whole sim.
+      const rival = (s.rivals || []).find((r) => r.id === rivalStableId);
       if (rival) {
         const updatedRoster = updateEntityInList(rival.roster, wA.id, (w) => ({
           ...w,
@@ -57,7 +60,10 @@ export function handleInjuries(
       const existing = rosterUpdates.get(wD.id) || wD;
       rosterUpdates.set(wD.id, { ...existing, injuries: [...(existing.injuries || []), injD] });
     } else if (rivalStableId) {
-      const rival = (s.rivals || []).find((r) => r.owner.id === rivalStableId);
+      // rivalStableId is set from `rival.id` (StableId) by pairings/world bouts,
+      // not owner.id. Looking up by owner.id silently dropped every rival
+      // injury — they remained completely unmaimed across the whole sim.
+      const rival = (s.rivals || []).find((r) => r.id === rivalStableId);
       if (rival) {
         const updatedRoster = updateEntityInList(rival.roster, wD.id, (w) => ({
           ...w,

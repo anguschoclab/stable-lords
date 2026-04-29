@@ -53,7 +53,7 @@ export function TagBadge({ tag, type, className }: TagBadgeProps) {
       <TooltipTrigger asChild>
         <span className="inline-flex">{badge}</span>
       </TooltipTrigger>
-      <TooltipContent side="top" className="w-full max-w-[240px] text-xs">
+      <TooltipContent side="top" className="w-full max-w-60 text-xs">
         {description}
       </TooltipContent>
     </Tooltip>

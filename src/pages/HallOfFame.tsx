@@ -27,6 +27,8 @@ import { Surface } from '@/components/ui/Surface';
 import { WarriorLink } from '@/components/EntityLink';
 import { STYLE_DISPLAY_NAMES, FightingStyle } from '@/types/game';
 import { motion } from 'framer-motion';
+import FightsList from '@/components/awards/FightsList';
+import UpsetsList, { type UpsetEntry } from '@/components/awards/UpsetsList';
 
 export default function HallOfFame() {
   const { roster, graveyard, retired, rivals, awards, year, player, season } = useGameStore();
@@ -61,6 +63,35 @@ export default function HallOfFame() {
   }, [allWarriors]);
 
   const myFallen = graveyard.filter((w) => w.stableId === player.id);
+
+  const fameByWarriorId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const w of allWarriors) map.set(w.id, w.fame ?? 0);
+    return map;
+  }, [allWarriors]);
+
+  const getFightsForYear = (yr: number) => {
+    const weekStart = (yr - 1) * 52 + 1;
+    const weekEnd = yr * 52;
+    return allFights.filter((f) => f.week >= weekStart && f.week <= weekEnd);
+  };
+
+  const getUpsetsForYear = (yr: number): UpsetEntry[] => {
+    return getFightsForYear(yr)
+      .map((f) => {
+        const fameA = fameByWarriorId.get(f.warriorIdA ?? '') ?? 0;
+        const fameD = fameByWarriorId.get(f.warriorIdD ?? '') ?? 0;
+        const winnerName = f.winner === 'A' ? f.a : f.d;
+        const loserName = f.winner === 'A' ? f.d : f.a;
+        const winnerFame = f.winner === 'A' ? fameA : fameD;
+        const loserFame = f.winner === 'A' ? fameD : fameA;
+        const fameDiff = loserFame - winnerFame;
+        return { winner: winnerName, loser: loserName, by: f.by, fameDiff, week: f.week };
+      })
+      .filter((u) => u.fameDiff >= 10)
+      .sort((a, b) => b.fameDiff - a.fameDiff)
+      .slice(0, 5);
+  };
 
   const awardIcon = (type: string) => {
     switch (type) {
@@ -106,13 +137,13 @@ export default function HallOfFame() {
         <TabsList className="bg-secondary/20 p-1 rounded-none h-12 w-full sm:w-auto">
           <TabsTrigger
             value="halloffame"
-            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
+            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             <Crown className="h-3.5 w-3.5" /> Hall of Fame
           </TabsTrigger>
           <TabsTrigger
             value="graveyard"
-            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-white transition-all"
+            className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-primary-foreground transition-all"
           >
             <Skull className="h-3.5 w-3.5" /> Graveyard
           </TabsTrigger>
@@ -185,6 +216,19 @@ export default function HallOfFame() {
                     );
                   })}
                 </div>
+
+                {/* ── Year fight highlights ── */}
+                {(() => {
+                  const yearFights = getFightsForYear(year);
+                  const yearUpsets = getUpsetsForYear(year);
+                  if (yearFights.length === 0) return null;
+                  return (
+                    <div className="border-t border-border/20 pt-4 space-y-3">
+                      <FightsList fights={yearFights} />
+                      <UpsetsList upsets={yearUpsets} />
+                    </div>
+                  );
+                })()}
               </article>
             ))
           ) : (
@@ -238,13 +282,13 @@ export default function HallOfFame() {
             <TabsList className="bg-secondary/20 p-1 rounded-none h-10 w-full sm:w-auto mb-8">
               <TabsTrigger
                 value="memorial"
-                className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-white transition-all"
+                className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
               >
                 <Zap className="h-3 w-3" /> My Fallen ({myFallen.length})
               </TabsTrigger>
               <TabsTrigger
                 value="world"
-                className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-white transition-all"
+                className="flex-1 rounded-none gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-destructive data-[state=active]:text-primary-foreground transition-all"
               >
                 <Skull className="h-3 w-3" /> World Cemetery ({graveyard.length})
               </TabsTrigger>
@@ -396,17 +440,17 @@ function FallenGrid({
                   <div className="flex flex-wrap gap-2 pt-6 mt-6 border-t border-white/5">
                     {w.career.medals.gold > 0 && (
                       <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2.5 py-1.5 border border-arena-gold/20">
-                        🥇 Gold Valor
+                        GOLD · VALOR
                       </span>
                     )}
                     {w.career.medals.silver > 0 && (
-                      <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/5 px-2.5 py-1.5 border border-white/10">
-                        🥈 Silver Token
+                      <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-foreground/5 px-2.5 py-1.5 border border-border/20">
+                        SILVER · TOKEN
                       </span>
                     )}
                     {w.career.medals.bronze > 0 && (
-                      <span className="text-[9px] uppercase font-black tracking-widest text-orange-500 bg-orange-500/10 px-2.5 py-1.5 border border-orange-500/20">
-                        🥉 Bronze Elite
+                      <span className="text-[9px] uppercase font-black tracking-widest text-arena-gold bg-arena-gold/10 px-2.5 py-1.5 border border-arena-gold/20">
+                        BRONZE · ELITE
                       </span>
                     )}
                   </div>

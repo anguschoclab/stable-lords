@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dices, ArrowRight } from 'lucide-react';
-import { randomOwnerName, randomStableName } from '@/data/randomNames';
+import { randomOwnerName, randomStableName } from '@/data/names';
 import { generateCrest } from '@/engine/crest/crestGenerator';
 import { StableCrest } from '@/components/crest/StableCrest';
 import type { CrestData } from '@/types/crest.types';
@@ -111,7 +111,7 @@ export default function NewGameForm({
             </div>
             <div>
               <h2 className="text-2xl font-display font-bold text-foreground">FORGE YOUR STABLE</h2>
-              <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-[280px] mx-auto">
+              <p className="text-muted-foreground text-xs mt-2 leading-relaxed max-w-xs mx-auto">
                 The orphanage doors creak open. Beyond them lies the roar of the crowd, the clash of
                 steel, and a chance to forge legends.
               </p>

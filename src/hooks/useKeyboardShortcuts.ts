@@ -13,7 +13,7 @@ import { useNavigate } from '@tanstack/react-router';
 const NAV_ROUTES = [
   '/', // 1 — Command Hub
   '/command/combat', // 2 — Combat
-  '/ops/personnel', // 3 — Personnel
+  '/ops/overview', // 3 — Stable Overview
   '/command/training', // 4 — Training
   '/world/intelligence', // 5 — Intelligence/Scouting
   '/ops/equipment', // 6 — Equipment

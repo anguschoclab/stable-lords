@@ -95,7 +95,7 @@ export const WarriorDossier = React.memo(function WarriorDossier({
           </div>
 
           {(warrior.origin || (warrior.traits && warrior.traits.length > 0)) && (
-            <div className="p-3 bg-white/5 border border-white/5 rounded-sm space-y-3">
+            <div className="p-3 bg-white/5 border border-white/5 rounded-none space-y-3">
               <div className="flex flex-wrap gap-2">
                 {warrior.traits?.map((t) => (
                   <Badge
@@ -173,13 +173,13 @@ export const WarriorDossier = React.memo(function WarriorDossier({
               <TabsList className="w-full bg-neutral-900 border border-white/5 p-1 rounded-none h-10">
                 <TabsTrigger
                   value="overview"
-                  className="flex-1 text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-primary data-[state=active]:text-white"
+                  className="flex-1 text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   <Fingerprint className="h-3 w-3 mr-2" /> Biometrics
                 </TabsTrigger>
                 <TabsTrigger
                   value="lineage"
-                  className="flex-1 text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-primary data-[state=active]:text-white"
+                  className="flex-1 text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   <History className="h-3 w-3 mr-2" /> Lineage
                 </TabsTrigger>
@@ -241,7 +241,7 @@ export const WarriorDossier = React.memo(function WarriorDossier({
                 </div>
                 {warrior.favorites?.discovered.weapon ? (
                   <div className="flex items-center justify-between p-2 rounded bg-arena-gold/5 border border-arena-gold/20">
-                    <span className="text-xs font-bold text-white uppercase tracking-tight">
+                    <span >
                       {favDisplay.weapon}
                     </span>
                     <Badge className="bg-arena-gold text-black font-black text-[8px] h-4 px-1">
@@ -267,7 +267,7 @@ export const WarriorDossier = React.memo(function WarriorDossier({
                 </div>
                 {warrior.favorites?.discovered.rhythm ? (
                   <div className="flex items-center justify-between p-2 rounded bg-arena-gold/5 border border-arena-gold/20">
-                    <span className="text-xs font-bold text-white uppercase tracking-tight">
+                    <span >
                       {favDisplay.rhythm}
                     </span>
                     <Badge className="bg-arena-gold text-black font-black text-[8px] h-4 px-1">

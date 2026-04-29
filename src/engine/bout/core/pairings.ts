@@ -1,4 +1,4 @@
-import { GameState, Warrior, BoutOffer } from '@/types/state.types';
+import { GameState, Warrior } from '@/types/state.types';
 
 export interface BoutPairing {
   a: Warrior;
@@ -26,13 +26,16 @@ export function generatePairings(state: GameState): BoutPairing[] {
     })();
 
   // 2. Derive pairings from Signed Contracts for this week
-  const currentOffers = Object.values(state.boutOffers || {}).filter(
+  const allOffers = Object.values(state.boutOffers || {});
+  const currentOffers = allOffers.filter(
     (o) => o.status === 'Signed' && o.boutWeek === currentWeek
   );
 
   currentOffers.forEach((offer) => {
-    const wA = warriorMap.get(offer.warriorIds[0]);
-    const wD = warriorMap.get(offer.warriorIds[1]);
+    const idA = offer.warriorIds[0];
+    const idD = offer.warriorIds[1];
+    const wA = idA ? warriorMap.get(idA) : undefined;
+    const wD = idD ? warriorMap.get(idD) : undefined;
 
     if (wA && wD) {
       // Find which stable wD belongs to
@@ -43,7 +46,7 @@ export function generatePairings(state: GameState): BoutPairing[] {
         d: wD,
         isRivalry: (offer.hype || 0) > 150, // Use hype as a proxy for rivalry
         rivalStable: rivalStable?.owner.stableName,
-        rivalStableId: rivalStable?.owner.id,
+        rivalStableId: rivalStable?.id,
         contractId: offer.id,
       });
     }

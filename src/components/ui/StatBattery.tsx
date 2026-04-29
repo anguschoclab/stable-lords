@@ -1,3 +1,4 @@
+import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
@@ -10,19 +11,15 @@ export interface StatBatteryProps {
   className?: string; // Optional wrapper class
 }
 
-export function StatBattery({
-  label,
-  value,
-  max = 100,
-  labelValue,
-  colorClass,
-  className,
-}: StatBatteryProps) {
+export const StatBattery = React.forwardRef<HTMLDivElement, StatBatteryProps>(function StatBattery(
+  { label, value, max = 100, labelValue, colorClass, className },
+  ref
+) {
   const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
   const displayValue = labelValue !== undefined ? labelValue : value;
 
   return (
-    <div className={cn('flex items-center gap-3', className)}>
+    <div ref={ref} className={cn('flex items-center gap-3', className)}>
       <span className="text-xs text-muted-foreground w-8 font-mono">{label}</span>
       <div className="flex-1 relative">
         <Progress
@@ -33,4 +30,4 @@ export function StatBattery({
       <span className="text-sm font-mono font-semibold w-6 text-right">{displayValue}</span>
     </div>
   );
-}
+});

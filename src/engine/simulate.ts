@@ -39,19 +39,20 @@ import type { WeatherType, DistanceRange, ArenaZone } from '@/types/shared.types
 import { getTrainerMods } from './combat/mechanics/simulateHelpers';
 import { getWeatherEffect, weatherOpeningLine } from './combat/mechanics/weatherEffects';
 import { getArenaById } from '@/data/arenas';
-import { getFeatureFlags } from '@/engine/featureFlags';
 import type { CrowdMood } from '@/engine/crowdMood';
 
 /**
- * Per-mood kill-window deltas. Magnitudes are intentionally tiny so the 8%
- * cap in `calculateKillWindow` keeps overall mortality near the 10% baseline
- * even when a Bloodthirsty crowd stacks with other risk factors.
+ * Per-mood kill-window deltas. Magnitudes intentionally tiny — the 0.025 cap
+ * in `calculateKillWindow` (lowered from 0.08 in 2026-04 to enable retirements)
+ * keeps per-bout mortality near the ~5% baseline even when a Bloodthirsty
+ * crowd stacks with other risk factors. Halved 2026-04 in proportion to the
+ * cap reduction so crowd mood remains a modulation, not a near-binary switch.
  */
 const CROWD_KILL_BONUS: Record<CrowdMood, number> = {
   Calm: 0,
-  Bloodthirsty: 0.008,
+  Bloodthirsty: 0.004,
   Theatrical: 0,
-  Solemn: -0.004,
+  Solemn: -0.002,
   Festive: 0,
 };
 
@@ -208,8 +209,7 @@ export function simulateFight(
     arenaConfig: getArenaById(arenaId),
     surfaceMod: getArenaById(arenaId).surfaceMod,
     pushedFighter: undefined,
-    crowdKillBonus:
-      getFeatureFlags().crowdMoodLethality && crowdMood ? CROWD_KILL_BONUS[crowdMood] : 0,
+    crowdKillBonus: crowdMood ? CROWD_KILL_BONUS[crowdMood] : 0,
   };
 
   const log: MinuteEvent[] = [];
@@ -227,50 +227,52 @@ export function simulateFight(
   let fatalExchangeIndex: number | undefined;
 
   // ── 1. Introductions ──
-  const introA = generateWarriorIntro(
-    rng,
-    {
-      name: nameA,
-      style: planA.style,
-      weaponId: weaponA,
-      armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor,
-      helmId: (warriorA?.equipment ?? DEFAULT_LOADOUT).helm,
-      attributes: warriorA?.attributes,
-      backupWeaponId: (warriorA?.equipment as { backup?: string } | undefined)?.backup,
-    },
-    warriorA?.attributes?.SZ
-  );
-  const introD = generateWarriorIntro(
-    rng,
-    {
-      name: nameD,
-      style: planD.style,
-      weaponId: weaponD,
-      armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor,
-      helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
-      attributes: warriorD?.attributes,
-      backupWeaponId: (warriorD?.equipment as { backup?: string } | undefined)?.backup,
-    },
-    warriorD?.attributes?.SZ
-  );
+  {
+    const introA = generateWarriorIntro(
+      rng,
+      {
+        name: nameA,
+        style: planA.style,
+        weaponId: weaponA,
+        armorId: (warriorA?.equipment ?? DEFAULT_LOADOUT).armor,
+        helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
+        attributes: warriorA?.attributes,
+        backupWeaponId: (warriorA?.equipment as { backup?: string } | undefined)?.backup,
+      },
+      warriorA?.attributes?.SZ
+    );
+    const introD = generateWarriorIntro(
+      rng,
+      {
+        name: nameD,
+        style: planD.style,
+        weaponId: weaponD,
+        armorId: (warriorD?.equipment ?? DEFAULT_LOADOUT).armor,
+        helmId: (warriorD?.equipment ?? DEFAULT_LOADOUT).helm,
+        attributes: warriorD?.attributes,
+        backupWeaponId: (warriorD?.equipment as { backup?: string } | undefined)?.backup,
+      },
+      warriorD?.attributes?.SZ
+    );
 
-  introA.forEach((line) => log.push({ minute: 0, text: line }));
-  log.push({ minute: 0, text: '' });
-  introD.forEach((line) => log.push({ minute: 0, text: line }));
-  log.push({ minute: 0, text: '' });
+    introA.forEach((line) => log.push({ minute: 0, text: line }));
+    log.push({ minute: 0, text: '' });
+    introD.forEach((line) => log.push({ minute: 0, text: line }));
+    log.push({ minute: 0, text: '' });
 
-  // Emit weather opening line with explicit type name (skipped for Clear/Overcast)
-  const weatherLine = weatherOpeningLine(weather);
-  if (weatherLine) log.push({ minute: 0, text: `☁ ${weather.toUpperCase()} — ${weatherLine}` });
+    // Emit weather opening line with explicit type name (skipped for Clear/Overcast)
+    const weatherLine = weatherOpeningLine(weather);
+    if (weatherLine) log.push({ minute: 0, text: `☁ ${weather.toUpperCase()} — ${weatherLine}` });
 
-  // Emit arena intro line for non-default arenas
-  if (arenaId !== 'standard_arena') {
-    log.push({ minute: 0, text: arenaIntroLine(resCtx.arenaConfig) });
+    // Emit arena intro line for non-default arenas
+    if (arenaId !== 'standard_arena') {
+      log.push({ minute: 0, text: arenaIntroLine(resCtx.arenaConfig) });
+    }
+
+    log.push({ minute: 1, text: battleOpener(rng) });
+    if (planA.OE <= 3) log.push({ minute: 1, text: conservingLine(nameA) });
+    if (planD.OE <= 3) log.push({ minute: 1, text: conservingLine(nameD) });
   }
-
-  log.push({ minute: 1, text: battleOpener(rng) });
-  if (planA.OE <= 3) log.push({ minute: 1, text: conservingLine(nameA) });
-  if (planD.OE <= 3) log.push({ minute: 1, text: conservingLine(nameD) });
 
   // ── 2. Main Simulation Loop ──
   for (let ex = 0; ex < MAX_EXCHANGES; ex++) {
@@ -310,36 +312,38 @@ export function simulateFight(
     exchangeLog.push(buildExchangeLogEntry(ex, min, phase, events));
 
     // B. Resolve Narration (Drama)
-    const narCtx: NarrationContext = {
-      rng,
-      nameA,
-      nameD,
-      weaponA,
-      weaponD,
-      styleA: fA.style,
-      styleD: fD.style,
-      maxHpA: fA.maxHp,
-      maxHpD: fD.maxHp,
-      prevHpRatioA,
-      prevHpRatioD,
-      fameA: warriorA?.fame ?? 0,
-      fameD: warriorD?.fame ?? 0,
-      isFavoriteA: !!warriorA?.favorites?.discovered?.weapon,
-      isFavoriteD: !!warriorD?.favorites?.discovered?.weapon,
-    };
-    const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
-    log.push(...newLines);
-    prevHpRatioA = lastHpRatioA;
-    prevHpRatioD = lastHpRatioD;
+    {
+      const narCtx: NarrationContext = {
+        rng,
+        nameA,
+        nameD,
+        weaponA,
+        weaponD,
+        styleA: fA.style,
+        styleD: fD.style,
+        maxHpA: fA.maxHp,
+        maxHpD: fD.maxHp,
+        prevHpRatioA,
+        prevHpRatioD,
+        fameA: warriorA?.fame ?? 0,
+        fameD: warriorD?.fame ?? 0,
+        isFavoriteA: !!warriorA?.favorites?.discovered?.weapon,
+        isFavoriteD: !!warriorD?.favorites?.discovered?.weapon,
+      };
+      const { log: newLines, lastHpRatioA, lastHpRatioD } = narrateEvents(events, narCtx, min);
+      log.push(...newLines);
+      prevHpRatioA = lastHpRatioA;
+      prevHpRatioD = lastHpRatioD;
 
-    // Tactic streak commentary — emit only at the 3 and 5 thresholds
-    if ((resCtx.tacticStreakA === 3 || resCtx.tacticStreakA === 5) && resCtx.lastOffTacticA) {
-      const streakLine = tacticStreakLine(nameA, resCtx.lastOffTacticA, resCtx.tacticStreakA);
-      if (streakLine) log.push({ minute: min, text: streakLine });
-    }
-    if ((resCtx.tacticStreakD === 3 || resCtx.tacticStreakD === 5) && resCtx.lastOffTacticD) {
-      const streakLine = tacticStreakLine(nameD, resCtx.lastOffTacticD, resCtx.tacticStreakD);
-      if (streakLine) log.push({ minute: min, text: streakLine });
+      // Tactic streak commentary — emit only at the 3 and 5 thresholds
+      if ((resCtx.tacticStreakA === 3 || resCtx.tacticStreakA === 5) && resCtx.lastOffTacticA) {
+        const streakLine = tacticStreakLine(nameA, resCtx.lastOffTacticA, resCtx.tacticStreakA);
+        if (streakLine) log.push({ minute: min, text: streakLine });
+      }
+      if ((resCtx.tacticStreakD === 3 || resCtx.tacticStreakD === 5) && resCtx.lastOffTacticD) {
+        const streakLine = tacticStreakLine(nameD, resCtx.lastOffTacticD, resCtx.tacticStreakD);
+        if (streakLine) log.push({ minute: min, text: streakLine });
+      }
     }
 
     // C. Check for End Events

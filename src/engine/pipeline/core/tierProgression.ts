@@ -77,7 +77,8 @@ export function processTierProgression(
       const result = rule(stats);
       if (result) {
         promotionNews.push(result.newsTemplate.replace('{name}', r.owner.stableName));
-        rivalsUpdates.set(r.owner.id, { tier: result.newTier });
+        // Key by rival.id (StableId), not owner.id — rivalsUpdates handler indexes by r.id.
+        rivalsUpdates.set(r.id, { tier: result.newTier });
         break;
       }
     }

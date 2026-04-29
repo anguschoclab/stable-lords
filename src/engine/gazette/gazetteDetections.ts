@@ -89,8 +89,9 @@ export function detectRivalryMatchup(
     if (!f) continue;
     if (names.has(f.a) && names.has(f.d)) {
       const key = f.a < f.d ? `${f.a}||${f.d}` : `${f.d}||${f.a}`;
-      if (pairCounts.has(key)) {
-        pairCounts.set(key, pairCounts.get(key)! + 1);
+      const currentCount = pairCounts.get(key);
+      if (currentCount !== undefined) {
+        pairCounts.set(key, currentCount + 1);
       }
     }
   }
@@ -166,20 +167,24 @@ export function detectRisingStars(fights: FightSummary[], allFights: FightSummar
 
   for (const af of allFights) {
     if (candidates.has(af.a)) {
-      const s = stats.get(af.a)!;
-      s.total++;
-      if (af.winner === 'A') s.wins++;
+      const s = stats.get(af.a);
+      if (s) {
+        s.total++;
+        if (af.winner === 'A') s.wins++;
+      }
     }
     if (candidates.has(af.d)) {
-      const s = stats.get(af.d)!;
-      s.total++;
-      if (af.winner === 'D') s.wins++;
+      const s = stats.get(af.d);
+      if (s) {
+        s.total++;
+        if (af.winner === 'D') s.wins++;
+      }
     }
   }
 
   for (const c of candidates) {
-    const s = stats.get(c)!;
-    if (s.total === 3 && s.wins === 3) {
+    const s = stats.get(c);
+    if (s && s.total === 3 && s.wins === 3) {
       risingStars.push(c);
     }
   }

@@ -5,6 +5,7 @@ import { runRankingsPass } from '@/engine/pipeline/passes/RankingsPass';
 import { runPromoterPass } from '@/engine/pipeline/passes/PromoterPass';
 import { processWeekBouts } from '@/engine/bout/services/boutProcessorService';
 import { respondToBoutOffer } from '@/engine/bout/mutations/contractMutations';
+import { resolveImpacts } from '@/engine/impacts';
 import { GameState, BoutOffer } from '@/types/state.types';
 
 describe('Contract System Cycle', () => {
@@ -74,10 +75,12 @@ describe('Contract System Cycle', () => {
     const ourBout = processed.results.find((r) => r.contractId === offer.id);
     expect(ourBout).toBeDefined();
 
+    const resolvedState = resolveImpacts(s, [processed.impact]);
+
     // Gold should have increased (either by purse or show fee)
-    expect(processed.state.treasury).toBeGreaterThan(initialGold);
+    expect(resolvedState.treasury).toBeGreaterThan(initialGold);
 
     // Contract should be cleared
-    expect(processed.state.boutOffers[offer.id]).toBeUndefined();
+    expect(resolvedState.boutOffers[offer.id]).toBeUndefined();
   });
 });

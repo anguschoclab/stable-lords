@@ -2,11 +2,9 @@ import { useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useGameStore, useWorldState, type GameStore } from '@/state/useGameStore';
 import { respondToBoutOffer } from '@/engine/bout/mutations/contractMutations';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Surface } from '@/components/ui/Surface';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -14,68 +12,22 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import {
   Briefcase,
-  User,
-  Coins,
-  Zap,
   CheckCircle2,
-  XCircle,
   Clock,
   ShieldAlert,
-  Crown,
   Heart,
-  AlertTriangle,
   Ban,
-  Users,
-  TrendingUp,
+  AlertTriangle,
+  Zap,
   Award,
   DollarSign,
-  Activity,
   Target,
 } from 'lucide-react';
 import { FightingStyle, STYLE_DISPLAY_NAMES } from '@/types/shared.types';
 import type { Warrior, PromoterPersonality, BoutOffer } from '@/types/state.types';
+import { PERSONALITY_CONFIG } from '@/data/promoterPersonalityConfig';
 import type { InjuryData } from '@/types/warrior.types';
 
-/** Personality badge colors, icons, and tooltip text */
-const PERSONALITY_CONFIG: Record<
-  PromoterPersonality,
-  { color: string; icon: React.ReactNode; desc: string; tooltip: string }
-> = {
-  Greedy: {
-    color: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
-    icon: <DollarSign className="h-3 w-3" />,
-    desc: '+15% purse · −10% hype',
-    tooltip: 'Greedy: +15% purse · −10% hype · prefers mismatches (best for money)',
-  },
-  Honorable: {
-    color: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
-    icon: <Award className="h-3 w-3" />,
-    desc: '+10% hype · parity fights',
-    tooltip:
-      'Honorable: +10% hype · baseline purse · prefers tight skill parity <10% gap (best for fame)',
-  },
-  Sadistic: {
-    color: 'bg-red-500/20 text-red-600 border-red-500/30',
-    icon: <AlertTriangle className="h-3 w-3" />,
-    desc: '+20% hype & purse · high danger',
-    tooltip:
-      'Sadistic: +20% hype & +20% purse on risky fights · seeks high-kill/injury matchups (high drama)',
-  },
-  Flashy: {
-    color: 'bg-purple-500/20 text-purple-600 border-purple-500/30',
-    icon: <Zap className="h-3 w-3" />,
-    desc: '+15% hype · +20% purse (fame>75)',
-    tooltip:
-      'Flashy: +15% hype · +20% purse for fame>75 · prefers famous warriors & showy styles (spectacle)',
-  },
-  Corporate: {
-    color: 'bg-slate-500/20 text-slate-600 border-slate-500/30',
-    icon: <TrendingUp className="h-3 w-3" />,
-    desc: '+5% purse · tier-matched bouts',
-    tooltip:
-      'Corporate: +5% purse · tier-boundary matching · balanced steady income (least volatile)',
-  },
-};
 
 /** Get fatigue status for display */
 function getFatigueStatus(fatigue: number): {
@@ -86,18 +38,18 @@ function getFatigueStatus(fatigue: number): {
   if (fatigue <= 30)
     return {
       label: 'Fresh',
-      color: 'bg-green-500/20 text-green-600 border-green-500/30',
+      color: 'bg-primary/20 text-primary border-primary/30',
       icon: <Heart className="h-3 w-3" />,
     };
   if (fatigue <= 60)
     return {
       label: 'Tired',
-      color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
+      color: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
       icon: <Clock className="h-3 w-3" />,
     };
   return {
     label: 'Exhausted',
-    color: 'bg-red-500/20 text-red-600 border-red-500/30',
+    color: 'bg-destructive/20 text-destructive border-destructive/30',
     icon: <AlertTriangle className="h-3 w-3" />,
   };
 }
@@ -110,20 +62,26 @@ function getInjuryBadge(
     ['Moderate', 'Severe', 'Critical', 'Permanent'].includes(i.severity)
   );
   if (blocking.length === 0) return null;
+  const first = blocking[0];
+  if (!first) return null;
   const severest = blocking.reduce<InjuryData>((max, i) => {
     const order = ['Minor', 'Moderate', 'Severe', 'Critical', 'Permanent'];
     return order.indexOf(i.severity) > order.indexOf(max.severity) ? i : max;
-  }, blocking[0]!);
+  }, first);
   const colorMap: Record<string, string> = {
-    Moderate: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30',
-    Severe: 'bg-orange-500/20 text-orange-600 border-orange-500/30',
-    Critical: 'bg-red-500/20 text-red-600 border-red-500/30',
-    Permanent: 'bg-purple-500/20 text-purple-600 border-purple-500/30',
+    Moderate: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
+    Severe: 'bg-arena-blood/20 text-arena-blood border-arena-blood/30',
+    Critical: 'bg-destructive/20 text-destructive border-destructive/30',
+    Permanent: 'bg-arena-fame/20 text-arena-fame border-arena-fame/30',
   };
   const severity = severest.severity ?? 'Moderate';
+  const color = colorMap[severity] ?? colorMap['Moderate'];
+  if (!color) {
+    throw new Error('Color not found for severity');
+  }
   return {
     label: severity,
-    color: colorMap[severity] ?? colorMap.Moderate,
+    color,
     count: blocking.length,
   };
 }
@@ -440,7 +398,7 @@ export default function BookingOffice() {
     toast.success(`Accepted ${accepted} offers from honorable promoters.`);
   };
 
-  const declineAllFromPromoter = (promoterId: string) => {
+  const _declineAllFromPromoter = (promoterId: string) => {
     const promoterOffers = thisWeekOffers.filter((o) => o.promoterId === promoterId);
     let declined = 0;
     promoterOffers.forEach((offer) => {
@@ -481,7 +439,7 @@ export default function BookingOffice() {
         >
           <div className="flex items-center gap-3">
             <Target className="h-4 w-4 text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">
               Market Overview
             </span>
           </div>
@@ -550,7 +508,7 @@ export default function BookingOffice() {
             >
               {roster.map((warrior) => {
                 const hasAccepted = Object.values(boutOffers).some(
-                  (o) => o.warriorIds.includes(warrior.id) && o.status === 'Accepted'
+                  (o) => o.warriorIds.includes(warrior.id) && o.status === 'Signed'
                 );
                 const hasProposed = Object.values(boutOffers).some(
                   (o) => o.warriorIds.includes(warrior.id) && o.status === 'Proposed'

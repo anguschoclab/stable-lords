@@ -34,7 +34,9 @@ export function updateEntity(
     const existing = maps.rosterUpdates.get(warriorId) || {};
     maps.rosterUpdates.set(warriorId, { ...existing, ...update });
   } else if (rivalStableId) {
-    const rival = (state.rivals || []).find((r) => r.owner.id === rivalStableId);
+    // rivalStableId is rival.id (StableId) — not owner.id. Looking up by
+    // owner.id silently dropped rival warrior updates.
+    const rival = (state.rivals || []).find((r) => r.id === rivalStableId);
     if (rival) {
       const existingRivalUpdate = maps.rivalsUpdates.get(rivalStableId) || {};
       const updatedRoster = updateEntityInList(rival.roster, warriorId, (w) => ({

@@ -232,7 +232,7 @@ export function RivalryWidget() {
                     </div>
                     <div className="text-right">
                       <div className="text-[10px] font-mono font-black text-foreground opacity-60">
-                        {r.playerWins}W <span className="text-white/10 mx-0.5">/</span>{' '}
+                        {r.playerWins}W <span className="text-foreground/10 mx-0.5">/</span>{' '}
                         {r.playerLosses}L
                       </div>
                       <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
@@ -273,7 +273,7 @@ export function RivalryWidget() {
                             )}
                           />
                           <span className="text-muted-foreground/60">{k.killer}</span>
-                          <span className="text-white/10">→</span>
+                          <span className="text-foreground/10">→</span>
                           <span className="text-foreground/80">{k.victim}</span>
                         </div>
                       ))}
@@ -307,7 +307,7 @@ export function RivalryWidget() {
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-mono font-black text-destructive">
-                      {mostWanted.wins} VICTORIES <span className="text-white/10 mx-1">|</span>{' '}
+                      {mostWanted.wins} VICTORIES <span className="text-foreground/10 mx-1">|</span>{' '}
                       {mostWanted.kills} TERMINATIONS
                     </div>
                     <span className="text-[8px] font-black uppercase tracking-widest text-destructive/40">

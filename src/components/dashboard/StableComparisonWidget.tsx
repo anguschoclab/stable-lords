@@ -296,7 +296,7 @@ export function StableComparisonWidget() {
                               FATALITIES
                             </span>
                             <span className="text-xs font-mono font-black text-destructive">
-                              💀 {rec.deaths}
+                              {rec.deaths}
                             </span>
                           </div>
                         )}

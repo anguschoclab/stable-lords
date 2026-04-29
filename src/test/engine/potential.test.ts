@@ -22,12 +22,12 @@ describe('Potential System', () => {
 
   describe('generatePotential', () => {
     it('should generate potential correctly for Common tier', () => {
-      // Common tier headroom is [2, 5]. For ST=10, potential should be between 12 and 15
-      const rng = vi.fn().mockReturnValue(0.5); // (5 - 2 + 1) * 0.5 = Math.floor(2) = 2. Headroom = 2 + 2 = 4
+      // Common tier headroom is [1, 4]. For ST=10, potential should be between 11 and 14
+      const rng = vi.fn().mockReturnValue(0.5); // (4 - 1 + 1) * 0.5 = Math.floor(2) = 2. Headroom = 1 + 2 = 3
       const potential = generatePotential(mockAttrs, 'Common', rng);
 
-      expect(potential.ST).toBe(14); // 10 + 4
-      expect(potential.CN).toBe(14);
+      expect(potential.ST).toBe(13); // 10 + 3
+      expect(potential.CN).toBe(13);
     });
 
     it('should enforce the POTENTIAL_ABSOLUTE_MAX (25) boundary', () => {

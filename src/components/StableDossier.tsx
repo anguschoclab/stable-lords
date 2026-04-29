@@ -64,7 +64,7 @@ export function StableDossier({ stableId, stableName }: StableDossierProps) {
                 )}
               </div>
             ) : (
-              <div className="h-16 w-16 rounded-lg border-2 border-dashed border-muted-foreground/30 flex items-center justify-center bg-secondary/20">
+              <div className="h-16 w-16 rounded-none border-2 border-dashed border-muted-foreground/30 flex items-center justify-center bg-secondary/20">
                 <span className="text-xs text-muted-foreground">?</span>
               </div>
             )}

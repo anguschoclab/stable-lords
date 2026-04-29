@@ -1,22 +1,18 @@
 import { useMemo } from 'react';
-import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { useWorldState } from '@/state/useGameStore';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { ATTRIBUTE_KEYS, ATTRIBUTE_LABELS } from '@/types/game';
 import { Surface } from '@/components/ui/Surface';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StatBadge, WarriorNameTag } from '@/components/ui/WarriorBadges';
 import { potentialRating, potentialGrade } from '@/engine/potential';
 import {
   Users,
   ChevronRight,
-  Trophy,
   Star,
   Swords,
-  Target,
   Crown,
   Activity,
-  BarChart3,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -54,11 +50,11 @@ export function RosterWall() {
           </div>
         </div>
 
-        <Link to="/ops/personnel">
+        <Link to="/ops/recruit">
           <Button
             variant="outline"
             size="sm"
-            className="bg-neutral-900 border-white/10 text-[10px] font-black uppercase tracking-[0.2em] gap-2 h-10 px-6 hover:bg-primary hover:text-white hover:border-primary transition-all"
+            
           >
             Initialize Recruitment <ChevronRight className="h-4 w-4" />
           </Button>
@@ -84,8 +80,8 @@ export function RosterWall() {
                 recruitment terminal to enlist your first combatant asset.
               </p>
             </div>
-            <Link to="/ops/personnel" className="mt-4">
-              <Button className="bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] px-10 h-12 shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] hover:scale-105 active:scale-95 transition-all">
+            <Link to="/ops/recruit" className="mt-4">
+              <Button >
                 Initialize Sync
               </Button>
             </Link>
@@ -105,9 +101,12 @@ export function RosterWall() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.5 }}
                   >
-                    <button
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => navigate({ to: '/warrior/$id', params: { id: w.id } })}
-                      className="w-full relative group"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate({ to: '/warrior/$id', params: { id: w.id } }); }}
+                      className="w-full relative group cursor-pointer"
                       aria-label={`View profile for ${w.name}`}
                     >
                       <Surface
@@ -188,7 +187,7 @@ export function RosterWall() {
                                           : grade === 'A'
                                             ? 'text-primary border-primary/40'
                                             : grade === 'B'
-                                              ? 'text-emerald-400 border-emerald-400/40'
+                                              ? 'text-primary border-emerald-400/40'
                                               : grade === 'C'
                                                 ? 'text-muted-foreground border-white/10'
                                                 : 'text-muted-foreground/60 border-white/5';
@@ -312,7 +311,7 @@ export function RosterWall() {
                           </div>
                         </div>
                       </Surface>
-                    </button>
+                    </div>
                   </motion.div>
                 );
               })}

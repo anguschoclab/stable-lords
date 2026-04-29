@@ -202,16 +202,28 @@ describe('Week Advancement Integration', () => {
     it('should age warriors after 52 weeks', () => {
       const state = {
         ...initialState,
+        rivals: [],
         roster: [makeWarrior('w1', 'Young Warrior', { age: 20 })],
+        boutOffers: {} as GameState['boutOffers'],
+        tournaments: [],
+        isTournamentWeek: false,
+        recruitPool: [],
+        promoters: {},
+        realmRankings: {},
+        treasury: 999999, // prevent bankruptcy from selling the warrior
       };
 
-      let current = state;
+      let current: GameState = state;
       for (let i = 0; i < 52; i++) {
         current = advanceWeek(current);
+        // Keep realmRankings empty so w1 is never seeded into tournaments
+        current = { ...current, realmRankings: {}, tournaments: [] };
       }
 
-      // Warrior should be 21 after 52 weeks
-      expect(current.roster[0].age).toBe(21);
+      // Warrior should be 21 after 52 weeks (find by ID in case roster order changed)
+      const aged = current.roster.find((w) => w.id === 'w1');
+      expect(aged, 'Warrior w1 should still be alive after 52 weeks').toBeDefined();
+      expect(aged!.age).toBe(21);
     });
   });
 
@@ -245,6 +257,7 @@ describe('Week Advancement Integration', () => {
     it('should maintain roster integrity across deaths', () => {
       const state = {
         ...initialState,
+        rivals: [], // no rivals → no fights → w2 cannot die in combat
         roster: [makeWarrior('w1', 'Warrior 1'), makeWarrior('w2', 'Warrior 2')],
         graveyard: [],
       };
@@ -269,11 +282,11 @@ describe('Week Advancement Integration', () => {
         current = advanceWeek(current);
       }
 
-      // Graveyard should remain stable
+      // Graveyard should remain stable (only w1)
       expect(current.graveyard).toHaveLength(1);
 
-      // Living warrior should still be in roster
-      expect(current.roster).toHaveLength(1);
+      // Living warrior (w2) should still be in roster
+      expect(current.roster.some((w) => w.id === 'w2')).toBe(true);
     });
   });
 

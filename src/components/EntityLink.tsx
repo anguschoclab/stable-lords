@@ -32,53 +32,51 @@ export function WarriorLink({ name, id, className, children }: WarriorLinkProps)
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Sheet>
-          <SheetTrigger asChild>
-            <button
-              className={cn(
-                'text-primary hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold',
-                className
-              )}
-              onClick={(e) => e.stopPropagation()}
-              aria-label={`Open details for warrior ${name}`}
-            >
-              {children ?? name}
-            </button>
+    <Sheet>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <SheetTrigger
+            className={cn(
+              'text-primary hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold',
+              className
+            )}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Open details for warrior ${name}`}
+          >
+            {children ?? name}
           </SheetTrigger>
-          <SheetContent className="sm:max-w-md border-l-primary/20 bg-card/95 backdrop-blur-md">
-            <SheetHeader className="pb-4 border-b">
-              <SheetTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  Warrior Dossier
-                </div>
-                {resolvedId && (
-                  <Link to={`/warrior/$id`} params={{ id: resolvedId }}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground"
-                      title="View full profile"
-                      aria-label="View full warrior profile"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                )}
-              </SheetTitle>
-            </SheetHeader>
-            <div className="mt-6 h-full">
-              <WarriorDossier warriorId={resolvedId} />
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p className="text-[10px] font-black uppercase tracking-widest">View Warrior Dossier</p>
+        </TooltipContent>
+      </Tooltip>
+      <SheetContent className="sm:max-w-md border-l-primary/20 bg-card/95 backdrop-blur-md">
+        <SheetHeader className="pb-4 border-b">
+          <SheetTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Warrior Dossier
             </div>
-          </SheetContent>
-        </Sheet>
-      </TooltipTrigger>
-      <TooltipContent side="top">
-        <p className="text-[10px] font-black uppercase tracking-widest">View Warrior Dossier</p>
-      </TooltipContent>
-    </Tooltip>
+            {resolvedId && (
+              <Link to={`/warrior/$id`} params={{ id: resolvedId }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  title="View full profile"
+                  aria-label="View full warrior profile"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
+            )}
+          </SheetTitle>
+        </SheetHeader>
+        <div className="mt-6 h-full">
+          <WarriorDossier warriorId={resolvedId} />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -118,65 +116,63 @@ export function StableLink({ name, className, children }: StableLinkProps) {
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Sheet>
-          <SheetTrigger asChild>
-            <button
-              className={cn(
-                'text-arena-gold hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold',
-                className
-              )}
-              onClick={(e) => e.stopPropagation()}
-              aria-label={`Open details for stable ${name}`}
-            >
-              {children ?? name}
-            </button>
+    <Sheet>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <SheetTrigger
+            className={cn(
+              'text-arena-gold hover:underline underline-offset-2 transition-colors cursor-pointer text-left font-bold',
+              className
+            )}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Open details for stable ${name}`}
+          >
+            {children ?? name}
           </SheetTrigger>
-          <SheetContent className="sm:max-w-md border-l-arena-gold/20 bg-card/95 backdrop-blur-md">
-            <SheetHeader className="pb-4 border-b">
-              <SheetTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Landmark className="h-5 w-5 text-arena-gold" />
-                  Stable Records
-                </div>
-                {isPlayer ? (
-                  <Link to="/command/roster">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground"
-                      title="View full stable"
-                      aria-label="View full stable"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                ) : stableId ? (
-                  <Link to="/world/stable/$id" params={{ id: stableId }}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground"
-                      title="View full stable"
-                      aria-label="View full stable"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                ) : null}
-              </SheetTitle>
-            </SheetHeader>
-            <div className="mt-6 h-full">
-              <StableDossier stableId={stableId} stableName={name} />
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p className="text-[10px] font-black uppercase tracking-widest">View Stable Records</p>
+        </TooltipContent>
+      </Tooltip>
+      <SheetContent className="sm:max-w-md border-l-arena-gold/20 bg-card/95 backdrop-blur-md">
+        <SheetHeader className="pb-4 border-b">
+          <SheetTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Landmark className="h-5 w-5 text-arena-gold" />
+              Stable Records
             </div>
-          </SheetContent>
-        </Sheet>
-      </TooltipTrigger>
-      <TooltipContent side="top">
-        <p className="text-[10px] font-black uppercase tracking-widest">View Stable Records</p>
-      </TooltipContent>
-    </Tooltip>
+            {isPlayer ? (
+              <Link to="/ops/overview">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  title="View full stable"
+                  aria-label="View full stable"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : stableId ? (
+              <Link to="/world/stable/$id" params={{ id: stableId }}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  title="View full stable"
+                  aria-label="View full stable"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : null}
+          </SheetTitle>
+        </SheetHeader>
+        <div className="mt-6 h-full">
+          <StableDossier stableId={stableId} stableName={name} />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 

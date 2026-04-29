@@ -168,7 +168,7 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
               >
                 <TableCell className="pl-8 py-5">
                   <div className="flex items-center gap-4">
-                    <span className="text-xs font-mono font-black text-white/20">#{idx + 1}</span>
+                    <span className="text-xs font-mono font-black text-foreground/20">#{idx + 1}</span>
                     <span className="font-display font-black text-sm uppercase tracking-tight group-hover:text-primary transition-colors">
                       {w.name}
                     </span>
@@ -187,9 +187,9 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
                     <TooltipTrigger asChild>
                       <div className="flex items-center justify-center gap-3 text-xs font-mono font-black">
                         <span className="text-arena-pop">{w.w}W</span>
-                        <span className="text-white/10">/</span>
+                        <span className="text-foreground/10">/</span>
                         <span className="text-destructive/60">{w.l}L</span>
-                        <span className="text-white/10">|</span>
+                        <span className="text-foreground/10">|</span>
                         <span className="text-arena-gold drop-shadow-[0_0_5px_rgba(255,215,0,0.3)]">
                           {w.k}K
                         </span>

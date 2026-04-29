@@ -173,7 +173,11 @@ function rollWeighted<K extends string>(weights: Partial<Record<K, number>>, rng
     roll -= w;
     if (roll <= 0) return key;
   }
-  return entries[entries.length - 1]![0];
+  const fallback = entries[entries.length - 1];
+  if (!fallback) {
+    throw new Error('No entries available for weighted roll');
+  }
+  return fallback[0];
 }
 
 /** Apply economy deltas to an Owner's fame/renown/titles-adjacent stats. */

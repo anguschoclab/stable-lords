@@ -13,8 +13,9 @@
  */
 import type { RivalStableData, Owner } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
-import type { StableTemplate } from '@/data/stableTemplates';
-import { STABLE_TEMPLATES } from '@/data/stableTemplates';
+import type { StableTemplate } from '@/data/templates';
+import type { StableId } from '@/types/shared.types';
+import { ALL_TEMPLATES } from '@/data/templates';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { FightingStyle } from '@/types/shared.types';
 import { generateCrest } from '../crest/crestGenerator';
@@ -25,7 +26,7 @@ import { generateStableTrainers } from './rivalTrainerFactory';
  * Gets stable templates.
  */
 export function getStableTemplates(): StableTemplate[] {
-  return [...STABLE_TEMPLATES];
+  return [...ALL_TEMPLATES];
 }
 
 /**
@@ -42,11 +43,11 @@ export function generateRivalStables(
   const rivals: RivalStableData[] = [];
 
   // Support for count > templates.length via over-sampling with procedural variance
-  const iterations = Math.ceil(count / STABLE_TEMPLATES.length);
+  const iterations = Math.ceil(count / ALL_TEMPLATES.length);
   const picked: { tmpl: StableTemplate; iteration: number }[] = [];
 
   for (let iter = 0; iter < iterations; iter++) {
-    const shuffled = [...STABLE_TEMPLATES].sort(() => rng.next() - 0.5);
+    const shuffled = [...ALL_TEMPLATES].sort(() => rng.next() - 0.5);
     shuffled.forEach((tmpl) => {
       if (picked.length < count) {
         picked.push({ tmpl, iteration: iter });
@@ -54,9 +55,10 @@ export function generateRivalStables(
     });
   }
 
-  for (let i = 0; i < picked.length; i++) {
-    const { tmpl, iteration } = picked[i]!;
-    const stableId = `rival_${i}`;
+  for (const item of picked) {
+    const tmpl = item.tmpl;
+    const iteration = item.iteration;
+    const stableId = rng.uuid() as StableId;
 
     // Procedural name variance for duplicates
     const nameSuffix =
@@ -96,18 +98,27 @@ export function generateRivalStables(
       if (!wName) wName = `${tmpl.stableName.split(' ').pop()?.toUpperCase()}_${j}`;
       usedWarriorNames.add(wName);
 
-      const style =
-        rng.next() < 0.7 && tmpl.preferredStyles.length > 0
-          ? tmpl.preferredStyles[Math.floor(rng.next() * tmpl.preferredStyles.length)]!
-          : Object.values(FightingStyle)[
-              Math.floor(rng.next() * Object.values(FightingStyle).length)
-            ]!;
+      let style: FightingStyle;
+      if (rng.next() < 0.7 && tmpl.preferredStyles.length > 0) {
+        const preferred = tmpl.preferredStyles[Math.floor(rng.next() * tmpl.preferredStyles.length)];
+        if (!preferred) {
+          throw new Error('Style selection from preferredStyles failed');
+        }
+        style = preferred;
+      } else {
+        const allStyles = Object.values(FightingStyle);
+        const randomStyle = allStyles[Math.floor(rng.next() * allStyles.length)];
+        if (!randomStyle) {
+          throw new Error('Style selection from all styles failed');
+        }
+        style = randomStyle;
+      }
 
       // Catch-up Attribute Scaling: +1 point per week (cap +40)
       const catchupStats = Math.min(40, week);
       const attrs = biasedAttrs(() => rng.next(), tmpl.attrBias, catchupStats);
 
-      const wId = `rival_w_${i}_${j}`;
+      const wId = rng.uuid('warrior');
       const warrior = createRivalWarrior(wId, wName, style, attrs, stableId, tmpl.fameRange, rng);
 
       warriors.push(warrior);

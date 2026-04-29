@@ -9,7 +9,7 @@ import type { Season } from '@/types/shared.types';
 import { processStaff } from './workers/staffWorker';
 import { processRoster } from './workers/rosterWorker';
 import { consolidateAgentMemory, createAgentContext } from './agentCore';
-import { StateImpact } from '@/engine/impacts';
+import { StateImpact, mergeImpacts } from '@/engine/impacts';
 
 import {
   FIGHT_PURSE,
@@ -41,10 +41,17 @@ export function processAIStable(
   const gazetteItems: string[] = [];
   const impacts: StateImpact[] = [];
 
-  // ── Fatigue Decay for AI Warriors (-25 per week) ──
+  // ── Fatigue Decay & HP Recovery for AI Warriors ──
   updatedRival.roster = updatedRival.roster.map((w) => {
-    if (w.status === 'Active' && w.fatigue && w.fatigue > 0) {
-      return { ...w, fatigue: Math.max(0, w.fatigue - 25) };
+    if (w.status === 'Active') {
+      const fatigue = Math.max(0, (w.fatigue || 0) - 25);
+      const currentHP = w.derivedStats?.hp ?? 100;
+      const hp = Math.min(100, currentHP + 20); // Passive heal +20%
+      return {
+        ...w,
+        fatigue,
+        derivedStats: { ...w.derivedStats, hp },
+      };
     }
     return w;
   });
@@ -54,11 +61,19 @@ export function processAIStable(
   // `BoutSimulationPass` → `resolveImpacts` to produce `settledState` before
   // calling `RivalStrategyPass`. That means `state.arenaHistory` already
   // reflects this week's bouts when we read it here — no stale N-1 income.
+  // FightSummary records the participants' stable identity in `stableIdA`/`stableIdD`
+  // (set by createFightSummary). The legacy `stableA`/`stableD` fields are
+  // never populated, and the comparison should match the rival's `id` (StableId),
+  // not `owner.id`. Prior bug: weeklyIncome was always 0 for rivals because
+  // both axes of the comparison were wrong, so rival treasuries never reflected
+  // bout earnings and stayed pinned to the 500g subsidy floor.
   let weeklyIncome = 0;
   const weekFights = state.arenaHistory.filter((f) => f.week === state.week);
   for (const f of weekFights) {
-    const isOwnerA = updatedRival.owner.id === f.stableA;
-    const isOwnerD = updatedRival.owner.id === f.stableD;
+    const stableA = f.stableIdA ?? f.stableA;
+    const stableD = f.stableIdD ?? f.stableD;
+    const isOwnerA = updatedRival.id === stableA;
+    const isOwnerD = updatedRival.id === stableD;
     if (isOwnerA || isOwnerD) {
       weeklyIncome += FIGHT_PURSE;
       if ((isOwnerA && f.winner === 'A') || (isOwnerD && f.winner === 'D')) {
@@ -103,14 +118,17 @@ export function processAIStable(
   // 5. Update Treasury & Check Bankruptcy (Risk Control)
   const treasuryDelta = weeklyIncome - weeklyExpenses;
   const newTreasury = updatedRival.treasury + treasuryDelta;
-  const isBankrupt = newTreasury <= 0;
-
-  updatedRival.treasury = newTreasury;
-
-  if (isBankrupt) {
+  // 🏛️ 1.0 Hardening: League Subsidy (Prevent economic death spiral)
+  const SUBSIDY_FLOOR = 500;
+  const isBankrupt = false;
+  if (newTreasury < SUBSIDY_FLOOR) {
+    const subsidy = SUBSIDY_FLOOR - (newTreasury < 0 ? 0 : newTreasury);
+    updatedRival.treasury = SUBSIDY_FLOOR;
     gazetteItems.push(
-      `📉 BANKRUPTCY: ${updatedRival.owner.stableName} has collapsed under its debts.`
+      `🏛️ SUBSIDY: ${updatedRival.owner.stableName} received ${subsidy}g from the League of Lords to maintain operations.`
     );
+  } else {
+    updatedRival.treasury = newTreasury;
   }
 
   // Milestone detection — narrow parity with the player's own-stable gazette.
@@ -137,14 +155,16 @@ export function processAIStable(
 
   // Collect impact for this rival
   const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
-  rivalsUpdates.set(rival.owner.id, updatedRival);
+  rivalsUpdates.set(rival.id, updatedRival);
   impacts.push({ rivalsUpdates });
+
+  // console.log(`[AIStable] ${updatedRival.owner.stableName} | Pop: ${updatedRival.roster.length} | T: ${updatedRival.treasury}`);
 
   return {
     updatedRival,
     isBankrupt,
     gazetteItems,
     updatedHiringPool: currentHiringPool,
-    impact: impacts.length > 0 ? impacts[0] : {},
+    impact: mergeImpacts(impacts),
   };
 }

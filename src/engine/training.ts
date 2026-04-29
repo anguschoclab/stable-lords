@@ -149,6 +149,7 @@ export function trainingImpactToStateImpact(
     if (original && original !== w) {
       // 🛠️ 1.0 Hardening: Return ONLY changed fields to avoid overwriting Aging/Health passes
       const delta: Partial<Warrior> = {
+        attributes: w.attributes,
         baseSkills: w.baseSkills,
         derivedStats: w.derivedStats,
         fatigue: w.fatigue ?? 0,

@@ -36,7 +36,12 @@ export class SeededRNG {
     if (arr.length === 0) {
       throw new Error('Cannot pick from empty array');
     }
-    return arr[Math.floor(this.next() * arr.length)]!;
+    const idx = Math.floor(this.next() * arr.length);
+    const item = arr[idx];
+    if (item === undefined) {
+      throw new Error('RNG index out of bounds');
+    }
+    return item;
   }
 
   /** Shuffles an array (returns a new array) */
@@ -44,7 +49,13 @@ export class SeededRNG {
     const copy = [...arr];
     for (let i = copy.length - 1; i > 0; i--) {
       const j = Math.floor(this.next() * (i + 1));
-      [copy[i]!, copy[j]!] = [copy[j]!, copy[i]!];
+      const tempI = copy[i];
+      const tempJ = copy[j];
+      if (tempI === undefined || tempJ === undefined) {
+        throw new Error('Shuffle index out of bounds');
+      }
+      copy[i] = tempJ;
+      copy[j] = tempI;
     }
     return copy;
   }
@@ -76,7 +87,12 @@ export function randomPick<T>(rng: (() => number) | IRNGService, arr: T[]): T {
     throw new Error('Cannot pick from empty array');
   }
   if (typeof rng === 'function') {
-    return arr[Math.floor(rng() * arr.length)]!;
+    const idx = Math.floor(rng() * arr.length);
+    const item = arr[idx];
+    if (item === undefined) {
+      throw new Error('RNG index out of bounds');
+    }
+    return item;
   }
   return rng.pick(arr);
 }

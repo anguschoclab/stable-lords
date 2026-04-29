@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
+
 import { runSimulation } from './simulation-harness';
 
 const WEEKS_TO_SIMULATE = 1000;
-const CONSTANTS_FILE = path.join(process.cwd(), 'src/engine/combat/mechanics/combatConstants.ts');
+
 const REPORT_FILE = path.join(process.cwd(), 'Daily_Balance_Report.md');
 
 interface MetricStats {
@@ -19,7 +19,8 @@ async function main() {
   const result = runSimulation({
     weeks: WEEKS_TO_SIMULATE,
     seed: 12345, // Deterministic
-    logFrequency: 52,
+    logFrequency: 1,
+    ignoreBankruptcy: true,
   });
 
   const { finalState, pulses } = result;
@@ -73,132 +74,43 @@ async function main() {
     console.log(`- ${style}: ${(rate * 100).toFixed(2)}%`);
   }
 
-  // Determine adjustments
-  let commitMessage = 'chore(balance): autonomous adjustments\n\nAutobalance Engine Findings:\n';
-  let constantsContent = fs.readFileSync(CONSTANTS_FILE, 'utf-8');
-  let changed = false;
 
-  // Rule: If mortality rate is above 10%, nerf CRIT_DAMAGE_MULT slightly.
-  // If it's below 2%, buff it slightly.
-  const critDamageMatch = constantsContent.match(/export const CRIT_DAMAGE_MULT = ([0-9.]+);/);
-  if (critDamageMatch) {
-    const critDamageMult = parseFloat(critDamageMatch[1]);
-    let newCrit = critDamageMult;
+  // Determine adjustments (Suggestions only)
+  let recommendations = '';
+  let hasAnomalies = false;
 
-    if (mortalityRate > 0.1) {
-      newCrit = Math.max(1.1, critDamageMult - 0.1);
-      commitMessage += `- Mortality rate is high (${(mortalityRate * 100).toFixed(2)}%). Reducing CRIT_DAMAGE_MULT from ${critDamageMult} to ${newCrit.toFixed(2)}.\n`;
-      changed = true;
-    } else if (mortalityRate < 0.02) {
-      newCrit = Math.min(2.5, critDamageMult + 0.1);
-      commitMessage += `- Mortality rate is low (${(mortalityRate * 100).toFixed(2)}%). Increasing CRIT_DAMAGE_MULT from ${critDamageMult} to ${newCrit.toFixed(2)}.\n`;
-      changed = true;
-    }
-
-    if (changed) {
-      constantsContent = constantsContent.replace(
-        `export const CRIT_DAMAGE_MULT = ${critDamageMult};`,
-        `export const CRIT_DAMAGE_MULT = ${newCrit.toFixed(2)};`
-      );
-    }
+  // Rule: If mortality rate is above 15%, suggest nerfing CRIT_DAMAGE_MULT.
+  // If it's below 8%, suggest buffing it.
+  if (mortalityRate > 0.15) {
+    recommendations += `- **Lethality High**: Mortality rate is ${(mortalityRate * 100).toFixed(2)}% (Target: 8% - 15%). Suggest reducing CRIT_DAMAGE_MULT.\n`;
+    hasAnomalies = true;
+  } else if (mortalityRate < 0.08) {
+    recommendations += `- **Lethality Low**: Mortality rate is ${(mortalityRate * 100).toFixed(2)}% (Target: 8% - 15%). Suggest increasing CRIT_DAMAGE_MULT.\n`;
+    hasAnomalies = true;
   }
 
   // Adjust style winrates
   for (const [style, rate] of Object.entries(styleWinRates)) {
     if (rate > 0.65) {
-      const enumStyle = style
-        .split(/[\s-]/)
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-        .join('');
-      const match = constantsContent.match(
-        new RegExp(`\\[FightingStyle\\.${enumStyle}\\]: ([-0-9.]+),`)
-      );
-      if (match) {
-        const currentVal = parseFloat(match[1]);
-        const newVal = currentVal - 1; // Nerf by 1
-        constantsContent = constantsContent.replace(
-          `[FightingStyle.${enumStyle}]: ${currentVal},`,
-          `[FightingStyle.${enumStyle}]: ${newVal},`
-        );
-        commitMessage += `- ${style} winrate is too high (${(rate * 100).toFixed(2)}%). Reduced base bonus from ${currentVal} to ${newVal}.\n`;
-        changed = true;
-      }
+      recommendations += `- **Meta Anomaly**: ${style} win rate is too high (${(rate * 100).toFixed(2)}%). Suggest reducing base bonus.\n`;
+      hasAnomalies = true;
     } else if (rate < 0.35) {
-      const enumStyle = style
-        .split(/[\s-]/)
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-        .join('');
-      const match = constantsContent.match(
-        new RegExp(`\\[FightingStyle\\.${enumStyle}\\]: ([-0-9.]+),`)
-      );
-      if (match) {
-        const currentVal = parseFloat(match[1]);
-        const newVal = currentVal + 1; // Buff by 1
-        constantsContent = constantsContent.replace(
-          `[FightingStyle.${enumStyle}]: ${currentVal},`,
-          `[FightingStyle.${enumStyle}]: ${newVal},`
-        );
-        commitMessage += `- ${style} winrate is too low (${(rate * 100).toFixed(2)}%). Increased base bonus from ${currentVal} to ${newVal}.\n`;
-        changed = true;
-      }
+      recommendations += `- **Meta Anomaly**: ${style} win rate is too low (${(rate * 100).toFixed(2)}%). Suggest increasing base bonus.\n`;
+      hasAnomalies = true;
     }
   }
 
   // Check economy
-  if (avgEconomy < -50000) {
-    const ecoFile = path.join(process.cwd(), 'src/data/economyConstants.ts');
-    if (fs.existsSync(ecoFile)) {
-      let ecoContent = fs.readFileSync(ecoFile, 'utf-8');
-      const fightPurseMatch = ecoContent.match(/export const FIGHT_PURSE = ([0-9.]+);/);
-      if (fightPurseMatch) {
-        const val = parseFloat(fightPurseMatch[1]);
-        const newVal = val + 20;
-        ecoContent = ecoContent.replace(
-          `export const FIGHT_PURSE = ${val};`,
-          `export const FIGHT_PURSE = ${newVal};`
-        );
-        fs.writeFileSync(ecoFile, ecoContent);
-        commitMessage += `- Average economy is negative (${avgEconomy.toFixed(0)} gold). Increased FIGHT_PURSE from ${val} to ${newVal}.\n`;
-        changed = true;
-      }
-    }
+  if (avgEconomy < -20000) {
+    recommendations += `- **Economy Warning**: Average stable economy is deeply negative (${avgEconomy.toFixed(0)} gold). Suggest increasing FIGHT_PURSE or reducing costs.\n`;
+    hasAnomalies = true;
   } else if (avgEconomy > 50000) {
-    const ecoFile = path.join(process.cwd(), 'src/data/economyConstants.ts');
-    if (fs.existsSync(ecoFile)) {
-      let ecoContent = fs.readFileSync(ecoFile, 'utf-8');
-      const fightPurseMatch = ecoContent.match(/export const FIGHT_PURSE = ([0-9.]+);/);
-      if (fightPurseMatch) {
-        const val = parseFloat(fightPurseMatch[1]);
-        const newVal = Math.max(10, val - 20);
-        ecoContent = ecoContent.replace(
-          `export const FIGHT_PURSE = ${val};`,
-          `export const FIGHT_PURSE = ${newVal};`
-        );
-        fs.writeFileSync(ecoFile, ecoContent);
-        commitMessage += `- Average economy is too high (${avgEconomy.toFixed(0)} gold). Decreased FIGHT_PURSE from ${val} to ${newVal}.\n`;
-        changed = true;
-      }
-    }
+    recommendations += `- **Economy Warning**: Hyper-inflation detected (${avgEconomy.toFixed(0)} gold). Suggest introducing new gold sinks or decreasing FIGHT_PURSE.\n`;
+    hasAnomalies = true;
   }
 
-  if (changed) {
-    fs.writeFileSync(CONSTANTS_FILE, constantsContent);
-    console.log('\nApplied autonomous balance tweaks.');
-    console.log('Commit Message:\n');
-    console.log(commitMessage);
-
-    try {
-      execSync(
-        'git add src/engine/combat/mechanics/combatConstants.ts src/data/economyConstants.ts'
-      );
-      execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}" || true`);
-      console.log('Committed to git successfully.');
-    } catch (e: any) {
-      console.error('Git commit failed:', e.message);
-    }
-  } else {
-    console.log('\nNo autonomous balance tweaks required. Meta is stable.');
-    commitMessage = 'chore(balance): autonomous engine found meta stable.\n\nNo tweaks required.\n';
+  if (!hasAnomalies) {
+    recommendations = '- No mathematical anomalies detected. Meta is stable.';
   }
 
   // Generate Report
@@ -217,8 +129,8 @@ ${Object.entries(styleWinRates)
   .map(([style, rate]) => `- **${style}:** ${(rate * 100).toFixed(2)}%`)
   .join('\n')}
 
-## Adjustments
-${changed ? commitMessage : 'None.'}
+## Suggested Variable Tweaks (For Product Owner Approval)
+${recommendations}
 `;
 
   fs.writeFileSync(REPORT_FILE, report);

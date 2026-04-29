@@ -5,29 +5,33 @@ import { contestCheck } from './combatMath';
 
 // ─── Weapon → Preferred Range ─────────────────────────────────────────────────
 
+// Weapon IDs MUST match those in `src/data/equipment.ts` (e.g. `broadsword`,
+// `longsword`, `short_spear`). Prior versions used `broad_sword`/`long_sword`/
+// `spear`/`flail` which silently miss the lookup → every warrior using their
+// canonical equipment fell through to the Striking default and got 0 range mod.
 const WEAPON_PREFERRED_RANGE: Record<string, DistanceRange> = {
-  // Grapple
-  open_hand: 'Grapple',
-  // Tight
+  // ── Tight (close, fast weapons) ────────────────────────────────────────────
   dagger: 'Tight',
-  club: 'Tight',
   short_sword: 'Tight',
   mace: 'Tight',
-  // Striking (default)
-  broad_sword: 'Striking',
-  long_sword: 'Striking',
-  axe: 'Striking',
+  hatchet: 'Tight',
+  // ── Striking (medium, balanced — most weapons) ────────────────────────────
+  broadsword: 'Striking',
+  longsword: 'Striking',
   scimitar: 'Striking',
-  falchion: 'Striking',
   battle_axe: 'Striking',
   war_hammer: 'Striking',
   morning_star: 'Striking',
-  flail: 'Striking',
-  // Extended
+  war_flail: 'Striking',
+  epee: 'Striking',
+  // ── Extended (long polearms, two-handers) ─────────────────────────────────
   halberd: 'Extended',
-  great_sword: 'Extended',
-  pike: 'Extended',
-  spear: 'Extended',
+  greatsword: 'Extended',
+  great_axe: 'Extended',
+  short_spear: 'Extended',
+  long_spear: 'Extended',
+  maul: 'Extended',
+  quarterstaff: 'Extended',
 };
 
 export function getWeaponPreferredRange(weaponId?: string): DistanceRange {
@@ -44,32 +48,33 @@ export function getWeaponPreferredRange(weaponId?: string): DistanceRange {
 // Design intent: a dagger user at Grapple gets +4 ATT — they should close range.
 //               A pike user at Grapple gets −10 ATT — they should flee to Extended.
 
+// Weapon IDs MUST match those in `src/data/equipment.ts`. See note above on
+// the prior id-mismatch bug that silently disabled this entire system.
 const WEAPON_RANGE_MODIFIERS: Record<string, Partial<Record<DistanceRange, number>>> = {
-  // ── Grapple-preferred ─────────────────────────────────────────────────────
-  open_hand: { Grapple: +6, Tight: +3, Striking: 0, Extended: -6 },
-
-  // ── Tight-preferred ───────────────────────────────────────────────────────
+  // ── Tight-preferred (close, fast) ────────────────────────────────────────
   dagger: { Grapple: +3, Tight: +4, Striking: 0, Extended: -5 },
-  club: { Grapple: +2, Tight: +3, Striking: 0, Extended: -3 },
   short_sword: { Grapple: +2, Tight: +4, Striking: 0, Extended: -4 },
   mace: { Grapple: -1, Tight: +3, Striking: 0, Extended: -2 },
+  hatchet: { Grapple: 0, Tight: +3, Striking: 0, Extended: -3 },
 
-  // ── Striking-preferred (default swords / axes) ────────────────────────────
-  broad_sword: { Grapple: -3, Tight: 0, Striking: 0, Extended: -1 },
-  long_sword: { Grapple: -4, Tight: -1, Striking: 0, Extended: +2 },
-  axe: { Grapple: -2, Tight: 0, Striking: 0, Extended: -2 },
+  // ── Striking-preferred (medium swords / axes) ─────────────────────────────
+  broadsword: { Grapple: -3, Tight: 0, Striking: 0, Extended: -1 },
+  longsword: { Grapple: -4, Tight: -1, Striking: 0, Extended: +2 },
   scimitar: { Grapple: -2, Tight: -1, Striking: 0, Extended: -1 },
-  falchion: { Grapple: -2, Tight: -1, Striking: 0, Extended: -1 },
   battle_axe: { Grapple: -5, Tight: -2, Striking: 0, Extended: +1 },
   war_hammer: { Grapple: -4, Tight: -1, Striking: 0, Extended: 0 },
   morning_star: { Grapple: -3, Tight: -1, Striking: 0, Extended: +1 },
-  flail: { Grapple: -2, Tight: 0, Striking: 0, Extended: +2 },
+  war_flail: { Grapple: -2, Tight: 0, Striking: 0, Extended: +2 },
+  epee: { Grapple: -2, Tight: 0, Striking: +1, Extended: 0 },
 
-  // ── Extended-preferred (polearms) ─────────────────────────────────────────
-  spear: { Grapple: -6, Tight: -3, Striking: 0, Extended: +4 },
+  // ── Extended-preferred (polearms / two-handers) ──────────────────────────
+  short_spear: { Grapple: -4, Tight: -2, Striking: 0, Extended: +3 },
+  long_spear: { Grapple: -8, Tight: -5, Striking: -1, Extended: +5 },
   halberd: { Grapple: -7, Tight: -4, Striking: 0, Extended: +4 },
-  great_sword: { Grapple: -6, Tight: -3, Striking: 0, Extended: +3 },
-  pike: { Grapple: -10, Tight: -6, Striking: -2, Extended: +6 },
+  greatsword: { Grapple: -6, Tight: -3, Striking: 0, Extended: +3 },
+  great_axe: { Grapple: -6, Tight: -3, Striking: 0, Extended: +3 },
+  maul: { Grapple: -6, Tight: -3, Striking: 0, Extended: +2 },
+  quarterstaff: { Grapple: -2, Tight: -1, Striking: +1, Extended: +2 },
 };
 
 /**

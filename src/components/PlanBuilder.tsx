@@ -56,7 +56,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                   className={cn(
                     'rounded-none border-none font-black text-[10px] tracking-tight px-1.5 py-0.5',
                     matchupAdv > 0
-                      ? 'bg-green-500/20 text-green-500'
+                      ? 'bg-primary/20 text-primary'
                       : 'bg-destructive/20 text-destructive'
                   )}
                 >
@@ -65,7 +65,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                 <div
                   className={cn(
                     'text-lg font-mono font-black italic',
-                    matchupAdv > 0 ? 'text-green-500' : 'text-destructive'
+                    matchupAdv > 0 ? 'text-primary' : 'text-destructive'
                   )}
                 >
                   {matchupAdv > 0 ? '+' : ''}
@@ -96,7 +96,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
         <div className="flex flex-wrap items-start justify-between gap-6 pb-4 border-b border-white/5">
           <StaminaCurve plan={plan} warrior={warrior} />
           {warnings.length > 0 && (
-            <ul className="flex-1 min-w-[240px] space-y-1">
+            <ul className="flex-1 min-w-60 space-y-1">
               {warnings.map((w) => (
                 <li
                   key={w.code}
@@ -105,7 +105,7 @@ export default function PlanBuilder({ plan, onPlanChange, warrior, rivalStyle }:
                     w.severity === 'error'
                       ? 'text-destructive border-destructive/40 bg-destructive/5'
                       : w.severity === 'warn'
-                        ? 'text-amber-400 border-amber-400/30 bg-amber-400/5'
+                        ? 'text-arena-gold border-arena-gold/30 bg-arena-gold/5'
                         : 'text-muted-foreground border-white/10 bg-black/40'
                   )}
                 >

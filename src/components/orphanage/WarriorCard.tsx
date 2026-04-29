@@ -63,7 +63,7 @@ export default function WarriorCard({ warrior, isSelected, canSelect, onClick }:
                     {warrior.trait}
                   </span>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[220px] text-[10px]">
+                <TooltipContent side="top" className="max-w-xs text-[10px]">
                   {(() => {
                     const data = TRAIT_DATA[warrior.trait];
                     if (!data) return <span>Flavor trait — shapes personality</span>;

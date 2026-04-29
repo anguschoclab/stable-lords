@@ -131,7 +131,7 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
                   </TooltipTrigger>
                   <TooltipContent
                     side="left"
-                    className="bg-destructive text-white border-none font-black text-[10px] tracking-widest"
+                    
                   >
                     TERMINATE CONTRACT
                   </TooltipContent>
@@ -171,7 +171,7 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
                         </span>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-[200px] text-[10px]">
+                    <TooltipContent side="bottom" className="max-w-xs text-[10px]">
                       +5% gain chance for{' '}
                       {STYLE_DISPLAY_NAMES[
                         trainer.styleBonusStyle as keyof typeof STYLE_DISPLAY_NAMES

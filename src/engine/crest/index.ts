@@ -2,7 +2,6 @@
  * Crest System - Main exports
  */
 
-
 export {
   generateCrest,
   inheritCrest,

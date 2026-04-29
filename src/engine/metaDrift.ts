@@ -4,6 +4,7 @@
  */
 import { FightingStyle } from '@/types/shared.types';
 import type { FightSummary } from '@/types/combat.types';
+import { clamp } from '@/utils/math';
 
 export type StyleMeta = Record<FightingStyle, number>; // -10 to +10 drift
 
@@ -44,7 +45,7 @@ export function computeMetaDrift(history: FightSummary[], window = 20): StyleMet
     // Drift = normalized win rate shifted to -10..+10
     const winRate = w / total;
     meta[style] = Math.round((winRate - 0.5) * 20);
-    meta[style] = Math.max(-10, Math.min(10, meta[style]));
+    meta[style] = clamp(meta[style], -10, 10);
   }
 
   return meta;

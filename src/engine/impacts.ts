@@ -73,6 +73,8 @@ export interface StateImpact {
   unacknowledgedDeaths?: string[];
   crowdMood?: CrowdMoodType;
   awards?: AnnualAward[];
+  /** 🛠️ 1.0 Hardening: Atomic replacement for the entire rivals array */
+  rivalStableReplacement?: RivalStableData[];
 }
 
 type ImpactHandler<K extends keyof StateImpact> = (
@@ -105,7 +107,7 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
   rivalsUpdates: (state, value) => {
     if (value.size === 0) return;
     state.rivals = state.rivals.map((r) => {
-      const update = value.get(r.owner.id);
+      const update = value.get(r.id);
       return update ? { ...r, ...update } : r;
     });
   },
@@ -173,7 +175,7 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
     state.awards = [...(state.awards || []), ...value];
   },
   boutOffers: (state, value) => {
-    state.boutOffers = value;
+    state.boutOffers = { ...(state.boutOffers || {}), ...value };
   },
   promoters: (state, value) => {
     state.promoters = value;
@@ -228,6 +230,9 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
   newPoolRecruits: (state, value) => {
     state.recruitPool = value;
   },
+  rivalStableReplacement: (state, value) => {
+    state.rivals = value;
+  },
 };
 
 export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameState {
@@ -247,7 +252,7 @@ export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameSt
 }
 
 // Merge strategy configuration
-type MergeStrategy = 'accumulate' | 'append' | 'mapMerge' | 'replace';
+type MergeStrategy = 'accumulate' | 'append' | 'mapMerge' | 'dictMerge' | 'replace';
 
 type MergeConfig = {
   [K in keyof StateImpact]: { strategy: MergeStrategy; defaultValue: StateImpact[K] };
@@ -281,7 +286,7 @@ const MERGE_CONFIG: MergeConfig = {
   recruitPool: { strategy: 'replace', defaultValue: undefined },
   newPoolRecruits: { strategy: 'replace', defaultValue: undefined },
   realmRankings: { strategy: 'replace', defaultValue: undefined },
-  boutOffers: { strategy: 'replace', defaultValue: undefined },
+  boutOffers: { strategy: 'dictMerge', defaultValue: undefined },
   promoters: { strategy: 'replace', defaultValue: undefined },
   trainers: { strategy: 'replace', defaultValue: undefined },
   hiringPool: { strategy: 'replace', defaultValue: undefined },
@@ -297,6 +302,7 @@ const MERGE_CONFIG: MergeConfig = {
   season: { strategy: 'replace', defaultValue: undefined },
   weather: { strategy: 'replace', defaultValue: undefined },
   crowdMood: { strategy: 'replace', defaultValue: undefined },
+  rivalStableReplacement: { strategy: 'replace', defaultValue: undefined },
 };
 
 // 🌩️ Pure helpers for merging strategies (Strategy Pattern)
@@ -320,6 +326,11 @@ const mergeStrategies: Record<MergeStrategy, (merged: any, key: string, value: a
       });
     }
   },
+  dictMerge: (merged, key, value) => {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      merged[key] = { ...(merged[key] ?? {}), ...value };
+    }
+  },
   replace: (merged, key, value) => {
     merged[key] = value;
   },
@@ -331,10 +342,11 @@ export function mergeImpacts(impacts: StateImpact[]): StateImpact {
   // Initialize merged with default values
   (Object.keys(MERGE_CONFIG) as Array<keyof StateImpact>).forEach((key) => {
     const config = MERGE_CONFIG[key];
+    if (!config) return;
     if (Array.isArray(config.defaultValue)) {
       (merged as any)[key] = [...config.defaultValue];
     } else if (config.defaultValue instanceof Map) {
-      (merged as any)[key] = new Map(config.defaultValue);
+      (merged as any)[key] = new Map(config.defaultValue as never);
     } else {
       (merged as any)[key] = config.defaultValue;
     }
@@ -343,6 +355,7 @@ export function mergeImpacts(impacts: StateImpact[]): StateImpact {
   for (const imp of impacts) {
     (Object.keys(MERGE_CONFIG) as Array<keyof StateImpact>).forEach((key) => {
       const config = MERGE_CONFIG[key];
+      if (!config) return;
       const value = imp[key];
       if (value === undefined || value === null) return;
 

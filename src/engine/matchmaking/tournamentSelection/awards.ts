@@ -81,8 +81,9 @@ export function awardTournamentPrizes(tournament: TournamentEntry, state: GameSt
         updatedState = PatronTokenService.awardToken(updatedState, tokenType, source, awardRng);
       }
     } else {
+      // warrior.stableId is rival.id (StableId), not owner.id
       updatedState.rivals = updatedState.rivals.map((r) =>
-        r.owner.id === w.stableId
+        r.id === w.stableId
           ? { ...r, treasury: r.treasury + prizeGold, fame: (r.fame || 0) + prizeFame }
           : r
       );

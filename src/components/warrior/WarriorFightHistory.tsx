@@ -105,7 +105,7 @@ export function WarriorFightHistory({
                   )}
                   {record && record.losses >= 3 && (
                     <Badge variant="destructive" className="text-[10px] gap-1">
-                      💀 Nemesis
+                      NEMESIS
                     </Badge>
                   )}
                 </div>

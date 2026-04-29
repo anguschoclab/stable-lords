@@ -1,4 +1,5 @@
 import { GameState, Warrior, BoutOffer } from '@/types/state.types';
+import type { BoutOfferId } from '@/types/shared.types';
 import { type FightOutcome } from '@/types/combat.types';
 import { simulateFight, defaultPlanForWarrior } from '@/engine/simulate';
 import { getMoodModifiers } from '@/engine/crowdMood';
@@ -67,8 +68,14 @@ export interface BoutContext {
 function getValidatedCombatants(ctx: BoutContext): { cW: Warrior; cO: Warrior } | null {
   const cW = ctx.warriorMap.get(ctx.warrior.id);
   const cO = ctx.warriorMap.get(ctx.opponent.id);
-  if (!validateBoutCombatants(cW, cO)) return null;
-  if (!cW || !cO) return null;
+  if (!cW || !cO) {
+    // console.log(`[BoutValidation] FAILED: Missing warriors (${ctx.warrior.id} vs ${ctx.opponent.id})`);
+    return null;
+  }
+  if (!validateBoutCombatants(cW, cO)) {
+    // console.log(`[BoutValidation] FAILED: validateBoutCombatants check`);
+    return null;
+  }
   return { cW, cO };
 }
 
@@ -89,7 +96,7 @@ function handleInvalidBout(ctx: BoutContext): BoutImpact {
 
 function runBoutSimulation(
   state: GameState,
-  ctx: BoutContext,
+  _ctx: BoutContext,
   validCW: Warrior,
   validCO: Warrior,
   boutSeed: number
@@ -252,8 +259,10 @@ export function processWeekBouts(state: GameState): {
   const results: BoutResult[] = [];
   const summary = createWeekBoutSummary();
 
-  generatePairings(state).forEach((p) => {
-    const contract = p.contractId ? state.boutOffers[p.contractId] : undefined;
+  const pairings = generatePairings(state);
+
+  pairings.forEach((p) => {
+    const contract = p.contractId ? state.boutOffers[p.contractId as BoutOfferId] : undefined;
     const res = resolveBout(state, {
       warrior: p.a,
       opponent: p.d,

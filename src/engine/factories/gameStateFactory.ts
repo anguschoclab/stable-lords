@@ -74,12 +74,6 @@ export function createFreshState(
     ownerGrudges: [],
     insightTokens: [],
     moodHistory: [],
-    settings: {
-      featureFlags: {
-        tournaments: true,
-        scouting: true,
-      },
-    },
     isFTUE: true,
     unacknowledgedDeaths: [],
     day: 0,
@@ -115,7 +109,11 @@ export function createFreshState(
 
   state.rivals = pool.slice(0, 4).map((name): RivalStableData => {
     const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
-    const backstoryId = BACKSTORY_IDS[Math.floor(rng.next() * BACKSTORY_IDS.length)]!;
+    const backstoryIdx = Math.floor(rng.next() * BACKSTORY_IDS.length);
+    const backstoryId = BACKSTORY_IDS[backstoryIdx];
+    if (!backstoryId) {
+      throw new Error('Backstory ID selection failed');
+    }
     const ownerId = rng.uuid() as StableId;
     return {
       id: rng.uuid() as StableId,
@@ -130,6 +128,8 @@ export function createFreshState(
         fame: 100,
         renown: 10,
         titles: 0,
+        age: 35 + Math.floor(rng.next() * 25), // Initial age 35-60
+        generation: 0,
       },
       roster: [],
       ledger: [],
@@ -146,36 +146,39 @@ export function createFreshState(
     FightingStyle.WallOfSteel,
   ];
 
-  state.recruitPool = initialStyles.map((style, i) => {
-    // Use rng for initial attributes (10 +/- 3)
-    const attrBase = () => 7 + Math.floor(rng.next() * 7);
-    const attrs = {
-      ST: attrBase(),
-      CN: attrBase(),
-      SZ: attrBase(),
-      WT: attrBase(),
-      WL: attrBase(),
-      SP: attrBase(),
-      DF: attrBase(),
-    };
+  state.recruitPool = initialStyles
+    .concat(initialStyles)
+    .slice(0, 12)
+    .map((style, i) => {
+      // Use rng for initial attributes (10 +/- 3)
+      const attrBase = () => 7 + Math.floor(rng.next() * 7);
+      const attrs = {
+        ST: attrBase(),
+        CN: attrBase(),
+        SZ: attrBase(),
+        WT: attrBase(),
+        WL: attrBase(),
+        SP: attrBase(),
+        DF: attrBase(),
+      };
 
-    const baseWarrior = makeWarrior(
-      rng.uuid() as WarriorId,
-      `Recruit ${i + 1}`,
-      style,
-      attrs,
-      {},
-      rng
-    );
-    return {
-      ...baseWarrior,
-      cost: 150 + Math.floor(rng.next() * 150),
-      tier: 'Common',
-      lore: (narrativeContent as NarrativeContent).recruitment.origin[0], // Seeded fallback
-      addedWeek: 1,
-      potential: generatePotential(attrs, 'Common', () => rng.next()),
-    } as PoolWarrior;
-  });
+      const baseWarrior = makeWarrior(
+        rng.uuid() as WarriorId,
+        `Recruit ${i + 1}`,
+        style,
+        attrs,
+        {},
+        rng
+      );
+      return {
+        ...baseWarrior,
+        cost: 150 + Math.floor(rng.next() * 150),
+        tier: 'Common',
+        lore: (narrativeContent as NarrativeContent).recruitment.origin[0], // Seeded fallback
+        addedWeek: 1,
+        potential: generatePotential(attrs, 'Common', () => rng.next()),
+      } as PoolWarrior;
+    });
 
   return state;
 }

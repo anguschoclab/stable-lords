@@ -1,10 +1,7 @@
 import type { RivalStableData, GameState, Trainer } from '@/types/state.types';
-import type { WeatherType } from '@/types/shared.types';
-import { type CrowdMood } from '../../crowdMood';
 import { checkBudget } from './budgetWorker';
 import { logAgentAction, type AgentContext } from '../agentCore';
 
-const SALARY: Record<string, number> = { Novice: 10, Seasoned: 25, Master: 75 };
 const HIRE_COST: Record<string, number> = { Novice: 50, Seasoned: 100, Master: 200 };
 
 /**
@@ -15,7 +12,7 @@ export function processStaff(
   rival: RivalStableData,
   state: GameState,
   hiringPool: Trainer[],
-  context?: AgentContext
+  _context?: AgentContext
 ): { updatedRival: RivalStableData; gazetteItems: string[]; updatedHiringPool: Trainer[] } {
   let updatedRival = { ...rival };
   const currentTrainers = [...(updatedRival.trainers || [])];
@@ -28,17 +25,33 @@ export function processStaff(
 
   // 1. Hiring logic (Medium/High Risk)
   if (intent !== 'RECOVERY' && currentTrainers.length < 2 && currentPool.length > 0) {
-    const affordable = currentPool.filter((t) => HIRE_COST[t.tier] < currentTreasury - 300);
+    const affordable = currentPool.filter((t) => (HIRE_COST[t.tier] ?? 0) < currentTreasury - 300);
     if (affordable.length > 0) {
-      // ⚡ Bolt: Reduced O(N log N) sort to O(N) reduction to find the highest cost trainer
-      const best = affordable.reduce(
-        (max, current) => (HIRE_COST[current.tier] > HIRE_COST[max.tier] ? current : max),
-        affordable[0]
+      // Intent-gated specialty preference: pick within preferred focus first, fall back to best tier
+      const preferredFocus =
+        intent === 'VENDETTA' || intent === 'AGGRESSIVE_EXPANSION'
+          ? 'Aggression'
+          : intent === 'EXPANSION'
+          ? 'Endurance'
+          : null;
+
+      const focusCandidates =
+        preferredFocus ? affordable.filter((t) => t.focus === preferredFocus) : [];
+      const pool = focusCandidates.length > 0 ? focusCandidates : affordable;
+
+      const first = pool[0];
+      if (!first) {
+        throw new Error('Pool is unexpectedly empty');
+      }
+      const best = pool.reduce(
+        (max, current) => ((HIRE_COST[current.tier] ?? 0) > (HIRE_COST[max.tier] ?? 0) ? current : max),
+        first
       );
-      const budgetReport = checkBudget(updatedRival, HIRE_COST[best.tier], 'STAFF');
+      const hireCost = HIRE_COST[best.tier] ?? 0;
+      const budgetReport = checkBudget(updatedRival, hireCost, 'STAFF');
 
       if (budgetReport.isAffordable) {
-        currentTreasury -= HIRE_COST[best.tier];
+        currentTreasury -= hireCost;
         currentTrainers.push(best);
         currentPool = currentPool.filter((t) => t.id !== best.id);
 

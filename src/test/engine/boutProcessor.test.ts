@@ -110,10 +110,10 @@ describe('boutProcessor - resolveBout', () => {
       playerId: 'p1',
     };
 
-    const { state, result } = resolveBout(mockState, ctx);
+    const { impact, result } = resolveBout(mockState, ctx);
+    // The engine no longer mutates state directly in resolveBout, it returns a StateImpact
 
     expect(result.outcome.winner).toBeDefined();
-    // TODO: Fix arenaHistory initialization
-    // expect(state.arenaHistory.length).toBe(1);
+    expect(impact.arenaHistory).toHaveLength(1);
   });
 });

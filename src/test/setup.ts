@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom';
+import { enableMapSet } from 'immer';
+
+enableMapSet();
 
 // Mock localStorage for Bun/Vitest environment
 const localStorageMock = (function () {
@@ -26,11 +29,13 @@ Object.defineProperty(global, 'localStorage', {
 
 // Mock ResizeObserver for JSDOM
 
-global.ResizeObserver = class ResizeObserver {
+ 
+class MockResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
-};
+}
+global.ResizeObserver = MockResizeObserver as typeof ResizeObserver;
 
 // Mock OPFS FileSystem interfaces for Vitest
 const createMockDirHandle = (name: string) => ({
@@ -54,26 +59,27 @@ Object.defineProperty(global.navigator, 'storage', {
 
 // Mock Worker for Vitest
 
-global.Worker = class Worker {
+ 
+class MockWorker {
   url: string;
-  onmessage: (event: any) => void = () => {};
-  onerror: (event: any) => void = () => {};
+  onmessage: (event: MessageEvent) => void = () => {};
+  onerror: (event: ErrorEvent) => void = () => {};
 
   constructor(stringUrl: string) {
     this.url = stringUrl;
   }
 
-  postMessage(_msg: any) {
-    // Basic mock: echo back a completion message for common simulation worker patterns
+  postMessage(_msg: unknown) {
     setTimeout(() => {
-      this.onmessage({ data: { type: 'WORKER_READY' } });
+      this.onmessage({ data: { type: 'WORKER_READY' } } as MessageEvent);
     }, 0);
   }
 
   terminate() {}
   addEventListener() {}
   removeEventListener() {}
-  dispatchEvent() {
+  dispatchEvent(): boolean {
     return true;
   }
-} as any;
+}
+global.Worker = MockWorker as unknown as typeof Worker;

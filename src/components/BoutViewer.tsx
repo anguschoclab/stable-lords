@@ -28,9 +28,7 @@ import ViewModeToggle from './arena/ViewModeToggle';
 import ArenaView from './arena/ArenaView';
 import TacticalLogView from './arena/TacticalLogView';
 import HighlightLog from './arena/HighlightLog';
-import TelemetryDashboard from './debug/TelemetryDashboard';
 import type { ViewMode } from './arena/ViewModeToggle';
-import type { ExchangeLogEntry } from '@/types/combat.types';
 
 interface BoutViewerProps {
   nameA: string;
@@ -45,7 +43,6 @@ interface BoutViewerProps {
   arenaTier?: 'training' | 'standard' | 'championship' | 'grand';
   weather?: string;
   transcript?: string[];
-  exchangeLog?: ExchangeLogEntry[];
 }
 
 function getOutcomeStyles(by: FightOutcomeBy) {
@@ -95,7 +92,6 @@ export default function BoutViewer({
   isRivalry,
   arenaTier = 'standard',
   weather = 'Clear',
-  exchangeLog,
 }: BoutViewerProps) {
   const store = useGameStore();
   const arenaPrefs = store.arenaPreferences;
@@ -302,7 +298,7 @@ export default function BoutViewer({
                   <TooltipTrigger asChild>
                     <button
                       onClick={reset}
-                      className="text-muted-foreground/40 hover:text-white transition-colors"
+                      
                       aria-label="Reset bout viewer"
                     >
                       <RotateCcw className="h-4 w-4" />
@@ -320,8 +316,8 @@ export default function BoutViewer({
                   className={cn(
                     'flex items-center justify-center p-2.5 rounded-full transition-all active:scale-95 group/play',
                     isPlaying
-                      ? 'bg-white/10 text-white'
-                      : 'bg-primary text-white shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]'
+                      ? 'bg-foreground/10 text-foreground'
+                      : 'bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)]'
                   )}
                   aria-label={isPlaying ? 'Pause playback' : 'Play bout'}
                 >
@@ -338,7 +334,7 @@ export default function BoutViewer({
                   <TooltipTrigger asChild>
                     <button
                       onClick={skipToEnd}
-                      className="text-muted-foreground/40 hover:text-white transition-colors"
+                      
                       aria-label="Skip to end of bout"
                     >
                       <SkipForward className="h-4 w-4" />
@@ -358,7 +354,7 @@ export default function BoutViewer({
                     className={cn(
                       'px-4 py-1.5 rounded-none text-[10px] font-mono font-black transition-all',
                       speed === s
-                        ? 'bg-white/10 text-white'
+                        ? 'bg-foreground/10 text-foreground'
                         : 'text-muted-foreground/20 hover:text-muted-foreground/60'
                     )}
                     aria-label={`Set playback speed to ${s}x`}
@@ -408,9 +404,6 @@ export default function BoutViewer({
           {/* Highlight Reel — curated notable minutes */}
           <HighlightLog log={log} visibleCount={visibleCount} />
 
-          {/* Dev-only telemetry dashboard (flagged) */}
-          <TelemetryDashboard exchangeLog={exchangeLog} />
-
           {/* Cinematic Resolution Banner */}
           {isComplete && winner && (
             <div
@@ -448,7 +441,7 @@ export default function BoutViewer({
                   <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest leading-none mb-1">
                     Resolution Time
                   </span>
-                  <span className="font-mono font-black text-white text-lg leading-none">
+                  <span >
                     {minutes}:00
                   </span>
                 </div>
@@ -457,7 +450,7 @@ export default function BoutViewer({
                   <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest leading-none mb-1">
                     Engagements
                   </span>
-                  <span className="font-mono font-black text-white text-lg leading-none">
+                  <span >
                     {totalEvents}
                   </span>
                 </div>

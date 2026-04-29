@@ -55,7 +55,7 @@ export function ScoutReportDetails({
             </div>
             <p className="text-sm text-foreground/80 leading-relaxed font-display max-w-md">
               Establish a tactical deep-scan on{' '}
-              <span className="text-white font-black uppercase tracking-tight decoration-primary/40 underline decoration-2 underline-offset-4">
+              <span >
                 {warriorName}
               </span>{' '}
               to uncover their combat signatures and metabolic thresholds.
@@ -75,7 +75,7 @@ export function ScoutReportDetails({
                     'w-full flex items-center justify-between p-4 rounded-none border transition-all relative group/btn',
                     canAfford
                       ? q === 'Expert'
-                        ? 'bg-primary text-white border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02]'
+                        ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02]'
                         : 'bg-neutral-900/60 border-white/5 hover:border-primary/40 hover:bg-white/5'
                       : 'bg-neutral-900/40 border-white/5 opacity-50 cursor-not-allowed'
                   )}
@@ -105,7 +105,7 @@ export function ScoutReportDetails({
                     className={cn(
                       'px-3 py-1.5 rounded-none border flex items-center gap-2 font-mono font-black text-xs',
                       q === 'Expert'
-                        ? 'bg-black/20 border-white/10 text-white'
+                        ? 'bg-black/20 border-foreground/10 text-foreground'
                         : 'bg-black border-white/5 text-arena-gold'
                     )}
                   >
@@ -134,7 +134,7 @@ export function ScoutReportDetails({
 
       <div className="p-6 border-b border-white/5 bg-primary/5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="p-2.5 rounded-none bg-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]">
+          <div >
             <Microscope className="h-5 w-5" />
           </div>
           <div>
@@ -296,7 +296,7 @@ export function ScoutReportDetails({
 
         {report.quality !== 'Expert' && (
           <button
-            className="w-full h-12 bg-primary/10 border border-primary/20 rounded-none hover:bg-primary hover:text-white transition-all group/expand"
+            
             onClick={() => onScout(report.quality === 'Basic' ? 'Detailed' : 'Expert')}
           >
             <div className="flex items-center justify-center gap-3">

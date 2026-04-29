@@ -7,7 +7,14 @@ import { type BoutResult } from '@/engine/boutProcessor';
 import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { engineProxy } from '@/engine/workerProxy';
 import { opfsArchive } from '@/engine/storage/opfsArchive';
-import { type WarriorId, type InjuryId } from '@/types/shared.types';
+
+// Helper to strip non-serializable fields before worker transfer
+function stripNonSerializable<T extends { warriorMap?: unknown; cachedMetaDrift?: unknown }>(
+  state: T
+): Omit<T, 'warriorMap' | 'cachedMetaDrift'> {
+  const { warriorMap, cachedMetaDrift, ...rest } = state;
+  return rest;
+}
 
 // ─── Slices ────────────────────────────────────────────────────────────────
 import { createEconomySlice, EconomySlice } from './slices/economySlice';
@@ -30,14 +37,14 @@ export interface GameStoreActions {
   doAdvanceWeek: (
     processedState?: GameState,
     results?: BoutResult[],
-    deaths?: WarriorId[],
-    injuries?: InjuryId[]
+    deaths?: string[],
+    injuries?: string[]
   ) => Promise<void>;
   doAdvanceDay: (
     processedState?: GameState,
     results?: BoutResult[],
-    deaths?: WarriorId[],
-    injuries?: InjuryId[]
+    deaths?: string[],
+    injuries?: string[]
   ) => Promise<void>;
   initialize: () => void;
   loadGame: (slotId: string, gameState: GameState) => void;
@@ -96,7 +103,6 @@ type GameStateValues = {
   moodHistory: GameState['moodHistory'];
   newsletter: GameState['newsletter'];
   hallOfFame: GameState['hallOfFame'];
-  settings: GameState['settings'];
   isFTUE: boolean;
   ftueStep: GameState['ftueStep'];
   ftueComplete: boolean;
@@ -149,7 +155,6 @@ export function reconstructGameState(store: GameStore): GameState {
     moodHistory: store.moodHistory,
     newsletter: store.newsletter,
     hallOfFame: store.hallOfFame,
-    settings: store.settings,
     isFTUE: store.isFTUE,
     ftueStep: store.ftueStep,
     ftueComplete: store.ftueComplete,
@@ -264,9 +269,6 @@ export const useGameStore = create<GameStore>()(
           draft.moodHistory = state.moodHistory || [];
           draft.newsletter = state.newsletter || [];
           draft.hallOfFame = state.hallOfFame || [];
-          draft.settings = state.settings || {
-            featureFlags: { tournaments: true, scouting: true },
-          };
           draft.isFTUE = state.isFTUE || false;
           draft.ftueStep = state.ftueStep || 0;
           draft.ftueComplete = state.ftueComplete || false;
@@ -275,6 +277,7 @@ export const useGameStore = create<GameStore>()(
           draft.matchHistory = state.matchHistory || [];
           draft.ownerGrudges = state.ownerGrudges || [];
           draft.phase = state.phase || 'planning';
+          draft.pendingResolutionData = state.pendingResolutionData;
           draft.playerChallenges = state.playerChallenges || [];
           draft.playerAvoids = state.playerAvoids || [];
 
@@ -294,8 +297,8 @@ export const useGameStore = create<GameStore>()(
       doAdvanceWeek: async (
         processedState?: GameState,
         results?: BoutResult[],
-        deaths?: WarriorId[],
-        injuries?: InjuryId[]
+        deaths?: string[],
+        injuries?: string[]
       ) => {
         const store = get();
         const raw = processedState || reconstructGameState(store);
@@ -303,8 +306,7 @@ export const useGameStore = create<GameStore>()(
         // In PROD (worker), structured clone handles this automatically
         const state = import.meta.env.DEV ? JSON.parse(JSON.stringify(raw)) : raw;
         // Strip non-serializable fields before structured-clone transfer to worker
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { warriorMap: _wm, cachedMetaDrift: _cmd, ...cleanState } = state as any;
+        const cleanState = stripNonSerializable(state) as GameState;
         const currentWeek = cleanState.week;
 
         set((draft) => {
@@ -327,13 +329,19 @@ export const useGameStore = create<GameStore>()(
           }
 
           next.phase = 'resolution';
-          next.pendingResolutionData = {
+          const resolutionPayload = {
             bouts: results || [],
             deaths: deaths || [],
             injuries: injuries || [],
             promotions: [],
             gazette: next.newsletter.filter((n) => n.week === currentWeek),
           };
+          next.pendingResolutionData = resolutionPayload;
+          if (next.arenaHistory?.length > 0) {
+            const idx = next.arenaHistory.length - 1;
+            const lastEntry = next.arenaHistory[idx]!;
+            next.arenaHistory[idx] = { ...lastEntry, pendingResolutionData: resolutionPayload };
+          }
 
           store.loadGame(store.activeSlotId || 'autosave', next);
           set((draft) => {
@@ -350,14 +358,13 @@ export const useGameStore = create<GameStore>()(
       doAdvanceDay: async (
         processedState?: GameState,
         results?: BoutResult[],
-        deaths?: WarriorId[],
-        injuries?: InjuryId[]
+        deaths?: string[],
+        injuries?: string[]
       ) => {
         const store = get();
         const raw = processedState || reconstructGameState(store);
         const state = import.meta.env.DEV ? JSON.parse(JSON.stringify(raw)) : raw;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { warriorMap: _wm, cachedMetaDrift: _cmd, ...cleanState } = state as any;
+        const cleanState = stripNonSerializable(state) as GameState;
         const currentWeek = cleanState.week;
 
         set((draft) => {
@@ -368,13 +375,19 @@ export const useGameStore = create<GameStore>()(
           const next = await engineProxy.advanceDay(cleanState);
 
           next.phase = 'resolution';
-          next.pendingResolutionData = {
+          const resolutionPayload = {
             bouts: results || [],
             deaths: deaths || [],
             injuries: injuries || [],
             promotions: [],
             gazette: next.newsletter.filter((n) => n.week === currentWeek),
           };
+          next.pendingResolutionData = resolutionPayload;
+          if (next.arenaHistory?.length > 0) {
+            const idx = next.arenaHistory.length - 1;
+            const lastEntry = next.arenaHistory[idx]!;
+            next.arenaHistory[idx] = { ...lastEntry, pendingResolutionData: resolutionPayload };
+          }
 
           store.loadGame(store.activeSlotId || 'autosave', next);
           set((draft) => {

@@ -200,7 +200,8 @@ function getAIPlan(
   opponentStyle?: FightingStyle,
   opponentOwnerId?: string
 ) {
-  const rival = state.rivals.find((r) => r.owner.id === w.stableId);
+  // warrior.stableId is rival.id (StableId), not owner.id — see warriorFactory + recruitmentWorker fixes
+  const rival = state.rivals.find((r) => r.id === w.stableId);
   if (!rival) return { ...defaultPlanForWarrior(w), killDesire: 7 };
 
   let grudgeIntensity = 0;
@@ -260,7 +261,8 @@ function applyBoutResultsToImpact(
       else rosterChanges.push(w);
     });
     if (rosterChanges.some((c) => c.id === wA.id || c.id === wD.id)) {
-      rivalsUpdates.set(r.owner.id, { roster: rosterChanges });
+      // Key by rival.id (StableId), not owner.id
+      rivalsUpdates.set(r.id, { roster: rosterChanges });
     }
   });
 

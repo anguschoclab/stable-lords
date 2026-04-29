@@ -108,7 +108,7 @@ export function RankingsWidget() {
         <div className="flex items-center gap-4">
           {playerStanding.bestWarriorName && playerStanding.bestRank !== null ? (
             <>
-              <span className="text-[10px] font-mono font-black text-primary truncate max-w-[120px]">
+              <span className="text-[10px] font-mono font-black text-primary truncate max-w-32">
                 {playerStanding.bestWarriorName}
               </span>
               <Badge
@@ -192,7 +192,7 @@ export function RankingsWidget() {
                     <div className="flex items-center gap-1.5">
                       <Target className="h-2.5 w-2.5 text-arena-pop opacity-40 group-hover/row:opacity-100 transition-opacity" />
                       <span className="text-[10px] font-mono font-black text-arena-pop/80">
-                        {w.career.wins}W <span className="text-white/10 font-normal">/</span>{' '}
+                        {w.career.wins}W <span className="text-foreground/10 font-normal">/</span>{' '}
                         {w.career.kills}K
                       </span>
                     </div>
@@ -211,7 +211,7 @@ export function RankingsWidget() {
                       FAME SCORE
                     </span>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-white/5 group-hover/row:text-primary transition-all group-hover/row:translate-x-1" />
+                  <ChevronRight  />
                 </div>
 
                 {/* Progress Sparkline Mask */}
@@ -227,7 +227,9 @@ export function RankingsWidget() {
       {/* Footer / CTA */}
       <div className="p-4 border-t border-white/5 bg-black/40 flex justify-center relative z-10">
         <button
+          type="button"
           onClick={() => navigate({ to: '/world' })}
+          aria-label="Sync Global Rankings"
           className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-colors opacity-40 hover:opacity-100 flex items-center gap-2 group"
         >
           Sync_Global_Rankings{' '}

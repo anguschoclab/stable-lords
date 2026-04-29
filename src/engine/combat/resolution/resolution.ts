@@ -44,6 +44,7 @@ import {
   type MasteryTier,
 } from '../../stylePassives';
 import { getFavoriteRhythmBonus } from '../../favorites';
+import { getDynamicTraitMods, type DynamicTraitContext } from '../../traits';
 import {
   GLOBAL_ATT_BONUS,
   GLOBAL_PAR_PENALTY,
@@ -102,6 +103,12 @@ export interface FighterState {
   armHits: number;
   legHits: number;
   favorites?: WarriorFavorites;
+  /** Inherent traits — Berserker, Patient, etc. Static mods are baked into
+   *  `skills`; conditional ones are evaluated each exchange in `resolveExchange`. */
+  traits?: string[];
+  /** Static endurance multiplier (e.g. Iron Lung trait). Multiplied into the
+   *  per-exchange endurance cost in applyEnduranceCosts. Defaults to 1. */
+  staticEnduranceMult?: number;
   totalFights: number;
   encumbrancePenalty?: { iniPenalty: number; enduranceMult: number };
   weaponId?: string;
@@ -153,7 +160,7 @@ export interface ResolutionContext {
   pushedFighter?: 'A' | 'D';
   /** Surface modifiers from arenaConfig, unpacked for convenience */
   surfaceMod: SurfaceMod;
-  /** Optional crowd-mood lethality delta (gated by featureFlags.crowdMoodLethality upstream). */
+  /** Crowd-mood lethality delta injected by simulate.ts. */
   crowdKillBonus?: number;
 }
 
@@ -356,6 +363,31 @@ export function resolveExchange(
   if (passD.narrative && rng() < 0.4)
     events.push({ type: 'PASSIVE', actor: 'D', result: passD.narrative });
 
+  // ── Dynamic trait mods (Berserker, Patient, Disciplined, etc.) ──
+  // Static trait mods (Quick, Heavy-Handed) are already baked into fA.skills.
+  // Conditional ones depend on per-exchange context and are added to the
+  // relevant skill checks below.
+  const traitCtxA: DynamicTraitContext = {
+    phase: stylePhase,
+    hpRatio: fA.hp / fA.maxHp,
+    endRatio: fA.endurance / fA.maxEndurance,
+    consecutiveHits: fA.consecutiveHits,
+  };
+  const traitCtxD: DynamicTraitContext = {
+    phase: stylePhase,
+    hpRatio: fD.hp / fD.maxHp,
+    endRatio: fD.endurance / fD.maxEndurance,
+    consecutiveHits: fD.consecutiveHits,
+  };
+  const dynTraitsA = getDynamicTraitMods(
+    fA.traits ? ({ traits: fA.traits } as unknown as Warrior) : undefined,
+    traitCtxA
+  );
+  const dynTraitsD = getDynamicTraitMods(
+    fD.traits ? ({ traits: fD.traits } as unknown as Warrior) : undefined,
+    traitCtxD
+  );
+
   // ── Spatial Sub-Phases ──
   const es = makeExchangeState();
 
@@ -385,7 +417,8 @@ export function resolveExchange(
     fA.momentum * 2 +
     (ctx.trainerModsA.iniMod ?? 0) +
     ctx.weatherEffect.initiativeMod +
-    ctx.surfaceMod.initiativeMod;
+    ctx.surfaceMod.initiativeMod +
+    dynTraitsA.iniMod;
   const iniD =
     fD.skills.INI +
     alIniMod(AL_D) +
@@ -400,7 +433,8 @@ export function resolveExchange(
     fD.momentum * 2 +
     (ctx.trainerModsD.iniMod ?? 0) +
     ctx.weatherEffect.initiativeMod +
-    ctx.surfaceMod.initiativeMod;
+    ctx.surfaceMod.initiativeMod +
+    dynTraitsD.iniMod;
 
   const aGoesFirst = contestCheck(rng, iniA, iniD);
   const attLabel = aGoesFirst ? 'A' : 'D';
@@ -451,6 +485,10 @@ export function resolveExchange(
   // A dagger user at Grapple gets +3-4; a pike user at Grapple gets -10.
   const attWeaponRangeMod = getWeaponRangeMod(att.weaponId, ctx.range);
   const defWeaponRangeMod = getWeaponRangeMod(def.weaponId, ctx.range);
+  // Conditional trait mods routed into the same attack/defense additive sums.
+  const attDynTraitAtt = aGoesFirst ? dynTraitsA.attMod : dynTraitsD.attMod;
+  const defDynTraitPar = aGoesFirst ? dynTraitsD.parMod : dynTraitsA.parMod;
+  const defDynTraitDef = aGoesFirst ? dynTraitsD.defMod : dynTraitsA.defMod;
   const attSucc = performAttackCheck(
     rng,
     att,
@@ -468,7 +506,8 @@ export function resolveExchange(
       (aGoesFirst ? es.rangeModA : es.rangeModD) +
       attCommit.attBonus +
       feintAttBonus +
-      attWeaponRangeMod
+      attWeaponRangeMod +
+      attDynTraitAtt
   );
 
   if (!attSucc) {
@@ -532,7 +571,15 @@ export function resolveExchange(
     // Negative defWeaponRangeMod means defender is disadvantaged at this range
     // (e.g. pike user can't parry effectively at Grapple). Convert to a positive penalty.
     const defRangePenalty = Math.max(0, -defWeaponRangeMod);
-    const extraDefPenalty = zonePenalty - defCommit.defPenalty + feintDefBonus + defRangePenalty;
+    // Conditional trait par/def bonuses help the defender — apply as a negative
+    // penalty (extraDefPenalty is *added* to the offence side of the contest).
+    const extraDefPenalty =
+      zonePenalty -
+      defCommit.defPenalty +
+      feintDefBonus +
+      defRangePenalty -
+      defDynTraitPar -
+      defDynTraitDef;
 
     const defCheck = performDefenseCheck(
       rng,

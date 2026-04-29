@@ -98,18 +98,18 @@ export function TournamentBracket({
                         : 'bg-secondary/10 border-primary/30 shadow-[0_0_15px_-5px_rgba(0,0,0,0.5)]',
                       isExpanded &&
                         'ring-2 ring-primary/50 border-primary shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)]',
-                      bronze && 'border-amber-500/40 bg-amber-500/5',
+                      bronze && 'border-arena-gold/40 bg-arena-gold/5',
                       championship &&
                         !isPending &&
-                        'border-arena-gold/50 bg-amber-500/10 shadow-[0_0_20px_-5px_rgba(255,215,0,0.3)]',
+                        'border-arena-gold/50 bg-arena-gold/10 shadow-[0_0_20px_-5px_rgba(255,215,0,0.3)]',
                       isBye && 'border-dashed border-border/30 bg-muted/10'
                     )}
                   >
                     <div
                       className={cn(
                         'px-3 py-1 border-b border-border/20 flex items-center justify-between bg-secondary/20',
-                        bronze && 'bg-amber-500/10 border-amber-500/20',
-                        championship && !isPending && 'bg-amber-500/20 border-amber-500/30'
+                        bronze && 'bg-arena-gold/10 border-arena-gold/20',
+                        championship && !isPending && 'bg-arena-gold/20 border-arena-gold/30'
                       )}
                     >
                       <div className="flex items-center gap-1">
@@ -120,7 +120,7 @@ export function TournamentBracket({
                               ? 'FINAL'
                               : `MATCH ${bout.matchIndex + 1}`}
                         </span>
-                        {bronze && <Medal className="h-3 w-3 text-amber-600" />}
+                        {bronze && <Medal className="h-3 w-3 text-arena-gold" />}
                         {championship && !isPending && (
                           <Crown className="h-3 w-3 text-arena-gold" />
                         )}
@@ -136,11 +136,11 @@ export function TournamentBracket({
                           </Badge>
                         )
                       ) : championship ? (
-                        <Badge className="h-3 px-1.5 text-[7px] bg-arena-gold/30 text-amber-700 border-amber-500/30">
+                        <Badge className="h-3 px-1.5 text-[7px] bg-arena-gold/30 text-arena-gold border-arena-gold/30">
                           CHAMPION
                         </Badge>
                       ) : bronze ? (
-                        <Badge className="h-3 px-1.5 text-[7px] bg-amber-500/30 text-amber-700 border-amber-500/30">
+                        <Badge className="h-3 px-1.5 text-[7px] bg-arena-gold/30 text-arena-gold border-arena-gold/30">
                           BRONZE
                         </Badge>
                       ) : (
@@ -161,7 +161,7 @@ export function TournamentBracket({
                               ? 'opacity-30 grayscale'
                               : 'bg-background/40',
                           isBye && 'bg-muted/30',
-                          isAChosen && championship && 'bg-arena-gold/20 text-amber-700'
+                          isAChosen && championship && 'bg-arena-gold/20 text-arena-gold'
                         )}
                       >
                         <div className="flex items-center gap-2 truncate">
@@ -194,7 +194,7 @@ export function TournamentBracket({
                           <div
                             className={cn(
                               'bg-secondary px-2 rounded-full border border-border/20 text-[8px] font-black text-muted-foreground',
-                              bronze && 'bg-amber-500/20 border-amber-500/30 text-amber-600'
+                              bronze && 'bg-arena-gold/20 border-arena-gold/30 text-arena-gold'
                             )}
                           >
                             {bronze ? '3RD PLACE' : 'VS'}
@@ -391,16 +391,16 @@ export function BronzeHighlight({ thirdPlaceName, thirdPlaceId }: BronzeHighligh
   return (
     <Surface
       variant="glass"
-      className="bg-gradient-to-br from-amber-600/10 to-transparent border-amber-500/30"
+      className="bg-gradient-to-br from-amber-600/10 to-transparent border-arena-gold/30"
     >
       <div className="p-5 text-center">
         <div className="flex items-center justify-center gap-4">
-          <Medal className="h-6 w-6 text-amber-600" />
+          <Medal className="h-6 w-6 text-arena-gold" />
           <div className="text-left">
             <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-black">
               Third Place Medalist
             </p>
-            <p className="text-lg font-display font-black text-amber-700 uppercase tracking-tight leading-none mt-1">
+            <p className="text-lg font-display font-black text-arena-gold uppercase tracking-tight leading-none mt-1">
               {displayName}
             </p>
           </div>

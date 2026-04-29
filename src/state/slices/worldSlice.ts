@@ -1,6 +1,7 @@
 import { StateCreator } from 'zustand';
 import type { GameStore } from '@/state/useGameStore';
 import {
+  type GameState,
   Season,
   WeatherType,
   Promoter,
@@ -53,12 +54,6 @@ export interface WorldSlice {
   hallOfFame: HallEntry[];
   crowdMood: CrowdMoodType;
   moodHistory: { week: number; mood: CrowdMoodType }[];
-  settings: {
-    featureFlags: {
-      tournaments: boolean;
-      scouting: boolean;
-    };
-  };
   arenaPreferences: ArenaPreferences;
   isFTUE: boolean;
   ftueStep?: number;
@@ -71,6 +66,7 @@ export interface WorldSlice {
   playerAvoids: string[];
   ownerGrudges: OwnerGrudge[];
   phase: 'planning' | 'resolution';
+  pendingResolutionData?: GameState['pendingResolutionData'];
   setWeek: (week: number) => void;
   setArenaPreferences: (prefs: Partial<ArenaPreferences>) => void;
   initializeStable: (name: string, stableName: string) => void;
@@ -112,12 +108,6 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
   hallOfFame: [],
   crowdMood: 'Neutral' as CrowdMoodType,
   moodHistory: [],
-  settings: {
-    featureFlags: {
-      tournaments: true,
-      scouting: true,
-    },
-  },
   arenaPreferences: {
     defaultViewMode: 'arena',
     audioEnabled: true,
@@ -142,6 +132,7 @@ export const createWorldSlice: StateCreator<GameStore, [], [], WorldSlice> = (se
   playerAvoids: [],
   ownerGrudges: [],
   phase: 'planning',
+  pendingResolutionData: undefined,
 
   setWeek: (week) => set({ week }),
 

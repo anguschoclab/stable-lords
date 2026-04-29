@@ -32,21 +32,18 @@ describe('PhysicalsSimulator Page', () => {
     expect(screen.getByText('Fighter B')).toBeDefined();
 
     // Check if simulation results area exists
-    expect(screen.getByText('Simulation Results (10 Minutes)')).toBeDefined();
+    expect(screen.getByText(/SIMULATION RESULTS/i)).toBeDefined();
   });
 
   it('calculates initial stats properly for both fighters', () => {
     render(<PhysicalsSimulator />);
 
-    // Find Fighter A's section by looking for its specific title context
-    // The easiest way is to look for the "Fighter A Base Stats" header
-    expect(screen.getByText('Fighter A Base Stats')).toBeDefined();
-    expect(screen.getByText('Fighter B Base Stats')).toBeDefined();
+    // Find Fighter A's analysis section
+    expect(screen.getByText('Fighter A Analysis')).toBeDefined();
+    expect(screen.getByText('Fighter B Analysis')).toBeDefined();
 
-    // Look for HP value
-    // Since there are multiple "HP" labels, we'll just check if the initial values look reasonable
-    // Default is 10/10/10 stats, which normally yields ~40 HP
-    const hpElements = screen.getAllByText(/\d+/); // Usually 40 or near it
-    expect(hpElements.length).toBeGreaterThan(0);
+    // Check that numeric stat values exist
+    const numElements = screen.getAllByText(/\d+/);
+    expect(numElements.length).toBeGreaterThan(0);
   });
 });

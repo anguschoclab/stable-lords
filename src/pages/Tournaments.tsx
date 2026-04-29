@@ -44,6 +44,7 @@ import { toast } from 'sonner';
 import { TournamentBracket } from '@/components/tournaments/TournamentBracket';
 import { TournamentHistory } from '@/components/tournaments/TournamentHistory';
 import { TournamentPrepDialog } from '@/components/tournaments/TournamentPrepDialog';
+import { TournamentSchedule } from '@/components/tournaments/TournamentSchedule';
 
 const SEASON_NAMES: Record<string, string> = {
   Spring: 'Spring Classic',
@@ -68,9 +69,9 @@ const TIER_PRIZES: Record<string, { first: number; second: number; third: number
 
 function getFatigueLabel(fatigue: number | undefined): { label: string; color: string } {
   const f = fatigue ?? 0;
-  if (f < 30) return { label: 'Fresh', color: 'text-emerald-400' };
-  if (f < 60) return { label: 'Tired', color: 'text-yellow-400' };
-  return { label: 'Exhausted', color: 'text-red-400' };
+  if (f < 30) return { label: 'Fresh', color: 'text-primary' };
+  if (f < 60) return { label: 'Tired', color: 'text-arena-gold' };
+  return { label: 'Exhausted', color: 'text-destructive' };
 }
 
 export default function Tournaments() {
@@ -166,7 +167,7 @@ export default function Tournaments() {
         actions={
           <div className="flex items-center gap-2">
             {!currentTournament && activeWarriors.length < 2 && (
-              <Link to="/ops/personnel">
+              <Link to="/ops/recruit">
                 <Button
                   variant="outline"
                   className="h-9 font-black uppercase text-[10px] tracking-widest gap-2"
@@ -181,7 +182,7 @@ export default function Tournaments() {
 
       {/* ── Pre-tournament readiness banner ── */}
       {currentTournament && playerWarriorsInTournament.length > 0 && (
-        <div className="rounded-lg border border-border/20 bg-secondary/10 px-5 py-4 space-y-3">
+        <div className="rounded-none border border-border/20 bg-secondary/10 px-5 py-4 space-y-3">
           {/* Header row */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
@@ -224,7 +225,7 @@ export default function Tournaments() {
                     {fatigueLabel}
                   </span>
                   {hasInjuries && (
-                    <div className="flex items-center gap-1 text-red-400">
+                    <div className="flex items-center gap-1 text-destructive">
                       <AlertTriangle className="h-3 w-3" />
                       <span className="text-[9px] font-black uppercase tracking-widest">
                         {w.injuries.length === 1
@@ -258,6 +259,10 @@ export default function Tournaments() {
             </div>
           </div>
           <div className="p-0">
+            <div className="p-6 border-b border-white/5">
+              <TournamentSchedule tournament={currentTournament} currentWeek={week} />
+            </div>
+
             <TournamentBracket
               bouts={currentTournament.bracket}
               arenaHistory={arenaHistory}

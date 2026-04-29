@@ -121,14 +121,23 @@ describe('Style Passives', () => {
       expect(passive.critChance).toBeGreaterThan(0);
     });
 
-    it('should not give Aimed Blow bonuses without targeting', () => {
-      const passive = getStylePassive(FightingStyle.AimedBlow, {
+    it('should give Aimed Blow a smaller bonus without targeting (and a larger one with targeting)', () => {
+      // Tuned 2026-04: AB used to have zero passive without targeting, which made
+      // default-plan AB warriors (target='Any') a 17% W% style. Now AB always
+      // gets a baseline attBonus + crit, with a stronger bonus when targeting.
+      const untargeted = getStylePassive(FightingStyle.AimedBlow, {
         ...baseContext,
         targetedLocation: 'Any',
       });
+      const targeted = getStylePassive(FightingStyle.AimedBlow, {
+        ...baseContext,
+        targetedLocation: 'Head',
+      });
 
-      expect(passive.attBonus).toBe(0);
-      expect(passive.critChance).toBe(0);
+      expect(untargeted.attBonus).toBeGreaterThan(0);
+      expect(untargeted.critChance).toBeGreaterThan(0);
+      expect(targeted.attBonus).toBeGreaterThan(untargeted.attBonus);
+      expect(targeted.critChance).toBeGreaterThan(untargeted.critChance);
     });
 
     it('should increase Bashing Attack damage with consecutive hits', () => {
@@ -168,9 +177,20 @@ describe('Style Passives', () => {
       expect(passive.ripBonus).toBeGreaterThan(0);
     });
 
-    it('should penalize Parry-Riposte ATT', () => {
-      const passive = getStylePassive(FightingStyle.ParryRiposte, baseContext);
-      expect(passive.attBonus).toBeLessThan(0);
+    it('should penalize Parry-Riposte ATT in OPENING phase', () => {
+      // Tuned 2026-04: PR's flat -1 attBonus made it a permanent offensive
+      // minus across all phases (31% W%). Now the penalty is gated to OPENING
+      // only — PR can ramp up offense as the fight progresses.
+      const opening = getStylePassive(FightingStyle.ParryRiposte, {
+        ...baseContext,
+        phase: 'OPENING',
+      });
+      const mid = getStylePassive(FightingStyle.ParryRiposte, {
+        ...baseContext,
+        phase: 'MID',
+      });
+      expect(opening.attBonus).toBeLessThan(0);
+      expect(mid.attBonus).toBeGreaterThanOrEqual(0);
     });
 
     it('should give Total Parry parry bonuses', () => {

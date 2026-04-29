@@ -159,8 +159,8 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                         <div>
                           {row.isPlayer ? (
                             <Link
-                              to="/command/roster"
-                              className="font-display font-black uppercase text-xs tracking-tight transition-all text-primary hover:text-white"
+                              to="/ops/overview"
+                              
                             >
                               {row.name}
                             </Link>

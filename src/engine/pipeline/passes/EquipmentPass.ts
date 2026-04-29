@@ -1,4 +1,5 @@
 import { GameState, RivalStableData } from '@/types/state.types';
+import type { StableId } from '@/types/shared.types';
 import { checkWeaponRequirements, DEFAULT_LOADOUT } from '@/data/equipment';
 import { StateImpact } from '@/engine/impacts';
 
@@ -6,12 +7,8 @@ import { StateImpact } from '@/engine/impacts';
  * Stable Lords — Equipment Pipeline Pass
  * Handles AI equipment optimization for rival stables.
  */
-/**
- * Stable Lords — Equipment Pipeline Pass
- * Handles AI equipment optimization for rival stables.
- */
 export function runEquipmentPass(state: GameState): StateImpact {
-  const rivalsUpdates = new Map<string, Partial<RivalStableData>>();
+  const rivalsUpdates = new Map<StableId, Partial<RivalStableData>>();
 
   (state.rivals || []).forEach((rival) => {
     let changed = false;
@@ -31,7 +28,8 @@ export function runEquipmentPass(state: GameState): StateImpact {
     });
 
     if (changed) {
-      rivalsUpdates.set(rival.owner.id, { roster: updatedRoster });
+      // Key by rival.id (StableId) — rivalsUpdates handler in impacts.ts indexes by r.id.
+      rivalsUpdates.set(rival.id as StableId, { roster: updatedRoster });
     }
   });
 

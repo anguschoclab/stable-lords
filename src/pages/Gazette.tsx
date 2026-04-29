@@ -16,6 +16,7 @@ import {
   Scroll,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 import { Surface } from '@/components/ui/Surface';
 import { Badge } from '@/components/ui/badge';

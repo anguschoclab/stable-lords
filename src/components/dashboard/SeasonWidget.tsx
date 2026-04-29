@@ -45,8 +45,8 @@ export function SeasonWidget() {
 
   const weather = state.weather || 'Clear';
   let WeatherIcon = Sun;
-  let weatherColor = 'text-yellow-500';
-  let weatherBg = 'bg-yellow-500/10 border-yellow-500/20';
+  let weatherColor = 'text-arena-gold';
+  let weatherBg = 'bg-arena-gold/10 border-arena-gold/20';
 
   if (weather === 'Rainy') {
     WeatherIcon = CloudRain;
@@ -54,32 +54,36 @@ export function SeasonWidget() {
     weatherBg = 'bg-stone-400/10 border-stone-400/20';
   } else if (weather === 'Blazing Sun') {
     WeatherIcon = Sun;
-    weatherColor = 'text-red-500';
-    weatherBg = 'bg-red-500/10 border-red-500/20';
+    weatherColor = 'text-destructive';
+    weatherBg = 'bg-destructive/10 border-destructive/20';
   } else if (weather === 'Sweltering') {
     WeatherIcon = Sun;
-    weatherColor = 'text-orange-500';
-    weatherBg = 'bg-orange-500/10 border-orange-500/20';
+    weatherColor = 'text-arena-gold';
+    weatherBg = 'bg-arena-gold/10 border-arena-gold/20';
   } else if (weather === 'Blood Moon') {
     WeatherIcon = Moon;
-    weatherColor = 'text-red-600';
-    weatherBg = 'bg-red-600/10 border-red-600/30 glow-neon-red';
+    weatherColor = 'text-arena-blood';
+    weatherBg = 'bg-arena-blood/10 border-arena-blood/30 glow-neon-red';
   } else if (weather === 'Overcast') {
     WeatherIcon = Cloud;
-    weatherColor = 'text-gray-400';
-    weatherBg = 'bg-gray-400/10 border-gray-400/20';
+    weatherColor = 'text-muted-foreground';
+    weatherBg = 'bg-muted/10 border-border/40';
   } else if (weather === 'Gale') {
     WeatherIcon = Wind;
-    weatherColor = 'text-emerald-500';
-    weatherBg = 'bg-emerald-500/10 border-emerald-500/20';
+    weatherColor = 'text-primary';
+    weatherBg = 'bg-primary/10 border-primary/20';
   } else if (weather === 'Breezy') {
     WeatherIcon = Wind;
     weatherColor = 'text-stone-300';
     weatherBg = 'bg-stone-300/10 border-stone-300/20';
   } else if (weather === 'Eclipse') {
     WeatherIcon = Moon;
-    weatherColor = 'text-purple-500';
-    weatherBg = 'bg-purple-500/10 border-purple-500/20';
+    weatherColor = 'text-arena-fame';
+    weatherBg = 'bg-arena-fame/10 border-arena-fame/20';
+  } else if (weather === 'Sandstorm') {
+    WeatherIcon = Wind;
+    weatherColor = 'text-amber-600';
+    weatherBg = 'bg-amber-600/10 border-amber-600/20';
   }
 
   return (
@@ -110,7 +114,7 @@ export function SeasonWidget() {
                 CURRENT EPOCH
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-display font-black text-white uppercase tracking-tighter">
+                <span className="text-2xl font-display font-black text-foreground uppercase tracking-tighter">
                   {season}
                 </span>
                 <Badge

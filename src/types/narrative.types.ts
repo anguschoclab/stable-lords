@@ -159,6 +159,8 @@ export interface Conclusions {
 export interface EventNarrative {
   title: string;
   newsletter: string[];
+  injury_name?: string;
+  injury_desc?: string;
 }
 
 export interface Events {

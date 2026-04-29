@@ -1,5 +1,5 @@
 import { useGameStore } from '@/state/useGameStore';
-import { Shield, Users, Crown, Medal, Award, Star, Sparkles } from 'lucide-react';
+import { Shield, Crown, Star, Sparkles } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Surface } from '@/components/ui/Surface';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,10 @@ export default function StableHall() {
         icon={Shield}
       />
 
-      {/* Band 2 — Stable Hero Strip (Spec §6.5) */}
+      {/* Band 1 — Roster Wall (primary content) */}
+      <RosterWall />
+
+      {/* Band 2 — Stable Hero Strip */}
       <Surface
         variant="gold"
         className="flex items-center gap-12 p-8 border-l-4 border-l-arena-gold/50"
@@ -66,7 +69,7 @@ export default function StableHall() {
               <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">
                 Patron Tokens
               </span>
-              <div className="flex items-center gap-2 font-display font-black text-2xl text-yellow-400 tracking-tighter leading-none">
+              <div className="flex items-center gap-2 font-display font-black text-2xl text-arena-gold tracking-tighter leading-none">
                 {pendingTokens} <Sparkles className="h-4 w-4 animate-pulse" />
               </div>
             </div>
@@ -81,7 +84,8 @@ export default function StableHall() {
         </div>
       </Surface>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      {/* Band 3 — Stable Composition (supporting context) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-12">
           <div className="flex items-center gap-3 px-1 mb-6">
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">
@@ -91,24 +95,24 @@ export default function StableHall() {
           </div>
         </div>
 
-        <div className="lg:col-span-5 flex flex-col gap-8">
+        <div className="lg:col-span-4 flex flex-col gap-8">
           <ReputationSliders />
           <StyleMeterTable />
-          <TrainerTable />
         </div>
 
-        <div className="lg:col-span-7">
-          <RosterWall />
+        <div className="lg:col-span-8">
+          <TrainerTable />
         </div>
       </div>
 
+      {/* Band 4 — Patronage Awards */}
       <div className="space-y-4">
         <div className="flex items-center gap-3 px-1">
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-arena-gold">
             PATRONAGE AWARDS
           </span>
           {pendingTokens > 0 ? (
-            <Badge className="bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-[9px] font-black">
+            <Badge className="bg-arena-gold/20 text-arena-gold border border-arena-gold/30 text-[9px] font-black rounded-none">
               {pendingTokens} TOKEN{pendingTokens !== 1 ? 'S' : ''} PENDING
             </Badge>
           ) : (
@@ -116,7 +120,7 @@ export default function StableHall() {
               Place in tournaments to earn tokens
             </Badge>
           )}
-          <div className="h-px flex-1 bg-gradient-to-r from-yellow-400/20 via-border/20 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-arena-gold/20 via-border/20 to-transparent" />
         </div>
         <InsightManager />
       </div>

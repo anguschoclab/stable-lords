@@ -1,9 +1,8 @@
 import { type RivalStableData, type PoolWarrior, type Warrior } from '@/types/state.types';
 import { PERSONALITY_STYLE_PREFS } from '@/data/ownerData';
-import { generateId } from '@/utils/idUtils';
 import { logAgentAction } from '../agentCore';
 import { checkBudget } from './budgetWorker';
-import { computeMetaDrift } from '../../metaDrift';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 /**
  * RecruitmentWorker: Handles drafting warriors from the pool.
@@ -54,6 +53,7 @@ export function processRecruitment(
 
   for (let i = 0; i < remainingPool.length; i++) {
     const w = remainingPool[i];
+    if (!w) continue;
     let score = 0;
     if (w.tier === 'Prodigy') score += 100;
     if (w.tier === 'Exceptional') score += 50;
@@ -84,6 +84,9 @@ export function processRecruitment(
   // 3. Risk-Tiered Budget Check & Finalizing Recruit
   if (bestIdx >= 0 && (bestScore > 30 || isMajorDraftWeek)) {
     const recruit = remainingPool[bestIdx];
+    if (!recruit) {
+      throw new Error('Recruit selection failed');
+    }
     const cost = recruit.tier === 'Prodigy' ? 400 : recruit.tier === 'Exceptional' ? 250 : 100;
 
     // ⚡ Lead Agent Verification: Check budget before signing
@@ -94,7 +97,7 @@ export function processRecruitment(
       remainingPool.splice(bestIdx, 1);
 
       const newWarrior: Warrior = {
-        id: rng.uuid(),
+        id: rng.uuid() as import('@/types/shared.types').WarriorId,
         name: recruit.name,
         style: recruit.style,
         attributes: { ...recruit.attributes },
@@ -110,8 +113,10 @@ export function processRecruitment(
         champion: false,
         status: 'Active',
         age: recruit.age,
-        stableId: updatedRival.owner.id,
+        stableId: updatedRival.id,
         lineage: recruit.lineage,
+        traits: [],
+        isStarInvestment: recruit.tier === 'Prodigy',
       };
 
       updatedRival.roster = [...updatedRival.roster, newWarrior];
