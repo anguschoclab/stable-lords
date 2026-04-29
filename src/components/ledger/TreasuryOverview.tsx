@@ -238,6 +238,7 @@ function FiscalTrajectoryMonitor({ breakdown, week }: FiscalTrajectoryMonitorPro
 }
 
 interface LedgerEntry {
+  id: string;
   week: number;
   label: string;
   amount: number;
