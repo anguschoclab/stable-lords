@@ -127,11 +127,8 @@ describe('Autosim Integration', () => {
     it('should provide stop details', async () => {
       const result = await runAutosim(initialState, 5, () => {});
 
-      // Guard for autosim not returning stopDetail
-      if (result.stopDetail) {
-        expect(typeof result.stopDetail).toBe('string');
-        expect(result.stopDetail.length).toBeGreaterThan(0);
-      }
+      expect(typeof result.stopDetail).toBe('string');
+      expect(result.stopDetail.length).toBeGreaterThan(0);
     });
 
     it('should stop at max weeks when no other conditions trigger', async () => {
@@ -325,11 +322,8 @@ describe('Autosim Integration', () => {
     it('should provide descriptive stop details', async () => {
       const result = await runAutosim(initialState, 5, () => {});
 
-      // TODO: Ensure stopDetail is always populated
-      if (result.stopDetail) {
-        expect(typeof result.stopDetail).toBe('string');
-        expect(result.stopDetail.length).toBeGreaterThan(0);
-      }
+      expect(typeof result.stopDetail).toBe('string');
+      expect(result.stopDetail.length).toBeGreaterThan(0);
     });
   });
 });

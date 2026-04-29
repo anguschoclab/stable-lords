@@ -20,7 +20,7 @@ export interface AutosimResult {
   finalState: GameState;
   weeksSimmed: number;
   stopReason: 'max_weeks' | 'death' | 'injury' | 'bankrupt' | 'no_pairings';
-  stopDetail?: string;
+  stopDetail: string;
   weekSummaries: AutosimWeekSummary[];
 }
 
