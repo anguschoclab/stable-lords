@@ -268,20 +268,35 @@ function szMod(table: Record<number, number>, sz: number): number {
 
 // ─── Style Penalty Table ──────────────────────────────────────────────────
 // Flat adjustments applied to attribute-derived skill totals.
-// Source: Terrablood Skill Chart "Style Modifications" section.
+//
+// Originally from Terrablood Skill Chart, but REBALANCED (2026-04) because
+// the original values assumed a uniform 70-point attribute spread.  Our
+// archetype-based stat generation creates wildly different breakpoint yields
+// per archetype (agile archetypes hit the WT=11/SP=11 spikes, brutal ones
+// don't), producing a 4:1 skill-budget gap.  These adjusted penalties
+// compress the effective skill budget to a ~22-30 range while preserving
+// each style's relative identity.
+//
 // Format: [ATT, PAR, DEF, INI, RIP, DEC]
 const STYLE_PENALTIES: Record<FightingStyle, [number, number, number, number, number, number]> = {
-  //                                        ATT  PAR  DEF  INI  RIP  DEC
-  [FightingStyle.AimedBlow]: [-17, -8, -12, -9, -7, +1],
-  [FightingStyle.BashingAttack]: [-8, -8, -13, -3, -4, +1],
-  [FightingStyle.LungingAttack]: [-6, -8, -10, -2, -4, 0],
-  [FightingStyle.ParryLunge]: [-8, -6, -12, -4, -4, -1],
-  [FightingStyle.ParryRiposte]: [-12, -6, -14, -5, 0, -1],
-  [FightingStyle.ParryStrike]: [-12, -6, -12, -7, -4, -1],
-  [FightingStyle.SlashingAttack]: [-8, -10, -12, 0, -4, 0],
-  [FightingStyle.StrikingAttack]: [-12, -9, -12, -5, -4, +1],
-  [FightingStyle.TotalParry]: [-14, -2, -12, -7, -4, -2],
-  [FightingStyle.WallOfSteel]: [-5, -4, -12, -1, -4, -1],
+  //                                           ATT  PAR  DEF  INI  RIP  DEC
+  // ── Cunning archetype (WT/DF/WL → high raw skills, needs steep penalty) ──
+  [FightingStyle.AimedBlow]:      /*AB*/  [-13, -6, -10, -7, -5, +1],    // was -52, now -40: +12 budget (ATT/PAR/DEF/INI/RIP)
+  [FightingStyle.ParryRiposte]:   /*PR*/  [-14, -8, -15, -8,  -2, -2],   // was -38, now -49: identity = riposte king (RIP least penalised)
+  [FightingStyle.ParryStrike]:    /*PS*/  [-12, -6, -12, -9, -4, -1],    // was -42, now -44: minor INI nerf
+  [FightingStyle.ParryLunge]:     /*PL*/  [-11, -7, -13, -7, -6, -1],    // was -35, now -45: ATT/INI/RIP down
+
+  // ── Agile archetype (SP/DF/WT → massive breakpoint yields, heaviest penalty) ──
+  [FightingStyle.LungingAttack]:  /*LU*/  [-10,-12, -13, -7, -7, -2],    // was -30, now -51: massive nerf to all skills
+  [FightingStyle.SlashingAttack]: /*SL*/  [-12,-14, -15, -4, -7, -2],    // was -34, now -54: INI kept as identity, everything else down
+
+  // ── Brutal archetype (ST/CN/SZ → low breakpoint yields, lightest penalty) ──
+  [FightingStyle.BashingAttack]:  /*BA*/  [ -4, -6, -10,  0, -2, +2],    // was -35, now -20: +15 budget across all skills
+  [FightingStyle.StrikingAttack]: /*ST*/  [ -7, -6,  -9, -2, -2, +2],    // was -41, now -24: +17 budget; still lower ATT than BA
+
+  // ── Tank archetype (CN/WL/SZ → endurance/HP, needs skill floor to compete) ──
+  [FightingStyle.TotalParry]:     /*TP*/  [-12, +1,  -9, -4, -2,  0],    // was -41, now -26: PAR buff is identity; ATT stays low
+  [FightingStyle.WallOfSteel]:    /*WS*/  [ -2, -2,  -9,  2, -2,  0],    // was -27, now -13: small universal buff; INI positive = reads attacks
 };
 
 // ─── Base Skill Computation ───────────────────────────────────────────────
