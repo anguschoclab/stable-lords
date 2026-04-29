@@ -312,10 +312,12 @@ export function processAllRivalsBoutOffers(
       if (!owningRival) return;
 
       // Group by rival stable ID
-      if (!offersByRival.has(owningRival.id)) {
-        offersByRival.set(owningRival.id, []);
+      let offersForRival = offersByRival.get(owningRival.id);
+      if (!offersForRival) {
+        offersForRival = [];
+        offersByRival.set(owningRival.id, offersForRival);
       }
-      offersByRival.get(owningRival.id)!.push(offer);
+      offersForRival.push(offer);
     });
   });
 

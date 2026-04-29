@@ -39,9 +39,13 @@ export function processStaff(
         preferredFocus ? affordable.filter((t) => t.focus === preferredFocus) : [];
       const pool = focusCandidates.length > 0 ? focusCandidates : affordable;
 
+      const first = pool[0];
+      if (!first) {
+        throw new Error('Pool is unexpectedly empty');
+      }
       const best = pool.reduce(
         (max, current) => ((HIRE_COST[current.tier] ?? 0) > (HIRE_COST[max.tier] ?? 0) ? current : max),
-        pool[0]!
+        first
       );
       const hireCost = HIRE_COST[best.tier] ?? 0;
       const budgetReport = checkBudget(updatedRival, hireCost, 'STAFF');

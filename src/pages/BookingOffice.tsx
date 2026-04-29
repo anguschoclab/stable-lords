@@ -62,10 +62,12 @@ function getInjuryBadge(
     ['Moderate', 'Severe', 'Critical', 'Permanent'].includes(i.severity)
   );
   if (blocking.length === 0) return null;
+  const first = blocking[0];
+  if (!first) return null;
   const severest = blocking.reduce<InjuryData>((max, i) => {
     const order = ['Minor', 'Moderate', 'Severe', 'Critical', 'Permanent'];
     return order.indexOf(i.severity) > order.indexOf(max.severity) ? i : max;
-  }, blocking[0]!);
+  }, first);
   const colorMap: Record<string, string> = {
     Moderate: 'bg-arena-gold/20 text-arena-gold border-arena-gold/30',
     Severe: 'bg-arena-blood/20 text-arena-blood border-arena-blood/30',
@@ -73,9 +75,13 @@ function getInjuryBadge(
     Permanent: 'bg-arena-fame/20 text-arena-fame border-arena-fame/30',
   };
   const severity = severest.severity ?? 'Moderate';
+  const color = colorMap[severity] ?? colorMap['Moderate'];
+  if (!color) {
+    throw new Error('Color not found for severity');
+  }
   return {
     label: severity,
-    color: (colorMap[severity] ?? colorMap['Moderate'])!,
+    color,
     count: blocking.length,
   };
 }

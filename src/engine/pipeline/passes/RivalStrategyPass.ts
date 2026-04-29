@@ -59,15 +59,13 @@ export function runRivalStrategyPass(
 
   // 1.5. World Matchmaking: NPCs propose bouts to each other
   const worldBouts = planWorldBouts(state, rng);
-  const boutOffersWithWorld = { ...(state.boutOffers || {}) };
+  let boutOffersWithWorld: Record<BoutOfferId, typeof state.boutOffers[BoutOfferId]> = { ...(state.boutOffers || {}) };
 
   // 🧹 1.6 Hardening: Purge Expired Offers (Prevent state bloat)
-  Object.keys(boutOffersWithWorld).forEach((id) => {
-    const offer = boutOffersWithWorld[id as BoutOfferId];
-    if (offer && offer.expirationWeek < nextWeek) {
-      delete boutOffersWithWorld[id as BoutOfferId];
-    }
+  const activeOffers = Object.entries(boutOffersWithWorld).filter(([_, offer]) => {
+    return !(offer && offer.expirationWeek < nextWeek);
   });
+  boutOffersWithWorld = Object.fromEntries(activeOffers) as Record<BoutOfferId, typeof boutOffersWithWorld[BoutOfferId]>;
 
   if (worldBouts.length > 0) {
     worldBouts.forEach((o) => {

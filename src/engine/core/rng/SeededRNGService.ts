@@ -41,10 +41,24 @@ export class SeededRNGService implements IRNGService {
     const totalWeight = weights.reduce((a, b) => a + b, 0);
     let random = this.rng.next() * totalWeight;
     for (let i = 0; i < items.length; i++) {
-      random -= weights[i]!;
-      if (random <= 0) return items[i]!;
+      const weight = weights[i];
+      if (weight === undefined) {
+        throw new Error('Weight index out of bounds');
+      }
+      random -= weight;
+      if (random <= 0) {
+        const item = items[i];
+        if (item === undefined) {
+          throw new Error('Item index out of bounds');
+        }
+        return item;
+      }
     }
-    return items[items.length - 1]!;
+    const fallback = items[items.length - 1];
+    if (fallback === undefined) {
+      throw new Error('No items available for weighted pick');
+    }
+    return fallback;
   }
 
   chance(probability: number): boolean {

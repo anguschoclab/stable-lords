@@ -97,10 +97,12 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
         rosterUpdates.set(w.id, update);
       } else if (rivalId) {
         const rKey = rivalId as StableId;
-        const rUpdate = rivalsUpdates.get(rKey) || {
-          roster: [...state.rivals.find((r) => r.id === rivalId)!.roster],
-        };
-        rUpdate.roster = rUpdate.roster!.map((rw) => (rw.id === w.id ? { ...rw, ...update } : rw));
+        const rival = state.rivals.find((r) => r.id === rivalId);
+        if (!rival) continue;
+        const rUpdate = rivalsUpdates.get(rKey) || { roster: [...rival.roster] };
+        if (rUpdate.roster) {
+          rUpdate.roster = rUpdate.roster.map((rw) => (rw.id === w.id ? { ...rw, ...update } : rw));
+        }
         rivalsUpdates.set(rKey, rUpdate);
       }
     }
@@ -113,7 +115,9 @@ export function computeAgingImpact(state: GameState, rng: IRNGService): StateImp
       const currentRival = state.rivals.find((r) => r.id === rivalId);
       if (currentRival) {
         const rUpdate = rivalsUpdates.get(rivalId) || { roster: [...currentRival.roster] };
-        rUpdate.roster = rUpdate.roster!.filter((w) => w.id !== rw.id);
+        if (rUpdate.roster) {
+          rUpdate.roster = rUpdate.roster.filter((w) => w.id !== rw.id);
+        }
         rivalsUpdates.set(rivalId, rUpdate);
       }
     }

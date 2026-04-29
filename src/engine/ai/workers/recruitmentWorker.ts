@@ -52,7 +52,8 @@ export function processRecruitment(
   let bestScore = -Infinity;
 
   for (let i = 0; i < remainingPool.length; i++) {
-    const w = remainingPool[i]!;
+    const w = remainingPool[i];
+    if (!w) continue;
     let score = 0;
     if (w.tier === 'Prodigy') score += 100;
     if (w.tier === 'Exceptional') score += 50;
@@ -82,7 +83,10 @@ export function processRecruitment(
 
   // 3. Risk-Tiered Budget Check & Finalizing Recruit
   if (bestIdx >= 0 && (bestScore > 30 || isMajorDraftWeek)) {
-    const recruit = remainingPool[bestIdx]!;
+    const recruit = remainingPool[bestIdx];
+    if (!recruit) {
+      throw new Error('Recruit selection failed');
+    }
     const cost = recruit.tier === 'Prodigy' ? 400 : recruit.tier === 'Exceptional' ? 250 : 100;
 
     // ⚡ Lead Agent Verification: Check budget before signing

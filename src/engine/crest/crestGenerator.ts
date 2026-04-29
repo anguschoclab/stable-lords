@@ -232,7 +232,7 @@ function selectCharge(
   const chargeName = rng.pick(availableCharges);
 
   // Determine count based on tier (higher = more charges)
-  let count: 1 | 2 | 3 = 1;
+  let count: 1 | 2 | 3;
   if (tier === 'Minor') {
     count = 1;
   } else if (tier === 'Established') {
