@@ -122,7 +122,7 @@ export async function deleteSlot(slotId: string) {
 }
 
 export function newSlotId(): string {
-  return `slot_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `slot_${crypto.randomUUID()}`;
 }
 
 export async function exportSlot(slotId: string): Promise<string | null> {
