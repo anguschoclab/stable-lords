@@ -2,8 +2,8 @@
  * Detects rivalry intensity escalation and fires toast notifications.
  * Blood Feud level (4-5) triggers screen shake + impact SFX via Web Audio API.
  */
-import { useEffect, useRef, useMemo, useCallback } from 'react';
-import { useGameStore, useWorldState } from '@/state/useGameStore';
+import { useEffect, useRef, useMemo } from 'react';
+import { useWorldState } from '@/state/useGameStore';
 import { toast } from '@/hooks/use-toast';
 
 interface RivalrySnapshot {
@@ -109,15 +109,16 @@ export function useRivalryAlerts() {
   );
 
   const rivalWarriorStable = useMemo(() => {
-    const m = new Map<string, string>();
+    const m: Record<string, string> = Object.create(null);
     for (const r of state.rivals ?? []) {
-      for (const w of r.roster) m.set(w.name, r.owner.stableName);
+      for (const w of r.roster) m[w.name] = r.owner.stableName;
     }
     return m;
   }, [state.rivals]);
 
   const currentRivalries = useMemo((): RivalrySnapshot[] => {
-    const map = new Map<string, { stableName: string; kills: number; bouts: number }>();
+    const map: Record<string, { stableName: string; kills: number; bouts: number }> = Object.create(null);
+    const result: { stableName: string; kills: number; bouts: number }[] = [];
 
     for (const bout of state.arenaHistory) {
       const aIsPlayer = rosterNames.has(bout.a);
@@ -125,17 +126,20 @@ export function useRivalryAlerts() {
       if (!aIsPlayer && !dIsPlayer) continue;
 
       const rivalName = aIsPlayer ? bout.d : bout.a;
-      const stable = rivalWarriorStable.get(rivalName);
+      const stable = rivalWarriorStable[rivalName];
       if (!stable) continue;
 
-      if (!map.has(stable)) map.set(stable, { stableName: stable, kills: 0, bouts: 0 });
-      const r = map.get(stable);
-      if (!r) continue;
+      let r = map[stable];
+      if (!r) {
+        r = { stableName: stable, kills: 0, bouts: 0 };
+        map[stable] = r;
+        result.push(r);
+      }
       r.bouts++;
       if (bout.by === 'Kill' && bout.winner) r.kills++;
     }
 
-    return [...map.values()].map((r) => {
+    return result.map((r) => {
       let intensity = Math.min(r.kills * 2, 4) + (r.bouts >= 5 ? 1 : 0);
       intensity = Math.max(1, Math.min(5, intensity));
       return { stableName: r.stableName, intensity };
