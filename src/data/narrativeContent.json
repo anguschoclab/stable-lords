@@ -1851,6 +1851,20 @@
       "newsletter": [
         "{{name}} got involved in a chaotic tavern brawl over the break! They broke a few noses (and maybe a chair), gaining notoriety, but took some bruises in the process. (+{{fame}} Fame, Minor Injury)"
       ]
+    },
+    "bards_song": {
+      "title": "A Bard's Song",
+      "effectType": "bards_song",
+      "newsletter": [
+        "A wandering bard composed a thrilling ballad about {{name}}'s recent victories! The song is spreading across the taverns. (+{{fame}} Fame)"
+      ]
+    },
+    "plague_outbreak": {
+      "title": "Plague Outbreak",
+      "effectType": "plague_outbreak",
+      "newsletter": [
+        "A nasty fever has swept through the gladiator barracks. {{name}} caught the worst of it, suffering a minor injury and temporary weakness. (-{{fame}} Fame, Sickness)"
+      ]
     }
   },
   "crowd_reactions": {

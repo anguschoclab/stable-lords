@@ -40,6 +40,10 @@ export interface TraitEffect {
 
   // Special: kill-streak / hit-streak based
   attModConsecutiveHits?: number; // when consecutiveHits >= 2
+
+  // Personality / Combat AI modifiers (from FTUE)
+  fightPlanMod?: Partial<import('@/types/shared.types').FightPlan>;
+  attrBonus?: Partial<import('@/types/shared.types').Attributes>;
 }
 
 export interface TraitDef {
@@ -150,6 +154,77 @@ export const TRAITS: Record<string, TraitDef> = {
     effect: { iniMod: -1 },
     weight: 0.4,
   },
+  // ── Personality / Combat AI Traits ──
+  aggressive: {
+    id: 'aggressive',
+    name: 'Aggressive',
+    description: 'Fights with reckless abandon, favoring strength over defense.',
+    effect: { fightPlanMod: { OE: 4, AL: -2, killDesire: 5 }, attrBonus: { ST: 1, WL: 1 } },
+    weight: 1.0,
+  },
+  disciplined_mind: {
+    id: 'disciplined_mind',
+    name: 'Disciplined',
+    description: 'Calm and focused, waiting for the perfect moment to strike.',
+    effect: { fightPlanMod: { AL: 3, OE: -1, feintTendency: 5 }, attrBonus: { DF: 1, WL: 1 } },
+    weight: 1.0,
+  },
+  cunning: {
+    id: 'cunning',
+    name: 'Cunning',
+    description: 'Favors trickery and misdirection to find the killing blow.',
+    effect: { fightPlanMod: { feintTendency: 10, AL: 2, killDesire: -2 }, attrBonus: { SP: 1, DF: 1 } },
+    weight: 1.0,
+  },
+  sturdy: {
+    id: 'sturdy',
+    name: 'Sturdy',
+    description: 'An unbreakable wall that outlasts any opponent.',
+    effect: { fightPlanMod: { AL: -3, OE: -2, killDesire: -5 }, attrBonus: { CN: 1, SZ: 1 } },
+    weight: 1.0,
+  },
+  feral: {
+    id: 'feral',
+    name: 'Feral',
+    description: 'Fights with a savage, unpredictable intensity.',
+    effect: { fightPlanMod: { OE: 6, AL: -4, killDesire: 10 }, attrBonus: { ST: 1, SP: 1 } },
+    weight: 0.6,
+  },
+  merciless: {
+    id: 'merciless',
+    name: 'Merciless',
+    description: 'Relentlessly pursues the kill, ignoring all distractions.',
+    effect: { fightPlanMod: { killDesire: 15, OE: 2 }, attrBonus: { ST: 1, WL: 1 } },
+    weight: 0.6,
+  },
+  calculated: {
+    id: 'calculated',
+    name: 'Calculated',
+    description: 'Every move is a deliberate setup for a final strike.',
+    effect: { fightPlanMod: { feintTendency: 8, AL: 4, OE: -3 }, attrBonus: { SP: 1, DF: 1 } },
+    weight: 0.8,
+  },
+  resilient: {
+    id: 'resilient',
+    name: 'Resilient',
+    description: 'Absorbs punishment that would fell a lesser warrior.',
+    effect: { fightPlanMod: { AL: -2, killDesire: -8 }, attrBonus: { CN: 2 } },
+    weight: 0.8,
+  },
+  evasive: {
+    id: 'evasive',
+    name: 'Evasive',
+    description: 'A ghost on the sand, near-impossible to pin down.',
+    effect: { fightPlanMod: { AL: 10, OE: -5, feintTendency: 5 }, attrBonus: { SP: 2 } },
+    weight: 0.8,
+  },
+  brutal: {
+    id: 'brutal',
+    name: 'Brutal',
+    description: 'Values raw power and crushing impact above all else.',
+    effect: { fightPlanMod: { OE: 8, killDesire: 5, AL: -5 }, attrBonus: { ST: 2 } },
+    weight: 0.8,
+  },
 };
 
 const TRAIT_IDS = Object.keys(TRAITS);
@@ -252,4 +327,23 @@ export function getDynamicTraitMods(
     if (e.killWindowBonus != null) acc.killWindowBonus += e.killWindowBonus;
   }
   return acc;
+}
+
+/** Combines personality/combat AI trait modifiers for a warrior's FightPlan */
+export function getTraitFightPlanMods(warrior?: Warrior): Partial<import('@/types/shared.types').FightPlan> {
+  const mods: Partial<import('@/types/shared.types').FightPlan> = {};
+  if (!warrior?.traits) return mods;
+
+  for (const id of warrior.traits) {
+    const t = TRAITS[id];
+    if (!t?.effect.fightPlanMod) continue;
+    
+    for (const [key, val] of Object.entries(t.effect.fightPlanMod)) {
+      const k = key as keyof import('@/types/shared.types').FightPlan;
+      if (typeof val === 'number') {
+        mods[k] = ((mods[k] as number) || 0) + val;
+      }
+    }
+  }
+  return mods;
 }

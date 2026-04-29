@@ -80,6 +80,10 @@ export function SeasonWidget() {
     WeatherIcon = Moon;
     weatherColor = 'text-arena-fame';
     weatherBg = 'bg-arena-fame/10 border-arena-fame/20';
+  } else if (weather === 'Sandstorm') {
+    WeatherIcon = Wind;
+    weatherColor = 'text-amber-600';
+    weatherBg = 'bg-amber-600/10 border-amber-600/20';
   }
 
   return (

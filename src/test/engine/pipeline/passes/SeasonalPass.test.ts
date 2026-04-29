@@ -35,7 +35,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 0.85; // picks index 4 = tavern_brawl
+      if (callCount === 1) return 4 / 7; // picks index 4 = tavern_brawl
       return originalNext();
     };
     (rng as any).next = mockNext;
@@ -74,7 +74,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 0.85; // picks tavern_brawl
+      if (callCount === 1) return 4 / 7; // picks tavern_brawl
       return originalNext();
     };
     (rng as any).next = mockNext;

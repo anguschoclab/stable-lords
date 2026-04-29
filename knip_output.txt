@@ -1,0 +1,572 @@
+Unused files (55)
+autosim.ts                                         
+electron/preload.js                                
+electron/preload.ts                                
+killer_audit.ts                                    
+meta_audit.ts                                      
+mini_test.ts                                       
+rewrite_json.cjs                                   
+scratch/combat_audit.ts                            
+scratch/diagnose_matchmaker.ts                     
+scratch/find_unused_exports.ts                     
+scratch/matchup_audit.ts                           
+scratch/matchup_harness_rich.ts                    
+scratch/matchup_harness.ts                         
+scratch/remove_pass_metadata.ts                    
+scratch/treasury_trace.ts                          
+scratch/world_health.ts                            
+scripts/daily_oracle.ts                            
+scripts/mock-env.ts                                
+scripts/season_smoke.ts                            
+scripts/validateNarrativeArchive.ts                
+src/components/awards/AwardCard.tsx                
+src/components/dashboard/FinancesWidget.tsx        
+src/components/dashboard/MetaPulseWidget.tsx       
+src/components/dashboard/RankingsWidget.tsx        
+src/components/dashboard/RivalsListWidget.tsx      
+src/components/dashboard/StableComparisonWidget.tsx
+src/components/dashboard/StableStrategyWidget.tsx  
+src/components/dashboard/StableWidget.tsx          
+src/components/dashboard/TrainingWidget.tsx        
+src/components/startGame/WaxSeal.tsx               
+src/components/ui/CodexTable.tsx                   
+src/components/ui/EquipmentCard.tsx                
+src/components/ui/SectionHeader.tsx                
+src/components/ui/TemplateInfo.tsx                 
+src/components/widgets/BubbleWatchWidget.tsx       
+src/components/widgets/CrowdMoodWidget.tsx         
+src/data/equipment/index.ts                        
+src/data/randomNames.ts                            
+src/data/stableTemplates.ts                        
+src/engine/bout/entityUpdateHelper.ts              
+src/engine/core/rng/index.ts                       
+src/engine/core/rng/TestRNGService.ts              
+src/engine/crest/index.ts                          
+src/engine/narrative/narrativeResolver.ts          
+src/engine/stylePresets.ts                         
+src/engine/tick/tickHandler.ts                     
+src/pages/RunRound.tsx                             
+src/scripts/autobalance.ts                         
+src/scripts/verify-economy.ts                      
+src/services/stableIntegrationService.ts           
+src/state/selectors.ts                             
+src/state/uiPrefs.ts                               
+src/types/electron.d.ts                            
+stress_test.ts                                     
+test_kill.js                                       
+Unused dependencies (24)
+@hello-pangea/dnd                package.json:38:6
+@hookform/resolvers              package.json:39:6
+@radix-ui/react-aspect-ratio     package.json:42:6
+@radix-ui/react-avatar           package.json:43:6
+@radix-ui/react-checkbox         package.json:44:6
+@radix-ui/react-context-menu     package.json:46:6
+@radix-ui/react-dropdown-menu    package.json:48:6
+@radix-ui/react-hover-card       package.json:49:6
+@radix-ui/react-menubar          package.json:51:6
+@radix-ui/react-navigation-menu  package.json:52:6
+@radix-ui/react-popover          package.json:53:6
+@radix-ui/react-radio-group      package.json:55:6
+@radix-ui/react-toggle           package.json:64:6
+@radix-ui/react-toggle-group     package.json:65:6
+cmdk                             package.json:70:6
+date-fns                         package.json:71:6
+dompurify                        package.json:72:6
+embla-carousel-react             package.json:73:6
+input-otp                        package.json:75:6
+react-day-picker                 package.json:79:6
+react-hook-form                  package.json:81:6
+react-resizable-panels           package.json:83:6
+recast                           package.json:84:6
+vaul                             package.json:90:6
+Unused devDependencies (15)
+@electron-forge/maker-deb       package.json:95:6 
+@electron-forge/maker-dmg       package.json:96:6 
+@electron-forge/maker-rpm       package.json:97:6 
+@electron-forge/maker-squirrel  package.json:98:6 
+@electron-forge/maker-zip       package.json:99:6 
+@tailwindcss/typography         package.json:102:6
+@testing-library/user-event     package.json:107:6
+dexie                           package.json:116:6
+electron-is-dev                 package.json:118:6
+electron-store                  package.json:119:6
+esbuild                         package.json:120:6
+inkjs                           package.json:127:6
+rollup-plugin-visualizer        package.json:131:6
+wait-on                         package.json:139:6
+unplugin                        package.json:141:6
+Unlisted binaries (1)
+sleep  package.json
+Unresolved imports (7)
+./resolution                 src/engine/combat/mechanics/conditionEngine.ts:7:54   
+./resolution                 src/engine/combat/mechanics/distanceResolution.ts:2:35
+@/engine/combat/resolution   src/engine/combat/mechanics/simulateHelpers.ts:4:59   
+../narrative/narrativeUtils  src/engine/combat/narrative/narrator.ts:25:38         
+@/engine/combat/resolution   src/engine/trainerSpecialties.ts:2:54                 
+@/engine/combat/resolution   src/test/engine/combat/exchangeSubPhases.test.ts:8:35 
+@/engine/combat/resolution   src/test/engine/trainerSpecialties.test.ts:4:54       
+Unused exports (278)
+HighlightLog                                        function  src/components/arena/HighlightLog.tsx:95:17            
+SIZE_MAP                                                      src/components/crest/StableCrest.tsx:490:10            
+default                                             function  src/components/crest/StableCrest.tsx:491:16            
+WeeklyDigestMini                                    function  src/components/dashboard/WeeklyDigestWidget.tsx:272:17 
+WarriorLinkSheet                                              src/components/EntityLink.tsx:179:25                   
+StableLinkSheet                                               src/components/EntityLink.tsx:179:57                   
+default                                             function  src/components/ledger/YearEndRecap.tsx:134:16          
+HUBS                                                          src/components/navigation/LeftNav.tsx:328:10           
+TACTIC_BANK                                                   src/components/planBuilder/TacticBank.tsx:5:14         
+getLethalityScore                                   function  src/components/run-round/LethalityBadge.tsx:11:17      
+ChampionDisplay                                     function  src/components/tournaments/TournamentBracket.tsx:340:17
+BronzeHighlight                                     function  src/components/tournaments/TournamentBracket.tsx:385:17
+TournamentProgress                                  function  src/components/tournaments/TournamentBracket.tsx:421:17
+AlertDialogPortal                                             src/components/ui/alert-dialog.tsx:105:3               
+AlertDialogOverlay                                            src/components/ui/alert-dialog.tsx:106:3               
+AlertDialogTrigger                                            src/components/ui/alert-dialog.tsx:107:3               
+badgeVariants                                                 src/components/ui/badge.tsx:37:17                      
+ChartLegend                                                   src/components/ui/chart.tsx:295:3                      
+ChartLegendContent                                            src/components/ui/chart.tsx:296:3                      
+ChartStyle                                                    src/components/ui/chart.tsx:297:3                      
+DialogPortal                                                  src/components/ui/dialog.tsx:93:3                      
+DialogOverlay                                                 src/components/ui/dialog.tsx:94:3                      
+DialogClose                                                   src/components/ui/dialog.tsx:95:3                      
+DialogFooter                                                  src/components/ui/dialog.tsx:99:3                      
+DialogDescription                                             src/components/ui/dialog.tsx:101:3                     
+ScrollBar                                                     src/components/ui/scroll-area.tsx:44:22                
+SelectGroup                                                   src/components/ui/select.tsx:142:3                     
+SelectLabel                                                   src/components/ui/select.tsx:146:3                     
+SelectSeparator                                               src/components/ui/select.tsx:148:3                     
+SelectScrollUpButton                                          src/components/ui/select.tsx:149:3                     
+SelectScrollDownButton                                        src/components/ui/select.tsx:150:3                     
+SheetPortal                                                   src/components/ui/sheet.tsx:111:3                      
+SheetOverlay                                                  src/components/ui/sheet.tsx:112:3                      
+SheetClose                                                    src/components/ui/sheet.tsx:114:3                      
+SheetFooter                                                   src/components/ui/sheet.tsx:117:3                      
+SheetDescription                                              src/components/ui/sheet.tsx:119:3                      
+toast                                                         src/components/ui/sonner.tsx:27:19                     
+surfaceVariants                                               src/components/ui/Surface.tsx:107:19                   
+TableFooter                                                   src/components/ui/table.tsx:91:41                      
+TableCaption                                                  src/components/ui/table.tsx:91:86                      
+ToastAction                                                   src/components/ui/toast.tsx:121:3                      
+MUDPIT_ARENA                                                  src/data/arenas.ts:38:14                               
+BLOODSANDS_ARENA                                              src/data/arenas.ts:49:14                               
+UNDERPIT_ARENA                                                src/data/arenas.ts:60:14                               
+SCOUT_COST                                                    src/data/economyConstants.ts:14:14                     
+REFRESH_COST                                                  src/data/economyConstants.ts:15:14                     
+ALL_EQUIPMENT                                                 src/data/equipment.ts:40:3                             
+SHIELD_ITEM_IDS                                               src/data/equipment.ts:46:10                            
+ALL_EQUIPMENT                                                 src/data/equipment/equipment.utils.ts:21:14            
+STYLE_CLASSIC_WEAPONS                                         src/data/equipment/equipment.utils.ts:161:14           
+SHIELD_ITEM_IDS                                               src/data/equipment/weapons.ts:326:14                   
+randomPrefixedStableName                            function  src/data/names/nameGenerators.ts:51:17                 
+randomAltStableName                                 function  src/data/names/nameGenerators.ts:63:17                 
+isValidWarriorName                                  function  src/data/names/nameValidation.ts:16:17                 
+isValidOwnerFirstName                               function  src/data/names/nameValidation.ts:26:17                 
+isValidOwnerLastName                                function  src/data/names/nameValidation.ts:36:17                 
+isValidOwnerName                                    function  src/data/names/nameValidation.ts:46:17                 
+isValidStablePrefix                                 function  src/data/names/nameValidation.ts:60:17                 
+isValidStableSuffix                                 function  src/data/names/nameValidation.ts:70:17                 
+isValidAltStableName                                function  src/data/names/nameValidation.ts:80:17                 
+isValidStableName                                   function  src/data/names/nameValidation.ts:90:17                 
+getStableNameFormat                                 function  src/data/names/nameValidation.ts:112:17                
+filterValidWarriorNames                             function  src/data/names/nameValidation.ts:134:17                
+filterValidOwnerNames                               function  src/data/names/nameValidation.ts:144:17                
+filterValidStableNames                              function  src/data/names/nameValidation.ts:154:17                
+PHILOSOPHY_TO_STYLES                                          src/data/ownerData.ts:54:14                            
+FLAIR_DESCRIPTIONS                                            src/data/tagDescriptions.ts:8:14                       
+TITLE_DESCRIPTIONS                                            src/data/tagDescriptions.ts:9:14                       
+INJURY_DESCRIPTIONS                                           src/data/tagDescriptions.ts:10:14                      
+STATUS_DESCRIPTIONS                                           src/data/tagDescriptions.ts:11:14                      
+getAllBackstoryIds                                  function  src/data/templates/backstoryData.ts:12:17              
+getTemplatesByBackstoryGroup                        function  src/data/templates/backstoryData.ts:23:17              
+getBackstoryCounts                                  function  src/data/templates/backstoryData.ts:39:17              
+getTemplatesByWarriorNameTheme                      function  src/data/templates/backstoryData.ts:53:17              
+getTemplatesByAttributeBias                         function  src/data/templates/backstoryData.ts:65:17              
+getAggressiveTemplates                              function  src/data/templates/backstoryData.ts:78:17              
+getDefensiveTemplates                               function  src/data/templates/backstoryData.ts:87:17              
+getTechnicalTemplates                               function  src/data/templates/backstoryData.ts:96:17              
+getBalancedTemplates                                function  src/data/templates/backstoryData.ts:105:17             
+getTemplatesByTier                                            src/data/templates/templateBuilders.ts:24:3            
+getTemplatesByPhilosophy                                      src/data/templates/templateBuilders.ts:25:3            
+getTemplatesByPersonality                                     src/data/templates/templateBuilders.ts:26:3            
+getTemplatesByMetaAdaptation                                  src/data/templates/templateBuilders.ts:27:3            
+getTemplatesByBackstory                                       src/data/templates/templateBuilders.ts:28:3            
+getTemplatesByStyle                                           src/data/templates/templateBuilders.ts:29:3            
+getTemplatesByFameRange                                       src/data/templates/templateBuilders.ts:30:3            
+getTemplatesByRosterRange                                     src/data/templates/templateBuilders.ts:31:3            
+searchTemplates                                               src/data/templates/templateBuilders.ts:32:3            
+getRandomTemplate                                   function  src/data/templates/templateBuilders.ts:38:17           
+getRandomTemplateByTier                             function  src/data/templates/templateBuilders.ts:45:17           
+createTemplateVariant                               function  src/data/templates/templateBuilders.ts:53:17           
+validateTemplate                                    function  src/data/templates/templateBuilders.ts:66:17           
+TIER_CACHES                                                   src/data/templates/templateCache.ts:24:14              
+clearTemplateCache                                  function  src/data/templates/templateCache.ts:264:17             
+getCacheStats                                       function  src/data/templates/templateCache.ts:271:17             
+ENCUMBRANCE_CAPACITY                                          src/data/terrabloodCharts.ts:161:14                    
+ENCUMBRANCE_LABELS                                            src/data/terrabloodCharts.ts:170:14                    
+ENDURANCE_LABELS                                              src/data/terrabloodCharts.ts:226:14                    
+generateBoutBids                                    function  src/engine/ai/workers/competitionWorker.ts:36:17       
+DEFAULT_AUTOSIM_STOP_CONDITIONS                               src/engine/autosim.ts:30:14                            
+applyFameDelta                                      function  src/engine/bout/warriorStateUpdater.ts:46:17           
+applyCareerStats                                    function  src/engine/bout/warriorStateUpdater.ts:56:17           
+AL_ATTR_SCALING                                               src/engine/combat/mechanics/combatConstants.ts:16:14   
+DAMAGE_TAX_SCALING                                            src/engine/combat/mechanics/combatConstants.ts:19:14   
+KILL_WINDOW_ENDURANCE                                         src/engine/combat/mechanics/combatConstants.ts:20:14   
+KILL_DESIRE_SCALING                                           src/engine/combat/mechanics/combatConstants.ts:21:14   
+KILL_PHASE_LATE_BONUS                                         src/engine/combat/mechanics/combatConstants.ts:22:14   
+KILL_THRESHOLD_MIN                                            src/engine/combat/mechanics/combatConstants.ts:23:14   
+KILL_THRESHOLD_BASE                                           src/engine/combat/mechanics/combatConstants.ts:24:14   
+STYLE_ORDER                                                   src/engine/combat/mechanics/combatConstants.ts:31:14   
+MATCHUP_MATRIX                                                src/engine/combat/mechanics/combatConstants.ts:72:14   
+pickText                                            function  src/engine/combat/mechanics/combatMath.ts:19:17        
+derivePsychState                                    function  src/engine/combat/mechanics/conditionEngine.ts:59:17   
+createRNGForContext                                 function  src/engine/combat/mechanics/simulateHelpers.ts:10:17   
+setupRng                                            function  src/engine/combat/mechanics/simulateHelpers.ts:14:17   
+processOutcomeTags                                  function  src/engine/combat/mechanics/simulateHelpers.ts:83:17   
+DECISION_HIT_MARGIN                                           src/engine/combat/resolution/resolution.ts:66:14       
+createBoutSummary                                   function  src/engine/core/fightSummaryFactory.ts:62:17           
+createMinimalFightSummary                           function  src/engine/core/fightSummaryFactory.ts:82:17           
+collectAllWarriors                                  function  src/engine/core/warriorCollection.ts:18:17             
+collectAvailableWarriors                            function  src/engine/core/warriorCollection.ts:65:17             
+buildWarriorMap                                     function  src/engine/core/warriorCollection.ts:88:17             
+findWarriorGlobally                                 function  src/engine/core/warriorCollection.ts:102:17            
+countActiveWarriors                                 function  src/engine/core/warriorCollection.ts:135:17            
+BEAST_PATHS                                                   src/engine/crest/chargePaths.ts:16:14                  
+WEAPON_PATHS                                                  src/engine/crest/chargePaths.ts:92:14                  
+SYMBOL_PATHS                                                  src/engine/crest/chargePaths.ts:161:14                 
+NATURE_PATHS                                                  src/engine/crest/chargePaths.ts:235:14                 
+CELESTIAL_PATHS                                               src/engine/crest/chargePaths.ts:309:14                 
+MYTHICAL_PATHS                                                src/engine/crest/chargePaths.ts:353:14                 
+getRandomCharge                                     function  src/engine/crest/chargePaths.ts:437:17                 
+CROWD_MOODS                                                   src/engine/crowdMood.ts:9:14                           
+clearDeathHandlers                                  function  src/engine/deathNotifier.ts:54:17                      
+makeFightSummary                                              src/engine/factories.ts:9:10                           
+styleName                                                     src/engine/gazetteNarrative.ts:7:10                    
+t                                                             src/engine/gazetteNarrative.ts:7:21                    
+MOOD_TONE                                                     src/engine/gazetteNarrative.ts:7:24                    
+detectRivalryMatchup                                          src/engine/gazetteNarrative.ts:10:3                    
+detectGazetteTags                                             src/engine/gazetteNarrative.ts:11:3                    
+detectHotStreakers                                            src/engine/gazetteNarrative.ts:12:3                    
+detectRisingStars                                             src/engine/gazetteNarrative.ts:13:3                    
+detectUpsets                                                  src/engine/gazetteNarrative.ts:14:3                    
+generateGazetteHeadline                                       src/engine/gazetteNarrative.ts:19:3                    
+generateGazetteBody                                           src/engine/gazetteNarrative.ts:20:3                    
+generateSeasonSummary                                         src/engine/gazetteNarrative.ts:21:3                    
+autoTuneFromBias                                              src/engine/index.ts:6:10                               
+reconcileGearTwoHanded                                        src/engine/index.ts:6:28                               
+ArenaHistory                                                  src/engine/index.ts:7:10                               
+NewsletterFeed                                                src/engine/index.ts:8:10                               
+StyleRollups                                                  src/engine/index.ts:9:10                               
+computeWarriorStats                                           src/engine/index.ts:10:10                              
+DAMAGE_LABELS                                                 src/engine/index.ts:10:31                              
+computeCrowdMood                                              src/engine/index.ts:12:3                               
+getMoodModifiers                                              src/engine/index.ts:13:3                               
+MOOD_DESCRIPTIONS                                             src/engine/index.ts:14:3                               
+MOOD_ICONS                                                    src/engine/index.ts:15:3                               
+computeMetaDrift                                              src/engine/index.ts:18:10                              
+getMetaLabel                                                  src/engine/index.ts:18:28                              
+getMetaColor                                                  src/engine/index.ts:18:42                              
+processOwnerGrudges                                           src/engine/index.ts:20:10                              
+calculateRivalryScore                                         src/engine/index.ts:20:31                              
+processAIRosterManagement                                     src/engine/index.ts:21:10                              
+generateOwnerNarratives                                       src/engine/index.ts:22:10                              
+evolvePhilosophies                                            src/engine/index.ts:23:10                              
+generateRivalStables                                          src/engine/index.ts:24:10                              
+processWeekBouts                                              src/engine/index.ts:25:10                              
+generatePairings                                              src/engine/index.ts:25:28                              
+resolveBout                                                   src/engine/index.ts:25:46                              
+getTempoBonus                                                 src/engine/index.ts:27:3                               
+getEnduranceMult                                              src/engine/index.ts:28:3                               
+getStylePassive                                               src/engine/index.ts:29:3                               
+getKillMechanic                                               src/engine/index.ts:30:3                               
+getStyleAntiSynergy                                           src/engine/index.ts:31:3                               
+getMastery                                                    src/engine/index.ts:32:3                               
+generateCrest                                                 src/engine/index.ts:37:3                               
+inheritCrest                                                  src/engine/index.ts:38:3                               
+getCrestColor                                                 src/engine/index.ts:39:3                               
+getChargeDescription                                          src/engine/index.ts:40:3                               
+getCrestDescription                                           src/engine/index.ts:41:3                               
+TickOrchestrator                                              src/engine/index.ts:54:10                              
+TimeAdvanceService                                            src/engine/index.ts:56:3                               
+DEFAULT_AUTOSIM_STOPS                                         src/engine/index.ts:63:3                               
+evaluateStopConditions                                        src/engine/index.ts:64:3                               
+runAutosim                                                    src/engine/index.ts:70:3                               
+DEFAULT_AUTOSIM_STOP_CONDITIONS                               src/engine/index.ts:74:3                               
+setTelemetryProvider                                          src/engine/index.ts:79:3                               
+getTelemetryProvider                                          src/engine/index.ts:80:3                               
+telemetry                                                     src/engine/index.ts:81:3                               
+TelemetryEvents                                               src/engine/index.ts:82:3                               
+TelemetryTags                                                 src/engine/index.ts:83:3                               
+generateInjury                   injuriesModule     function  src/engine/injuries.ts:115:17                          
+addMatchRecord                   matchmakingModule  function  src/engine/matchmaking/historyLogic.ts:28:17           
+TOURNAMENT_TIERS                                              src/engine/matchmaking/tournamentSelection.ts:11:10    
+AIBoutService                                                 src/engine/matchmakingServices.ts:81:14                
+generateWarriorIntro                                          src/engine/narrative/combatNarrator.ts:305:14          
+battleOpener                                                  src/engine/narrative/combatNarrator.ts:306:14          
+narrateAttack                                                 src/engine/narrative/combatNarrator.ts:307:14          
+narratePassive                                                src/engine/narrative/combatNarrator.ts:308:14          
+narrateParry                                                  src/engine/narrative/combatNarrator.ts:309:14          
+narrateDodge                                                  src/engine/narrative/combatNarrator.ts:310:14          
+narrateCounterstrike                                          src/engine/narrative/combatNarrator.ts:311:14          
+narrateHit                                                    src/engine/narrative/combatNarrator.ts:312:14          
+narrateParryBreak                                             src/engine/narrative/combatNarrator.ts:313:14          
+narrateInitiative                                             src/engine/narrative/combatNarrator.ts:314:14          
+narrateBoutEnd                                                src/engine/narrative/combatNarrator.ts:315:14          
+narrateParryBreak                                   function  src/engine/narrative/narrativeCombat.ts:133:17         
+RANGE_NAMES                                                   src/engine/narrative/narrativePositioning.ts:10:14     
+pressingLine                                        function  src/engine/narrative/narrativePositioning.ts:97:17     
+popularityLine                                      function  src/engine/narrative/narrativePostBout.ts:111:17       
+skillLearnLine                                      function  src/engine/narrative/narrativePostBout.ts:121:17       
+tradingBlowsLine                                    function  src/engine/narrative/narrativePostBout.ts:129:17       
+stalemateLine                                       function  src/engine/narrative/narrativePostBout.ts:136:17       
+damageSeverityLine                                            src/engine/narrative/statusNarrator.ts:222:14          
+stateChangeLine                                               src/engine/narrative/statusNarrator.ts:223:14          
+fatigueLine                                                   src/engine/narrative/statusNarrator.ts:224:14          
+crowdReaction                                                 src/engine/narrative/statusNarrator.ts:225:14          
+minuteStatusLine                                              src/engine/narrative/statusNarrator.ts:226:14          
+popularityLine                                                src/engine/narrative/statusNarrator.ts:227:14          
+skillLearnLine                                                src/engine/narrative/statusNarrator.ts:228:14          
+tradingBlowsLine                                              src/engine/narrative/statusNarrator.ts:229:14          
+stalemateLine                                                 src/engine/narrative/statusNarrator.ts:230:14          
+tauntLine                                                     src/engine/narrative/statusNarrator.ts:231:14          
+conservingLine                                                src/engine/narrative/statusNarrator.ts:232:14          
+pressingLine                                                  src/engine/narrative/statusNarrator.ts:233:14          
+narrateInsightHint                                            src/engine/narrative/statusNarrator.ts:234:14          
+getStrikeSeverity                                             src/engine/narrativePBP.ts:9:3                         
+richHitLocation                                               src/engine/narrativePBP.ts:11:3                        
+narrateParryBreak                                             src/engine/narrativePBP.ts:26:3                        
+popularityLine                                                src/engine/narrativePBP.ts:38:3                        
+skillLearnLine                                                src/engine/narrativePBP.ts:39:3                        
+tradingBlowsLine                                              src/engine/narrativePBP.ts:40:3                        
+stalemateLine                                                 src/engine/narrativePBP.ts:41:3                        
+RANGE_NAMES                                                   src/engine/narrativePBP.ts:46:3                        
+pressingLine                                                  src/engine/narrativePBP.ts:52:3                        
+seasonToNumber                                      function  src/engine/pipeline/adapters/opfsArchiver.ts:6:17      
+getAttributeRangeDescription                        function  src/engine/scouting.ts:61:17                           
+createFighterState                                            src/engine/simulate.ts:60:10                           
+resolveDecision                                               src/engine/simulate.ts:60:30                           
+computeBaseSkills                                   function  src/engine/skillCalc.ts:305:17                         
+computeHP                                           function  src/engine/skillCalc.ts:335:17                         
+computeDamage                                       function  src/engine/skillCalc.ts:345:17                         
+computeEncumbrance                                  function  src/engine/skillCalc.ts:350:17                         
+getDamageRating                                               src/engine/skillCalc.ts:356:3                          
+getHPRating                                                   src/engine/skillCalc.ts:357:3                          
+computeEncumbranceClass                                       src/engine/skillCalc.ts:358:3                          
+computeEnduranceTier                                          src/engine/skillCalc.ts:359:3                          
+ENDURANCE_LABELS                                              src/engine/skillCalc.ts:360:3                          
+computeDerivedStats                                 function  src/engine/skillCalc.ts:381:17                         
+ArchiveConflictError                                class     src/engine/storage/electronArchive.ts:28:14            
+ElectronArchiveService                              class     src/engine/storage/electronArchive.ts:35:14            
+opfsArchive                                                   src/engine/storage/electronArchive.ts:163:28           
+STYLE_IDENTITY                                                src/engine/stylePassives.ts:90:14                      
+getStyleIdentity                                    function  src/engine/stylePassives.ts:163:17                     
+SUITABILITY_COLORS                                            src/engine/tacticSuitability.ts:62:14                  
+SUITABILITY_LABELS                                            src/engine/tacticSuitability.ts:68:14                  
+setTelemetryProvider                                function  src/engine/telemetry.ts:27:17                          
+getTelemetryProvider                                function  src/engine/telemetry.ts:34:17                          
+DEFAULT_AUTOSIM_STOPS                                         src/engine/tick/TimeAdvanceService.ts:18:14            
+evaluateStopConditions                              function  src/engine/tick/TimeAdvanceService.ts:94:17            
+default                                             variable  src/engine/tick/TimeAdvanceService.ts:333:16           
+updateWarriorAfterBout                              function  src/engine/warrior/careerUpdate.ts:109:17              
+isRetired                                           function  src/engine/warriorStatus.ts:15:17                      
+reducer                                                       src/hooks/use-toast.ts:71:14                           
+usePlayer                                                     src/state/useGameStore.ts:437:14                       
+useRoster                                                     src/state/useGameStore.ts:438:14                       
+useRivals                                                     src/state/useGameStore.ts:439:14                       
+useTreasury                                                   src/state/useGameStore.ts:440:14                       
+useWeek                                                       src/state/useGameStore.ts:441:14                       
+useIsSimulating                                               src/state/useGameStore.ts:442:14                       
+useGame                                                       src/state/useGameStore.ts:443:14                       
+ARMOR_WEIGHT_MAP                                              src/types/combat.types.ts:25:14                        
+INJURY_SEVERITY_WEEKS                                         src/types/warrior.types.ts:67:14                       
+getWarriorPairKey                                   function  src/utils/keyUtils.ts:17:17                            
+clamp01                                             function  src/utils/math.ts:18:17                                
+lerp                                                function  src/utils/math.ts:26:17                                
+mapRange                                            function  src/utils/math.ts:34:17                                
+roundTo                                             function  src/utils/math.ts:48:17                                
+addCapped                                           function  src/utils/math.ts:57:17                                
+Unused exported types (176)
+Season                               type       src/components/arena/ArenaBackground.tsx:4:13                          
+ParticleType                         type       src/components/arena/effects/ParticleSystem.tsx:4:13                   
+DerivedRivalry                       interface  src/components/dashboard/RivalryWidget.tsx:10:18                       
+HubId                                type       src/components/navigation/LeftNav.tsx:328:21                           
+BadgeProps                           interface  src/components/ui/badge.tsx:25:18                                      
+ButtonProps                          interface  src/components/ui/button.tsx:43:18                                     
+BodyPart                             type       src/components/ui/PaperDoll.tsx:3:13                                   
+PaperDollProps                       interface  src/components/ui/PaperDoll.tsx:5:18                                   
+SortDir                              type       src/components/ui/sort-header.tsx:4:13                                 
+SortHeaderProps                      interface  src/components/ui/sort-header.tsx:6:18                                 
+StatBatteryProps                     interface  src/components/ui/StatBattery.tsx:5:18                                 
+SurfaceProps                         interface  src/components/ui/Surface.tsx:81:18                                    
+FavoritesDisplayInfo                 interface  src/components/warrior/favoritesDisplay.ts:9:18                        
+StoreKey                             type       src/constants/storeKeys.ts:13:13                                       
+BackstoryEconomy                     interface  src/data/backstories.ts:22:18                                          
+BackstoryIdentitySeed                interface  src/data/backstories.ts:29:18                                          
+BackstoryDef                         interface  src/data/backstories.ts:35:18                                          
+WeaponReqCheck                       type       src/data/equipment.ts:19:3                                             
+LoadoutIssue                         type       src/data/equipment.ts:20:3                                             
+OrphanWarrior                        interface  src/data/orphanPool.ts:11:18                                           
+TraitData                            interface  src/data/orphanPool.ts:259:18                                          
+PersonalityEntry                     interface  src/data/promoterPersonalityConfig.tsx:5:18                            
+StablePhilosophy                     type       src/data/templates/stableTemplate.types.ts:38:13                       
+ActivityRating                       type       src/data/terrabloodCharts.ts:277:13                                    
+CoordinationRating                   type       src/data/terrabloodCharts.ts:335:13                                    
+WarriorOverviewStatements            interface  src/data/warriorStatements.ts:8:18                                     
+PlayerThreatLevel                    type       src/engine/ai/agentCore.ts:18:13                                       
+RiskLevel                            type       src/engine/ai/workers/budgetWorker.ts:7:13                             
+BoutBid                              interface  src/engine/ai/workers/competitionWorker.ts:26:18                       
+AutosimOptions                       interface  src/engine/autosim.ts:52:18                                            
+BoutContext                          interface  src/engine/bout/services/boutProcessorService.ts:55:18                 
+BoutImpact                           type       src/engine/boutProcessor.ts:6:8                                        
+WeekBoutSummary                      type       src/engine/boutProcessor.ts:7:8                                        
+BoutContext                          type       src/engine/boutProcessor.ts:8:8                                        
+HitLocation                          type       src/engine/combat/mechanics/combatDamage.ts:6:13                       
+DistanceContestResult                interface  src/engine/combat/mechanics/distanceResolution.ts:108:18               
+FeintResult                          interface  src/engine/combat/resolution/exchangeSubPhases.ts:60:18                
+CommitResult                         interface  src/engine/combat/resolution/exchangeSubPhases.ts:109:18               
+FightSummaryParams                   interface  src/engine/core/fightSummaryFactory.ts:10:18                           
+WarriorWithStable                    interface  src/engine/core/warriorCollection.ts:8:18                              
+MoodModifiers                        interface  src/engine/crowdMood.ts:27:18                                          
+DeathNotification                    interface  src/engine/deathNotifier.ts:16:18                                      
+DeathHandler                         type       src/engine/deathNotifier.ts:21:13                                      
+WeeklyBreakdown            Economy   interface  src/engine/economy.ts:26:18                                            
+GearRecommendation                   interface  src/engine/equipmentOptimizer.ts:18:18                                 
+FamePop                              interface  src/engine/fame.ts:5:18                                                
+DiscoveryResult                      interface  src/engine/favorites.ts:81:18                                          
+GazetteDetections                    type       src/engine/gazetteNarrative.ts:15:8                                    
+Bias                                 type       src/engine/index.ts:6:57                                               
+CrowdMood                            type       src/engine/index.ts:16:8                                               
+StyleMeta                            type       src/engine/index.ts:18:61                                              
+CrestData                            type       src/engine/index.ts:45:3                                               
+CrestCharge                          type       src/engine/index.ts:46:3                                               
+ShieldShape                          type       src/engine/index.ts:47:3                                               
+FieldType                            type       src/engine/index.ts:48:3                                               
+MetalColor                           type       src/engine/index.ts:49:3                                               
+ChargeType                           type       src/engine/index.ts:50:3                                               
+AdvanceOptions                       type       src/engine/index.ts:57:8                                               
+WeekSummary                          type       src/engine/index.ts:58:8                                               
+QuarterSummary                       type       src/engine/index.ts:59:8                                               
+QuarterAdvanceResult                 type       src/engine/index.ts:60:8                                               
+YearAdvanceResult                    type       src/engine/index.ts:61:8                                               
+SoftStopCondition                    type       src/engine/index.ts:62:8                                               
+WeekAdvanceOptions                   type       src/engine/index.ts:66:15                                              
+AutosimOptions                       type       src/engine/index.ts:71:8                                               
+AutosimWeekSummary                   type       src/engine/index.ts:72:8                                               
+AutosimResult                        type       src/engine/index.ts:73:8                                               
+TelemetryProvider                    type       src/engine/index.ts:84:8                                               
+TournamentBracketConfig              interface  src/engine/matchmaking/tournament/tournamentBracketBuilder.ts:5:18     
+RoundResolutionResult                interface  src/engine/matchmaking/tournament/tournamentResolver.ts:13:18          
+CommitteeSelectionResult             interface  src/engine/matchmaking/tournament/tournamentSelectionCommittee.ts:19:18
+WarriorIntroData                     interface  src/engine/narrative/combatNarrator.ts:10:18                           
+WarriorIntroData                     interface  src/engine/narrative/narrativeIntro.ts:13:18                           
+BoutEndContext                       interface  src/engine/narrative/narrativePostBout.ts:20:18                        
+CombatContext                        type       src/engine/narrativePBP.ts:12:8                                        
+WarriorIntroData                     type       src/engine/narrativePBP.ts:17:8                                        
+NewsletterIssue                      interface  src/engine/newsletter/feed.ts:11:18                                    
+XPGain                               interface  src/engine/progression.ts:30:18                                        
+ScoutReport                          interface  src/engine/scouting.ts:18:18                                           
+DamageRating                         type       src/engine/skillCalc.ts:361:8                                          
+HPRating                             type       src/engine/skillCalc.ts:362:8                                          
+EnduranceTier                        type       src/engine/skillCalc.ts:363:8                                          
+EncumbranceClass                     type       src/engine/skillCalc.ts:364:8                                          
+StableReputation                     interface  src/engine/stableReputation.ts:9:18                                    
+StableStats                          interface  src/engine/stats/stableStats.ts:3:18                                   
+StyleRecord                          type       src/engine/stats/styleRollups.ts:183:13                                
+ArchiveService                       interface  src/engine/storage/electronArchive.ts:3:18                             
+ArchiveService                       interface  src/engine/storage/opfsArchive.ts:4:18                                 
+WarningSeverity                      type       src/engine/strategyValidator.ts:9:13                                   
+StrategyWarning                      interface  src/engine/strategyValidator.ts:11:18                                  
+StylePassiveResult                   interface  src/engine/stylePassives.ts:15:18                                      
+KillMechanic                         interface  src/engine/stylePassives.ts:28:18                                      
+StyleStrategy                        interface  src/engine/stylePassives.ts:36:18                                      
+StylePassiveContext                  interface  src/engine/stylePassives.ts:51:18                                      
+KillContext                          interface  src/engine/stylePassives.ts:64:18                                      
+StyleVoice                           type       src/engine/stylePassives.ts:76:13                                      
+AttackFreq                           type       src/engine/stylePassives.ts:77:13                                      
+KillBias                             type       src/engine/stylePassives.ts:78:13                                      
+FatigueBurn                          type       src/engine/stylePassives.ts:79:13                                      
+StyleIdentity                        interface  src/engine/stylePassives.ts:81:18                                      
+MasteryInfo                          interface  src/engine/stylePassives.ts:171:18                                     
+TelemetryProvider                    interface  src/engine/telemetry.ts:6:18                                           
+WeekSummary                          interface  src/engine/tick/TimeAdvanceService.ts:43:18                            
+QuarterSummary                       interface  src/engine/tick/TimeAdvanceService.ts:55:18                            
+SpecialtyMods                        interface  src/engine/trainerSpecialties.ts:9:18                                  
+TrainingImpact             Training  interface  src/engine/training.ts:20:18                                           
+TraitEffect                          interface  src/engine/traits.ts:22:18                                             
+TraitDef                             interface  src/engine/traits.ts:45:18                                             
+CareerUpdateResult                   interface  src/engine/warrior/careerUpdate.ts:18:18                               
+UseArenaAnimationReturn              interface  src/hooks/useArenaAnimation.ts:26:18                                   
+CoachTip                             interface  src/hooks/useCoachTip.ts:11:18                                         
+SfxType                              type       src/lib/AudioManager.ts:16:13                                          
+ObfuscatedWarrior                    interface  src/lib/obfuscation.ts:4:18                                            
+SimulationConfig                     interface  src/scripts/simulation-harness.ts:9:18                                 
+SimulationResult                     interface  src/scripts/simulation-harness.ts:16:18                                
+ArenaPreferences                     interface  src/state/slices/worldSlice.ts:33:18                                   
+GameStoreState                       interface  src/state/useGameStore.ts:25:18                                        
+GameStoreActions                     interface  src/state/useGameStore.ts:34:18                                        
+ArenaFighterData                     interface  src/types/arena.types.ts:47:18                                         
+ArmorWeight                          type       src/types/combat.types.ts:23:13                                        
+EquipmentSlot                        type       src/types/combat.types.ts:36:13                                        
+ArmorEncumbrance                     interface  src/types/combat.types.ts:38:18                                        
+CombatEventType                      type       src/types/combat.types.ts:57:13                                        
+AttackTarget                         type       src/types/combat.types.ts:195:8                                        
+ProtectTarget                        type       src/types/combat.types.ts:196:8                                        
+DeathEvent                           type       src/types/combat.types.ts:200:8                                        
+BeastPosture                         type       src/types/crest.types.ts:27:13                                         
+MoodToneRecord                       interface  src/types/narrative.types.ts:10:18                                     
+UxMetadata                           interface  src/types/narrative.types.ts:16:18                                     
+PersonaDescriptor                    interface  src/types/narrative.types.ts:24:18                                     
+PersonaSkill                         interface  src/types/narrative.types.ts:29:18                                     
+PersonaGood                          interface  src/types/narrative.types.ts:34:18                                     
+PersonaBad                           interface  src/types/narrative.types.ts:43:18                                     
+PersonaDescriptors                   interface  src/types/narrative.types.ts:48:18                                     
+Persona                              interface  src/types/narrative.types.ts:53:18                                     
+StrikeCategory                       interface  src/types/narrative.types.ts:61:18                                     
+StrikesCollection                    interface  src/types/narrative.types.ts:70:18                                     
+HitLocations                         interface  src/types/narrative.types.ts:80:18                                     
+DamageSeverity                       interface  src/types/narrative.types.ts:90:18                                     
+StatusChanges                        interface  src/types/narrative.types.ts:97:18                                     
+Defenses                             interface  src/types/narrative.types.ts:103:18                                    
+Pacing                               interface  src/types/narrative.types.ts:109:18                                    
+Reactions                            interface  src/types/narrative.types.ts:115:18                                    
+Taunts                               interface  src/types/narrative.types.ts:121:18                                    
+Insights                             interface  src/types/narrative.types.ts:126:18                                    
+PbpNarratives                        interface  src/types/narrative.types.ts:133:18                                    
+Conclusions                          interface  src/types/narrative.types.ts:150:18                                    
+Events                               interface  src/types/narrative.types.ts:166:18                                    
+GazetteFights                        interface  src/types/narrative.types.ts:173:18                                    
+GazetteHeadlines                     interface  src/types/narrative.types.ts:182:18                                    
+GazetteFeatured                      interface  src/types/narrative.types.ts:198:18                                    
+SeasonSummary                        interface  src/types/narrative.types.ts:209:18                                    
+GazetteNarratives                    interface  src/types/narrative.types.ts:214:18                                    
+Fanfare                              interface  src/types/narrative.types.ts:223:18                                    
+Memorials                            interface  src/types/narrative.types.ts:241:18                                    
+TierConfig                           interface  src/types/narrative.types.ts:247:18                                    
+Recruitment                          interface  src/types/narrative.types.ts:253:18                                    
+Meta                                 interface  src/types/narrative.types.ts:263:18                                    
+Passives                             interface  src/types/narrative.types.ts:272:18                                    
+KillText                             interface  src/types/narrative.types.ts:278:18                                    
+Brand                                type       src/types/shared.types.ts:3:13                                         
+TrainerId                            type       src/types/shared.types.ts:8:13                                         
+Weapon                               interface  src/types/shared.types.ts:127:18                                       
+DesperatePlan                        interface  src/types/shared.types.ts:164:18                                       
+ArenaWeatherMod                      interface  src/types/shared.types.ts:243:18                                       
+TrainerSpecialty                     type       src/types/shared.types.ts:267:13                                       
+CrestData                            type       src/types/state.types.ts:43:3                                          
+BoutOfferStatus                      type       src/types/state.types.ts:58:13                                         
+BoutOfferResponse                    type       src/types/state.types.ts:59:13                                         
+AnnualAwardType                      type       src/types/state.types.ts:317:13                                        
+UIPrefs                              interface  src/types/state.types.ts:403:18                                        
+BaseSkills                           type       src/types/warrior.types.ts:180:8                                       
+DerivedStats                         type       src/types/warrior.types.ts:181:8                                       
+OutcomeStyle                         interface  src/utils/combat.ts:8:18                                               
+WarriorMinimal                       type       src/utils/historyResolver.ts:4:13                                      
+RivalShallow                         type       src/utils/historyResolver.ts:6:13                                      
+Duplicate exports (7)
+HighlightLog|default          src/components/arena/HighlightLog.tsx 
+StableCrest|default           src/components/crest/StableCrest.tsx  
+YearEndRecap|default          src/components/ledger/YearEndRecap.tsx
+generateInjury|rollForInjury  src/engine/injuries.ts                
+TimeAdvanceService|default    src/engine/tick/TimeAdvanceService.ts 
+HallOfFights|default          src/lore/HallOfFights.tsx             
+useGameStore|useGame          src/state/useGameStore.ts             
+Configuration hints (1)

@@ -21,7 +21,7 @@ function t(template: string, data: Record<string, string | number>): string {
 
 interface OffseasonEventNarrative {
   title: string;
-  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany' | 'tavern_brawl';
+  effectType: 'fame_boost' | 'winter_chill' | 'merchant_blessing' | 'epiphany' | 'tavern_brawl' | 'bards_song' | 'plague_outbreak';
   newsletter: string[];
 }
 
@@ -166,8 +166,53 @@ export function runSeasonalPass(
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],
       });
     }
-  }
+  } else if (e.effectType === 'bards_song') {
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors)!;
+      const fameGained = 15 + Math.floor(seasonRng.next() * 20);
+      rosterUpdates.set(chosen.id, {
+        fame: (chosen.fame || 0) + fameGained,
+      });
+      newsletterItems.push({
+        id: seasonRng.uuid('newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],
+      });
+    }
+  } else if (e.effectType === 'plague_outbreak') {
+    const activeWarriors = state.roster.filter(
+      (w) => w.status === 'Active' && (!w.injuries || w.injuries.length === 0)
+    );
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors)!;
+      const fameLost = 5 + Math.floor(seasonRng.next() * 10);
 
+      const newInjury: InjuryData = {
+        id: seasonRng.uuid('injury') as InjuryId,
+        name: 'Camp Fever',
+        description: 'Leaves the victim weak and fatigued.',
+        severity: 'Minor',
+        weeksRemaining: 2 + Math.floor(seasonRng.next() * 2), // 2-3 weeks
+        penalties: { CN: -2, ST: -1 },
+      };
+
+      const currentInjuries = chosen.injuries || [];
+
+      rosterUpdates.set(chosen.id, {
+        fame: Math.max(0, (chosen.fame || 0) - fameLost),
+        injuries: [...currentInjuries, newInjury],
+      });
+
+      newsletterItems.push({
+        id: seasonRng.uuid('newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameLost })],
+      });
+    }
+  }
   // Record this event in the State so the UI can pick it up
   const impact: StateImpact = {
     rosterUpdates,
