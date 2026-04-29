@@ -76,9 +76,8 @@ describe('Autosim Integration', () => {
 
       expect(result.finalState).toBeDefined();
       expect(result.finalState.week).toBeGreaterThan(initialState.week);
-      expect(result.weeksSimmed).toBeGreaterThan(0);
-      expect(result.weeksSimmed).toBeLessThanOrEqual(weeksToAdvance);
-      expect(progressCalls).toBeGreaterThan(0);
+      expect(result.weeksSimmed).toBe(weeksToAdvance);
+      expect(progressCalls).toBe(weeksToAdvance);
     });
 
     it('should provide week summaries', async () => {
