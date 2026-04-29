@@ -305,9 +305,9 @@ function LedgerRegistry({ recentLedger, totalLedgerEntries }: LedgerRegistryProp
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentLedger.map((entry, i) => (
+              {recentLedger.map((entry) => (
                 <TableRow
-                  key={i}
+                  key={entry.id}
                   className="border-white/5 group hover:bg-white/2 transition-colors"
                 >
                   <TableCell className="pl-8 py-4">
