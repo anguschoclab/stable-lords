@@ -399,7 +399,10 @@ describe('processAttributeTraining - successful gain', () => {
     });
 
     it('should hard cap training if potential is reached', () => {
-      const warrior = makeWarrior({ ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 12, DF: 12 }, { potential: { ST: 12 } });
+      const warrior = makeWarrior(
+        { ST: 12, CN: 12, SZ: 12, WT: 12, WL: 12, SP: 12, DF: 12 },
+        { potential: { ST: 12 } }
+      );
       const rng = new SeededRNGService(1);
       const res = processAttributeTraining(warrior, 'ST', {} as GameState, [], rng);
       expect(res.hardCapped).toBe(true);

@@ -29,7 +29,6 @@ Object.defineProperty(global, 'localStorage', {
 
 // Mock ResizeObserver for JSDOM
 
- 
 class MockResizeObserver {
   observe() {}
   unobserve() {}
@@ -59,7 +58,6 @@ Object.defineProperty(global.navigator, 'storage', {
 
 // Mock Worker for Vitest
 
- 
 class MockWorker {
   url: string;
   onmessage: (event: MessageEvent) => void = () => {};

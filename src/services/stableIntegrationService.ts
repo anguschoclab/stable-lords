@@ -6,19 +6,15 @@
 import type { StableTemplate, StableTier } from '@/data/templates';
 import type { EquipmentItem, EquipmentLoadout } from '@/data/equipment';
 import type { Attributes } from '@/types/shared.types';
-import { 
-  ALL_TEMPLATES, 
-  getTemplatesByTier, 
-  getRandomTemplateByTier 
-} from '@/data/templates';
-import { 
-  ALL_EQUIPMENT, 
-  getItemById, 
-  getAvailableItems, 
+import { ALL_TEMPLATES, getTemplatesByTier, getRandomTemplateByTier } from '@/data/templates';
+import {
+  ALL_EQUIPMENT,
+  getItemById,
+  getAvailableItems,
   isPreferredWeapon,
   getStyleDefaultLoadout,
   validateLoadout,
-  checkWeaponRequirements 
+  checkWeaponRequirements,
 } from '@/data/equipment';
 import { randomWarriorName, randomOwnerName, randomStableName } from '@/data/names';
 import { clamp } from '@/utils/math';
@@ -28,7 +24,6 @@ import { clamp } from '@/utils/math';
  */
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StableIntegrationService {
-  
   /**
    * Generates a complete stable configuration with warriors, equipment, and names
    */
@@ -49,10 +44,11 @@ export class StableIntegrationService {
   } {
     // Get appropriate template
     const templates = getTemplatesByTier(tier);
-    const philosophyTemplates = templates.filter(t => t.philosophy === philosophy);
-    const template = philosophyTemplates.length > 0 
-      ? philosophyTemplates[Math.floor(Math.random() * philosophyTemplates.length)]
-      : getRandomTemplateByTier(tier);
+    const philosophyTemplates = templates.filter((t) => t.philosophy === philosophy);
+    const template =
+      philosophyTemplates.length > 0
+        ? philosophyTemplates[Math.floor(Math.random() * philosophyTemplates.length)]
+        : getRandomTemplateByTier(tier);
 
     if (!template) {
       throw new Error(`No template found for tier ${tier} and philosophy ${philosophy}`);
@@ -66,13 +62,14 @@ export class StableIntegrationService {
     const warriors = [];
     for (let i = 0; i < warriorCount; i++) {
       const warriorName = randomWarriorName();
-      const style = template.preferredStyles[Math.floor(Math.random() * template.preferredStyles.length)];
-      
+      const style =
+        template.preferredStyles[Math.floor(Math.random() * template.preferredStyles.length)];
+
       if (!style) continue;
-      
+
       // Get style-appropriate equipment
       const equipment = getStyleDefaultLoadout(style as any);
-      
+
       // Simulate warrior attributes for requirement checking
       const mockAttrs = this.generateMockAttributes(style, tier);
       const requirementsMet = this.checkEquipmentRequirements(equipment, mockAttrs);
@@ -81,7 +78,7 @@ export class StableIntegrationService {
         name: warriorName,
         style,
         equipment,
-        requirementsMet
+        requirementsMet,
       });
     }
 
@@ -89,16 +86,14 @@ export class StableIntegrationService {
       template,
       warriors,
       ownerName,
-      stableName
+      stableName,
     };
   }
 
   /**
    * Analyzes template-equipment compatibility
    */
-  static analyzeTemplateEquipmentCompatibility(
-    template: StableTemplate
-  ): {
+  static analyzeTemplateEquipmentCompatibility(template: StableTemplate): {
     compatibleEquipment: EquipmentItem[];
     preferredEquipment: EquipmentItem[];
     restrictedEquipment: EquipmentItem[];
@@ -112,7 +107,7 @@ export class StableIntegrationService {
     const compatibleEquipment: EquipmentItem[] = [];
     const preferredEquipment: EquipmentItem[] = [];
     const restrictedEquipment: EquipmentItem[] = [];
-    
+
     const coverage = { weapon: 0, armor: 0, shield: 0, helm: 0 };
 
     for (const item of ALL_EQUIPMENT) {
@@ -136,11 +131,11 @@ export class StableIntegrationService {
         compatibleEquipment.push(item);
         coverage[item.slot]++;
       }
-      
+
       if (isPreferred) {
         preferredEquipment.push(item);
       }
-      
+
       if (isRestricted) {
         restrictedEquipment.push(item);
       }
@@ -150,7 +145,7 @@ export class StableIntegrationService {
       compatibleEquipment,
       preferredEquipment,
       restrictedEquipment,
-      coverage
+      coverage,
     };
   }
 
@@ -178,7 +173,7 @@ export class StableIntegrationService {
     // Score weapons based on multiple factors
     for (const weapon of availableWeapons) {
       let score = 0;
-      
+
       // Preferred style bonus
       if (isPreferredWeapon(weapon, style as any)) {
         score += 10;
@@ -213,9 +208,9 @@ export class StableIntegrationService {
     }, availableArmor[0] || null);
 
     // Select shield if not two-handed
-    const bestShield = bestWeapon?.twoHanded 
-      ? { id: 'none_shield' } as EquipmentItem
-      : availableShields[0] || { id: 'none_shield' } as EquipmentItem;
+    const bestShield = bestWeapon?.twoHanded
+      ? ({ id: 'none_shield' } as EquipmentItem)
+      : availableShields[0] || ({ id: 'none_shield' } as EquipmentItem);
 
     // Select helm (balance of protection and style compatibility)
     const bestHelm = availableHelms.reduce((best, current) => {
@@ -229,17 +224,17 @@ export class StableIntegrationService {
       weapon: bestWeapon?.id || 'none_weapon',
       armor: bestArmor?.id || 'none_armor',
       shield: bestShield?.id || 'none_shield',
-      helm: bestHelm?.id || 'none_helm'
+      helm: bestHelm?.id || 'none_helm',
     };
 
     // Validate final loadout
     const validationIssues = validateLoadout(loadout);
-    issues.push(...validationIssues.map(issue => issue.message));
+    issues.push(...validationIssues.map((issue) => issue.message));
 
     return {
       loadout,
       score: bestScore,
-      issues
+      issues,
     };
   }
 
@@ -251,11 +246,11 @@ export class StableIntegrationService {
       Legendary: { ST: 15, CN: 15, SZ: 12, WT: 12, WL: 12, SP: 12, DF: 12 },
       Major: { ST: 12, CN: 12, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
       Established: { ST: 10, CN: 10, SZ: 8, WT: 8, WL: 8, SP: 8, DF: 8 },
-      Minor: { ST: 8, CN: 8, SZ: 6, WT: 6, WL: 6, SP: 6, DF: 6 }
+      Minor: { ST: 8, CN: 8, SZ: 6, WT: 6, WL: 6, SP: 6, DF: 6 },
     };
 
     const stats = { ...baseStats[tier] };
-    
+
     // Adjust based on style
     switch (style) {
       case 'Striking Attack':
@@ -274,7 +269,7 @@ export class StableIntegrationService {
     }
 
     // Clamp all values to valid ranges
-    Object.keys(stats).forEach(key => {
+    Object.keys(stats).forEach((key) => {
       stats[key as keyof Attributes] = clamp(stats[key as keyof Attributes], 1, 21);
     });
 
@@ -317,15 +312,15 @@ export class StableIntegrationService {
     }
 
     if (criteria.philosophy) {
-      templates = templates.filter(t => t.philosophy === criteria.philosophy);
+      templates = templates.filter((t) => t.philosophy === criteria.philosophy);
     }
 
     if (criteria.style) {
-      templates = templates.filter(t => t.preferredStyles.includes(criteria.style as any));
+      templates = templates.filter((t) => t.preferredStyles.includes(criteria.style as any));
     }
 
     if (criteria.minFame !== undefined || criteria.maxFame !== undefined) {
-      templates = templates.filter(t => {
+      templates = templates.filter((t) => {
         const [min, max] = t.fameRange;
         if (criteria.minFame !== undefined && min < criteria.minFame) return false;
         if (criteria.maxFame !== undefined && max > criteria.maxFame) return false;
@@ -335,11 +330,19 @@ export class StableIntegrationService {
 
     // Apply equipment weight filter
     if (criteria.equipmentWeight) {
-      templates = templates.filter(t => {
+      templates = templates.filter((t) => {
         const compatible = this.analyzeTemplateEquipmentCompatibility(t);
-        const hasWeightInRange = compatible.compatibleEquipment.some(item => {
-          if (criteria.equipmentWeight?.min !== undefined && item.weight < criteria.equipmentWeight.min) return false;
-          if (criteria.equipmentWeight?.max !== undefined && item.weight > criteria.equipmentWeight.max) return false;
+        const hasWeightInRange = compatible.compatibleEquipment.some((item) => {
+          if (
+            criteria.equipmentWeight?.min !== undefined &&
+            item.weight < criteria.equipmentWeight.min
+          )
+            return false;
+          if (
+            criteria.equipmentWeight?.max !== undefined &&
+            item.weight > criteria.equipmentWeight.max
+          )
+            return false;
           return true;
         });
         return hasWeightInRange;
@@ -368,9 +371,9 @@ export class StableIntegrationService {
       totalNames: {
         warrior: 0, // Would need to import from name modules
         owner: 0,
-        stable: 0
+        stable: 0,
       },
-      cacheStats: null // Would need to import from cache module
+      cacheStats: null, // Would need to import from cache module
     };
   }
 }

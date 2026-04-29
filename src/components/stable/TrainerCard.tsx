@@ -129,12 +129,7 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
                       <UserMinus className="h-4 w-4 group-hover/fire:scale-110 transition-transform" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="left"
-                    
-                  >
-                    TERMINATE CONTRACT
-                  </TooltipContent>
+                  <TooltipContent side="left">TERMINATE CONTRACT</TooltipContent>
                 </Tooltip>
               )}
             </div>

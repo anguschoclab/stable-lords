@@ -285,13 +285,14 @@ function WeatherOverlay({ weather }: { weather: string }) {
     );
   }
 
-    // Sandstorm haze
+  // Sandstorm haze
   if (weatherLower.includes('sandstorm')) {
     return (
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(180,120,50,0.3) 0%, rgba(180,120,50,0.5) 100%)',
+          background:
+            'radial-gradient(ellipse at center, rgba(180,120,50,0.3) 0%, rgba(180,120,50,0.5) 100%)',
           mixBlendMode: 'multiply',
         }}
       />

@@ -8,13 +8,13 @@ import { WEAPONS } from './weapons';
 import { ARMORS } from './armor';
 import { SHIELDS } from './shields';
 import { HELMS } from './helms';
-import type { 
-  EquipmentItem, 
-  EquipmentSlot, 
-  EquipmentLoadout, 
-  WeaponReqResult, 
+import type {
+  EquipmentItem,
+  EquipmentSlot,
+  EquipmentLoadout,
+  WeaponReqResult,
   WeaponReqCheck,
-  LoadoutIssue
+  LoadoutIssue,
 } from './equipment.types';
 
 // Combined all equipment for convenience

@@ -158,13 +158,13 @@ describe('Week Advancement Integration', () => {
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
-      expect(state.season).toBe("Fall");
+      expect(state.season).toBe('Fall');
 
       // Advance to Winter (week 40)
       for (let i = 0; i < 13; i++) {
         state = advanceWeek(state);
       }
-      expect(state.season).toBe("Winter");
+      expect(state.season).toBe('Winter');
 
       // Advance to next year Spring (week 1)
       for (let i = 0; i < 13; i++) {
@@ -172,7 +172,7 @@ describe('Week Advancement Integration', () => {
       }
       expect(state.year).toBe(2);
       expect(state.week).toBe(1);
-      expect(state.season).toBe("Spring");
+      expect(state.season).toBe('Spring');
 
       // Advance to next year Summer (week 14)
       for (let i = 0; i < 13; i++) {

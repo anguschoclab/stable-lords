@@ -115,7 +115,12 @@ export function createFighterState(
       traitMods.iniMod +
       (injuryPenalties['INI'] ?? 0),
     RIP: skills.RIP + (drills.RIP ?? 0) + traitMods.ripMod + (injuryPenalties['RIP'] ?? 0),
-    DEC: skills.DEC + (trainerMods?.decMod ?? 0) + (drills.DEC ?? 0) + traitMods.decMod + (injuryPenalties['DEC'] ?? 0),
+    DEC:
+      skills.DEC +
+      (trainerMods?.decMod ?? 0) +
+      (drills.DEC ?? 0) +
+      traitMods.decMod +
+      (injuryPenalties['DEC'] ?? 0),
   };
 
   // Personality trait FightPlan mods (Aggressive +OE, Cunning +feint, etc.)
@@ -125,8 +130,13 @@ export function createFighterState(
   const traitPlan = { ...plan };
   if (aiMods.OE != null) traitPlan.OE = Math.max(0, Math.min(10, traitPlan.OE + aiMods.OE));
   if (aiMods.AL != null) traitPlan.AL = Math.max(0, Math.min(10, traitPlan.AL + aiMods.AL));
-  if (aiMods.killDesire != null) traitPlan.killDesire = Math.max(0, Math.min(100, traitPlan.killDesire + aiMods.killDesire));
-  if (aiMods.feintTendency != null) traitPlan.feintTendency = Math.max(0, Math.min(100, traitPlan.feintTendency + aiMods.feintTendency));
+  if (aiMods.killDesire != null)
+    traitPlan.killDesire = Math.max(0, Math.min(100, traitPlan.killDesire + aiMods.killDesire));
+  if (aiMods.feintTendency != null)
+    traitPlan.feintTendency = Math.max(
+      0,
+      Math.min(100, traitPlan.feintTendency + aiMods.feintTendency)
+    );
 
   return {
     label,

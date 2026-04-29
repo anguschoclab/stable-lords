@@ -296,11 +296,7 @@ export default function BoutViewer({
               <div className="flex items-center px-4 py-2 rounded-none bg-black border border-white/5 gap-4">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button
-                      onClick={reset}
-                      
-                      aria-label="Reset bout viewer"
-                    >
+                    <button onClick={reset} aria-label="Reset bout viewer">
                       <RotateCcw className="h-4 w-4" />
                     </button>
                   </TooltipTrigger>
@@ -332,11 +328,7 @@ export default function BoutViewer({
 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button
-                      onClick={skipToEnd}
-                      
-                      aria-label="Skip to end of bout"
-                    >
+                    <button onClick={skipToEnd} aria-label="Skip to end of bout">
                       <SkipForward className="h-4 w-4" />
                     </button>
                   </TooltipTrigger>
@@ -441,18 +433,14 @@ export default function BoutViewer({
                   <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest leading-none mb-1">
                     Resolution Time
                   </span>
-                  <span >
-                    {minutes}:00
-                  </span>
+                  <span>{minutes}:00</span>
                 </div>
                 <div className="h-8 w-px bg-white/5" />
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest leading-none mb-1">
                     Engagements
                   </span>
-                  <span >
-                    {totalEvents}
-                  </span>
+                  <span>{totalEvents}</span>
                 </div>
               </div>
             </div>

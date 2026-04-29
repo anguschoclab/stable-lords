@@ -102,7 +102,11 @@ export function NextBoutWidget() {
                   <span
                     className={cn(
                       'font-bold',
-                      odds > 60 ? 'text-primary' : odds < 40 ? 'text-destructive' : 'text-arena-gold'
+                      odds > 60
+                        ? 'text-primary'
+                        : odds < 40
+                          ? 'text-destructive'
+                          : 'text-arena-gold'
                     )}
                   >
                     {odds}%

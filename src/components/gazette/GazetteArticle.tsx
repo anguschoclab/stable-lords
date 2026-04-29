@@ -50,9 +50,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
                 SEASON_{season} // VOLUME_IV
               </span>
             </div>
-            <h2 >
-              {issue.mainHeadline.replace('_', ' ')}
-            </h2>
+            <h2>{issue.mainHeadline.replace('_', ' ')}</h2>
           </div>
 
           <div className="flex flex-col items-end gap-1 opacity-40 group-hover:opacity-80 transition-opacity">
@@ -61,9 +59,7 @@ export function GazetteArticle({ issue, season }: GazetteArticleProps) {
             </span>
             <div className="flex items-center gap-2">
               <Sparkles className="h-3 w-3 text-arena-gold" />
-              <span >
-                HASH: {Math.random().toString(16).slice(2, 10).toUpperCase()}
-              </span>
+              <span>HASH: {Math.random().toString(16).slice(2, 10).toUpperCase()}</span>
             </div>
           </div>
         </div>

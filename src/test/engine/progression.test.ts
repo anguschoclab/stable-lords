@@ -53,16 +53,17 @@ describe('Warrior Progression', () => {
   });
 
   describe('applyXP', () => {
-    const mockWarrior = (): Warrior => ({
-      id: 'w1',
-      name: 'Test Warrior',
-      xp: 0,
-      attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
-      potential: { ST: 15, CN: 15, SZ: 15, WT: 15, WL: 15, SP: 15, DF: 15 },
-      potentialRevealed: {},
-      style: 'AIMED BLOW',
-      derivedStats: {} as any,
-    } as Warrior);
+    const mockWarrior = (): Warrior =>
+      ({
+        id: 'w1',
+        name: 'Test Warrior',
+        xp: 0,
+        attributes: { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 },
+        potential: { ST: 15, CN: 15, SZ: 15, WT: 15, WL: 15, SP: 15, DF: 15 },
+        potentialRevealed: {},
+        style: 'AIMED BLOW',
+        derivedStats: {} as any,
+      }) as Warrior;
 
     it('adds XP without leveling up', () => {
       const warrior = mockWarrior();

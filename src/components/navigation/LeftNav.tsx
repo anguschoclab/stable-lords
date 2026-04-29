@@ -194,7 +194,6 @@ export function LeftNav({ className }: LeftNavProps) {
                     e.stopPropagation();
                     navigate({ to: alertLink });
                   }}
-                  
                 >
                   {alertCount}
                 </button>
@@ -270,7 +269,9 @@ export function LeftNav({ className }: LeftNavProps) {
 
 function AlertStrip() {
   const { counts } = useNavAlerts();
-  const { isTournamentWeek } = useGameStore(useShallow((s) => ({ isTournamentWeek: s.isTournamentWeek })));
+  const { isTournamentWeek } = useGameStore(
+    useShallow((s) => ({ isTournamentWeek: s.isTournamentWeek }))
+  );
 
   const untrainedCount = counts.command;
   const pendingOffers = counts.ops;

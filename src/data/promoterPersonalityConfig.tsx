@@ -44,8 +44,7 @@ export const PERSONALITY_CONFIG: Record<PromoterPersonality, PersonalityEntry> =
     label: 'Flashy',
     description: 'Fame-focused, showy style bonus (+15% hype)',
     desc: '+15% hype · +20% purse (fame>75)',
-    tooltip:
-      'Flashy: +15% hype · +20% purse for high-fame warriors (best for rising stars)',
+    tooltip: 'Flashy: +15% hype · +20% purse for high-fame warriors (best for rising stars)',
   },
   Corporate: {
     color: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/30',

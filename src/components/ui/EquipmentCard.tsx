@@ -6,15 +6,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import {
-  Sword,
-  Shield,
-  HardHat,
-  Shirt,
-  AlertTriangle,
-  Star,
-  Weight,
-} from 'lucide-react';
+import { Sword, Shield, HardHat, Shirt, AlertTriangle, Star, Weight } from 'lucide-react';
 import type { EquipmentItem, WeaponReqResult } from '@/data/equipment';
 import { checkWeaponRequirements } from '@/data/equipment';
 import { FightingStyle } from '@/types/shared.types';
@@ -59,16 +51,16 @@ function getEquipmentRarity(item: EquipmentItem): number {
   return Math.min(rarity, 4);
 }
 
-export function EquipmentCard({ 
-  item, 
-  warriorAttrs, 
-  warriorStyle, 
-  showRequirements = false 
+export function EquipmentCard({
+  item,
+  warriorAttrs,
+  warriorStyle,
+  showRequirements = false,
 }: EquipmentCardProps) {
   const rarity = getEquipmentRarity(item);
   const isPreferred = warriorStyle && item.preferredStyles?.includes(warriorStyle);
   const isRestricted = warriorStyle && item.restrictedStyles?.includes(warriorStyle);
-  
+
   let weaponReqResult: WeaponReqResult | null = null;
   if (showRequirements && warriorAttrs && item.slot === 'weapon') {
     weaponReqResult = checkWeaponRequirements(item.id, warriorAttrs);
@@ -83,9 +75,7 @@ export function EquipmentCard({
             {item.name}
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge className={SLOT_COLORS[item.slot]}>
-              {item.slot}
-            </Badge>
+            <Badge className={SLOT_COLORS[item.slot]}>{item.slot}</Badge>
             {item.code && (
               <Badge variant="outline" className="text-xs">
                 {item.code}
@@ -95,7 +85,7 @@ export function EquipmentCard({
         </div>
         <p className="text-sm text-muted-foreground">{item.description}</p>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Basic Stats */}
         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -151,7 +141,13 @@ export function EquipmentCard({
                 {item.reqST && (
                   <div className="flex justify-between text-sm">
                     <span>Strength:</span>
-                    <span className={warriorAttrs && warriorAttrs.ST < item.reqST ? 'text-destructive' : 'text-primary'}>
+                    <span
+                      className={
+                        warriorAttrs && warriorAttrs.ST < item.reqST
+                          ? 'text-destructive'
+                          : 'text-primary'
+                      }
+                    >
                       {warriorAttrs?.ST || 0} / {item.reqST}
                     </span>
                   </div>
@@ -159,7 +155,13 @@ export function EquipmentCard({
                 {item.reqSZ && (
                   <div className="flex justify-between text-sm">
                     <span>Size:</span>
-                    <span className={warriorAttrs && warriorAttrs.SZ < item.reqSZ ? 'text-destructive' : 'text-primary'}>
+                    <span
+                      className={
+                        warriorAttrs && warriorAttrs.SZ < item.reqSZ
+                          ? 'text-destructive'
+                          : 'text-primary'
+                      }
+                    >
                       {warriorAttrs?.SZ || 0} / {item.reqSZ}
                     </span>
                   </div>
@@ -167,7 +169,13 @@ export function EquipmentCard({
                 {item.reqWT && (
                   <div className="flex justify-between text-sm">
                     <span>Wit:</span>
-                    <span className={warriorAttrs && warriorAttrs.WT < item.reqWT ? 'text-destructive' : 'text-primary'}>
+                    <span
+                      className={
+                        warriorAttrs && warriorAttrs.WT < item.reqWT
+                          ? 'text-destructive'
+                          : 'text-primary'
+                      }
+                    >
                       {warriorAttrs?.WT || 0} / {item.reqWT}
                     </span>
                   </div>
@@ -175,18 +183,27 @@ export function EquipmentCard({
                 {item.reqDF && (
                   <div className="flex justify-between text-sm">
                     <span>Deftness:</span>
-                    <span className={warriorAttrs && warriorAttrs.DF < item.reqDF ? 'text-destructive' : 'text-primary'}>
+                    <span
+                      className={
+                        warriorAttrs && warriorAttrs.DF < item.reqDF
+                          ? 'text-destructive'
+                          : 'text-primary'
+                      }
+                    >
                       {warriorAttrs?.DF || 0} / {item.reqDF}
                     </span>
                   </div>
                 )}
               </div>
-              
+
               {!weaponReqResult.met && (
                 <div className="mt-3 p-2 bg-destructive/10 rounded-none">
                   <div className="flex items-center gap-2 text-destructive text-sm">
                     <AlertTriangle className="h-4 w-4" />
-                    <span>Penalties: ATT {weaponReqResult.attPenalty}, Endurance +{(weaponReqResult.endurancePenalty - 1) * 100}%</span>
+                    <span>
+                      Penalties: ATT {weaponReqResult.attPenalty}, Endurance +
+                      {(weaponReqResult.endurancePenalty - 1) * 100}%
+                    </span>
                   </div>
                 </div>
               )}

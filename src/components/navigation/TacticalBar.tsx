@@ -220,9 +220,9 @@ export function TacticalBar() {
                               alert.type === 'warning' &&
                                 'border-arena-gold/30 hover:bg-arena-gold/20',
                               alert.type === 'info' && 'border-border/30 hover:bg-muted/20',
-                              alert.type === 'urgent' && 'border-destructive/30 hover:bg-destructive/20',
-                              alert.type === 'success' &&
-                                'border-primary/30 hover:bg-primary/20'
+                              alert.type === 'urgent' &&
+                                'border-destructive/30 hover:bg-destructive/20',
+                              alert.type === 'success' && 'border-primary/30 hover:bg-primary/20'
                             )}
                           >
                             {alert.action.label}

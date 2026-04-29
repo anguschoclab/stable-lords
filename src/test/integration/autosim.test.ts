@@ -50,7 +50,7 @@ describe('Autosim Integration', () => {
         length: 0,
         key: vi.fn(),
       },
-      configurable: true
+      configurable: true,
     });
 
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -58,7 +58,10 @@ describe('Autosim Integration', () => {
 
   afterAll(() => {
     if (originalLocalStorage !== undefined) {
-      Object.defineProperty(globalThis, 'localStorage', { value: originalLocalStorage, configurable: true });
+      Object.defineProperty(globalThis, 'localStorage', {
+        value: originalLocalStorage,
+        configurable: true,
+      });
     } else {
       delete (globalThis as any).localStorage;
     }
@@ -148,7 +151,6 @@ describe('Autosim Integration', () => {
     it('should maintain roster integrity during autosim', async () => {
       const result = await runAutosim(initialState, 10, () => {});
 
-
       expect(result.finalState).toBeDefined();
 
       // Roster + graveyard + retired should account for all warriors
@@ -203,7 +205,6 @@ describe('Autosim Integration', () => {
 
     it('should process economy correctly', async () => {
       const result = await runAutosim(initialState, 5, () => {});
-
 
       expect(result.finalState).toBeDefined();
 

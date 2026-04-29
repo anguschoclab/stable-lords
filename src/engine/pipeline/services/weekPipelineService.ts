@@ -89,7 +89,11 @@ function checkBankruptcy(state: GameState, coreImpacts: StateImpact[]): boolean 
   return estimatedTreasury < -500;
 }
 
-function collectRemainingImpacts(state: GameState, ctx: WeekContext, opts?: WeekAdvanceOptions): StateImpact[] {
+function collectRemainingImpacts(
+  state: GameState,
+  ctx: WeekContext,
+  opts?: WeekAdvanceOptions
+): StateImpact[] {
   const impacts: StateImpact[] = [
     runWorldPass(state, ctx.nextWeek, ctx.rootRng),
     runSystemPass(state, ctx.rootRng),
@@ -110,7 +114,12 @@ function collectRemainingImpacts(state: GameState, ctx: WeekContext, opts?: Week
   return impacts;
 }
 
-function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext, opts?: WeekAdvanceOptions): GameState {
+function finalizeState(
+  state: GameState,
+  oldState: GameState,
+  ctx: WeekContext,
+  opts?: WeekAdvanceOptions
+): GameState {
   state.week = ctx.nextWeek;
   state.year = ctx.nextYear;
   state.day = 0;
@@ -142,7 +151,12 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext, 
   if (opts?.deferArchives) {
     // In batch mode, defer archives to state for later flushing
     // Accumulate bout logs in state.deferredBoutLogs
-    const pendingArchives: Array<{year: number; season: number; boutId: string; transcript: string[]}> = [];
+    const pendingArchives: Array<{
+      year: number;
+      season: number;
+      boutId: string;
+      transcript: string[];
+    }> = [];
     for (const summary of state.arenaHistory || []) {
       if (summary.transcript && summary.transcript.length > 0 && summary.week === ctx.currentWeek) {
         const seasonIdx = ['Spring', 'Summer', 'Fall', 'Winter'].indexOf(state.season);
@@ -158,7 +172,10 @@ function finalizeState(state: GameState, oldState: GameState, ctx: WeekContext, 
     }
 
     // Store in state for batch flushing
-    (state as any).deferredBoutLogs = [...((state as any).deferredBoutLogs || []), ...pendingArchives];
+    (state as any).deferredBoutLogs = [
+      ...((state as any).deferredBoutLogs || []),
+      ...pendingArchives,
+    ];
     return state;
   }
 
@@ -178,11 +195,15 @@ export function advanceWeek(state: GameState, opts?: WeekAdvanceOptions): GameSt
   const coreImpacts = collectCoreImpacts(settledState, ctx);
 
   if (checkBankruptcy(settledState, coreImpacts)) {
-    return finalizeState(resolveImpacts(settledState, coreImpacts), state, ctx, { deferArchives: opts?.deferArchives });
+    return finalizeState(resolveImpacts(settledState, coreImpacts), state, ctx, {
+      deferArchives: opts?.deferArchives,
+    });
   }
 
   // Stage the pipeline: apply core impacts BEFORE running remaining passes
   const stateAfterCore = resolveImpacts(settledState, coreImpacts);
   const remainingImpacts = collectRemainingImpacts(stateAfterCore, ctx, { headless });
-  return finalizeState(resolveImpacts(stateAfterCore, remainingImpacts), state, ctx, { deferArchives: opts?.deferArchives });
+  return finalizeState(resolveImpacts(stateAfterCore, remainingImpacts), state, ctx, {
+    deferArchives: opts?.deferArchives,
+  });
 }

@@ -90,9 +90,7 @@ export function InsightManager() {
           <Search className="h-5 w-5" />
         </div>
         <div>
-          <h3 >
-            Insight Intelligence Hub
-          </h3>
+          <h3>Insight Intelligence Hub</h3>
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-40">
             Decrypting Asset Profiles // Tokens Available: {tokens.length}
           </p>
@@ -140,9 +138,7 @@ export function InsightManager() {
                         );
                       })()}
                       <div>
-                        <span >
-                          {token.type}_Token
-                        </span>
+                        <span>{token.type}_Token</span>
                         <span className="block text-[9px] text-muted-foreground uppercase tracking-widest font-mono opacity-60">
                           WK_{token.discoveredWeek} // {token.id.slice(0, 8)}
                         </span>
@@ -232,9 +228,7 @@ export function InsightManager() {
                       )}
                     </div>
                     <div>
-                      <p >
-                        {selectedWarrior?.name || 'Target Required'}
-                      </p>
+                      <p>{selectedWarrior?.name || 'Target Required'}</p>
                       <p className="text-[9px] text-muted-foreground uppercase tracking-widest opacity-60">
                         Ready For Extraction
                       </p>
@@ -281,15 +275,13 @@ export function InsightManager() {
           >
             <div className="bg-neutral-950 border-2 border-primary/40 rounded-none p-10 max-w-md w-full text-center relative shadow-[0_0_50px_rgba(255,0,0,0.2)]">
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-none bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.5)]">
-                <Sparkles  />
+                <Sparkles />
               </div>
 
               <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">
                 Discovery Successful
               </h4>
-              <h2 >
-                {revealData.name}
-              </h2>
+              <h2>{revealData.name}</h2>
 
               <div className="bg-white/5 border border-white/10 rounded-none p-6 mb-8">
                 <span className="block text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">
@@ -300,12 +292,7 @@ export function InsightManager() {
                 </span>
               </div>
 
-              <Button
-                onClick={() => setRevealData(null)}
-                
-              >
-                Close Sequence
-              </Button>
+              <Button onClick={() => setRevealData(null)}>Close Sequence</Button>
             </div>
           </motion.div>
         )}

@@ -168,7 +168,9 @@ export function GazetteLeaderboard({ allFights }: LeaderboardProps) {
               >
                 <TableCell className="pl-8 py-5">
                   <div className="flex items-center gap-4">
-                    <span className="text-xs font-mono font-black text-foreground/20">#{idx + 1}</span>
+                    <span className="text-xs font-mono font-black text-foreground/20">
+                      #{idx + 1}
+                    </span>
                     <span className="font-display font-black text-sm uppercase tracking-tight group-hover:text-primary transition-colors">
                       {w.name}
                     </span>

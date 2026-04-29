@@ -120,7 +120,9 @@ export function CoachOverlay() {
 
 function Badge({ children, className, variant }: any) {
   return (
-    <span className={cn('px-2 py-0.5 rounded-none text-foreground text-[10px] font-black', className)}>
+    <span
+      className={cn('px-2 py-0.5 rounded-none text-foreground text-[10px] font-black', className)}
+    >
       {children}
     </span>
   );

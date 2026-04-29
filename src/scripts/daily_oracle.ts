@@ -74,7 +74,6 @@ async function main() {
     console.log(`- ${style}: ${(rate * 100).toFixed(2)}%`);
   }
 
-
   // Determine adjustments (Suggestions only)
   let recommendations = '';
   let hasAnomalies = false;

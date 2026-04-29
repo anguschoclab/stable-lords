@@ -43,9 +43,7 @@ describe('runSeasonalPass', () => {
     const warriorId = 'w-seasonal' as WarriorId;
     const state: Partial<GameState> = {
       year: 1,
-      roster: [
-        { id: warriorId, name: 'Ragnar', status: 'Active', fame: 10, injuries: [] } as any,
-      ],
+      roster: [{ id: warriorId, name: 'Ragnar', status: 'Active', fame: 10, injuries: [] } as any],
       newsletter: [],
     };
 
@@ -89,7 +87,13 @@ describe('runSeasonalPass', () => {
           status: 'Active',
           fame: 5,
           injuries: [
-            { id: 'inj-1' as any, name: 'Cracked Ribs', severity: 'Moderate', weeksRemaining: 3, penalties: { CN: -2 } },
+            {
+              id: 'inj-1' as any,
+              name: 'Cracked Ribs',
+              severity: 'Moderate',
+              weeksRemaining: 3,
+              penalties: { CN: -2 },
+            },
           ],
         } as any,
       ],

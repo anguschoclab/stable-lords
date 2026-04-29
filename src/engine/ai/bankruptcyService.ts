@@ -100,5 +100,5 @@ export const BankruptcyService = {
     impact.newsletterItems = [newsletterItem];
 
     return { bankrupt: true, impact };
-  }
+  },
 } as const;

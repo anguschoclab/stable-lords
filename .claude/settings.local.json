@@ -62,7 +62,8 @@
       "Bash(node node_modules/.bin/vite build)",
       "Bash(bun -e ' *)",
       "Bash(bunx --bun tsc --noEmit)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(npx --yes vite build)"
     ]
   },
   "hooks": {

@@ -10,7 +10,7 @@ import { randomPick } from '@/utils/random';
 
 /**
  * Generates a random warrior name from the WARRIOR_NAMES array.
- * 
+ *
  * @param rng - Optional random number generator function
  * @returns A random warrior name
  */
@@ -20,7 +20,7 @@ export function randomWarriorName(rng?: () => number): string {
 
 /**
  * Generates a random owner name by combining first and last names.
- * 
+ *
  * @param rng - Optional random number generator function
  * @returns A random owner name in "First Last" format
  */
@@ -32,7 +32,7 @@ export function randomOwnerName(rng?: () => number): string {
 
 /**
  * Generates a random stable name using either prefixed format or alternative names.
- * 
+ *
  * @param rng - Optional random number generator function
  * @returns A random stable name
  */
@@ -44,7 +44,7 @@ export function randomStableName(rng?: () => number): string {
 
 /**
  * Generates a random prefixed stable name (e.g., "Red Dragon", "Iron Wolf").
- * 
+ *
  * @param rng - Optional random number generator function
  * @returns A random prefixed stable name
  */
@@ -56,7 +56,7 @@ export function randomPrefixedStableName(rng?: () => number): string {
 
 /**
  * Generates a random alternative stable name from the STABLE_ALT array.
- * 
+ *
  * @param rng - Optional random number generator function
  * @returns A random alternative stable name
  */

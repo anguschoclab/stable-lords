@@ -158,12 +158,7 @@ export function StableRankings({ rows, sort, onSort }: StableRankingsProps) {
                       <TooltipTrigger asChild>
                         <div>
                           {row.isPlayer ? (
-                            <Link
-                              to="/ops/overview"
-                              
-                            >
-                              {row.name}
-                            </Link>
+                            <Link to="/ops/overview">{row.name}</Link>
                           ) : (
                             <Link
                               to="/world/stable/$id"

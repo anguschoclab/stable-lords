@@ -102,7 +102,9 @@ export function WarriorTrainingCard({
                 : 'bg-white/5 hover:bg-white/10'
             )}
           >
-            <Heart className={cn('h-3.5 w-3.5', isRecovery ? 'text-destructive' : 'text-destructive')} />
+            <Heart
+              className={cn('h-3.5 w-3.5', isRecovery ? 'text-destructive' : 'text-destructive')}
+            />
             {isRecovery ? 'CANCEL RECOVERY' : 'ACTIVE RECOVERY'}
           </Button>
         )}

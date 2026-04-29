@@ -298,13 +298,17 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
     // (initiative is enough; doubling with damage was the runaway combo) and
     // extend the late-phase malus to MID as well, so LU has to win in the
     // first ~5 exchanges or fade.
+    //
+    // Pass 4: MID fade removed — only LATE is penalised. Disciplined trait
+    // (attModLate +1) now exactly offsets the LATE penalty, enabling a lunger
+    // that never fades if trained correctly.
     getPassive: (ctx, m) => {
       const isFirst = ctx.exchange === 0;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
         iniBonus: isFirst ? 1 + m.bonus : 0,
-        attBonus: isFirst ? 0 : ctx.phase === 'LATE' ? -1 : ctx.phase === 'MID' ? -1 : 0,
+        attBonus: isFirst ? 0 : ctx.phase === 'LATE' ? -1 : 0,
         hasPassiveNarrative: isFirst,
       };
     },
@@ -373,7 +377,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killBonus: 0.03,
       decBonus: 2,
       extendedKillWindow: false,
-      killWindowHpMult: 0.40,
+      killWindowHpMult: 0.4,
       killNarrative: 'pivots around the attack and delivers a stinging riposte!',
     }),
     getAntiSynergy: (off) => {
@@ -436,7 +440,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killBonus: ctx.hitsLanded >= 4 ? 0.06 : 0,
       decBonus: 0,
       extendedKillWindow: ctx.hitsLanded >= 5,
-      killWindowHpMult: ctx.hitsLanded >= 5 ? 0.50 : 0.40,
+      killWindowHpMult: ctx.hitsLanded >= 5 ? 0.5 : 0.4,
       killNarrative: 'overwhelms their foe with a flurry of precise cuts!',
     }),
     getAntiSynergy: (off, def) => {
@@ -457,17 +461,20 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
 
   [FightingStyle.StrikingAttack]: {
     tempo: { opening: 1, mid: 0, late: 0, enduranceMult: 0.96 },
+    // attBonus requires the first hit to unlock rhythm — a sparing ST (low OE,
+    // few hard hits) still profits from unconditional dmgBonus every connection.
     getPassive: (ctx, m) => ({
       ...EMPTY_PASSIVE,
       mastery: m.tier,
-      attBonus: 1 + m.bonus,
+      attBonus: ctx.hitsLanded >= 1 ? 1 + m.bonus : 0,
       dmgBonus: 1,
+      hasPassiveNarrative: ctx.hitsLanded >= 1,
     }),
-    getKillMechanic: () => ({
-      killBonus: 0.1,
+    getKillMechanic: (ctx) => ({
+      killBonus: 0.07,
       decBonus: 2,
-      extendedKillWindow: true,
-      killWindowHpMult: 0.40,
+      extendedKillWindow: ctx.hitsLanded >= 2,
+      killWindowHpMult: 0.4,
       killNarrative: 'lands a devastating, direct strike!',
     }),
     getAntiSynergy: (off, def) => ({ offMult: 1, defMult: def === 'Riposte' ? 0.6 : 1 }),
@@ -490,9 +497,12 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       iniBonus: 1,
       hasPassiveNarrative: ctx.phase === 'LATE' && ctx.endRatio > 0.5,
     }),
-    getKillMechanic: () => ({
-      killBonus: -0.05,
-      decBonus: -1,
+    // Kill penalty graduates through phases — LATE penalty drops to zero so
+    // a Merciless or Berserker TP can actually threaten after doing endurance
+    // groundwork. OPENING stays harshly negative to prevent early aggression.
+    getKillMechanic: (ctx) => ({
+      killBonus: ctx.phase === 'LATE' ? 0 : ctx.phase === 'MID' ? -0.02 : -0.05,
+      decBonus: ctx.phase === 'LATE' ? 1 : -1,
       extendedKillWindow: false,
       killWindowHpMult: 0.35,
       killNarrative: 'finds a momentary opening in their own defensive shell!',
@@ -516,7 +526,9 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
     // late-game style, not a flat-strong all-phases bulldozer.
     tempo: { opening: 0, mid: 0, late: 1, enduranceMult: 0.92 },
     getPassive: (ctx, m) => {
-      const wallBonus = Math.min(1 + m.bonus, Math.floor(ctx.exchange / 5));
+      // /4 instead of /5 shaves one exchange off each ramp step — Quick-trait
+      // WS reaches its wall identity before the mid-point of a normal fight.
+      const wallBonus = Math.min(1 + m.bonus, Math.floor(ctx.exchange / 4));
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
@@ -530,7 +542,7 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       killBonus: -0.03,
       decBonus: 0,
       extendedKillWindow: false,
-      killWindowHpMult: 0.40,
+      killWindowHpMult: 0.4,
       killNarrative: 'shifts their weight and drives through the defense!',
     }),
     getAntiSynergy: () => ({ offMult: 1, defMult: 1 }),

@@ -421,12 +421,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
           </TableHeader>
           <TableBody>
             {filtered.slice(0, 100).map((row, i) => (
-              <WarriorLeaderboardRow
-                key={row.id}
-                row={row}
-                index={i}
-                isFiltered={isFiltered}
-              />
+              <WarriorLeaderboardRow key={row.id} row={row} index={i} isFiltered={isFiltered} />
             ))}
           </TableBody>
         </Table>

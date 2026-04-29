@@ -1,5 +1,8 @@
 import type { GameState } from '@/types/state.types';
-import { advanceWeek, type WeekAdvanceOptions } from '@/engine/pipeline/services/weekPipelineService';
+import {
+  advanceWeek,
+  type WeekAdvanceOptions,
+} from '@/engine/pipeline/services/weekPipelineService';
 import { flushDeferredArchives } from '@/engine/pipeline/adapters/opfsArchiver';
 import { telemetry, TelemetryEvents, TelemetryTags } from '@/engine/telemetry';
 
@@ -194,7 +197,10 @@ export const TimeAdvanceService = {
           if (opts.deferArchives) {
             const flushStart = performance.now();
             await flushDeferredArchives(currentState);
-            telemetry.timing(TelemetryEvents.FLUSH_DEFERRED_ARCHIVES, performance.now() - flushStart);
+            telemetry.timing(
+              TelemetryEvents.FLUSH_DEFERRED_ARCHIVES,
+              performance.now() - flushStart
+            );
           }
 
           const duration = performance.now() - startTime;
@@ -285,8 +291,14 @@ export const TimeAdvanceService = {
             startYear,
             endYear: currentState.year,
             treasuryDelta: currentState.treasury - startTreasury,
-            totalBouts: quarterResults.reduce((sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.bouts, 0), 0),
-            totalDeaths: quarterResults.reduce((sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.deaths, 0), 0),
+            totalBouts: quarterResults.reduce(
+              (sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.bouts, 0),
+              0
+            ),
+            totalDeaths: quarterResults.reduce(
+              (sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.deaths, 0),
+              0
+            ),
           },
           stopReason: result.stopReason,
         };
@@ -300,8 +312,14 @@ export const TimeAdvanceService = {
         startYear,
         endYear: currentState.year,
         treasuryDelta: currentState.treasury - startTreasury,
-        totalBouts: quarterResults.reduce((sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.bouts, 0), 0),
-        totalDeaths: quarterResults.reduce((sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.deaths, 0), 0),
+        totalBouts: quarterResults.reduce(
+          (sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.bouts, 0),
+          0
+        ),
+        totalDeaths: quarterResults.reduce(
+          (sum, r) => sum + r.quarterSummary.weekSummaries.reduce((s, w) => s + w.deaths, 0),
+          0
+        ),
       },
       stopReason: null,
     };
@@ -310,7 +328,10 @@ export const TimeAdvanceService = {
   /**
    * Skip to quarter end (headless mode for UI)
    */
-  async skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<QuarterAdvanceResult> {
+  async skipToQuarterEnd(
+    state: GameState,
+    opts?: Omit<AdvanceOptions, 'checkpointInterval'>
+  ): Promise<QuarterAdvanceResult> {
     return this.advanceQuarter(state, {
       ...opts,
       headless: true,
@@ -321,7 +342,10 @@ export const TimeAdvanceService = {
   /**
    * Skip to year end (headless mode for UI)
    */
-  async skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<YearAdvanceResult> {
+  async skipToYearEnd(
+    state: GameState,
+    opts?: Omit<AdvanceOptions, 'checkpointInterval'>
+  ): Promise<YearAdvanceResult> {
     return this.advanceYear(state, {
       ...opts,
       headless: true,

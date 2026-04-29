@@ -28,8 +28,7 @@ function routeUpdate(
   rivalsUpdates: Map<StableId, Partial<RivalStableData>>
 ): void {
   const isPlayer =
-    s.player?.id === warrior.stableId ||
-    (s.roster || []).some((w) => w.id === warrior.id);
+    s.player?.id === warrior.stableId || (s.roster || []).some((w) => w.id === warrior.id);
   if (isPlayer) {
     const existing = rosterUpdates.get(warrior.id) ?? {};
     rosterUpdates.set(warrior.id, { ...existing, ...partial });

@@ -54,11 +54,8 @@ export function ScoutReportDetails({
               </h4>
             </div>
             <p className="text-sm text-foreground/80 leading-relaxed font-display max-w-md">
-              Establish a tactical deep-scan on{' '}
-              <span >
-                {warriorName}
-              </span>{' '}
-              to uncover their combat signatures and metabolic thresholds.
+              Establish a tactical deep-scan on <span>{warriorName}</span> to uncover their combat
+              signatures and metabolic thresholds.
             </p>
           </div>
 
@@ -134,7 +131,7 @@ export function ScoutReportDetails({
 
       <div className="p-6 border-b border-white/5 bg-primary/5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div >
+          <div>
             <Microscope className="h-5 w-5" />
           </div>
           <div>
@@ -295,10 +292,7 @@ export function ScoutReportDetails({
         </div>
 
         {report.quality !== 'Expert' && (
-          <button
-            
-            onClick={() => onScout(report.quality === 'Basic' ? 'Detailed' : 'Expert')}
-          >
+          <button onClick={() => onScout(report.quality === 'Basic' ? 'Detailed' : 'Expert')}>
             <div className="flex items-center justify-center gap-3">
               <Eye className="h-4 w-4 group-hover/expand:scale-110 transition-transform" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">

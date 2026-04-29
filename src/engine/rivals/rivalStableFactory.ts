@@ -100,7 +100,8 @@ export function generateRivalStables(
 
       let style: FightingStyle;
       if (rng.next() < 0.7 && tmpl.preferredStyles.length > 0) {
-        const preferred = tmpl.preferredStyles[Math.floor(rng.next() * tmpl.preferredStyles.length)];
+        const preferred =
+          tmpl.preferredStyles[Math.floor(rng.next() * tmpl.preferredStyles.length)];
         if (!preferred) {
           throw new Error('Style selection from preferredStyles failed');
         }

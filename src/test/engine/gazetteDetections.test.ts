@@ -31,7 +31,9 @@ const createFight = (overrides: Partial<FightSummary> = {}): FightSummary => ({
 describe('detectUpsets', () => {
   it('detects an upset when the underdog wins significantly', () => {
     // Loser fame (30) >= winner fame (10) + 10 AND loser fame (30) >= 2 * winner fame (10)
-    const fights = [createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: 10, fameD: 30 })];
+    const fights = [
+      createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: 10, fameD: 30 }),
+    ];
     const upsets = detectUpsets(fights);
     expect(upsets).toHaveLength(1);
     expect(upsets[0]).toEqual({
@@ -44,21 +46,27 @@ describe('detectUpsets', () => {
 
   it('does not detect an upset when fame difference is small', () => {
     // Loser fame (15) < winner fame (10) + 10
-    const fights = [createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: 10, fameD: 15 })];
+    const fights = [
+      createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: 10, fameD: 15 }),
+    ];
     const upsets = detectUpsets(fights);
     expect(upsets).toHaveLength(0);
   });
 
   it('does not detect an upset when ratio is small', () => {
-     // Loser fame (25) >= winner fame (15) + 10 is TRUE
-     // BUT loser fame (25) < 2 * winner fame (15) (30)
-    const fights = [createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: 15, fameD: 25 })];
+    // Loser fame (25) >= winner fame (15) + 10 is TRUE
+    // BUT loser fame (25) < 2 * winner fame (15) (30)
+    const fights = [
+      createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: 15, fameD: 25 }),
+    ];
     const upsets = detectUpsets(fights);
     expect(upsets).toHaveLength(0);
   });
 
   it('does not detect an upset when the favorite wins', () => {
-    const fights = [createFight({ a: 'Favorite', d: 'Underdog', winner: 'A', fameA: 30, fameD: 10 })];
+    const fights = [
+      createFight({ a: 'Favorite', d: 'Underdog', winner: 'A', fameA: 30, fameD: 10 }),
+    ];
     const upsets = detectUpsets(fights);
     expect(upsets).toHaveLength(0);
   });
@@ -70,7 +78,9 @@ describe('detectUpsets', () => {
   });
 
   it('does not detect an upset when fame data is missing', () => {
-    const fights = [createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: undefined, fameD: 30 })];
+    const fights = [
+      createFight({ a: 'Underdog', d: 'Favorite', winner: 'A', fameA: undefined, fameD: 30 }),
+    ];
     const upsets = detectUpsets(fights);
     expect(upsets).toHaveLength(0);
   });
@@ -92,7 +102,10 @@ describe('detectDebuts', () => {
     // weekFights: f2(Alice, Charlie), f3(Dave, Alice).
     // debuts: Charlie, Dave.
 
-    const debuts = detectDebuts(weekFights, [...allFights, createFight({id: 'f3', a: 'Dave', d: 'Alice'})]);
+    const debuts = detectDebuts(weekFights, [
+      ...allFights,
+      createFight({ id: 'f3', a: 'Dave', d: 'Alice' }),
+    ]);
     expect(debuts).toContain('Charlie');
     expect(debuts).toContain('Dave');
     expect(debuts).not.toContain('Alice');
@@ -142,7 +155,10 @@ describe('detectRivalryMatchup', () => {
 
 describe('detectHotStreakers', () => {
   it('detects winners on a streak of 5+', () => {
-    const streaks = new Map([['Alice', 5], ['Bob', 4]]);
+    const streaks = new Map([
+      ['Alice', 5],
+      ['Bob', 4],
+    ]);
     const weekFights = [
       createFight({ a: 'Alice', d: 'Charlie', winner: 'A' }),
       createFight({ a: 'Bob', d: 'Dave', winner: 'A' }),
@@ -180,11 +196,14 @@ describe('detectRisingStars', () => {
 
 describe('detectGazetteTags', () => {
   it('assigns Bloodbath for 2+ kills', () => {
-    const fights = [
-      createFight({ by: 'Kill' }),
-      createFight({ by: 'Kill' }),
-    ];
-    const detections = { tags: [], hotStreakers: [], rivalryPair: null, risingStars: [], upsets: [] };
+    const fights = [createFight({ by: 'Kill' }), createFight({ by: 'Kill' })];
+    const detections = {
+      tags: [],
+      hotStreakers: [],
+      rivalryPair: null,
+      risingStars: [],
+      upsets: [],
+    };
     const tags = detectGazetteTags(fights, detections);
     expect(tags).toContain('Bloodbath');
   });
@@ -195,7 +214,13 @@ describe('detectGazetteTags', () => {
       createFight({ by: 'KO' }),
       createFight({ by: 'KO' }),
     ];
-    const detections = { tags: [], hotStreakers: [], rivalryPair: null, risingStars: [], upsets: [] };
+    const detections = {
+      tags: [],
+      hotStreakers: [],
+      rivalryPair: null,
+      risingStars: [],
+      upsets: [],
+    };
     const tags = detectGazetteTags(fights, detections);
     expect(tags).toContain('KO Fest');
   });
@@ -206,7 +231,7 @@ describe('detectGazetteTags', () => {
       hotStreakers: [],
       rivalryPair: null,
       risingStars: [],
-      upsets: [{ winner: 'W', loser: 'L', winnerFame: 1, loserFame: 20 }]
+      upsets: [{ winner: 'W', loser: 'L', winnerFame: 1, loserFame: 20 }],
     };
     const tags = detectGazetteTags([], detections);
     expect(tags).toContain('Upset');

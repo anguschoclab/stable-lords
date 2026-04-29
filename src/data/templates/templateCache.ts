@@ -101,7 +101,9 @@ export function getTemplatesByTier(tier: StableTier): StableTemplate[] {
  * Gets templates by philosophy using pre-computed cache
  * Performance: O(1) - Direct Map access
  */
-export function getTemplatesByPhilosophy(philosophy: StableTemplate['philosophy']): StableTemplate[] {
+export function getTemplatesByPhilosophy(
+  philosophy: StableTemplate['philosophy']
+): StableTemplate[] {
   return PHILOSOPHY_CACHE.get(philosophy) || [];
 }
 
@@ -109,7 +111,9 @@ export function getTemplatesByPhilosophy(philosophy: StableTemplate['philosophy'
  * Gets templates by personality using pre-computed cache
  * Performance: O(1) - Direct Map access
  */
-export function getTemplatesByPersonality(personality: StableTemplate['personality']): StableTemplate[] {
+export function getTemplatesByPersonality(
+  personality: StableTemplate['personality']
+): StableTemplate[] {
   return PERSONALITY_CACHE.get(personality) || [];
 }
 
@@ -117,7 +121,9 @@ export function getTemplatesByPersonality(personality: StableTemplate['personali
  * Gets templates by meta adaptation using pre-computed cache
  * Performance: O(1) - Direct Map access
  */
-export function getTemplatesByMetaAdaptation(metaAdaptation: StableTemplate['metaAdaptation']): StableTemplate[] {
+export function getTemplatesByMetaAdaptation(
+  metaAdaptation: StableTemplate['metaAdaptation']
+): StableTemplate[] {
   return META_ADAPTATION_CACHE.get(metaAdaptation) || [];
 }
 
@@ -125,7 +131,9 @@ export function getTemplatesByMetaAdaptation(metaAdaptation: StableTemplate['met
  * Gets templates by backstory using pre-computed cache
  * Performance: O(1) - Direct Map access
  */
-export function getTemplatesByBackstory(backstoryId: StableTemplate['backstoryId']): StableTemplate[] {
+export function getTemplatesByBackstory(
+  backstoryId: StableTemplate['backstoryId']
+): StableTemplate[] {
   return BACKSTORY_CACHE.get(backstoryId) || [];
 }
 
@@ -140,10 +148,10 @@ export function getTemplatesByStyle(style: string): StableTemplate[] {
     return cached;
   }
 
-  const result = ALL_TEMPLATES.filter(template => 
+  const result = ALL_TEMPLATES.filter((template) =>
     template.preferredStyles.includes(style as any)
   );
-  
+
   templateCache.set(cacheKey, result);
   return result;
 }
@@ -159,10 +167,10 @@ export function getTemplatesByFameRange(minFame: number, maxFame: number): Stabl
     return cached;
   }
 
-  const result = ALL_TEMPLATES.filter(template => 
-    template.fameRange[0] >= minFame && template.fameRange[1] <= maxFame
+  const result = ALL_TEMPLATES.filter(
+    (template) => template.fameRange[0] >= minFame && template.fameRange[1] <= maxFame
   );
-  
+
   templateCache.set(cacheKey, result);
   return result;
 }
@@ -178,10 +186,10 @@ export function getTemplatesByRosterRange(minRoster: number, maxRoster: number):
     return cached;
   }
 
-  const result = ALL_TEMPLATES.filter(template => 
-    template.rosterRange[0] >= minRoster && template.rosterRange[1] <= maxRoster
+  const result = ALL_TEMPLATES.filter(
+    (template) => template.rosterRange[0] >= minRoster && template.rosterRange[1] <= maxRoster
   );
-  
+
   templateCache.set(cacheKey, result);
   return result;
 }
@@ -217,27 +225,27 @@ export function searchTemplates(criteria: {
   }
 
   if (criteria.philosophy) {
-    result = result.filter(template => template.philosophy === criteria.philosophy);
+    result = result.filter((template) => template.philosophy === criteria.philosophy);
   }
 
   if (criteria.personality) {
-    result = result.filter(template => template.personality === criteria.personality);
+    result = result.filter((template) => template.personality === criteria.personality);
   }
 
   if (criteria.metaAdaptation) {
-    result = result.filter(template => template.metaAdaptation === criteria.metaAdaptation);
+    result = result.filter((template) => template.metaAdaptation === criteria.metaAdaptation);
   }
 
   if (criteria.backstoryId) {
-    result = result.filter(template => template.backstoryId === criteria.backstoryId);
+    result = result.filter((template) => template.backstoryId === criteria.backstoryId);
   }
 
   if (criteria.style) {
-    result = result.filter(template => template.preferredStyles.includes(criteria.style as any));
+    result = result.filter((template) => template.preferredStyles.includes(criteria.style as any));
   }
 
   if (criteria.minFame !== undefined || criteria.maxFame !== undefined) {
-    result = result.filter(template => {
+    result = result.filter((template) => {
       const [min, max] = template.fameRange;
       if (criteria.minFame !== undefined && min < criteria.minFame) return false;
       if (criteria.maxFame !== undefined && max > criteria.maxFame) return false;
@@ -246,7 +254,7 @@ export function searchTemplates(criteria: {
   }
 
   if (criteria.minRoster !== undefined || criteria.maxRoster !== undefined) {
-    result = result.filter(template => {
+    result = result.filter((template) => {
       const [min, max] = template.rosterRange;
       if (criteria.minRoster !== undefined && min < criteria.minRoster) return false;
       if (criteria.maxRoster !== undefined && max > criteria.maxRoster) return false;

@@ -75,9 +75,7 @@ export function ReputationQuadrant({ className }: { className?: string }) {
         <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
           Fame →
         </span>
-        <span
-          className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 [writing-mode:vertical-rl] rotate-180"
-        >
+        <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase tracking-widest text-muted-foreground/30 [writing-mode:vertical-rl] rotate-180">
           Notoriety →
         </span>
 

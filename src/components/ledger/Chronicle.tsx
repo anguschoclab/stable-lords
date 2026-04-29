@@ -91,9 +91,7 @@ export function Chronicle() {
 
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
                       <div className="space-y-1">
-                        <h4 >
-                          {n.title}
-                        </h4>
+                        <h4>{n.title}</h4>
                         <div className="flex items-center gap-3">
                           <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40">
                             Entry_Registry_Sync

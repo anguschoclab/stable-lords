@@ -149,7 +149,11 @@ function useTournamentSchedule(tournament: TournamentEntry) {
   };
 }
 
-function TournamentStatsHeader({ stats }: { stats: { total: number; completed: number; byes: number; upcoming: number } }) {
+function TournamentStatsHeader({
+  stats,
+}: {
+  stats: { total: number; completed: number; byes: number; upcoming: number };
+}) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       <Card className="bg-gradient-to-br from-primary/5 to-transparent">
@@ -165,9 +169,7 @@ function TournamentStatsHeader({ stats }: { stats: { total: number; completed: n
           <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold">
             <Trophy className="h-3.5 w-3.5" /> Completed
           </div>
-          <div className="text-xl font-black font-mono mt-1 text-primary">
-            {stats.completed}
-          </div>
+          <div className="text-xl font-black font-mono mt-1 text-primary">{stats.completed}</div>
         </CardContent>
       </Card>
       <Card className="bg-gradient-to-br from-amber-500/5 to-transparent">
@@ -222,19 +224,22 @@ function TournamentFilterBar({
       <Button variant="ghost" size="sm" onClick={expandAll} className="text-[10px] uppercase h-7">
         Expand All
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={collapseAll}
-        className="text-[10px] uppercase h-7"
-      >
+      <Button variant="ghost" size="sm" onClick={collapseAll} className="text-[10px] uppercase h-7">
         Collapse
       </Button>
     </div>
   );
 }
 
-function TournamentBoutRow({ bout, state, round }: { bout: TournamentBout; state: GameState; round: number }) {
+function TournamentBoutRow({
+  bout,
+  state,
+  round,
+}: {
+  bout: TournamentBout;
+  state: GameState;
+  round: number;
+}) {
   const isBye = isByeMatch(bout);
   const isResolved = bout.winner !== undefined;
   const bronze = isBronzeMatch(bout);
@@ -248,9 +253,7 @@ function TournamentBoutRow({ bout, state, round }: { bout: TournamentBout; state
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="text-xs text-muted-foreground font-mono w-8">
-          #{bout.matchIndex + 1}
-        </div>
+        <div className="text-xs text-muted-foreground font-mono w-8">#{bout.matchIndex + 1}</div>
         <div className="space-y-1">
           <div
             className={cn(
@@ -268,9 +271,7 @@ function TournamentBoutRow({ bout, state, round }: { bout: TournamentBout; state
             <span className="text-sm truncate max-w-32">
               {resolveWarriorName(state, bout.warriorIdA, bout.a)}
             </span>
-            {bout.winner === 'A' && (
-              <Trophy className="h-3 w-3 text-arena-gold" />
-            )}
+            {bout.winner === 'A' && <Trophy className="h-3 w-3 text-arena-gold" />}
           </div>
 
           {!isBye ? (
@@ -290,9 +291,7 @@ function TournamentBoutRow({ bout, state, round }: { bout: TournamentBout; state
               <span className="text-sm truncate max-w-32">
                 {resolveWarriorName(state, bout.warriorIdD, bout.d)}
               </span>
-              {bout.winner === 'D' && (
-                <Trophy className="h-3 w-3 text-arena-gold" />
-              )}
+              {bout.winner === 'D' && <Trophy className="h-3 w-3 text-arena-gold" />}
             </div>
           ) : (
             <div className="flex items-center gap-2 opacity-50 italic">
@@ -305,10 +304,7 @@ function TournamentBoutRow({ bout, state, round }: { bout: TournamentBout; state
 
       <div className="flex items-center gap-2">
         {bronze && (
-          <Badge
-            variant="outline"
-            className="text-[9px] border-arena-gold/30 text-arena-gold"
-          >
+          <Badge variant="outline" className="text-[9px] border-arena-gold/30 text-arena-gold">
             Bronze
           </Badge>
         )}
@@ -411,11 +407,7 @@ function TournamentRoundCard({
               aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${getRoundName(round, totalRounds)}`}
               aria-expanded={isExpanded}
             >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
           </div>
         </div>
@@ -425,12 +417,7 @@ function TournamentRoundCard({
         <CardContent className="p-0">
           <div className="divide-y divide-border/30">
             {bouts.map((bout, idx) => (
-              <TournamentBoutRow
-                key={`${round}-${idx}`}
-                bout={bout}
-                state={state}
-                round={round}
-              />
+              <TournamentBoutRow key={`${round}-${idx}`} bout={bout} state={state} round={round} />
             ))}
           </div>
         </CardContent>

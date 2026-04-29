@@ -33,7 +33,12 @@ interface GlobalTreasuryMatrixProps {
   totalKills: number;
 }
 
-function GlobalTreasuryMatrix({ gold, activeWarriorsCount, totalWins, totalKills }: GlobalTreasuryMatrixProps) {
+function GlobalTreasuryMatrix({
+  gold,
+  activeWarriorsCount,
+  totalWins,
+  totalKills,
+}: GlobalTreasuryMatrixProps) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {[
@@ -164,9 +169,7 @@ function FiscalTrajectoryMonitor({ breakdown, week }: FiscalTrajectoryMonitorPro
                 <span className="text-[11px] font-medium text-foreground/70 group-hover/item:text-foreground">
                   {item.label}
                 </span>
-                <span className="text-arena-pop font-mono font-black text-xs">
-                  +{item.amount}G
-                </span>
+                <span className="text-arena-pop font-mono font-black text-xs">+{item.amount}G</span>
               </div>
             ))}
             {breakdown.income.length === 0 && (
@@ -359,7 +362,9 @@ export function TreasuryOverview() {
   const breakdown = useMemo(() => computeWeeklyBreakdown(state), [state]);
   const gold = state.treasury ?? 0;
 
-  const activeWarriorsCount = (state.roster ?? []).filter((w: Warrior) => w.status === 'Active').length;
+  const activeWarriorsCount = (state.roster ?? []).filter(
+    (w: Warrior) => w.status === 'Active'
+  ).length;
 
   // ⚡ Bolt: Fast accumulation without allocating objects per iteration
   let totalWins = 0;
@@ -394,10 +399,7 @@ export function TreasuryOverview() {
         <FiscalTrajectoryMonitor breakdown={breakdown} week={state.week} />
 
         {/* ─── High-Fidelity Ledger Chronicle ─── */}
-        <LedgerRegistry
-          recentLedger={recentLedger}
-          totalLedgerEntries={totalLedgerEntries}
-        />
+        <LedgerRegistry recentLedger={recentLedger} totalLedgerEntries={totalLedgerEntries} />
       </div>
     </div>
   );

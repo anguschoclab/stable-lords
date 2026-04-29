@@ -68,5 +68,5 @@ export const SeasonalRetirementService = {
     });
 
     return { updatedState, legacyCandidates };
-  }
+  },
 } as const;

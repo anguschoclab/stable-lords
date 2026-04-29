@@ -181,7 +181,10 @@ export const TRAITS: Record<string, TraitDef> = {
     id: 'cunning',
     name: 'Cunning',
     description: 'Favors trickery and misdirection to find the killing blow.',
-    effect: { fightPlanMod: { feintTendency: 10, AL: 2, killDesire: -2 }, attrBonus: { SP: 1, DF: 1 } },
+    effect: {
+      fightPlanMod: { feintTendency: 10, AL: 2, killDesire: -2 },
+      attrBonus: { SP: 1, DF: 1 },
+    },
     weight: 1.0,
     synergy: ['cunning', 'agile'],
     antiSynergy: ['brutal'],
@@ -207,8 +210,10 @@ export const TRAITS: Record<string, TraitDef> = {
   merciless: {
     id: 'merciless',
     name: 'Merciless',
+    // killDesire 12 stays the highest single-trait source (Feral=10, Aggressive=5);
+    // pulled back from 15 to prevent Merciless+Bloodthirsty tripling base kill rate.
     description: 'Relentlessly pursues the kill, ignoring all distractions.',
-    effect: { fightPlanMod: { killDesire: 15, OE: 2 }, attrBonus: { ST: 1, WL: 1 } },
+    effect: { fightPlanMod: { killDesire: 12, OE: 2 }, attrBonus: { ST: 1, WL: 1 } },
     weight: 0.6,
     synergy: ['brutal'],
   },
@@ -370,14 +375,16 @@ export function getDynamicTraitMods(
 }
 
 /** Combines personality/combat AI trait modifiers for a warrior's FightPlan */
-export function getTraitFightPlanMods(warrior?: Warrior): Partial<import('@/types/shared.types').FightPlan> {
+export function getTraitFightPlanMods(
+  warrior?: Warrior
+): Partial<import('@/types/shared.types').FightPlan> {
   const mods: Partial<import('@/types/shared.types').FightPlan> = {};
   if (!warrior?.traits) return mods;
 
   for (const id of warrior.traits) {
     const t = TRAITS[id];
     if (!t?.effect.fightPlanMod) continue;
-    
+
     for (const [key, val] of Object.entries(t.effect.fightPlanMod)) {
       const k = key as keyof import('@/types/shared.types').FightPlan;
       if (typeof val === 'number') {

@@ -1,4 +1,3 @@
-
 import { describe, it, expect } from 'vitest';
 import { resolveWarriorName, resolveStableName, findWarrior } from '@/utils/historyResolver';
 import { GameState } from '@/types/state.types';
@@ -8,25 +7,23 @@ describe('historyResolver', () => {
     player: { id: 'p1', stableName: 'Player Stable', name: 'Player' },
     roster: [
       { id: 'w1', name: 'Warrior 1' },
-      { id: 'shared-id', name: 'Roster Warrior' }
+      { id: 'shared-id', name: 'Roster Warrior' },
     ],
     graveyard: [
       { id: 'w2', name: 'Warrior 2' },
-      { id: 'shared-id', name: 'Grave Warrior' }
+      { id: 'shared-id', name: 'Grave Warrior' },
     ],
-    retired: [
-      { id: 'w3', name: 'Warrior 3' }
-    ],
+    retired: [{ id: 'w3', name: 'Warrior 3' }],
     rivals: [
       {
         id: 'r1',
         owner: { id: 'r1', stableName: 'Rival Stable 1' },
         roster: [
           { id: 'w4', name: 'Warrior 4' },
-          { id: 'shared-id', name: 'Rival Warrior' }
-        ]
-      }
-    ]
+          { id: 'shared-id', name: 'Rival Warrior' },
+        ],
+      },
+    ],
   };
 
   describe('resolveWarriorName', () => {
@@ -86,12 +83,12 @@ describe('historyResolver', () => {
     });
 
     it('should prioritize roster over other lists when searching by name', () => {
-        const stateWithNameConflict: any = {
-            ...mockState,
-            roster: [...mockState.roster, { id: 'w-new', name: 'Warrior 4' }]
-        };
-        const w = findWarrior(stateWithNameConflict, undefined, 'Warrior 4');
-        expect(w?.id).toBe('w-new');
+      const stateWithNameConflict: any = {
+        ...mockState,
+        roster: [...mockState.roster, { id: 'w-new', name: 'Warrior 4' }],
+      };
+      const w = findWarrior(stateWithNameConflict, undefined, 'Warrior 4');
+      expect(w?.id).toBe('w-new');
     });
   });
 

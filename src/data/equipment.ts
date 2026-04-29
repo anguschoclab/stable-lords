@@ -2,7 +2,7 @@
  * Stable Lords — Canonical Equipment Database
  * Weapons, armor, shields, helms with codes, weights, style restrictions.
  * Based on canonical Duelmasters equipment tables.
- * 
+ *
  * This file now serves as a compatibility layer for the modular equipment system.
  * For new code, prefer importing from '@/data/equipment' directly.
  */
@@ -11,13 +11,13 @@
 export * from './equipment';
 
 // Re-export types for backward compatibility
-export type { 
-  EquipmentItem, 
-  EquipmentSlot, 
-  EquipmentLoadout, 
-  WeaponReqResult, 
+export type {
+  EquipmentItem,
+  EquipmentSlot,
+  EquipmentLoadout,
+  WeaponReqResult,
   WeaponReqCheck,
-  LoadoutIssue
+  LoadoutIssue,
 } from './equipment/equipment.types';
 
 // Re-export specific equipment arrays for backward compatibility with tests

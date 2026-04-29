@@ -6,14 +6,7 @@ import { Surface } from '@/components/ui/Surface';
 import { Button } from '@/components/ui/button';
 import { StatBadge, WarriorNameTag } from '@/components/ui/WarriorBadges';
 import { potentialRating, potentialGrade } from '@/engine/potential';
-import {
-  Users,
-  ChevronRight,
-  Star,
-  Swords,
-  Crown,
-  Activity,
-} from 'lucide-react';
+import { Users, ChevronRight, Star, Swords, Crown, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { StatBattery } from '@/components/ui/StatBattery';
@@ -51,11 +44,7 @@ export function RosterWall() {
         </div>
 
         <Link to="/ops/recruit">
-          <Button
-            variant="outline"
-            size="sm"
-            
-          >
+          <Button variant="outline" size="sm">
             Initialize Recruitment <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -81,9 +70,7 @@ export function RosterWall() {
               </p>
             </div>
             <Link to="/ops/recruit" className="mt-4">
-              <Button >
-                Initialize Sync
-              </Button>
+              <Button>Initialize Sync</Button>
             </Link>
           </Surface>
         ) : (
@@ -105,7 +92,10 @@ export function RosterWall() {
                       role="button"
                       tabIndex={0}
                       onClick={() => navigate({ to: '/warrior/$id', params: { id: w.id } })}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate({ to: '/warrior/$id', params: { id: w.id } }); }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ')
+                          navigate({ to: '/warrior/$id', params: { id: w.id } });
+                      }}
                       className="w-full relative group cursor-pointer"
                       aria-label={`View profile for ${w.name}`}
                     >

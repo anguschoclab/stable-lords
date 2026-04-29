@@ -98,9 +98,7 @@ export function LineageTree({ lineage, warriorName }: LineageTreeProps) {
                 <p className="text-[9px] font-black text-arena-gold uppercase tracking-[0.3em] mb-1">
                   Current Subject
                 </p>
-                <p >
-                  {warriorName}
-                </p>
+                <p>{warriorName}</p>
                 <div className="mt-3 flex justify-center gap-1">
                   {[...Array(lineage.generation)].map((_, i) => (
                     <div

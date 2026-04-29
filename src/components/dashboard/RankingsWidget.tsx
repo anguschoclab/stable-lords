@@ -212,7 +212,7 @@ export function RankingsWidget() {
                       FAME SCORE
                     </span>
                   </div>
-                  <ChevronRight  />
+                  <ChevronRight />
                 </div>
 
                 {/* Progress Sparkline Mask */}

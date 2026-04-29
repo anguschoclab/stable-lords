@@ -213,7 +213,7 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
 
       // Optimized candidate selection: single pass with inline scoring
       // Avoids multiple array allocations (filter + map + sort)
-      let bestCandidate: typeof shuffledWarriors[0] | null = null;
+      let bestCandidate: (typeof shuffledWarriors)[0] | null = null;
       let bestScore = -Infinity;
       let bestGap = 0;
 

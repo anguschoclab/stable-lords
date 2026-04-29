@@ -74,7 +74,9 @@ export function StableWidget() {
                 >
                   <div className="relative">
                     <div className="w-10 h-10 rounded-none bg-secondary/20 border border-white/10 flex items-center justify-center overflow-hidden transition-transform group-hover/item:scale-105">
-                      <span className="text-xs font-black text-foreground/40">{w.name.charAt(0)}</span>
+                      <span className="text-xs font-black text-foreground/40">
+                        {w.name.charAt(0)}
+                      </span>
                       {hasInjuries && (
                         <div className="absolute -top-1 -right-1 bg-destructive p-0.5 rounded-full ring-2 ring-[#050506]">
                           <AlertCircle className="h-2 w-2 text-foreground" />

@@ -124,7 +124,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-[#0C0806] flex flex-col overflow-hidden text-foreground selection:bg-primary/30">
       {/* ─── Global Status Header ─── */}
@@ -138,7 +137,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               whileHover={{ rotate: 15 }}
               className="w-8 h-8 rounded-none bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.4)] border border-white/10"
             >
-              <Swords  />
+              <Swords />
             </motion.div>
             <div className="flex flex-col">
               <span className="font-display font-black text-sm tracking-tighter uppercase leading-none group-hover:text-primary transition-colors">

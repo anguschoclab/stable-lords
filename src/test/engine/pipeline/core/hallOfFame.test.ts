@@ -72,7 +72,7 @@ describe('processHallOfFame', () => {
     const res = resolveImpacts(state, [impact]);
 
     expect(res.awards?.length).toBeGreaterThan(0);
-    const awardTypes = res.awards?.map(a => a.type);
+    const awardTypes = res.awards?.map((a) => a.type);
     expect(awardTypes).toContain('WARRIOR_OF_YEAR');
     expect(awardTypes).toContain('KILLER_OF_YEAR');
   });

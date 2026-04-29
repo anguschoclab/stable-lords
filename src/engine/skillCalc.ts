@@ -281,22 +281,22 @@ function szMod(table: Record<number, number>, sz: number): number {
 const STYLE_PENALTIES: Record<FightingStyle, [number, number, number, number, number, number]> = {
   //                                           ATT  PAR  DEF  INI  RIP  DEC
   // ── Cunning archetype (WT/DF/WL → high raw skills, needs steep penalty) ──
-  [FightingStyle.AimedBlow]:      /*AB*/  [-13, -6, -10, -7, -5, +1],    // was -52, now -40: +12 budget (ATT/PAR/DEF/INI/RIP)
-  [FightingStyle.ParryRiposte]:   /*PR*/  [-14, -8, -15, -8,  -2, -2],   // was -38, now -49: identity = riposte king (RIP least penalised)
-  [FightingStyle.ParryStrike]:    /*PS*/  [-12, -6, -12, -9, -4, -1],    // was -42, now -44: minor INI nerf
-  [FightingStyle.ParryLunge]:     /*PL*/  [-11, -7, -13, -7, -6, -1],    // was -35, now -45: ATT/INI/RIP down
+  [FightingStyle.AimedBlow]: /*AB*/ [-13, -6, -10, -7, -5, +1], // was -52, now -40: +12 budget (ATT/PAR/DEF/INI/RIP)
+  [FightingStyle.ParryRiposte]: /*PR*/ [-14, -8, -15, -8, -2, -2], // was -38, now -49: identity = riposte king (RIP least penalised)
+  [FightingStyle.ParryStrike]: /*PS*/ [-12, -6, -12, -9, -4, -1], // was -42, now -44: minor INI nerf
+  [FightingStyle.ParryLunge]: /*PL*/ [-11, -7, -13, -7, -6, -1], // was -35, now -45: ATT/INI/RIP down
 
   // ── Agile archetype (SP/DF/WT → massive breakpoint yields, heaviest penalty) ──
-  [FightingStyle.LungingAttack]:  /*LU*/  [-10,-12, -13, -7, -7, -2],    // was -30, now -51: massive nerf to all skills
-  [FightingStyle.SlashingAttack]: /*SL*/  [-12,-14, -15, -4, -7, -2],    // was -34, now -54: INI kept as identity, everything else down
+  [FightingStyle.LungingAttack]: /*LU*/ [-10, -12, -13, -7, -7, -2], // was -30, now -51: massive nerf to all skills
+  [FightingStyle.SlashingAttack]: /*SL*/ [-12, -14, -15, -4, -7, -2], // was -34, now -54: INI kept as identity, everything else down
 
   // ── Brutal archetype (ST/CN/SZ → low breakpoint yields, lightest penalty) ──
-  [FightingStyle.BashingAttack]:  /*BA*/  [ -4, -6, -10,  0, -2, +2],    // was -35, now -20: +15 budget across all skills
-  [FightingStyle.StrikingAttack]: /*ST*/  [ -7, -6,  -9, -2, -2, +2],    // was -41, now -24: +17 budget; still lower ATT than BA
+  [FightingStyle.BashingAttack]: /*BA*/ [-4, -6, -10, 0, -2, +2], // was -35, now -20: +15 budget across all skills
+  [FightingStyle.StrikingAttack]: /*ST*/ [-7, -6, -9, -2, -2, +2], // was -41, now -24: +17 budget; still lower ATT than BA
 
   // ── Tank archetype (CN/WL/SZ → endurance/HP, needs skill floor to compete) ──
-  [FightingStyle.TotalParry]:     /*TP*/  [-12, +1,  -9, -4, -2,  0],    // was -41, now -26: PAR buff is identity; ATT stays low
-  [FightingStyle.WallOfSteel]:    /*WS*/  [ -2, -2,  -9,  2, -2,  0],    // was -27, now -13: small universal buff; INI positive = reads attacks
+  [FightingStyle.TotalParry]: /*TP*/ [-12, +1, -9, -4, -2, 0], // was -41, now -26: PAR buff is identity; ATT stays low
+  [FightingStyle.WallOfSteel]: /*WS*/ [-2, -2, -9, 2, -2, 0], // was -27, now -13: small universal buff; INI positive = reads attacks
 };
 
 // ─── Base Skill Computation ───────────────────────────────────────────────

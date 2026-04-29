@@ -39,9 +39,7 @@ export function pickWeeklyIntent(
   const seasonRecord = rival.agentMemory?.seasonRecord;
   const seasonFightsPlayed = (seasonRecord?.wins ?? 0) + (seasonRecord?.losses ?? 0);
   const seasonWinRate =
-    seasonFightsPlayed >= 6
-      ? (seasonRecord?.wins ?? 0) / seasonFightsPlayed
-      : null;
+    seasonFightsPlayed >= 6 ? (seasonRecord?.wins ?? 0) / seasonFightsPlayed : null;
 
   if (
     rival.treasury < 200 ||
@@ -64,8 +62,7 @@ export function pickWeeklyIntent(
       ? 0.25
       : 0;
 
-  const vendettaChance =
-    personality === 'Aggressive' ? 0.4 : personality === 'Showman' ? 0.2 : 0.1;
+  const vendettaChance = personality === 'Aggressive' ? 0.4 : personality === 'Showman' ? 0.2 : 0.1;
   if (hasGrudge && rngService.next() < vendettaChance) {
     return 'VENDETTA';
   }
@@ -99,7 +96,9 @@ export function pickWeeklyIntent(
     const styleCounts: Record<string, number> = {};
     for (const s of allStyles) styleCounts[s] = (styleCounts[s] ?? 0) + 1;
     const maxConcentration = Math.max(...Object.values(styleCounts)) / allStyles.length;
-    const dominantStyle = Object.entries(styleCounts).reduce((a, b) => (b[1] > a[1] ? b : a))[0] as FightingStyle;
+    const dominantStyle = Object.entries(styleCounts).reduce((a, b) =>
+      b[1] > a[1] ? b : a
+    )[0] as FightingStyle;
     if (maxConcentration >= 0.5 && (meta[dominantStyle] ?? 0) <= -3) {
       return 'ROSTER_DIVERSITY';
     }
@@ -111,8 +110,10 @@ export function pickWeeklyIntent(
   const rivalExpanding = knownRivals.some((rivalId) => {
     const r = state.rivals?.find((rv) => rv.owner.id === rivalId);
     if (!r || !r.agentMemory?.seasonRecord) return false;
-    return r.roster.filter((w) => w.status === 'Active').length >
-      r.agentMemory.seasonRecord.rosterSizeAtSeasonStart + 1;
+    return (
+      r.roster.filter((w) => w.status === 'Active').length >
+      r.agentMemory.seasonRecord.rosterSizeAtSeasonStart + 1
+    );
   });
   const expansionThreshold = rivalExpanding ? Math.floor(minSize * 0.8) : minSize;
   if (activeRoster.length < expansionThreshold && rival.treasury > 300) {

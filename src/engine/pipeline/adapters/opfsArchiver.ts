@@ -15,12 +15,14 @@ export async function flushDeferredArchives(state: GameState): Promise<GameState
   const opfs = new OPFSArchiveService();
   if (!opfs.isSupported()) return state;
 
-  const deferred = (state as any).deferredBoutLogs as Array<{
-    year: number;
-    season: number;
-    boutId: string;
-    transcript: string[];
-  }> | undefined;
+  const deferred = (state as any).deferredBoutLogs as
+    | Array<{
+        year: number;
+        season: number;
+        boutId: string;
+        transcript: string[];
+      }>
+    | undefined;
 
   if (!deferred || deferred.length === 0) return state;
 

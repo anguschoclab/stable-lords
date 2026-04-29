@@ -261,7 +261,9 @@ function AlertBox({ type, message }: AlertBoxProps) {
   const config = configs[type];
 
   return (
-    <div className={cn('flex items-center gap-2 p-2 rounded-none border text-sm', config.className)}>
+    <div
+      className={cn('flex items-center gap-2 p-2 rounded-none border text-sm', config.className)}
+    >
       {config.icon}
       <span className="font-medium">{message}</span>
     </div>

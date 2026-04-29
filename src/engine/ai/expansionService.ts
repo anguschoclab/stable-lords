@@ -112,5 +112,5 @@ export const ExpansionService = {
     updatedState.rivals = [...(updatedState.rivals || []), ...newStables];
 
     return { updatedState, newStables };
-  }
+  },
 } as const;
