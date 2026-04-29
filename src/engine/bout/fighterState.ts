@@ -12,7 +12,7 @@ import {
 } from '@/data/equipment';
 import { getTrainingBonus } from '@/engine/trainers';
 import { getFavoriteWeaponBonus } from '@/engine/favorites';
-import { getStaticTraitMods } from '@/engine/traits';
+import { getStaticTraitMods, getTraitFightPlanMods } from '@/engine/traits';
 import { getInjuryPenalties } from '@/engine/injuries';
 import { type FighterState } from '../combat/resolution';
 
@@ -118,6 +118,13 @@ export function createFighterState(
     DEC: skills.DEC + (trainerMods?.decMod ?? 0) + (drills.DEC ?? 0) + traitMods.decMod + (injuryPenalties['DEC'] ?? 0),
   };
 
+  const aiMods = getTraitFightPlanMods(warrior);
+  const activePlan = { ...plan };
+  if (aiMods.OE != null) activePlan.OE = Math.max(0, Math.min(10, activePlan.OE + aiMods.OE));
+  if (aiMods.AL != null) activePlan.AL = Math.max(0, Math.min(10, activePlan.AL + aiMods.AL));
+  if (aiMods.killDesire != null) activePlan.killDesire = Math.max(0, Math.min(100, activePlan.killDesire + aiMods.killDesire));
+  if (aiMods.feintTendency != null) activePlan.feintTendency = Math.max(0, Math.min(100, activePlan.feintTendency + aiMods.feintTendency));
+
   return {
     label,
     style: plan.style,
@@ -128,7 +135,7 @@ export function createFighterState(
       damage: derived.damage + (isMastered ? 1 : 0) + traitMods.dmgBonus,
     },
     plan,
-    activePlan: plan,
+    activePlan,
     psychState: 'Neutral',
     hp: derived.hp,
     maxHp: derived.hp,
