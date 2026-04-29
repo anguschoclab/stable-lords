@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
 import type { WeatherType } from '@/types/shared.types';
 
+import { isIndoorArena } from '@/data/arenas';
+
 interface WeatherAudioProps {
   weather: WeatherType;
   volume: number;
   enabled: boolean;
+  arenaId?: string;
 }
 
 // Weather to ambient sound mapping
@@ -21,29 +24,30 @@ const WEATHER_AMBIENCE: Record<WeatherType, string | null> = {
   Sandstorm: 'ambience-wind-gale',
 };
 
-export default function WeatherAudio({ weather, volume, enabled }: WeatherAudioProps) {
+export default function WeatherAudio({ weather, volume, enabled, arenaId }: WeatherAudioProps) {
   const currentWeatherRef = useRef<WeatherType | null>(null);
+  const isIndoor = isIndoorArena(arenaId);
+  const effectiveWeather = isIndoor ? 'Clear' : weather;
 
   useEffect(() => {
     if (!enabled) return;
 
     // Crossfade between weather states
-    if (weather !== currentWeatherRef.current) {
+    if (effectiveWeather !== currentWeatherRef.current) {
       const oldAmbience = currentWeatherRef.current
         ? WEATHER_AMBIENCE[currentWeatherRef.current]
         : null;
-      const newAmbience = WEATHER_AMBIENCE[weather];
+      const newAmbience = WEATHER_AMBIENCE[effectiveWeather];
 
       if (oldAmbience !== newAmbience) {
         console.log(
           `[WeatherAudio] Crossfade: ${oldAmbience || 'none'} → ${newAmbience || 'none'} at ${volume * 100}%`
         );
-        // In full implementation: fade out old, fade in new
       }
 
-      currentWeatherRef.current = weather;
+      currentWeatherRef.current = effectiveWeather;
     }
-  }, [weather, volume, enabled]);
+  }, [effectiveWeather, volume, enabled]);
 
   // Update volume without changing weather
   useEffect(() => {

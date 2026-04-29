@@ -60,12 +60,14 @@ export function runEventPass(
         week: nextWeek,
         title: e.title,
         items: [t(brawlRng.pick(e.newsletter), { name: brawler.name, fame: 5 })],
+        category: 'event',
       });
     }
   }
 
   // ☄️ Star-crossed Blessing Event
-  if (brawlRng.next() < 0.03 && state.roster.length > 0) {
+  const blessingChance = state.weather === 'Mana Surge' ? 0.25 : 0.03;
+  if (brawlRng.next() < blessingChance && state.roster.length > 0) {
     const youngWarriors = state.roster.filter((w) => w.status === 'Active' && (w.age || 0) <= 25);
     if (youngWarriors.length > 0) {
       const chosenIndex = Math.floor(brawlRng.next() * youngWarriors.length);
@@ -84,6 +86,7 @@ export function runEventPass(
         week: nextWeek,
         title: e.title,
         items: [t(brawlRng.pick(e.newsletter), { name: chosen.name, fame: 15, xp: 2 })],
+        category: 'event',
       });
     }
   }
@@ -108,6 +111,7 @@ export function runEventPass(
         week: nextWeek,
         title: e.title,
         items: [t(brawlRng.pick(e.newsletter), { name: chosen.name, fame: 10, xp: 5 })],
+        category: 'event',
       });
     }
   }
@@ -130,6 +134,7 @@ export function runEventPass(
       week: nextWeek,
       title: e.title,
       items: [t(brawlRng.pick(e.newsletter), { gold })],
+      category: 'event',
     });
   }
 

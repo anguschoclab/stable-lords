@@ -31,6 +31,7 @@ interface ArenaViewProps {
   isComplete?: boolean;
   arenaTier?: ArenaTier;
   weather?: WeatherType;
+  arenaId?: string;
   gearA?: Gear;
   gearD?: Gear;
   maxHpA?: number;
@@ -51,6 +52,7 @@ export default function ArenaView({
   isComplete = false,
   arenaTier = 'standard',
   weather = 'Clear',
+  arenaId,
   gearA,
   gearD,
   maxHpA = 50,
@@ -153,7 +155,12 @@ export default function ArenaView({
       className={cn('relative w-full h-full min-h-96 overflow-hidden rounded-none', className)}
     >
       {/* Arena Background */}
-      <ArenaBackground tier={arenaTier} weather={weather} className="absolute inset-0" />
+      <ArenaBackground
+        tier={arenaTier}
+        weather={weather}
+        arenaId={arenaId}
+        className="absolute inset-0"
+      />
 
       {/* Crowd Reactions */}
       {arenaPrefs.effectsEnabled && <CrowdReactions tier={arenaTier} state={crowdState} />}
@@ -168,6 +175,7 @@ export default function ArenaView({
       {weather && (
         <WeatherAudio
           weather={weather}
+          arenaId={arenaId}
           volume={arenaPrefs.audioVolume}
           enabled={arenaPrefs.audioEnabled}
         />

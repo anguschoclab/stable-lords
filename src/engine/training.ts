@@ -27,7 +27,11 @@ export interface TrainingImpact {
  * Compute the impact of training assignments for the current week.
  * Returns a pure impact object without modifying game state directly.
  */
-export function computeTrainingImpact(state: GameState, rng: IRNGService): TrainingImpact {
+export function computeTrainingImpact(
+  state: GameState,
+  rng: IRNGService,
+  weather: import('@/types/shared.types').WeatherType = 'Clear'
+): TrainingImpact {
   if (!state.trainingAssignments || state.trainingAssignments.length === 0) {
     return {
       updatedRoster: state.roster,
@@ -74,7 +78,8 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
       const { injury, result: injuryResult } = rollForTrainingInjury(
         updatedWarrior || warrior,
         healingBonus + 1,
-        rng
+        rng,
+        weather
       );
       if (injury && injuryResult) {
         currentRoster = updateEntityInList(currentRoster, warrior.id, (w) => ({
@@ -119,7 +124,8 @@ export function computeTrainingImpact(state: GameState, rng: IRNGService): Train
     const { injury, result: injuryResult } = rollForTrainingInjury(
       updatedWarrior || warrior,
       healingBonus,
-      rng
+      rng,
+      weather
     );
     if (injury && injuryResult) {
       currentRoster = updateEntityInList(currentRoster, warrior.id, (w) => ({

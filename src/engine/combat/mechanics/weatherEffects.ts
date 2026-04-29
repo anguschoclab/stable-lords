@@ -84,6 +84,48 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
     damageMult: 0.9,
     description: 'Choking dust drains stamina and blinds fighters.',
   },
+  Blizzard: {
+    staminaMult: 1.5,
+    initiativeMod: -4,
+    riposteMod: 0,
+    damageMult: 0.8,
+    description: 'Freezing winds drain stamina rapidly and numb the limbs.',
+  },
+  'Dense Fog': {
+    staminaMult: 1.0,
+    initiativeMod: -8,
+    riposteMod: +12,
+    damageMult: 1.1,
+    description: 'Zero visibility — ambush tactics and counters reign supreme.',
+  },
+  Thunderstorm: {
+    staminaMult: 1.2,
+    initiativeMod: -2,
+    riposteMod: 0,
+    damageMult: 1.25,
+    description: 'The roar of thunder and flash of lightning drives up the stakes.',
+  },
+  Ashfall: {
+    staminaMult: 1.4,
+    initiativeMod: -3,
+    riposteMod: 0,
+    damageMult: 0.9,
+    description: 'Falling ash chokes the air and exhausts the lungs.',
+  },
+  'Acid Rain': {
+    staminaMult: 1.3,
+    initiativeMod: 0,
+    riposteMod: -6,
+    damageMult: 1.2,
+    description: 'Burning rain erodes armor and creates a desperate struggle.',
+  },
+  'Mana Surge': {
+    staminaMult: 0.7,
+    initiativeMod: +10,
+    riposteMod: +10,
+    damageMult: 1.5,
+    description: 'Raw magical energy empowers every strike and movement.',
+  },
 };
 
 export function getWeatherEffect(weather: WeatherType): WeatherEffect {
@@ -116,6 +158,18 @@ export function weatherOpeningLine(weather: WeatherType): string | null {
       return 'Darkness falls mid-day. An eerie calm descends before the violence.';
     case 'Sandstorm':
       return 'A howling sandstorm blinds the arena. Every breath is a battle.';
+    case 'Blizzard':
+      return 'A brutal blizzard freezes the arena. Survival is the only goal.';
+    case 'Dense Fog':
+      return 'A thick mist swallows the fighters. Every shadow is a threat.';
+    case 'Thunderstorm':
+      return 'Thunder shakes the ground while lightning splits the sky.';
+    case 'Ashfall':
+      return 'Gray ash falls like snow. The air itself tastes of death.';
+    case 'Acid Rain':
+      return 'Hissing rain burns the skin. This fight will be short and brutal.';
+    case 'Mana Surge':
+      return 'The air crackles with power. The fighters move with impossible speed.';
     default:
       return null;
   }

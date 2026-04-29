@@ -303,14 +303,23 @@ export function processSkillDrillTraining(
 export function rollForTrainingInjury(
   warrior: Warrior,
   healingBonus: number,
-  rng: IRNGService
+  rng: IRNGService,
+  weather: import('@/types/shared.types').WeatherType = 'Clear'
 ): { injury: InjuryData | null; result: TrainingResult | null } {
   const age = warrior.age ?? 18;
   const agePenalty = age > 30 ? (age - 30) * 0.005 : 0;
   const healReduce = healingBonus * 0.01;
+
+  // 🌩️ Weather Modifiers
+  let weatherMod = 0;
+  if (weather === 'Rainy') weatherMod = 0.02;
+  if (weather === 'Gale') weatherMod = 0.03;
+  if (weather === 'Sandstorm') weatherMod = 0.01;
+  if (weather === 'Breezy') weatherMod = -0.01;
+
   const injuryChance = Math.max(
     INJURY_CHANCE_MIN,
-    Math.min(INJURY_CHANCE_MAX, BASE_TRAINING_INJURY_CHANCE + agePenalty - healReduce)
+    Math.min(INJURY_CHANCE_MAX, BASE_TRAINING_INJURY_CHANCE + agePenalty - healReduce + weatherMod)
   );
 
   if (rng.next() < injuryChance) {

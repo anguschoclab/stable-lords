@@ -11,8 +11,22 @@ import {
   VolumeX,
   Coins,
   Crown,
-  Cloud,
   ChevronRight,
+  Sun,
+  Cloud,
+  CloudRain,
+  Flame,
+  Wind,
+  CloudLightning,
+  CloudSnow,
+  CloudFog,
+  Factory,
+  Droplets,
+  Sparkles,
+  Moon,
+  Circle,
+  Waves,
+  CloudSun,
 } from 'lucide-react';
 import { audioManager } from '@/lib/AudioManager';
 import { Button } from '@/components/ui/button';
@@ -20,6 +34,7 @@ import { useGameStore, type GameStore } from '@/state/useGameStore';
 import { Separator } from '@/components/ui/separator';
 import { MOOD_ICONS } from '@/engine/crowdMood';
 import type { Warrior } from '@/types/state.types';
+import { getWeatherEffect } from '@/engine/combat/mechanics/weatherEffects';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +57,44 @@ import { DeathModal } from '@/components/modals/DeathModal';
 import { CoachOverlay } from '@/components/ui/CoachOverlay';
 import { TacticalBar } from '@/components/navigation/TacticalBar';
 import EventLog from '@/components/EventLog';
+
+const WEATHER_ICONS: Record<string, any> = {
+  Clear: Sun,
+  Overcast: CloudSun,
+  Rainy: CloudRain,
+  Sweltering: Flame,
+  Breezy: Wind,
+  'Blazing Sun': Sun,
+  Gale: CloudLightning,
+  'Blood Moon': Moon,
+  Eclipse: Circle,
+  Sandstorm: Waves,
+  Blizzard: CloudSnow,
+  'Dense Fog': CloudFog,
+  Thunderstorm: CloudLightning,
+  Ashfall: Factory,
+  'Acid Rain': Droplets,
+  'Mana Surge': Sparkles,
+};
+
+const WEATHER_COLORS: Record<string, string> = {
+  Clear: 'text-yellow-400',
+  Overcast: 'text-slate-400',
+  Rainy: 'text-blue-400',
+  Sweltering: 'text-orange-500',
+  Breezy: 'text-emerald-400',
+  'Blazing Sun': 'text-red-500',
+  Gale: 'text-cyan-400',
+  'Blood Moon': 'text-red-600',
+  Eclipse: 'text-purple-400',
+  Sandstorm: 'text-amber-600',
+  Blizzard: 'text-blue-200',
+  'Dense Fog': 'text-slate-400',
+  Thunderstorm: 'text-yellow-400',
+  Ashfall: 'text-stone-500',
+  'Acid Rain': 'text-lime-500',
+  'Mana Surge': 'text-fuchsia-400',
+};
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const {
@@ -196,9 +249,33 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
                 Weather
               </span>
-              <span className="font-mono font-black text-xs text-sky-400 flex items-center gap-1">
-                <Cloud className="h-3 w-3 opacity-60" /> {weather || 'Clear'}
-              </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={cn(
+                      'font-mono font-black text-xs flex items-center gap-1.5 px-2 py-0.5 rounded border border-white/5 bg-white/5 cursor-help transition-colors',
+                      WEATHER_COLORS[weather] || 'text-sky-400'
+                    )}
+                  >
+                    {(() => {
+                      const Icon = WEATHER_ICONS[weather] || Cloud;
+                      return <Icon className="h-3 w-3" />;
+                    })()}
+                    {weather || 'Clear'}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="bottom"
+                  className="bg-[#0C0806] border-white/10 p-3 max-w-[200px]"
+                >
+                  <p className="text-[10px] font-black uppercase tracking-widest mb-1">
+                    Environmental Status
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {getWeatherEffect(weather).description}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>

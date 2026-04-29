@@ -103,6 +103,21 @@ export function generateBoutBids(
       if (warrior.style === FightingStyle.BashingAttack) weatherModifier = +2; // Mudders love the rain
     } else if (weather === 'Sweltering' && warrior.attributes.CN < 10) {
       weatherModifier = -2; // Low constitution warriors hate heat
+    } else if (weather === 'Blizzard') {
+      weatherModifier = -4; // Brutal for everyone
+      if (warrior.style === FightingStyle.BashingAttack) weatherModifier = -1; // Heavy hitters suffer less
+    } else if (weather === 'Dense Fog') {
+      if (warrior.style === FightingStyle.LungingAttack) weatherModifier = -5; // Blinds lungers
+      if (warrior.style === FightingStyle.ParryRiposte) weatherModifier = +3; // Riposters love the ambush opportunity
+    } else if (weather === 'Thunderstorm') {
+      weatherModifier = -1;
+      if (warrior.style === FightingStyle.BashingAttack) weatherModifier = +2; // Chaos favors the aggressive
+    } else if (weather === 'Ashfall') {
+      if (warrior.attributes.CN < 14) weatherModifier = -3; // Choking ash
+    } else if (weather === 'Acid Rain') {
+      weatherModifier = -6; // Severe danger
+    } else if (weather === 'Mana Surge') {
+      weatherModifier = +4; // Pure power — everyone wants in
     }
 
     // ⚡ TSA: Crowd Pandering
@@ -181,6 +196,18 @@ export function verifyBoutAcceptance(
 
   if (weather === 'Sweltering' && warrior.attributes.CN < 15) {
     return { accepted: false, reason: 'Heatstroke risk too high.' };
+  }
+
+  if (weather === 'Acid Rain') {
+    return { accepted: false, reason: 'Acid rain causes permanent scarring and gear rot.' };
+  }
+
+  if (weather === 'Blizzard' && (isLunger || warrior.attributes.CN < 12)) {
+    return { accepted: false, reason: 'Too cold for precise footwork/low stamina.' };
+  }
+
+  if (weather === 'Dense Fog' && isLunger) {
+    return { accepted: false, reason: 'Zero visibility prevents lunging strategy.' };
   }
 
   // Skeptical Check: RECOVERY agents refuse fights with "Killers"

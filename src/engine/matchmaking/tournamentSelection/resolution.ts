@@ -58,7 +58,7 @@ export function resolveRound(
       rng.roll(0, 1000000),
       updatedState.trainers,
       updatedState.weather,
-      undefined,
+      'bloodsands_arena',
       updatedState.crowdMood
     );
 

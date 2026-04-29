@@ -3,10 +3,13 @@ import { cn } from '@/lib/utils';
 export type ArenaTier = 'training' | 'standard' | 'championship' | 'grand';
 export type Season = 'spring' | 'summer' | 'fall' | 'winter' | 'tournament';
 
+import { isIndoorArena } from '@/data/arenas';
+
 interface ArenaBackgroundProps {
   tier?: ArenaTier;
   season?: Season;
   weather?: string;
+  arenaId?: string;
   className?: string;
 }
 
@@ -94,10 +97,14 @@ export default function ArenaBackground({
   tier = 'standard',
   season = 'summer',
   weather,
+  arenaId,
   className,
 }: ArenaBackgroundProps) {
   const style = ARENA_STYLES[tier];
   const seasonMod = SEASON_MODIFIERS[season];
+
+  const isIndoor = isIndoorArena(arenaId);
+  const effectiveWeather = isIndoor ? 'Clear' : weather;
 
   return (
     <div className={cn('relative w-full h-full overflow-hidden', className)}>
@@ -150,7 +157,7 @@ export default function ArenaBackground({
       )}
 
       {/* Weather overlay */}
-      {weather && <WeatherOverlay weather={weather} />}
+      {effectiveWeather && <WeatherOverlay weather={effectiveWeather} />}
 
       {/* Lighting overlay */}
       <div
@@ -229,7 +236,7 @@ function SeasonDecorations({ season, tier }: { season: Season; tier: ArenaTier }
 function WeatherOverlay({ weather }: { weather: string }) {
   const weatherLower = weather.toLowerCase();
 
-  // Rain effect
+  // 🌧️ Rain effect
   if (weatherLower.includes('rain')) {
     return (
       <div className="absolute inset-0 pointer-events-none">
@@ -248,7 +255,7 @@ function WeatherOverlay({ weather }: { weather: string }) {
     );
   }
 
-  // Heat shimmer
+  // 🌡️ Heat shimmer
   if (weatherLower.includes('blazing') || weatherLower.includes('sweltering')) {
     return (
       <div
@@ -261,19 +268,29 @@ function WeatherOverlay({ weather }: { weather: string }) {
     );
   }
 
-  // Blood moon tint
-  if (weatherLower.includes('blood moon')) {
+  // 🌬️ Wind / Gale effect
+  if (weatherLower.includes('gale') || weatherLower.includes('breezy')) {
+    const isGale = weatherLower.includes('gale');
     return (
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at top, rgba(139,0,0,0.2) 0%, transparent 60%)',
-        }}
-      />
+      <div className="absolute inset-0 pointer-events-none">
+        {Array.from({ length: isGale ? 40 : 15 }).map((_, i) => (
+          <div
+            key={i}
+            className={cn('absolute h-px bg-white/20 animate-wind', isGale ? 'w-16' : 'w-8')}
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `-20%`,
+              animationDelay: `${Math.random() * 4}s`,
+              animationDuration: `${0.8 + Math.random() * 1.5}s`,
+              opacity: 0.05 + Math.random() * 0.15,
+            }}
+          />
+        ))}
+      </div>
     );
   }
 
-  // Eclipse darkness
+  // 🌑 Eclipse darkness
   if (weatherLower.includes('eclipse')) {
     return (
       <div
@@ -285,17 +302,164 @@ function WeatherOverlay({ weather }: { weather: string }) {
     );
   }
 
-  // Sandstorm haze
+  // 🩸 Blood Moon
+  if (weatherLower.includes('blood moon')) {
+    return (
+      <div
+        className="absolute inset-0 pointer-events-none animate-pulse-slow"
+        style={{
+          background: 'radial-gradient(ellipse at top, rgba(139,0,0,0.3) 0%, transparent 80%)',
+          boxShadow: 'inset 0 0 100px rgba(139,0,0,0.15)',
+        }}
+      />
+    );
+  }
+
+  // 🏜️ Sandstorm
   if (weatherLower.includes('sandstorm')) {
     return (
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse at center, rgba(180,120,50,0.3) 0%, rgba(180,120,50,0.5) 100%)',
+            'radial-gradient(ellipse at center, rgba(180,120,50,0.2) 0%, rgba(180,120,50,0.4) 100%)',
           mixBlendMode: 'multiply',
         }}
       />
+    );
+  }
+
+  // ❄️ Blizzard
+  if (weatherLower.includes('blizzard')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay" />
+        {Array.from({ length: 80 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/60 rounded-full animate-snow"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 2}s`,
+              filter: 'blur(1px)',
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // 🌫️ Dense Fog
+  if (weatherLower.includes('dense fog')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute inset-0 animate-fog-drift"
+          style={{
+            background:
+              'radial-gradient(ellipse at 50% 50%, rgba(200,200,200,0.1) 0%, rgba(150,150,150,0.6) 100%)',
+            filter: 'blur(40px)',
+            width: '120%',
+            left: '-10%',
+          }}
+        />
+      </div>
+    );
+  }
+
+  // ⛈️ Thunderstorm
+  if (weatherLower.includes('thunderstorm')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-blue-900/20" />
+        {/* Lightning strike simulation */}
+        <div className="absolute inset-0 animate-pulse-slow opacity-10 bg-white" />
+        {Array.from({ length: 60 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-px h-6 bg-blue-200/40 animate-rain"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${0.4 + Math.random() * 0.3}s`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // 🌋 Ashfall
+  if (weatherLower.includes('ashfall')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-stone-900/10 mix-blend-multiply" />
+        {Array.from({ length: 40 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-stone-500/40 animate-ash-fall"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${4 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // 🧪 Acid Rain
+  if (weatherLower.includes('acid rain')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-lime-900/5 mix-blend-color" />
+        {Array.from({ length: 60 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-px h-5 bg-lime-400/30 animate-rain"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${0.6 + Math.random() * 0.4}s`,
+            }}
+          />
+        ))}
+        {/* Acid sizzle glow on floor */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-lime-500/5 blur-xl animate-pulse" />
+      </div>
+    );
+  }
+
+  // ✨ Mana Surge
+  if (weatherLower.includes('mana surge')) {
+    return (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            background:
+              'linear-gradient(45deg, rgba(255,0,255,0.1), rgba(0,255,255,0.1), rgba(255,0,255,0.1))',
+            backgroundSize: '200% 200%',
+            animation: 'bronzeShimmer 5s linear infinite',
+          }}
+        />
+        {Array.from({ length: 25 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1.5 h-1.5 bg-fuchsia-400/40 rounded-full animate-mana-spark"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              '--tx': `${(Math.random() - 0.5) * 100}px`,
+              '--ty': `${(Math.random() - 0.5) * 100}px`,
+              animationDelay: `${Math.random() * 4}s`,
+            } as any}
+          />
+        ))}
+      </div>
     );
   }
 

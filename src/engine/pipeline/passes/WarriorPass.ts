@@ -12,7 +12,7 @@ import { convertRetiredToTrainer } from '@/engine/trainers';
  * Handles weekly training, aging, and recovery using the established impact pattern.
  */
 export function runWarriorPass(state: GameState, rng: IRNGService): StateImpact {
-  const trainingImpactRaw = computeTrainingImpact(state, rng);
+  const trainingImpactRaw = computeTrainingImpact(state, rng, state.weather);
   const { impact: trainingImpact, seasonalGrowth } = trainingImpactToStateImpact(
     state,
     trainingImpactRaw,

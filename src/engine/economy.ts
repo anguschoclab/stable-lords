@@ -65,6 +65,11 @@ export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
   if (state.fame > 0)
     income.push({ label: 'Fame dividends', amount: Math.round(state.fame * FAME_DIVIDEND) });
 
+  // 🌩️ Weather Impact: Mana Surge Gift
+  if (state.weather === 'Mana Surge') {
+    income.push({ label: 'Celestial Gift (Mana Surge)', amount: 250 });
+  }
+
   // 🏛️ 1.0 Hardening: Noble Patronage (High-fame warriors attract wealthy sponsors)
   const patronageIncome = state.roster.reduce((sum, w) => {
     if ((w.fame || 0) > 40) {
@@ -80,9 +85,20 @@ export function computeWeeklyBreakdown(state: GameState): WeeklyBreakdown {
     // 🏛️ 1.0 Hardening: Elite Maintenance (Legendary warriors demand luxury overhead)
     const rosterUpkeep = state.roster.reduce((sum, w) => {
       const famePremium = Math.floor((w.fame || 0) / 10) * 15; // Increased from 10 to 15 for 1.0 balance
-      return sum + WARRIOR_UPKEEP_BASE + famePremium;
+      let weatherPremium = 0;
+      if (state.weather === 'Sweltering') weatherPremium = 5;
+      if (state.weather === 'Blizzard') weatherPremium = 10;
+      return sum + WARRIOR_UPKEEP_BASE + famePremium + weatherPremium;
     }, 0);
     expenses.push({ label: `Warrior upkeep (${state.roster.length})`, amount: rosterUpkeep });
+
+    // Weather-specific ledger labels for clarity
+    if (state.weather === 'Sweltering') {
+      expenses.push({ label: 'Cooling & Ventilation Overhead', amount: state.roster.length * 5 });
+    }
+    if (state.weather === 'Blizzard') {
+      expenses.push({ label: 'Insulation & Fuel Overhead', amount: state.roster.length * 10 });
+    }
   }
 
   const activeTrainers = state.trainers.filter((t) => t.contractWeeksLeft > 0);

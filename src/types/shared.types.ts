@@ -153,6 +153,7 @@ export interface NewsletterItem {
   week: number;
   title: string;
   items: string[];
+  category?: 'event' | 'news' | 'newsletter';
 }
 
 // ─── Equipment ──────────────────────────────────────────────────────────────
@@ -324,7 +325,13 @@ export type WeatherType =
   | 'Gale'
   | 'Blood Moon'
   | 'Eclipse'
-  | 'Sandstorm';
+  | 'Sandstorm'
+  | 'Blizzard'
+  | 'Dense Fog'
+  | 'Thunderstorm'
+  | 'Ashfall'
+  | 'Acid Rain'
+  | 'Mana Surge';
 
 export interface DeathEvent {
   boutId: string;

@@ -42,6 +42,7 @@ interface BoutViewerProps {
   isRivalry?: boolean;
   arenaTier?: 'training' | 'standard' | 'championship' | 'grand';
   weather?: string;
+  arenaId?: string;
   transcript?: string[];
 }
 
@@ -80,6 +81,8 @@ function getOutcomeStyles(by: FightOutcomeBy) {
   }
 }
 
+import { isIndoorArena } from '@/data/arenas';
+
 export default function BoutViewer({
   nameA,
   nameD,
@@ -92,7 +95,10 @@ export default function BoutViewer({
   isRivalry,
   arenaTier = 'standard',
   weather = 'Clear',
+  arenaId,
 }: BoutViewerProps) {
+  const isIndoor = isIndoorArena(arenaId);
+  const effectiveWeather = isIndoor ? 'Clear' : weather;
   const store = useGameStore();
   const arenaPrefs = store.arenaPreferences;
   const [expanded, setExpanded] = useState(true);
@@ -385,7 +391,8 @@ export default function BoutViewer({
               isPlaying={isPlaying}
               isComplete={isComplete}
               arenaTier={arenaTier}
-              weather={weather}
+              weather={effectiveWeather}
+              arenaId={arenaId}
               maxHpA={50}
               maxHpD={50}
             />

@@ -158,10 +158,15 @@ export function simulateFight(
   const weaponA = (warriorA?.equipment ?? DEFAULT_LOADOUT).weapon;
   const weaponD = (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon;
 
+  const arena = getArenaById(arenaId);
+  const isIndoor = arena.tags.includes('indoor');
+  // 🌩️ 1.0 Hardening: Weather does not affect indoor arenas mechanically.
+  const effectiveWeather = isIndoor ? 'Clear' : weather;
+
   const fA = createFighterState('A', planA, warriorA, trainers);
   const fD = createFighterState('D', planD, warriorD, trainers);
 
-  if (weather === 'Blood Moon') {
+  if (effectiveWeather === 'Blood Moon') {
     // Blood Moon drives fighters to a frenzy
     fA.plan = { ...fA.plan, killDesire: Math.min(10, (fA.plan.killDesire ?? 5) + 3) };
     fD.plan = { ...fD.plan, killDesire: Math.min(10, (fD.plan.killDesire ?? 5) + 3) };
@@ -187,8 +192,8 @@ export function simulateFight(
     rng,
     phase: 'OPENING',
     exchange: 0,
-    weather,
-    weatherEffect: getWeatherEffect(weather),
+    weather: effectiveWeather,
+    weatherEffect: getWeatherEffect(effectiveWeather),
     matchupA: getMatchupBonus(planA.style, planD.style),
     matchupD: getMatchupBonus(planD.style, planA.style),
     trainerModsA: modsA,

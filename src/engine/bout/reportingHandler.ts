@@ -23,7 +23,9 @@ export function handleReporting(
   _rivalStableId?: string,
   isRivalry?: boolean,
   _day: number = 0,
-  rng?: IRNGService
+  rng?: IRNGService,
+  arenaId?: string,
+  weather?: import('@/types/shared.types').WeatherType
 ) {
   const safeRng = rng;
   const boutId = (safeRng ? safeRng.uuid() : generateId(undefined, 'bout')) as FightId;
@@ -35,6 +37,8 @@ export function handleReporting(
     d: wD.name,
     warriorIdA: wA.id,
     warriorIdD: wD.id,
+    arenaId,
+    weather,
     // Stable identity fields — needed by stableManager.weeklyIncome (which keys
     // by stableIdA/B) and by ownerNarrative/schedulingAssistant rivalry lookups.
     // Prior code omitted these on regular bouts (only tournament summaries via

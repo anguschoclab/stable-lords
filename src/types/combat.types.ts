@@ -185,6 +185,8 @@ export interface FightSummary {
   isDeathEvent?: boolean;
   deathEventData?: DeathEvent;
   isRivalry?: boolean;
+  arenaId?: string;
+  weather?: import('./shared.types').WeatherType;
 }
 
 export {

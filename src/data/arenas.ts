@@ -22,6 +22,12 @@ export function getArenasByTier(tier: 1 | 2 | 3): ArenaConfig[] {
   return getAllArenas().filter((a) => a.tier === tier);
 }
 
+export function isIndoorArena(id?: string): boolean {
+  if (!id) return false;
+  const arena = registry.get(id);
+  return !!arena?.tags.includes('indoor');
+}
+
 // ─── Seed Arenas ─────────────────────────────────────────────────────────────
 
 export const STANDARD_ARENA: ArenaConfig = {

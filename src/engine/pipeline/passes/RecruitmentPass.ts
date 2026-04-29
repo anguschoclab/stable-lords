@@ -53,5 +53,27 @@ export function runRecruitmentPass(state: GameState, rootRng?: IRNGService): Sta
     }
   }
 
+  // 3. Weather Modulation
+  if (state.weather === 'Blizzard') {
+    // Passes are blocked — drastically reduce the pool
+    recruitPool = recruitPool.slice(0, Math.max(3, Math.floor(recruitPool.length * 0.4)));
+  } else if (state.weather === 'Mana Surge') {
+    // Celestial attraction — add exceptional recruits
+    const poolNames = new Set(recruitPool.map((w) => w.name));
+    const allUsed = new Set<string>([...usedNames, ...poolNames]);
+    for (let i = 0; i < 3; i++) {
+      recruitPool.push(
+        generateRecruit(
+          rng,
+          allUsed,
+          state.week,
+          'Exceptional',
+          state.cachedMetaDrift,
+          legacyCandidates
+        )
+      );
+    }
+  }
+
   return { recruitPool };
 }

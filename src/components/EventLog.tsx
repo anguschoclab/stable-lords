@@ -34,6 +34,7 @@ type EventType =
   | 'injury'
   | 'retirement'
   | 'training'
+  | 'event'
   | 'recovery';
 
 interface GameEvent {
@@ -49,6 +50,8 @@ interface GameEvent {
   entityNames?: string[];
 }
 
+import { Sparkles } from 'lucide-react';
+
 const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }> = {
   fight: { icon: Swords, color: 'text-primary' },
   kill: { icon: Skull, color: 'text-arena-blood' },
@@ -56,6 +59,7 @@ const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }>
   recruit: { icon: UserPlus, color: 'text-arena-pop' },
   tournament: { icon: Trophy, color: 'text-arena-gold' },
   news: { icon: Newspaper, color: 'text-muted-foreground' },
+  event: { icon: Sparkles, color: 'text-arena-gold' },
   injury: { icon: AlertTriangle, color: 'text-arena-gold' },
   retirement: { icon: Star, color: 'text-arena-fame' },
   training: { icon: Dumbbell, color: 'text-primary' },
@@ -215,15 +219,16 @@ export default function EventLog() {
 
     // Newsletter
     state.newsletter.forEach((n) => {
+      const isEvent = n.category === 'event';
       all.push({
-        id: `news-${n.week}-${n.title}`,
+        id: `news-${n.id || n.title}`,
         week: n.week,
-        type: 'news',
+        type: isEvent ? 'event' : 'news',
         title: n.title,
         subtitle: n.items[0]?.slice(0, 60) ?? '',
-        icon: EVENT_ICONS.news.icon,
-        iconColor: EVENT_ICONS.news.color,
-        linkTo: '/world/chronicle',
+        icon: EVENT_ICONS[isEvent ? 'event' : 'news'].icon,
+        iconColor: EVENT_ICONS[isEvent ? 'event' : 'news'].color,
+        linkTo: isEvent ? '/command/roster' : '/world/chronicle',
       });
     });
 
@@ -245,6 +250,20 @@ export default function EventLog() {
           entityNames: names,
         });
       });
+
+    // Gazettes
+    (state.gazettes || []).forEach((g) => {
+      all.push({
+        id: `gazette-${g.id}`,
+        week: g.week,
+        type: 'news',
+        title: g.headline,
+        subtitle: g.body.slice(0, 80) + '...',
+        icon: EVENT_ICONS.news.icon,
+        iconColor: 'text-amber-400',
+        linkTo: '/world/chronicle',
+      });
+    });
 
     all.sort((a, b) => b.week - a.week || b.id.localeCompare(a.id));
     return all;

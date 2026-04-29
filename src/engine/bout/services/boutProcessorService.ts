@@ -31,6 +31,8 @@ export interface BoutResult {
   isRivalry: boolean;
   rivalStable?: string;
   contractId?: string;
+  arenaId?: string;
+  weather?: import('@/types/shared.types').WeatherType;
 }
 export interface BoutImpact {
   impact: StateImpact;
@@ -192,7 +194,9 @@ function collectBoutImpacts(
     ctx.rivalStableId,
     ctx.isRivalry,
     0,
-    rng
+    rng,
+    ctx.contract?.arenaId,
+    state.weather
   );
   impacts.push({ arenaHistory: [summary] });
   engineEventBus.emit({
@@ -230,6 +234,8 @@ export function resolveBout(state: GameState, ctx: BoutContext): BoutImpact {
       isRivalry: ctx.isRivalry,
       rivalStable: ctx.rivalStable,
       contractId: ctx.contract?.id,
+      arenaId: ctx.contract?.arenaId,
+      weather: state.weather,
     },
     stats: {
       death: deathRes.death,
