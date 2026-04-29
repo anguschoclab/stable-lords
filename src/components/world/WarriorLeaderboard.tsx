@@ -270,11 +270,7 @@ export function WarriorLeaderboard({ rows, sort, onSort }: WarriorLeaderboardPro
                 <TableCell>
                   <div className="flex flex-col">
                     {row.isPlayer ? (
-                      <Link
-                        to="/warrior/$id"
-                        params={{ id: row.id }}
-                        
-                      >
+                      <Link to="/warrior/$id" params={{ id: row.id }}>
                         {row.name}
                         {row.officialRank === 1 && <Crown className="h-3 w-3 text-arena-gold" />}
                       </Link>

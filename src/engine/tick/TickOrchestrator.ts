@@ -2,7 +2,12 @@ import type { GameState } from '@/types/state.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { advanceWeek as runWeeklyPipeline } from '@/engine/pipeline/services/weekPipelineService';
 import { TournamentSelectionService } from '@/engine/matchmaking/tournamentSelection';
-import { TimeAdvanceService, type QuarterAdvanceResult, type YearAdvanceResult, type AdvanceOptions } from './TimeAdvanceService';
+import {
+  TimeAdvanceService,
+  type QuarterAdvanceResult,
+  type YearAdvanceResult,
+  type AdvanceOptions,
+} from './TimeAdvanceService';
 
 /**
  * Stable Lords — Unified Tick Orchestrator
@@ -114,7 +119,10 @@ export const TickOrchestrator = {
    * Skip to quarter end (headless mode for UI).
    * Batches 13 weeks with deferred I/O.
    */
-  async skipToQuarterEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<QuarterAdvanceResult> {
+  async skipToQuarterEnd(
+    state: GameState,
+    opts?: Omit<AdvanceOptions, 'checkpointInterval'>
+  ): Promise<QuarterAdvanceResult> {
     return TimeAdvanceService.skipToQuarterEnd(state, opts);
   },
 
@@ -130,7 +138,10 @@ export const TickOrchestrator = {
    * Skip to year end (headless mode for UI).
    * Batches 52 weeks with deferred I/O.
    */
-  async skipToYearEnd(state: GameState, opts?: Omit<AdvanceOptions, 'checkpointInterval'>): Promise<YearAdvanceResult> {
+  async skipToYearEnd(
+    state: GameState,
+    opts?: Omit<AdvanceOptions, 'checkpointInterval'>
+  ): Promise<YearAdvanceResult> {
     return TimeAdvanceService.skipToYearEnd(state, opts);
   },
 };

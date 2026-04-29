@@ -32,5 +32,5 @@ export const BoutNarrator = {
     weaponId?: string
   ): string[] {
     return CombatNarrator.narrateBoutEnd(rng, by, winnerName, loserName, weaponId);
-  }
+  },
 } as const;

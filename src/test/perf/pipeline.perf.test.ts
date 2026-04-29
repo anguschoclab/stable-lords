@@ -93,7 +93,6 @@ describe('Pipeline Performance Benchmarks', () => {
 });
 
 describe('Determinism vs Performance Trade-offs', () => {
-
   it('sequential vs batch should produce similar functional state', async () => {
     const FIXED_ISO = '2026-04-28T09:00:00Z';
     vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(FIXED_ISO);
@@ -123,7 +122,6 @@ describe('Determinism vs Performance Trade-offs', () => {
 
 // Stress test for long-running simulations
 describe('Long-running Simulation Stress Tests', () => {
-
   it('should handle long simulation without memory issues', async () => {
     const state = createFreshState('stress-test', '2026-04-28T09:00:00Z');
     // Just run 1 year (52 weeks) for the stress test

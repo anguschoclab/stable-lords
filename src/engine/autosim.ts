@@ -2,10 +2,7 @@ import { type GameState } from '@/types/state.types';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
 import { respondToBoutOffer } from '@/engine/bout/mutations/contractMutations';
 import { resolveImpacts } from './impacts';
-import {
-  TimeAdvanceService,
-  type SoftStopCondition,
-} from './tick/TimeAdvanceService';
+import { TimeAdvanceService, type SoftStopCondition } from './tick/TimeAdvanceService';
 
 export interface AutosimWeekSummary {
   week: number;

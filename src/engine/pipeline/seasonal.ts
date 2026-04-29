@@ -4,7 +4,12 @@ import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import narrativeContent from '@/data/narrativeContent.json';
 import { StateImpact } from '@/engine/impacts';
-import { type WarriorId, type LedgerEntryId, type InsightId, type InjuryId } from '@/types/shared.types';
+import {
+  type WarriorId,
+  type LedgerEntryId,
+  type InsightId,
+  type InjuryId,
+} from '@/types/shared.types';
 import type { InsightToken } from '@/types/state.types';
 
 /**
@@ -134,7 +139,6 @@ export function runSeasonalPass(
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name })],
       });
     }
-
   } else if (e.effectType === 'tavern_brawl') {
     const activeWarriors = state.roster.filter(
       (w) => w.status === 'Active' && (!w.injuries || w.injuries.length === 0)

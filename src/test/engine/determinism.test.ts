@@ -89,7 +89,6 @@ describe('Simulation Determinism', () => {
 });
 
 describe('Quarter/Year Advancement Determinism', () => {
-
   it('advanceQuarter should produce functionally equivalent state to 13 sequential advanceWeek calls', async () => {
     const FIXED_ISO = '2026-04-11T09:00:00.000Z';
     vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(FIXED_ISO);

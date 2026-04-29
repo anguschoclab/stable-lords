@@ -3,12 +3,7 @@
  * Verifies trait generation, static mod summing, and conditional mod evaluation.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  TRAITS,
-  generateTraits,
-  getStaticTraitMods,
-  getDynamicTraitMods,
-} from '@/engine/traits';
+import { TRAITS, generateTraits, getStaticTraitMods, getDynamicTraitMods } from '@/engine/traits';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import type { Warrior } from '@/types/warrior.types';
 
@@ -84,12 +79,18 @@ describe('Warrior Traits', () => {
     it('Berserker: +2 ATT only when HP < 50%', () => {
       const fresh = getDynamicTraitMods(mockWarrior(['berserker']), { ...baseCtx, hpRatio: 0.8 });
       expect(fresh.attMod).toBe(0);
-      const bloodied = getDynamicTraitMods(mockWarrior(['berserker']), { ...baseCtx, hpRatio: 0.4 });
+      const bloodied = getDynamicTraitMods(mockWarrior(['berserker']), {
+        ...baseCtx,
+        hpRatio: 0.4,
+      });
       expect(bloodied.attMod).toBe(2);
     });
 
     it('Patient: +2 DEF only in OPENING phase', () => {
-      const opening = getDynamicTraitMods(mockWarrior(['patient']), { ...baseCtx, phase: 'OPENING' });
+      const opening = getDynamicTraitMods(mockWarrior(['patient']), {
+        ...baseCtx,
+        phase: 'OPENING',
+      });
       expect(opening.defMod).toBe(2);
       const late = getDynamicTraitMods(mockWarrior(['patient']), { ...baseCtx, phase: 'LATE' });
       expect(late.defMod).toBe(0);
@@ -103,9 +104,15 @@ describe('Warrior Traits', () => {
     });
 
     it('Combo Artist: +1 ATT only when consecutiveHits >= 2', () => {
-      const cold = getDynamicTraitMods(mockWarrior(['combo_artist']), { ...baseCtx, consecutiveHits: 1 });
+      const cold = getDynamicTraitMods(mockWarrior(['combo_artist']), {
+        ...baseCtx,
+        consecutiveHits: 1,
+      });
       expect(cold.attMod).toBe(0);
-      const hot = getDynamicTraitMods(mockWarrior(['combo_artist']), { ...baseCtx, consecutiveHits: 2 });
+      const hot = getDynamicTraitMods(mockWarrior(['combo_artist']), {
+        ...baseCtx,
+        consecutiveHits: 2,
+      });
       expect(hot.attMod).toBe(1);
     });
 

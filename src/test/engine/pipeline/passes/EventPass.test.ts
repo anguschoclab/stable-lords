@@ -6,7 +6,6 @@ import type { GameState } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
 import type { WarriorId } from '@/types/shared.types';
 
-
 describe('EventPass', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -30,7 +29,13 @@ describe('EventPass', () => {
     };
     (rng as any).next = mockNext;
 
-    const w: Partial<Warrior> = { id: 'w-1' as WarriorId, name: 'Gladiator', status: 'Active', fame: 0, xp: 0 };
+    const w: Partial<Warrior> = {
+      id: 'w-1' as WarriorId,
+      name: 'Gladiator',
+      status: 'Active',
+      fame: 0,
+      xp: 0,
+    };
     const state: Partial<GameState> = {
       roster: [w as Warrior],
       newsletter: [],

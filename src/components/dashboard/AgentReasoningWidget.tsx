@@ -109,9 +109,7 @@ export function AgentReasoningWidget({ rival }: AgentReasoningWidgetProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-1 w-1 rounded-full bg-primary animate-ping" />
-              <span className="text-[8px] font-black uppercase text-primary/60">
-                ACTIVE INTENT
-              </span>
+              <span className="text-[8px] font-black uppercase text-primary/60">ACTIVE INTENT</span>
             </div>
           </div>
           <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-medium">

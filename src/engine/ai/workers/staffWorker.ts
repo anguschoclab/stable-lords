@@ -32,11 +32,12 @@ export function processStaff(
         intent === 'VENDETTA' || intent === 'AGGRESSIVE_EXPANSION'
           ? 'Aggression'
           : intent === 'EXPANSION'
-          ? 'Endurance'
-          : null;
+            ? 'Endurance'
+            : null;
 
-      const focusCandidates =
-        preferredFocus ? affordable.filter((t) => t.focus === preferredFocus) : [];
+      const focusCandidates = preferredFocus
+        ? affordable.filter((t) => t.focus === preferredFocus)
+        : [];
       const pool = focusCandidates.length > 0 ? focusCandidates : affordable;
 
       const first = pool[0];
@@ -44,7 +45,8 @@ export function processStaff(
         throw new Error('Pool is unexpectedly empty');
       }
       const best = pool.reduce(
-        (max, current) => ((HIRE_COST[current.tier] ?? 0) > (HIRE_COST[max.tier] ?? 0) ? current : max),
+        (max, current) =>
+          (HIRE_COST[current.tier] ?? 0) > (HIRE_COST[max.tier] ?? 0) ? current : max,
         first
       );
       const hireCost = HIRE_COST[best.tier] ?? 0;

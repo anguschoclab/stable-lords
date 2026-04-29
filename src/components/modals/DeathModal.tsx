@@ -105,12 +105,7 @@ export function DeathModal() {
           </div>
 
           <footer className="pt-4 flex flex-col items-center gap-4 border-t border-white/5">
-            <Button
-              onClick={() => acknowledgeDeath(warrior.id)}
-              
-            >
-              MEMORIALIZE & CONTINUE
-            </Button>
+            <Button onClick={() => acknowledgeDeath(warrior.id)}>MEMORIALIZE & CONTINUE</Button>
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">
               "Even the strongest steel returns to the earth"
             </p>

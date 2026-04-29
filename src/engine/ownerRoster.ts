@@ -1,8 +1,4 @@
-import type {
-  GameState,
-  RivalStableData,
-  MetaAdaptation,
-} from '@/types/state.types';
+import type { GameState, RivalStableData, MetaAdaptation } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { FightingStyle } from '@/types/shared.types';
@@ -44,7 +40,8 @@ export function processAIRosterManagement(
       const wId = (w as any).id as string;
       const recentFights = getRecentFightsForWarrior(state.arenaHistory, wId, 5);
       const recentWins = recentFights.filter(
-        (f) => (f.warriorIdA === wId && f.winner === 'A') || (f.warriorIdD === wId && f.winner === 'D')
+        (f) =>
+          (f.warriorIdA === wId && f.winner === 'A') || (f.warriorIdD === wId && f.winner === 'D')
       ).length;
       return recentWins >= 3;
     };

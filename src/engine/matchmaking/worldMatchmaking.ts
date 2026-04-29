@@ -44,9 +44,10 @@ export function planWorldBouts(state: GameState, rng: IRNGService): BoutOffer[] 
 
     // Find a suitable opponent (proximity in fame + different stable)
     // If the stable is on a VENDETTA intent with a target, bias toward that stable's warriors.
-    const vendettaTargetId = entryA.stable.strategy?.intent === 'VENDETTA'
-      ? entryA.stable.strategy.targetStableId
-      : undefined;
+    const vendettaTargetId =
+      entryA.stable.strategy?.intent === 'VENDETTA'
+        ? entryA.stable.strategy.targetStableId
+        : undefined;
 
     let bestOpponent: typeof entryA | null = null;
     let minFameGap = Infinity;
@@ -93,7 +94,9 @@ export function planWorldBouts(state: GameState, rng: IRNGService): BoutOffer[] 
           [bestOpponent.warrior.id]: 'Pending',
         },
         conditions: [],
-        createdAt: new Date(Date.UTC(2026, 0, 1) + (state.week - 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(
+          Date.UTC(2026, 0, 1) + (state.week - 1) * 7 * 24 * 60 * 60 * 1000
+        ).toISOString(),
       };
       offers.push(offer);
     }

@@ -1,7 +1,4 @@
-import type {
-  GameState,
-  OwnerGrudge,
-} from '@/types/state.types';
+import type { GameState, OwnerGrudge } from '@/types/state.types';
 import { getRecentFights } from '@/engine/core/historyUtils';
 import { PERSONALITY_CLASH } from '@/data/ownerData';
 import { clamp } from '@/utils/math';

@@ -115,7 +115,12 @@ export function createFighterState(
       traitMods.iniMod +
       (injuryPenalties['INI'] ?? 0),
     RIP: skills.RIP + (drills.RIP ?? 0) + traitMods.ripMod + (injuryPenalties['RIP'] ?? 0),
-    DEC: skills.DEC + (trainerMods?.decMod ?? 0) + (drills.DEC ?? 0) + traitMods.decMod + (injuryPenalties['DEC'] ?? 0),
+    DEC:
+      skills.DEC +
+      (trainerMods?.decMod ?? 0) +
+      (drills.DEC ?? 0) +
+      traitMods.decMod +
+      (injuryPenalties['DEC'] ?? 0),
   };
 
   return {

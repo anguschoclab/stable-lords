@@ -214,12 +214,7 @@ export function verifyBoutAcceptance(
  *  override even Critical injuries, which meant rivals routinely sent
  *  half-dead warriors to die. Tightened 2026-04 to never override.
  */
-const BLOCKING_INJURY_SEVERITIES = [
-  'Moderate',
-  'Severe',
-  'Critical',
-  'Permanent',
-] as const;
+const BLOCKING_INJURY_SEVERITIES = ['Moderate', 'Severe', 'Critical', 'Permanent'] as const;
 type BlockingSeverity = (typeof BLOCKING_INJURY_SEVERITIES)[number];
 
 /**

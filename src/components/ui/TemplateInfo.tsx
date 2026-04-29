@@ -6,17 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import {
-  Crown,
-  Sword,
-  Shield,
-  Brain,
-  Heart,
-  Zap,
-  Users,
-  Target,
-  TrendingUp,
-} from 'lucide-react';
+import { Crown, Sword, Shield, Brain, Heart, Zap, Users, Target, TrendingUp } from 'lucide-react';
 import type { StableTemplate } from '@/data/templates';
 import { getTemplatesByTier } from '@/data/templates';
 
@@ -36,11 +26,11 @@ const PHILOSOPHY_ICONS = {
   'Brute Force': <Sword className="h-4 w-4" />,
   'Speed Kills': <Zap className="h-4 w-4" />,
   'Iron Defense': <Shield className="h-4 w-4" />,
-  'Balanced': <Target className="h-4 w-4" />,
-  'Spectacle': <Heart className="h-4 w-4" />,
-  'Cunning': <Brain className="h-4 w-4" />,
-  'Endurance': <TrendingUp className="h-4 w-4" />,
-  'Specialist': <Users className="h-4 w-4" />,
+  Balanced: <Target className="h-4 w-4" />,
+  Spectacle: <Heart className="h-4 w-4" />,
+  Cunning: <Brain className="h-4 w-4" />,
+  Endurance: <TrendingUp className="h-4 w-4" />,
+  Specialist: <Users className="h-4 w-4" />,
 };
 
 export function TemplateInfo({ template, showWarriorNames = false }: TemplateInfoProps) {
@@ -58,7 +48,7 @@ export function TemplateInfo({ template, showWarriorNames = false }: TemplateInf
         </div>
         <p className="text-sm text-muted-italic italic">"{template.motto}"</p>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Owner Info */}
         <div>
@@ -78,9 +68,7 @@ export function TemplateInfo({ template, showWarriorNames = false }: TemplateInf
         {/* Origin */}
         <div>
           <h4 className="font-semibold text-sm mb-1">Origin</h4>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {template.origin}
-          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{template.origin}</p>
         </div>
 
         {/* Preferred Styles */}

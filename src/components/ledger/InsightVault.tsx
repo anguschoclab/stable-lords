@@ -28,9 +28,7 @@ export function InsightVault() {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 >
-                The Insight Vault
-              </h3>
+              <h3>The Insight Vault</h3>
               <Badge className="bg-arena-gold/20 text-arena-gold border-arena-gold/30 font-mono font-black text-[10px] px-2">
                 ENCRYPTED SYNC ACTIVE
               </Badge>

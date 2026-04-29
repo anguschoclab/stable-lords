@@ -153,9 +153,7 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
             <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold">
               <Trophy className="h-3.5 w-3.5" /> Completed
             </div>
-            <div className="text-xl font-black font-mono mt-1 text-primary">
-              {stats.completed}
-            </div>
+            <div className="text-xl font-black font-mono mt-1 text-primary">{stats.completed}</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-amber-500/5 to-transparent">
@@ -163,7 +161,9 @@ export function TournamentSchedule({ tournament, currentWeek }: TournamentSchedu
             <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold">
               <Clock className="h-3.5 w-3.5" /> Pending
             </div>
-            <div className="text-xl font-black font-mono mt-1 text-arena-gold">{stats.upcoming}</div>
+            <div className="text-xl font-black font-mono mt-1 text-arena-gold">
+              {stats.upcoming}
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-stone-500/5 to-transparent">

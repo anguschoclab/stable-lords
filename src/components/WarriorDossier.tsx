@@ -241,9 +241,7 @@ export const WarriorDossier = React.memo(function WarriorDossier({
                 </div>
                 {warrior.favorites?.discovered.weapon ? (
                   <div className="flex items-center justify-between p-2 rounded bg-arena-gold/5 border border-arena-gold/20">
-                    <span >
-                      {favDisplay.weapon}
-                    </span>
+                    <span>{favDisplay.weapon}</span>
                     <Badge className="bg-arena-gold text-black font-black text-[8px] h-4 px-1">
                       MASTERY ✨
                     </Badge>
@@ -267,9 +265,7 @@ export const WarriorDossier = React.memo(function WarriorDossier({
                 </div>
                 {warrior.favorites?.discovered.rhythm ? (
                   <div className="flex items-center justify-between p-2 rounded bg-arena-gold/5 border border-arena-gold/20">
-                    <span >
-                      {favDisplay.rhythm}
-                    </span>
+                    <span>{favDisplay.rhythm}</span>
                     <Badge className="bg-arena-gold text-black font-black text-[8px] h-4 px-1">
                       SYNERGY ✨
                     </Badge>

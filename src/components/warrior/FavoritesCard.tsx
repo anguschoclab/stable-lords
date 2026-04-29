@@ -207,9 +207,7 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
             <div className="flex-1">
               {isWeaponDiscovered ? (
                 <div className="space-y-0.5">
-                  <div >
-                    {favDisplay.weapon}
-                  </div>
+                  <div>{favDisplay.weapon}</div>
                   <div className="text-[9px] font-mono text-arena-gold font-bold">
                     +2 ATT / +1 DAMAGE
                   </div>
@@ -291,9 +289,7 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
             <div className="flex-1">
               {isRhythmDiscovered ? (
                 <div className="space-y-0.5">
-                  <div >
-                    {favDisplay.rhythm}
-                  </div>
+                  <div>{favDisplay.rhythm}</div>
                   <div className="text-[9px] font-mono text-arena-gold font-bold">
                     +2 INI / +2 DEF (BONUS)
                   </div>

@@ -8,27 +8,12 @@ import { useGameStore } from '@/state/useGameStore';
 import type { Promoter, BoutOffer, PromoterPersonality } from '@/types/state.types';
 import { PERSONALITY_CONFIG } from '@/data/promoterPersonalityConfig';
 import { STYLE_DISPLAY_NAMES } from '@/types/shared.types';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Calendar,
-  Users,
-  Sword,
-  History,
-  ArrowRight,
-  Building2,
-  DollarSign,
-} from 'lucide-react';
+import { Calendar, Users, Sword, History, ArrowRight, Building2, DollarSign } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { PageHeader } from '@/components/ui/PageHeader';
-
 
 const TIER_COLORS: Record<Promoter['tier'], string> = {
   Local: 'bg-muted/40 text-muted-foreground border-border/40',

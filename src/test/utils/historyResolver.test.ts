@@ -65,11 +65,21 @@ test('historyResolver caching logic exactly matches precedence', () => {
     ],
   };
 
-  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w1', '')).toBe('Roster Warrior 1');
-  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w2', '')).toBe('Graveyard Warrior 2');
-  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w3', '')).toBe('Retired Warrior 3');
-  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w4', '')).toBe('Rival1 Warrior 4');
-  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w5', '')).toBe('Rival2 Warrior 5');
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w1', '')).toBe(
+    'Roster Warrior 1'
+  );
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w2', '')).toBe(
+    'Graveyard Warrior 2'
+  );
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w3', '')).toBe(
+    'Retired Warrior 3'
+  );
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w4', '')).toBe(
+    'Rival1 Warrior 4'
+  );
+  expect(resolveWarriorName(state as unknown as NameResolutionState, 'w5', '')).toBe(
+    'Rival2 Warrior 5'
+  );
 });
 
 test('historyResolver stable name logic exactly matches precedence', () => {
@@ -101,8 +111,14 @@ test('findWarrior uses the correct precedence and caching', () => {
   } as unknown as GameState;
 
   expect(findWarrior(state, 'w1')).toEqual({ id: 'w1', name: 'Warrior 1' } as any);
-  expect(findWarrior(state, undefined, 'Warrior 1')).toEqual({ id: 'w1', name: 'Warrior 1' } as any);
-  expect(findWarrior(state, undefined, 'Warrior 2')).toEqual({ id: 'w1', name: 'Warrior 2' } as any);
+  expect(findWarrior(state, undefined, 'Warrior 1')).toEqual({
+    id: 'w1',
+    name: 'Warrior 1',
+  } as any);
+  expect(findWarrior(state, undefined, 'Warrior 2')).toEqual({
+    id: 'w1',
+    name: 'Warrior 2',
+  } as any);
   expect(findWarrior(state, 'w99', 'Warrior 99')).toBeUndefined();
 });
 

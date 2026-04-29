@@ -104,9 +104,7 @@ export function ContractManager() {
                 </p>
               </div>
               <Link to="/ops/recruit" className="mt-4">
-                <Button >
-                  Access_Recruitment_Hub
-                </Button>
+                <Button>Access_Recruitment_Hub</Button>
               </Link>
             </div>
           ) : (

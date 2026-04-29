@@ -142,7 +142,10 @@ function getBestOffensiveTactic(style: FightingStyle): OffensiveTactic {
   for (const t of tactics) {
     const r = getOffensiveSuitability(style, t);
     const score = r === 'WS' ? 2 : r === 'S' ? 1 : 0;
-    if (score > bestScore) { bestScore = score; best = t; }
+    if (score > bestScore) {
+      bestScore = score;
+      best = t;
+    }
   }
   return bestScore > 0 ? best : 'none';
 }
@@ -157,7 +160,10 @@ function getBestDefensiveTactic(style: FightingStyle): DefensiveTactic {
   for (const t of tactics) {
     const r = getDefensiveSuitability(style, t);
     const score = r === 'WS' ? 2 : r === 'S' ? 1 : 0;
-    if (score > bestScore) { bestScore = score; best = t; }
+    if (score > bestScore) {
+      bestScore = score;
+      best = t;
+    }
   }
   return bestScore > 0 ? best : 'none';
 }
@@ -170,20 +176,23 @@ function buildPhasePlan(
   personality: OwnerPersonality,
   style: FightingStyle
 ): FightPlan['phases'] {
-  const isDefensive = (
+  const isDefensive =
     style === FightingStyle.TotalParry ||
     style === FightingStyle.WallOfSteel ||
-    style === FightingStyle.ParryRiposte
-  );
+    style === FightingStyle.ParryRiposte;
   const openingOE = clamp(plan.OE - (isDefensive ? 2 : 1), 1, 10);
-  const opening: PhaseStrategy = { OE: openingOE, AL: plan.AL, killDesire: Math.max(1, (plan.killDesire ?? 5) - 1) };
+  const opening: PhaseStrategy = {
+    OE: openingOE,
+    AL: plan.AL,
+    killDesire: Math.max(1, (plan.killDesire ?? 5) - 1),
+  };
   const mid: PhaseStrategy = { OE: plan.OE, AL: plan.AL, killDesire: plan.killDesire ?? 5 };
   const lateOE =
     personality === 'Aggressive' || personality === 'Showman'
       ? clamp(plan.OE + 1, 1, 10)
       : personality === 'Methodical' || personality === 'Tactician'
-      ? clamp(plan.OE - 1, 1, 10)
-      : plan.OE;
+        ? clamp(plan.OE - 1, 1, 10)
+        : plan.OE;
   const lateAL =
     personality === 'Methodical' || personality === 'Tactician'
       ? clamp(plan.AL + 1, 1, 10)
@@ -203,12 +212,20 @@ function buildDesperatePlan(
   const baseAL = plan.AL;
   const baseKD = plan.killDesire ?? 5;
   if (personality === 'Aggressive') {
-    return { OE: clamp(baseOE - 1, 1, 10), AL: clamp(baseAL + 1, 1, 10), killDesire: clamp(baseKD + 1, 1, 10) };
+    return {
+      OE: clamp(baseOE - 1, 1, 10),
+      AL: clamp(baseAL + 1, 1, 10),
+      killDesire: clamp(baseKD + 1, 1, 10),
+    };
   }
   if (personality === 'Methodical') {
     return { OE: 1, AL: clamp(baseAL + 3, 1, 10), killDesire: clamp(baseKD - 2, 1, 10) };
   }
-  return { OE: clamp(baseOE - 2, 1, 10), AL: clamp(baseAL + 2, 1, 10), killDesire: clamp(baseKD - 2, 1, 10) };
+  return {
+    OE: clamp(baseOE - 2, 1, 10),
+    AL: clamp(baseAL + 2, 1, 10),
+    killDesire: clamp(baseKD - 2, 1, 10),
+  };
 }
 
 /**

@@ -28,7 +28,6 @@ import type { Warrior, PromoterPersonality, BoutOffer } from '@/types/state.type
 import { PERSONALITY_CONFIG } from '@/data/promoterPersonalityConfig';
 import type { InjuryData } from '@/types/warrior.types';
 
-
 /** Get fatigue status for display */
 function getFatigueStatus(fatigue: number): {
   label: string;
