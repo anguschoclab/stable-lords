@@ -151,6 +151,50 @@ describe('detectRivalryMatchup', () => {
     const rivalry = detectRivalryMatchup(weekFights, allFights);
     expect(rivalry).toBeNull();
   });
+
+  it('correctly normalizes attacker/defender order', () => {
+    const f1 = createFight({ a: 'Alice', d: 'Bob' });
+    const f2 = createFight({ a: 'Bob', d: 'Alice' });
+    const f3 = createFight({ a: 'Alice', d: 'Bob' });
+    const allFights = [f1, f2, f3];
+    const weekFights = [f3];
+
+    const rivalry = detectRivalryMatchup(weekFights, allFights);
+    expect(rivalry).toEqual({ a: 'Alice', b: 'Bob', count: 3 });
+  });
+
+  it('selects the rivalry with the highest count when multiple candidates exist', () => {
+    // Alice & Bob fought 3 times
+    const ab1 = createFight({ a: 'Alice', d: 'Bob' });
+    const ab2 = createFight({ a: 'Alice', d: 'Bob' });
+    const ab3 = createFight({ a: 'Alice', d: 'Bob' });
+
+    // Charlie & Dave fought 4 times
+    const cd1 = createFight({ a: 'Charlie', d: 'Dave' });
+    const cd2 = createFight({ a: 'Charlie', d: 'Dave' });
+    const cd3 = createFight({ a: 'Charlie', d: 'Dave' });
+    const cd4 = createFight({ a: 'Charlie', d: 'Dave' });
+
+    const allFights = [ab1, ab2, ab3, cd1, cd2, cd3, cd4];
+    const weekFights = [ab3, cd4];
+
+    const rivalry = detectRivalryMatchup(weekFights, allFights);
+    // Should pick Charlie/Dave because count is 4 > 3
+    expect(rivalry).toEqual({ a: 'Charlie', b: 'Dave', count: 4 });
+  });
+
+  it('handles null or undefined fights gracefully', () => {
+    const f1 = createFight({ a: 'Alice', d: 'Bob' });
+    const f2 = createFight({ a: 'Alice', d: 'Bob' });
+    const f3 = createFight({ a: 'Alice', d: 'Bob' });
+
+    // Explicitly add undefined/null (as unknown as FightSummary to bypass type check in test)
+    const allFights = [f1, null, f2, undefined, f3] as unknown as FightSummary[];
+    const weekFights = [null, f3] as unknown as FightSummary[];
+
+    const rivalry = detectRivalryMatchup(weekFights, allFights);
+    expect(rivalry).toEqual({ a: 'Alice', b: 'Bob', count: 3 });
+  });
 });
 
 describe('detectHotStreakers', () => {
