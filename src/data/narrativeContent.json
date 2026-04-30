@@ -1959,7 +1959,7 @@
       "title": "A Grand Feast",
       "effectType": "grand_feast",
       "newsletter": [
-        "We hosted a grand feast for the stable! It cost {{gold}} gold, but spirits are high, and everyone feels invigorated."
+        "We hosted a grand feast for the stable! It cost {{gold}} gold, but spirits are high, and everyone feels invigorated. (+10 XP)"
       ]
     }
   },
