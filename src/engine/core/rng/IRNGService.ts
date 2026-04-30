@@ -20,7 +20,7 @@ export interface IRNGService {
   uuid(prefix?: string): string;
 
   /**
-   * Returns a random integer between min (inclusive) and max (exclusive).
+   * Returns a random integer between min (inclusive) and max (inclusive).
    */
   roll(min: number, max: number): number;
 

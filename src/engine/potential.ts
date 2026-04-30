@@ -15,6 +15,7 @@ import type { Warrior } from '@/types/warrior.types';
 import type { FightSummary } from '@/types/combat.types';
 import { FightingStyle } from '@/types/shared.types';
 import type { RecruitTier } from './recruitment';
+import type { IRNGService } from './core/rng/IRNGService';
 
 // ─── Potential Range by Tier ──────────────────────────────────────────────
 // [headroom_min, headroom_max] added ON TOP of the warrior's starting attribute.
@@ -38,13 +39,13 @@ const POTENTIAL_ABSOLUTE_MAX = ATTRIBUTE_MAX; // 25
 export function generatePotential(
   attrs: Attributes,
   tier: RecruitTier,
-  rng: () => number
+  rng: IRNGService
 ): AttributePotential {
   const [hMin, hMax] = TIER_HEADROOM[tier];
   const potential = {} as AttributePotential;
 
   for (const key of ATTRIBUTE_KEYS) {
-    const headroom = hMin + Math.floor(rng() * (hMax - hMin + 1));
+    const headroom = rng.roll(hMin, hMax);
     const raw = attrs[key] + headroom;
     potential[key] = Math.max(POTENTIAL_MIN, Math.min(POTENTIAL_ABSOLUTE_MAX, raw));
   }

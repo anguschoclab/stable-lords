@@ -8,6 +8,7 @@ import { computeWarriorStats } from '@/engine/skillCalc';
 import { generateFavorites } from '@/engine/favorites';
 import { generateId } from '@/utils/idUtils';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 /**
  * Creates a new warrior with calculated stats and favorites.
@@ -27,11 +28,12 @@ export function makeWarrior(
   overrides?: Partial<Warrior>,
   rng?: IRNGService
 ): Warrior {
+  const activeRng = rng ?? new SeededRNGService(Date.now());
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
-  const favorites = generateFavorites(style, rng ? () => rng.next() : () => 0.5);
+  const favorites = generateFavorites(style, activeRng);
 
   return {
-    id: id ?? (rng ? (rng.uuid() as WarriorId) : (generateId(undefined, 'warrior') as WarriorId)),
+    id: id ?? (activeRng.uuid() as WarriorId),
     name,
     style,
     attributes: attrs,
@@ -45,7 +47,7 @@ export function makeWarrior(
     career: { wins: 0, losses: 0, kills: 0 },
     champion: false,
     status: 'Active',
-    age: 18 + Math.floor((rng ? rng.next() : 0.5) * 8),
+    age: activeRng.roll(18, 25),
     favorites,
     traits: overrides?.traits ?? [],
     lore: overrides?.lore ?? '',

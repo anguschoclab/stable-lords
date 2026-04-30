@@ -88,7 +88,7 @@ function distributeAttributes(rng: IRNGService, total: number): Attributes {
     const key = rng.pick(keys);
     const max = Math.min(pool, 21 - attrs[key]); // recruit cap is 21
     if (max <= 0) continue;
-    const add = Math.min(max, Math.floor(rng.next() * 3) + 1);
+    const add = Math.min(max, rng.roll(1, 3));
     attrs[key] += add;
     pool -= add;
   }
@@ -114,8 +114,7 @@ export function generateRecruit(
   const tier = forceTier ?? rollTier(rng);
   const tierData = getTierData(tier);
   const [minPts, maxPts] = tierData.points;
-  // ⚡ Fix: use rng instead of Math.random()
-  const total = Math.floor(rng.next() * (maxPts - minPts + 1)) + minPts;
+  const total = rng.roll(minPts, maxPts);
   const attributes = distributeAttributes(rng, total);
 
   const styles = Object.values(FightingStyle);
@@ -123,7 +122,7 @@ export function generateRecruit(
   let lineage: import('@/types/warrior.types').WarriorLineage | undefined;
 
   // 🧬 Genetic Bloodlines: 5% chance to be a Legacy recruit
-  const isLegacy = rng.next() < 0.05 && legacyCandidates.length > 0;
+  const isLegacy = rng.chance(0.05) && legacyCandidates.length > 0;
   if (isLegacy) {
     const parent = rng.pick(legacyCandidates);
     style = parent.style;
@@ -156,8 +155,8 @@ export function generateRecruit(
   usedNames.add(name);
 
   const { baseSkills, derivedStats } = computeWarriorStats(attributes, style);
-  const potential = generatePotential(attributes, tier, () => rng.next());
-  const favorites = generateFavorites(style, () => rng.next());
+  const potential = generatePotential(attributes, tier, rng);
+  const favorites = generateFavorites(style, rng);
 
   return {
     id: rng.uuid(),
@@ -169,7 +168,7 @@ export function generateRecruit(
     derivedStats,
     tier,
     cost: TIER_COST[tier],
-    age: 16 + Math.floor(rng.next() * 6),
+    age: rng.roll(16, 21),
     lore: generateLore(rng, style),
     addedWeek: week,
     favorites,
@@ -195,7 +194,7 @@ export function generateRecruitPool(
       rngService,
       usedNames,
       week,
-      rngService.next() < 0.3 ? 'Exceptional' : 'Promising',
+      rngService.chance(0.3) ? 'Exceptional' : 'Promising',
       meta,
       legacyCandidates
     )
@@ -205,7 +204,7 @@ export function generateRecruitPool(
       rngService,
       usedNames,
       week,
-      rngService.next() < 0.1 ? 'Prodigy' : 'Promising',
+      rngService.chance(0.1) ? 'Prodigy' : 'Promising',
       meta,
       legacyCandidates
     )

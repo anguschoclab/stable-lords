@@ -169,7 +169,7 @@ export function processAttributeTraining(
   const gainChance = computeGainChance(warrior, attr, state.trainers ?? []);
 
   // Roll for gain
-  if (rng.next() < gainChance) {
+  if (rng.chance(gainChance)) {
     const newAttrs = { ...warrior.attributes, [attr]: currentVal + 1 };
     const { baseSkills, derivedStats } = computeWarriorStats(newAttrs, warrior.style);
 
@@ -212,7 +212,7 @@ export function processAttributeTraining(
   } else {
     // Failed to gain, but might still reveal potential from hard work!
     const isRevealed = warrior.potentialRevealed?.[attr];
-    if (!isRevealed && rng.next() < 0.2) {
+    if (!isRevealed && rng.chance(0.2)) {
       const newRevealed = { ...(warrior.potentialRevealed || {}), [attr]: true };
       return {
         updatedWarrior: { ...warrior, potentialRevealed: newRevealed },
@@ -278,7 +278,7 @@ export function processSkillDrillTraining(
   }
 
   const chance = computeSkillDrillChance(warrior, skill, state.trainers ?? []);
-  if (rng.next() < chance) {
+  if (rng.chance(chance)) {
     const drills = { ...(warrior.skillDrills ?? {}), [skill]: current + 1 };
     return {
       updatedWarrior: { ...warrior, skillDrills: drills },
@@ -312,10 +312,10 @@ export function rollForTrainingInjury(
     Math.min(INJURY_CHANCE_MAX, BASE_TRAINING_INJURY_CHANCE + agePenalty - healReduce)
   );
 
-  if (rng.next() < injuryChance) {
+  if (rng.chance(injuryChance)) {
     const template = rng.pick(TRAINING_INJURIES);
     const [minW, maxW] = template.weeksRange;
-    const weeks = rng.roll(minW || 1, (maxW ?? (minW || 1)) + 1);
+    const weeks = rng.roll(minW || 1, maxW ?? (minW || 1));
     const injury: InjuryData = {
       id: generateId(),
       name: template.name,

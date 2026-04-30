@@ -4,6 +4,7 @@ import type { FightOutcome } from '@/types/combat.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { calculateXP, applyXP } from '@/engine/progression';
 import { checkDiscovery } from '@/engine/favorites';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { updateEntityInList } from '@/utils/stateUtils';
 import { generateId } from '@/utils/idUtils';
 import { StateImpact } from '@/engine/impacts';
@@ -31,10 +32,10 @@ export function handleProgressions(
   }
 
   // Favorites Discovery
-  const discRng = rng;
+  const discRng = rng ?? new SeededRNGService(Date.now());
   [wA, !rivalStableId ? wD : null].forEach((w) => {
     if (!w) return;
-    const disc = checkDiscovery(w, () => discRng?.next() ?? 0.5);
+    const disc = checkDiscovery(w, discRng);
     if (disc.updated) {
       const existing = rosterUpdates.get(w.id) || w;
       rosterUpdates.set(w.id, { ...existing, favorites: w.favorites });

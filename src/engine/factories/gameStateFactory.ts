@@ -102,30 +102,21 @@ export function createFreshState(
   ];
 
   // Shuffle and pick 4
-  const pool = [...RIVAL_NAMES];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng.next() * (i + 1));
-    const temp = pool[i];
-    const temp2 = pool[j];
-    if (temp !== undefined && temp2 !== undefined) {
-      pool[i] = temp2;
-      pool[j] = temp;
-    }
-  }
+  const pool = rng.shuffle([...RIVAL_NAMES]);
 
   state.rivals = pool.slice(0, 4).map((name): RivalStableData => {
-    const personalityIndex = Math.floor(rng.next() * PERSONALITIES.length);
-    const backstoryId = BACKSTORY_IDS[Math.floor(rng.next() * BACKSTORY_IDS.length)]!;
+    const personality = rng.pick(PERSONALITIES);
+    const backstoryId = rng.pick(BACKSTORY_IDS);
     const ownerId = rng.uuid() as StableId;
     return {
       id: rng.uuid() as StableId,
       fame: 100,
-      treasury: 1500 + Math.floor(rng.next() * 1000),
+      treasury: rng.roll(1500, 2499),
       owner: {
         id: ownerId,
         name: `Lord ${name.split(' ')[0]}`,
         stableName: name,
-        personality: PERSONALITIES[personalityIndex],
+        personality,
         backstoryId,
         fame: 100,
         renown: 10,
@@ -148,7 +139,7 @@ export function createFreshState(
 
   state.recruitPool = initialStyles.map((style, i) => {
     // Use rng for initial attributes (10 +/- 3)
-    const attrBase = () => 7 + Math.floor(rng.next() * 7);
+    const attrBase = () => rng.roll(7, 13);
     const attrs = {
       ST: attrBase(),
       CN: attrBase(),
@@ -169,11 +160,11 @@ export function createFreshState(
     );
     return {
       ...baseWarrior,
-      cost: 150 + Math.floor(rng.next() * 150),
+      cost: rng.roll(150, 299),
       tier: 'Common',
       lore: (narrativeContent as NarrativeContent).recruitment.origin[0], // Seeded fallback
       addedWeek: 1,
-      potential: generatePotential(attrs, 'Common', () => rng.next()),
+      potential: generatePotential(attrs, 'Common', rng),
     } as PoolWarrior;
   });
 

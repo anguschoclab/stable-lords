@@ -56,9 +56,19 @@ export class TestRNGService implements IRNGService {
     this.callCount++;
     const v = this.nextValues.shift();
     if (v !== undefined) {
-      return min + Math.floor(v * (max - min));
+      return min + Math.floor(v * (max - min + 1));
     }
     return min; // Default to min
+  }
+
+  pickWeighted<T>(items: T[], weights: number[]): T {
+    this.callCount++;
+    if (items.length === 0) throw new Error('Cannot pick from empty array');
+    return items[0]!;
+  }
+
+  chance(probability: number): boolean {
+    return this.next() < probability;
   }
 
   shuffle<T>(array: T[]): T[] {

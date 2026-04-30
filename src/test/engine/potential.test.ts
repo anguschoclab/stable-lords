@@ -8,6 +8,7 @@ import {
   potentialGrade,
 } from '@/engine/potential';
 import type { Attributes, AttributePotential } from '@/types/game';
+import { TestRNGService } from '@/engine/core/rng/TestRNGService';
 
 describe('Potential System', () => {
   const mockAttrs: Attributes = {
@@ -23,7 +24,8 @@ describe('Potential System', () => {
   describe('generatePotential', () => {
     it('should generate potential correctly for Common tier', () => {
       // Common tier headroom is [2, 5]. For ST=10, potential should be between 12 and 15
-      const rng = vi.fn().mockReturnValue(0.5); // (5 - 2 + 1) * 0.5 = Math.floor(2) = 2. Headroom = 2 + 2 = 4
+      const rng = new TestRNGService();
+      rng.setNextValues([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]); // 2 + Math.floor(0.5 * (5-2+1)) = 2+2=4
       const potential = generatePotential(mockAttrs, 'Common', rng);
 
       expect(potential.ST).toBe(14); // 10 + 4
@@ -41,7 +43,8 @@ describe('Potential System', () => {
         SP: 24,
         DF: 24,
       };
-      const rng = vi.fn().mockReturnValue(0.99); // max out the headroom (Prodigy = 12)
+      const rng = new TestRNGService();
+      rng.setNextValues([0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]); // max out the headroom (Prodigy = [7, 12])
       const potential = generatePotential(highAttrs, 'Prodigy', rng);
 
       // Should be clamped to 25
@@ -58,7 +61,8 @@ describe('Potential System', () => {
         SP: 120,
         DF: 120,
       };
-      const rng = vi.fn().mockReturnValue(0.99);
+      const rng = new TestRNGService();
+      rng.setNextValues([0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]);
       const potential = generatePotential(veryHighAttrs, 'Prodigy', rng);
 
       // The system should clamp the crazy potential down to 25
