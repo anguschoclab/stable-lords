@@ -10,7 +10,7 @@ import * as fs from 'fs';
  * Objectives:
  * 1. Validate long-term economic stability (inflation/deflation).
  * 2. Track class popularity and meta drift.
- * 3. Monitor banzuke health and rank turnover.
+ * 3. Monitor standings health and rank turnover.
  * 4. Verify generational turnover (aging, retirement, legacy).
  * 5. Detect world depopulation or power creep.
  */

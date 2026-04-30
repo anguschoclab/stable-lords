@@ -69,7 +69,7 @@ export function SeasonSynthesis() {
       {/* Divisional Standings */}
       <Surface variant="glass" padding="none" className="border-border/40 overflow-hidden">
         <div className="p-4 border-b border-white/5 bg-neutral-900/60 flex items-center gap-3">
-          <div className="p-1.5 rounded bg-arena-gold/10 border border-arena-gold/20">
+          <div className="p-1.5 rounded-none bg-arena-gold/10 border border-arena-gold/20">
             <Trophy className="h-3.5 w-3.5 text-arena-gold" />
           </div>
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">
@@ -141,7 +141,7 @@ export function SeasonSynthesis() {
         {/* Grudge Network */}
         <Surface variant="glass" padding="none" className="border-arena-blood/20 overflow-hidden">
           <div className="p-4 border-b border-white/5 bg-arena-blood/5 flex items-center gap-3">
-            <div className="p-1.5 rounded bg-arena-blood/10 border border-arena-blood/20">
+            <div className="p-1.5 rounded-none bg-arena-blood/10 border border-arena-blood/20">
               <Flame className="h-3.5 w-3.5 text-arena-blood" />
             </div>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-arena-blood">
@@ -191,7 +191,7 @@ export function SeasonSynthesis() {
         {/* Style of the Season */}
         <Surface variant="glass" padding="none" className="border-accent/10 overflow-hidden">
           <div className="p-4 border-b border-white/5 bg-accent/5 flex items-center gap-3">
-            <div className="p-1.5 rounded bg-accent/10 border border-accent/20">
+            <div className="p-1.5 rounded-none bg-accent/10 border border-accent/20">
               <TrendingUp className="h-3.5 w-3.5 text-accent" />
             </div>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent">
@@ -247,7 +247,7 @@ export function SeasonSynthesis() {
       {seasonGazette.length > 0 && (
         <Surface variant="glass" padding="none" className="border-border/40 overflow-hidden">
           <div className="p-4 border-b border-white/5 bg-neutral-900/60 flex items-center gap-3">
-            <div className="p-1.5 rounded bg-primary/10 border border-primary/20">
+            <div className="p-1.5 rounded-none bg-primary/10 border border-primary/20">
               <ScrollText className="h-3.5 w-3.5 text-primary" />
             </div>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">

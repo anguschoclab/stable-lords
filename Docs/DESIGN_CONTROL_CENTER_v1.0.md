@@ -17,11 +17,11 @@ A single-screen command surface for the player's weekly cycle. The player should
 2. **What is the one thing pressing on me right now?** (hero narrative card)
 3. **Can I afford to keep going?** (treasury + runway)
 4. **Who is fighting and when?** (this week's card)
-5. **Where do I stand in the world?** (banzuke-equivalent: top stables)
+5. **Where do I stand in the world?** (top stables registry)
 6. **What is my stable actually doing?** (training regimens, leading warriors)
 7. **What just happened?** (event log, always visible)
 
-Analogue to the Basho Manager Control Center, but reframed around the **weekly cycle**, **fame/gold economy**, and **imperial ranking** of Stable Lords.
+Analogue to the Administrative Control Center, but reframed around the **weekly cycle**, **fame/gold economy**, and **imperial ranking** of Stable Lords.
 
 ---
 
@@ -42,7 +42,7 @@ Analogue to the Basho Manager Control Center, but reframed around the **weekly c
 │          │   │ THIS WEEK'S CARD (bouts)    │          │                   │
 │          │   │  ┌──────────────┬─────────┐ │          │                   │
 │          │   │  │ Today's Bouts│ Imperial│ │          │                   │
-│          │   │  │              │ Banzuke │ │          │                   │
+│          │   │  │              │ Registry│ │          │                   │
 │          │   │  └──────────────┴─────────┘ │          │                   │
 │          │   ├──────────────┬──────────────┤          │                   │
 │          │   │ TRAINING     │ LEADING      │          │                   │
@@ -153,7 +153,7 @@ Two stat columns:
 
 Bottom: `SEASON PROGRESS` stat-bar — gradient from primary to accent, `75%` tick on the right.
 
-### 5.4 This Week's Card (left, col-span-1) — the Basho "Today's Bouts" equivalent
+### 5.4 This Week's Card (left, col-span-1) — the "Active Matchups" equivalent
 
 Eyebrow: `WEEK 12 · CARD`  Title: `Scheduled Bouts`  Action icon: shuffle/reroll (tournament only).
 
@@ -163,9 +163,9 @@ Bout rows (repeat up to 4, then "View all N bouts →"):
 - Rank badges: small parchment tiles with `font-mono font-black` (e.g. `TOP 3`, `#18`, `CHMP`).
 - Style badge right-aligned uses weapon-family color token. If outcome pending: muted "PENDING" pill; if lethal match stakes: blood pill `DEATH MATCH`.
 
-### 5.5 Imperial Banzuke (right, col-span-1) — Top Ranks
+### 5.5 Imperial Standings (right, col-span-1) — Top Ranks
 
-Eyebrow: `IMPERIAL REGISTRY · TOP RANKS`  Title: `Banzuke`  Action: jump to World Overview.
+Eyebrow: `IMPERIAL REGISTRY · TOP RANKS`  Title: `Standings`  Action: jump to World Overview.
 
 Dense two-column list of top 10 stables (5 per column, mirrored around a divider like the PDF). Each row: stable name + `W-L` in font-mono. Player's stable row: crimson left-border, bold. Empty slot ("vacant throne"): em-dash placeholder (used e.g. when a Grand Champion seat is unfilled — preserves the vacant-yokozuna flavor).
 
@@ -243,7 +243,7 @@ OVERVIEW · BOUTS · STABLE · FINANCES · STORYLINES
 Each tab reconfigures the main column's six-card grid:
 - **OVERVIEW** — as specified above (default).
 - **BOUTS** — expands bout card full-width, collapses treasury/season into slim strip.
-- **STABLE** — foregrounds roster and training, hides banzuke.
+- **STABLE** — foregrounds roster and training, hides standings.
 - **FINANCES** — expands Treasury card to full grid, adds sponsorships/payroll tables.
 - **STORYLINES** — full-width stack of hero cards (rivalries, champion arcs, deaths).
 
@@ -317,7 +317,7 @@ Empty states:
 - [ ] Hero storyline card selects based on priority rules in §5.1; falls back gracefully.
 - [ ] `EXECUTE WEEK N` button advances the cycle (wires to existing simulate pipeline).
 - [ ] Event log filters (ALL / ARENA / NEWS) functional and persist in session state.
-- [ ] Player rows in Banzuke and Leading Warriors get `border-l-2 border-primary` treatment.
+- [ ] Player rows in Standings and Leading Warriors get `border-l-2 border-primary` treatment.
 - [ ] Runway < 4wk renders blood-tint and escalates to the Hero card.
 - [ ] No `rounded-xl` anywhere on the route; focus rings warm crimson.
 - [ ] AA contrast verified on all muted/papyrus text.
@@ -325,4 +325,4 @@ Empty states:
 
 ---
 
-*Stable Lords — Control Center Spec v1.0. Derived from Codex Sanguis Design Bible v1.0. Parallel reference: Basho Manager Pro Edition Control Center (sumo-manager-pro).*
+*Stable Lords — Control Center Spec v1.0. Derived from Codex Sanguis Design Bible v1.0.*

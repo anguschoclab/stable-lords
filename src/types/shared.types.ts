@@ -60,40 +60,6 @@ export const STYLE_ABBREV: Record<FightingStyle, string> = {
   [FightingStyle.WallOfSteel]: 'WS',
 };
 
-// ─── Sumo Ranks (Banzuke) ───────────────────────────────────────────────────
-
-export enum SumoRank {
-  Yokozuna = 'YOKOZUNA',
-  Ozeki = 'OZEKI',
-  Sekiwake = 'SEKIWAKE',
-  Komusubi = 'KOMUSUBI',
-  Maegashira = 'MAEGASHIRA',
-  Juryo = 'JURYO',
-  Makushita = 'MAKUSHITA',
-  Sandanme = 'SANDANME',
-  Jonidan = 'JONIDAN',
-  Jonokuchi = 'JONOKUCHI',
-}
-
-export type Ichimon =
-  | 'Dewanoumi'
-  | 'Nishonoseki'
-  | 'Takadagawa'
-  | 'Tokitsukaze'
-  | 'Isegahama'
-  | 'Sakaigawa';
-
-export type Kimarite =
-  | 'Yorikiri' // Force out
-  | 'Oshidashi' // Push out
-  | 'Uwatenage' // Overarm throw
-  | 'Shitatenage' // Underarm throw
-  | 'Hataki-komi' // Slap down
-  | 'Tsuki-dashi' // Thrust out
-  | 'Kotenage' // Armlock throw
-  | 'Okuridashi' // Rear push out
-  | 'Hottakiri' // Hypothetical: Slash down
-  | 'Sukuinage'; // Scoop throw
 
 // ─── Attributes ─────────────────────────────────────────────────────────────
 

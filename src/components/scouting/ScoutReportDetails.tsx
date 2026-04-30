@@ -213,12 +213,12 @@ export function ScoutReportDetails({
                       {key}
                     </span>
                   </div>
-                  <div className="flex-1 h-8 bg-neutral-900 rounded border border-white/5 px-4 flex items-center group-hover:border-primary/20 transition-all">
+                  <div className="flex-1 h-8 bg-neutral-900 rounded-none border border-white/5 px-4 flex items-center group-hover:border-primary/20 transition-all">
                     <span className="text-xs font-mono font-black text-foreground">{range}</span>
                     <div className="ml-auto flex gap-1 items-baseline">
-                      <div className="h-1.5 w-1 bg-primary/40 rounded-full" />
-                      <div className="h-2.5 w-1 bg-primary/60 rounded-full" />
-                      <div className="h-2 w-1 bg-primary/20 rounded-full" />
+                      <div className="h-1.5 w-1 bg-primary/40 rounded-none" />
+                      <div className="h-2.5 w-1 bg-primary/60 rounded-none" />
+                      <div className="h-2 w-1 bg-primary/20 rounded-none" />
                     </div>
                   </div>
                 </div>
@@ -259,7 +259,7 @@ export function ScoutReportDetails({
             {report.knownInjuries.length > 0 && (
               <div className="pt-4 border-t border-white/5 space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1 rounded bg-destructive/10 border border-destructive/20">
+                  <div className="p-1 rounded-none bg-destructive/10 border border-destructive/20">
                     <ShieldAlert className="h-3 w-3 text-destructive" />
                   </div>
                   <span className="text-[9px] font-black uppercase tracking-widest text-destructive/60">

@@ -331,10 +331,10 @@ export default function EquipmentLoadoutUI({
                 Over-encumbered! Combat penalties apply:
               </div>
               <div className="grid grid-cols-2 gap-2 pl-5 text-[10px] font-mono">
-                <div className="bg-destructive/10 text-destructive p-1 rounded border border-destructive/20 text-center">
+                <div className="bg-destructive/10 text-destructive p-1 rounded-none border border-destructive/20 text-center">
                   -2 Initiative
                 </div>
-                <div className="bg-destructive/10 text-destructive p-1 rounded border border-destructive/20 text-center">
+                <div className="bg-destructive/10 text-destructive p-1 rounded-none border border-destructive/20 text-center">
                   +20% END Cost
                 </div>
               </div>

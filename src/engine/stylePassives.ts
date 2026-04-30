@@ -227,9 +227,9 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        attBonus: scale(targeted ? 3 : 2, m),
-        parBonus: 1,
-        critChance: targeted ? 0.08 + (ctx.exchange > 8 ? 0.04 : 0) : 0.04,
+        attBonus: scale(targeted ? 4 : 3, m),
+        parBonus: 2,
+        critChance: targeted ? 0.12 + (ctx.exchange > 8 ? 0.05 : 0) : 0.06,
         hasPassiveNarrative: !!(targeted && ctx.exchange > 5),
       };
     },
@@ -248,14 +248,14 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
   [FightingStyle.BashingAttack]: {
     tempo: { opening: 1, mid: 0, late: 0, enduranceMult: 0.98 },
     getPassive: (ctx, m) => {
-      const momentumDmg = Math.min(2 + m.bonus, ctx.consecutiveHits);
+      const momentumDmg = Math.min(2 + m.bonus, Math.floor(ctx.consecutiveHits / 2));
       const vsTP = ctx.opponentStyle === FightingStyle.TotalParry;
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
         dmgBonus: scale(momentumDmg, m) + (vsTP ? 1 : 0),
-        attBonus: scale(ctx.consecutiveHits >= 3 ? 2 : 1, m) + (vsTP ? 1 : 0),
-        hasPassiveNarrative: (vsTP && ctx.consecutiveHits >= 2) || ctx.consecutiveHits >= 3,
+        attBonus: scale(ctx.consecutiveHits >= 4 ? 2 : 0, m) + (vsTP ? 1 : 0),
+        hasPassiveNarrative: (vsTP && ctx.consecutiveHits >= 2) || ctx.consecutiveHits >= 4,
       };
     },
     getKillMechanic: (ctx) => {
@@ -307,8 +307,8 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,
-        iniBonus: isFirst ? 1 + m.bonus : 0,
-        attBonus: isFirst ? 0 : ctx.phase === 'LATE' ? -1 : 0,
+        iniBonus: isFirst ? m.bonus : 0,
+        attBonus: isFirst ? 0 : ctx.phase === 'LATE' ? -2 : -1,
         hasPassiveNarrative: isFirst,
       };
     },
@@ -369,8 +369,8 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
       ...EMPTY_PASSIVE,
       mastery: m.tier,
       attBonus: ctx.phase === 'OPENING' ? -1 : 0,
-      parBonus: 1,
-      ripBonus: 1 + (ctx.ripostes >= 2 ? 1 : 0),
+      parBonus: 4,
+      ripBonus: 2 + (ctx.ripostes >= 2 ? 1 : 0),
       hasPassiveNarrative: ctx.ripostes >= 3,
     }),
     getKillMechanic: () => ({
@@ -404,8 +404,8 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
     getPassive: (ctx, m) => ({
       ...EMPTY_PASSIVE,
       mastery: m.tier,
-      parBonus: 2,
-      attBonus: 1 + (ctx.hitsTaken > ctx.hitsLanded ? 1 : 0),
+      parBonus: 3,
+      attBonus: 1 + (ctx.hitsTaken > ctx.hitsLanded ? 2 : 0),
     }),
     getKillMechanic: () => ({
       killBonus: 0,
@@ -526,9 +526,8 @@ const STYLES: Record<FightingStyle, StyleStrategy> = {
     // late-game style, not a flat-strong all-phases bulldozer.
     tempo: { opening: 0, mid: 0, late: 1, enduranceMult: 0.92 },
     getPassive: (ctx, m) => {
-      // /4 instead of /5 shaves one exchange off each ramp step — Quick-trait
-      // WS reaches its wall identity before the mid-point of a normal fight.
-      const wallBonus = Math.min(1 + m.bonus, Math.floor(ctx.exchange / 4));
+      // /10 instead of /8 slows the ramp decisively — WS is a pure late-bout fortress.
+      const wallBonus = Math.min(1 + m.bonus, Math.floor(ctx.exchange / 10));
       return {
         ...EMPTY_PASSIVE,
         mastery: m.tier,

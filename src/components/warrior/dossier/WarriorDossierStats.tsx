@@ -46,7 +46,7 @@ export function WarriorDossierStats({ warrior, condition }: WarriorDossierStatsP
         {ATTRIBUTE_KEYS.map((key) => (
           <div
             key={key}
-            className="flex items-center justify-between p-2 rounded bg-secondary/10 border border-border/50"
+            className="flex items-center justify-between p-2 rounded-none bg-secondary/10 border border-border/50"
           >
             <span className="text-[10px] uppercase text-muted-foreground font-medium">
               {ATTRIBUTE_LABELS[key]}

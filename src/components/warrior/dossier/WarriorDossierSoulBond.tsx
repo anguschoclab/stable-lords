@@ -25,14 +25,14 @@ export function WarriorDossierSoulBond({ warrior }: WarriorDossierSoulBondProps)
             <Swords className="h-3 w-3" /> Weapon Preference
           </div>
           {warrior.favorites?.discovered.weapon ? (
-            <div className="flex items-center justify-between p-2 rounded bg-arena-gold/5 border border-arena-gold/20">
+            <div className="flex items-center justify-between p-2 rounded-none bg-arena-gold/5 border border-arena-gold/20">
               <span>{favDisplay.weapon}</span>
               <Badge className="bg-arena-gold text-black font-black text-[8px] h-4 px-1">
                 MASTERY ✨
               </Badge>
             </div>
           ) : warrior.favorites?.discovered.weaponHints ? (
-            <div className="p-2 rounded bg-white/5 border border-white/10 opacity-60">
+            <div className="p-2 rounded-none bg-white/5 border border-white/10 opacity-60">
               <span className="text-xs font-medium italic text-muted-foreground">
                 {favDisplay.weaponHint}
               </span>
@@ -49,14 +49,14 @@ export function WarriorDossierSoulBond({ warrior }: WarriorDossierSoulBondProps)
             <Activity className="h-3 w-3" /> Natural Rhythm
           </div>
           {warrior.favorites?.discovered.rhythm ? (
-            <div className="flex items-center justify-between p-2 rounded bg-arena-gold/5 border border-arena-gold/20">
+            <div className="flex items-center justify-between p-2 rounded-none bg-arena-gold/5 border border-arena-gold/20">
               <span>{favDisplay.rhythm}</span>
               <Badge className="bg-arena-gold text-black font-black text-[8px] h-4 px-1">
                 SYNERGY ✨
               </Badge>
             </div>
           ) : warrior.favorites?.discovered.rhythmHints ? (
-            <div className="p-2 rounded bg-white/5 border border-white/10 animate-pulse">
+            <div className="p-2 rounded-none bg-white/5 border border-white/10 animate-pulse">
               <span className="text-xs font-bold text-arena-gold/40 uppercase tracking-widest blur-[1px]">
                 {favDisplay.rhythmHint}
               </span>

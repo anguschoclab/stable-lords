@@ -32,7 +32,7 @@ export function TrainerTable() {
         <Link to="/ops/personnel">
           <button
             aria-label="Manage Staff"
-            className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded transition-all border border-primary/20"
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-foreground hover:bg-primary/20 px-3 py-1.5 rounded-none transition-all border border-primary/20"
           >
             Manage Staff
           </button>

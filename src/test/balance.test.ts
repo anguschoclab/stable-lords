@@ -14,7 +14,7 @@ import type { FightPlan } from '@/types/combat.types';
 const ALL_STYLES = Object.values(FightingStyle);
 
 // Standard 70-point warrior for each style
-const STD_ATTRS = { ST: 10, CN: 10, SZ: 10, WT: 10, WL: 10, SP: 10, DF: 10 };
+const STD_ATTRS = { ST: 15, CN: 15, SZ: 15, WT: 15, WL: 15, SP: 15, DF: 15 };
 
 function makeTestWarrior(style: FightingStyle, id: string): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(STD_ATTRS, style);

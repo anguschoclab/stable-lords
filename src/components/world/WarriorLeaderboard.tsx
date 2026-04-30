@@ -196,7 +196,7 @@ function WarriorLeaderboardRow({ row, index, isFiltered }: WarriorLeaderboardRow
         <div className="flex flex-col items-center gap-0.5">
           <div
             className={cn(
-              'font-mono text-xs font-black p-1 rounded border inline-block min-w-6',
+              'font-mono text-xs font-black p-1 rounded-none border inline-block min-w-6',
               row.officialRank <= 64
                 ? 'bg-arena-gold/10 text-arena-gold border-arena-gold/20'
                 : row.officialRank <= 128

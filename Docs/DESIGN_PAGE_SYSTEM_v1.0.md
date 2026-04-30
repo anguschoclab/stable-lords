@@ -167,7 +167,7 @@ Each section lists only what is unique beyond the archetype. Common rules from �
 Hero Strip: **Crowd Mood** card full-width — large omen icon (auspicious/neutral/restless), `arena-pop` border, modifiers list as bronze stat pills (`TICKET_YIELD +8% · FAME_GAIN +4%`).
 
 Grid cards:
-1. **Imperial Standings** — top 5 stables table (mini Banzuke).
+1. **Imperial Standings** — top 5 stables table.
 2. **Arena Analytics** — carved wall of stats: attendance, kills-per-week, ticket revenue, Fame circulating.
 3. **This Week's Card** — re-uses Control Center's bout card component.
 4. **Rising Contenders** — top 3 warriors by form delta.

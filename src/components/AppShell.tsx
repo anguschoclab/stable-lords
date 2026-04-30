@@ -209,7 +209,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
                 Arena Time
               </span>
-              <span className="font-mono font-black text-xs text-foreground bg-white/5 px-2 py-0.5 rounded border border-white/5">
+              <span className="font-mono font-black text-xs text-foreground bg-white/5 px-2 py-0.5 rounded-none border border-white/5">
                 {isSimulating ? (
                   <span className="animate-pulse opacity-40">W—</span>
                 ) : (
@@ -253,7 +253,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <TooltipTrigger asChild>
                   <span
                     className={cn(
-                      'font-mono font-black text-xs flex items-center gap-1.5 px-2 py-0.5 rounded border border-white/5 bg-white/5 cursor-help transition-colors',
+                      'font-mono font-black text-xs flex items-center gap-1.5 px-2 py-0.5 rounded-none border border-white/5 bg-white/5 cursor-help transition-colors',
                       WEATHER_COLORS[weather] || 'text-sky-400'
                     )}
                   >

@@ -60,7 +60,7 @@ export function HeadToHead({ rosterA, rosterB }: Omit<HeadToHeadProps, 'nameA' |
 
       <div className="p-4 border-b border-white/5 bg-neutral-900/60 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-1 px-2 rounded bg-arena-gold/10 border border-arena-gold/20">
+          <div className="p-1 px-2 rounded-none bg-arena-gold/10 border border-arena-gold/20">
             <History className="h-3.5 w-3.5 text-arena-gold" />
           </div>
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">

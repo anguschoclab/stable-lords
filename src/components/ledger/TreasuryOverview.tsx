@@ -164,7 +164,7 @@ function FiscalTrajectoryMonitor({ breakdown, week }: FiscalTrajectoryMonitorPro
             {breakdown.income.map((item, i) => (
               <div
                 key={i}
-                className="flex justify-between items-center group/item hover:bg-white/2 p-1.5 rounded transition-colors"
+                className="flex justify-between items-center group/item hover:bg-white/2 p-1.5 rounded-none transition-colors"
               >
                 <span className="text-[11px] font-medium text-foreground/70 group-hover/item:text-foreground">
                   {item.label}
@@ -192,7 +192,7 @@ function FiscalTrajectoryMonitor({ breakdown, week }: FiscalTrajectoryMonitorPro
             {breakdown.expenses.map((item, i) => (
               <div
                 key={i}
-                className="flex justify-between items-center group/item hover:bg-white/2 p-1.5 rounded transition-colors"
+                className="flex justify-between items-center group/item hover:bg-white/2 p-1.5 rounded-none transition-colors"
               >
                 <span className="text-[11px] font-medium text-foreground/70 group-hover/item:text-foreground">
                   {item.label}

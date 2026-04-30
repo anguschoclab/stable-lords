@@ -29,7 +29,7 @@ export function StableStrategyWidget() {
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-black">
               Personality
             </span>
-            <span className="text-[9px] bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground">
+            <span className="text-[9px] bg-secondary px-1.5 py-0.5 rounded-none text-secondary-foreground">
               {personality}
             </span>
           </div>
@@ -37,7 +37,7 @@ export function StableStrategyWidget() {
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-black">
               Adaptation
             </span>
-            <span className="text-[9px] bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground">
+            <span className="text-[9px] bg-secondary px-1.5 py-0.5 rounded-none text-secondary-foreground">
               {metaAdaptation}
             </span>
           </div>

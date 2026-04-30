@@ -10,7 +10,7 @@ export const MAX_EXCHANGES = 30; // 10 minutes (Death Rattle calibration)
 export const EXCHANGES_PER_MINUTE = 3;
 export const INITIATIVE_PRESS_BONUS = 1;
 
-export const OE_ATT_SCALING = 0.7;
+export const OE_ATT_SCALING = 0.85;
 export const OE_DEF_SCALING = 0.5;
 export const AL_INI_SCALING = 0.7;
 export const AL_ATTR_SCALING = 0.5;
@@ -66,16 +66,16 @@ export const STYLE_ORDER = [
  */
 export const MATCHUP_MATRIX: number[][] = [
   //AB  BA  LU  PL  PR  PS  SL  ST  TP  WS
-  [0, +1, +2, +1, +1, +1, +1, +2, +1, +2], // AB  (AB vs SL +2→+1; SL was losing 84%)
-  [0, 0, 0, -1, +1, 0, -1, 0, +1, 0], // BA  (BA vs PL +1→-1, BA vs PS +1→0, BA vs SL 0→-1; BA at 74% → nerf)
-  [-2, 0, 0, +1, +1, -1, 0, 0, +1, -1], // LU  (restored LU vs PL +1; PlanBuilder test requires this)
-  [0, +2, -1, 0, +2, +2, 0, 0, +2, 0], // PL  (PL row: buff vs BA/PR/PS/TP; LU vs PL restored)
-  [0, -1, 0, -2, 0, 0, 0, -1, +1, 0], // PR  (PR vs PL 0→-2; PR was 94% vs PL)
-  [0, 0, +1, -2, 0, 0, 0, -1, 0, 0], // PS  (PS vs PL 0→-2; PS was 91% vs PL)
-  [-1, -1, 0, 0, +1, 0, 0, -1, +1, 0], // SL  (unchanged; SL already weak, let passives fix it)
-  [-1, 0, +1, +1, +1, 0, 0, 0, +1, +1], // ST  (ST vs SL +1→0; ST was 82% vs SL)
-  [-2, 0, -1, -2, 0, 0, -1, -1, 0, -1], // TP  (TP vs AB 0→-2, TP vs PL 0→-2, TP vs WS 0→-1; TP dominant at 95-100%)
-  [-1, 0, +1, 0, 0, 0, 0, 0, 0, 0], // WS  (unchanged)
+  [0, +1, +2, +1, +1, +1, +2, +2, +1, +2], // AB
+  [-1, 0, 0, -1, -1, 0, -1, -1, 0, -1], // BA (Nerfed vs PR)
+  [-2, 0, 0, 0, 0, -1, -1, -1, 0, -1], // LU
+  [-1, +1, 0, 0, +1, +1, 0, 0, +1, 0], // PL
+  [-1, +1, 0, 0, 0, 0, 0, +1, +1, 0], // PR (Buffed vs BA and ST)
+  [-1, 0, +1, -1, 0, 0, 0, +2, 0, 0], // PS (Buffed vs ST)
+  [-2, +1, +1, 0, 0, 0, 0, -1, +1, 0], // SL
+  [-2, +1, +1, 0, -1, -2, +1, 0, +1, +1], // ST (Nerfed vs PR and PS)
+  [-1, 0, 0, -1, 0, 0, +1, -1, 0, -1], // TP
+  [-4, 0, -1, -2, -1, -3, -2, -2, 0, 0], // WS (Nerfed matrix entries globally)
 ];
 
 export function getMatchupBonus(attStyle: FightingStyle, defStyle: FightingStyle): number {

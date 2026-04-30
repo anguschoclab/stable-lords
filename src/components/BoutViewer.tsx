@@ -367,11 +367,11 @@ export default function BoutViewer({
 
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 font-mono text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">
-                <div className="p-1 px-2 rounded bg-neutral-950 border border-white/5 text-primary">
+                <div className="p-1 px-2 rounded-none bg-neutral-950 border border-white/5 text-primary">
                   {visibleCount}
                 </div>
                 <span className="opacity-20 text-xs">/</span>
-                <div className="p-1 px-2 rounded bg-neutral-950 border border-white/5">
+                <div className="p-1 px-2 rounded-none bg-neutral-950 border border-white/5">
                   {totalEvents}
                 </div>
                 ENTRIES

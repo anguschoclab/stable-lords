@@ -368,7 +368,7 @@ export function StableComparison({ rivals }: StableComparisonProps) {
                 className="border-arena-gold/10 overflow-hidden"
               >
                 <div className="p-4 border-b border-white/5 bg-arena-gold/5 flex items-center gap-3">
-                  <div className="p-1.5 rounded bg-arena-gold/10 border border-arena-gold/20">
+                  <div className="p-1.5 rounded-none bg-arena-gold/10 border border-arena-gold/20">
                     <BrainCircuit className="h-3.5 w-3.5 text-arena-gold" />
                   </div>
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-arena-gold">
@@ -500,7 +500,7 @@ export function StableComparison({ rivals }: StableComparisonProps) {
 
           <Surface variant="glass" padding="none" className="border-border/40 overflow-hidden">
             <div className="p-4 border-b border-white/5 bg-neutral-900/60 flex items-center gap-3">
-              <div className="p-1.5 rounded bg-arena-gold/10 border border-arena-gold/20">
+              <div className="p-1.5 rounded-none bg-arena-gold/10 border border-arena-gold/20">
                 <Trophy className="h-3.5 w-3.5 text-arena-gold" />
               </div>
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">

@@ -41,7 +41,16 @@ const createMockDirHandle = (name: string) => ({
   kind: 'directory',
   name,
   getDirectoryHandle: async (dirName: string) => createMockDirHandle(dirName),
-  getFileHandle: async () => ({}),
+  getFileHandle: async () => ({
+    kind: 'file',
+    createWritable: async () => ({
+      write: async () => {},
+      close: async () => {},
+    }),
+    getFile: async () => ({
+      text: async () => '{}',
+    }),
+  }),
   values: async function* () {},
 });
 

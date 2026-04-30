@@ -45,8 +45,8 @@ describe('applyRecords', () => {
 
     const impact = applyRecords(s, wA, wD, outcome, [], 5, 2, 1, 1);
 
-    const updatedA = impact.rosterUpdates?.get('A')!;
-    const updatedD = impact.rosterUpdates?.get('D')!;
+    const updatedA = impact.rosterUpdates!.get('A')!;
+    const updatedD = impact.rosterUpdates!.get('D')!;
 
     expect(updatedA).toBeDefined();
     expect(updatedD).toBeDefined();
@@ -72,8 +72,8 @@ describe('applyRecords', () => {
 
     const impact = applyRecords(s, wA, wD, outcome, ['Flashy'], 1, 1, 5, 2);
 
-    const updatedA = impact.rosterUpdates?.get('A')!;
-    const updatedD = impact.rosterUpdates?.get('D')!;
+    const updatedA = impact.rosterUpdates!.get('A')!;
+    const updatedD = impact.rosterUpdates!.get('D')!;
 
     expect(updatedA).toBeDefined();
     expect(updatedD).toBeDefined();
@@ -123,7 +123,7 @@ describe('applyRecords', () => {
     expect(impact.rosterUpdates?.has('D')).toBeFalsy();
     expect(impact.rivalsUpdates?.has('rival-1')).toBeTruthy();
 
-    const updatedRivalData = impact.rivalsUpdates?.get('rival-1')!;
+    const updatedRivalData = impact.rivalsUpdates!.get('rival-1')!;
     expect(updatedRivalData.roster).toBeDefined();
     const updatedWD = updatedRivalData.roster?.find((w) => w.id === 'D');
     expect(updatedWD).toBeDefined();
@@ -154,8 +154,8 @@ describe('applyRecords', () => {
 
     const impact = applyRecords(s, wA, wD, outcome, [], 5, 2, 1, 1);
 
-    const updatedA = impact.rosterUpdates?.get('A')!;
-    const updatedD = impact.rosterUpdates?.get('D')!;
+    const updatedA = impact.rosterUpdates!.get('A')!;
+    const updatedD = impact.rosterUpdates!.get('D')!;
 
     expect(updatedA.fatigue).toBe(20); // No change
     expect(updatedD.fatigue).toBe(30); // No change
@@ -169,8 +169,8 @@ describe('applyRecords', () => {
     const wD2 = createMockWarrior('D', { fatigue: undefined });
     const impact = applyRecords(s, wA2, wD2, outcome, [], 0, 0, 0, 0);
 
-    const updatedA = impact.rosterUpdates?.get('A')!;
-    const updatedD = impact.rosterUpdates?.get('D')!;
+    const updatedA = impact.rosterUpdates!.get('A')!;
+    const updatedD = impact.rosterUpdates!.get('D')!;
 
     expect(updatedA.fatigue).toBe(25); // 0 + 25
     expect(updatedD.fatigue).toBe(25); // 0 + 25

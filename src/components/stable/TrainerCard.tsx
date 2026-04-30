@@ -68,12 +68,12 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
             <div className="flex items-center gap-6">
               {/* Visual Avatar Container */}
               <div className="relative group-hover:scale-105 transition-transform duration-500 overflow-visible">
-                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-none opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="w-16 h-16 rounded-none bg-neutral-900 border border-white/5 flex items-center justify-center relative z-10 shadow-inner text-3xl">
                   {icon}
                 </div>
                 {trainer.tier === 'Master' && (
-                  <div className="absolute -top-2 -right-2 bg-arena-gold text-black p-1 rounded-full shadow-[0_0_10px_rgba(255,215,0,0.5)]">
+                  <div className="absolute -top-2 -right-2 bg-arena-gold text-black p-1 rounded-none shadow-[0_0_10px_rgba(255,215,0,0.5)]">
                     <Trophy className="h-3 w-3" />
                   </div>
                 )}
@@ -87,7 +87,7 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
                   {trainer.retiredFromWarrior && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="p-1 rounded bg-arena-fame/10 border border-arena-fame/20">
+                        <div className="p-1 rounded-none bg-arena-fame/10 border border-arena-fame/20">
                           <GraduationCap className="h-3 w-3 text-arena-fame" />
                         </div>
                       </TooltipTrigger>
@@ -140,7 +140,7 @@ export function TrainerCard({ trainer, onFire, owned, action }: TrainerCardProps
             <div className="flex-1 flex items-center gap-4">
               <div className="flex-1 bg-black/40 rounded-none border border-white/5 p-3 flex items-center justify-between group/intel">
                 <div className="flex items-center gap-3">
-                  <div className="p-1.5 rounded bg-primary/10 border border-primary/20">
+                  <div className="p-1.5 rounded-none bg-primary/10 border border-primary/20">
                     <Sparkles className="h-3.5 w-3.5 text-primary" />
                   </div>
                   <div>
