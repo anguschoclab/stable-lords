@@ -6,7 +6,7 @@ import crypto from 'crypto';
 
 function createMockWarrior(style: FightingStyle, wt: number = 10): Warrior {
   return {
-    id: crypto.randomUUID() as any,
+    id: crypto.randomUUID() as WarriorId,
     name: 'Test Warrior',
     style,
     attributes: {
