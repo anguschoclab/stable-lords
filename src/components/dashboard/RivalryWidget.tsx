@@ -216,7 +216,7 @@ export function RivalryWidget() {
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
-                            'h-1 w-1 rounded-full',
+                            'h-1 w-1 rounded-none',
                             r.intensity >= 4 ? 'bg-destructive animate-pulse' : 'bg-arena-gold'
                           )}
                         />
@@ -247,7 +247,7 @@ export function RivalryWidget() {
                         <div
                           key={i}
                           className={cn(
-                            'flex-1 rounded-full transition-all duration-500',
+                            'flex-1 rounded-none transition-all duration-500',
                             i <= r.intensity
                               ? i >= 4
                                 ? 'bg-destructive shadow-[0_0_8px_rgba(var(--destructive-rgb),0.5)]'

@@ -1,0 +1,1321 @@
+
+> stable-lords@2.1.0 lint
+> eslint .
+
+
+/Users/amauricia/Documents/GitHub/stable-lords/autosim.ts
+  34:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/electron/main.ts
+  296:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/electron/preload.ts
+   7:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/killer_audit.ts
+   4:10  warning  'FightingStyle' is defined but never used  @typescript-eslint/no-unused-vars
+  18:10  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  43:27  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  57:23  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  70:31  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/meta_audit.ts
+  19:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/mini_test.ts
+   3:15  warning  'GameState' is defined but never used     @typescript-eslint/no-unused-vars
+  12:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/scratch/combat_audit.ts
+   3:10  warning  'FightingStyle' is defined but never used          @typescript-eslint/no-unused-vars
+  18:7   warning  'totalRepeats' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  47:19  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  47:71  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  48:19  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  48:79  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  66:29  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/scratch/diagnose_matchmaker.ts
+  5:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/scratch/matchup_audit.ts
+  60:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/scratch/treasury_trace.ts
+  8:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/scratch/world_health.ts
+  3:10  warning  'FightingStyle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/scripts/season_smoke.ts
+  3:15  warning  'GameState' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/AppShell.tsx
+  63:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/EntityLink.tsx
+  110:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/EventLog.tsx
+  270:6  warning  React Hook useMemo has a missing dependency: 'state.gazettes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/WarriorBuilder.tsx
+  19:10  warning  'Separator' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/arena/ArenaBackground.tsx
+  460:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/dashboard/IntelligenceHubWidget.tsx
+  175:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/dashboard/MedicalAuditWidget.tsx
+  80:21  warning  'isCritical' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/dashboard/MetaPulseWidget.tsx
+   4:3   warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+   5:3   warning  'Zap' is defined but never used           @typescript-eslint/no-unused-vars
+   8:3   warning  'Target' is defined but never used        @typescript-eslint/no-unused-vars
+  13:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/dashboard/RankingsWidget.tsx
+   2:10  warning  'Link' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+  29:6   warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  43:39  warning  Unexpected any. Specify a different type                                                                @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/dashboard/RecentBoutsWidget.tsx
+  26:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ledger/InsightManager.tsx
+  113:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/modals/DeathModal.tsx
+  13:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/navigation/TacticalBar.tsx
+  103:6  warning  React Hook useMemo has an unnecessary dependency: 'trainers'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/planBuilder/PhaseOverrides.tsx
+  38:36  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/planBuilder/TacticBank.tsx
+  5:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/run-round/LethalityBadge.tsx
+  11:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/scouting/RivalWarriorList.tsx
+  1:10  warning  'Badge' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/scouting/ScoutIntelTab.tsx
+  2:18  warning  'Eye' is defined but never used       @typescript-eslint/no-unused-vars
+  2:31  warning  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/scouting/ScoutReportDetails.tsx
+  13:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/scouting/StableComparison.tsx
+    4:3   warning  'ArrowLeftRight' is defined but never used  @typescript-eslint/no-unused-vars
+  455:46  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  458:54  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  468:46  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  471:54  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  482:46  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  487:54  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/scouting/WarriorComparison.tsx
+  7:3  warning  'Zap' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/stable/ReputationSliders.tsx
+  2:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+  5:10  warning  'Badge' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/stable/TrainerCard.tsx
+   2:10  warning  'Badge' is defined but never used                @typescript-eslint/no-unused-vars
+   9:3   warning  'Clock' is defined but never used                @typescript-eslint/no-unused-vars
+  12:3   warning  'ChevronRight' is defined but never used         @typescript-eslint/no-unused-vars
+  37:9   warning  'tierAccent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/stable/TrainerTable.tsx
+  1:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+  8:25  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+  8:54  warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/tournaments/TournamentBracket.tsx
+  2:69  warning  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/tournaments/TournamentSchedule.tsx
+  237:3  warning  'round' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/training/WarriorTrainingCard.tsx
+  12:35  warning  'TooltipProvider' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ui/CoachOverlay.tsx
+    2:10  warning  'useGameStore' is defined but never used                                   @typescript-eslint/no-unused-vars
+    4:10  warning  'AlertCircle' is defined but never used                                    @typescript-eslint/no-unused-vars
+    4:23  warning  'ShieldAlert' is defined but never used                                    @typescript-eslint/no-unused-vars
+    4:43  warning  'History' is defined but never used                                        @typescript-eslint/no-unused-vars
+   13:9   warning  Unexpected any. Specify a different type                                   @typescript-eslint/no-explicit-any
+  121:39  warning  'variant' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  121:50  warning  Unexpected any. Specify a different type                                   @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ui/CodexTable.tsx
+   66:35  warning  'accentColumn' is assigned a value but never used. Allowed unused args must match /^_/u                                         @typescript-eslint/no-unused-vars
+   66:53  warning  'accentType' is assigned a value but never used. Allowed unused args must match /^_/u                                           @typescript-eslint/no-unused-vars
+  126:61  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  221:3   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  222:3   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  223:3   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ui/Surface.tsx
+  107:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ui/badge.tsx
+  37:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ui/button.tsx
+  84:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/ui/sonner.tsx
+  27:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/warrior/BiometricsTab.tsx
+  1:10  warning  'Shield' is defined but never used  @typescript-eslint/no-unused-vars
+  1:33  warning  'Zap' is defined but never used     @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/warrior/ConditionEditor.tsx
+  106:22  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  120:22  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/warrior/FavoritesCard.tsx
+   1:17  warning  'useMemo' is defined but never used          @typescript-eslint/no-unused-vars
+   2:15  warning  'Lightbulb' is defined but never used        @typescript-eslint/no-unused-vars
+   2:49  warning  'Download' is defined but never used         @typescript-eslint/no-unused-vars
+   5:10  warning  'Badge' is defined but never used            @typescript-eslint/no-unused-vars
+   7:10  warning  'Tooltip' is defined but never used          @typescript-eslint/no-unused-vars
+   7:19  warning  'TooltipContent' is defined but never used   @typescript-eslint/no-unused-vars
+   7:35  warning  'TooltipProvider' is defined but never used  @typescript-eslint/no-unused-vars
+   7:52  warning  'TooltipTrigger' is defined but never used   @typescript-eslint/no-unused-vars
+  16:9   warning  'state' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/warrior/MissionControlTab.tsx
+  2:10  warning  'Badge' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/warrior/WarriorHeroHeader.tsx
+   1:10  warning  'Trophy' is defined but never used                                             @typescript-eslint/no-unused-vars
+   1:18  warning  'Flame' is defined but never used                                              @typescript-eslint/no-unused-vars
+   1:25  warning  'Users' is defined but never used                                              @typescript-eslint/no-unused-vars
+   2:10  warning  'Badge' is defined but never used                                              @typescript-eslint/no-unused-vars
+   7:10  warning  'cn' is defined but never used                                                 @typescript-eslint/no-unused-vars
+  37:3   warning  'streakLabel' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  38:3   warning  'streakVal' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/warrior/dossier/WarriorDossierTabs.tsx
+  2:10  warning  'Surface' is defined but never used  @typescript-eslint/no-unused-vars
+  4:15  warning  'Warrior' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/widgets/BubbleWatchWidget.tsx
+  1:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+  4:18  warning  'HelpCircle' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/widgets/CrowdMoodWidget.tsx
+  4:10  warning  'SectionDivider' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/widgets/MetaDriftWidget.tsx
+  7:10  warning  'SectionDivider' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/widgets/NextBoutWidget.tsx
+  5:34  warning  'TrendingUp' is defined but never used   @typescript-eslint/no-unused-vars
+  7:10  warning  'WarriorLink' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/widgets/SchedulingWidget.tsx
+  16:3  warning  'Target' is defined but never used         @typescript-eslint/no-unused-vars
+  17:3  warning  'AlertTriangle' is defined but never used  @typescript-eslint/no-unused-vars
+  19:3  warning  'Trophy' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/widgets/WeatherWidget.tsx
+  1:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/components/world/StableRankings.tsx
+  14:18  warning  'Star' is defined but never used      @typescript-eslint/no-unused-vars
+  14:24  warning  'Swords' is defined but never used    @typescript-eslint/no-unused-vars
+  14:39  warning  'Target' is defined but never used    @typescript-eslint/no-unused-vars
+  14:47  warning  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/data/backstories.ts
+  6:3  warning  'RivalStableData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/data/tagDescriptions.ts
+  11:86  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/data/templates/backstoryData.ts
+  27:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/data/templates/templateCache.ts
+  152:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  244:94  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/data/warriorStatements.ts
+  106:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/aging.ts
+  88:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/ai/stableManager.ts
+  4:3   warning  'AIIntent' is defined but never used    @typescript-eslint/no-unused-vars
+  5:3   warning  'AIStrategy' is defined but never used  @typescript-eslint/no-unused-vars
+  8:15  warning  'Season' is defined but never used      @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/ai/workers/budgetWorker.ts
+  18:3  warning  'category' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/ai/workers/rosterWorker.ts
+  62:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/ai/worldManagement.ts
+  2:15  warning  'IRNGService' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/autosim.ts
+  247:24  warning  't' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/bout/core/resolveHelpers.ts
+  39:3   warning  'rivalStableId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  44:41  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  51:9   warning  'rivalD' is assigned a value but never used                                      @typescript-eslint/no-unused-vars
+  90:26  warning  '_' is assigned a value but never used                                           @typescript-eslint/no-unused-vars
+  96:83  warning  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/bout/fighterState.ts
+  6:3  warning  'DEFAULT_LOADOUT' is defined but never used   @typescript-eslint/no-unused-vars
+  9:3  warning  'getLoadoutWeight' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/combat/mechanics/tacticResolution.ts
+  3:15  warning  'Warrior' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/combat/narrative/narrator.ts
+  18:3   warning  'tauntLine' is defined but never used             @typescript-eslint/no-unused-vars
+  25:10  warning  'getWeaponDisplayName' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/combat/resolution/exchangeHelpers.ts
+   2:3   warning  'FightingStyle' is defined but never used    @typescript-eslint/no-unused-vars
+   3:8   warning  'Attributes' is defined but never used       @typescript-eslint/no-unused-vars
+   4:8   warning  'BaseSkills' is defined but never used       @typescript-eslint/no-unused-vars
+   5:8   warning  'DerivedStats' is defined but never used     @typescript-eslint/no-unused-vars
+   6:8   warning  'OffensiveTactic' is defined but never used  @typescript-eslint/no-unused-vars
+   7:8   warning  'DefensiveTactic' is defined but never used  @typescript-eslint/no-unused-vars
+  11:15  warning  'Trainer' is defined but never used          @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/combat/resolution/exchangeSubPhases.ts
+  193:13  warning  'prev' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/combat/resolution/resolution.ts
+  11:26  warning  'FightSummary' is defined but never used                 @typescript-eslint/no-unused-vars
+  26:10  warning  'getWeatherEffect' is defined but never used             @typescript-eslint/no-unused-vars
+  29:10  warning  'skillCheck' is defined but never used                   @typescript-eslint/no-unused-vars
+  31:3   warning  'computeHitDamage' is defined but never used             @typescript-eslint/no-unused-vars
+  32:3   warning  'rollHitLocation' is defined but never used              @typescript-eslint/no-unused-vars
+  33:3   warning  'applyProtectMod' is defined but never used              @typescript-eslint/no-unused-vars
+  34:3   warning  'calculateKillWindow' is defined but never used          @typescript-eslint/no-unused-vars
+  39:3   warning  'getEnduranceMult' is defined but never used             @typescript-eslint/no-unused-vars
+  41:3   warning  'getKillMechanic' is defined but never used              @typescript-eslint/no-unused-vars
+  44:8   warning  'MasteryTier' is defined but never used                  @typescript-eslint/no-unused-vars
+  49:3   warning  'GLOBAL_ATT_BONUS' is defined but never used             @typescript-eslint/no-unused-vars
+  50:3   warning  'GLOBAL_PAR_PENALTY' is defined but never used           @typescript-eslint/no-unused-vars
+  51:3   warning  'INITIATIVE_PRESS_BONUS' is defined but never used       @typescript-eslint/no-unused-vars
+  52:3   warning  'DEFENDER_ENDURANCE_DISCOUNT' is defined but never used  @typescript-eslint/no-unused-vars
+  53:3   warning  'CRIT_DAMAGE_MULT' is defined but never used             @typescript-eslint/no-unused-vars
+  58:3   warning  'oeAttMod' is defined but never used                     @typescript-eslint/no-unused-vars
+  59:3   warning  'oeDefMod' is defined but never used                     @typescript-eslint/no-unused-vars
+  78:8   warning  'ExchangeState' is defined but never used                @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/core/historyUtils.ts
+  2:15  warning  'GameState' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/core/worldSeeder.ts
+   3:8   warning  'Attributes' is defined but never used        @typescript-eslint/no-unused-vars
+   4:3   warning  'ATTRIBUTE_KEYS' is defined but never used    @typescript-eslint/no-unused-vars
+   5:3   warning  'ATTRIBUTE_MAX' is defined but never used     @typescript-eslint/no-unused-vars
+   8:15  warning  'CombatEvent' is defined but never used       @typescript-eslint/no-unused-vars
+   9:15  warning  'Trainer' is defined but never used           @typescript-eslint/no-unused-vars
+  10:10  warning  'createFreshState' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/dayPipeline.ts
+  9:46  warning  'rng' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/draftService.ts
+  24:9  warning  'updatedRivals' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/economy.ts
+  14:39  warning  'Warrior' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/equipmentOptimizer.ts
+   5:25  warning  'STYLE_DISPLAY_NAMES' is defined but never used  @typescript-eslint/no-unused-vars
+   7:3   warning  'WEAPONS' is defined but never used              @typescript-eslint/no-unused-vars
+   8:3   warning  'ARMORS' is defined but never used               @typescript-eslint/no-unused-vars
+   9:3   warning  'SHIELDS' is defined but never used              @typescript-eslint/no-unused-vars
+  10:3   warning  'HELMS' is defined but never used                @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/factories/combatFactory.ts
+  22:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/favorites.ts
+  15:38  warning  'STYLE_CLASSIC_WEAPONS' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/gazette/gazetteFactory.ts
+  25:3  warning  'generateSeasonSummary' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/gazette/gazetteNarrative.ts
+   92:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/gazette/gazetteTemplateHelpers.ts
+  32:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/health.ts
+  1:26  warning  'SeasonalGrowth' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/history/arenaHistory.ts
+  56:17  warning  'transcript' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/impacts.ts
+  246:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  309:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  309:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  347:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  349:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  351:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/injuries.ts
+  14:10  warning  'generateId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/rivalryLogic.ts
+  65:15  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/tournament/tournamentBracketBuilder.ts
+  3:10  warning  'SeededRNGService' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/tournament/tournamentResolver.ts
+    1:35  warning  'TournamentEntry' is defined but never used  @typescript-eslint/no-unused-vars
+    7:27  warning  'modifyWarrior' is defined but never used    @typescript-eslint/no-unused-vars
+  231:12  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  239:41  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/tournament/tournamentSelectionCommittee.ts
+  1:35  warning  'Season' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/tournament/tournamentStateMutator.ts
+  14:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/tournamentSelection/committee.ts
+  10:10  warning  'generateId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/matchmaking/worldMatchmaking.ts
+  3:10  warning  'generateId' is defined but never used     @typescript-eslint/no-unused-vars
+  4:10  warning  'FightingStyle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/narrative/narrativeCombat.ts
+  6:47  warning  'pick' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/narrative/narrativeIntro.ts
+  9:52  warning  'CombatContext' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/narrative/narrativePBPUtils.ts
+  111:12  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/narrative/narrativePostBout.ts
+  5:47  warning  'pick' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/narrative/narrativeTemplateEngine.ts
+  65:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/ownerRoster.ts
+  40:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/pipeline/adapters/opfsArchiver.ts
+  18:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/pipeline/core/hallOfFame.ts
+  186:10  warning  'createYearlySnapshots' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/pipeline/core/tierProgression.ts
+  5:10  warning  'generateId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/pipeline/passes/PromoterPass.ts
+  250:11  warning  'bestGap' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/pipeline/passes/TrainerPass.ts
+  1:26  warning  'Trainer' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/pipeline/services/weekPipelineService.ts
+  130:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  175:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  176:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/recruitment.ts
+  51:7  warning  'getTierData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/schedulingAssistant.ts
+  3:24  warning  'InjuryData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/scouting.ts
+  11:29  warning  'InsightTokenType' is defined but never used  @typescript-eslint/no-unused-vars
+  14:10  warning  'generateId' is defined but never used        @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/skillCalc.ts
+  13:10  warning  'ATTRIBUTE_KEYS' is defined but never used           @typescript-eslint/no-unused-vars
+  13:26  warning  'ATTRIBUTE_MAX' is defined but never used            @typescript-eslint/no-unused-vars
+  14:15  warning  'Warrior' is defined but never used                  @typescript-eslint/no-unused-vars
+  14:24  warning  'AttributePotential' is defined but never used       @typescript-eslint/no-unused-vars
+  19:3   warning  'getDamageRating' is defined but never used          @typescript-eslint/no-unused-vars
+  22:3   warning  'computeEnduranceTier' is defined but never used     @typescript-eslint/no-unused-vars
+  23:3   warning  'getHPRating' is defined but never used              @typescript-eslint/no-unused-vars
+  24:3   warning  'computeEncumbranceClass' is defined but never used  @typescript-eslint/no-unused-vars
+  25:8   warning  'DamageRating' is defined but never used             @typescript-eslint/no-unused-vars
+  26:8   warning  'HPRating' is defined but never used                 @typescript-eslint/no-unused-vars
+  27:8   warning  'EnduranceTier' is defined but never used            @typescript-eslint/no-unused-vars
+  28:8   warning  'EncumbranceClass' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/stableReputation.ts
+  122:3  warning  'arenaHistory' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  123:3  warning  'stableName' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/storage/electronArchive.ts
+  36:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/storage/opfsArchive.ts
+    2:15  warning  'FightSummary' is defined but never used  @typescript-eslint/no-unused-vars
+   37:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  161:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/storage/truncation.ts
+   2:15  warning  'Warrior' is defined but never used              @typescript-eslint/no-unused-vars
+  15:15  warning  'transcript' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/stylePassives.ts
+  8:15  warning  'Warrior' is defined but never used    @typescript-eslint/no-unused-vars
+  9:15  warning  'FightPlan' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/trainers.ts
+  8:15  warning  'GameState' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/training.ts
+  4:10  warning  'SeededRNGService' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/training/trainingGains.ts
+  1:31  warning  'TrainingAssignment' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/engine/warriorStatus.ts
+  6:24  warning  'WarriorStatus' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/hooks/use-toast.ts
+  15:7  warning  'actionTypes' is assigned a value but only used as a type  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/hooks/useClickSound.ts
+  14:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/lib/AudioManager.ts
+  12:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/lib/obfuscation.ts
+  35:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  67:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/lore/HallOfFights.tsx
+  6:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/lore/LoreArchive.ts
+  58:17  warning  'transcript' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/main.tsx
+  13:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/AdminTools.tsx
+  158:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/ArenaHub.tsx
+   16:10  warning  'STYLE_DISPLAY_NAMES' is defined but never used  @typescript-eslint/no-unused-vars
+   16:31  warning  'FightingStyle' is defined but never used        @typescript-eslint/no-unused-vars
+   37:3   warning  'Flame' is defined but never used                @typescript-eslint/no-unused-vars
+   44:3   warning  'Target' is defined but never used               @typescript-eslint/no-unused-vars
+   46:3   warning  'Info' is defined but never used                 @typescript-eslint/no-unused-vars
+   49:35  warning  'TooltipProvider' is defined but never used      @typescript-eslint/no-unused-vars
+  291:9   warning  'navigate' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/BookingOffice.tsx
+    2:10  warning  'Link' is defined but never used                 @typescript-eslint/no-unused-vars
+    6:10  warning  'Badge' is defined but never used                @typescript-eslint/no-unused-vars
+   10:10  warning  'Tooltip' is defined but never used              @typescript-eslint/no-unused-vars
+   10:19  warning  'TooltipContent' is defined but never used       @typescript-eslint/no-unused-vars
+   10:35  warning  'TooltipProvider' is defined but never used      @typescript-eslint/no-unused-vars
+   10:52  warning  'TooltipTrigger' is defined but never used       @typescript-eslint/no-unused-vars
+   17:3   warning  'ShieldAlert' is defined but never used          @typescript-eslint/no-unused-vars
+   23:3   warning  'DollarSign' is defined but never used           @typescript-eslint/no-unused-vars
+   25:3   warning  'Users' is defined but never used                @typescript-eslint/no-unused-vars
+   26:3   warning  'Activity' is defined but never used             @typescript-eslint/no-unused-vars
+   27:3   warning  'ArrowRight' is defined but never used           @typescript-eslint/no-unused-vars
+   29:10  warning  'FightingStyle' is defined but never used        @typescript-eslint/no-unused-vars
+   29:25  warning  'STYLE_DISPLAY_NAMES' is defined but never used  @typescript-eslint/no-unused-vars
+  299:79  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/ControlCenter.tsx
+  208:10  warning  'HeroPanel' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Gazette.tsx
+   6:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+   9:3   warning  'Newspaper' is defined but never used     @typescript-eslint/no-unused-vars
+  23:10  warning  'Button' is defined but never used        @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Graveyard.tsx
+   6:10  warning  'Card' is defined but never used             @typescript-eslint/no-unused-vars
+   6:16  warning  'CardContent' is defined but never used      @typescript-eslint/no-unused-vars
+   8:10  warning  'Button' is defined but never used           @typescript-eslint/no-unused-vars
+  10:17  warning  'Armchair' is defined but never used         @typescript-eslint/no-unused-vars
+  10:43  warning  'Swords' is defined but never used           @typescript-eslint/no-unused-vars
+  10:51  warning  'Trophy' is defined but never used           @typescript-eslint/no-unused-vars
+  13:10  warning  'SectionDivider' is defined but never used   @typescript-eslint/no-unused-vars
+  14:10  warning  'ImperialRing' is defined but never used     @typescript-eslint/no-unused-vars
+  15:10  warning  'Link' is defined but never used             @typescript-eslint/no-unused-vars
+  18:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+  19:10  warning  'PageFrame' is defined but never used        @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/HallOfFame.tsx
+  27:10  warning  'SectionDivider' is defined but never used   @typescript-eslint/no-unused-vars
+  28:10  warning  'ImperialRing' is defined but never used     @typescript-eslint/no-unused-vars
+  31:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+  32:10  warning  'PageFrame' is defined but never used        @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/HallOfFame/InducteeCard.tsx
+   4:10  warning  'Card' is defined but never used          @typescript-eslint/no-unused-vars
+   6:18  warning  'Trophy' is defined but never used        @typescript-eslint/no-unused-vars
+   6:36  warning  'Medal' is defined but never used         @typescript-eslint/no-unused-vars
+   6:43  warning  'Star' is defined but never used          @typescript-eslint/no-unused-vars
+  10:10  warning  'ImperialRing' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Help.tsx
+  1:10  warning  'Card' is defined but never used         @typescript-eslint/no-unused-vars
+  1:16  warning  'CardContent' is defined but never used  @typescript-eslint/no-unused-vars
+  1:29  warning  'CardHeader' is defined but never used   @typescript-eslint/no-unused-vars
+  1:41  warning  'CardTitle' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Offseason.tsx
+  19:3   warning  'Shield' is defined but never used        @typescript-eslint/no-unused-vars
+  20:3   warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+  22:3   warning  'TrendingUp' is defined but never used    @typescript-eslint/no-unused-vars
+  24:10  warning  'cn' is defined but never used            @typescript-eslint/no-unused-vars
+  90:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  95:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/PhysicalsSimulator.tsx
+  120:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  122:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Recruit.tsx
+   10:3   warning  'generateRecruitPool' is defined but never used  @typescript-eslint/no-unused-vars
+   34:3   warning  'Users' is defined but never used                @typescript-eslint/no-unused-vars
+   36:3   warning  'Clock' is defined but never used                @typescript-eslint/no-unused-vars
+  313:65  warning  'week' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  348:41  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  356:23  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  356:46  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  357:36  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  357:61  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  358:23  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  425:32  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  426:35  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  427:33  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  428:40  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  428:69  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  620:89  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  640:79  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/RunRound.tsx
+   4:15  warning  'GameState' is defined but never used     @typescript-eslint/no-unused-vars
+  10:10  warning  'Badge' is defined but never used         @typescript-eslint/no-unused-vars
+  15:10  warning  'ImperialRing' is defined but never used  @typescript-eslint/no-unused-vars
+  16:30  warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+  16:40  warning  'FastForward' is defined but never used   @typescript-eslint/no-unused-vars
+  16:53  warning  'Heart' is defined but never used         @typescript-eslint/no-unused-vars
+  18:10  warning  'cn' is defined but never used            @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Scouting.tsx
+  5:10  warning  'Search' is defined but never used           @typescript-eslint/no-unused-vars
+  5:18  warning  'Eye' is defined but never used              @typescript-eslint/no-unused-vars
+  5:23  warning  'ArrowLeftRight' is defined but never used   @typescript-eslint/no-unused-vars
+  5:39  warning  'UserRoundSearch' is defined but never used  @typescript-eslint/no-unused-vars
+  5:56  warning  'Shield' is defined but never used           @typescript-eslint/no-unused-vars
+  5:64  warning  'Target' is defined but never used           @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/StableDetail.tsx
+    4:10  warning  'STYLE_DISPLAY_NAMES' is defined but never used  @typescript-eslint/no-unused-vars
+   14:3   warning  'Star' is defined but never used                 @typescript-eslint/no-unused-vars
+  246:55  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/StableEquipment.tsx
+    5:10  warning  'Card' is defined but never used             @typescript-eslint/no-unused-vars
+    5:16  warning  'CardContent' is defined but never used      @typescript-eslint/no-unused-vars
+    5:29  warning  'CardHeader' is defined but never used       @typescript-eslint/no-unused-vars
+    5:41  warning  'CardTitle' is defined but never used        @typescript-eslint/no-unused-vars
+    5:52  warning  'CardDescription' is defined but never used  @typescript-eslint/no-unused-vars
+    8:10  warning  'Progress' is defined but never used         @typescript-eslint/no-unused-vars
+   24:3   warning  'Zap' is defined but never used              @typescript-eslint/no-unused-vars
+   57:33  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  276:54  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  375:9   warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/StableHall.tsx
+   2:31  warning  'Sparkles' is defined but never used      @typescript-eslint/no-unused-vars
+   2:41  warning  'UserCheck' is defined but never used     @typescript-eslint/no-unused-vars
+   2:52  warning  'BookOpen' is defined but never used      @typescript-eslint/no-unused-vars
+  13:10  warning  'ImperialRing' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/StableLedger.tsx
+  17:10  warning  'Separator' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Tournaments.tsx
+    7:10  warning  'simulateFight' is defined but never used           @typescript-eslint/no-unused-vars
+    7:25  warning  'defaultPlanForWarrior' is defined but never used   @typescript-eslint/no-unused-vars
+    7:48  warning  'fameFromTags' is defined but never used            @typescript-eslint/no-unused-vars
+    7:62  warning  'aiPlanForWarrior' is defined but never used        @typescript-eslint/no-unused-vars
+    9:8   warning  'TournamentEntry' is defined but never used         @typescript-eslint/no-unused-vars
+   10:8   warning  'TournamentBout' is defined but never used          @typescript-eslint/no-unused-vars
+   11:8   warning  'FightSummary' is defined but never used            @typescript-eslint/no-unused-vars
+   12:8   warning  'Warrior' is defined but never used                 @typescript-eslint/no-unused-vars
+   13:3   warning  'FightingStyle' is defined but never used           @typescript-eslint/no-unused-vars
+   15:10  warning  'generateId' is defined but never used              @typescript-eslint/no-unused-vars
+   16:10  warning  'hashStr' is defined but never used                 @typescript-eslint/no-unused-vars
+   17:10  warning  'SeededRNG' is defined but never used               @typescript-eslint/no-unused-vars
+   18:10  warning  'ArenaHistory' is defined but never used            @typescript-eslint/no-unused-vars
+   19:10  warning  'LoreArchive' is defined but never used             @typescript-eslint/no-unused-vars
+   20:10  warning  'NewsletterFeed' is defined but never used          @typescript-eslint/no-unused-vars
+   21:10  warning  'StyleRollups' is defined but never used            @typescript-eslint/no-unused-vars
+   22:10  warning  'getFightsForTournament' is defined but never used  @typescript-eslint/no-unused-vars
+   23:10  warning  'Card' is defined but never used                    @typescript-eslint/no-unused-vars
+   23:16  warning  'CardContent' is defined but never used             @typescript-eslint/no-unused-vars
+   23:29  warning  'CardHeader' is defined but never used              @typescript-eslint/no-unused-vars
+   23:41  warning  'CardTitle' is defined but never used               @typescript-eslint/no-unused-vars
+   32:3   warning  'FastForward' is defined but never used             @typescript-eslint/no-unused-vars
+   46:10  warning  'TournamentPrepDialog' is defined but never used    @typescript-eslint/no-unused-vars
+   82:5   warning  'rivals' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   83:5   warning  'trainers' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   84:5   warning  'weather' is assigned a value but never used        @typescript-eslint/no-unused-vars
+   89:5   warning  'rosterBonus' is assigned a value but never used    @typescript-eslint/no-unused-vars
+   90:5   warning  'setState' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   97:10  warning  'isPrepOpen' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  142:62  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/Trainers.tsx
+   18:10  warning  'WarriorNameTag' is defined but never used  @typescript-eslint/no-unused-vars
+   23:3   warning  'DialogHeader' is defined but never used    @typescript-eslint/no-unused-vars
+   24:3   warning  'DialogTitle' is defined but never used     @typescript-eslint/no-unused-vars
+   25:3   warning  'DialogTrigger' is defined but never used   @typescript-eslint/no-unused-vars
+   34:3   warning  'Coins' is defined but never used           @typescript-eslint/no-unused-vars
+   35:3   warning  'ChevronRight' is defined but never used    @typescript-eslint/no-unused-vars
+   40:10  warning  'Tooltip' is defined but never used         @typescript-eslint/no-unused-vars
+   40:19  warning  'TooltipContent' is defined but never used  @typescript-eslint/no-unused-vars
+   40:35  warning  'TooltipTrigger' is defined but never used  @typescript-eslint/no-unused-vars
+   45:10  warning  'generateId' is defined but never used      @typescript-eslint/no-unused-vars
+  440:29  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  447:29  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/TrainingPlanner.tsx
+    7:3   warning  'STYLE_DISPLAY_NAMES' is defined but never used                           @typescript-eslint/no-unused-vars
+   15:10  warning  'Tooltip' is defined but never used                                       @typescript-eslint/no-unused-vars
+   15:19  warning  'TooltipContent' is defined but never used                                @typescript-eslint/no-unused-vars
+   15:35  warning  'TooltipProvider' is defined but never used                               @typescript-eslint/no-unused-vars
+   15:52  warning  'TooltipTrigger' is defined but never used                                @typescript-eslint/no-unused-vars
+   19:3   warning  'Lock' is defined but never used                                          @typescript-eslint/no-unused-vars
+   23:3   warning  'Shield' is defined but never used                                        @typescript-eslint/no-unused-vars
+   24:3   warning  'Zap' is defined but never used                                           @typescript-eslint/no-unused-vars
+   25:3   warning  'Heart' is defined but never used                                         @typescript-eslint/no-unused-vars
+   26:3   warning  'Info' is defined but never used                                          @typescript-eslint/no-unused-vars
+   31:10  warning  'WarriorLink' is defined but never used                                   @typescript-eslint/no-unused-vars
+  273:3   warning  'season' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  373:46  warning  Unexpected any. Specify a different type                                  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/WarriorDetail.tsx
+    8:29  warning  'GameStore' is defined but never used               @typescript-eslint/no-unused-vars
+    9:31  warning  'GameState' is defined but never used               @typescript-eslint/no-unused-vars
+   17:8   warning  'SubNav' is defined but never used                  @typescript-eslint/no-unused-vars
+   19:25  warning  'Heart' is defined but never used                   @typescript-eslint/no-unused-vars
+   19:32  warning  'Zap' is defined but never used                     @typescript-eslint/no-unused-vars
+   19:37  warning  'Shield' is defined but never used                  @typescript-eslint/no-unused-vars
+   19:55  warning  'TargetIcon' is defined but never used              @typescript-eslint/no-unused-vars
+   20:10  warning  'Badge' is defined but never used                   @typescript-eslint/no-unused-vars
+   55:5   warning  'renameWarrior' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   92:24  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  112:24  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  209:82  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  215:51  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/pages/WorldOverview.tsx
+    2:10  warning  'useGameStore' is defined but never used  @typescript-eslint/no-unused-vars
+    3:33  warning  'Skull' is defined but never used         @typescript-eslint/no-unused-vars
+    3:40  warning  'Crown' is defined but never used         @typescript-eslint/no-unused-vars
+    3:47  warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+   55:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  200:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  289:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/scripts/autobalance.ts
+   10:11  warning  'MetricStats' is defined but never used   @typescript-eslint/no-unused-vars
+  196:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/scripts/daily_bard.ts
+  124:10  warning  'root' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  124:16  warning  'type' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  124:22  warning  'leaf' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  152:21  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  187:19  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  209:17  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  241:22  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  241:61  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  246:20  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  246:61  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  265:33  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  267:23  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/scripts/daily_oracle.ts
+  10:11  warning  'MetricStats' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/scripts/simulation-harness.ts
+  3:10  warning  'processWeekBouts' is defined but never used  @typescript-eslint/no-unused-vars
+  7:10  warning  'resolveImpacts' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/scripts/simulation.test.ts
+   1:26  warning  'expect' is defined but never used            @typescript-eslint/no-unused-vars
+   3:10  warning  'formatPulseTable' is defined but never used  @typescript-eslint/no-unused-vars
+  42:11  warning  'result' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/scripts/verify-economy.ts
+   3:10  warning  'WARRIOR_UPKEEP_BASE' is defined but never used  @typescript-eslint/no-unused-vars
+  16:8   warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/services/stableIntegrationService.ts
+   71:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  167:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  178:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  319:88  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  366:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/state/mutations/contractMutations.ts
+  1:21  warning  'BoutOffer' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/state/saveSlots.ts
+  136:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/state/slices/rosterSlice.ts
+   3:3   warning  'GameState' is defined but never used                                  @typescript-eslint/no-unused-vars
+  16:8   warning  'StableId' is defined but never used                                   @typescript-eslint/no-unused-vars
+  52:86  warning  'get' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/state/slices/worldSlice.ts
+   30:8   warning  'TournamentId' is defined but never used                               @typescript-eslint/no-unused-vars
+   95:84  warning  'get' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  162:21  warning  'transcript' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  214:24  warning  'removed' is assigned a value but never used                           @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/state/useGameStore.ts
+  15:11  warning  'warriorMap' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  15:23  warning  'cachedMetaDrift' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/advanceWeek.test.ts
+  78:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/combat.test.ts
+  414:62  warning  'killsArmored' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  446:54  warning  'killsLeg' is assigned a value but never used      @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/components/PlanBuilder.test.tsx
+   9:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/data/tagDescriptions.test.ts
+  25:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/agentArchitecture.test.ts
+  51:29  warning  'WeatherType' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ai/bankruptcyService.test.ts
+  53:15  warning  'updatedState' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  63:15  warning  'updatedState' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ai/expansionService.test.ts
+  64:15  warning  'updatedState' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ai/workers/competitionWorker.test.ts
+    4:10  warning  'runPromoterPass' is defined but never used  @typescript-eslint/no-unused-vars
+  499:31  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  514:32  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/bardEngine.test.ts
+  61:18  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  63:25  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  99:13  warning  'output2' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/bout/mutations/contractMutations.test.ts
+  3:21  warning  'BoutOffer' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/boutProcessor.test.ts
+    2:32  warning  'vi' is defined but never used            @typescript-eslint/no-unused-vars
+    8:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   74:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/combat/distanceResolution.test.ts
+   59:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   65:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/combat/exchangeSubPhases.test.ts
+   13:33  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   17:41  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   18:47  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   57:72  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   67:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   80:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   90:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   98:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  113:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  125:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  136:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  149:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  153:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  165:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  169:49  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  220:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  221:19  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  225:28  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  231:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  232:19  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  240:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  241:19  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  242:11  warning  'initialEventCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  246:30  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  252:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  260:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/combat/traitBalance.test.ts
+  137:26  warning  'baseline' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  154:26  warning  'baseline' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  200:26  warning  'baseline' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/contractCycle.test.ts
+  47:11  warning  'playerWarriorId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  70:11  warning  'playerWarriorId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/crowdMood.test.ts
+  17:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/determinism.test.ts
+  38:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/factories/combatFactory.test.ts
+  34:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/gazetteDetections.test.ts
+  247:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/health.test.ts
+  1:32  warning  'vi' is defined but never used       @typescript-eslint/no-unused-vars
+  3:31  warning  'Warrior' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/matchmaking/tournament/tournamentResolver.test.ts
+   15:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   56:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  189:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  228:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  271:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  284:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  323:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  386:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  444:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  511:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  555:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  564:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  612:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  624:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/newsletter/feed.test.ts
+   40:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   41:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   49:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   50:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ownerAI.test.ts
+  7:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ownerGrudges.test.ts
+   4:10  warning  'FightingStyle' is defined but never used  @typescript-eslint/no-unused-vars
+   7:20  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  55:89  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ownerPhilosophy.test.ts
+   5:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/ownerRoster.test.ts
+  14:26  warning  'RivalStableData' is defined but never used        @typescript-eslint/no-unused-vars
+  17:20  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  47:28  warning  'gazetteItems' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  57:26  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  90:26  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/pipeline/boutSimulation.test.ts
+  75:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  95:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/pipeline/core/hallOfFame.test.ts
+  29:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  66:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/pipeline/health.test.ts
+  4:31  warning  'Warrior' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/pipeline/passes/EventPass.test.ts
+   30:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/pipeline/passes/PromoterPass.test.ts
+  9:15  warning  'InjuryData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/pipeline/passes/SeasonalPass.test.ts
+   15:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   15:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   22:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   27:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   47:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   47:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   54:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   61:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:95  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/planBias.test.ts
+  5:57  warning  'Bias' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/progression.test.ts
+    1:32  warning  'vi' is defined but never used                                         @typescript-eslint/no-unused-vars
+   65:29  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+   83:21  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+   84:12  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  101:56  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  105:21  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  106:12  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  127:21  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  128:12  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  145:16  warning  'arr' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  145:21  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  146:12  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  158:16  warning  'arr' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  158:21  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  159:12  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/recruitment.test.ts
+   6:3   warning  'PoolWarrior' is defined but never used           @typescript-eslint/no-unused-vars
+  35:11  warning  'initialSize' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/rivals/rivalUtils.test.ts
+  77:13  warning  'run3' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/scouting.test.ts
+  8:8  warning  'ScoutQuality' is defined but never used             @typescript-eslint/no-unused-vars
+  9:3  warning  'getAttributeDescription' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/stats/styleRollups.test.ts
+   25:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  161:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/storage/opfsArchive.test.ts
+  13:17  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  17:11  warning  'MockDirectoryHandle' is defined but never used  @typescript-eslint/no-unused-vars
+  29:19  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/stylePassives.test.ts
+  12:8  warning  'MasteryTier' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/tacticSuitability.test.ts
+  9:8  warning  'SuitabilityRating' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/trainerSpecialties.test.ts
+  394:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/trainers.test.ts
+  10:8  warning  'TrainerFocus' is defined but never used  @typescript-eslint/no-unused-vars
+  11:8  warning  'TrainerTier' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/training.test.ts
+   10:60  warning  'TrainingAssignment' is defined but never used  @typescript-eslint/no-unused-vars
+   19:29  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  216:94  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  221:76  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  233:14  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  234:73  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  238:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  256:94  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  261:76  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  268:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  281:91  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  284:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  284:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  290:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  290:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  296:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  296:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  302:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  302:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  308:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  308:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  315:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  317:71  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  325:74  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  327:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  327:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  336:73  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  338:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  338:78  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  346:91  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  357:14  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  358:30  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  362:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  362:65  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  373:91  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  378:93  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  379:79  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  384:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  384:65  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  395:91  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  401:72  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  413:14  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  414:76  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  418:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  418:65  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  429:91  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  439:12  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  440:87  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  445:79  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  455:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  455:65  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  468:91  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  472:53  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  472:65  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  487:12  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  488:84  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  498:12  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  499:41  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  521:12  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  523:41  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/training/coachLogic.test.ts
+  31:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/training/trainingGains.test.ts
+    4:3   warning  'computeGainChance' is defined but never used  @typescript-eslint/no-unused-vars
+    8:3   warning  'TOTAL_CAP' is defined but never used          @typescript-eslint/no-unused-vars
+   16:10  warning  'SeededRNG' is defined but never used          @typescript-eslint/no-unused-vars
+   18:29  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   62:95  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   75:59  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   82:12  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  175:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  193:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  195:41  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  210:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  212:40  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  227:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  229:41  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  243:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  252:10  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  266:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  267:41  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  282:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  320:74  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  358:15  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  371:43  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  372:72  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  384:43  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  385:72  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/engine/weekPipeline.test.ts
+  3:21  warning  'RivalStableData' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/integration/autosim.test.ts
+  38:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  66:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/lore/HallOfFights.test.tsx
+  12:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:10  warning  'render' is defined but never used        @typescript-eslint/no-unused-vars
+  22:34  warning  'fireEvent' is defined but never used     @typescript-eslint/no-unused-vars
+  22:45  warning  'waitFor' is defined but never used       @typescript-eslint/no-unused-vars
+  55:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/pages/AdminTools.test.tsx
+   1:48  warning  'Mock' is defined but never used                   @typescript-eslint/no-unused-vars
+   2:10  warning  'render' is defined but never used                 @typescript-eslint/no-unused-vars
+   7:9   warning  'mockSetState' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   8:9   warning  'mockDoReset' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  42:54  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  54:54  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  70:54  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  78:82  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  91:54  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/pages/HallOfFame.test.tsx
+  5:10  warning  'render' is defined but never used  @typescript-eslint/no-unused-vars
+  5:18  warning  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/pages/PhysicalsSimulator.test.tsx
+  2:26  warning  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+  2:37  warning  'within' is defined but never used     @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/pages/Tournaments.test.tsx
+   1:48  warning  'beforeAll' is defined but never used                    @typescript-eslint/no-unused-vars
+   1:59  warning  'Mock' is defined but never used                         @typescript-eslint/no-unused-vars
+   2:10  warning  'render' is defined but never used                       @typescript-eslint/no-unused-vars
+   2:18  warning  'screen' is defined but never used                       @typescript-eslint/no-unused-vars
+   2:26  warning  'fireEvent' is defined but never used                    @typescript-eslint/no-unused-vars
+   4:10  warning  'useGameStore' is defined but never used                 @typescript-eslint/no-unused-vars
+   9:24  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  16:9   warning  'mockSetState' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  27:9   warning  'mockActiveWarrior2' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  56:88  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/pages/Trainers.test.tsx
+   4:10  warning  'render' is defined but never used        @typescript-eslint/no-unused-vars
+  19:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  28:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/pages/WorldOverview.test.tsx
+  12:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:10  warning  'render' is defined but never used        @typescript-eslint/no-unused-vars
+  22:26  warning  'fireEvent' is defined but never used     @typescript-eslint/no-unused-vars
+  22:45  warning  'waitFor' is defined but never used       @typescript-eslint/no-unused-vars
+  40:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/perf/pipeline.perf.test.ts
+  11:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  88:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/setup.ts
+  17:22  warning  '_' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  58:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/state/useGameStore.perf.test.tsx
+  12:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  82:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/testHelpers.ts
+  2:23  warning  'createFreshState' is defined but never used                                             @typescript-eslint/no-unused-vars
+  4:10  warning  'generateId' is defined but never used                                                   @typescript-eslint/no-unused-vars
+  9:53  warning  'warriorCount' is assigned a value but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/testUtils.tsx
+  15:22  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/utils/historyResolver.test.ts
+   3:10  warning  'GameState' is defined but never used     @typescript-eslint/no-unused-vars
+   6:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/test/utils/roster.test.ts
+  28:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  88:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/src/utils/historyResolver.ts
+  102:10  warning  'getCache' is defined but never used      @typescript-eslint/no-unused-vars
+  110:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  131:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/stress_test.ts
+    3:15  warning  'GameState' is defined but never used     @typescript-eslint/no-unused-vars
+   34:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   35:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   50:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/amauricia/Documents/GitHub/stable-lords/vite.config.ts
+  28:32  warning  'mode' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+✖ 854 problems (0 errors, 854 warnings)
+
