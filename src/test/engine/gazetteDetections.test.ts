@@ -132,9 +132,7 @@ describe('detectDebuts', () => {
   });
 
   it('does not return duplicates if a debuting fighter fights multiple times in a week', () => {
-    const allFights = [
-      createFight({ id: 'f1', a: 'Alice', d: 'Bob' })
-    ];
+    const allFights = [createFight({ id: 'f1', a: 'Alice', d: 'Bob' })];
     const weekFights = [
       createFight({ id: 'f2', a: 'Charlie', d: 'Dave' }),
       createFight({ id: 'f3', a: 'Charlie', d: 'Eve' }),
@@ -144,7 +142,7 @@ describe('detectDebuts', () => {
     expect(debuts).toContain('Charlie');
     expect(debuts).toContain('Dave');
     expect(debuts).toContain('Eve');
-    expect(debuts.filter(d => d === 'Charlie')).toHaveLength(1); // Only 1 Charlie
+    expect(debuts.filter((d) => d === 'Charlie')).toHaveLength(1); // Only 1 Charlie
   });
 
   it('safely handles undefined or null entries in allFights', () => {
@@ -153,9 +151,7 @@ describe('detectDebuts', () => {
       undefined as unknown as FightSummary,
       null as unknown as FightSummary,
     ];
-    const weekFights = [
-      createFight({ id: 'f2', a: 'Alice', d: 'Charlie' }),
-    ];
+    const weekFights = [createFight({ id: 'f2', a: 'Alice', d: 'Charlie' })];
     // Ensure allFights length includes the undefined/nulls to test loop logic properly
     const debuts = detectDebuts(weekFights, [...allFights, ...weekFights]);
     expect(debuts).toHaveLength(1);

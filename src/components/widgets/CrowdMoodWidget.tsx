@@ -50,7 +50,9 @@ export function CrowdMoodWidget() {
           <ImperialRing size="xs" variant="blood">
             <Heart className="h-3.5 w-3.5 text-primary" />
           </ImperialRing>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">Crowd Resonance</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">
+            Crowd Resonance
+          </span>
         </div>
       </div>
 
@@ -100,7 +102,9 @@ export function CrowdMoodWidget() {
 
         <div className="text-center space-y-2">
           <div className="text-2xl animate-pulse">{icon}</div>
-          <div className="text-[12px] font-display font-black uppercase tracking-widest text-foreground">{mood}</div>
+          <div className="text-[12px] font-display font-black uppercase tracking-widest text-foreground">
+            {mood}
+          </div>
           <p className="text-[10px] font-black uppercase tracking-tight text-muted-foreground/40 max-w-[200px] mx-auto leading-relaxed">
             {desc}
           </p>
@@ -109,13 +113,27 @@ export function CrowdMoodWidget() {
         {/* Modifier grid */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'Fame', value: fmtMod(mods.fameMultiplier), color: modColor(mods.fameMultiplier) },
-            { label: 'Pop', value: fmtMod(mods.popMultiplier), color: modColor(mods.popMultiplier) },
-            { label: 'Lethality', value: fmtKill(mods.killChanceBonus), color: killColor(mods.killChanceBonus) },
+            {
+              label: 'Fame',
+              value: fmtMod(mods.fameMultiplier),
+              color: modColor(mods.fameMultiplier),
+            },
+            {
+              label: 'Pop',
+              value: fmtMod(mods.popMultiplier),
+              color: modColor(mods.popMultiplier),
+            },
+            {
+              label: 'Lethality',
+              value: fmtKill(mods.killChanceBonus),
+              color: killColor(mods.killChanceBonus),
+            },
           ].map((m) => (
             <div key={m.label} className="text-center p-3 bg-white/[0.02] border border-white/5">
-              <div className={cn("text-xs font-display font-black mb-1", m.color)}>{m.value}</div>
-              <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">{m.label}</div>
+              <div className={cn('text-xs font-display font-black mb-1', m.color)}>{m.value}</div>
+              <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/30">
+                {m.label}
+              </div>
             </div>
           ))}
         </div>
@@ -124,13 +142,26 @@ export function CrowdMoodWidget() {
         {moodHistory.length >= 2 && (
           <div className="pt-6 border-t border-white/5">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/20">Temporal Shift</span>
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/20">Last 10 Cycles</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/20">
+                Temporal Shift
+              </span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/20">
+                Last 10 Cycles
+              </span>
             </div>
             {(() => {
-              const MOOD_Y: Record<string, number> = { Solemn: 4, Calm: 3, Theatrical: 2, Festive: 1, Bloodthirsty: 0 };
+              const MOOD_Y: Record<string, number> = {
+                Solemn: 4,
+                Calm: 3,
+                Theatrical: 2,
+                Festive: 1,
+                Bloodthirsty: 0,
+              };
               const last10 = moodHistory.slice(-10);
-              const w = 240, h = 32, px = 8, py = 4;
+              const w = 240,
+                h = 32,
+                px = 8,
+                py = 4;
               const stepX = (w - px * 2) / Math.max(last10.length - 1, 1);
               const stepY = (h - py * 2) / 4;
               const pts = last10.map((entry, i) => ({
@@ -155,7 +186,7 @@ export function CrowdMoodWidget() {
                       cx={p.x}
                       cy={p.y}
                       r="1.5"
-                      fill={p.mood === mood ? "hsl(var(--primary))" : "rgba(255,255,255,0.1)"}
+                      fill={p.mood === mood ? 'hsl(var(--primary))' : 'rgba(255,255,255,0.1)'}
                     />
                   ))}
                 </svg>

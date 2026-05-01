@@ -26,14 +26,18 @@ export default function StableHall() {
         actions={
           <div className="flex items-center gap-8">
             <div className="flex flex-col items-end">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-1">Eminent Fame</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-1">
+                Eminent Fame
+              </span>
               <div className="flex items-center gap-2 font-display font-black text-xl text-arena-gold">
                 {fame} <Star className="h-3.5 w-3.5" />
               </div>
             </div>
             <div className="h-8 w-px bg-white/5" />
             <div className="flex flex-col items-end">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-1">Master Titles</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-1">
+                Master Titles
+              </span>
               <div className="flex items-center gap-2 font-display font-black text-xl text-primary">
                 {player.titles || 0} <Crown className="h-3.5 w-3.5" />
               </div>
@@ -61,12 +65,16 @@ export default function StableHall() {
 
           <section>
             <SectionDivider label="Institutional Creed" />
-            <Surface variant="glass" className="mt-8 p-6 border-white/5 bg-white/[0.01] relative overflow-hidden">
+            <Surface
+              variant="glass"
+              className="mt-8 p-6 border-white/5 bg-white/[0.01] relative overflow-hidden"
+            >
               <div className="absolute -right-4 -bottom-4 opacity-[0.03]">
                 <Quote className="h-24 w-24" />
               </div>
               <p className="text-[11px] text-muted-foreground/60 leading-relaxed italic relative z-10">
-                "The sand remembers every drop of blood shed in the name of the {player.stableName.split(' ')[0]} legacy. We do not just fight; we endure."
+                "The sand remembers every drop of blood shed in the name of the{' '}
+                {player.stableName.split(' ')[0]} legacy. We do not just fight; we endure."
               </p>
             </Surface>
           </section>

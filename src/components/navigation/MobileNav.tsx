@@ -261,7 +261,9 @@ export function MobileNav({ className }: MobileNavProps) {
 // ─── Bottom alert strip ─────────────────────────────────────────────────────
 
 function AlertStrip({ alerts }: { alerts: Record<HubId, number> }) {
-  const { isTournamentWeek } = useGameStore(useShallow((s) => ({ isTournamentWeek: s.isTournamentWeek })));
+  const { isTournamentWeek } = useGameStore(
+    useShallow((s) => ({ isTournamentWeek: s.isTournamentWeek }))
+  );
 
   const alertItems: { icon: React.ElementType; label: string; color: string; to: string }[] = [];
 

@@ -205,7 +205,8 @@ export default function Trainers() {
                     Personnel Database Empty
                   </h4>
                   <p className="text-[10px] text-muted-foreground/40 uppercase tracking-[0.2em] italic max-w-sm mx-auto">
-                    Establish your training core by recruiting specialists from the tactical hire registry.
+                    Establish your training core by recruiting specialists from the tactical hire
+                    registry.
                   </p>
                 </div>
               </Surface>
@@ -271,11 +272,17 @@ export default function Trainers() {
                 onClick={() => setConvertDialogOpen(true)}
                 className="w-full h-20 bg-primary/5 border border-primary/20 text-primary hover:bg-primary/10 transition-all rounded-none flex items-center justify-center gap-6 group"
               >
-                <ImperialRing size="md" variant="blood" className="group-hover:scale-110 transition-transform">
+                <ImperialRing
+                  size="md"
+                  variant="blood"
+                  className="group-hover:scale-110 transition-transform"
+                >
                   <Armchair className="h-5 w-5" />
                 </ImperialRing>
                 <div className="text-left">
-                  <span className="text-[12px] font-black uppercase tracking-[0.3em] block mb-1">Veteran Reassignment Protocol</span>
+                  <span className="text-[12px] font-black uppercase tracking-[0.3em] block mb-1">
+                    Veteran Reassignment Protocol
+                  </span>
                   <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest italic">
                     {convertableRetired.length} Retired Assets Ready for Staff Transition
                   </span>
@@ -322,14 +329,18 @@ export default function Trainers() {
                 action={
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end">
-                      <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Acquisition</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                        Acquisition
+                      </span>
                       <span className="font-display font-black text-arena-gold text-lg leading-none">
                         {TIER_COST[t.tier as TrainerTier] ?? 50}G
                       </span>
                     </div>
 
                     <Button
-                      disabled={!canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)}
+                      disabled={
+                        !canHire || !canTransact(treasury, TIER_COST[t.tier as TrainerTier] ?? 50)
+                      }
                       onClick={() => hireTrainer(t)}
                       className="h-12 px-8 bg-primary text-primary-foreground font-black uppercase text-[10px] tracking-[0.2em] rounded-none hover:shadow-[0_0_20px_rgba(135,34,40,0.3)] transition-all"
                     >
@@ -385,7 +396,9 @@ export default function Trainers() {
                         {i + 1}
                       </span>
                       <div className="flex flex-col">
-                        <span className="text-[12px] font-black uppercase tracking-tight text-foreground">{t.name}</span>
+                        <span className="text-[12px] font-black uppercase tracking-tight text-foreground">
+                          {t.name}
+                        </span>
                         <span className="text-[9px] text-muted-foreground/40 uppercase tracking-widest">
                           {t.tier} · {t.focus} SPECIALIST
                         </span>
@@ -460,22 +473,37 @@ export default function Trainers() {
                     className="p-6 border-white/5 flex items-center justify-between group hover:bg-white/[0.03] transition-all"
                   >
                     <div className="flex items-center gap-6">
-                      <div className={cn(
-                        "p-3 border transition-all",
-                        w.kind === 'fallen' ? "bg-destructive/5 border-destructive/20 text-destructive" : "bg-white/5 border-white/10 text-muted-foreground/40"
-                      )}>
-                        {w.kind === 'fallen' ? <Skull className="h-4 w-4" /> : <Armchair className="h-4 w-4" />}
+                      <div
+                        className={cn(
+                          'p-3 border transition-all',
+                          w.kind === 'fallen'
+                            ? 'bg-destructive/5 border-destructive/20 text-destructive'
+                            : 'bg-white/5 border-white/10 text-muted-foreground/40'
+                        )}
+                      >
+                        {w.kind === 'fallen' ? (
+                          <Skull className="h-4 w-4" />
+                        ) : (
+                          <Armchair className="h-4 w-4" />
+                        )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[12px] font-black uppercase tracking-tight text-foreground">{w.name}</span>
+                        <span className="text-[12px] font-black uppercase tracking-tight text-foreground">
+                          {w.name}
+                        </span>
                         <span className="text-[9px] text-muted-foreground/40 uppercase tracking-widest">
-                          {STYLE_DISPLAY_NAMES[w.style as FightingStyle]} · {w.kind === 'fallen' ? 'Fallen' : 'Retired'} · Wk {w.week}
+                          {STYLE_DISPLAY_NAMES[w.style as FightingStyle]} ·{' '}
+                          {w.kind === 'fallen' ? 'Fallen' : 'Retired'} · Wk {w.week}
                         </span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-muted-foreground/30 text-[8px] font-black uppercase tracking-widest block mb-1">Fame</span>
-                      <span className="font-display font-black text-arena-gold text-xl leading-none">{w.fame}</span>
+                      <span className="text-muted-foreground/30 text-[8px] font-black uppercase tracking-widest block mb-1">
+                        Fame
+                      </span>
+                      <span className="font-display font-black text-arena-gold text-xl leading-none">
+                        {w.fame}
+                      </span>
                     </div>
                   </Surface>
                 ))}

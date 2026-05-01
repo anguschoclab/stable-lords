@@ -458,7 +458,7 @@ export default function ArenaHub() {
         <div className="lg:col-span-4 flex flex-col gap-8">
           <SectionDivider label="Atmospheric Conditions" />
           <WeatherWidget />
-          
+
           <SectionDivider label="Style Meta State" />
           <MetaDriftWidget />
 
@@ -545,8 +545,13 @@ export default function ArenaHub() {
                 <Zap className="h-5 w-5 text-primary" />
               </ImperialRing>
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Engage Mode</span>
-                <h3 className="font-display font-black text-xl uppercase tracking-tight text-foreground"> Engagement Console</h3>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+                  Engage Mode
+                </span>
+                <h3 className="font-display font-black text-xl uppercase tracking-tight text-foreground">
+                  {' '}
+                  Engagement Console
+                </h3>
               </div>
             </div>
             {results.length > 0 && (
@@ -569,21 +574,33 @@ export default function ArenaHub() {
             className="flex items-center gap-12 p-8 border-l-4 border-l-primary shadow-xl"
           >
             <div className="flex flex-col gap-1">
-              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/50">Readiness State</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/50">
+                Readiness State
+              </span>
               <div className="flex items-center gap-4">
                 <Activity className="h-5 w-5 text-primary" />
-                <span className="font-display font-black text-xl uppercase tracking-tighter">Operational</span>
+                <span className="font-display font-black text-xl uppercase tracking-tighter">
+                  Operational
+                </span>
               </div>
             </div>
             <div className="h-12 w-px bg-white/5" />
             <div className="flex items-center gap-12">
               <div className="flex flex-col">
-                <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">Mission Ready</span>
-                <span className="font-display font-black text-3xl text-primary leading-none">{fightReady.length}</span>
+                <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">
+                  Mission Ready
+                </span>
+                <span className="font-display font-black text-3xl text-primary leading-none">
+                  {fightReady.length}
+                </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">Combat Pairs</span>
-                <span className="font-display font-black text-3xl text-arena-gold leading-none">{matchCard.length}</span>
+                <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-[0.2em] mb-1">
+                  Combat Pairs
+                </span>
+                <span className="font-display font-black text-3xl text-arena-gold leading-none">
+                  {matchCard.length}
+                </span>
               </div>
             </div>
             {!autosimming && !autosimResult && results.length === 0 && (
@@ -615,9 +632,14 @@ export default function ArenaHub() {
                     <ImperialRing size="sm" variant="gold">
                       <Activity className="h-3.5 w-3.5 text-accent" />
                     </ImperialRing>
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/80">Active Manifest</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/80">
+                      Active Manifest
+                    </span>
                   </div>
-                  <Badge variant="outline" className="text-[9px] font-black uppercase tracking-[0.2em] border-white/10 rounded-none h-8 px-4">
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] font-black uppercase tracking-[0.2em] border-white/10 rounded-none h-8 px-4"
+                  >
                     {matchCard.length} PAIRINGS
                   </Badge>
                 </div>

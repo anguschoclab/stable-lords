@@ -10,14 +10,15 @@ export function useClickSound() {
     audioManager.play('ui_click');
   }, []);
 
-  const withSound = useCallback(<T extends (...args: any[]) => any>(
-    handler?: T
-  ): ((...args: Parameters<T>) => void) => {
-    return (...args: Parameters<T>) => {
-      audioManager.play('ui_click');
-      handler?.(...args);
-    };
-  }, []);
+  const withSound = useCallback(
+    <T extends (...args: any[]) => any>(handler?: T): ((...args: Parameters<T>) => void) => {
+      return (...args: Parameters<T>) => {
+        audioManager.play('ui_click');
+        handler?.(...args);
+      };
+    },
+    []
+  );
 
   return { playClick, withSound };
 }

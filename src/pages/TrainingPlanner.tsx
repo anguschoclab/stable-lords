@@ -13,7 +13,18 @@ import { computeGainChance } from '@/engine/training';
 import { potentialRating, potentialGrade, diminishingReturnsFactor } from '@/engine/potential';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dumbbell, AlertTriangle, Lock, Star, Target, Activity, Shield, Zap, Heart, Info } from 'lucide-react';
+import {
+  Dumbbell,
+  AlertTriangle,
+  Lock,
+  Star,
+  Target,
+  Activity,
+  Shield,
+  Zap,
+  Heart,
+  Info,
+} from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Surface } from '@/components/ui/Surface';
 import { cn } from '@/lib/utils';
@@ -104,22 +115,35 @@ function BurnWarnings({ burns }: { burns: BurnWarning[] }) {
     <div className="mt-8 pt-8 border-t border-white/5 space-y-3">
       <div className="flex items-center gap-3">
         <AlertTriangle className="h-4 w-4 text-primary" />
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Operational Constraints</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+          Operational Constraints
+        </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {visibleBurns.map((b, i) => (
           <div
             key={i}
             className={cn(
-              "p-4 border bg-white/[0.01] flex items-center justify-between",
+              'p-4 border bg-white/[0.01] flex items-center justify-between',
               b.severity === 'high' ? 'border-primary/20' : 'border-white/5'
             )}
           >
             <div className="flex flex-col gap-1">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">{ATTRIBUTE_LABELS[b.attribute]}</span>
-              <span className="text-[10px] text-foreground font-display font-black italic">"{b.reason}"</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                {ATTRIBUTE_LABELS[b.attribute]}
+              </span>
+              <span className="text-[10px] text-foreground font-display font-black italic">
+                "{b.reason}"
+              </span>
             </div>
-            <Badge className={cn("rounded-none text-[8px] font-black uppercase tracking-widest", b.severity === 'high' ? 'bg-primary text-primary-foreground' : 'bg-white/10 text-muted-foreground')}>
+            <Badge
+              className={cn(
+                'rounded-none text-[8px] font-black uppercase tracking-widest',
+                b.severity === 'high'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-white/10 text-muted-foreground'
+              )}
+            >
               {b.severity} Risk
             </Badge>
           </div>
@@ -147,18 +171,30 @@ function AttributeRow({
   const isRecommended = !attr.capped && !attr.seasonCapped && attr.chance >= 0.4;
   const pct = (attr.val / 25) * 100;
   const potPct = attr.pot ? (attr.pot / 25) * 100 : 0;
-  
-  const colorClass = attr.val >= 16 ? "bg-primary" : attr.val >= 12 ? "bg-arena-gold" : "bg-white/20";
+
+  const colorClass =
+    attr.val >= 16 ? 'bg-primary' : attr.val >= 12 ? 'bg-arena-gold' : 'bg-white/20';
 
   return (
-    <div className={cn("p-4 border border-white/5 bg-white/[0.01] transition-all", attr.capped && "opacity-20 grayscale")}>
+    <div
+      className={cn(
+        'p-4 border border-white/5 bg-white/[0.01] transition-all',
+        attr.capped && 'opacity-20 grayscale'
+      )}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 w-16">{ATTRIBUTE_LABELS[attr.key]}</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 w-16">
+            {ATTRIBUTE_LABELS[attr.key]}
+          </span>
           <div className="flex items-center gap-2">
-            <span className="text-xl font-display font-black text-foreground leading-none">{attr.val}</span>
+            <span className="text-xl font-display font-black text-foreground leading-none">
+              {attr.val}
+            </span>
             {attr.pot !== undefined && (
-              <span className="text-[11px] font-display font-black text-arena-gold opacity-40">/ {attr.pot}</span>
+              <span className="text-[11px] font-display font-black text-arena-gold opacity-40">
+                / {attr.pot}
+              </span>
             )}
           </div>
         </div>
@@ -168,28 +204,37 @@ function AttributeRow({
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className={cn(
-                  "w-2 h-2",
-                  i < attr.seasonGain ? "bg-primary" : "bg-white/5"
-                )}
+                className={cn('w-2 h-2', i < attr.seasonGain ? 'bg-primary' : 'bg-white/5')}
               />
             ))}
           </div>
           {/* Chance Badge */}
           {!attr.capped ? (
             <div className="w-16 text-right">
-              <span className={cn(
-                "text-[10px] font-display font-black tracking-widest",
-                chancePct >= 50 ? "text-arena-pop" : chancePct >= 30 ? "text-foreground" : "text-primary"
-              )}>
+              <span
+                className={cn(
+                  'text-[10px] font-display font-black tracking-widest',
+                  chancePct >= 50
+                    ? 'text-arena-pop'
+                    : chancePct >= 30
+                      ? 'text-foreground'
+                      : 'text-primary'
+                )}
+              >
                 {chancePct}%
               </span>
-              <p className="text-[8px] font-black uppercase text-muted-foreground/20 tracking-tighter">SUCCESS</p>
+              <p className="text-[8px] font-black uppercase text-muted-foreground/20 tracking-tighter">
+                SUCCESS
+              </p>
             </div>
           ) : (
             <div className="w-16 text-right">
-              <span className="text-[10px] font-display font-black text-muted-foreground/40 tracking-widest">CEILING</span>
-              <p className="text-[8px] font-black uppercase text-muted-foreground/20 tracking-tighter">REACHED</p>
+              <span className="text-[10px] font-display font-black text-muted-foreground/40 tracking-widest">
+                CEILING
+              </span>
+              <p className="text-[8px] font-black uppercase text-muted-foreground/20 tracking-tighter">
+                REACHED
+              </p>
             </div>
           )}
         </div>
@@ -198,22 +243,24 @@ function AttributeRow({
       <div className="h-1 bg-white/5 relative overflow-hidden">
         {/* Potential Marker */}
         {attr.pot !== undefined && (
-          <div 
+          <div
             className="absolute h-full w-px bg-arena-gold/30 z-10"
             style={{ left: `${potPct}%` }}
           />
         )}
         {/* Progress Bar */}
-        <div 
-          className={cn("h-full transition-all duration-1000", colorClass)}
+        <div
+          className={cn('h-full transition-all duration-1000', colorClass)}
           style={{ width: `${pct}%` }}
         />
       </div>
-      
+
       {isRecommended && (
         <div className="flex items-center gap-2 mt-3">
           <Target className="h-3 w-3 text-arena-pop" />
-          <span className="text-[8px] font-black uppercase tracking-widest text-arena-pop">Optimized Development Path Detected</span>
+          <span className="text-[8px] font-black uppercase tracking-widest text-arena-pop">
+            Optimized Development Path Detected
+          </span>
         </div>
       )}
     </div>
@@ -270,24 +317,32 @@ function WarriorPlannerCard({
               </h2>
               <div className="flex items-center gap-4">
                 <StatBadge styleName={warrior.style as FightingStyle} showFullName />
-                <span className="text-[10px] text-muted-foreground/40 uppercase tracking-widest font-black">Age {warrior.age}</span>
+                <span className="text-[10px] text-muted-foreground/40 uppercase tracking-widest font-black">
+                  Age {warrior.age}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-6">
             <div className="text-right">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Potential Index</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Potential Index
+              </span>
               <div className="flex items-center gap-3">
                 <Star className="h-4 w-4 text-arena-gold" />
                 <span className="text-xl font-display font-black text-arena-gold">{potGrade}</span>
               </div>
             </div>
             <div className="text-right border-l border-white/5 pl-6">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Trainability</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Trainability
+              </span>
               <div className="flex items-center gap-3">
                 <Dumbbell className="h-4 w-4 text-primary" />
-                <span className="text-xl font-display font-black text-foreground">{trainability}%</span>
+                <span className="text-xl font-display font-black text-foreground">
+                  {trainability}%
+                </span>
               </div>
             </div>
           </div>
@@ -340,12 +395,20 @@ export default function TrainingPlanner() {
         actions={
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Stable Trainability</span>
-              <span className="text-sm font-display font-black text-primary">{avgTrainability}% Aggregate</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Stable Trainability
+              </span>
+              <span className="text-sm font-display font-black text-primary">
+                {avgTrainability}% Aggregate
+              </span>
             </div>
             <div className="flex flex-col items-end border-l border-white/5 pl-6">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Active Trainers</span>
-              <span className="text-sm font-display font-black text-foreground">{currentTrainers.filter((t) => t.contractWeeksLeft > 0).length} Personnel</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Active Trainers
+              </span>
+              <span className="text-sm font-display font-black text-foreground">
+                {currentTrainers.filter((t) => t.contractWeeksLeft > 0).length} Personnel
+              </span>
             </div>
           </div>
         }
@@ -378,13 +441,18 @@ export default function TrainingPlanner() {
                   key={warrior.id}
                   onClick={() => setSelectedId(warrior.id)}
                   className={cn(
-                    "flex flex-col gap-1 p-4 border transition-all text-left group",
-                    isSelected 
-                      ? "bg-white/[0.05] border-white/20" 
-                      : "bg-transparent border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
+                    'flex flex-col gap-1 p-4 border transition-all text-left group',
+                    isSelected
+                      ? 'bg-white/[0.05] border-white/20'
+                      : 'bg-transparent border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0'
                   )}
                 >
-                  <span className={cn("text-[10px] font-black uppercase tracking-widest", isSelected ? "text-foreground" : "text-muted-foreground")}>
+                  <span
+                    className={cn(
+                      'text-[10px] font-black uppercase tracking-widest',
+                      isSelected ? 'text-foreground' : 'text-muted-foreground'
+                    )}
+                  >
                     {warrior.name}
                   </span>
                   <span className="text-[9px] font-black text-primary uppercase tracking-tighter">
@@ -406,13 +474,20 @@ export default function TrainingPlanner() {
               seasonalGains={seasonalGainsMap.get(selectedWarrior.id) ?? {}}
             />
           ) : (
-            <Surface variant="glass" className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6">
+            <Surface
+              variant="glass"
+              className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6"
+            >
               <ImperialRing size="lg" variant="bronze" className="opacity-20">
                 <Dumbbell className="h-8 w-8" />
               </ImperialRing>
               <div className="space-y-2">
-                <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">Zero Assets Selected</p>
-                <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">Select a combat asset from the registry to initialize planning.</p>
+                <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">
+                  Zero Assets Selected
+                </p>
+                <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">
+                  Select a combat asset from the registry to initialize planning.
+                </p>
               </div>
             </Surface>
           )}

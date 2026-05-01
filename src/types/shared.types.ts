@@ -60,7 +60,6 @@ export const STYLE_ABBREV: Record<FightingStyle, string> = {
   [FightingStyle.WallOfSteel]: 'WS',
 };
 
-
 // ─── Attributes ─────────────────────────────────────────────────────────────
 
 export interface Attributes {

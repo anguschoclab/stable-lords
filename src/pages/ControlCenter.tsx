@@ -494,7 +494,7 @@ export default function ControlCenter() {
         {/* Left Column: High Density Intel */}
         <div className="lg:col-span-8 flex flex-col gap-10">
           <KpiBar />
-          
+
           <div className="space-y-6">
             <SectionDivider label="Registry Intelligence" variant="gold" />
             <RankingsBar />

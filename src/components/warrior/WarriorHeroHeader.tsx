@@ -46,15 +46,15 @@ export function WarriorHeroHeader({
   return (
     <Surface variant="glass" className="relative p-8 border-white/5 overflow-hidden">
       <div className="absolute top-0 left-0 w-1 h-full bg-primary/40" />
-      
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
         <div className="space-y-4">
           <div className="space-y-1">
             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">
-              {isPlayerOwned ? "Registry Asset // Internal" : "External Dossier // Intelligence"}
+              {isPlayerOwned ? 'Registry Asset // Internal' : 'External Dossier // Intelligence'}
             </span>
             <div className="flex items-center gap-4">
-               {isPlayerOwned && id ? (
+              {isPlayerOwned && id ? (
                 <EditableText
                   value={warrior.name}
                   onSave={(newName) => store.renameWarrior(id, newName)}
@@ -113,17 +113,21 @@ export function WarriorHeroHeader({
         </div>
 
         <div className="flex items-center gap-8">
-           <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2">
             <ImperialRing size="md" variant="blood">
-               <Zap className="h-5 w-5 text-primary" />
+              <Zap className="h-5 w-5 text-primary" />
             </ImperialRing>
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Status</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+              Status
+            </span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <ImperialRing size="md" variant="bronze">
-               <Heart className="h-5 w-5 text-muted-foreground/60" />
+              <Heart className="h-5 w-5 text-muted-foreground/60" />
             </ImperialRing>
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Vitals</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+              Vitals
+            </span>
           </div>
         </div>
       </div>

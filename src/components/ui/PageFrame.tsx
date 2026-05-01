@@ -6,11 +6,7 @@ interface PageFrameProps {
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-export function PageFrame({
-  children,
-  className,
-  maxWidth = 'xl',
-}: PageFrameProps) {
+export function PageFrame({ children, className, maxWidth = 'xl' }: PageFrameProps) {
   const widthClasses = {
     sm: 'max-w-3xl',
     md: 'max-w-5xl',

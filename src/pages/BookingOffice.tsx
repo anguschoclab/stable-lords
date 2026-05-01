@@ -24,7 +24,7 @@ import {
   Target,
   Users,
   Activity,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 import { FightingStyle, STYLE_DISPLAY_NAMES } from '@/types/shared.types';
 import type { Warrior, PromoterPersonality, BoutOffer } from '@/types/state.types';
@@ -134,8 +134,8 @@ function OfferCard({
     <Surface
       variant="glass"
       className={cn(
-        "border-white/5 overflow-hidden group hover:border-primary/20 transition-all duration-500",
-        isSigned && "opacity-60 grayscale-[0.5]"
+        'border-white/5 overflow-hidden group hover:border-primary/20 transition-all duration-500',
+        isSigned && 'opacity-60 grayscale-[0.5]'
       )}
     >
       <div className="p-6 border-b border-white/5 flex items-start justify-between bg-white/[0.01]">
@@ -152,30 +152,53 @@ function OfferCard({
                 {promoter?.tier} PROMOTER
               </span>
               {personalityConfig && (
-                <span className={cn("text-[8px] font-black uppercase tracking-widest", personalityConfig.color)}>
-                   {personality}
+                <span
+                  className={cn(
+                    'text-[8px] font-black uppercase tracking-widest',
+                    personalityConfig.color
+                  )}
+                >
+                  {personality}
                 </span>
               )}
             </div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xl font-display font-black text-arena-gold leading-none">{offer.purse}G</div>
-          <p className="text-[8px] font-black uppercase text-muted-foreground/20 tracking-tighter mt-1">ALLOCATED PURSE</p>
+          <div className="text-xl font-display font-black text-arena-gold leading-none">
+            {offer.purse}G
+          </div>
+          <p className="text-[8px] font-black uppercase text-muted-foreground/20 tracking-tighter mt-1">
+            ALLOCATED PURSE
+          </p>
         </div>
       </div>
 
       <div className="p-8 space-y-8">
         <div className="flex items-center justify-between gap-6">
           <div className="flex-1 text-center space-y-2">
-            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/40">DEPLOYMENT</span>
-            <div className="text-xs font-display font-black uppercase text-foreground">{playerWarrior?.name}</div>
+            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/40">
+              DEPLOYMENT
+            </span>
+            <div className="text-xs font-display font-black uppercase text-foreground">
+              {playerWarrior?.name}
+            </div>
             <div className="flex items-center justify-center gap-2">
-              <span className={cn("text-[8px] font-black uppercase tracking-widest", fatigueStatus.color)}>
+              <span
+                className={cn(
+                  'text-[8px] font-black uppercase tracking-widest',
+                  fatigueStatus.color
+                )}
+              >
                 {fatigueStatus.label} [{100 - fatigue}%]
               </span>
               {injuryBadge && (
-                <span className={cn("text-[8px] font-black uppercase tracking-widest", injuryBadge.color)}>
+                <span
+                  className={cn(
+                    'text-[8px] font-black uppercase tracking-widest',
+                    injuryBadge.color
+                  )}
+                >
                   / {injuryBadge.label}
                 </span>
               )}
@@ -188,8 +211,12 @@ function OfferCard({
           </div>
 
           <div className="flex-1 text-center space-y-2">
-            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground/20">TARGET</span>
-            <div className="text-xs font-display font-black uppercase text-muted-foreground/80">{opponent?.name || 'CLASSIFIED'}</div>
+            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground/20">
+              TARGET
+            </span>
+            <div className="text-xs font-display font-black uppercase text-muted-foreground/80">
+              {opponent?.name || 'CLASSIFIED'}
+            </div>
             <div className="text-[8px] font-black uppercase text-muted-foreground/40 tracking-widest">
               {opponent?.stableName || 'UNKNOWN STABLE'}
             </div>
@@ -198,12 +225,20 @@ function OfferCard({
 
         <div className="grid grid-cols-2 gap-8 py-6 border-y border-white/5">
           <div className="space-y-1">
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Temporal Window</span>
-            <div className="text-[11px] font-display font-black uppercase">Operation Week {offer.boutWeek}</div>
+            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+              Temporal Window
+            </span>
+            <div className="text-[11px] font-display font-black uppercase">
+              Operation Week {offer.boutWeek}
+            </div>
           </div>
           <div className="space-y-1 text-right">
-            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Projection Index</span>
-            <div className="text-[11px] font-display font-black uppercase text-arena-gold">{offer.hype}% Expected Hype</div>
+            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+              Projection Index
+            </span>
+            <div className="text-[11px] font-display font-black uppercase text-arena-gold">
+              {offer.hype}% Expected Hype
+            </div>
           </div>
         </div>
       </div>
@@ -340,12 +375,20 @@ export default function BookingOffice() {
         actions={
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Market Saturation</span>
-              <span className="text-sm font-display font-black text-primary">{thisWeekOffers.length + upcomingOffers.length} Live Proposals</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Market Saturation
+              </span>
+              <span className="text-sm font-display font-black text-primary">
+                {thisWeekOffers.length + upcomingOffers.length} Live Proposals
+              </span>
             </div>
             <div className="flex flex-col items-end border-l border-white/5 pl-6">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Peak Valuation</span>
-              <span className="text-sm font-display font-black text-arena-gold">{highestPurse.toLocaleString()}G CAP</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Peak Valuation
+              </span>
+              <span className="text-sm font-display font-black text-arena-gold">
+                {highestPurse.toLocaleString()}G CAP
+              </span>
             </div>
           </div>
         }
@@ -356,19 +399,30 @@ export default function BookingOffice() {
           <ImperialRing size="sm" variant="blood">
             <Target className="h-4 w-4 text-primary" />
           </ImperialRing>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">Operational Overview</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">
+            Operational Overview
+          </span>
         </div>
 
         <div className="flex items-center gap-10">
           <div className="flex flex-col">
-            <span className="text-[8px] font-black uppercase text-muted-foreground/40 tracking-widest mb-1">Idle Assets</span>
-            <span className={cn("font-display font-black text-lg leading-none", idleWarriors.length > 0 ? "text-primary" : "text-muted-foreground/40")}>
+            <span className="text-[8px] font-black uppercase text-muted-foreground/40 tracking-widest mb-1">
+              Idle Assets
+            </span>
+            <span
+              className={cn(
+                'font-display font-black text-lg leading-none',
+                idleWarriors.length > 0 ? 'text-primary' : 'text-muted-foreground/40'
+              )}
+            >
               {idleWarriors.length}
             </span>
           </div>
           <div className="h-8 w-px bg-white/5" />
           <div className="flex flex-col">
-            <span className="text-[8px] font-black uppercase text-muted-foreground/40 tracking-widest mb-1">Personnel Deployed</span>
+            <span className="text-[8px] font-black uppercase text-muted-foreground/40 tracking-widest mb-1">
+              Personnel Deployed
+            </span>
             <span className="font-display font-black text-lg leading-none">
               {roster.length - idleWarriors.length} / {roster.length}
             </span>
@@ -403,20 +457,30 @@ export default function BookingOffice() {
                   key={warrior.id}
                   onClick={() => setSelectedWarriorId(isSelected ? null : warrior.id)}
                   className={cn(
-                    "flex flex-col gap-1 p-4 border transition-all text-left group relative overflow-hidden",
-                    isSelected 
-                      ? "bg-white/[0.05] border-white/20" 
-                      : "bg-transparent border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0",
-                    hasAccepted && "border-l-4 border-l-primary"
+                    'flex flex-col gap-1 p-4 border transition-all text-left group relative overflow-hidden',
+                    isSelected
+                      ? 'bg-white/[0.05] border-white/20'
+                      : 'bg-transparent border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0',
+                    hasAccepted && 'border-l-4 border-l-primary'
                   )}
                 >
                   <div className="flex items-center justify-between">
-                    <span className={cn("text-[10px] font-black uppercase tracking-widest", isSelected ? "text-foreground" : "text-muted-foreground")}>
+                    <span
+                      className={cn(
+                        'text-[10px] font-black uppercase tracking-widest',
+                        isSelected ? 'text-foreground' : 'text-muted-foreground'
+                      )}
+                    >
                       {warrior.name}
                     </span>
                     {hasAccepted && <CheckCircle2 className="h-3 w-3 text-primary" />}
                   </div>
-                  <span className={cn("text-[8px] font-black uppercase tracking-tighter", fatigueConfig.color)}>
+                  <span
+                    className={cn(
+                      'text-[8px] font-black uppercase tracking-tighter',
+                      fatigueConfig.color
+                    )}
+                  >
                     {fatigueConfig.label} Readiness
                   </span>
                 </button>
@@ -447,13 +511,20 @@ export default function BookingOffice() {
 
             <TabsContent value="this-week" className="mt-0 space-y-8">
               {thisWeekOffers.length === 0 ? (
-                <Surface variant="glass" className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6">
+                <Surface
+                  variant="glass"
+                  className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6"
+                >
                   <ImperialRing size="lg" variant="bronze" className="opacity-20">
                     <Briefcase className="h-8 w-8" />
                   </ImperialRing>
                   <div className="space-y-2">
-                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">Zero Proposals Found</p>
-                    <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">No immediate contract offers detected for the current window.</p>
+                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">
+                      Zero Proposals Found
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">
+                      No immediate contract offers detected for the current window.
+                    </p>
                   </div>
                 </Surface>
               ) : (
@@ -475,13 +546,20 @@ export default function BookingOffice() {
 
             <TabsContent value="upcoming" className="mt-0 space-y-8">
               {upcomingOffers.length === 0 ? (
-                <Surface variant="glass" className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6">
+                <Surface
+                  variant="glass"
+                  className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6"
+                >
                   <ImperialRing size="lg" variant="bronze" className="opacity-20">
                     <Briefcase className="h-8 w-8" />
                   </ImperialRing>
                   <div className="space-y-2">
-                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">Upcoming Slates Empty</p>
-                    <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">No future engagement projections currently available.</p>
+                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">
+                      Upcoming Slates Empty
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">
+                      No future engagement projections currently available.
+                    </p>
                   </div>
                 </Surface>
               ) : (

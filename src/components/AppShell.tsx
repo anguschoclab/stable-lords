@@ -190,7 +190,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               to="/"
               className="flex items-center gap-4 group active:scale-95 transition-all duration-300"
             >
-              <ImperialRing size="md" variant="blood" className="group-hover:rotate-[225deg] transition-all duration-700">
+              <ImperialRing
+                size="md"
+                variant="blood"
+                className="group-hover:rotate-[225deg] transition-all duration-700"
+              >
                 <Swords className="w-5 h-5" />
               </ImperialRing>
               <div className="flex flex-col">

@@ -25,17 +25,8 @@ import { computeNextSeason } from '@/engine/pipeline/passes/WorldPass';
 import type { GameState, RivalStableData } from '@/types/state.types';
 
 export default function AdminTools() {
-  const {
-    setState,
-    doReset,
-    treasury,
-    fame,
-    week,
-    season,
-    roster,
-    player,
-    ftueComplete,
-  } = useGameStore();
+  const { setState, doReset, treasury, fame, week, season, roster, player, ftueComplete } =
+    useGameStore();
 
   const [activeCategory, setActiveCategory] = React.useState<
     'SYSTEM' | 'ECONOMY' | 'WORLD' | 'TELEMETRY' | 'PREFERENCES'
@@ -138,10 +129,12 @@ export default function AdminTools() {
               <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1">
                 Authorization
               </span>
-              <span className={cn(
-                "text-[10px] font-black uppercase tracking-widest",
-                ftueComplete ? "text-primary" : "text-destructive"
-              )}>
+              <span
+                className={cn(
+                  'text-[10px] font-black uppercase tracking-widest',
+                  ftueComplete ? 'text-primary' : 'text-destructive'
+                )}
+              >
                 SYSTEM_{ftueComplete ? 'UNLOCKED' : 'LOCKED'}
               </span>
             </div>
@@ -170,10 +163,14 @@ export default function AdminTools() {
                     : 'text-muted-foreground/60 hover:bg-white/5 hover:text-foreground'
                 )}
               >
-                <cat.icon className={cn(
-                  "h-4 w-4 transition-colors",
-                  activeCategory === cat.id ? "text-black" : "text-muted-foreground/40 group-hover:text-primary"
-                )} />
+                <cat.icon
+                  className={cn(
+                    'h-4 w-4 transition-colors',
+                    activeCategory === cat.id
+                      ? 'text-black'
+                      : 'text-muted-foreground/40 group-hover:text-primary'
+                  )}
+                />
                 {cat.label}
               </button>
             ))}
@@ -230,7 +227,8 @@ export default function AdminTools() {
                   </div>
                   <div className="p-8 space-y-6">
                     <p className="text-[10px] text-primary/60 font-mono leading-relaxed">
-                      WARNING: This bypasses all safety checks and nukes the local IndexedDB pool. All progress will be lost.
+                      WARNING: This bypasses all safety checks and nukes the local IndexedDB pool.
+                      All progress will be lost.
                     </p>
                     <Button
                       onClick={doReset}
@@ -337,7 +335,10 @@ export default function AdminTools() {
           {activeCategory === 'TELEMETRY' && (
             <div className="space-y-12">
               <SectionDivider label="Data Visualization" />
-              <Surface variant="glass" className="border-white/5 overflow-hidden font-mono text-[11px]">
+              <Surface
+                variant="glass"
+                className="border-white/5 overflow-hidden font-mono text-[11px]"
+              >
                 <div className="bg-white/[0.01] px-6 py-4 border-b border-white/5 flex items-center gap-4 text-muted-foreground/40 uppercase font-black tracking-widest">
                   <Activity className="h-4 w-4" /> Protocol Dump // V2.4.0
                 </div>

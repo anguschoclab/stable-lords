@@ -40,7 +40,7 @@ export function BiometricsTab({ warrior, displayWarrior }: BiometricsTabProps) {
             </div>
           </div>
         </Surface>
-        
+
         <SectionDivider label="Cognitive Imprint" />
         <FavoritesCard warrior={warrior} onUpdate={() => {}} />
       </div>

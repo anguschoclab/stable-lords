@@ -70,10 +70,14 @@ export function WarriorFightHistory({
           const record = h2h.get(opponent);
 
           return (
-            <Surface key={f.id} variant="glass" className="p-0 border-white/5 rounded-none overflow-hidden">
+            <Surface
+              key={f.id}
+              variant="glass"
+              className="p-0 border-white/5 rounded-none overflow-hidden"
+            >
               <button
                 className={cn(
-                  "w-full flex items-center justify-between py-2.5 px-3 transition-colors text-left",
+                  'w-full flex items-center justify-between py-2.5 px-3 transition-colors text-left',
                   isExpanded ? 'bg-primary/5' : 'hover:bg-white/[0.02]'
                 )}
                 onClick={() => setExpandedId(isExpanded ? null : f.id)}
@@ -95,9 +99,7 @@ export function WarriorFightHistory({
                       H2H: {record.wins}-{record.losses}
                       {record.draws > 0 ? `-${record.draws}` : ''}
                       {record.kills > 0 && (
-                        <span className="text-destructive ml-1">
-                          ☠{record.kills}
-                        </span>
+                        <span className="text-destructive ml-1">☠{record.kills}</span>
                       )}
                     </span>
                   )}

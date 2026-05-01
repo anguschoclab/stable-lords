@@ -122,7 +122,9 @@ export default function Training() {
             <div className="hidden sm:flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
               <div className="flex items-center gap-1.5">
                 <Activity className="h-3 w-3 text-primary" />
-                <span>SYNC_LOAD: {Math.round((trainingCount / (state.roster.length || 1)) * 100)}%</span>
+                <span>
+                  SYNC_LOAD: {Math.round((trainingCount / (state.roster.length || 1)) * 100)}%
+                </span>
               </div>
               <div className="h-3 w-px bg-border/40" />
               <div className="flex items-center gap-1.5">
@@ -169,7 +171,8 @@ export default function Training() {
                   className={cn(
                     'flex items-start gap-2 px-3 py-2 text-[10px] uppercase font-black tracking-tight',
                     kind === 'gain' && 'bg-primary/5 text-primary border border-primary/10',
-                    kind === 'injury' && 'bg-arena-gold/5 text-arena-gold border border-arena-gold/10',
+                    kind === 'injury' &&
+                      'bg-arena-gold/5 text-arena-gold border border-arena-gold/10',
                     kind === 'recovery' && 'bg-sky-500/5 text-sky-400 border border-sky-500/10'
                   )}
                 >
@@ -205,12 +208,15 @@ export default function Training() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2 text-primary">
                     <Zap className="h-4 w-4" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Active Drills</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">
+                      Active Drills
+                    </span>
                   </div>
                   <span className="text-2xl font-display font-black">{trainingCount}</span>
                 </div>
                 <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
-                  Attribute synchronization in progress. Higher Intelligence (WT) increases gain probability.
+                  Attribute synchronization in progress. Higher Intelligence (WT) increases gain
+                  probability.
                 </p>
               </Surface>
 
@@ -233,7 +239,7 @@ export default function Training() {
         {/* Main: Personnel Registry */}
         <div className="lg:col-span-8 space-y-8">
           <SectionDivider label={`Personnel Registry [${state.roster.length}]`} variant="primary" />
-          
+
           {state.roster.length === 0 ? (
             <Surface variant="glass" className="py-24 text-center border-dashed border-white/5">
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">

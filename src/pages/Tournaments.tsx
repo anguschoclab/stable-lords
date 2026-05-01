@@ -233,7 +233,9 @@ export default function Tournaments() {
                         <div className="flex items-center gap-1.5 text-destructive animate-pulse">
                           <AlertTriangle className="h-2.5 w-2.5" />
                           <span className="text-[8px] font-black uppercase tracking-widest">
-                            {w.injuries.length === 1 ? w.injuries[0].severity : `${w.injuries.length} INJURIES`}
+                            {w.injuries.length === 1
+                              ? w.injuries[0].severity
+                              : `${w.injuries.length} INJURIES`}
                           </span>
                         </div>
                       ) : (
@@ -243,15 +245,25 @@ export default function Tournaments() {
                       )}
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className={cn("text-[9px] font-black uppercase tracking-widest", fatigueColor)}>
+                      <span
+                        className={cn(
+                          'text-[9px] font-black uppercase tracking-widest',
+                          fatigueColor
+                        )}
+                      >
                         {fatigueLabel}
                       </span>
                       <div className="h-1 w-12 bg-white/5 mt-1">
-                        <div 
-                          className={cn("h-full transition-all", 
-                            (w.fatigue ?? 0) < 30 ? "bg-primary" : (w.fatigue ?? 0) < 60 ? "bg-arena-gold" : "bg-destructive"
-                          )} 
-                          style={{ width: `${Math.min(100, w.fatigue ?? 0)}%` }} 
+                        <div
+                          className={cn(
+                            'h-full transition-all',
+                            (w.fatigue ?? 0) < 30
+                              ? 'bg-primary'
+                              : (w.fatigue ?? 0) < 60
+                                ? 'bg-arena-gold'
+                                : 'bg-destructive'
+                          )}
+                          style={{ width: `${Math.min(100, w.fatigue ?? 0)}%` }}
                         />
                       </div>
                     </div>
@@ -277,7 +289,9 @@ export default function Tournaments() {
                   <span className="text-xl">{SEASON_ICONS[season]}</span>
                 </ImperialRing>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Tournament Active</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+                    Tournament Active
+                  </span>
                   <h3 className="font-display text-2xl font-black uppercase tracking-tight text-foreground">
                     {currentTournament.name}
                   </h3>
@@ -287,7 +301,7 @@ export default function Tournaments() {
                 LIVE PHASE
               </Badge>
             </div>
-            
+
             <div className="p-0">
               <div className="p-8 border-b border-white/5 bg-white/[0.01]">
                 <TournamentSchedule tournament={currentTournament} currentWeek={week} />

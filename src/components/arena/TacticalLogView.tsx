@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { MinuteEvent } from '@/types/combat.types';
@@ -65,6 +65,54 @@ function getEventColor(type: ReturnType<typeof classifyEvent>) {
   }
 }
 
+// Optimization: Extracts the individual log entry into a React.memo component.
+// Because the log frequently appends new events (changing visibleCount), memoization
+// ensures that previously rendered log events do not re-render unnecessarily.
+// This changes rendering per tick from O(N) to O(1) during long simulated battles.
+const TacticalLogEntry = React.memo(
+  ({
+    event,
+    index,
+    isLatest,
+    type,
+  }: {
+    event: MinuteEvent;
+    index: number;
+    isLatest: boolean;
+    type: ReturnType<typeof classifyEvent>;
+  }) => {
+    return (
+      <div
+        key={index}
+        className={cn(
+          'flex items-start gap-2 py-1.5 px-2 border-l-2 text-xs transition-all duration-300',
+          getEventColor(type),
+          isLatest && 'animate-in slide-in-from-left-2 duration-300',
+          isLatest && type === 'crit' && 'animate-pulse'
+        )}
+      >
+        <div className="mt-0.5 shrink-0">{getEventIcon(type)}</div>
+        <div className="flex-1 leading-relaxed">
+          <span
+            className={cn(
+              'font-serif',
+              type === 'crit' && 'font-bold text-destructive',
+              type === 'death' && 'font-bold text-arena-blood'
+            )}
+          >
+            {event.text}
+          </span>
+          {event.phase && (
+            <span className="ml-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+              — {event.phase} Phase
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
+);
+
 export default function TacticalLogView({ log, visibleCount, className }: TacticalLogViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -89,33 +137,13 @@ export default function TacticalLogView({ log, visibleCount, className }: Tactic
             const isLatest = index === visibleEvents.length - 1;
 
             return (
-              <div
+              <TacticalLogEntry
                 key={index}
-                className={cn(
-                  'flex items-start gap-2 py-1.5 px-2 border-l-2 text-xs transition-all duration-300',
-                  getEventColor(type),
-                  isLatest && 'animate-in slide-in-from-left-2 duration-300',
-                  isLatest && type === 'crit' && 'animate-pulse'
-                )}
-              >
-                <div className="mt-0.5 shrink-0">{getEventIcon(type)}</div>
-                <div className="flex-1 leading-relaxed">
-                  <span
-                    className={cn(
-                      'font-serif',
-                      type === 'crit' && 'font-bold text-destructive',
-                      type === 'death' && 'font-bold text-arena-blood'
-                    )}
-                  >
-                    {event.text}
-                  </span>
-                  {event.phase && (
-                    <span className="ml-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                      — {event.phase} Phase
-                    </span>
-                  )}
-                </div>
-              </div>
+                event={event}
+                index={index}
+                isLatest={isLatest}
+                type={type}
+              />
             );
           })
         )}

@@ -88,7 +88,7 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
           Synaptic Mapping
         </span>
       </div>
-      
+
       <div className="p-8 space-y-10">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -106,7 +106,9 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
             <div className="flex-1">
               {isWeaponDiscovered ? (
                 <div className="space-y-1">
-                  <div className="text-sm font-display font-black uppercase">{favDisplay.weapon}</div>
+                  <div className="text-sm font-display font-black uppercase">
+                    {favDisplay.weapon}
+                  </div>
                   <div className="text-[9px] font-black text-arena-gold uppercase tracking-widest">
                     Operational Bonus: +2 ACC / +1 DMG
                   </div>
@@ -144,7 +146,9 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
             <div
               className={cn(
                 'h-full transition-all duration-1000',
-                isWeaponDiscovered ? 'bg-arena-gold shadow-[0_0_8px_rgba(255,184,0,0.4)]' : 'bg-white/10'
+                isWeaponDiscovered
+                  ? 'bg-arena-gold shadow-[0_0_8px_rgba(255,184,0,0.4)]'
+                  : 'bg-white/10'
               )}
               style={{ width: `${weaponProgress}%` }}
             />
@@ -167,7 +171,9 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
             <div className="flex-1">
               {isRhythmDiscovered ? (
                 <div className="space-y-1">
-                  <div className="text-sm font-display font-black uppercase">{favDisplay.rhythm}</div>
+                  <div className="text-sm font-display font-black uppercase">
+                    {favDisplay.rhythm}
+                  </div>
                   <div className="text-[9px] font-black text-arena-gold uppercase tracking-widest">
                     Tactical Bonus: +2 INI / +2 DEF
                   </div>
@@ -217,7 +223,9 @@ export function FavoritesCard({ warrior, onUpdate }: { warrior: Warrior; onUpdat
             <div
               className={cn(
                 'h-full transition-all duration-1000',
-                isRhythmDiscovered ? 'bg-arena-gold shadow-[0_0_8px_rgba(255,184,0,0.4)]' : 'bg-white/10'
+                isRhythmDiscovered
+                  ? 'bg-arena-gold shadow-[0_0_8px_rgba(255,184,0,0.4)]'
+                  : 'bg-white/10'
               )}
               style={{ width: `${rhythmProgress}%` }}
             />

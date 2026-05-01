@@ -149,7 +149,7 @@ export default function WarriorDetail() {
     <PageFrame maxWidth="lg" className="pb-32">
       <PageHeader
         icon={User}
-        eyebrow={isPlayerOwned ? "Registry Asset" : "External Dossier"}
+        eyebrow={isPlayerOwned ? 'Registry Asset' : 'External Dossier'}
         title={displayWarrior.name}
         subtitle={`${STYLE_DISPLAY_NAMES[warrior.style as FightingStyle] || 'Unknown Style'} · ${warrior.status}`}
         actions={
@@ -158,9 +158,7 @@ export default function WarriorDetail() {
               <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1">
                 Career Record
               </span>
-              <span className="font-mono font-black text-foreground text-sm">
-                {record}
-              </span>
+              <span className="font-mono font-black text-foreground text-sm">{record}</span>
             </div>
             {isPlayerOwned && warrior.status === 'Active' && (
               <Button
@@ -222,7 +220,9 @@ export default function WarriorDetail() {
               />
             )}
 
-            {activeTab === 'chronicle' && <ChronicleTab warrior={warrior} arenaHistory={arenaHistory} />}
+            {activeTab === 'chronicle' && (
+              <ChronicleTab warrior={warrior} arenaHistory={arenaHistory} />
+            )}
           </div>
         </div>
 
@@ -231,49 +231,69 @@ export default function WarriorDetail() {
           <Surface variant="glass" className="p-8 space-y-8 border-white/5">
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-1">
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Fame Quotient</span>
-                <span className="font-display font-black text-3xl text-arena-fame leading-none">{displayWarrior.fame}</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+                  Fame Quotient
+                </span>
+                <span className="font-display font-black text-3xl text-arena-fame leading-none">
+                  {displayWarrior.fame}
+                </span>
               </div>
               <ImperialRing size="md" variant="gold">
                 <Trophy className="h-5 w-5 text-arena-fame" />
               </ImperialRing>
             </div>
-            
+
             <Separator className="bg-white/5" />
-            
+
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-1">
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Public Resonance</span>
-                <span className="font-display font-black text-3xl text-arena-pop leading-none">{displayWarrior.popularity}</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+                  Public Resonance
+                </span>
+                <span className="font-display font-black text-3xl text-arena-pop leading-none">
+                  {displayWarrior.popularity}
+                </span>
               </div>
               <ImperialRing size="md" variant="silver">
                 <Users className="h-5 w-5 text-arena-pop" />
               </ImperialRing>
             </div>
           </Surface>
-          
+
           <SectionDivider label="Service History" />
           <Surface variant="glass" className="p-8 space-y-6 border-white/5">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-1">
-                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Engagements</span>
-                <p className="text-sm font-display font-black">{displayWarrior.career.wins + displayWarrior.career.losses}</p>
+                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                  Engagements
+                </span>
+                <p className="text-sm font-display font-black">
+                  {displayWarrior.career.wins + displayWarrior.career.losses}
+                </p>
               </div>
               <div className="space-y-1 text-right">
-                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Fatalities</span>
-                <p className="text-sm font-display font-black text-primary">{displayWarrior.career.kills}</p>
+                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                  Fatalities
+                </span>
+                <p className="text-sm font-display font-black text-primary">
+                  {displayWarrior.career.kills}
+                </p>
               </div>
             </div>
-            
+
             {streakLabel && (
-              <div className={cn(
-                "p-3 text-center border font-black uppercase text-[10px] tracking-[0.2em]",
-                streakVal > 0 ? "border-primary/20 bg-primary/5 text-primary" : "border-destructive/20 bg-destructive/5 text-destructive"
-              )}>
+              <div
+                className={cn(
+                  'p-3 text-center border font-black uppercase text-[10px] tracking-[0.2em]',
+                  streakVal > 0
+                    ? 'border-primary/20 bg-primary/5 text-primary'
+                    : 'border-destructive/20 bg-destructive/5 text-destructive'
+                )}
+              >
                 {streakLabel}
               </div>
             )}
-            
+
             {warrior.champion && (
               <div className="p-3 text-center border border-arena-gold/20 bg-arena-gold/10 text-arena-gold font-black uppercase text-[10px] tracking-[0.2em]">
                 Standard Bearer / Champion

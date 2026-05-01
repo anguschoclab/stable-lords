@@ -16,7 +16,7 @@ export interface SoundButtonProps extends ButtonProps {
 
 /**
  * SoundButton — Button with automatic click sound feedback
- * 
+ *
  * Usage:
  * ```tsx
  * <SoundButton onClick={handleAction}>Click Me</SoundButton>

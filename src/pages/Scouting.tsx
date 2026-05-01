@@ -85,14 +85,20 @@ export default function Scouting() {
         actions={
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Active Protocols</span>
-              <span className="text-sm font-display font-black text-foreground">{scoutReports?.length || 0} Synchronized</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Active Protocols
+              </span>
+              <span className="text-sm font-display font-black text-foreground">
+                {scoutReports?.length || 0} Synchronized
+              </span>
             </div>
             <div className="flex items-center gap-4 border-l border-white/5 pl-6">
               <ImperialRing size="xs" variant="blood" className="animate-pulse">
                 <Radio className="h-3 w-3 text-primary" />
               </ImperialRing>
-              <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">Scanning Data Packets...</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">
+                Scanning Data Packets...
+              </span>
             </div>
           </div>
         }
@@ -100,20 +106,20 @@ export default function Scouting() {
 
       <Tabs defaultValue="scout" className="w-full space-y-12">
         <TabsList className="w-full h-16 bg-white/[0.02] border border-white/5 p-1 rounded-none">
-          <TabsTrigger 
-            value="scout" 
+          <TabsTrigger
+            value="scout"
             className="flex-1 h-full font-black uppercase text-[10px] tracking-[0.3em] rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             Scout Intel
           </TabsTrigger>
-          <TabsTrigger 
-            value="compare" 
+          <TabsTrigger
+            value="compare"
             className="flex-1 h-full font-black uppercase text-[10px] tracking-[0.3em] rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             Stable Dynamics
           </TabsTrigger>
-          <TabsTrigger 
-            value="warriors" 
+          <TabsTrigger
+            value="warriors"
             className="flex-1 h-full font-black uppercase text-[10px] tracking-[0.3em] rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             Warrior Face-Off

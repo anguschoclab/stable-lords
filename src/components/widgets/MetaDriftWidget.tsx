@@ -33,7 +33,9 @@ export function MetaDriftWidget() {
           <ImperialRing size="xs" variant="bronze">
             <Activity className="h-3 w-3 text-primary" />
           </ImperialRing>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">Style Meta Drift</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">
+            Style Meta Drift
+          </span>
         </div>
         <TooltipProvider>
           <Tooltip>
@@ -72,7 +74,10 @@ export function MetaDriftWidget() {
                   </div>
                   <Badge
                     variant="outline"
-                    className={cn('text-[8px] font-black uppercase py-0 px-2 h-4 rounded-none border-white/5', isPositive ? 'text-primary' : 'text-muted-foreground/40')}
+                    className={cn(
+                      'text-[8px] font-black uppercase py-0 px-2 h-4 rounded-none border-white/5',
+                      isPositive ? 'text-primary' : 'text-muted-foreground/40'
+                    )}
                   >
                     {item.label}
                   </Badge>
@@ -98,7 +103,8 @@ export function MetaDriftWidget() {
 
         <div className="pt-6 border-t border-white/5">
           <p className="text-[9px] text-muted-foreground/40 leading-relaxed italic uppercase font-black tracking-tight">
-            Institutional meta-cycles occur every 20 engagements. Adaptive stables pivot training to exploit declining tactical archetypes.
+            Institutional meta-cycles occur every 20 engagements. Adaptive stables pivot training to
+            exploit declining tactical archetypes.
           </p>
         </div>
       </div>

@@ -18,11 +18,7 @@ const CROWD_SOUNDS: Record<CrowdState, string | null> = {
   chant: 'crowd-blood-moon',
 };
 
-export default function CrowdAudio({
-  state,
-  volume,
-  enabled,
-}: CrowdAudioProps) {
+export default function CrowdAudio({ state, volume, enabled }: CrowdAudioProps) {
   const lastStateRef = useRef<CrowdState>('idle');
   const [isInitialized, setIsInitialized] = useState(false);
 

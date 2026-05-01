@@ -26,13 +26,13 @@ describe('contractMutations', () => {
         purse: 100,
         hype: 10,
         status: 'Proposed',
-        responses: { w1: 'Pending', w2: 'Pending' }
+        responses: { w1: 'Pending', w2: 'Pending' },
       };
 
       const impact = respondToBoutOffer(state, 'offer1', 'w1', 'Accepted');
       expect(impact.boutOffers?.['offer1'].responses).toEqual({
         w1: 'Accepted',
-        w2: 'Pending'
+        w2: 'Pending',
       });
       expect(impact.boutOffers?.['offer1'].status).toBe('Proposed');
     });
@@ -47,13 +47,13 @@ describe('contractMutations', () => {
         purse: 100,
         hype: 10,
         status: 'Proposed',
-        responses: { w1: 'Accepted', w2: 'Pending' }
+        responses: { w1: 'Accepted', w2: 'Pending' },
       };
 
       const impact = respondToBoutOffer(state, 'offer1', 'w2', 'Accepted');
       expect(impact.boutOffers?.['offer1'].responses).toEqual({
         w1: 'Accepted',
-        w2: 'Accepted'
+        w2: 'Accepted',
       });
       expect(impact.boutOffers?.['offer1'].status).toBe('Signed');
     });
@@ -68,13 +68,13 @@ describe('contractMutations', () => {
         purse: 100,
         hype: 10,
         status: 'Proposed',
-        responses: { w1: 'Accepted', w2: 'Pending' }
+        responses: { w1: 'Accepted', w2: 'Pending' },
       };
 
       const impact = respondToBoutOffer(state, 'offer1', 'w2', 'Declined');
       expect(impact.boutOffers?.['offer1'].responses).toEqual({
         w1: 'Accepted',
-        w2: 'Declined'
+        w2: 'Declined',
       });
       expect(impact.boutOffers?.['offer1'].status).toBe('Rejected');
     });

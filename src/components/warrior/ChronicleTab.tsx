@@ -33,16 +33,28 @@ export function ChronicleTab({ warrior, arenaHistory }: ChronicleTabProps) {
             </div>
             <div className="p-8 space-y-6">
               <div className="flex justify-between items-center">
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Peak Valuation</span>
-                <span className="text-sm font-display font-black text-foreground">{warrior.fame} PT</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+                  Peak Valuation
+                </span>
+                <span className="text-sm font-display font-black text-foreground">
+                  {warrior.fame} PT
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Major Titles</span>
-                <span className="text-sm font-display font-black text-foreground">{warrior.career.wins > 10 ? 1 : 0}</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+                  Major Titles
+                </span>
+                <span className="text-sm font-display font-black text-foreground">
+                  {warrior.career.wins > 10 ? 1 : 0}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">Aggregated Yield</span>
-                <span className="text-sm font-display font-black text-arena-gold">{(warrior.career.wins * 150).toLocaleString()}G</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+                  Aggregated Yield
+                </span>
+                <span className="text-sm font-display font-black text-arena-gold">
+                  {(warrior.career.wins * 150).toLocaleString()}G
+                </span>
               </div>
             </div>
           </Surface>
@@ -57,7 +69,7 @@ export function ChronicleTab({ warrior, arenaHistory }: ChronicleTabProps) {
                   <Star className="h-3 w-3 text-primary" />
                 </ImperialRing>
                 <span className="text-[10px] font-black uppercase tracking-widest text-foreground">
-                   Institutional Honors
+                  Institutional Honors
                 </span>
               </div>
               <div className="p-8 space-y-8">
@@ -89,15 +101,17 @@ export function ChronicleTab({ warrior, arenaHistory }: ChronicleTabProps) {
         <SectionDivider label="Engagement Archive" />
         <Surface variant="glass" className="border-white/5 min-h-[700px] overflow-hidden">
           <div className="bg-white/[0.01] px-10 py-8 border-b border-white/5 flex items-center justify-between">
-             <div className="flex items-center gap-6">
-                <History className="h-6 w-6 text-muted-foreground/20" />
-                <div className="space-y-1">
-                   <h2 className="font-display font-black uppercase text-3xl tracking-tight text-foreground">
-                      Service Record
-                   </h2>
-                   <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">Chronicle // Historical Database Access</p>
-                </div>
-             </div>
+            <div className="flex items-center gap-6">
+              <History className="h-6 w-6 text-muted-foreground/20" />
+              <div className="space-y-1">
+                <h2 className="font-display font-black uppercase text-3xl tracking-tight text-foreground">
+                  Service Record
+                </h2>
+                <p className="text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">
+                  Chronicle // Historical Database Access
+                </p>
+              </div>
+            </div>
           </div>
           <div className="p-4 md:p-8">
             <WarriorFightHistory warriorName={warrior.name} arenaHistory={arenaHistory} />

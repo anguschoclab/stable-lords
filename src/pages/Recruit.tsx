@@ -40,7 +40,7 @@ import {
   Shield,
   Target,
   Sword,
-  Info
+  Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -58,11 +58,34 @@ import { ImperialRing } from '@/components/ui/ImperialRing';
 
 const CUSTOM_COST = 200;
 
-const TIER_CONFIG: Record<RecruitTier, { border: string; text: string; bg: string; ring: "bronze" | "silver" | "gold" | "blood" }> = {
-  Common: { border: 'border-white/10', text: 'text-muted-foreground', bg: 'bg-white/5', ring: 'bronze' },
-  Promising: { border: 'border-white/20', text: 'text-foreground', bg: 'bg-white/10', ring: 'silver' },
-  Exceptional: { border: 'border-primary/30', text: 'text-primary', bg: 'bg-primary/5', ring: 'blood' },
-  Prodigy: { border: 'border-arena-gold/30', text: 'text-arena-gold', bg: 'bg-arena-gold/5', ring: 'gold' },
+const TIER_CONFIG: Record<
+  RecruitTier,
+  { border: string; text: string; bg: string; ring: 'bronze' | 'silver' | 'gold' | 'blood' }
+> = {
+  Common: {
+    border: 'border-white/10',
+    text: 'text-muted-foreground',
+    bg: 'bg-white/5',
+    ring: 'bronze',
+  },
+  Promising: {
+    border: 'border-white/20',
+    text: 'text-foreground',
+    bg: 'bg-white/10',
+    ring: 'silver',
+  },
+  Exceptional: {
+    border: 'border-primary/30',
+    text: 'text-primary',
+    bg: 'bg-primary/5',
+    ring: 'blood',
+  },
+  Prodigy: {
+    border: 'border-arena-gold/30',
+    text: 'text-arena-gold',
+    bg: 'bg-arena-gold/5',
+    ring: 'gold',
+  },
 };
 
 function TierBadge({ tier }: { tier: RecruitTier }) {
@@ -72,7 +95,7 @@ function TierBadge({ tier }: { tier: RecruitTier }) {
     <Badge
       variant="outline"
       className={cn(
-        "text-[9px] gap-1.5 font-black uppercase tracking-[0.2em] px-3 py-1 rounded-none border-white/10",
+        'text-[9px] gap-1.5 font-black uppercase tracking-[0.2em] px-3 py-1 rounded-none border-white/10',
         config.text
       )}
     >
@@ -90,8 +113,8 @@ function TierBadge({ tier }: { tier: RecruitTier }) {
 
 function StatBar({ label, value, max = 21 }: { label: string; value: number; max?: number }) {
   const pct = Math.min(100, (value / max) * 100);
-  const colorClass = value >= 16 ? "bg-primary" : value >= 12 ? "bg-arena-gold" : "bg-white/20";
-  
+  const colorClass = value >= 16 ? 'bg-primary' : value >= 12 ? 'bg-arena-gold' : 'bg-white/20';
+
   return (
     <div className="flex items-center gap-4">
       <span className="text-[10px] font-black uppercase text-muted-foreground/40 w-8 tracking-tighter">
@@ -99,7 +122,7 @@ function StatBar({ label, value, max = 21 }: { label: string; value: number; max
       </span>
       <div className="flex-1 h-1 bg-white/5 rounded-none overflow-hidden relative">
         <div
-          className={cn("h-full transition-all duration-1000 ease-out", colorClass)}
+          className={cn('h-full transition-all duration-1000 ease-out', colorClass)}
           style={{ width: `${pct}%` }}
         />
         {/* Threshold Markers */}
@@ -147,7 +170,7 @@ function RecruitCard({
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-6">
             <ImperialRing size="md" variant={config.ring}>
-              <Sword className={cn("h-5 w-5", config.text)} />
+              <Sword className={cn('h-5 w-5', config.text)} />
             </ImperialRing>
             <div>
               <h3 className="text-xl font-display font-black uppercase tracking-tight text-foreground leading-none mb-2">
@@ -170,7 +193,9 @@ function RecruitCard({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Eye className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Intelligence Synchronized</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                  Intelligence Synchronized
+                </span>
               </div>
               <Badge className="bg-primary text-primary-foreground font-black text-[10px] rounded-none px-3">
                 POTENTIAL: {grade}
@@ -186,7 +211,9 @@ function RecruitCard({
           <div className="bg-white/[0.02] border border-white/5 p-6 flex items-center justify-between group/scout">
             <div className="flex items-center gap-3 opacity-40">
               <Info className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Personnel Intel Redacted</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                Personnel Intel Redacted
+              </span>
             </div>
             <Button
               variant="outline"
@@ -210,17 +237,25 @@ function RecruitCard({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-white/[0.02] border border-white/5 space-y-1">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-widest">Health Capacity</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-widest">
+                Health Capacity
+              </span>
               <div className="flex items-center gap-3">
                 <Heart className="h-3.5 w-3.5 text-destructive" />
-                <span className="text-lg font-display font-black text-foreground">{warrior.derivedStats.hp}</span>
+                <span className="text-lg font-display font-black text-foreground">
+                  {warrior.derivedStats.hp}
+                </span>
               </div>
             </div>
             <div className="p-4 bg-white/[0.02] border border-white/5 space-y-1">
-              <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-widest">Endurance Pool</span>
+              <span className="text-[9px] font-black uppercase text-muted-foreground/40 tracking-widest">
+                Endurance Pool
+              </span>
               <div className="flex items-center gap-3">
                 <Zap className="h-3.5 w-3.5 text-arena-fame" />
-                <span className="text-lg font-display font-black text-foreground">{warrior.derivedStats.endurance}</span>
+                <span className="text-lg font-display font-black text-foreground">
+                  {warrior.derivedStats.endurance}
+                </span>
               </div>
             </div>
           </div>
@@ -237,10 +272,14 @@ function RecruitCard({
         {/* Footer Actions */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 pt-8 border-t border-white/5">
           <div className="flex flex-col">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1">Contract Value</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 mb-1">
+              Contract Value
+            </span>
             <div className="flex items-center gap-2">
               <Coins className="h-4 w-4 text-arena-gold" />
-              <span className="text-2xl font-display font-black text-arena-gold">{warrior.cost}G</span>
+              <span className="text-2xl font-display font-black text-arena-gold">
+                {warrior.cost}G
+              </span>
             </div>
           </div>
 
@@ -442,11 +481,16 @@ export default function Recruit() {
     }
     pool.sort((a: PoolWarrior, b: PoolWarrior) => {
       switch (sortBy) {
-        case 'cost-asc': return a.cost - b.cost;
-        case 'cost-desc': return b.cost - a.cost;
-        case 'potential-desc': return potentialRating(b.potential) - potentialRating(a.potential);
-        case 'age-asc': return a.age - b.age;
-        default: return 0;
+        case 'cost-asc':
+          return a.cost - b.cost;
+        case 'cost-desc':
+          return b.cost - a.cost;
+        case 'potential-desc':
+          return potentialRating(b.potential) - potentialRating(a.potential);
+        case 'age-asc':
+          return a.age - b.age;
+        default:
+          return 0;
       }
     });
     return pool;
@@ -467,11 +511,17 @@ export default function Recruit() {
         actions={
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Roster Capacity</span>
-              <span className="text-sm font-display font-black text-foreground">{roster.length} / {MAX_ROSTER}</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Roster Capacity
+              </span>
+              <span className="text-sm font-display font-black text-foreground">
+                {roster.length} / {MAX_ROSTER}
+              </span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">Available Credits</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40">
+                Available Credits
+              </span>
               <span className="text-sm font-display font-black text-arena-gold">{treasury}G</span>
             </div>
           </div>
@@ -479,27 +529,34 @@ export default function Recruit() {
       />
 
       {rosterFull && (
-        <Surface variant="glass" className="border-destructive/30 bg-destructive/5 p-6 mb-8 flex items-center gap-6">
+        <Surface
+          variant="glass"
+          className="border-destructive/30 bg-destructive/5 p-6 mb-8 flex items-center gap-6"
+        >
           <ImperialRing size="sm" variant="blood">
             <Shield className="h-4 w-4 text-destructive" />
           </ImperialRing>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-destructive">Roster Capacity Exhausted</p>
-            <p className="text-[9px] text-muted-foreground/60 uppercase tracking-widest italic">Protocol: Decommission active assets before acquiring new recruits.</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-destructive">
+              Roster Capacity Exhausted
+            </p>
+            <p className="text-[9px] text-muted-foreground/60 uppercase tracking-widest italic">
+              Protocol: Decommission active assets before acquiring new recruits.
+            </p>
           </div>
         </Surface>
       )}
 
       <Tabs defaultValue="scout" className="w-full space-y-12">
         <TabsList className="w-full h-16 bg-white/[0.02] border border-white/5 p-1 rounded-none">
-          <TabsTrigger 
-            value="scout" 
+          <TabsTrigger
+            value="scout"
             className="flex-1 h-full font-black uppercase text-[10px] tracking-[0.3em] rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             Personnel Registry
           </TabsTrigger>
-          <TabsTrigger 
-            value="custom" 
+          <TabsTrigger
+            value="custom"
             className="flex-1 h-full font-black uppercase text-[10px] tracking-[0.3em] rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
           >
             Custom Specification
@@ -511,44 +568,55 @@ export default function Recruit() {
             {/* Left Sidebar */}
             <aside className="space-y-8">
               <SectionDivider label="Filter Engine" />
-              
+
               <div className="space-y-8">
                 {/* Tiers */}
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Market Tier Filter</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    Market Tier Filter
+                  </label>
                   <div className="grid grid-cols-1 gap-3">
-                    {(['Common', 'Promising', 'Exceptional', 'Prodigy'] as RecruitTier[]).map((tier) => {
-                      const isActive = activeTiers.has(tier);
-                      const config = TIER_CONFIG[tier];
-                      return (
-                        <button
-                          key={tier}
-                          onClick={() => toggleTier(tier)}
-                          className={cn(
-                            "group flex items-center justify-between p-4 border transition-all",
-                            isActive 
-                              ? "bg-white/[0.05] border-white/20" 
-                              : "bg-transparent border-white/5 opacity-20 grayscale hover:opacity-100 hover:grayscale-0"
-                          )}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className={cn("w-1.5 h-1.5", config.bg)} />
-                            <span className={cn("text-[10px] font-black uppercase tracking-widest", isActive ? "text-foreground" : "text-muted-foreground")}>
-                              {tier}
+                    {(['Common', 'Promising', 'Exceptional', 'Prodigy'] as RecruitTier[]).map(
+                      (tier) => {
+                        const isActive = activeTiers.has(tier);
+                        const config = TIER_CONFIG[tier];
+                        return (
+                          <button
+                            key={tier}
+                            onClick={() => toggleTier(tier)}
+                            className={cn(
+                              'group flex items-center justify-between p-4 border transition-all',
+                              isActive
+                                ? 'bg-white/[0.05] border-white/20'
+                                : 'bg-transparent border-white/5 opacity-20 grayscale hover:opacity-100 hover:grayscale-0'
+                            )}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className={cn('w-1.5 h-1.5', config.bg)} />
+                              <span
+                                className={cn(
+                                  'text-[10px] font-black uppercase tracking-widest',
+                                  isActive ? 'text-foreground' : 'text-muted-foreground'
+                                )}
+                              >
+                                {tier}
+                              </span>
+                            </div>
+                            <span className="font-display font-black text-[10px] text-arena-gold">
+                              {TIER_COST[tier]}G
                             </span>
-                          </div>
-                          <span className="font-display font-black text-[10px] text-arena-gold">
-                            {TIER_COST[tier]}G
-                          </span>
-                        </button>
-                      );
-                    })}
+                          </button>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
 
                 {/* Style */}
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Tactical Archetype</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    Tactical Archetype
+                  </label>
                   <Select value={activeStyle} onValueChange={(v) => setActiveStyle(v as any)}>
                     <SelectTrigger className="h-12 bg-white/[0.02] border-white/10 rounded-none font-black uppercase text-[10px] tracking-widest">
                       <SelectValue placeholder="All Archetypes" />
@@ -556,7 +624,9 @@ export default function Recruit() {
                     <SelectContent className="bg-neutral-950 border-white/10 rounded-none">
                       <SelectItem value="all">ALL ARCHETYPES</SelectItem>
                       {Object.entries(STYLE_DISPLAY_NAMES).map(([k, v]) => (
-                        <SelectItem key={k} value={k}>{v.toUpperCase()}</SelectItem>
+                        <SelectItem key={k} value={k}>
+                          {v.toUpperCase()}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -564,7 +634,9 @@ export default function Recruit() {
 
                 {/* Sort */}
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Registry Sequence</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    Registry Sequence
+                  </label>
                   <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
                     <SelectTrigger className="h-12 bg-white/[0.02] border-white/10 rounded-none font-black uppercase text-[10px] tracking-widest">
                       <SelectValue />
@@ -586,11 +658,15 @@ export default function Recruit() {
                 >
                   <div className="flex items-center gap-4">
                     <RefreshCw className="h-4 w-4 text-primary group-hover:rotate-180 transition-all duration-700" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Sync Registry</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      Sync Registry
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Coins className="h-3 w-3 text-arena-gold" />
-                    <span className="font-display font-black text-arena-gold text-xs">{REFRESH_COST}G</span>
+                    <span className="font-display font-black text-arena-gold text-xs">
+                      {REFRESH_COST}G
+                    </span>
                   </div>
                 </Button>
               </div>
@@ -627,13 +703,20 @@ export default function Recruit() {
                   ))}
                 </div>
               ) : (
-                <Surface variant="glass" className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6">
+                <Surface
+                  variant="glass"
+                  className="py-48 text-center border-dashed border-white/10 flex flex-col items-center gap-6"
+                >
                   <ImperialRing size="lg" variant="bronze" className="opacity-20">
                     <Search className="h-8 w-8" />
                   </ImperialRing>
                   <div className="space-y-2">
-                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">Zero Results Detected</p>
-                    <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">Broaden filtering parameters or synchronize registry.</p>
+                    <p className="text-[12px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">
+                      Zero Results Detected
+                    </p>
+                    <p className="text-[9px] text-muted-foreground/20 uppercase tracking-widest italic">
+                      Broaden filtering parameters or synchronize registry.
+                    </p>
                   </div>
                 </Surface>
               )}
@@ -642,18 +725,25 @@ export default function Recruit() {
         </TabsContent>
 
         <TabsContent value="custom" className="mt-0 space-y-12 focus-visible:outline-none">
-          <Surface variant="glass" className="p-8 border-primary/20 bg-primary/5 flex items-center gap-8">
+          <Surface
+            variant="glass"
+            className="p-8 border-primary/20 bg-primary/5 flex items-center gap-8"
+          >
             <ImperialRing size="md" variant="blood">
               <Hammer className="h-5 w-5 text-primary" />
             </ImperialRing>
             <div className="space-y-2">
-              <h3 className="text-lg font-black uppercase tracking-tight text-foreground leading-none">Custom Specification Protocol</h3>
+              <h3 className="text-lg font-black uppercase tracking-tight text-foreground leading-none">
+                Custom Specification Protocol
+              </h3>
               <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest leading-relaxed">
-                Unit Cost: <span className="text-arena-gold font-display font-black">200G</span> · Allocation: <span className="text-foreground font-black">66 Attribute Points</span> · Full tactical customization enabled.
+                Unit Cost: <span className="text-arena-gold font-display font-black">200G</span> ·
+                Allocation: <span className="text-foreground font-black">66 Attribute Points</span>{' '}
+                · Full tactical customization enabled.
               </p>
             </div>
           </Surface>
-          
+
           <WarriorBuilder
             onCreateWarrior={handleCustomCreate}
             maxRoster={MAX_ROSTER}

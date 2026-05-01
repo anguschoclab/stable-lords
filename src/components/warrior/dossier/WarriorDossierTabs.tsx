@@ -24,8 +24,8 @@ export default function WarriorDossierTabs({ activeTab, setActiveTab }: Props) {
           key={tab.id}
           onClick={() => setActiveTab(tab.id)}
           className={cn(
-            "flex items-center gap-2 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all relative",
-            activeTab === tab.id ? "text-primary" : "text-muted-foreground/40 hover:text-foreground"
+            'flex items-center gap-2 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all relative',
+            activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/40 hover:text-foreground'
           )}
         >
           <tab.icon className="h-3.5 w-3.5" />

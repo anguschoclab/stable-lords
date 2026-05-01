@@ -125,20 +125,33 @@ export default function RunRound() {
 
       {/* Main Focus: Execution & Roster Status */}
       <div className="space-y-12">
-        <Surface variant="glass" className="p-8 border-primary/20 bg-primary/[0.02] flex flex-col items-center text-center">
+        <Surface
+          variant="glass"
+          className="p-8 border-primary/20 bg-primary/[0.02] flex flex-col items-center text-center"
+        >
           <div className="flex items-center gap-12 mb-10">
             <div className="text-center">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">Units Ready</div>
-              <div className="text-3xl font-display font-black text-foreground">{fightReady.length}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">
+                Units Ready
+              </div>
+              <div className="text-3xl font-display font-black text-foreground">
+                {fightReady.length}
+              </div>
             </div>
             <div className="h-10 w-px bg-white/5" />
             <div className="text-center">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">Paired Bouts</div>
-              <div className="text-3xl font-display font-black text-arena-gold">{matchCard.length}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">
+                Paired Bouts
+              </div>
+              <div className="text-3xl font-display font-black text-arena-gold">
+                {matchCard.length}
+              </div>
             </div>
             <div className="h-10 w-px bg-white/5" />
             <div className="text-center">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">Medical List</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">
+                Medical List
+              </div>
               <div className="text-3xl font-display font-black text-destructive">
                 {state.roster.filter((w) => (w.fatigue ?? 0) > 70 || w.status === 'Injured').length}
               </div>
@@ -153,23 +166,32 @@ export default function RunRound() {
               className="relative h-20 px-12 rounded-none bg-primary text-black font-black uppercase text-base tracking-[0.3em] hover:bg-primary/90 transition-all shadow-[0_0_40px_rgba(var(--primary-rgb),0.3)]"
             >
               <Zap className="h-5 w-5 mr-4 fill-current" />
-              {state.isTournamentWeek ? `EXECUTE_DAY_${state.day + 1}` : `EXECUTE_WEEK_${state.week}`}
+              {state.isTournamentWeek
+                ? `EXECUTE_DAY_${state.day + 1}`
+                : `EXECUTE_WEEK_${state.week}`}
               <ChevronRight className="h-5 w-5 ml-4" />
             </Button>
           </div>
-          
+
           <p className="mt-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">
-            {running ? "SYNCING_WITH_ARENA_RECORDS..." : "AWAITING_COMMAND_AUTHORIZATION"}
+            {running ? 'SYNCING_WITH_ARENA_RECORDS...' : 'AWAITING_COMMAND_AUTHORIZATION'}
           </p>
         </Surface>
 
         {/* Manifest / Results Section */}
         <section className="space-y-8">
-          <SectionDivider label={results.length > 0 ? "Execution Report" : "Active Engagement Manifest"} variant="primary" />
-          
+          <SectionDivider
+            label={results.length > 0 ? 'Execution Report' : 'Active Engagement Manifest'}
+            variant="primary"
+          />
+
           <div className="mx-auto">
             {results.length > 0 ? (
-              <RunResults results={results} expandedId={expandedId} onToggleExpand={setExpandedId} />
+              <RunResults
+                results={results}
+                expandedId={expandedId}
+                onToggleExpand={setExpandedId}
+              />
             ) : (
               <div className="space-y-4">
                 {matchCard.length > 0 ? (
@@ -186,12 +208,17 @@ export default function RunRound() {
                     />
                   ))
                 ) : (
-                  <Surface variant="glass" className="py-24 text-center border-dashed border-white/5">
+                  <Surface
+                    variant="glass"
+                    className="py-24 text-center border-dashed border-white/5"
+                  >
                     <Skull className="h-12 w-12 mx-auto mb-6 opacity-20 text-muted-foreground" />
                     <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/40">
                       Zero Engagement Pairs Detected
                       <br />
-                      <span className="text-[9px] opacity-60">Warriors may be unassigned or incapacitated.</span>
+                      <span className="text-[9px] opacity-60">
+                        Warriors may be unassigned or incapacitated.
+                      </span>
                     </p>
                   </Surface>
                 )}

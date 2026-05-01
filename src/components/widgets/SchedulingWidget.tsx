@@ -49,7 +49,9 @@ function MatchupCard({ matchup, type }: MatchupCardProps) {
               <TrendingDown className="h-3 w-3 text-destructive" />
             )}
           </ImperialRing>
-          <span className="font-display font-black text-[11px] uppercase tracking-tight text-foreground">{w.name}</span>
+          <span className="font-display font-black text-[11px] uppercase tracking-tight text-foreground">
+            {w.name}
+          </span>
         </div>
         <Link to="/warrior/$id" params={{ id: w.id }}>
           <Button
@@ -63,10 +65,16 @@ function MatchupCard({ matchup, type }: MatchupCardProps) {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest px-2 py-0 rounded-none border-white/5 bg-white/5">
+        <Badge
+          variant="outline"
+          className="text-[8px] font-black uppercase tracking-widest px-2 py-0 rounded-none border-white/5 bg-white/5"
+        >
           {STYLE_DISPLAY_NAMES[w.style]}
         </Badge>
-        <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest px-2 py-0 rounded-none border-white/5 bg-white/5">
+        <Badge
+          variant="outline"
+          className="text-[8px] font-black uppercase tracking-widest px-2 py-0 rounded-none border-white/5 bg-white/5"
+        >
           {matchup.rivalStableName}
         </Badge>
       </div>
@@ -152,8 +160,9 @@ export function SchedulingWidget({ warrior }: SchedulingWidgetProps) {
             <Swords className="h-4 w-4 text-muted-foreground/40" />
           </ImperialRing>
           <div className="text-[11px] text-muted-foreground/60 leading-relaxed uppercase font-black tracking-tight">
-            <span className="text-foreground">Tactical Intelligence Note:</span>{' '}
-            Engagement matrices are calculated based on style affinity, historical performance, and institutional fame differential. Grudge matches against rivals escalate priority levels.
+            <span className="text-foreground">Tactical Intelligence Note:</span> Engagement matrices
+            are calculated based on style affinity, historical performance, and institutional fame
+            differential. Grudge matches against rivals escalate priority levels.
           </div>
         </div>
       </Surface>
