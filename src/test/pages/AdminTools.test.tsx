@@ -69,8 +69,8 @@ describe('AdminTools Page', () => {
   it('provides button for hard reset', () => {
     renderWithGameState(<AdminTools />, mockState as any);
 
-    // The SYSTEM tab (default) shows the Wipe_All_Data button
-    const resetBtn = screen.getByRole('button', { name: /Wipe_All_Data/i });
+    // The SYSTEM tab (default) shows the Execute System Wipe button
+    const resetBtn = screen.getByRole('button', { name: /Execute System Wipe/i });
     expect(resetBtn).toBeDefined();
   });
 

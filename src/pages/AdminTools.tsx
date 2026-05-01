@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useGameStore } from '@/state/useGameStore';
+import { useGameStore, reconstructGameState } from '@/state/useGameStore';
 import { Button } from '@/components/ui/button';
 import {
   Settings,
@@ -25,7 +25,7 @@ import { computeNextSeason } from '@/engine/pipeline/passes/WorldPass';
 import type { GameState, RivalStableData } from '@/types/state.types';
 
 export default function AdminTools() {
-  const { setState, doReset, treasury, fame, week, season, roster, player, ftueComplete } =
+  const { setState, doReset, doAdvanceWeek, treasury, fame, week, season, roster, player, ftueComplete } =
     useGameStore();
 
   const [activeCategory, setActiveCategory] = React.useState<
@@ -70,48 +70,45 @@ export default function AdminTools() {
     [setState]
   );
 
-  const skipWeek = useCallback(() => {
-    setState((prev: GameState) => {
-      const next = advanceWeek(prev);
-      toast.success(`Advanced to Week ${next.week}`);
-      return next;
-    });
-  }, [setState]);
+  const skipWeek = useCallback(async () => {
+    await doAdvanceWeek();
+    toast.success(`Advanced 1 Week`);
+  }, [doAdvanceWeek]);
 
   const skipSeason = useCallback(() => {
-    setState((prev: GameState) => {
-      let newState = { ...prev };
-      for (let i = 0; i < 13; i++) {
-        newState = advanceWeek(newState);
-      }
-      newState.season = computeNextSeason(newState.week);
-      return newState;
-    });
+    const store = useGameStore.getState();
+    let currentState = reconstructGameState(store);
+    for (let i = 0; i < 13; i++) {
+      currentState = advanceWeek(currentState);
+    }
+    currentState.season = computeNextSeason(currentState.week);
+    store.loadGame(store.activeSlotId || 'autosave', currentState);
     toast.success('Seasonal transition forced.');
-  }, [setState]);
+  }, []);
 
   const skipFTUE = useCallback(() => {
-    const defaultPlayer = {
-      id: 'admin-0',
-      name: 'Master Admin',
-      stableName: 'The Admin Lords',
-      fame: 0,
-      renown: 0,
-      titles: 0,
-    };
-    setState((prev: GameState) => ({
-      ...prev,
-      ftueComplete: true,
-      isFTUE: false,
-      player: { ...defaultPlayer, ...(prev.player ?? {}) },
-    }));
+    setState((draft) => {
+      const defaultPlayer = {
+        id: 'admin-0',
+        name: 'Master Admin',
+        stableName: 'The Admin Lords',
+        fame: 0,
+        renown: 0,
+        titles: 0,
+      };
+      draft.ftueComplete = true;
+      draft.isFTUE = false;
+      draft.player = { ...defaultPlayer, ...(draft.player || {}) } as any;
+    });
     toast.success('FTUE constraints bypassed.');
   }, [setState]);
 
   const resetRivals = useCallback(() => {
     import('@/engine/rivals').then(({ generateRivalStables }) => {
       const newRivals = generateRivalStables(23, Date.now()) as RivalStableData[];
-      setState((prev: GameState) => ({ ...prev, rivals: newRivals }));
+      setState((draft) => {
+        draft.rivals = newRivals;
+      });
       toast.success('Rival ecosystem regenerated.');
     });
   }, [setState]);
