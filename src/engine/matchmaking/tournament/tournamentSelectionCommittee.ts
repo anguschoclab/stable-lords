@@ -2,7 +2,7 @@ import type { GameState, Warrior, Season } from '@/types/state.types';
 import { FightingStyle } from '@/types/shared.types';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 
 /**
  * Tournament Selection Committee

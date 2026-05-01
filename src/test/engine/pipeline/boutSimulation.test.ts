@@ -3,7 +3,7 @@ import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
 import { GameState, BoutOffer, Promoter } from '@/types/state.types';
 import { FightingStyle } from '@/types/shared.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 
 describe('Bout Simulation Integration - getFromArchive function issue', () => {
   it('should simulate a signed bout and update state accordingly', async () => {

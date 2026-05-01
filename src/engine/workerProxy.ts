@@ -26,7 +26,7 @@ function buildProxy(): AsyncEngine {
       ] = await Promise.all([
         import('./pipeline/services/weekPipelineService'),
         import('./dayPipeline'),
-        import('./factories'),
+        import('./factories/gameStateFactory'),
         import('./matchmaking/tournamentSelection'),
       ]);
       cached = {

@@ -123,7 +123,7 @@ export function generateRecruit(
   }
 
   const archetype = STYLE_ARCHETYPE[style];
-  const attributes = generateArchetypeAttrs(style, () => rng.next());
+  const attributes = generateArchetypeAttrs(style, rng);
 
   // Trait generation — unified TRAITS registry with archetype-aware weighting.
   // Uses snake_case IDs that the combat engine (traits.ts) recognises.
@@ -150,10 +150,10 @@ export function generateRecruit(
   usedNames.add(name);
 
   const { baseSkills, derivedStats } = computeWarriorStats(attributes, style);
-  const potential = generatePotential(attributes, tier, () => rng.next());
-  const favorites = generateFavorites(style, () => rng.next());
-  const originStr = generateOrigin(() => rng.next());
-  const loreStr = generateLore(name, () => rng.next());
+  const potential = generatePotential(attributes, tier, rng);
+  const favorites = generateFavorites(style, rng);
+  const originStr = generateOrigin(rng);
+  const loreStr = generateLore(name, rng);
 
   return {
     id: rng.uuid(),

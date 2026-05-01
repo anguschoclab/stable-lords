@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { populateInitialWorld } from '@/engine/core/worldSeeder';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
 

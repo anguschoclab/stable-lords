@@ -4,7 +4,8 @@
  * Tests the autosim system that allows multi-week advancement with stop conditions.
  */
 import { describe, it, expect, beforeEach, beforeAll, afterAll, vi } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { createFreshState } from '@/engine/factories/warriorFactory';
 
 // Mock localStorage for Vitest since autosim triggers stat rollup saves
 import { runAutosim } from '@/engine/autosim';

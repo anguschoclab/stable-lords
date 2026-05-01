@@ -24,7 +24,7 @@ Object.defineProperty(global, 'localStorage', { value: localStorageMock, writabl
 
 // Now import the state modules
 import { useGameStore } from '@/state/useGameStore';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 // A helper to inject a mock state into the Zustand store before rendering

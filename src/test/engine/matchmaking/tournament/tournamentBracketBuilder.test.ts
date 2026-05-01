@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { FightingStyle } from '@/types/shared.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { buildTournament } from '@/engine/matchmaking/tournament/tournamentBracketBuilder';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 
 describe('TournamentBracketBuilder', () => {
   describe('buildTournament', () => {

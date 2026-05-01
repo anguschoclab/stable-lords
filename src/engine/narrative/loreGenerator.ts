@@ -1,4 +1,5 @@
 import { pick } from '@/utils/random';
+import type { IRNGService } from '@/engine/core/rng/IRNGService';
 
 const ORIGINS = [
   'Found as an infant in the collapsed mines beneath Ironveil',
@@ -67,13 +68,13 @@ const DEFINING_MOMENTS = [
   'now standing at the threshold of a legacy they are eager to claim',
 ];
 
-export function generateLore(name: string, rng: () => number): string {
-  const r = rng;
+export function generateLore(name: string, rng: IRNGService): string {
+  const r = () => rng.next();
   const childhood = pick(CHILDHOOD_TRAITS, r);
   const defining = pick(DEFINING_MOMENTS, r);
   return `${name} ${childhood}, ${defining}.`;
 }
 
-export function generateOrigin(rng: () => number): string {
-  return pick(ORIGINS, rng);
+export function generateOrigin(rng: IRNGService): string {
+  return pick(ORIGINS, () => rng.next());
 }

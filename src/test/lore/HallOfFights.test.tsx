@@ -22,7 +22,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, within, fireEvent, waitFor } from '@testing-library/react';
 import { HallOfFights } from '@/lore/HallOfFights';
 import { renderWithGameState } from '../testUtils';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { FightingStyle } from '@/types/game';
 import type { GameState, FightSummary } from '@/types/game';
 import '../setup';

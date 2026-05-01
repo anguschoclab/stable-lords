@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useGameStore, type GameStore } from '@/state/useGameStore';
 import { FightingStyle, STYLE_DISPLAY_NAMES, ATTRIBUTE_KEYS, type Attributes } from '@/types/game';
 import { BASE_ROSTER_CAP } from '@/data/constants';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { hashStr } from '@/utils/random';
 import {

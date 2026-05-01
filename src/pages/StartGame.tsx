@@ -5,7 +5,7 @@
  */
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useGameStore } from '@/state/useGameStore';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import {
   listSaveSlots,
   loadFromSlot,

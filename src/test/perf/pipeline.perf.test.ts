@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { TimeAdvanceService } from '@/engine/tick/TimeAdvanceService';
 import { runAutosim } from '@/engine/autosim';
 

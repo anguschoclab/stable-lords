@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { BankruptcyService } from '@/engine/ai/bankruptcyService';
 import type { GameState } from '@/types/state.types';
 

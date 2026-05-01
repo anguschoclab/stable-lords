@@ -1,5 +1,5 @@
 import { GameState, Warrior, RivalStableData } from '@/types/state.types';
-import { makeWarrior, createFreshState } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { FightingStyle } from '@/types/shared.types';
 import { generateId } from '@/utils/idUtils';
 

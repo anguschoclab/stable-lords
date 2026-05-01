@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { createFreshState } from '@/engine/factories/warriorFactory';
 import { populateTestState } from '@/test/testHelpers';
 import { runPromoterPass } from '@/engine/pipeline/passes/PromoterPass';
 import { runRankingsPass } from '@/engine/pipeline/passes/RankingsPass';
@@ -8,7 +9,8 @@ import {
   processAllRivalsBoutOffers,
 } from '@/engine/ai/workers/competitionWorker';
 import { FightingStyle } from '@/types/shared.types';
-import { makeWarrior } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import type { GameState, RivalStableData, Warrior, BoutOffer } from '@/types/state.types';
 import type { WarriorId, BoutOfferId, PromoterId, StableId, InjuryId } from '@/types/shared.types';
 import type { InjuryData } from '@/types/warrior.types';

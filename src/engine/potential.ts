@@ -35,13 +35,14 @@ const POTENTIAL_ABSOLUTE_MAX = ATTRIBUTE_MAX; // 25
 export function generatePotential(
   attrs: Attributes,
   tier: RecruitTier,
-  rng: () => number
+  rng: IRNGService
 ): AttributePotential {
+  const r = () => rng.next();
   const [hMin, hMax] = TIER_HEADROOM[tier];
   const potential = {} as AttributePotential;
 
   for (const key of ATTRIBUTE_KEYS) {
-    const headroom = hMin + Math.floor(rng() * (hMax - hMin + 1));
+    const headroom = hMin + Math.floor(r() * (hMax - hMin + 1));
     const raw = attrs[key] + headroom;
     potential[key] = clamp(raw, POTENTIAL_MIN, POTENTIAL_ABSOLUTE_MAX);
   }

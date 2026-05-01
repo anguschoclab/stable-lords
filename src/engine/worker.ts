@@ -1,7 +1,7 @@
 import * as Comlink from 'comlink';
 import { advanceWeek } from './pipeline/services/weekPipelineService';
 import { advanceDay } from './dayPipeline';
-import { createFreshState } from './factories';
+import { createFreshState } from './factories/gameStateFactory';
 import { TournamentSelectionService } from './matchmaking/tournamentSelection';
 
 /**

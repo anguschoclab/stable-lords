@@ -8,6 +8,7 @@ import {
   type YearAdvanceResult,
   type AdvanceOptions,
 } from './TimeAdvanceService';
+import { WEEKS_PER_YEAR } from '@/engine/core/constants';
 
 /**
  * Stable Lords — Unified Tick Orchestrator
@@ -20,10 +21,13 @@ export const TickOrchestrator = {
   advanceDay(state: GameState): GameState {
     const currentDay = state.day || 0;
     const nextDay = currentDay + 1;
-    const rng = new SeededRNGService(state.week * 100 + nextDay);
+    // Standardize seed generation
+    const seed = state.year * 10000 + state.week * 100 + nextDay;
+    const rng = new SeededRNGService(seed);
 
     // 1. Weekly Transition (Day 7)
     if (nextDay >= 7) {
+      // Correct for 52-week year wrap-around logic moved to SystemPass
       const finalState = runWeeklyPipeline(state);
       return {
         ...finalState,
@@ -72,14 +76,18 @@ export const TickOrchestrator = {
 
     // 1. Resolve Tournament Rounds (Batched)
     if (state.isTournamentWeek && state.activeTournamentId) {
+      const tournamentId = state.activeTournamentId;
       for (let day = currentDay + 1; day < 7; day++) {
+        const daySeed = state.year * 10000 + state.week * 100 + day;
         const { updatedState, roundResults } = TournamentSelectionService.resolveRound(
           currentState,
-          state.activeTournamentId,
-          state.week * 100 + day
+          tournamentId,
+          daySeed
         );
         currentState = updatedState;
-        weeklyNewsItems.push(...roundResults.map((r) => `[Day ${day}] ${r}`));
+        if (roundResults.length > 0) {
+          weeklyNewsItems.push(...roundResults.map((r) => `[Day ${day}] ${r}`));
+        }
       }
     }
 

@@ -91,3 +91,8 @@ export const PERSONALITY_STYLE_PREFS: Record<OwnerPersonality, FightingStyle[]> 
 export function getPhilosophyStyles(philosophy: string): FightingStyle[] {
   return PHILOSOPHY_TO_STYLES[philosophy] ?? Object.values(FightingStyle);
 }
+
+// ─── 1.0 Hardening: Thresholds ───────────────────────────────────────────
+export const PHILOSOPHY_EVOLVE_THRESHOLD_WIN = 0.7;
+export const PHILOSOPHY_EVOLVE_THRESHOLD_LOSS = 0.3;
+export const PHILOSOPHY_MIN_FIGHTS = 4;

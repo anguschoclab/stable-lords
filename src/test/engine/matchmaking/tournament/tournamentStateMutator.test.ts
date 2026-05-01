@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { createFreshState } from '@/engine/factories/warriorFactory';
 import { FightingStyle } from '@/types/shared.types';
 import {
   findWarriorById,
   modifyWarrior,
 } from '@/engine/matchmaking/tournament/tournamentStateMutator';
-import { makeWarrior } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { resolveImpacts } from '@/engine/impacts';
 import type { GameState } from '@/types/state.types';
 import type { TournamentEntry } from '@/types/state.types';

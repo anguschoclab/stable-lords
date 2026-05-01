@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { createFreshState } from '@/engine/factories/warriorFactory';
 import { populateTestState } from '@/test/testHelpers';
 import { runPromoterPass } from '@/engine/pipeline/passes/PromoterPass';
 import { runRankingsPass } from '@/engine/pipeline/passes/RankingsPass';
 import { FightingStyle } from '@/types/shared.types';
-import { makeWarrior } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import type { GameState, Promoter, TournamentEntry, Warrior } from '@/types/state.types';
 import type { InjuryData } from '@/types/warrior.types';
 import type { WarriorId, InjuryId } from '@/types/shared.types';

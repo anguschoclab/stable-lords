@@ -3,7 +3,7 @@ import { computeWeeklyBreakdown, computeEconomyImpact } from '@/engine/economy';
 import { resolveImpacts } from '@/engine/impacts';
 import type { GameState, Warrior } from '@/types/game';
 import { FightingStyle, type FightSummary } from '@/types/game';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 
 function makeTestWarrior(overrides: Partial<Warrior> = {}): Warrior {
   return {

@@ -3,7 +3,7 @@
  * Tests for warrior career progression, fatigue management, and tournament exemptions
  */
 import { describe, it, expect } from 'vitest';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { FightingStyle } from '@/types/shared.types';
 import type { Warrior } from '@/types/state.types';

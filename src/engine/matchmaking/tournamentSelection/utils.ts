@@ -1,7 +1,7 @@
 import type { GameState, Warrior, TournamentEntry } from '@/types/state.types';
 import { FightingStyle } from '@/types/shared.types';
 import { SeededRNG } from '@/utils/random';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { aiPlanForWarrior, defaultPlanForWarrior } from '@/engine';
 
 export function findWarriorById(

@@ -32,8 +32,8 @@ const ARCHETYPE_STAT_WEIGHTS: Record<
  * @param rng Optional RNG generator.
  * @returns The generated Attributes object.
  */
-export function generateArchetypeAttrs(style: FightingStyle, rng: () => number): Attributes {
-  const r = rng;
+export function generateArchetypeAttrs(style: FightingStyle, rng: IRNGService): Attributes {
+  const r = () => rng.next();
   const archetype = STYLE_ARCHETYPE[style];
   const weights = ARCHETYPE_STAT_WEIGHTS[archetype];
   const attrs: Attributes = { ST: 3, CN: 3, SZ: 3, WT: 3, WL: 3, SP: 3, DF: 3 };

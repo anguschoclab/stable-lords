@@ -22,7 +22,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import WorldOverview from '@/pages/WorldOverview';
 import { renderWithGameState } from '../testUtils';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { FightingStyle } from '@/types/game';
 import type { Warrior, GameState } from '@/types/game';
 import '../setup';

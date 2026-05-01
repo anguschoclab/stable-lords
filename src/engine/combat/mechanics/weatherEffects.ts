@@ -128,6 +128,15 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
   },
 };
 
+/**
+ * Resolves the final mechanical weather condition based on arena type.
+ * Indoor arenas negate all weather effects (return 'Clear').
+ */
+export function resolveEffectiveWeather(weather: WeatherType, arenaTags: string[]): WeatherType {
+  const isIndoor = arenaTags.includes('indoor');
+  return isIndoor ? 'Clear' : weather;
+}
+
 export function getWeatherEffect(weather: WeatherType): WeatherEffect {
   return WEATHER_EFFECTS[weather] ?? WEATHER_EFFECTS['Clear'];
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { TimeAdvanceService } from '@/engine/tick/TimeAdvanceService';
 
 // Mock the archiver adapter (used by weekPipelineService) to avoid disk I/O during tests

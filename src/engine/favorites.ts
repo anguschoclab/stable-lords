@@ -41,23 +41,24 @@ const STYLE_RHYTHM_RANGES: Record<FightingStyle, { oe: [number, number]; al: [nu
 };
 
 /** Generate hidden favorites for a warrior at creation */
-export function generateFavorites(style: FightingStyle, rng: () => number): WarriorFavorites {
+export function generateFavorites(style: FightingStyle, rng: IRNGService): WarriorFavorites {
+  const r = () => rng.next();
   // Favorite weapon: draw randomly from style-appropriate pool (no bias toward canonical gear)
   // This allows for "unideal" but legal favorites (e.g. lightweight warrior favoring a medium weapon)
   const available = getAvailableItems('weapon', style);
-  const weaponId = available[Math.floor(rng() * available.length)]?.id ?? 'broadsword';
+  const weaponId = available[Math.floor(r() * available.length)]?.id ?? 'broadsword';
 
   // Favorite rhythm: 80% chance of style-standard range, 20% global "weird" range
-  const useStyleRange = rng() < 0.8;
+  const useStyleRange = r() < 0.8;
   let oe: number, al: number;
 
   if (useStyleRange) {
     const range = STYLE_RHYTHM_RANGES[style];
-    oe = range.oe[0] + Math.floor(rng() * (range.oe[1] - range.oe[0] + 1));
-    al = range.al[0] + Math.floor(rng() * (range.al[1] - range.al[0] + 1));
+    oe = range.oe[0] + Math.floor(r() * (range.oe[1] - range.oe[0] + 1));
+    al = range.al[0] + Math.floor(r() * (range.al[1] - range.al[0] + 1));
   } else {
-    oe = 1 + Math.floor(rng() * 9);
-    al = 1 + Math.floor(rng() * 9);
+    oe = 1 + Math.floor(r() * 9);
+    al = 1 + Math.floor(r() * 9);
   }
 
   return {
@@ -85,12 +86,12 @@ export interface DiscoveryResult {
   rhythmRevealed: boolean;
 }
 
-/** Check if a warrior should discover more about their favorites after a bout */
 export function checkDiscovery(
   warrior: Warrior,
-  rng: () => number,
+  rng: IRNGService,
   context?: { weaponId: string; oe: number; al: number }
 ): DiscoveryResult {
+  const r = () => rng.next();
   const fav = warrior.favorites;
   if (!fav) return { updated: false, hints: [], weaponRevealed: false, rhythmRevealed: false };
 
@@ -104,7 +105,7 @@ export function checkDiscovery(
     const isUsingFav = context?.weaponId === fav.weaponId;
     const revealRoll = isUsingFav ? CHANCE_REVEAL_SYMMETRY : CHANCE_REVEAL_BASE;
 
-    if (rng() < revealRoll) {
+    if (r() < revealRoll) {
       fav.discovered.weapon = true;
       weaponRevealed = true;
       const weaponItem = WEAPONS.find((w) => w.id === fav.weaponId);
@@ -113,7 +114,7 @@ export function checkDiscovery(
         : `💡 A sudden epiphany! ${warrior.name} realizes their true weapon preference is the ${weaponItem?.name ?? fav.weaponId}.`;
       hints.push(sparkLine);
       updated = true;
-    } else if (rng() < CHANCE_HINT && fav.discovered.weaponHints < 2) {
+    } else if (r() < CHANCE_HINT && fav.discovered.weaponHints < 2) {
       fav.discovered.weaponHints++;
       hints.push(`🔍 ${warrior.name} is developing a distinct feel for certain weapons...`);
       updated = true;
@@ -128,14 +129,14 @@ export function checkDiscovery(
       Math.abs(context.al - fav.rhythm.al) <= 1;
     const revealRoll = isMatchingRhythm ? CHANCE_REVEAL_SYMMETRY : CHANCE_REVEAL_BASE;
 
-    if (rng() < revealRoll) {
+    if (r() < revealRoll) {
       fav.discovered.rhythm = true;
       rhythmRevealed = true;
       hints.push(
         `✨ ${warrior.name} has found their natural soul-rhythm: OE ${fav.rhythm.oe}, AL ${fav.rhythm.al}!`
       );
       updated = true;
-    } else if (rng() < CHANCE_HINT && fav.discovered.rhythmHints < 2) {
+    } else if (r() < CHANCE_HINT && fav.discovered.rhythmHints < 2) {
       fav.discovered.rhythmHints++;
       hints.push(`🔍 ${warrior.name} is finding their own unique rhythm in the chaos of battle.`);
       updated = true;

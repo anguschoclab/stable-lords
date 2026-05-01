@@ -9,6 +9,8 @@ export const GLOBAL_PAR_PENALTY = -2.5;
 export const MAX_EXCHANGES = 30; // 10 minutes (Death Rattle calibration)
 export const EXCHANGES_PER_MINUTE = 3;
 export const INITIATIVE_PRESS_BONUS = 1;
+export const WIN_XP = 2;
+export const LOSS_XP = 1;
 
 export const OE_ATT_SCALING = 0.85;
 export const OE_DEF_SCALING = 0.5;

@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { createFreshState } from '@/engine/factories/warriorFactory';
 import { FightingStyle } from '@/types/shared.types';
 import { SeasonalRetirementService } from '@/engine/ai/seasonalRetirementService';
-import { makeWarrior } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import type { GameState, IRNGService } from '@/types/state.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 

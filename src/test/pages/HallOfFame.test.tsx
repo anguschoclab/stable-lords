@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import HallOfFame from '@/pages/HallOfFame';
 import { renderWithGameState } from '../testUtils';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { FightingStyle } from '@/types/game';
 import type { GameState, FightSummary, NewsletterItem, Warrior } from '@/types/game';
 

@@ -7,7 +7,8 @@ import {
 import type { Warrior } from '@/types/warrior.types';
 import type { CombatEvent } from '@/types/combat.types';
 import type { Trainer, GameState, Promoter } from '@/types/state.types';
-import { createFreshState, makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import { generateRivalStables } from '@/engine/rivals';
 import { generateRecruitPool } from '@/engine/recruitment';
 import { generateHiringPool } from '@/engine/trainers';

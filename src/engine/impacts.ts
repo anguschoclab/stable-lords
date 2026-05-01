@@ -39,7 +39,6 @@ export interface StateImpact {
   newsletterItems?: NewsletterItem[];
   ledgerEntries?: LedgerEntry[];
   seasonalGrowth?: SeasonalGrowth[];
-  newPoolRecruits?: PoolWarrior[];
   recruitPool?: PoolWarrior[];
   tournaments?: TournamentEntry[];
   isTournamentWeek?: boolean;
@@ -73,8 +72,6 @@ export interface StateImpact {
   unacknowledgedDeaths?: string[];
   crowdMood?: CrowdMoodType;
   awards?: AnnualAward[];
-  /** 🛠️ 1.0 Hardening: Atomic replacement for the entire rivals array */
-  rivalStableReplacement?: RivalStableData[];
 }
 
 type ImpactHandler<K extends keyof StateImpact> = (
@@ -227,12 +224,6 @@ const impactHandlers: { [K in keyof StateImpact]-?: ImpactHandler<K> } = {
   lastSimulationReport: (state, value) => {
     state.lastSimulationReport = value;
   },
-  newPoolRecruits: (state, value) => {
-    state.recruitPool = value;
-  },
-  rivalStableReplacement: (state, value) => {
-    state.rivals = value;
-  },
 };
 
 export function resolveImpacts(state: GameState, impacts: StateImpact[]): GameState {
@@ -284,7 +275,6 @@ const MERGE_CONFIG: MergeConfig = {
   rosterRemovals: { strategy: 'append', defaultValue: [] },
   tournaments: { strategy: 'replace', defaultValue: undefined },
   recruitPool: { strategy: 'replace', defaultValue: undefined },
-  newPoolRecruits: { strategy: 'replace', defaultValue: undefined },
   realmRankings: { strategy: 'replace', defaultValue: undefined },
   boutOffers: { strategy: 'dictMerge', defaultValue: undefined },
   promoters: { strategy: 'replace', defaultValue: undefined },
@@ -302,7 +292,6 @@ const MERGE_CONFIG: MergeConfig = {
   season: { strategy: 'replace', defaultValue: undefined },
   weather: { strategy: 'replace', defaultValue: undefined },
   crowdMood: { strategy: 'replace', defaultValue: undefined },
-  rivalStableReplacement: { strategy: 'replace', defaultValue: undefined },
 };
 
 // 🌩️ Pure helpers for merging strategies (Strategy Pattern)

@@ -11,6 +11,7 @@ import { STYLE_ARCHETYPE } from '@/engine/factories/statGeneration';
 import { getStyleDefaultLoadout } from '@/data/equipment';
 import { generateId } from '@/utils/idUtils';
 import type { IRNGService } from '@/engine/core/rng/IRNGService';
+import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 
 /**
  * Creates a new warrior with calculated stats and favorites.
@@ -31,7 +32,7 @@ export function makeWarrior(
   rng?: IRNGService
 ): Warrior {
   const { baseSkills, derivedStats } = computeWarriorStats(attrs, style);
-  const favorites = generateFavorites(style, rng ? () => rng.next() : () => 0.5);
+  const favorites = generateFavorites(style, rng || new SeededRNGService(Date.now()));
   // Traits are now consumed in combat (see src/engine/traits.ts) — generate
   // them at creation so warriors carry inherent quirks. Tests/explicit
   // overrides win via the spread below.

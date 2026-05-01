@@ -175,7 +175,7 @@ export function createFreshState(
         tier: 'Common',
         lore: (narrativeContent as NarrativeContent).recruitment.origin[0], // Seeded fallback
         addedWeek: 1,
-        potential: generatePotential(attrs, 'Common', () => rng.next()),
+        potential: generatePotential(attrs, 'Common', rng),
       } as PoolWarrior;
     });
 

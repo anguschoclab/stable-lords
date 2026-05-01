@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { advanceWeek } from '@/engine/pipeline/services/weekPipelineService';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import * as Training from '@/engine/training';
 import * as Economy from '@/engine/economy';
 import * as Aging from '@/engine/aging';

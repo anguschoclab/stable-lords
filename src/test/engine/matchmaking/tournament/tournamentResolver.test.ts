@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { createFreshState } from '@/engine/factories/warriorFactory';
 import { FightingStyle } from '@/types/shared.types';
 import { SeededRNGService } from '@/engine/core/rng/SeededRNGService';
 import { buildTournament } from '@/engine/matchmaking/tournament/tournamentBracketBuilder';
@@ -7,7 +8,8 @@ import {
   resolveRound,
   resolveCompleteTournament,
 } from '@/engine/matchmaking/tournament/tournamentResolver';
-import { makeWarrior } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { resolveImpacts } from '@/engine/impacts';
 import type { TournamentBout } from '@/types/state.types';
 

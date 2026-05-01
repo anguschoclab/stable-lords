@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import Trainers from '@/pages/Trainers';
 import { renderWithGameState } from '../testUtils';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 import type { GameState, Trainer as TrainerData } from '@/types/state.types';
 // Mock the router components
 vi.mock('@tanstack/react-router', () => ({

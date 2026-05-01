@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { respondToBoutOffer } from '@/engine/bout/mutations/contractMutations';
 import { GameState, BoutOffer } from '@/types/state.types';
-import { createFreshState } from '@/engine/factories';
+import { createFreshState } from '@/engine/factories/gameStateFactory';
 
 describe('contractMutations', () => {
   let state: GameState;

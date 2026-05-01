@@ -7,7 +7,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, type GameStore } from '@/state/useGameStore';
-import { makeWarrior } from '@/engine/factories';
+import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { simulateFight, defaultPlanForWarrior } from '@/engine';
 import { generateRivalStables } from '@/engine/rivals';
 import { generateRecruitPool } from '@/engine/recruitment';

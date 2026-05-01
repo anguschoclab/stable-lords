@@ -7,6 +7,8 @@ import {
   getMatchupBonus,
   MAX_EXCHANGES,
   EXCHANGES_PER_MINUTE,
+  WIN_XP,
+  LOSS_XP,
 } from './combat/mechanics/combatConstants';
 import {
   resolveEffectiveTactics,
@@ -37,7 +39,11 @@ import type {
 } from '@/types/combat.types';
 import type { WeatherType, DistanceRange, ArenaZone } from '@/types/shared.types';
 import { getTrainerMods } from './combat/mechanics/simulateHelpers';
-import { getWeatherEffect, weatherOpeningLine } from './combat/mechanics/weatherEffects';
+import {
+  getWeatherEffect,
+  weatherOpeningLine,
+  resolveEffectiveWeather,
+} from './combat/mechanics/weatherEffects';
 import { getArenaById } from '@/data/arenas';
 import type { CrowdMood } from '@/engine/crowdMood';
 
@@ -130,7 +136,7 @@ export function simulateFight(
   planD: FightPlan,
   warriorA?: Warrior,
   warriorD?: Warrior,
-  providedRng?: (() => number) | number,
+  providedRng?: IRNGService | number,
   trainers?: Trainer[],
   weather: WeatherType = 'Clear',
   arenaId: string = 'standard_arena',
@@ -138,20 +144,14 @@ export function simulateFight(
 ): FightOutcome {
   // 1. Deterministic RNG setup
   let rngService: IRNGService;
-  let rng: () => number;
-  if (typeof providedRng === 'function') {
-    rng = providedRng;
-    // Create a wrapper service for functions that need IRNGService
-    rngService = {
-      next: rng,
-      pick: <T>(arr: T[]) => arr[Math.floor(rng() * arr.length)],
-    } as IRNGService;
+  if (providedRng && typeof providedRng === 'object') {
+    rngService = providedRng;
   } else {
     const seed =
       typeof providedRng === 'number' ? providedRng : crypto.getRandomValues(new Uint32Array(1))[0];
     rngService = new SeededRNGService(seed);
-    rng = () => rngService.next();
   }
+  const rng = () => rngService.next();
 
   const nameA = warriorA?.name ?? 'Attacker';
   const nameD = warriorD?.name ?? 'Defender';
@@ -159,9 +159,7 @@ export function simulateFight(
   const weaponD = (warriorD?.equipment ?? DEFAULT_LOADOUT).weapon;
 
   const arena = getArenaById(arenaId);
-  const isIndoor = arena.tags.includes('indoor');
-  // 🌩️ 1.0 Hardening: Weather does not affect indoor arenas mechanically.
-  const effectiveWeather = isIndoor ? 'Clear' : weather;
+  const effectiveWeather = resolveEffectiveWeather(weather, arena.tags);
 
   const fA = createFighterState('A', planA, warriorA, trainers);
   const fD = createFighterState('D', planD, warriorD, trainers);
@@ -433,8 +431,8 @@ export function simulateFight(
     log,
     exchangeLog,
     post: {
-      xpA: winner === 'A' ? 2 : 1,
-      xpD: winner === 'D' ? 2 : 1,
+      xpA: winner === 'A' ? WIN_XP : LOSS_XP,
+      xpD: winner === 'D' ? WIN_XP : LOSS_XP,
       hitsA: fA.hitsLanded,
       hitsD: fD.hitsLanded,
       gotKillA: winner === 'A' && by === 'Kill',
