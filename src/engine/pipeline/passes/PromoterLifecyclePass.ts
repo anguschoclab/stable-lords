@@ -62,18 +62,9 @@ export function runPromoterLifecyclePass(state: GameState, rng?: IRNGService): S
           },
         };
 
-        const retiredIds = new Set<string>();
-        retiredIds.add(id);
-        const successors: Record<string, Promoter> = {};
-        successors[newId] = successor;
-
         // Apply removals safely
-        const filteredPromoters = Object.entries(newPromoters)
-          .filter(([pid]) => !retiredIds.has(pid))
-          .reduce((acc, [pid, pObj]) => ({ ...acc, [pid]: pObj }), {});
-
-        Object.assign(newPromoters, filteredPromoters);
-        Object.assign(newPromoters, successors);
+        delete newPromoters[id];
+        newPromoters[newId] = successor;
 
         // This is a bit complex inside a loop. Better: re-read the file and use a cleaner approach.
         news.push(

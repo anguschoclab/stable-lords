@@ -1,3 +1,3 @@
-## YYYY-MM-DD - [Optimizing array search to constant-time Map lookup]
-**Learning:** In state resolution systems with many linear scans over arrays during tight rendering loops (like historyResolver traversing `roster`, `graveyard`, `retired`, and `rivals`), using `WeakMap` to store precomputed index Maps by reference can avoid massive GC pressure and provide huge speedups without changing function contracts.
-**Action:** Use `WeakMap` keyed against state objects to build and return `Map` caches for fast, reactive queries in React loops. Make sure to adhere perfectly to existing precedence behaviors (e.g. iterate in reverse order so higher-precedence entities overwrite correctly).
+## 2024-05-18 - [Optimizing Object.entries -> map -> sort to inline filtering and loops]
+**Learning:** In hot loops such as AI execution (`daily_oracle.ts`) or `PromoterPass.ts` where arrays need to be processed or scored repeatedly, chaining `Object.entries(data).filter(...).map(...).sort(...)` creates excessive intermediate arrays and objects resulting in GC pressure and significant performance slowdowns over thousands of game ticks.
+**Action:** Replace functional array chaining with inline single-pass `for...of` loops, or caching structures, effectively avoiding array allocations completely.

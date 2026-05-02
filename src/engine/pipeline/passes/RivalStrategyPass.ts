@@ -64,13 +64,14 @@ export function runRivalStrategyPass(
   };
 
   // 🧹 1.6 Hardening: Purge Expired Offers (Prevent state bloat)
-  const activeOffers = Object.entries(boutOffersWithWorld).filter(([_, offer]) => {
-    return !(offer && offer.expirationWeek < nextWeek);
-  });
-  boutOffersWithWorld = Object.fromEntries(activeOffers) as Record<
-    BoutOfferId,
-    (typeof boutOffersWithWorld)[BoutOfferId]
-  >;
+  const newBoutOffersWithWorld: Record<BoutOfferId, (typeof boutOffersWithWorld)[BoutOfferId]> = {} as any;
+  for (const key in boutOffersWithWorld) {
+    const offer = boutOffersWithWorld[key as BoutOfferId];
+    if (offer && offer.expirationWeek >= nextWeek) {
+      newBoutOffersWithWorld[key as BoutOfferId] = offer;
+    }
+  }
+  boutOffersWithWorld = newBoutOffersWithWorld;
 
   if (worldBouts.length > 0) {
     worldBouts.forEach((o) => {
