@@ -150,13 +150,13 @@ export function runPromoterPass(state: GameState, rng?: IRNGService): StateImpac
   const rankings = state.realmRankings || {};
 
   // 0. Garbage Collection: Prune expired or stale bout offers
-  const newOffers: Record<string, any> = {};
+  const newOffers: typeof state.boutOffers = {};
   for (const key in state.boutOffers) {
-    const offer = state.boutOffers[key];
+    const offer = state.boutOffers[key as BoutOfferId];
     const isPast = offer.boutWeek < state.week;
     const isExpired = offer.expirationWeek < state.week && offer.status !== 'Signed';
     if (!isPast && !isExpired) {
-      newOffers[key] = offer;
+      newOffers[key as BoutOfferId] = offer;
     }
   }
 
