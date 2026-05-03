@@ -66,10 +66,11 @@ export function processHallOfFame(
     } else if (woty.w.stableId) {
       const stableId = woty.w.stableId;
       const existingRoster = rivalsUpdates.get(stableId)?.roster || [];
-      const updatedRoster = existingRoster.map((w: Warrior) =>
-        w.id === woty.w.id ? updatedWarrior : w
-      );
-      if (!existingRoster.find((w: Warrior) => w.id === woty.w.id)) {
+      const updatedRoster = [...existingRoster];
+      const index = updatedRoster.findIndex((w: Warrior) => w.id === woty.w.id);
+      if (index !== -1) {
+        updatedRoster[index] = updatedWarrior;
+      } else {
         updatedRoster.push(updatedWarrior);
       }
       rivalsUpdates.set(stableId, { roster: updatedRoster });
@@ -100,8 +101,11 @@ export function processHallOfFame(
       rosterUpdates.set(koty.w.id, updatedWarrior);
     } else if (koty.w.stableId) {
       const existingRoster = rivalsUpdates.get(koty.w.stableId)?.roster || [];
-      const updatedRoster = existingRoster.map((w) => (w.id === koty.w.id ? updatedWarrior : w));
-      if (!existingRoster.find((w) => w.id === koty.w.id)) {
+      const updatedRoster = [...existingRoster];
+      const index = updatedRoster.findIndex((w) => w.id === koty.w.id);
+      if (index !== -1) {
+        updatedRoster[index] = updatedWarrior;
+      } else {
         updatedRoster.push(updatedWarrior);
       }
       rivalsUpdates.set(koty.w.stableId, { roster: updatedRoster });
@@ -136,8 +140,11 @@ export function processHallOfFame(
         rosterUpdates.set(mvp.w.id, updatedWarrior);
       } else if (mvp.w.stableId) {
         const existingRoster = rivalsUpdates.get(mvp.w.stableId)?.roster || [];
-        const updatedRoster = existingRoster.map((w) => (w.id === mvp.w.id ? updatedWarrior : w));
-        if (!existingRoster.find((w) => w.id === mvp.w.id)) {
+        const updatedRoster = [...existingRoster];
+        const index = updatedRoster.findIndex((w) => w.id === mvp.w.id);
+        if (index !== -1) {
+          updatedRoster[index] = updatedWarrior;
+        } else {
           updatedRoster.push(updatedWarrior);
         }
         rivalsUpdates.set(mvp.w.stableId, { roster: updatedRoster });
