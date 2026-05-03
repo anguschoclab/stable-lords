@@ -1,0 +1,6 @@
+⚡ Bolt: Pre-calculate highlight log text classification
+
+💡 What: Changed `HighlightLog.tsx` to memoize the string-parsing classification of the `MinuteEvent` log based on the `log` array instead of `visibleCount`.
+🎯 Why: `visibleCount` changes on every frame tick of the BoutViewer replay loop. Re-running `classify()` via text `.includes()` checks on the entire log array on every tick caused severe O(N^2) jank during playback.
+📊 Impact: Changes performance of highlight curation from O(N) operations per frame tick to O(1) filter per tick (with a single O(N) cost upfront when the log loads). Eliminates significant replay jank.
+🔬 Measurement: Run a long bout in the BoutViewer and observe the frame rate during playback with the "Highlight Reel" visible.

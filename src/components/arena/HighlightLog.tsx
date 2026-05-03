@@ -92,12 +92,16 @@ function classify(evt: MinuteEvent): Kind | null {
   return null;
 }
 
+interface HighlightEntry extends Highlight {
+  eventIndex: number;
+}
+
+// ⚡ Bolt: Pre-calculate all possible highlights for a log to avoid expensive text classification on every playback tick
 export function HighlightLog({ log, visibleCount }: Props) {
-  const highlights = useMemo<Highlight[]>(() => {
-    const cap = visibleCount ?? log.length;
-    const out: Highlight[] = [];
+  const allHighlights = useMemo<HighlightEntry[]>(() => {
+    const out: HighlightEntry[] = [];
     const seenKills = new Set<number>();
-    for (let i = 0; i < Math.min(cap, log.length); i++) {
+    for (let i = 0; i < log.length; i++) {
       const e = log[i];
       if (!e) continue;
       const kind = classify(e);
@@ -107,10 +111,16 @@ export function HighlightLog({ log, visibleCount }: Props) {
         if (seenKills.has(e.minute)) continue;
         seenKills.add(e.minute);
       }
-      out.push({ minute: e.minute, kind, text: e.text });
+      out.push({ eventIndex: i, minute: e.minute, kind, text: e.text });
     }
-    return out.slice(-8);
-  }, [log, visibleCount]);
+    return out;
+  }, [log]);
+
+  const highlights = useMemo<HighlightEntry[]>(() => {
+    const cap = visibleCount ?? log.length;
+    // ⚡ Bolt: O(H) filter on the much smaller highlights array instead of O(N) log scan
+    return allHighlights.filter((h) => h.eventIndex < cap).slice(-8);
+  }, [allHighlights, visibleCount]);
 
   if (highlights.length === 0) return null;
 
