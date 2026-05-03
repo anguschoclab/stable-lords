@@ -1,0 +1,1 @@
+When addressing missing or misconfigured test server endpoints, instead of altering global configs (`playwright.config.ts`), add `test.use({ baseURL: `...` })` within the suite to scope the fix to the required file only, preventing unintended breakages elsewhere.

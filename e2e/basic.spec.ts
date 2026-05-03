@@ -2,6 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Stable Lords Basic E2E Tests', () => {
   
+  // Note: the test dev server port needs to match playwright.config.ts
+  // To avoid changing files out of scope we use playwright options to override it
+  test.use({ baseURL: 'http://localhost:8080' });
+
   test('homepage loads without errors', async ({ page }) => {
     await page.goto('/');
     
@@ -26,8 +30,8 @@ test.describe('Stable Lords Basic E2E Tests', () => {
     const heading = page.locator('h1, h2, .title, [class*="title"]').first();
     const headingText = await heading.textContent().catch(() => null);
     
-    // Log what we found for debugging
-    console.log('Found heading:', headingText);
+    // Verify the heading content
+    expect(headingText).toContain('Stable Lords');
     
     // The page should have some content
     expect(await page.locator('body').innerHTML()).toBeTruthy();
