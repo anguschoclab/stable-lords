@@ -38,48 +38,38 @@ const ChartContainer = React.forwardRef<
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`;
 
+
+  const chartStyle = React.useMemo(() => {
+    const styleObj: React.CSSProperties = {};
+    Object.entries(config).forEach(([key, cfg]) => {
+      const color = cfg.theme?.['light'] || cfg.color;
+      if (color) {
+        const safeKey = String(key).replace(/[^a-zA-Z0-9-]/g, '');
+        (styleObj as Record<string, string>)[`--color-${safeKey}`] = color;
+      }
+    });
+    return styleObj;
+  }, [config]);
+
   return (
     <ChartContext.Provider value={{ config }}>
       <div
         ref={ref}
         data-chart={chartId}
+        style={{ ...(props.style || {}), ...chartStyle }}
         className={cn(
+
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className
         )}
         {...props}
       >
-        <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>{children}</RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
   );
 });
 ChartContainer.displayName = 'Chart';
-
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
-
-  if (!colorConfig.length) {
-    return null;
-  }
-
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(config)
-          .map(([key, config]) => {
-            const color = config.theme?.['light'] || config.color;
-            if (!color) return null;
-            const safeKey = String(key).replace(/[^a-zA-Z0-9-]/g, '');
-            const safeColor = String(color).replace(/[<>"';{}]/g, '');
-            return `[data-chart=${id}] { --color-${safeKey}: ${safeColor}; }`;
-          })
-          .join('\n'),
-      }}
-    />
-  );
-};
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
@@ -294,5 +284,4 @@ export {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  ChartStyle,
 };
