@@ -11,13 +11,7 @@ import type { Warrior, SeasonalGrowth } from '@/types/state.types';
 import { computeGainChance } from '@/engine/training';
 import { potentialRating, potentialGrade, diminishingReturnsFactor } from '@/engine/potential';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dumbbell,
-  AlertTriangle,
-  Star,
-  Target,
-  Activity,
-} from 'lucide-react';
+import { Dumbbell, AlertTriangle, Star, Target, Activity } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Surface } from '@/components/ui/Surface';
 import { cn } from '@/lib/utils';

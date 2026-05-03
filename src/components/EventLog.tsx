@@ -51,8 +51,6 @@ interface GameEvent {
   entityNames?: string[];
 }
 
-
-
 const EVENT_ICONS: Record<EventType, { icon: React.ElementType; color: string }> = {
   fight: { icon: Swords, color: 'text-primary' },
   kill: { icon: Skull, color: 'text-arena-blood' },

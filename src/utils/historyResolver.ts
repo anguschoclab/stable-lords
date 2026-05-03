@@ -17,8 +17,6 @@ export interface NameResolutionState {
   retired: WarriorMinimal[];
 }
 
-
-
 type CachedWarrior = { id: string; name: string } & Record<string, unknown>;
 
 interface WarriorCache {

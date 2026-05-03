@@ -5,15 +5,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useWorldState } from '@/state/useGameStore';
 import { ArenaHistory } from '@/engine/history/arenaHistory';
-import {
-  Terminal,
-  BarChart3,
-  Radio,
-  History,
-  ChevronDown,
-  Sparkles,
-  Scroll,
-} from 'lucide-react';
+import { Terminal, BarChart3, Radio, History, ChevronDown, Sparkles, Scroll } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 

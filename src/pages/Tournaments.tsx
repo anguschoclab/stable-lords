@@ -12,15 +12,7 @@ import { Surface } from '@/components/ui/Surface';
 import { PageFrame } from '@/components/ui/PageFrame';
 import { SectionDivider } from '@/components/ui/SectionDivider';
 import { ImperialRing } from '@/components/ui/ImperialRing';
-import {
-  Trophy,
-  Play,
-  UserPlus,
-  Settings2,
-  Zap,
-  AlertTriangle,
-  Medal,
-} from 'lucide-react';
+import { Trophy, Play, UserPlus, Settings2, Zap, AlertTriangle, Medal } from 'lucide-react';
 import { audioManager } from '@/lib/AudioManager';
 import { engineProxy } from '@/engine/workerProxy';
 import { Link } from '@tanstack/react-router';

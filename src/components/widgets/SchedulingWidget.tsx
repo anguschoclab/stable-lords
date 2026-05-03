@@ -12,12 +12,7 @@ import { Button } from '@/components/ui/button';
 import { SectionDivider } from '@/components/ui/SectionDivider';
 import { ImperialRing } from '@/components/ui/ImperialRing';
 import { Link } from '@tanstack/react-router';
-import {
-  Swords,
-  ExternalLink,
-  TrendingUp,
-  TrendingDown,
-} from 'lucide-react';
+import { Swords, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MatchupCardProps {

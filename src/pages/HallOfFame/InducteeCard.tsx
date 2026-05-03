@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Surface } from '@/components/ui/Surface';
 
-
 /* ── helpers ─────────────────────────────────────────────── */
 
 function bestFight(warrior: Warrior, fights: FightSummary[]): FightSummary | null {

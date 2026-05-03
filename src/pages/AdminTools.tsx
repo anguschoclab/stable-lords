@@ -25,8 +25,18 @@ import { computeNextSeason } from '@/engine/pipeline/passes/WorldPass';
 import type { GameState, RivalStableData } from '@/types/state.types';
 
 export default function AdminTools() {
-  const { setState, doReset, doAdvanceWeek, treasury, fame, week, season, roster, player, ftueComplete } =
-    useGameStore();
+  const {
+    setState,
+    doReset,
+    doAdvanceWeek,
+    treasury,
+    fame,
+    week,
+    season,
+    roster,
+    player,
+    ftueComplete,
+  } = useGameStore();
 
   const [activeCategory, setActiveCategory] = React.useState<
     'SYSTEM' | 'ECONOMY' | 'WORLD' | 'TELEMETRY' | 'PREFERENCES'
@@ -152,7 +162,11 @@ export default function AdminTools() {
             ].map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategory(cat.id as 'SYSTEM' | 'ECONOMY' | 'WORLD' | 'TELEMETRY' | 'PREFERENCES')}
+                onClick={() =>
+                  setActiveCategory(
+                    cat.id as 'SYSTEM' | 'ECONOMY' | 'WORLD' | 'TELEMETRY' | 'PREFERENCES'
+                  )
+                }
                 className={cn(
                   'w-full flex items-center gap-4 px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 group',
                   activeCategory === cat.id
