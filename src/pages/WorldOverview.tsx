@@ -11,7 +11,6 @@ import { ReputationQuadrant } from '@/components/charts/ReputationQuadrant';
 import { getStableTemplates } from '@/engine/rivals';
 import type { Warrior } from '@/types/game';
 
-
 type SortField =
   | 'rank'
   | 'name'

@@ -10,14 +10,7 @@ import { ImperialRing } from '@/components/ui/ImperialRing';
 import { PageFrame } from '@/components/ui/PageFrame';
 import { YearEndRecap } from '@/components/ledger/YearEndRecap';
 import { SeasonSynthesis } from '@/components/ledger/SeasonSynthesis';
-import {
-  CalendarDays,
-  UserPlus,
-  GraduationCap,
-  BookOpen,
-  ArrowRight,
-  History,
-} from 'lucide-react';
+import { CalendarDays, UserPlus, GraduationCap, BookOpen, ArrowRight, History } from 'lucide-react';
 
 export default function Offseason() {
   return (
@@ -114,7 +107,9 @@ export default function Offseason() {
                   <History className="h-3 w-3 text-muted-foreground/40" />
                 </ImperialRing>
                 <div className="text-[10px] text-muted-foreground/60 leading-relaxed uppercase font-black tracking-tight">
-                  <span className="text-foreground">Dormancy Note:</span> The offseason period is the only window for primary personnel restructuring without service disruption. Asset depreciation is frozen during this cycle.
+                  <span className="text-foreground">Dormancy Note:</span> The offseason period is
+                  the only window for primary personnel restructuring without service disruption.
+                  Asset depreciation is frozen during this cycle.
                 </div>
               </div>
             </Surface>
