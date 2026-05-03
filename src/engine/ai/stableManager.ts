@@ -64,16 +64,16 @@ export function processAIStable(
   // FightSummary records the participants' stable identity in `stableIdA`/`stableIdD`
   // (set by createFightSummary). The legacy `stableA`/`stableD` fields are
   // never populated, and the comparison should match the rival's `id` (StableId),
-  // not `owner.id`. Prior bug: weeklyIncome was always 0 for rivals because
-  // both axes of the comparison were wrong, so rival treasuries never reflected
-  // bout earnings and stayed pinned to the 500g subsidy floor.
+  // Some parts of the codebase might still be using the old stable format or
+  // populated the 'owner.id' instead of the stable 'id' for the stable identifier,
+  // so we check both 'updatedRival.id' and 'updatedRival.owner.id' against the FightSummary stable.
   let weeklyIncome = 0;
   const weekFights = state.arenaHistory.filter((f) => f.week === state.week);
   for (const f of weekFights) {
     const stableA = f.stableIdA ?? f.stableA;
     const stableD = f.stableIdD ?? f.stableD;
-    const isOwnerA = updatedRival.id === stableA;
-    const isOwnerD = updatedRival.id === stableD;
+    const isOwnerA = updatedRival.id === stableA || updatedRival.owner.id === stableA;
+    const isOwnerD = updatedRival.id === stableD || updatedRival.owner.id === stableD;
     if (isOwnerA || isOwnerD) {
       weeklyIncome += FIGHT_PURSE;
       if ((isOwnerA && f.winner === 'A') || (isOwnerD && f.winner === 'D')) {
