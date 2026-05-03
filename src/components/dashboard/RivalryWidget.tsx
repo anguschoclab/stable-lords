@@ -29,12 +29,15 @@ function usePlayerRosterNames(state: GameState): Set<string> {
 }
 
 // Custom Hook to map rival warrior names to their stable
-function useRivalWarriorStable(state: GameState): Map<string, string> {
+function useRivalWarriorStable(
+  state: GameState
+): Map<string, { stableName: string; ownerId: string }> {
   return useMemo(() => {
-    const m = new Map<string, string>();
+    const m = new Map<string, { stableName: string; ownerId: string }>();
     for (const r of state.rivals ?? []) {
       if (r.roster) {
-        for (const w of r.roster) m.set(w.name, r.owner.stableName);
+        for (const w of r.roster)
+          m.set(w.name, { stableName: r.owner.stableName, ownerId: r.owner.id });
       }
     }
     return m;
@@ -45,7 +48,7 @@ function useRivalWarriorStable(state: GameState): Map<string, string> {
 function useRivalriesList(
   state: GameState,
   rosterNames: Set<string>,
-  rivalWarriorStable: Map<string, string>
+  rivalWarriorStable: Map<string, { stableName: string; ownerId: string }>
 ): DerivedRivalry[] {
   return useMemo(() => {
     const map = new Map<string, DerivedRivalry>();
@@ -57,14 +60,14 @@ function useRivalriesList(
       if (!aIsPlayer && !dIsPlayer) continue;
 
       const rivalName = aIsPlayer ? bout.d : bout.a;
-      const stable = rivalWarriorStable.get(rivalName);
-      if (!stable) continue;
+      const stableInfo = rivalWarriorStable.get(rivalName);
+      if (!stableInfo) continue;
+      const stable = stableInfo.stableName;
 
       if (!map.has(stable)) {
-        const owner = (state.rivals ?? []).find((r) => r.owner.stableName === stable);
         map.set(stable, {
           stableName: stable,
-          ownerId: owner?.owner.id ?? stable,
+          ownerId: stableInfo.ownerId,
           intensity: 0,
           kills: [],
           bouts: 0,
@@ -107,7 +110,7 @@ function useRivalriesList(
 function useMostWantedRival(
   state: GameState,
   rosterNames: Set<string>,
-  rivalWarriorStable: Map<string, string>
+  rivalWarriorStable: Map<string, { stableName: string; ownerId: string }>
 ) {
   return useMemo(() => {
     const winCounts = new Map<
@@ -124,7 +127,7 @@ function useMostWantedRival(
       if (playerWon || !bout.winner) continue;
 
       const rivalName = aIsPlayer ? bout.d : bout.a;
-      const stable = rivalWarriorStable.get(rivalName) ?? 'Unknown';
+      const stable = rivalWarriorStable.get(rivalName)?.stableName ?? 'Unknown';
       const entry = winCounts.get(rivalName) ?? { name: rivalName, stable, wins: 0, kills: 0 };
       entry.wins++;
       if (bout.by === 'Kill') entry.kills++;
