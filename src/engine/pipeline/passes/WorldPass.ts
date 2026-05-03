@@ -19,7 +19,8 @@ export function rollWeather(rng: IRNGService, season: Season): WeatherType {
   // Summer: Hot, dry, and storm-prone
   if (season === 'Summer') {
     if (roll < 0.3) return 'Clear';
-    if (roll < 0.45) return 'Blazing Sun';
+    if (roll < 0.4) return 'Blazing Sun';
+    if (roll < 0.5) return 'Scorching Wind';
     if (roll < 0.6) return 'Sweltering';
     if (roll < 0.7) return 'Overcast';
     if (roll < 0.8) return 'Thunderstorm';
@@ -48,7 +49,8 @@ export function rollWeather(rng: IRNGService, season: Season): WeatherType {
   // Spring/Fall: Wet, windy, and unpredictable
   if (roll < 0.35) return 'Clear';
   if (roll < 0.5) return 'Overcast';
-  if (roll < 0.65) return 'Rainy';
+  if (roll < 0.6) return 'Rainy';
+  if (roll < 0.65) return 'Mist';
   if (roll < 0.75) return 'Breezy';
   if (roll < 0.8) return 'Dense Fog';
   if (roll < 0.85) return 'Thunderstorm';

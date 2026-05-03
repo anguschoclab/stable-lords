@@ -84,6 +84,14 @@ export function SeasonWidget() {
     WeatherIcon = Wind;
     weatherColor = 'text-arena-gold';
     weatherBg = 'bg-arena-gold/10 border-arena-gold/20';
+  } else if (weather === 'Mist') {
+    WeatherIcon = Cloud;
+    weatherColor = 'text-stone-300';
+    weatherBg = 'bg-stone-300/10 border-stone-300/20';
+  } else if (weather === 'Scorching Wind') {
+    WeatherIcon = Wind;
+    weatherColor = 'text-destructive';
+    weatherBg = 'bg-destructive/10 border-destructive/20';
   }
 
   return (
@@ -220,7 +228,11 @@ export function SeasonWidget() {
                               ? '20% less stamina drain in combat. Fights are slow and methodical.'
                               : weather === 'Rainy'
                                 ? 'Poor visibility and slick ground penalize initiative and attack.'
-                                : 'Standard atmospheric conditions.'}
+                                : weather === 'Scorching Wind'
+                                  ? '30% more stamina drain in combat. Fighters push harder and act rashly.'
+                                  : weather === 'Mist'
+                                    ? 'Reduced visibility makes initial strikes trickier.'
+                                    : 'Standard atmospheric conditions.'}
                 </TooltipContent>
               </Tooltip>
             </div>

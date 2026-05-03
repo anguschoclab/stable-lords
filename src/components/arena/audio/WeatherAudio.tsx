@@ -22,6 +22,14 @@ const WEATHER_AMBIENCE: Record<WeatherType, string | null> = {
   'Blood Moon': 'ambience-blood-moon',
   Eclipse: 'ambience-eclipse',
   Sandstorm: 'ambience-wind-gale',
+  Mist: null,
+  'Scorching Wind': 'ambience-wind-gale',
+  Blizzard: 'ambience-wind-gale',
+  'Dense Fog': null,
+  Thunderstorm: 'ambience-thunderstorm',
+  Ashfall: null,
+  'Acid Rain': 'ambience-acid-rain',
+  'Mana Surge': 'ambience-mana-surge',
 };
 
 export default function WeatherAudio({ weather, volume, enabled, arenaId }: WeatherAudioProps) {

@@ -98,6 +98,13 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
     damageMult: 1.1,
     description: 'Zero visibility — ambush tactics and counters reign supreme.',
   },
+  Mist: {
+    staminaMult: 1.0,
+    initiativeMod: -2,
+    riposteMod: +2,
+    damageMult: 1.0,
+    description: 'A light mist obscures the arena, making initial strikes trickier.',
+  },
   Thunderstorm: {
     staminaMult: 1.2,
     initiativeMod: -2,
@@ -125,6 +132,13 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
     riposteMod: +10,
     damageMult: 1.5,
     description: 'Raw magical energy empowers every strike and movement.',
+  },
+  'Scorching Wind': {
+    staminaMult: 1.3,
+    initiativeMod: +1,
+    riposteMod: -1,
+    damageMult: 1.0,
+    description: 'Hot winds sap stamina and dry the throat, pushing fighters to act rashly.',
   },
 };
 
@@ -171,6 +185,8 @@ export function weatherOpeningLine(weather: WeatherType): string | null {
       return 'A brutal blizzard freezes the arena. Survival is the only goal.';
     case 'Dense Fog':
       return 'A thick mist swallows the fighters. Every shadow is a threat.';
+    case 'Mist':
+      return 'A light mist rolls across the sand, clinging to the fighters.';
     case 'Thunderstorm':
       return 'Thunder shakes the ground while lightning splits the sky.';
     case 'Ashfall':
@@ -179,6 +195,8 @@ export function weatherOpeningLine(weather: WeatherType): string | null {
       return 'Hissing rain burns the skin. This fight will be short and brutal.';
     case 'Mana Surge':
       return 'The air crackles with power. The fighters move with impossible speed.';
+    case 'Scorching Wind':
+      return 'A hot, dry wind sweeps the arena, parching throats and sapping strength.';
     default:
       return null;
   }

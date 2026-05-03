@@ -293,10 +293,12 @@ export type WeatherType =
   | 'Sandstorm'
   | 'Blizzard'
   | 'Dense Fog'
+  | 'Mist'
   | 'Thunderstorm'
   | 'Ashfall'
   | 'Acid Rain'
-  | 'Mana Surge';
+  | 'Mana Surge'
+  | 'Scorching Wind';
 
 export interface DeathEvent {
   boutId: string;
