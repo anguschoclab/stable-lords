@@ -1993,6 +1993,13 @@
         "A peculiar wandering healer arrived and cured {{name}} of an injury! It cost us {{gold}} gold.",
         "A wandering medicine man offered snake oil tonics to the stable. It cost us {{gold}} gold, but at least they tasted interesting."
       ]
+    },
+    "mystic_vision": {
+      "title": "A Mystic Vision",
+      "effectType": "mystic_vision",
+      "newsletter": [
+        "A strange hermit visited the camp. {{name}} experienced a mystic vision, unlocking latent potential! (+{{xp}} XP, +{{fame}} Fame)"
+      ]
     }
   },
   "crowd_reactions": {

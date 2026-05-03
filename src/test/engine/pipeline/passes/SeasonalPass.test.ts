@@ -16,7 +16,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 7.5 / 10; // picks index 7 = black_market_raid
+      if (callCount === 1) return 7.5 / 11; // picks index 7 = black_market_raid
       return originalNext();
     };
     (rng as any).rng.next = mockNext;
@@ -48,7 +48,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 8.5 / 10; // picks index 8 = grand_feast
+      if (callCount === 1) return 8.5 / 11; // picks index 8 = grand_feast
       return originalNext();
     };
     (rng as any).rng.next = mockNext;
@@ -110,7 +110,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 4.5 / 10; // picks index 4 = tavern_brawl
+      if (callCount === 1) return 4.5 / 11; // picks index 4 = tavern_brawl
       return originalNext();
     };
     (rng as any).rng.next = mockNext;
@@ -147,7 +147,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 4.5 / 10; // picks tavern_brawl
+      if (callCount === 1) return 4.5 / 11; // picks tavern_brawl
       return originalNext();
     };
     (rng as any).rng.next = mockNext;
@@ -187,7 +187,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 9.5 / 10; // picks index 9 = wandering_healer
+      if (callCount === 1) return 9.5 / 11; // picks index 9 = wandering_healer
       return originalNext();
     };
     (rng as any).rng.next = mockNext;
@@ -247,7 +247,7 @@ describe('runSeasonalPass', () => {
     let callCount = 0;
     const mockNext = () => {
       callCount++;
-      if (callCount === 1) return 9.5 / 10; // picks index 9 = wandering_healer
+      if (callCount === 1) return 9.5 / 11; // picks index 9 = wandering_healer
       return originalNext();
     };
     (rng as any).rng.next = mockNext;
@@ -281,5 +281,36 @@ describe('runSeasonalPass', () => {
     expect(impact.newsletterItems).toHaveLength(1);
     expect(impact.newsletterItems?.[0]?.title).toBe('A Wandering Healer');
     expect(impact.newsletterItems?.[0]?.items[0]).toContain('snake oil tonics');
+  });
+
+  it('should trigger the mystic_vision offseason event, award xp and fame, and add a newsletter item', () => {
+    const rng = new SeededRNGService(99);
+    const originalNext = (rng as any).rng.next.bind((rng as any).rng);
+    let callCount = 0;
+    const mockNext = () => {
+      callCount++;
+      if (callCount === 1) return 10.5 / 11; // picks index 10 = mystic_vision
+      return originalNext();
+    };
+    (rng as any).rng.next = mockNext;
+
+    const warriorId = 'w-mystic' as WarriorId;
+    const state: Partial<GameState> = {
+      year: 1,
+      roster: [{ id: warriorId, name: 'Grok', status: 'Active', xp: 5, fame: 5 } as any],
+      newsletter: [],
+    };
+
+    const impact = runSeasonalPass(state as GameState, 1, rng);
+
+    // The warrior should have received XP (+15) and Fame (+10)
+    const update = impact.rosterUpdates?.get(warriorId);
+    expect(update).toBeDefined();
+    expect(update?.xp).toBe(20);
+    expect(update?.fame).toBe(15);
+
+    // Newsletter should reference the mystic vision
+    expect(impact.newsletterItems).toHaveLength(1);
+    expect(impact.newsletterItems?.[0]?.title).toBe('A Mystic Vision');
   });
 });

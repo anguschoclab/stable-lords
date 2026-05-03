@@ -36,7 +36,8 @@ interface OffseasonEventNarrative {
     | 'plague_outbreak'
     | 'black_market_raid'
     | 'grand_feast'
-    | 'wandering_healer';
+    | 'wandering_healer'
+    | 'mystic_vision';
   newsletter: string[];
 }
 
@@ -327,6 +328,24 @@ export function runSeasonalPass(
         week: nextWeek,
         title: e.title,
         items: [t(e.newsletter[1] || '', { gold: goldCost })],
+      });
+    }
+  } else if (e.effectType === 'mystic_vision') {
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors);
+      if (!chosen) return {};
+
+      rosterUpdates.set(chosen.id, {
+        xp: (chosen.xp || 0) + 15,
+        fame: (chosen.fame || 0) + 10,
+      });
+
+      newsletterItems.push({
+        id: seasonRng.uuid('newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, xp: 15, fame: 10 })],
       });
     }
   }
