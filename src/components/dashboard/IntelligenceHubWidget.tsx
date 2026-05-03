@@ -172,7 +172,9 @@ export function IntelligenceHubWidget() {
             <TabsContent value="reasoning" className="m-0 h-full">
               <ScrollArea className="h-72 px-6">
                 <div className="py-6">
-                  <AgentReasoningWidget rival={state.rivals?.[0] as import('@/types/state.types').RivalStableData} />
+                  <AgentReasoningWidget
+                    rival={state.rivals?.[0] as import('@/types/state.types').RivalStableData}
+                  />
                 </div>
                 <div className="h-6" />
               </ScrollArea>

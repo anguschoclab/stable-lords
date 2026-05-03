@@ -131,7 +131,8 @@ export function hashStr(s: string): number {
 export function randomShuffle<T>(arr: T[], rng: (() => number) | IRNGService): T[] {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
-    const j = typeof rng === 'function' ? Math.floor(rng() * (i + 1)) : Math.floor(rng.next() * (i + 1));
+    const j =
+      typeof rng === 'function' ? Math.floor(rng() * (i + 1)) : Math.floor(rng.next() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;

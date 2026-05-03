@@ -18,7 +18,7 @@ import {
   Award,
   Target,
 } from 'lucide-react';
-import { } from '@/types/shared.types';
+import {} from '@/types/shared.types';
 import type { Warrior, PromoterPersonality, BoutOffer } from '@/types/state.types';
 import { PERSONALITY_CONFIG } from '@/data/promoterPersonalityConfig';
 import type { InjuryData } from '@/types/warrior.types';
@@ -288,7 +288,9 @@ export default function BookingOffice() {
     );
 
     const filtered = selectedWarriorId
-      ? playerOffers.filter((o) => o.warriorIds.includes(selectedWarriorId as import('@/types/warrior.types').WarriorId))
+      ? playerOffers.filter((o) =>
+          o.warriorIds.includes(selectedWarriorId as import('@/types/warrior.types').WarriorId)
+        )
       : playerOffers;
 
     const bestByPromoter = (offers: BoutOffer[]): BoutOffer[] => {

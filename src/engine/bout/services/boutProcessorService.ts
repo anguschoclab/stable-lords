@@ -262,18 +262,24 @@ export function processWeekBouts(state: GameState): {
   summary: WeekBoutSummary;
 } {
   const warriorMap = state.warriorMap || buildWarriorMap(state);
-  
+
   // 🏟️ Minimum Viable Arena (1.0 Fix)
   // Ensure at least 2 warriors are healthy/active across all stables.
-  const eligibleCount = Array.from(warriorMap.values()).filter(w => isFightReady(w, state.isTournamentWeek)).length;
+  const eligibleCount = Array.from(warriorMap.values()).filter((w) =>
+    isFightReady(w, state.isTournamentWeek)
+  ).length;
   if (eligibleCount < 2) {
     const quietImpact: StateImpact = {
-      newsletterItems: [{
-        id: `quiet-week-${state.week}`,
-        week: state.week,
-        title: 'Arena Gazette',
-        items: ['🏟️ A quiet week in the arena... Not enough able-bodied warriors were fit to fight.']
-      }]
+      newsletterItems: [
+        {
+          id: `quiet-week-${state.week}`,
+          week: state.week,
+          title: 'Arena Gazette',
+          items: [
+            '🏟️ A quiet week in the arena... Not enough able-bodied warriors were fit to fight.',
+          ],
+        },
+      ],
     };
     return { impact: quietImpact, results: [], summary: createWeekBoutSummary() };
   }

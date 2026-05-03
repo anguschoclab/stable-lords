@@ -269,14 +269,19 @@ export default function StableEquipment() {
                           <AlertTriangle className="h-3 w-3" /> Stat Requirement Failed
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {reqCheck.failures.map((f: { stat: string; current: number; required: number }, fi: number) => (
-                            <div
-                              key={fi}
-                              className="text-[9px] font-mono font-black text-destructive/80 uppercase"
-                            >
-                              {`[${f.stat}: ${f.current} < ${f.required}]`}
-                            </div>
-                          ))}
+                          {reqCheck.failures.map(
+                            (
+                              f: { stat: string; current: number; required: number },
+                              fi: number
+                            ) => (
+                              <div
+                                key={fi}
+                                className="text-[9px] font-mono font-black text-destructive/80 uppercase"
+                              >
+                                {`[${f.stat}: ${f.current} < ${f.required}]`}
+                              </div>
+                            )
+                          )}
                         </div>
                       </div>
                     )}

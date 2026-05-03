@@ -1,4 +1,4 @@
-import type { GameState } from '@/types/state.types';
+import type { GameState, TournamentEntry } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
 import { StateImpact } from '@/engine/impacts';
 
@@ -32,11 +32,6 @@ export function modifyWarrior(
       }
       return w;
     });
-    // Two prior bugs: (a) `updatedRoster !== r.roster` was always true since
-    // `.map()` returns a new array, so we wrote a no-op rivalsUpdates entry
-    // for every rival on every call; (b) the key was r.owner.id, but
-    // rivalsUpdates handler indexes by r.id (StableId), so even when the
-    // warrior WAS modified the update silently dropped on the floor.
     if (modified) {
       rivalsUpdates.set(r.id, { roster: updatedRoster });
     }

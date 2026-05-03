@@ -1,6 +1,5 @@
 import type { GameState } from '@/types/state.types';
 
-
 export interface ArchiveService {
   isSupported: () => boolean;
 
