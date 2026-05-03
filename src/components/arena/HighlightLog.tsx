@@ -116,7 +116,7 @@ export function HighlightLog({ log, visibleCount }: Props) {
     return out;
   }, [log]);
 
-  const highlights = useMemo<Highlight[]>(() => {
+  const highlights = useMemo<HighlightEntry[]>(() => {
     const cap = visibleCount ?? log.length;
     // ⚡ Bolt: O(H) filter on the much smaller highlights array instead of O(N) log scan
     return allHighlights.filter((h) => h.eventIndex < cap).slice(-8);
