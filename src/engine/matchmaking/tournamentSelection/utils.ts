@@ -4,18 +4,42 @@ import { SeededRNG } from '@/utils/random';
 import { makeWarrior } from '@/engine/factories/warriorFactory';
 import { aiPlanForWarrior, defaultPlanForWarrior } from '@/engine';
 
+const warriorCache = new WeakMap<GameState, Map<string, Warrior>>();
+
 export function findWarriorById(
   state: GameState,
   warriorId: string,
   tournament?: TournamentEntry
 ): Warrior | undefined {
-  const playerW = state.roster.find((w) => w.id === warriorId);
-  if (playerW) return playerW;
-  for (const r of state.rivals) {
-    const rw = r.roster.find((w) => w.id === warriorId);
-    if (rw) return rw;
+  let map = warriorCache.get(state);
+  if (!map) {
+    map = new Map<string, Warrior>();
+    for (let i = 0; i < state.roster.length; i++) {
+      const w = state.roster[i];
+      map.set(w.id, w);
+    }
+    for (let i = 0; i < state.rivals.length; i++) {
+      const r = state.rivals[i];
+      for (let j = 0; j < r.roster.length; j++) {
+        const w = r.roster[j];
+        map.set(w.id, w);
+      }
+    }
+    warriorCache.set(state, map);
   }
-  return tournament?.participants.find((w) => w.id === warriorId);
+
+  const w = map.get(warriorId);
+  if (w) return w;
+
+  if (tournament) {
+    for (let i = 0; i < tournament.participants.length; i++) {
+      if (tournament.participants[i].id === warriorId) {
+        return tournament.participants[i];
+      }
+    }
+  }
+
+  return undefined;
 }
 
 export function getAIPlan(

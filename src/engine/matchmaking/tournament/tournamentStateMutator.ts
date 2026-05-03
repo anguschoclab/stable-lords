@@ -1,4 +1,4 @@
-import type { GameState } from '@/types/state.types';
+import type { GameState, TournamentEntry } from '@/types/state.types';
 import type { Warrior } from '@/types/warrior.types';
 import { StateImpact } from '@/engine/impacts';
 
@@ -48,6 +48,8 @@ export function modifyWarrior(
   };
 }
 
+const warriorCache = new WeakMap<GameState, Map<string, Warrior>>();
+
 export function findWarriorById(
   state: GameState,
   warriorId: string,
@@ -55,14 +57,29 @@ export function findWarriorById(
 ): Warrior | undefined {
   // Check tournament first if provided
   if (tournament) {
-    const tournamentW = tournament.participants.find((w) => w.id === warriorId);
-    if (tournamentW) return tournamentW;
+    for (let i = 0; i < tournament.participants.length; i++) {
+      if (tournament.participants[i].id === warriorId) {
+        return tournament.participants[i];
+      }
+    }
   }
-  const playerW = state.roster.find((w) => w.id === warriorId);
-  if (playerW) return playerW;
-  for (const r of state.rivals) {
-    const rw = r.roster.find((w) => w.id === warriorId);
-    if (rw) return rw;
+
+  let map = warriorCache.get(state);
+  if (!map) {
+    map = new Map<string, Warrior>();
+    for (let i = 0; i < state.roster.length; i++) {
+      const w = state.roster[i];
+      map.set(w.id, w);
+    }
+    for (let i = 0; i < state.rivals.length; i++) {
+      const r = state.rivals[i];
+      for (let j = 0; j < r.roster.length; j++) {
+        const w = r.roster[j];
+        map.set(w.id, w);
+      }
+    }
+    warriorCache.set(state, map);
   }
-  return undefined;
+
+  return map.get(warriorId);
 }
