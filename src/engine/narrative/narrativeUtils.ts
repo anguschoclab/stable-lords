@@ -43,7 +43,6 @@ export function getWeaponType(weaponId?: string): WeaponType {
   ];
   const bashing = [
     'mace',
-    'war_hammer',
     'morning_star',
     'maul',
     'war_flail',
@@ -51,7 +50,7 @@ export function getWeaponType(weaponId?: string): WeaponType {
     'medium_shield',
     'small_shield',
   ];
-  const piercing = ['epee', 'dagger', 'short_spear', 'long_spear', 'halberd', 'quarterstaff'];
+  const piercing = ['epee', 'dagger', 'short_spear', 'halberd', 'quarterstaff'];
 
   if (slashing.includes(weaponId)) return 'slashing';
   if (bashing.includes(weaponId)) return 'bashing';
