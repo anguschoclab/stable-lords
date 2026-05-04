@@ -40,25 +40,11 @@ describe('Simulation Determinism', () => {
     delete (currentA as any).cachedMetaDrift;
     delete (currentB as any).cachedMetaDrift;
 
-    const strA = JSON.stringify(currentA);
-    const strB = JSON.stringify(currentB);
+    // Use toEqual for deep comparison and clear diffs in Vitest output
+    const objA = JSON.parse(JSON.stringify(currentA));
+    const objB = JSON.parse(JSON.stringify(currentB));
 
-    if (strA !== strB) {
-      // Find the first diff for debugging
-      const objA = JSON.parse(strA);
-      const objB = JSON.parse(strB);
-
-      for (const key in objA) {
-        if (JSON.stringify(objA[key]) !== JSON.stringify(objB[key])) {
-          console.log(`Mismatch in key: ${key}`);
-          console.log(`A: ${JSON.stringify(objA[key]).substring(0, 100)}`);
-          console.log(`B: ${JSON.stringify(objB[key]).substring(0, 100)}`);
-          break;
-        }
-      }
-    }
-
-    expect(strA).toBe(strB);
+    expect(currentA).toEqual(currentB);
   });
 
   it('should remain deterministic even when branching (recreating RNG)', () => {
