@@ -29,7 +29,7 @@ describe('computeReachScore', () => {
 describe('getWeaponPreferredRange', () => {
   // Updated 2026-04: weapon ids must match those in src/data/equipment.ts.
   // Prior tests used `open_hand` and `pike` which were never real weapon ids,
-  // (Fixed: pike -> long_spear to use a valid weapon id)
+  // (Fixed: pike -> short_spear to use a valid weapon id)
   // exposing the underlying weapon-id-mismatch bug that silently disabled the
   // entire range/weapon system.
   it('returns Tight for short_sword', () => {
