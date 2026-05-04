@@ -205,7 +205,6 @@ function RankingsBar() {
 
 // ─── Hero Panel ───────────────────────────────────────────────────────────────
 
-
 // ─── Roster Snapshot Tab ──────────────────────────────────────────────────────
 
 function RosterSnapshot() {

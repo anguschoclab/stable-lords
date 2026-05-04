@@ -172,10 +172,7 @@ function finalizeState(
     }
 
     // Store in state for batch flushing
-    state.deferredBoutLogs = [
-      ...(state.deferredBoutLogs || []),
-      ...pendingArchives,
-    ];
+    state.deferredBoutLogs = [...(state.deferredBoutLogs || []), ...pendingArchives];
     return state;
   }
 

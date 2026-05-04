@@ -91,6 +91,9 @@ export function processContractPayouts(
   return impacts;
 }
 
-export function getDefaultPlan(w: Warrior, defaultPlanForWarrior: (w: Warrior) => import('@/types/combat.types').FightPlan) {
+export function getDefaultPlan(
+  w: Warrior,
+  defaultPlanForWarrior: (w: Warrior) => import('@/types/combat.types').FightPlan
+) {
   return w.plan ?? defaultPlanForWarrior(w);
 }

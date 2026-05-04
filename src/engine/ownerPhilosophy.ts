@@ -25,17 +25,17 @@ export function evolvePhilosophies(
 
   const gazetteItems: string[] = [];
   const recentFights = getRecentFights(state.arenaHistory, state.week - 13);
-  
+
   // 🚀 Performance Optimization (1.0): Pre-calculate stable performance map
   // Complexity reduction from O(Rivals * Fights) to O(Fights + Rivals)
   const performanceMap = new Map<string, { wins: number; total: number }>();
   for (const fight of recentFights) {
     const winnerId = fight.winner === 'A' ? fight.a : fight.d;
     const loserId = fight.winner === 'A' ? fight.d : fight.a;
-    
+
     // We don't have stable IDs in FightSummary, so we use warrior names as keys.
     // This assumes names are unique within a season (which recruitment.ts enforces).
-    [fight.a, fight.d].forEach(name => {
+    [fight.a, fight.d].forEach((name) => {
       const current = performanceMap.get(name) || { wins: 0, total: 0 };
       if (name === winnerId) current.wins++;
       current.total++;
@@ -52,7 +52,7 @@ export function evolvePhilosophies(
     // Aggregate performance for the stable's roster
     let wins = 0;
     let totalFights = 0;
-    rival.roster.forEach(w => {
+    rival.roster.forEach((w) => {
       const stats = performanceMap.get(w.name);
       if (stats) {
         wins += stats.wins;
@@ -86,4 +86,3 @@ export function evolvePhilosophies(
 
   return { updatedRivals, gazetteItems };
 }
-
