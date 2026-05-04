@@ -36,8 +36,8 @@ function useRivalWarriorStable(
     const m = new Map<string, { stableName: string; ownerId: string }>();
     for (const r of state.rivals ?? []) {
       if (r.roster) {
-        for (const w of r.roster)
-          m.set(w.name, { stableName: r.owner.stableName, ownerId: r.owner.id });
+        const info = { stableName: r.owner.stableName, ownerId: r.owner.id };
+        for (const w of r.roster) m.set(w.name, info);
       }
     }
     return m;
