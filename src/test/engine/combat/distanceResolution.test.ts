@@ -76,7 +76,7 @@ describe('contestDistance', () => {
       skills: { INI: 15 },
       activePlan: { OE: 5, rangePreference: 'Extended' },
       recoveryDebt: 0,
-      weaponId: 'long_spear',
+      weaponId: 'short_spear',
     } as any;
     const fD = {
       skills: { INI: 5 },
