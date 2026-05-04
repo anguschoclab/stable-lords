@@ -44,7 +44,7 @@ describe('Simulation Determinism', () => {
     const objA = JSON.parse(JSON.stringify(currentA));
     const objB = JSON.parse(JSON.stringify(currentB));
 
-    expect(objA).toEqual(objB);
+    expect(currentA).toEqual(currentB);
   });
 
   it('should remain deterministic even when branching (recreating RNG)', () => {
