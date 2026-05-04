@@ -69,7 +69,7 @@ export function handleProgressions(
   // Favorites discovery — also for both fighters (was player-only)
   const discRng = rng;
   for (const w of [wA, wD]) {
-    const disc = checkDiscovery(w, () => discRng?.next() ?? 0.5);
+    const disc = checkDiscovery(w, discRng ?? { next: () => 0.5, uuid: () => 'uuid' });
     if (disc.updated) {
       routeUpdate(s, w, { favorites: w.favorites }, rosterUpdates, rivalsUpdates);
       if (disc.hints.length > 0) {
