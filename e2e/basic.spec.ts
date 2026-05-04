@@ -30,7 +30,7 @@ test.describe('Stable Lords Basic E2E Tests', () => {
     const headingText = await heading.textContent().catch(() => null);
     
     // Verify the heading content
-    expect(headingText).toContain('Stable Lords');
+    await expect(heading).toContainText('Stable Lords');
     
     // The page should have some content
     expect(await page.locator('body').innerHTML()).toBeTruthy();
