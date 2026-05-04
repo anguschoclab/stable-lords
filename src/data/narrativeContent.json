@@ -2000,6 +2000,13 @@
       "newsletter": [
         "A strange hermit visited the camp. {{name}} experienced a mystic vision, unlocking latent potential! (+{{xp}} XP, +{{fame}} Fame)"
       ]
+    },
+    "wild_animal_attack": {
+      "title": "Wild Beast Encounter",
+      "effectType": "wild_animal_attack",
+      "newsletter": [
+        "A wild beast wandered into the camp! {{name}} fended it off, gaining some fame (+{{fame}}) but taking a nasty bite in the process."
+      ]
     }
   },
   "crowd_reactions": {

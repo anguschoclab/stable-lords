@@ -255,6 +255,24 @@ function WeatherOverlay({ weather }: { weather: string }) {
     );
   }
 
+  // 🌫️ Mist
+  if (weatherLower === 'mist') {
+    return (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute inset-0 animate-fog-drift"
+          style={{
+            background:
+              'radial-gradient(ellipse at 50% 80%, rgba(200,200,200,0.05) 0%, rgba(150,150,150,0.3) 100%)',
+            filter: 'blur(20px)',
+            width: '120%',
+            left: '-10%',
+          }}
+        />
+      </div>
+    );
+  }
+
   // 🌡️ Heat shimmer
   if (weatherLower.includes('blazing') || weatherLower.includes('sweltering')) {
     return (
@@ -269,8 +287,8 @@ function WeatherOverlay({ weather }: { weather: string }) {
   }
 
   // 🌬️ Wind / Gale effect
-  if (weatherLower.includes('gale') || weatherLower.includes('breezy')) {
-    const isGale = weatherLower.includes('gale');
+  if (weatherLower.includes('gale') || weatherLower.includes('breezy') || weatherLower.includes('scorching wind')) {
+    const isGale = weatherLower.includes('gale') || weatherLower.includes('scorching wind');
     return (
       <div className="absolute inset-0 pointer-events-none">
         {Array.from({ length: isGale ? 40 : 15 }).map((_, i) => (

@@ -46,6 +46,8 @@ export function weatherStaminaModifier(weather?: string): number {
   switch (weather) {
     case 'Blazing Sun':
       return 1.3; // 30% more stamina drain
+    case 'Scorching Wind':
+      return 1.3; // 30% more stamina drain
     case 'Sweltering':
       return 1.2; // 20% more stamina drain
     case 'Blood Moon':

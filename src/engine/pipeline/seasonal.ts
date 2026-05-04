@@ -37,7 +37,8 @@ interface OffseasonEventNarrative {
     | 'black_market_raid'
     | 'grand_feast'
     | 'wandering_healer'
-    | 'mystic_vision';
+    | 'mystic_vision'
+    | 'wild_animal_attack';
   newsletter: string[];
 }
 
@@ -346,6 +347,38 @@ export function runSeasonalPass(
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, xp: 15, fame: 10 })],
+      });
+    }
+  } else if (e.effectType === 'wild_animal_attack') {
+    const activeWarriors = state.roster.filter(
+      (w) => w.status === 'Active' && (!w.injuries || w.injuries.length === 0)
+    );
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors);
+      if (!chosen) return {};
+      const fameGained = 5 + Math.floor(seasonRng.next() * 6); // 5-10 fame
+
+      const newInjury: InjuryData = {
+        id: seasonRng.uuid('injury') as InjuryId,
+        name: 'Bite Wound',
+        description: 'A nasty bite from a wild beast.',
+        severity: 'Minor',
+        weeksRemaining: 1 + Math.floor(seasonRng.next() * 2), // 1-2 weeks
+        penalties: { CN: -1 },
+      };
+
+      const currentInjuries = chosen.injuries || [];
+
+      rosterUpdates.set(chosen.id, {
+        fame: (chosen.fame || 0) + fameGained,
+        injuries: [...currentInjuries, newInjury],
+      });
+
+      newsletterItems.push({
+        id: seasonRng.uuid('newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],
       });
     }
   }
