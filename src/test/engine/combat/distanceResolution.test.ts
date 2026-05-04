@@ -35,9 +35,6 @@ describe('getWeaponPreferredRange', () => {
   it('returns Tight for short_sword', () => {
     expect(getWeaponPreferredRange('short_sword')).toBe('Tight');
   });
-  it('returns Extended for long_spear', () => {
-    expect(getWeaponPreferredRange('long_spear')).toBe('Extended');
-  });
   it('returns Extended for halberd', () => {
     expect(getWeaponPreferredRange('halberd')).toBe('Extended');
   });

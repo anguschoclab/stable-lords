@@ -20,7 +20,6 @@ const WEAPON_PREFERRED_RANGE: Record<string, DistanceRange> = {
   longsword: 'Striking',
   scimitar: 'Striking',
   battle_axe: 'Striking',
-  war_hammer: 'Striking',
   morning_star: 'Striking',
   war_flail: 'Striking',
   epee: 'Striking',
@@ -29,7 +28,6 @@ const WEAPON_PREFERRED_RANGE: Record<string, DistanceRange> = {
   greatsword: 'Extended',
   great_axe: 'Extended',
   short_spear: 'Extended',
-  long_spear: 'Extended',
   maul: 'Extended',
   quarterstaff: 'Extended',
 };
@@ -62,14 +60,12 @@ const WEAPON_RANGE_MODIFIERS: Record<string, Partial<Record<DistanceRange, numbe
   longsword: { Grapple: -4, Tight: -1, Striking: 0, Extended: +2 },
   scimitar: { Grapple: -2, Tight: -1, Striking: 0, Extended: -1 },
   battle_axe: { Grapple: -5, Tight: -2, Striking: 0, Extended: +1 },
-  war_hammer: { Grapple: -4, Tight: -1, Striking: 0, Extended: 0 },
   morning_star: { Grapple: -3, Tight: -1, Striking: 0, Extended: +1 },
   war_flail: { Grapple: -2, Tight: 0, Striking: 0, Extended: +2 },
   epee: { Grapple: -2, Tight: 0, Striking: +1, Extended: 0 },
 
   // ── Extended-preferred (polearms / two-handers) ──────────────────────────
   short_spear: { Grapple: -4, Tight: -2, Striking: 0, Extended: +3 },
-  long_spear: { Grapple: -8, Tight: -5, Striking: -1, Extended: +5 },
   halberd: { Grapple: -7, Tight: -4, Striking: 0, Extended: +4 },
   greatsword: { Grapple: -6, Tight: -3, Striking: 0, Extended: +3 },
   great_axe: { Grapple: -6, Tight: -3, Striking: 0, Extended: +3 },
