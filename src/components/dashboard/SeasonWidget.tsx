@@ -92,6 +92,10 @@ export function SeasonWidget() {
     WeatherIcon = Wind;
     weatherColor = 'text-destructive';
     weatherBg = 'bg-destructive/10 border-destructive/20';
+  } else if (weather === 'Abyssal Gloom') {
+    WeatherIcon = Moon;
+    weatherColor = 'text-arena-fame';
+    weatherBg = 'bg-arena-fame/10 border-arena-fame/20';
   }
 
   return (
@@ -232,7 +236,9 @@ export function SeasonWidget() {
                                   ? '30% more stamina drain in combat. Fighters push harder and act rashly.'
                                   : weather === 'Mist'
                                     ? 'Reduced visibility makes initial strikes trickier.'
-                                    : 'Standard atmospheric conditions.'}
+                                    : weather === 'Abyssal Gloom'
+                                      ? 'A supernatural darkness dulls the senses. Attacks and initiative suffer.'
+                                      : 'Standard atmospheric conditions.'}
                 </TooltipContent>
               </Tooltip>
             </div>

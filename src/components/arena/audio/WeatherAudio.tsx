@@ -30,6 +30,7 @@ const WEATHER_AMBIENCE: Record<WeatherType, string | null> = {
   Ashfall: null,
   'Acid Rain': 'ambience-acid-rain',
   'Mana Surge': 'ambience-mana-surge',
+  'Abyssal Gloom': 'ambience-eclipse',
 };
 
 export default function WeatherAudio({ weather, volume, enabled, arenaId }: WeatherAudioProps) {
