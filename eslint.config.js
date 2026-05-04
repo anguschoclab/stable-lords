@@ -93,7 +93,7 @@ export default tseslint.config(
   },
   {
     /* SCRATCH/SCRIPTS: Utility/debug files - allow non-null assertions */
-    files: ["scratch/**/*.{ts,tsx}", "scripts/**/*.{ts,tsx}", "*.ts"],
+    files: ["scratch/**/*.{ts,tsx}", "scripts/**/*.{ts,tsx}", "src/scripts/**/*.{ts,tsx}", "*.ts"],
     rules: { "@typescript-eslint/no-non-null-assertion": "off" },
   }
 );
