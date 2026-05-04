@@ -2,8 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Stable Lords Basic E2E Tests', () => {
   
-  // Note: the test dev server port needs to match playwright.config.ts
-  // To avoid changing files out of scope we use playwright options to override it
+  // Override the global baseURL to match the Vite dev server port (8080)
   test.use({ baseURL: 'http://localhost:8080' });
 
   test('homepage loads without errors', async ({ page }) => {
