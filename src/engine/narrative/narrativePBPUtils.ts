@@ -30,19 +30,21 @@ export function interpolateTemplate(template: string, ctx: CombatContext): strin
     .replace(/%BP/g, ctx.bodyPart || 'body')
     .replace(/%H/g, String(ctx.hits || ''));
 
-  // Also support Handlebars-style placeholders
-  for (const [key, value] of Object.entries(ctx)) {
-    if (value !== undefined) {
-      result = result.replace(new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g'), String(value));
-    }
-  }
+  if (!result.includes('{{')) return result;
 
-  // Fallbacks for specific templates that use {{name}} but only pass attacker/defender
-  if (ctx.attacker && !ctx.name) {
-    result = result.replace(/\{\{\s*name\s*\}\}/g, String(ctx.attacker));
-  } else if (ctx.name && !ctx.attacker) {
-    result = result.replace(/\{\{\s*attacker\s*\}\}/g, String(ctx.name));
-  }
+  // Also support Handlebars-style placeholders with optimized regex replacement
+  result = result.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
+    // Fallbacks for specific templates that use {{name}} but only pass attacker/defender
+    if (key === 'name' && !ctx.name && ctx.attacker) {
+      return String(ctx.attacker);
+    }
+    if (key === 'attacker' && !ctx.attacker && ctx.name) {
+      return String(ctx.name);
+    }
+
+    const val = ctx[key as keyof CombatContext];
+    return val !== undefined ? String(val) : match;
+  });
 
   return result;
 }
