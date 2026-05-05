@@ -37,9 +37,11 @@ export function t(
       ? rng.pick(template)
       : template[Math.floor(new SeededRNGService(Date.now()).next() * template.length)] || ''
     : template;
-  if (!result) return '';
-  for (const [key, value] of Object.entries(data)) {
-    result = result.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
-  }
-  return result;
+
+  if (!result || typeof result !== 'string' || !result.includes('{{')) return result || '';
+
+  return result.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
+    const val = data[key];
+    return val !== undefined ? String(val) : match;
+  });
 }
