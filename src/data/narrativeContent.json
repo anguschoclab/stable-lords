@@ -2007,6 +2007,13 @@
       "newsletter": [
         "A wild beast wandered into the camp! {{name}} fended it off, gaining some fame (+{{fame}}) but taking a nasty bite in the process."
       ]
+    },
+    "loyal_stray": {
+      "title": "A Loyal Stray",
+      "effectType": "loyal_stray",
+      "newsletter": [
+        "A scruffy stray dog wandered into the training grounds and immediately bonded with {{name}}. The mood in the camp has lifted considerably! (+10 XP, +5 Fame, -25 Gold for treats)"
+      ]
     }
   },
   "crowd_reactions": {

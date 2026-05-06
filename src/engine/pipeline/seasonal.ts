@@ -38,7 +38,8 @@ interface OffseasonEventNarrative {
     | 'grand_feast'
     | 'wandering_healer'
     | 'mystic_vision'
-    | 'wild_animal_attack';
+    | 'wild_animal_attack'
+    | 'loyal_stray';
   newsletter: string[];
 }
 
@@ -379,6 +380,41 @@ export function runSeasonalPass(
         week: nextWeek,
         title: e.title,
         items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name, fame: fameGained })],
+      });
+    }
+  } else if (e.effectType === 'loyal_stray') {
+    const goldCost = 25;
+    treasuryDelta -= goldCost;
+    ledgerEntries.push({
+      id: seasonRng.uuid('ledger') as LedgerEntryId,
+      week: nextWeek,
+      label: 'Dog Food & Treats',
+      amount: -goldCost,
+      category: 'other',
+    });
+
+    const activeWarriors = state.roster.filter((w) => w.status === 'Active');
+    if (activeWarriors.length > 0) {
+      const chosen = seasonRng.pick(activeWarriors);
+      if (chosen) {
+        rosterUpdates.set(chosen.id, {
+          xp: (chosen.xp || 0) + 10,
+          fame: (chosen.fame || 0) + 5,
+        });
+
+        newsletterItems.push({
+          id: seasonRng.uuid('newsletter'),
+          week: nextWeek,
+          title: e.title,
+          items: [t(seasonRng.pick(e.newsletter) || '', { name: chosen.name })],
+        });
+      }
+    } else {
+      newsletterItems.push({
+        id: seasonRng.uuid('newsletter'),
+        week: nextWeek,
+        title: e.title,
+        items: [t(seasonRng.pick(e.newsletter) || '', { name: 'Someone' })],
       });
     }
   }
