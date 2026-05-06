@@ -145,7 +145,7 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
     initiativeMod: -4,
     riposteMod: +2,
     damageMult: 0.9,
-    description: 'A supernatural darkness thickens the air, dulling the senses.',
+    description: 'A supernatural darkness thickens the air, making movements sluggish and predictable.',
   },
 };
 
