@@ -31,11 +31,10 @@ export function interpolateTemplate(template: string, ctx: CombatContext): strin
     .replace(/%H/g, String(ctx.hits || ''));
 
   // Also support Handlebars-style placeholders
-  for (const [key, value] of Object.entries(ctx)) {
-    if (value !== undefined) {
-      result = result.replace(new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g'), String(value));
-    }
-  }
+  result = result.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
+    const value = (ctx as any)[key];
+    return value !== undefined ? String(value) : match;
+  });
 
   // Fallbacks for specific templates that use {{name}} but only pass attacker/defender
   if (ctx.attacker && !ctx.name) {

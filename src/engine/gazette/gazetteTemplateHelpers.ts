@@ -38,8 +38,8 @@ export function t(
       : template[Math.floor(new SeededRNGService(Date.now()).next() * template.length)] || ''
     : template;
   if (!result) return '';
-  for (const [key, value] of Object.entries(data)) {
-    result = result.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
-  }
-  return result;
+  return result.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
+    const value = data[key];
+    return value !== undefined ? String(value) : match;
+  });
 }
