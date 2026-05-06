@@ -205,7 +205,7 @@ export function weatherOpeningLine(weather: WeatherType): string | null {
     case 'Scorching Wind':
       return 'A hot, dry wind sweeps the arena, parching throats and sapping strength.';
     case 'Abyssal Gloom':
-      return 'A supernatural darkness thickens the air, dulling the senses.';
+      return 'A supernatural darkness thickens the air, making movements sluggish and predictable.';
     default:
       return null;
   }
