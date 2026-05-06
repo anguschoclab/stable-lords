@@ -140,6 +140,13 @@ const WEATHER_EFFECTS: Record<WeatherType, WeatherEffect> = {
     damageMult: 1.0,
     description: 'Hot winds sap stamina and dry the throat, pushing fighters to act rashly.',
   },
+  'Abyssal Gloom': {
+    staminaMult: 1.1,
+    initiativeMod: -4,
+    riposteMod: +2,
+    damageMult: 0.9,
+    description: 'A supernatural darkness thickens the air, making movements sluggish and predictable.',
+  },
 };
 
 /**
@@ -197,6 +204,8 @@ export function weatherOpeningLine(weather: WeatherType): string | null {
       return 'The air crackles with power. The fighters move with impossible speed.';
     case 'Scorching Wind':
       return 'A hot, dry wind sweeps the arena, parching throats and sapping strength.';
+    case 'Abyssal Gloom':
+      return 'A supernatural darkness thickens the air, making movements sluggish and predictable.';
     default:
       return null;
   }

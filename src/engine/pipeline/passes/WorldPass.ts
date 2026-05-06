@@ -41,6 +41,7 @@ export function rollWeather(rng: IRNGService, season: Season): WeatherType {
     if (roll < 0.85) return 'Dense Fog';
     if (roll < 0.92) return 'Gale';
     if (roll < 0.96) return 'Breezy';
+    if (roll < 0.98) return 'Abyssal Gloom';
     if (roll < 0.995) return 'Blood Moon'; // Includes 0.99
     if (roll < 0.998) return 'Eclipse';
     return 'Mana Surge';
@@ -56,6 +57,7 @@ export function rollWeather(rng: IRNGService, season: Season): WeatherType {
   if (roll < 0.85) return 'Thunderstorm';
   if (roll < 0.9) return 'Acid Rain';
   if (roll < 0.94) return 'Gale';
+  if (roll < 0.98) return 'Abyssal Gloom';
   if (roll < 0.995) return 'Blood Moon'; // Includes 0.99
   if (roll < 0.998) return 'Eclipse';
   return 'Mana Surge';
