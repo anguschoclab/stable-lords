@@ -33,7 +33,7 @@ export function interpolateTemplate(template: string, ctx: CombatContext): strin
   // Also support Handlebars-style placeholders
   result = result.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
     const value = (ctx as any)[key];
-    return value !== undefined ? String(value) : match;
+    return (value !== undefined && Object.hasOwn(ctx, key)) ? String(value) : match;
   });
 
   // Fallbacks for specific templates that use {{name}} but only pass attacker/defender
