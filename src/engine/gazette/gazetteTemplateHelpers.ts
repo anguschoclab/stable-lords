@@ -40,6 +40,6 @@ export function t(
   if (!result) return '';
   return result.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
     const value = data[key];
-    return value !== undefined ? String(value) : match;
+    return (value !== undefined && Object.hasOwn(data, key)) ? String(value) : match;
   });
 }
