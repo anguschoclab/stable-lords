@@ -13,7 +13,7 @@ import type { EventNarrative } from '@/types/narrative.types';
 function t(template: string, data: Record<string, string | number>): string {
   return template.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
     const value = data[key];
-    return value !== undefined ? String(value) : match;
+    return (value !== undefined && Object.hasOwn(data, key)) ? String(value) : match;
   });
 }
 
