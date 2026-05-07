@@ -11,11 +11,10 @@ import type { EventNarrative } from '@/types/narrative.types';
  * Stable Lords — Random Event Pipeline Pass
  */
 function t(template: string, data: Record<string, string | number>): string {
-  let result = template;
-  for (const [key, value] of Object.entries(data)) {
-    result = result.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
-  }
-  return result;
+  return template.replace(/\{\{\s*([^{}\s]+)\s*\}\}/g, (match, key) => {
+    const value = data[key];
+    return (value !== undefined && Object.hasOwn(data, key)) ? String(value) : match;
+  });
 }
 
 export function runEventPass(
