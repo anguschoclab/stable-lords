@@ -2012,7 +2012,7 @@
       "title": "A Loyal Stray",
       "effectType": "loyal_stray",
       "newsletter": [
-        "A scruffy stray dog wandered into the training grounds and immediately bonded with {{name}}. The mood in the camp has lifted considerably! (+10 XP, +5 Fame, -25 Gold for treats)"
+"A scruffy stray dog wandered into the training grounds and immediately bonded with {{name}}. The mood in the camp has lifted considerably! (+{{xp}} XP, +{{fame}} Fame, -{{gold}} Gold for treats)"
       ]
     }
   },
